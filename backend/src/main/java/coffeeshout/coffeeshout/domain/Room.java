@@ -40,11 +40,12 @@ public class Room {
         players.add(joinPlayer);
     }
 
-    public void addMiniGame(MiniGame miniGame) {
-        state(miniGames.size() < 5, "미니게임은 5개 이하여야 합니다.");
-
-        miniGames.add(miniGame);
+    public void setMiniGame(List<MiniGame> miniGames) {
+        state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
+        this.miniGames = miniGames;
     }
+
+    // TODO: 플레이어가 방에서 나가는 로직 필요
 
     public boolean hasNoMiniGames() {
         return miniGames.isEmpty();

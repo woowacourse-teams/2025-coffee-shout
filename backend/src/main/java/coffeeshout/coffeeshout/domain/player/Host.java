@@ -7,7 +7,7 @@ import coffeeshout.coffeeshout.domain.Room;
 
 public class Host extends Player {
 
-    public Host(final Long id, final String name, final Menu menu, final Room room) {
+    public Host(Long id, String name, Menu menu, Room room) {
         super(id, name, menu, room);
     }
 

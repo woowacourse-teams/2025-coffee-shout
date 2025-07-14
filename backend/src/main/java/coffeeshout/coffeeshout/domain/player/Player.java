@@ -13,7 +13,7 @@ public abstract class Player {
 
     protected Room room;
 
-    public Player(final Long id, final String name, final Menu menu, final Room room) {
+    public Player(Long id, String name, Menu menu, Room room) {
         this.id = id;
         this.name = name;
         this.menu = menu;

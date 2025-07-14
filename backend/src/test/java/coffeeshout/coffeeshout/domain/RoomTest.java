@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import coffeeshout.coffeeshout.domain.player.Guest;
 import coffeeshout.coffeeshout.domain.player.Host;
 import coffeeshout.coffeeshout.domain.player.Player;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class RoomTest {
@@ -50,7 +51,7 @@ class RoomTest {
         // given
         room.joinPlayer(new Guest(null, "hans1", menu, room));
         room.joinPlayer(new Guest(null, "hans3", menu, room));
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
 
         // when
         host.playMiniGame();
@@ -69,7 +70,7 @@ class RoomTest {
     @Test
     void 미니게임이_있으면_false를_반환한다() {
         // given
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
 
         // when & then
         assertThat(room.hasNoMiniGames()).isFalse();
@@ -93,19 +94,21 @@ class RoomTest {
 
     @Test
     void 미니게임은_5개_이하여야_한다_초과할_경우_예외_발생() {
-        // given
-        for (int i = 0; i < 5; ++i) {
-            room.addMiniGame(new MiniGame());
-        }
         // when & then
-        assertThatThrownBy(() -> room.addMiniGame(new MiniGame()))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> room.setMiniGame(List.of(
+                new MiniGame(),
+                new MiniGame(),
+                new MiniGame(),
+                new MiniGame(),
+                new MiniGame(),
+                new MiniGame()
+        ))).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void 미니게임을_추가한다() {
         // when
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
 
         // then
         assertThat(room.getMiniGames().size()).isEqualTo(1);

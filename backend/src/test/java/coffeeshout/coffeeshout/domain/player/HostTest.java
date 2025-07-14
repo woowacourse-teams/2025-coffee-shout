@@ -7,6 +7,7 @@ import coffeeshout.coffeeshout.domain.Menu;
 import coffeeshout.coffeeshout.domain.MiniGame;
 import coffeeshout.coffeeshout.domain.Room;
 import coffeeshout.coffeeshout.domain.Roulette;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class HostTest {
@@ -40,7 +41,7 @@ class HostTest {
         // given
         room.joinPlayer(host);
         room.joinPlayer(new Guest(3L, "p2", menu, room));
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
 
         // when
         host.playMiniGame();
@@ -54,7 +55,7 @@ class HostTest {
         // given
         room.joinPlayer(host);
         room.joinPlayer(new Guest(3L, "p2", menu, room));
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
 
         // when & then
         assertThatThrownBy(() -> host.playRoulette())
@@ -66,7 +67,7 @@ class HostTest {
         // given
         room.joinPlayer(host);
         room.joinPlayer(new Guest(3L, "p2", menu, room));
-        room.addMiniGame(new MiniGame());
+        room.setMiniGame(List.of(new MiniGame()));
         room.setPlaying();
 
         // when & then
