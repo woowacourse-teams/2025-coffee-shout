@@ -13,6 +13,7 @@ class RoomTest {
         // when
         Room room = new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 List.of(new MiniGame())
         );
@@ -26,6 +27,7 @@ class RoomTest {
         // when & then
         assertThatThrownBy(() -> new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 Collections.emptyList()
         )).isInstanceOf(IllegalArgumentException.class);
@@ -36,6 +38,7 @@ class RoomTest {
         // given
         Room room = new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 List.of(new MiniGame())
         );
@@ -49,6 +52,7 @@ class RoomTest {
         // given
         Room room = new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 List.of(new MiniGame())
         );
@@ -62,6 +66,7 @@ class RoomTest {
         // given
         Room room = new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 List.of(new MiniGame())
         );
@@ -75,12 +80,30 @@ class RoomTest {
         // given
         Room room = new Room(
                 new JoinCode("ABCSD"),
+                new Player(),
                 new Roulette(),
                 List.of(new MiniGame())
         );
 
         // when & then
         assertThatThrownBy(room::playRoulette).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 플레이어가_방에_입장한다() {
+        // given
+        Room room = new Room(
+                new JoinCode("ABCSD"),
+                new Player(),
+                new Roulette(),
+                List.of(new MiniGame())
+        );
+
+        // when
+        room.joinPlayer(new Player());
+
+        // then
+        assertThat(room.getPlayers().size()).isEqualTo(1);
     }
 
 
