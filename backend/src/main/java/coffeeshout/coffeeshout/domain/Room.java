@@ -1,5 +1,9 @@
 package coffeeshout.coffeeshout.domain;
 
+import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.state;
+
+import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -17,57 +21,55 @@ public class Room {
 
     private Roulette roulette;
 
-    private List<MiniGame> miniGames;
+    private List<MiniGame> miniGames = new ArrayList<>();
 
     private RoomState roomState;
 
-    public static final int MAXIMUM_PLAYER_COUNT = 9;
-    public static final int MINIMUM_PLAYER_COUNT = 2;
+    public static final int MAXIMUM_GUEST_COUNT = 9;
+    public static final int MINIMUM_GUEST_COUNT = 2;
 
-    Room(JoinCode joinCode, Player host, Roulette roulette, List<MiniGame> miniGames) {
-        validate(miniGames);
+    public Room(JoinCode joinCode, Roulette roulette) {
         this.joinCode = joinCode;
         this.roulette = roulette;
-        this.host = host;
         this.roomState = RoomState.READY;
     }
 
-    public void playMiniGame() {
-        validateMinimumPlayer();
-        // TODO: 미니게임 실행시키기
-    }
-
-    public void playRoulette() {
-        validateMinimumPlayer();
-        if (roomState != RoomState.PLAYING) {
-            throw new IllegalStateException("게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        }
-        // TODO: 룰렛 실행시키기
+    public void changeHost(Player host) {
+        this.host = host;
     }
 
     public void joinPlayer(Player joinPlayer) {
-        if (totalPlayerCount() == MAXIMUM_PLAYER_COUNT) {
-            throw new IllegalArgumentException("게임은 최대 9명까지 참여할 수 있습니다.");
-        }
-        if (players.stream().anyMatch(player -> player.isSameName(joinPlayer))) {
-            throw new IllegalArgumentException("이미 존재하는 플레이어 이름입니다.");
-        }
+        isTrue(players.size() < MAXIMUM_GUEST_COUNT, "게임은 최대 9명까지 참여할 수 있습니다.");
+        isTrue(players.stream().noneMatch(player -> player.isSameName(joinPlayer)), "이미 존재하는 플레이어 이름입니다.");
+        isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
+        // TODO: 룰렛 확률 조정
         players.add(joinPlayer);
     }
 
-    private void validate(List<MiniGame> miniGames) {
-        if (miniGames.isEmpty()) {
-            throw new IllegalArgumentException("미니게임은 한 개 이상이어야 합니다.");
-        }
+    public void setMiniGame(List<MiniGame> miniGames) {
+        state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
+        this.miniGames = miniGames;
     }
 
-    private void validateMinimumPlayer() {
-        if (totalPlayerCount() < MINIMUM_PLAYER_COUNT) {
-            throw new IllegalStateException("게임을 시작 하려면 플레이어가 2명 이상이어야 합니다.");
-        }
+    // TODO: 플레이어가 방에서 나가는 로직 필요
+
+    public boolean hasNoMiniGames() {
+        return miniGames.isEmpty();
     }
 
-    private Integer totalPlayerCount() {
-        return players.size() + 1;
+    public boolean isInPlayingState() {
+        return roomState == RoomState.PLAYING;
+    }
+
+    public boolean hasEnoughPlayers() {
+        return players.size() >= MINIMUM_GUEST_COUNT && players.size() <= MAXIMUM_GUEST_COUNT;
+    }
+
+    public void setPlaying() {
+        roomState = RoomState.PLAYING;
+    }
+
+    public boolean isHost(Player player) {
+        return host.equals(player);
     }
 }
