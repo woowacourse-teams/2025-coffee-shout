@@ -28,13 +28,8 @@ public class Roulette {
     }
 
     private void validate(List<Player> players, int round) {
-        if (players.size() <= MINIMUM_PLAYER_COUNT) {
-            throw new IllegalArgumentException("플레이어 인원 수는 2명 이상이여야 합니다.");
-        }
-
-        if (round <= 0) {
-            throw new IllegalArgumentException("라운드 수는 양수여야 합니다.");
-        }
+        Assert.state(players.size() > MINIMUM_PLAYER_COUNT, "플레이어 인원 수는 2명 이상이여야 합니다.");
+        Assert.state(round > 0, "라운드 수는 양수여야 합니다.");
     }
 
     private int getOptimalDelta(List<Player> players, int round) {
