@@ -116,4 +116,12 @@ export default [
   },
  
   ...storybook.configs['flat/recommended'],
+  {
+    files: ['jest.config.js', 'cypress.config.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ];

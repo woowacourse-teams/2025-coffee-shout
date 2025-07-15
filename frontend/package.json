@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "똥손도 즐기는 커피빵 전쟁 ☕️",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "webpack serve --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
