@@ -1,13 +1,22 @@
 const color = {
   point: {
+<<<<<<< HEAD
     50: '#FEF2F2',
     100: '#FFE1E1', 
     200: '#FFC8C9',
     300: '#FF8789',
     400: '#FD6C6E',
     500: '#F53E41',
+=======
+    1: '#FEF2F2',
+    2: '#FFE1E1',
+    3: '#FFC8C9',
+    4: '#FF8789',
+    5: '#FD6C6E',
+    6: '#F53E41',
+>>>>>>> 5f8016a9770cb38b16bb56cc977503477fa28651
   },
-  
+
   gray: {
     50: '#F9FAFB',
     100: '#F3F4F6',
@@ -21,50 +30,53 @@ const color = {
     900: '#101828',
     950: '#030712',
   },
-  
+
   white: '#FFFFFF',
   black: '#000000',
 } as const;
 
- const typography = {
+const typography = {
   h1: {
     fontSize: '30px',
-    fontWeight: 700, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 700,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h2: {
     fontSize: '24px',
-    fontWeight: 600, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 600,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h3: {
     fontSize: '20px',
-    fontWeight: 600, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 600,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h4: {
     fontSize: '16px',
-    fontWeight: 600, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 600,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
-  
+
   paragraph: {
     fontSize: '16px',
-    fontWeight: 500, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 500,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
-  
+
   small: {
     fontSize: '14px',
-    fontWeight: 400, 
-    fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    fontWeight: 400,
+    fontFamily:
+      "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
 } as const;
-
 
 export const theme = {
   color,
   typography,
 } as const;
-
-
