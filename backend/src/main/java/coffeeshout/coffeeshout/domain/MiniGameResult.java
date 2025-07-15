@@ -6,7 +6,7 @@ import org.springframework.util.Assert;
 
 public class MiniGameResult {
 
-    private Map<Integer, Player> ranks;
+    private final Map<Integer, Player> ranks;
 
     public MiniGameResult(Map<Integer, Player> ranks) {
         this.ranks = ranks;
@@ -19,6 +19,7 @@ public class MiniGameResult {
                 .orElseThrow(() -> new IllegalStateException("값이 존재해야 합니다."));
     }
 
+    // TODO 동점 순위 생각해야 함
     public double getAverageRank() {
         return (double) (ranks.size() + 1) / 2;
     }
