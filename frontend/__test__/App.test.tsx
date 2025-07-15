@@ -7,4 +7,4 @@ describe('App', () => {
     // App 컴포넌트가 렌더링되는지 확인
     expect(screen.getByText('Hello, World!')).toBeInTheDocument();
   });
-}); 
+});
