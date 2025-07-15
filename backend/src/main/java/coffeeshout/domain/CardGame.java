@@ -11,12 +11,12 @@ import lombok.Getter;
 public class CardGame implements Playable {
 
     private final Map<Player, List<Card>> playerCards;
-    private final List<Card> cards;
-    private final Integer round;
+    private List<Card> cards;
+    private CardGameRound round;
 
     public CardGame(List<Player> players) {
         this.playerCards = initPlayerCards(players);
-        this.round = 1;
+        this.round = CardGameRound.ONE;
         this.cards = CardGameDeck.spreadCards();
     }
 
@@ -25,12 +25,12 @@ public class CardGame implements Playable {
 
     }
 
-    private Map<Player, List<Card>> initPlayerCards(List<Player> players) {
-        Map<Player, List<Card>> playerCards = new HashMap<>();
-        for (Player player : players) {
-            playerCards.put(player, new ArrayList<>());
-        }
-        return playerCards;
+    public void nextRound() {
+        this.round = round.next();
+    }
+
+    public void shuffle() {
+        this.cards = CardGameDeck.spreadCards();
     }
 
     public void selectCard(Player player, Integer cardPosition) {
@@ -45,6 +45,39 @@ public class CardGame implements Playable {
         }
 
         return scores;
+    }
+
+    public Player findCardHolder(Card card, Integer round) {
+        for (Entry<Player, List<Card>> playerCardsEntry : playerCards.entrySet()) {
+            if (playerCardsEntry.getValue().get(round).equals(card)) {
+                return playerCardsEntry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public Boolean isFirstRoundFinished() {
+        Boolean allSelected = true;
+
+        for (List<Card> cards : playerCards.values()) {
+            if (cards.size() != 1) {
+                return false;
+            }
+        }
+
+        return allSelected;
+    }
+
+    public Boolean isSecondRoundFinished() {
+        Boolean allSelected = true;
+
+        for (List<Card> cards : playerCards.values()) {
+            if (cards.size() != 2) {
+                return false;
+            }
+        }
+
+        return allSelected;
     }
 
     private Integer sumCards(List<Card> cards) {
@@ -63,24 +96,11 @@ public class CardGame implements Playable {
         return sum;
     }
 
-    public Player findCardHolder(Card card, Integer round) {
-        for (Entry<Player, List<Card>> playerCardsEntry : playerCards.entrySet()) {
-            if (playerCardsEntry.getValue().get(round).equals(card)) {
-                return playerCardsEntry.getKey();
-            }
+    private Map<Player, List<Card>> initPlayerCards(List<Player> players) {
+        Map<Player, List<Card>> playerCards = new HashMap<>();
+        for (Player player : players) {
+            playerCards.put(player, new ArrayList<>());
         }
-        return null;
-    }
-
-    public Boolean allSelected() {
-        Boolean allSelected = true;
-
-        for (List<Card> cards : playerCards.values()) {
-            if (cards.size() != 1) {
-                return false;
-            }
-        }
-
-        return allSelected;
+        return playerCards;
     }
 }

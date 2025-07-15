@@ -37,6 +37,8 @@ public class CardGameController {
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 
         sendGameState(cardGame, message.roomId());
+
+        cardGameService.checkRound(message.roomId());
     }
 
 
@@ -46,10 +48,10 @@ public class CardGameController {
 
         GameStateMessage stateMessage = new GameStateMessage(
                 roomId,
-                cardGame.getRound(),
+                cardGame.getRound().getValue(),
                 playerSelections,
                 scores,
-                cardGame.allSelected()
+                cardGame.isFirstRoundFinished()
         );
 
         messagingTemplate.convertAndSend("/topic/gameState/" + roomId, stateMessage);
@@ -60,7 +62,7 @@ public class CardGameController {
         cardGame.getCards()
                 .forEach(card -> playerSelections.put(
                         CardDto.from(card),
-                        cardGame.findCardHolder(card, cardGame.getRound()).getId()
+                        cardGame.findCardHolder(card, cardGame.getRound().getValue()).getId()
                 ));
 
         return playerSelections;
@@ -72,6 +74,6 @@ public class CardGameController {
         cardGame.calculateScores()
                 .forEach((player, score) -> scores.put(player.getId(), score));
 
-        return null;
+        return scores;
     }
 }
