@@ -43,8 +43,9 @@ public class Roulette {
         double center = miniGameResult.getCenterRank();
         int maxLevel = (int) Math.floor((getPlayerCount() - 1) / 2.0);
 
-        for (int rank = 1; rank <= miniGameResult.getLastRank(); rank++) {
-            Player player = miniGameResult.getPlayer(rank);
+        for(Player player : playerWeights.keySet()){
+            int rank = miniGameResult.getRank(player);
+
             int sign = Double.compare(rank, center);
             int level = getLevel(rank, center);
             double diffWeight = delta / Math.pow(2, (double) maxLevel - level);

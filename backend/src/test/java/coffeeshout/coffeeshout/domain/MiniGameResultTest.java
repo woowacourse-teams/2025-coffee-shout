@@ -17,11 +17,11 @@ class MiniGameResultTest {
     void 마지막_랭크를_탐색한다() {
         // given
         final MiniGameResult miniGameResult = new MiniGameResult(
-                Map.of(1, player1, 2, player2, 3, player3, 4, player4)
+                Map.of(player1, 1, player2, 2, player3, 3, player4, 4)
         );
 
         // when
-        int result = miniGameResult.getLastRank();
+        final int result = miniGameResult.getLastRank();
 
         // then
         assertThat(result).isEqualTo(4);
@@ -31,11 +31,11 @@ class MiniGameResultTest {
     void 중간_순위를_가져온다() {
         // given
         final MiniGameResult miniGameResult = new MiniGameResult(
-                Map.of(1, player1, 2, player2, 3, player3, 4, player4)
+                Map.of(player1, 1, player2, 2, player3, 3, player4, 4)
         );
 
         // when
-        double averageRank = miniGameResult.getCenterRank();
+        final double averageRank = miniGameResult.getCenterRank();
 
         // then
         assertThat(averageRank).isEqualTo(2.5);

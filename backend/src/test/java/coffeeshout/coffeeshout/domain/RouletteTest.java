@@ -43,7 +43,7 @@ class RouletteTest {
         final Roulette roulette = new Roulette(players, round);
 
         final MiniGameResult miniGameResult = new MiniGameResult(
-                Map.of(1, player1, 2, player2, 3, player3, 4, player4)
+                Map.of(player1, 1, player2, 2, player3, 3, player4, 4)
         );
 
         // when

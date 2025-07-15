@@ -1,32 +1,39 @@
 package coffeeshout.coffeeshout.domain;
 
 import coffeeshout.coffeeshout.domain.player.Player;
+import java.util.List;
 import java.util.Map;
 import org.springframework.util.Assert;
 
 public class MiniGameResult {
 
-    private final Map<Integer, Player> ranks;
+    private final Map<Player, Integer> ranks;
 
-    public MiniGameResult(Map<Integer, Player> ranks) {
+    public MiniGameResult(Map<Player, Integer> ranks) {
         this.ranks = ranks;
     }
 
     public int getLastRank() {
-        return ranks.keySet()
+        return ranks.values()
                 .stream()
                 .max(Integer::compareTo)
                 .orElseThrow(() -> new IllegalStateException("값이 존재해야 합니다."));
     }
 
-    // TODO 동점 순위 생각해야 함
     public double getCenterRank() {
-        return (double) (getLastRank() + 1) / 2;
+        List<Integer> sortedRanks = ranks.values().stream().sorted().toList();
+        int size = sortedRanks.size();
+        int midIdx = size / 2;
+        if (size % 2 == 1) {
+            return sortedRanks.get(midIdx);
+        }
+
+        return (sortedRanks.get(midIdx - 1) + sortedRanks.get(midIdx)) / 2.0;
     }
 
-    public Player getPlayer(int rank) {
-        Assert.state(ranks.containsKey(rank), "존재하지 않는 rank입니다. rank=" + rank);
+    public int getRank(Player player) {
+        Assert.state(ranks.containsKey(player), "존재하지 않는 player입니다. player=" + player);
 
-        return ranks.get(rank);
+        return ranks.get(player);
     }
 }
