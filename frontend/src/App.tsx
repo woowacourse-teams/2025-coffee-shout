@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import { ThemeProvider } from "@emotion/react";
 import { theme } from "./styles/theme";
-=======
-import { ThemeProvider } from '@emotion/react';
-import { theme } from './styles/theme';
->>>>>>> 5f8016a9770cb38b16bb56cc977503477fa28651
 
 const App = () => {
   return (
@@ -17,9 +12,3 @@ const App = () => {
 };
 
 export default App;
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 5f8016a9770cb38b16bb56cc977503477fa28651
