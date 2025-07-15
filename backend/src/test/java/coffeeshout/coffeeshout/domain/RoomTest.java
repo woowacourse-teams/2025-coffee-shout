@@ -35,7 +35,7 @@ class RoomTest {
     void 중복된_이름으로_참가하면_예외가_발생한다() {
         // given
         room.joinPlayer(host);
-        Player duplicate = new Player(null, "hans", menu, room);
+        final Player duplicate = new Player(null, "hans", menu, room);
 
         // when & then
         assertThatThrownBy(() -> room.joinPlayer(duplicate))
