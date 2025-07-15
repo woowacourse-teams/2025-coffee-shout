@@ -1,11 +1,11 @@
-const colors = {
+const color = {
   point: {
-    1: '#FEF2F2',
-    2: '#FFE1E1', 
-    3: '#FFC8C9',
-    4: '#FF8789',
-    5: '#FD6C6E',
-    6: '#F53E41',
+    50: '#FEF2F2',
+    100: '#FFE1E1', 
+    200: '#FFC8C9',
+    300: '#FF8789',
+    400: '#FD6C6E',
+    500: '#F53E41',
   },
   
   gray: {
@@ -63,7 +63,7 @@ const colors = {
 
 
 export const theme = {
-  colors,
+  color,
   typography,
 } as const;
 
