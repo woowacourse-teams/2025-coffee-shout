@@ -1,7 +1,10 @@
-package coffeeshout.coffeeshout.domain;
+package coffeeshout.coffeeshout.domain.roulette;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.coffeeshout.domain.Menu;
+import coffeeshout.coffeeshout.domain.MiniGameResult;
 import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ class RouletteTest {
         final List<Player> players = List.of(player1);
         final int round = 1;
 
-        assertThatThrownBy(() -> new Roulette(players, round))
+        assertThatThrownBy(() -> new Roulette(players, round, new JavaRandomGenerator()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -31,7 +34,7 @@ class RouletteTest {
         final List<Player> players = List.of(player1, player2);
         final int round = 0;
 
-        assertThatThrownBy(() -> new Roulette(players, round))
+        assertThatThrownBy(() -> new Roulette(players, round, new JavaRandomGenerator()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -40,7 +43,7 @@ class RouletteTest {
         // given
         final List<Player> players = List.of(player1, player2, player3, player4);
         final int round = 3;
-        final Roulette roulette = new Roulette(players, round);
+        final Roulette roulette = new Roulette(players, round, new JavaRandomGenerator());
 
         final MiniGameResult miniGameResult = new MiniGameResult(
                 Map.of(player1, 1, player2, 2, player3, 3, player4, 4)
@@ -58,5 +61,18 @@ class RouletteTest {
             softly.assertThat(probabilities).containsEntry(player3, 29.0);
             softly.assertThat(probabilities).containsEntry(player4, 33.0);
         });
+    }
+
+    @Test
+    void 당첨자를_뽑는다() {
+        // given
+        final List<Player> players = List.of(player1, player2, player3, player4);
+        final int round = 1;
+        final Roulette roulette = new Roulette(players, round, new FixedRandomGenerator());
+
+        // when
+        Player result = roulette.spin();
+
+        assertThat(result).isEqualTo(player4);
     }
 }
