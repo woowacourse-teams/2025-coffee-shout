@@ -1,5 +1,6 @@
 package coffeeshout.coffeeshout.domain;
 
+import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.Map;
 import org.springframework.util.Assert;
 
