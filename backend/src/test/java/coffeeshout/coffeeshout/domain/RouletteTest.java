@@ -1,20 +1,20 @@
 package coffeeshout.coffeeshout.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 class RouletteTest {
 
     private final Menu menu = new Menu();
-    private final Player player1 = new Player(null, "꾹", menu, null);
-    private final Player player2 = new Player(null, "한스", menu, null);
-    private final Player player3 = new Player(null, "민수", menu, null);
-    private final Player player4 = new Player(null, "지훈", menu, null);
+    private final Player player1 = new Player(1L, "꾹", menu, null);
+    private final Player player2 = new Player(2L, "한스", menu, null);
+    private final Player player3 = new Player(3L, "민수", menu, null);
+    private final Player player4 = new Player(4L, "지훈", menu, null);
 
     @Test
     void 플레이어_인원_수는_2명_이상이여야_한다() {
@@ -39,7 +39,7 @@ class RouletteTest {
     void 미니게임_결과에_따라_확률이_조정된다() {
         // given
         final List<Player> players = List.of(player1, player2, player3, player4);
-        final int round = 1;
+        final int round = 3;
         final Roulette roulette = new Roulette(players, round);
 
         final MiniGameResult miniGameResult = new MiniGameResult(
@@ -51,11 +51,12 @@ class RouletteTest {
 
         // when & then
         final Map<Player, Double> probabilities = roulette.getPlayerProbabilities();
-        assertThat(probabilities.get(player1)).isEqualTo(17.0);
-        assertThat(probabilities.get(player2)).isEqualTo(21.0);
-        assertThat(probabilities.get(player3)).isEqualTo(29.0);
-        assertThat(probabilities.get(player4)).isEqualTo(33.0);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(probabilities).containsEntry(player1, 17.0);
+            softly.assertThat(probabilities).containsEntry(player2, 21.0);
+            softly.assertThat(probabilities).containsEntry(player3, 29.0);
+            softly.assertThat(probabilities).containsEntry(player4, 33.0);
+        });
     }
-
-
 }

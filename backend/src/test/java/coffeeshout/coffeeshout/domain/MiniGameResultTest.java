@@ -35,10 +35,9 @@ class MiniGameResultTest {
         );
 
         // when
-        double averageRank = miniGameResult.getAverageRank();
+        double averageRank = miniGameResult.getCenterRank();
 
         // then
         assertThat(averageRank).isEqualTo(2.5);
     }
-
 }

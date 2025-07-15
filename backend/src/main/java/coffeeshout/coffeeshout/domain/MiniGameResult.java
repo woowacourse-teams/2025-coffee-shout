@@ -20,12 +20,12 @@ public class MiniGameResult {
     }
 
     // TODO 동점 순위 생각해야 함
-    public double getAverageRank() {
-        return (double) (ranks.size() + 1) / 2;
+    public double getCenterRank() {
+        return (double) (getLastRank() + 1) / 2;
     }
 
     public Player getPlayer(int rank) {
-        Assert.state(!ranks.containsKey(rank), "존재하지 않는 rank입니다. rank=" + rank);
+        Assert.state(ranks.containsKey(rank), "존재하지 않는 rank입니다. rank=" + rank);
 
         return ranks.get(rank);
     }

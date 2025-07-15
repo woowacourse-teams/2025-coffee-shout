@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 import org.springframework.util.Assert;
 
-@Getter
 public class Roulette {
 
     private static final int MINIMUM_PLAYER_COUNT = 2;
-    private static final int TOTAL_WEIGHT = 10000;
+    private static final int INITIAL_TOTAL_WEIGHT = 10000;
     private static final int GAME_INFLUENCE_CONSTANT = 9600;
 
     private final Map<Player, Integer> playerWeights = new LinkedHashMap<>();
@@ -22,7 +20,7 @@ public class Roulette {
     public Roulette(List<Player> players, int round) {
         validate(players, round);
         for (Player player : players) {
-            this.playerWeights.put(player, TOTAL_WEIGHT / players.size());
+            this.playerWeights.put(player, INITIAL_TOTAL_WEIGHT / players.size());
         }
         this.delta = getOptimalDelta(players, round);
     }
@@ -42,16 +40,30 @@ public class Roulette {
     }
 
     public void adjustWeight(MiniGameResult miniGameResult) {
+        double center = miniGameResult.getCenterRank();
+        int maxLevel = (int) Math.floor((getPlayerCount() - 1) / 2.0);
+
         for (int rank = 1; rank <= miniGameResult.getLastRank(); rank++) {
             Player player = miniGameResult.getPlayer(rank);
-            int weight = getWeight(player);
-            int diffWeight = (int) (rank - miniGameResult.getAverageRank()) * delta;
-            playerWeights.put(player, weight + diffWeight);
+            int sign = Double.compare(rank, center);
+            int level = getLevel(rank, center);
+            double diffWeight = delta / Math.pow(2, (double) maxLevel - level);
+            int finalDiff = sign * (int) Math.round(diffWeight);
+
+            playerWeights.put(player, getWeight(player) + finalDiff);
         }
     }
 
+    private int getLevel(int rank, double center) {
+        if (getPlayerCount() % 2 == 0) {
+            return (int) (Math.abs(rank - center) - 0.5);
+        }
+
+        return (int) Math.abs(rank - center);
+    }
+
     private int getWeight(Player player) {
-        Assert.state(!playerWeights.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
+        Assert.state(playerWeights.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
 
         return playerWeights.get(player);
     }
@@ -61,10 +73,21 @@ public class Roulette {
         List<Player> players = new ArrayList<>(playerWeights.keySet());
 
         for (Player player : players) {
-            double rawPercentage = (double) playerWeights.get(player) / TOTAL_WEIGHT * 100.0;
+            double rawPercentage = (double) getWeight(player) / getTotalWeight() * 100.0;
             double roundedPercentage = Math.round(rawPercentage * 100.0) / 100.0;
             probabilities.put(player, roundedPercentage);
         }
         return probabilities;
+    }
+
+    private int getPlayerCount() {
+        return playerWeights.size();
+    }
+
+    private int getTotalWeight() {
+        return playerWeights.values()
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 }
