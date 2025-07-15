@@ -9,10 +9,10 @@ import static org.assertj.core.api.Assertions.*;
 
 class RoulettePlayServiceTest {
 
-    private RoulettePlayService service = new RoulettePlayService();
-    private Room room = new Room(new JoinCode("XYZ123"), new Roulette());
-    private Player host = new Player(1L, "host", new Menu(), room);
-    private Player guest = new Player(2L, "guest", new Menu(), room);
+    private final RoulettePlayService service = new RoulettePlayService();
+    private final Room room = new Room(new JoinCode("XYZ123"), new Roulette());
+    private final Player host = new Player(1L, "host", new Menu(), room);
+    private final Player guest = new Player(2L, "guest", new Menu(), room);
 
     @BeforeEach
     void setUp() {

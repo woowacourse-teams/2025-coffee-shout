@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 
 class RoomTest {
 
-    private Menu menu = new Menu();
-    private Room room = new Room(new JoinCode("ABC345"), new Roulette());
-    private MiniGamePlayService miniGamePlayService = new MiniGamePlayService();
-    private Player host = new Player(null, "hans", menu, room);
+    private final Menu menu = new Menu();
+    private final Room room = new Room(new JoinCode("ABC345"), new Roulette());
+    private final MiniGamePlayService miniGamePlayService = new MiniGamePlayService();
+    private final Player host = new Player(null, "hans", menu, room);
 
     @BeforeEach
     void setUp() {
@@ -33,7 +33,7 @@ class RoomTest {
     void 중복된_이름으로_참가하면_예외가_발생한다() {
         // given
         room.joinPlayer(host);
-        Player duplicate = new Player(null, "hans", menu, room);
+        final Player duplicate = new Player(null, "hans", menu, room);
 
         // when & then
         assertThatThrownBy(() -> room.joinPlayer(duplicate))

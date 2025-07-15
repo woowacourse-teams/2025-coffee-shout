@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class MiniGamePlayServiceTest {
+class MiniGamePlayServiceTest {
 
-    private MiniGamePlayService service = new MiniGamePlayService();;
-    private Room room = new Room(new JoinCode("AAAAAA"), new Roulette());;
-    private Player host = new Player(1L, "host", new Menu(), room);;
-    private Player guest = new Player(2L, "guest", new Menu(), room);;
+    private final MiniGamePlayService service = new MiniGamePlayService();;
+    private final Room room = new Room(new JoinCode("AAAAAA"), new Roulette());;
+    private final Player host = new Player(1L, "host", new Menu(), room);;
+    private final Player guest = new Player(2L, "guest", new Menu(), room);;
 
     @BeforeEach
     void setUp() {
