@@ -99,16 +99,19 @@ export default [
   },
   // Cypress override
   {
-    files: ['cypress/**/*.cy.[jt]s?(x)'],
+    files: ['**/*.cy.{js,ts,jsx,tsx}'],
     languageOptions: {
       globals: {
         ...globals.cypress,
         ...globals.node,
         ...globals.browser,
+        describe: 'readonly',
+        it: 'readonly',
+        cy: 'readonly',
       },
     },
     plugins: {
-      cypress,
+      cypress
     },
     rules: {
       ...cypress.configs.recommended.rules,
