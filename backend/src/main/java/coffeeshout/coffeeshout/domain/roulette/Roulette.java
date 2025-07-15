@@ -1,5 +1,6 @@
-package coffeeshout.coffeeshout.domain;
+package coffeeshout.coffeeshout.domain.roulette;
 
+import coffeeshout.coffeeshout.domain.MiniGameResult;
 import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -14,15 +15,16 @@ public class Roulette {
     private static final int GAME_INFLUENCE_CONSTANT = 9600;
 
     private final Map<Player, Integer> playerWeights = new LinkedHashMap<>();
-
+    private final RandomGenerator randomGenerator;
     private final int delta;
 
-    public Roulette(List<Player> players, int round) {
+    public Roulette(List<Player> players, int round, RandomGenerator randomGenerator) {
         validate(players, round);
         for (Player player : players) {
             this.playerWeights.put(player, INITIAL_TOTAL_WEIGHT / players.size());
         }
         this.delta = getOptimalDelta(players, round);
+        this.randomGenerator = randomGenerator;
     }
 
     private void validate(List<Player> players, int round) {
@@ -43,7 +45,7 @@ public class Roulette {
         double center = miniGameResult.getCenterRank();
         int maxLevel = (int) Math.floor((getPlayerCount() - 1) / 2.0);
 
-        for(Player player : playerWeights.keySet()){
+        for (Player player : playerWeights.keySet()) {
             int rank = miniGameResult.getRank(player);
 
             int sign = Double.compare(rank, center);
@@ -51,8 +53,15 @@ public class Roulette {
             double diffWeight = delta / Math.pow(2, (double) maxLevel - level);
             int finalDiff = sign * (int) Math.round(diffWeight);
 
-            playerWeights.put(player, getWeight(player) + finalDiff);
+            changePlayerWeight(player, finalDiff);
         }
+    }
+
+    private void changePlayerWeight(Player player, int finalDiff) {
+        int newWeight = getWeight(player) + finalDiff;
+        Assert.state(newWeight >= 0 && newWeight <= INITIAL_TOTAL_WEIGHT, "확률은 0보다 작거나, 100을 초과할 수 없습니다.");
+
+        playerWeights.put(player, newWeight);
     }
 
     private int getLevel(int rank, double center) {
@@ -63,10 +72,21 @@ public class Roulette {
         return (int) Math.abs(rank - center);
     }
 
-    private int getWeight(Player player) {
-        Assert.state(playerWeights.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
+    public Player spin() {
+        int randomNumber = randomGenerator.nextInt(getTotalWeight());
 
-        return playerWeights.get(player);
+        for (Map.Entry<Player, Integer> entry : playerWeights.entrySet()) {
+            Player player = entry.getKey();
+            int weight = entry.getValue();
+
+            randomNumber -= weight;
+
+            if (randomNumber < 0) {
+                return player;
+            }
+        }
+
+        throw new IllegalStateException("잘못된 당첨 번호입니다. randomNumber = " + randomNumber);
     }
 
     public Map<Player, Double> getPlayerProbabilities() {
@@ -79,6 +99,12 @@ public class Roulette {
             probabilities.put(player, roundedPercentage);
         }
         return probabilities;
+    }
+
+    private int getWeight(Player player) {
+        Assert.state(playerWeights.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
+
+        return playerWeights.get(player);
     }
 
     private int getPlayerCount() {
