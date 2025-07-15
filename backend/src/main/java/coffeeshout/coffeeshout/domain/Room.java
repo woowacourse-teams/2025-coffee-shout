@@ -15,6 +15,8 @@ public class Room {
 
     private JoinCode joinCode;
 
+    private Player host;
+
     private List<Player> players = new ArrayList<>();
 
     private Roulette roulette;
@@ -30,6 +32,10 @@ public class Room {
         this.joinCode = joinCode;
         this.roulette = roulette;
         this.roomState = RoomState.READY;
+    }
+
+    public void changeHost(Player host) {
+        this.host = host;
     }
 
     public void joinPlayer(Player joinPlayer) {
@@ -61,5 +67,9 @@ public class Room {
 
     public void setPlaying() {
         roomState = RoomState.PLAYING;
+    }
+
+    public boolean isHost(Player player) {
+        return host.equals(player);
     }
 }

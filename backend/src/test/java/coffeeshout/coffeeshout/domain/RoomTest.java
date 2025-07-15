@@ -2,17 +2,23 @@ package coffeeshout.coffeeshout.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import coffeeshout.coffeeshout.domain.player.Guest;
-import coffeeshout.coffeeshout.domain.player.Host;
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.service.MiniGamePlayService;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RoomTest {
 
     private Menu menu = new Menu();
     private Room room = new Room(new JoinCode("ABC345"), new Roulette());
-    private Host host = new Host(null, "hans", menu, room);
+    private MiniGamePlayService miniGamePlayService = new MiniGamePlayService();
+    private Player host = new Player(null, "hans", menu, room);
+
+    @BeforeEach
+    void setUp() {
+        room.changeHost(host);
+    }
 
     @Test
     void 플레이어가_정상적으로_참가할_수_있다() {
@@ -27,7 +33,7 @@ class RoomTest {
     void 중복된_이름으로_참가하면_예외가_발생한다() {
         // given
         room.joinPlayer(host);
-        Player duplicate = new Guest(null, "hans", menu, room);
+        Player duplicate = new Player(null, "hans", menu, room);
 
         // when & then
         assertThatThrownBy(() -> room.joinPlayer(duplicate))
@@ -38,26 +44,25 @@ class RoomTest {
     void 최대_인원을_초과하면_예외가_발생한다() {
         // given
         for (int i = 0; i < Room.MAXIMUM_GUEST_COUNT; i++) {
-            room.joinPlayer(new Guest(null, "p" + i, menu, room));
+            room.joinPlayer(new Player(null, "p" + i, menu, room));
         }
 
         // when & then
-        assertThatThrownBy(() -> room.joinPlayer(new Guest(null, "overflow", menu, room)))
+        assertThatThrownBy(() -> room.joinPlayer(new Player(null, "overflow", menu, room)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void READY_상태가_아니면_참가할_수_없다() {
         // given
-        room.joinPlayer(new Guest(null, "hans1", menu, room));
-        room.joinPlayer(new Guest(null, "hans3", menu, room));
+        room.joinPlayer(new Player(null, "hans1", menu, room));
+        room.joinPlayer(new Player(null, "hans3", menu, room));
         room.setMiniGame(List.of(new MiniGame()));
 
-        // when
-        host.playMiniGame();
+        miniGamePlayService.playMiniGame(host, room);
 
         // then
-        assertThatThrownBy(() -> room.joinPlayer(new Guest(null, "late", menu, room)))
+        assertThatThrownBy(() -> room.joinPlayer(new Player(null, "late", menu, room)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -79,8 +84,8 @@ class RoomTest {
     @Test
     void 플레이어가_충분하면_true를_반환한다() {
         // given
-        room.joinPlayer(new Guest(null, "p1", menu, room));
-        room.joinPlayer(new Guest(null, "p2", menu, room));
+        room.joinPlayer(new Player(null, "p1", menu, room));
+        room.joinPlayer(new Player(null, "p2", menu, room));
 
         // when & then
         assertThat(room.hasEnoughPlayers()).isTrue();
