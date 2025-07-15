@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;

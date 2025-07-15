@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.roulette.JavaRandomGenerator;
+import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import coffeeshout.coffeeshout.domain.service.MiniGamePlayService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +15,7 @@ class RoomTest {
 
     private Menu menu = new Menu();
     private List<Player> players = List.of(new Player(null, "꾹", menu, null), new Player(null, "한스", menu, null));
-    private Room room = new Room(new JoinCode("ABC345"), new Roulette(players, 1));
+    private Room room = new Room(new JoinCode("ABC345"), new Roulette(players, 1, new JavaRandomGenerator()));
     private Player host = new Player(null, "hans", menu, room);
     private MiniGamePlayService miniGamePlayService = new MiniGamePlayService();
 
