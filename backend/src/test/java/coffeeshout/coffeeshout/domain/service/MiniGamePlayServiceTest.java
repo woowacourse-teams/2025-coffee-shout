@@ -1,19 +1,25 @@
 package coffeeshout.coffeeshout.domain.service;
 
-import coffeeshout.coffeeshout.domain.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import coffeeshout.coffeeshout.domain.JoinCode;
+import coffeeshout.coffeeshout.domain.Menu;
+import coffeeshout.coffeeshout.domain.MiniGame;
+import coffeeshout.coffeeshout.domain.Room;
+import coffeeshout.coffeeshout.domain.Roulette;
 import coffeeshout.coffeeshout.domain.player.Player;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+class MiniGamePlayServiceTest {
 
-public class MiniGamePlayServiceTest {
-
-    private MiniGamePlayService service = new MiniGamePlayService();;
-    private Room room = new Room(new JoinCode("AAAAAA"), new Roulette());;
-    private Player host = new Player(1L, "host", new Menu(), room);;
-    private Player guest = new Player(2L, "guest", new Menu(), room);;
+    private MiniGamePlayService service = new MiniGamePlayService();
+    private List<Player> players = List.of(new Player(null, "꾹", null, null), new Player(null, "한스", null, null));
+    private Room room = new Room(new JoinCode("AAAAAA"), new Roulette(players, 1));
+    private Player host = new Player(1L, "host", new Menu(), room);
+    private Player guest = new Player(2L, "guest", new Menu(), room);
 
     @BeforeEach
     void setUp() {
