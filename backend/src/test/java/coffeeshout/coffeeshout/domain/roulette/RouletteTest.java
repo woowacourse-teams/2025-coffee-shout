@@ -50,7 +50,7 @@ class RouletteTest {
         );
 
         // when
-        roulette.adjustWeight(miniGameResult);
+        roulette.adjustProbability(miniGameResult);
 
         // when & then
         final Map<Player, Double> probabilities = roulette.getPlayerProbabilities();

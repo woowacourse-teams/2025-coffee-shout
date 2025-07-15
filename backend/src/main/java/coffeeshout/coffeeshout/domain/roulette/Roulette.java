@@ -11,17 +11,18 @@ import org.springframework.util.Assert;
 public class Roulette {
 
     private static final int MINIMUM_PLAYER_COUNT = 2;
-    private static final int INITIAL_TOTAL_WEIGHT = 10000;
+    private static final int INITIAL_TOTAL_PROBABILITY = 10000;
     private static final int GAME_INFLUENCE_CONSTANT = 9600;
+    private static final double PERCENTAGE_MULTIPLIER = 100.0;
 
-    private final Map<Player, Integer> playerWeights = new LinkedHashMap<>();
+    private final Map<Player, Integer> playerProbabilities = new LinkedHashMap<>();
     private final RandomGenerator randomGenerator;
     private final int delta;
 
     public Roulette(List<Player> players, int round, RandomGenerator randomGenerator) {
         validate(players, round);
         for (Player player : players) {
-            this.playerWeights.put(player, INITIAL_TOTAL_WEIGHT / players.size());
+            this.playerProbabilities.put(player, INITIAL_TOTAL_PROBABILITY / players.size());
         }
         this.delta = getOptimalDelta(players, round);
         this.randomGenerator = randomGenerator;
@@ -36,30 +37,30 @@ public class Roulette {
         return GAME_INFLUENCE_CONSTANT / (players.size() * round);
     }
 
-    public void adjustWeight(MiniGameResult miniGameResult) {
+    public void adjustProbability(MiniGameResult miniGameResult) {
         double center = miniGameResult.getCenterRank();
-        int maxLevel = (int) Math.floor((getPlayerCount() - 1) / 2.0);
+        int maxGap = (int) Math.floor((getPlayerCount() - 1) / 2.0);
 
-        for (Player player : playerWeights.keySet()) {
+        for (Player player : playerProbabilities.keySet()) {
             int rank = miniGameResult.getRank(player);
 
             int sign = Double.compare(rank, center);
-            int level = getLevel(rank, center);
-            double diffWeight = delta / Math.pow(2, (double) maxLevel - level);
-            int finalDiff = sign * (int) Math.round(diffWeight);
+            int gap = getGap(rank, center);
+            double diffProbability = delta / Math.pow(2, (double) maxGap - gap);
+            int finalDiff = sign * (int) Math.round(diffProbability);
 
-            changePlayerWeight(player, finalDiff);
+            changePlayerProbability(player, finalDiff);
         }
     }
 
-    private void changePlayerWeight(Player player, int finalDiff) {
-        int newWeight = getWeight(player) + finalDiff;
-        Assert.state(newWeight >= 0 && newWeight <= INITIAL_TOTAL_WEIGHT, "확률은 0보다 작거나, 100을 초과할 수 없습니다.");
+    private void changePlayerProbability(Player player, int finalDiff) {
+        int newProbability = getProbability(player) + finalDiff;
+        Assert.state(newProbability >= 0 && newProbability <= INITIAL_TOTAL_PROBABILITY, "확률은 0보다 작거나, 100을 초과할 수 없습니다.");
 
-        playerWeights.put(player, newWeight);
+        playerProbabilities.put(player, newProbability);
     }
 
-    private int getLevel(int rank, double center) {
+    private int getGap(int rank, double center) {
         if (getPlayerCount() % 2 == 0) {
             return (int) (Math.abs(rank - center) - 0.5);
         }
@@ -68,13 +69,13 @@ public class Roulette {
     }
 
     public Player spin() {
-        int randomNumber = randomGenerator.nextInt(getTotalWeight());
+        int randomNumber = randomGenerator.nextInt(getTotalProbability());
 
-        for (Map.Entry<Player, Integer> entry : playerWeights.entrySet()) {
+        for (Map.Entry<Player, Integer> entry : playerProbabilities.entrySet()) {
             Player player = entry.getKey();
-            int weight = entry.getValue();
+            int probability = entry.getValue();
 
-            randomNumber -= weight;
+            randomNumber -= probability;
 
             if (randomNumber < 0) {
                 return player;
@@ -86,28 +87,28 @@ public class Roulette {
 
     public Map<Player, Double> getPlayerProbabilities() {
         Map<Player, Double> probabilities = new LinkedHashMap<>();
-        List<Player> players = new ArrayList<>(playerWeights.keySet());
+        List<Player> players = new ArrayList<>(playerProbabilities.keySet());
 
         for (Player player : players) {
-            double rawPercentage = (double) getWeight(player) / getTotalWeight() * 100.0;
-            double roundedPercentage = Math.round(rawPercentage * 100.0) / 100.0;
+            double rawPercentage = (double) getProbability(player) / getTotalProbability() * PERCENTAGE_MULTIPLIER;
+            double roundedPercentage = Math.round(rawPercentage * PERCENTAGE_MULTIPLIER) / PERCENTAGE_MULTIPLIER;
             probabilities.put(player, roundedPercentage);
         }
         return probabilities;
     }
 
-    private int getWeight(Player player) {
-        Assert.state(playerWeights.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
+    private int getProbability(Player player) {
+        Assert.state(playerProbabilities.containsKey(player), "존재하지 않는 Player입니다. Player=" + player);
 
-        return playerWeights.get(player);
+        return playerProbabilities.get(player);
     }
 
     private int getPlayerCount() {
-        return playerWeights.size();
+        return playerProbabilities.size();
     }
 
-    private int getTotalWeight() {
-        return playerWeights.values()
+    private int getTotalProbability() {
+        return playerProbabilities.values()
                 .stream()
                 .mapToInt(Integer::intValue)
                 .sum();
