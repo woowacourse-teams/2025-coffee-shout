@@ -1,10 +1,15 @@
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default {
   entry: './src/main.tsx',
   output: {
-    path: path.resolve(process.cwd(), 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].js',
     clean: true,
   },
@@ -28,7 +33,7 @@ export default {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      '@': path.resolve(process.cwd(), 'src'),
+      '@': path.resolve(__dirname, 'src'),
     },
   },
   plugins: [
