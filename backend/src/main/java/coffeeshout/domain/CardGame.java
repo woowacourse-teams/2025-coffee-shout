@@ -25,8 +25,8 @@ public class CardGame implements Playable {
     }
 
     @Override
-    public void play() {
-
+    public void start() {
+        shuffle();
     }
 
     @Override
@@ -85,7 +85,6 @@ public class CardGame implements Playable {
         return scores;
     }
 
-
     public boolean isFirstRoundFinished() {
         final boolean allSelected = true;
 
@@ -128,5 +127,13 @@ public class CardGame implements Playable {
         }
 
         return cardGameScore;
+    }
+
+    public boolean isFirstRound() {
+        return round == CardGameRound.ONE;
+    }
+
+    public boolean isSecondRound() {
+        return round == CardGameRound.TWO;
     }
 }

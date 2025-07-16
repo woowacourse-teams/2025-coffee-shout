@@ -1,6 +1,9 @@
 package coffeeshout.application;
 
+import static org.springframework.util.Assert.state;
+
 import coffeeshout.domain.CardGame;
+import coffeeshout.domain.CardGameRandomDeckGenerator;
 import coffeeshout.domain.MiniGameResult;
 import coffeeshout.domain.Room;
 import java.util.Map;
@@ -20,7 +23,9 @@ public class CardGameService {
 
     public void start(Long roomId) {
         final Room room = roomQueryService.findById(roomId);
-        final CardGame cardGame = new CardGame(room.getPlayers());
+        final CardGame cardGame = new CardGame(room.getPlayers(), new CardGameRandomDeckGenerator());
+
+        cardGame.start();
 
         cardGames.put(roomId, cardGame);
     }
@@ -35,11 +40,13 @@ public class CardGameService {
         final CardGame cardGame = cardGames.get(roomId);
 
         if (cardGame.isFirstRoundFinished()) {
+            state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
             cardGame.nextRound();
             cardGame.shuffle();
         }
 
-        if(cardGame.isSecondRoundFinished()) {
+        if (cardGame.isSecondRoundFinished()) {
+            state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
             cardGame.nextRound();
         }
     }

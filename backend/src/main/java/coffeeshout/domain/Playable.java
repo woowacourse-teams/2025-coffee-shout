@@ -2,7 +2,7 @@ package coffeeshout.domain;
 
 public interface Playable {
 
-    void play();
+    void start();
 
     MiniGameResult getResult();
 }
