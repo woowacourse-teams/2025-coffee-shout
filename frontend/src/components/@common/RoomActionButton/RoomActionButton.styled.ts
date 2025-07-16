@@ -1,6 +1,4 @@
 import styled from '@emotion/styled';
-import Headline3 from '../Headline3/Headline3';
-import Description from '../Description/Description';
 
 export const Container = styled.button`
   position: relative;
@@ -29,8 +27,4 @@ export const NextStepIcon = styled.img`
 export const DescriptionBox = styled.div`
   display: flex;
   align-items: flex-start;
-`;
-
-export const RoomDescription = styled(Description)`
-  color: ${({ theme }) => theme.color.gray[400]};
 `;

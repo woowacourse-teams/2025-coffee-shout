@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react';
 import Headline3 from '../Headline3/Headline3';
-import Description from '../Description/Description';
 import * as S from './RoomActionButton.styled';
+import Description from '../Description/Description';
 
 type Props = {
   title: string;
@@ -15,7 +15,7 @@ const RoomActionButton = ({ title, descriptions }: Props) => {
       <div>
         {descriptions.map((description, index) => (
           <S.DescriptionBox key={index}>
-            <S.RoomDescription color="gray-300">{description}</S.RoomDescription>
+            <Description color="gray-400">{description}</Description>
           </S.DescriptionBox>
         ))}
       </div>
