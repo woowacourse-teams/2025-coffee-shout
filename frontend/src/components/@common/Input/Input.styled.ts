@@ -9,7 +9,7 @@ export const Container = styled.div<ContainerProps>`
   width: 100%;
   height: ${({ height }) => height};
   border-bottom: ${({ theme, hasValue }) =>
-    `2px solid ${hasValue ? theme.color.point[400] : theme.color.gray[200]}`};
+    `2px solid ${hasValue ? theme.color.gray[400] : theme.color.gray[200]}`};
 `;
 
 export const Input = styled.input`
