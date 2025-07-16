@@ -6,7 +6,7 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
     '<rootDir>/src/**/*.{test,spec}.{ts,tsx}',
-    '<rootDir>/__test__/**/*.{ts,tsx}',
+    '<rootDir>/__tests__/**/*.{ts,tsx}',
   ],
 
   // 모듈 파일 확장자

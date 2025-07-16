@@ -76,7 +76,7 @@ export default [
   // Jest override
   {
     files: [
-      '**/__test__/**/*.[jt]s?(x)',
+      '**/__tests__/**/*.[jt]s?(x)',
       '**/*.test.[jt]s?(x)',
       '**/*.spec.[jt]s?(x)',
       'src/setupTests.ts',

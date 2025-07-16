@@ -20,6 +20,6 @@
     },
     "types": ["jest", "node"]
   },
-  "include": ["src/**/*", "__test__/**/*"],
+  "include": ["src/**/*", "__tests__/**/*"],
   "exclude": ["node_modules", "dist"]
 }
