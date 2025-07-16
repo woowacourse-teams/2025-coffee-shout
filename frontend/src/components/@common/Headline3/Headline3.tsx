@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { COLOR_MAP } from '@/constants/colorMap';
-import { ColorKey } from '@/types/colorKey';
+import { COLOR_MAP, ColorKey } from '@/constants/color';
 import * as S from './Headline3.styled';
 
 type Props = { color?: ColorKey } & PropsWithChildren;

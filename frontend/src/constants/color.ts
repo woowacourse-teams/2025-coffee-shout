@@ -6,4 +6,6 @@ export const COLOR_MAP = {
   ...makeColorMap('point', theme.color.point),
   white: theme.color.white,
   black: theme.color.black,
-};
+} as const;
+
+export type ColorKey = keyof typeof COLOR_MAP;
