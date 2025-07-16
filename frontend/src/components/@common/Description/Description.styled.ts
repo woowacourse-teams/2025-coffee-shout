@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.span`
+type Props = { $color: string };
+
+export const Container = styled.span<Props>`
   ${({ theme }) => theme.typography.small}
+  color: ${({ $color }) => $color};
 `;
