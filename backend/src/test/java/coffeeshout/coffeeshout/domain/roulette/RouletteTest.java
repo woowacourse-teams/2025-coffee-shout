@@ -1,7 +1,6 @@
 package coffeeshout.coffeeshout.domain.roulette;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.coffeeshout.domain.fixture.PlayersFixture;
 import coffeeshout.coffeeshout.domain.fixture.RouletteFixture;

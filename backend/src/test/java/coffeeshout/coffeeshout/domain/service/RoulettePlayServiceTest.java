@@ -17,9 +17,7 @@ class RoulettePlayServiceTest {
     private final JoinCode joinCode = new JoinCode("ABCDEF");
     private final Roulette roulette = RouletteFixture.고정_끝값_반환();
     private final Player 호스트_한스 = PlayerFixture.한스();
-    private final Player 게스트_루키 = PlayerFixture.루키();
     private final Player 게스트_꾹이 = PlayerFixture.꾹이();
-    private final Player 게스트_엠제이 = PlayerFixture.엠제이();
     private final Room room = new Room(joinCode, roulette, 호스트_한스);;
 
     @Test

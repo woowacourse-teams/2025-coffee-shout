@@ -1,11 +1,7 @@
 package coffeeshout.coffeeshout.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.player.Player;
-import java.util.Map;
-import org.junit.jupiter.api.Test;
 
 class MiniGameResultTest {
 
