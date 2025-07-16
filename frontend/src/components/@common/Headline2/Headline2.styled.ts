@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.h2`
-  ${({ theme }) => theme.typography.h2}
+type Props = { $color: string };
+
+export const Container = styled.h2<Props>`
+  ${({ theme }) => theme.typography.h2};
+  color: ${({ $color }) => $color};
 `;
