@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fe/prod
+      - main
 
 env:
   FE_PROD_PATH: fe-prod
@@ -12,7 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
-    # 동일한 워크플로가 실행되었을 시 이전 껏을 취소하고 실행
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    # 동일한 워크플로가 실행되었을 시 이전 워크플로를 취소하고 최신 버젼을 실행
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: true
