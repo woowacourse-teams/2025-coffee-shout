@@ -1,6 +1,4 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook';
-
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
@@ -44,8 +42,8 @@ export default [
       react,
       'react-hooks': reactHooks,
       prettier,
-      'jest': jest,
-      'cypress': cypress,
+      jest: jest,
+      cypress: cypress,
     },
     rules: {
       ...typescript.configs.recommended.rules,
@@ -81,7 +79,7 @@ export default [
       '**/__test__/**/*.[jt]s?(x)',
       '**/*.test.[jt]s?(x)',
       '**/*.spec.[jt]s?(x)',
-      'src/setupTests.ts'
+      'src/setupTests.ts',
     ],
     languageOptions: {
       globals: {
@@ -111,13 +109,13 @@ export default [
       },
     },
     plugins: {
-      cypress
+      cypress,
     },
     rules: {
       ...cypress.configs.recommended.rules,
     },
   },
- 
+
   ...storybook.configs['flat/recommended'],
   {
     files: ['jest.config.js', 'cypress.config.ts'],
