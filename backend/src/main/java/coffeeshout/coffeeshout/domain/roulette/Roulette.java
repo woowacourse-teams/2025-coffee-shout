@@ -17,8 +17,7 @@ public class Roulette {
 
     private final Map<Player, Integer> playerProbabilities = new LinkedHashMap<>();
     private final RandomGenerator randomGenerator;
-    private final ProbabilityCalculator probabilityCalculator;
-    private final int delta;
+    private final ProbabilityAdjuster probabilityCalculator;
 
     public Roulette(List<Player> players, int roundCount, RandomGenerator randomGenerator) {
         validate(players, roundCount);
@@ -27,42 +26,12 @@ public class Roulette {
         }
         this.delta = getOptimalDelta(players, roundCount);
         this.randomGenerator = randomGenerator;
-        this.probabilityCalculator = new ProbabilityCalculator(players.size(), roundCount);
+        this.probabilityCalculator = new ProbabilityAdjuster(players.size(), roundCount);
     }
 
     private void validate(List<Player> players, int round) {
         Assert.state(players.size() > MINIMUM_PLAYER_COUNT, "플레이어 인원 수는 2명 이상이여야 합니다.");
         Assert.state(round > 0, "라운드 수는 양수여야 합니다.");
-    }
-
-    private int getOptimalDelta(List<Player> players, int round) {
-        return GAME_INFLUENCE_CONSTANT / (players.size() * round);
-    }
-
-    public void adjustProbability(MiniGameResult miniGameResult) {
-        for (Player player : playerProbabilities.keySet()) {
-            int rank = miniGameResult.getRank(player);
-            double adjustProbability = probabilityCalculator.getAdjustProbability(rank);
-            int diffProbability = (int) adjustProbability * 100;
-
-            changePlayerProbability(player, diffProbability);
-        }
-    }
-
-    private void changePlayerProbability(Player player, int finalDiff) {
-        int newProbability = getProbability(player) + finalDiff;
-        Assert.state(newProbability >= 0 && newProbability <= INITIAL_TOTAL_PROBABILITY,
-                "확률은 0보다 작거나, 100을 초과할 수 없습니다.");
-
-        playerProbabilities.put(player, newProbability);
-    }
-
-    private int getGap(int rank, double center) {
-        if (getPlayerCount() % 2 == 0) {
-            return (int) (Math.abs(rank - center) - 0.5);
-        }
-
-        return (int) Math.abs(rank - center);
     }
 
     public Player spin() {

@@ -14,6 +14,4 @@ public class MiniGamePlayService {
         room.setPlaying();
         // TODO: 미니게임 실행시키기
     }
-
-
 }

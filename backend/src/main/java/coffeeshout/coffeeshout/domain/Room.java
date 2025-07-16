@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.player.Players;
 import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ public class Room {
 
     private Player host;
 
-    private List<Player> players = new ArrayList<>();
+    private Players players = new Players();
 
-    private Roulette roulette;
+//    private Roulette roulette;
 
     private List<MiniGame> miniGames = new ArrayList<>();
 
@@ -35,16 +36,21 @@ public class Room {
         this.roomState = RoomState.READY;
     }
 
+    public Room(JoinCode joinCode, Roulette roulette, Player host) {
+        this.joinCode = joinCode;
+        this.roulette = roulette;
+        this.host = host;
+        players.join(host);
+        this.roomState = RoomState.READY;
+    }
+
     public void changeHost(Player host) {
         this.host = host;
     }
 
     public void joinPlayer(Player joinPlayer) {
-        isTrue(players.size() < MAXIMUM_GUEST_COUNT, "게임은 최대 9명까지 참여할 수 있습니다.");
-        isTrue(players.stream().noneMatch(player -> player.isSameName(joinPlayer)), "이미 존재하는 플레이어 이름입니다.");
         isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        // TODO: 룰렛 확률 조정
-        players.add(joinPlayer);
+        players.join(joinPlayer);
     }
 
     public void setMiniGame(List<MiniGame> miniGames) {
@@ -63,7 +69,7 @@ public class Room {
     }
 
     public boolean hasEnoughPlayers() {
-        return players.size() >= MINIMUM_GUEST_COUNT && players.size() <= MAXIMUM_GUEST_COUNT;
+        return players.playerCount() >= MINIMUM_GUEST_COUNT && players.playerCount() <= MAXIMUM_GUEST_COUNT;
     }
 
     public void setPlaying() {
