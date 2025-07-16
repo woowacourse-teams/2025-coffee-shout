@@ -1,8 +1,12 @@
 package coffeeshout.ui.response;
 
+import coffeeshout.domain.Card;
 import coffeeshout.domain.CardGame;
+import coffeeshout.domain.Player;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public record MiniGameStateMessage(
         Long roomId,
@@ -32,10 +36,19 @@ public record MiniGameStateMessage(
         cardGame.getCards()
                 .forEach(card -> playerSelections.put(
                         CardDto.from(card),
-                        cardGame.findCardHolder(card, cardGame.getRound().getValue()).getId()
+                        findCardHolderId(cardGame, card)
                 ));
 
         return playerSelections;
+    }
+
+    private static Long findCardHolderId(CardGame cardGame, Card card) {
+        for (Entry<Player, List<Card>> playerCardsEntry : cardGame.getPlayerCards().entrySet()) {
+            if (playerCardsEntry.getValue().get(cardGame.getRound().getValue()).equals(card)) {
+                return playerCardsEntry.getKey().getId();
+            }
+        }
+        return null;
     }
 
     private static Map<Long, Integer> generatePlayerScores(CardGame cardGame) {

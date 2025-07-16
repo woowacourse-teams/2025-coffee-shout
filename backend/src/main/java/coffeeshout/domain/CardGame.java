@@ -83,14 +83,6 @@ public class CardGame implements Playable {
         return scores;
     }
 
-    public Player findCardHolder(Card card, Integer round) {
-        for (Entry<Player, List<Card>> playerCardsEntry : playerCards.entrySet()) {
-            if (playerCardsEntry.getValue().get(round).equals(card)) {
-                return playerCardsEntry.getKey();
-            }
-        }
-        return null;
-    }
 
     public Boolean isFirstRoundFinished() {
         final Boolean allSelected = true;
