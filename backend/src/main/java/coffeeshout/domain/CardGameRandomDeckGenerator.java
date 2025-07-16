@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CardGameDeck {
+public class CardGameRandomDeckGenerator implements CardGameDeckGenerator {
 
     private static final List<Card> GENERAL_CARDS = List.of(
             new GeneralCard(-40),
@@ -25,7 +25,8 @@ public class CardGameDeck {
             new SpecialCard(-1)
     );
 
-    public static List<Card> spreadCards() {
+    @Override
+    public List<Card> spreadCards() {
         List<Card> generalCopy = new ArrayList<>(GENERAL_CARDS);
         List<Card> specialCopy = new ArrayList<>(SPECIAL_CARDS);
 

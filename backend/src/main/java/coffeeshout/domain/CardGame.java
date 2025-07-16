@@ -16,10 +16,12 @@ public class CardGame implements Playable {
 
     private CardGameRound round;
 
-    public CardGame(List<Player> players) {
+    private final CardGameDeckGenerator cardGameDeckGenerator;
+
+    public CardGame(List<Player> players, CardGameDeckGenerator cardGameDeckGenerator) {
         this.playerCards = initPlayerCards(players);
         this.round = CardGameRound.ONE;
-        this.cards = CardGameDeck.spreadCards();
+        this.cardGameDeckGenerator = cardGameDeckGenerator;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class CardGame implements Playable {
     }
 
     public void shuffle() {
-        this.cards = CardGameDeck.spreadCards();
+        this.cards = cardGameDeckGenerator.spreadCards();
     }
 
     public void selectCard(Player player, Integer cardPosition) {

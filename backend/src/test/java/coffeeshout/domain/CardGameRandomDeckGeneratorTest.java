@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class CardGameDeckTest {
+class CardGameRandomDeckGeneratorTest {
 
     @Test
     void 카드를_랜덤으로_9장_뽑는다() {
         // Given
-        List<Card> cards = CardGameDeck.spreadCards();
+        final CardGameDeckGenerator cardGameDeck = new CardGameRandomDeckGenerator();
+        List<Card> cards = cardGameDeck.spreadCards();
 
         // When & Then
         assertThat(cards).hasSize(9);
