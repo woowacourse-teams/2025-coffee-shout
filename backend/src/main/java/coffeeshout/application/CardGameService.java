@@ -1,6 +1,7 @@
 package coffeeshout.application;
 
 import coffeeshout.domain.CardGame;
+import coffeeshout.domain.MiniGameResult;
 import coffeeshout.domain.Room;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,22 +13,21 @@ import org.springframework.stereotype.Service;
 public class CardGameService {
 
     private final RoomQueryService roomQueryService;
-    private final PlayerQueryService playerQueryService;
 
+    private final PlayerQueryService playerQueryService;
 
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
 
-    public CardGame start(Long roomId) {
-        Room room = roomQueryService.findById(roomId);
+    public void start(Long roomId) {
+        final Room room = roomQueryService.findById(roomId);
         final CardGame cardGame = new CardGame(room.getPlayers());
 
         cardGames.put(roomId, cardGame);
-
-        return cardGame;
     }
 
     public void selectCard(Long roomId, Long playerId, Integer cardPosition) {
         final CardGame cardGame = cardGames.get(roomId);
+
         cardGame.selectCard(playerQueryService.findById(playerId), cardPosition);
     }
 
