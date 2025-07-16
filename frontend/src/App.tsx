@@ -1,5 +1,5 @@
-import { ThemeProvider } from "@emotion/react";
-import { theme } from "./styles/theme";
+import { ThemeProvider } from '@emotion/react';
+import { theme } from './styles/theme';
 
 const App = () => {
   return (

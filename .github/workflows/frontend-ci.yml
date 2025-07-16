@@ -41,7 +41,7 @@ jobs:
         continue-on-error: false
 
       - name: Run Tests
-        run: npm run test
+        run: npm run test:jest
         env:
           CI: true
 
