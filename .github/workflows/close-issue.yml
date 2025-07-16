@@ -1,8 +1,8 @@
-name: Close issues when PR is merged to fe/dev
+name: Close issues when PR is merged
 on:
   pull_request:
     types: [closed] # PR이 닫힐 때
-    branches: [fe/dev, fe/prod]
+    branches: [fe/dev, fe/prod, be/dev, be/prod]
 jobs:
   close_linked_issues:
     if: github.event.pull_request.merged == true
