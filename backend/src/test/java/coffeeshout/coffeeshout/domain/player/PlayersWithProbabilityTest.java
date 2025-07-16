@@ -5,7 +5,7 @@ import coffeeshout.coffeeshout.domain.fixture.MiniGameResultFixture;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.PlayersFixture;
 import coffeeshout.coffeeshout.domain.roulette.Probability;
-import coffeeshout.coffeeshout.domain.roulette.ProbabilityAdjuster;
+import coffeeshout.coffeeshout.domain.roulette.ProbabilityCalculator;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class PlayersWithProbabilityTest {
         final MiniGameResult miniGameResult = MiniGameResultFixture.한스_루키_꾹이_엠제이();
 
         // when
-        playersWithProbability.adjustProbabilities(miniGameResult, new ProbabilityAdjuster(4, 5));
+        playersWithProbability.adjustProbabilities(miniGameResult, new ProbabilityCalculator(4, 5));
 
         // then
         SoftAssertions.assertSoftly(softly ->{

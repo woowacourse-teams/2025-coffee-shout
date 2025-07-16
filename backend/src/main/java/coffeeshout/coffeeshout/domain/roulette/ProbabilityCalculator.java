@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class ProbabilityAdjuster {
+/*
+    등수별 확률 조정 정도를 계산하는 클래스
+ */
+public class ProbabilityCalculator {
 
     private final Integer playerCount;
 
@@ -14,12 +17,12 @@ public class ProbabilityAdjuster {
 
     private final Map<Integer, Probability> adjustedProbabilities;
 
-    public ProbabilityAdjuster(Integer playerCount, Integer roundCount) {
+    public ProbabilityCalculator(Integer playerCount, Integer roundCount) {
         validate(playerCount, roundCount);
         this.playerCount = playerCount;
         this.roundCount = roundCount;
         adjustedProbabilities = initialAdjustProbabilities();
-        adjustProbabilities();
+        assignAdjustedProbabilities();
     }
 
     public Probability getAdjustProbability(int rank) {
@@ -27,45 +30,45 @@ public class ProbabilityAdjuster {
         return adjustedProbabilities.get(rank);
     }
 
-    public static Probability initialProbability(int playerCount) {
+    public static Probability computeInitialProbability(int playerCount) {
         return new Probability(10000 / playerCount);
     }
 
-    private void adjustProbabilities() {
-        adjustBottomPlayerProbabilities();
-        adjustTopPlayerProbabilities();
+    private void assignAdjustedProbabilities() {
+        assignProbabilitiesToLowerRanks();
+        assignProbabilitiesToUpperRanks();
     }
 
-    private void adjustBottomPlayerProbabilities() {
-        Probability current = getMaxAdjustableRangePerRound();
+    private void assignProbabilitiesToLowerRanks() {
+        Probability current = computeMaxAdjustableProbability();
         final int startRank = playerCount;
-        final int endRank = playerCount - countEffectivePlayer();
+        final int endRank = playerCount - countAdjustableRanks();
         for (int rank = startRank; rank >= endRank; rank--) {
             adjustedProbabilities.put(rank, current);
-            current = current.minus(computeAdjustProbabilityStep());
+            current = current.minus(computeAdjustmentStep());
         }
     }
 
-    private void adjustTopPlayerProbabilities() {
-        Probability invertCurrent = getMaxAdjustableRangePerRound().invert();
+    private void assignProbabilitiesToUpperRanks() {
+        Probability invertCurrent = computeMaxAdjustableProbability().invert();
         final int startRank = 1;
-        final int endRank = countEffectivePlayer();
+        final int endRank = countAdjustableRanks();
         for (int rank = startRank; rank <= endRank; rank++) {
             adjustedProbabilities.put(rank, invertCurrent);
-            invertCurrent = invertCurrent.plus(computeAdjustProbabilityStep());
+            invertCurrent = invertCurrent.plus(computeAdjustmentStep());
         }
     }
 
-    private Probability getMaxAdjustableRangePerRound() {
-        Probability initialProbability = initialProbability(playerCount);
+    private Probability computeMaxAdjustableProbability() {
+        Probability initialProbability = computeInitialProbability(playerCount);
         return initialProbability.divide(roundCount);
     }
 
-    private Probability computeAdjustProbabilityStep() {
-        return getMaxAdjustableRangePerRound().divide(countEffectivePlayer());
+    private Probability computeAdjustmentStep() {
+        return computeMaxAdjustableProbability().divide(countAdjustableRanks());
     }
 
-    private int countEffectivePlayer() {
+    private int countAdjustableRanks() {
         return playerCount / 2;
     }
 

@@ -15,10 +15,6 @@ public class Player {
         this.menu = menu;
     }
 
-    public boolean isSameName(Player player) {
-        return this.name.equals(player.name);
-    }
-
     @Override
     public boolean equals(final Object object) {
         if (this == object) {

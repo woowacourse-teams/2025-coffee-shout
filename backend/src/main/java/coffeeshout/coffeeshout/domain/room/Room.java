@@ -7,7 +7,7 @@ import coffeeshout.coffeeshout.domain.game.MiniGame;
 import coffeeshout.coffeeshout.domain.game.MiniGameResult;
 import coffeeshout.coffeeshout.domain.player.Player;
 import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
-import coffeeshout.coffeeshout.domain.roulette.ProbabilityAdjuster;
+import coffeeshout.coffeeshout.domain.roulette.ProbabilityCalculator;
 import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +55,8 @@ public class Room {
 
     // TODO 미니게임 결과 반영
     public void applyMiniGameResult(MiniGameResult miniGameResult){
-        playersWithProbability.adjustProbabilities(miniGameResult, new ProbabilityAdjuster(playersWithProbability.getPlayerCount(), miniGames.size()));
+        playersWithProbability.adjustProbabilities(miniGameResult, new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
     }
-
-    // TODO: 플레이어가 방에서 나가는 로직 필요
 
     public boolean hasNoMiniGames() {
         return miniGames.isEmpty();
