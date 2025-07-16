@@ -1,9 +1,11 @@
 package coffeeshout.domain;
 
+import java.util.Objects;
+
 public class CardGameScore implements Comparable<CardGameScore> {
 
-    private Integer sum;
-    private Integer mul;
+    private int sum;
+    private int mul;
 
     public CardGameScore() {
         this.sum = 0;
@@ -20,13 +22,26 @@ public class CardGameScore implements Comparable<CardGameScore> {
         }
     }
 
-    public Integer getResult() {
+    public int getResult() {
         return sum * mul;
     }
 
     @Override
     public int compareTo(final CardGameScore o) {
         return Integer.compare(this.getResult(), o.getResult());
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof final CardGameScore that)) {
+            return false;
+        }
+        return Objects.equals(this.getResult(), that.getResult());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getResult());
     }
 }
 

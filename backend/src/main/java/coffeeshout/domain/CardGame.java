@@ -84,8 +84,8 @@ public class CardGame implements Playable {
     }
 
 
-    public Boolean isFirstRoundFinished() {
-        final Boolean allSelected = true;
+    public boolean isFirstRoundFinished() {
+        final boolean allSelected = true;
 
         for (List<Card> cards : playerCards.values()) {
             if (cards.size() != 1) {
@@ -96,8 +96,8 @@ public class CardGame implements Playable {
         return allSelected;
     }
 
-    public Boolean isSecondRoundFinished() {
-        final Boolean allSelected = true;
+    public boolean isSecondRoundFinished() {
+        final boolean allSelected = true;
 
         for (List<Card> cards : playerCards.values()) {
             if (cards.size() != 2) {

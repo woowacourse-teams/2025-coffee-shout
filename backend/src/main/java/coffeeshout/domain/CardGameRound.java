@@ -13,7 +13,7 @@ public enum CardGameRound {
     }
 
     public CardGameRound next() {
-        final Integer ordinal = this.ordinal();
+        final int ordinal = this.ordinal();
         CardGameRound[] values = values();
         return values[ordinal + 1];
     }
