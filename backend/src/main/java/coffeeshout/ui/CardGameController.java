@@ -2,12 +2,12 @@ package coffeeshout.ui;
 
 import coffeeshout.application.CardGameService;
 import coffeeshout.domain.CardGame;
+import coffeeshout.domain.MiniGameResult;
+import coffeeshout.ui.request.CardGameRankMessage;
 import coffeeshout.ui.request.CardGameSelectMessage;
 import coffeeshout.ui.request.CardGameStartMessage;
-import coffeeshout.ui.response.CardDto;
-import coffeeshout.ui.response.GameStateMessage;
-import java.util.HashMap;
-import java.util.Map;
+import coffeeshout.ui.response.MiniGameRanksMessage;
+import coffeeshout.ui.response.MiniGameStateMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,7 +27,7 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 
-        sendGameState(cardGame, message.roomId());
+        messagingTemplate.convertAndSend("/topic/gameState/", MiniGameStateMessage.of(cardGame, message.roomId()));
     }
 
     @MessageMapping("/cardGame/select")
@@ -36,7 +36,7 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 
-        sendGameState(cardGame, message.roomId());
+        messagingTemplate.convertAndSend("/topic/gameState/", MiniGameStateMessage.of(cardGame, message.roomId()));
 
         cardGameService.checkRound(message.roomId());
     }
