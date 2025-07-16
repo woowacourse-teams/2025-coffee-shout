@@ -103,4 +103,14 @@ public class CardGame implements Playable {
         }
         return playerCards;
     }
+
+    private CardGameScore sumCards(List<Card> cards) {
+        final CardGameScore cardGameScore = new CardGameScore();
+
+        for (Card card : cards) {
+            cardGameScore.addCard(card);
+        }
+
+        return cardGameScore;
+    }
 }
