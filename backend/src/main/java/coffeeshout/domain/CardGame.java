@@ -22,6 +22,7 @@ public class CardGame implements Playable {
         this.playerCards = initPlayerCards(players);
         this.round = CardGameRound.ONE;
         this.cardGameDeckGenerator = cardGameDeckGenerator;
+        this.cards = new ArrayList<>();
     }
 
     @Override
