@@ -1,7 +1,7 @@
 package coffeeshout.coffeeshout.domain.roulette;
 
 import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
 
 public class Roulette {
 
@@ -11,8 +11,8 @@ public class Roulette {
         this.randomGenerator = randomGenerator;
     }
 
-    public Player spin(Players players) {
-        RouletteRanges rouletteRanges = new RouletteRanges(players);
+    public Player spin(PlayersWithProbability playersWithProbability) {
+        RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
         int randomNumber = randomGenerator.nextInt(1, rouletteRanges.endValue());
         return rouletteRanges.pickPlayer(randomNumber);
     }

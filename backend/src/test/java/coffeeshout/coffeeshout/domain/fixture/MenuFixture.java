@@ -1,6 +1,6 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
-import coffeeshout.coffeeshout.domain.Menu;
+import coffeeshout.coffeeshout.domain.player.Menu;
 
 public class MenuFixture {
 

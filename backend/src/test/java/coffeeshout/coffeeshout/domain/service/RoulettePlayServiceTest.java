@@ -2,11 +2,12 @@ package coffeeshout.coffeeshout.domain.service;
 
 import static org.assertj.core.api.Assertions.*;
 
-import coffeeshout.coffeeshout.domain.Room;
-import coffeeshout.coffeeshout.domain.RoomState;
+import coffeeshout.coffeeshout.domain.room.Room;
+import coffeeshout.coffeeshout.domain.room.RoomState;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.RoomFixture;
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.roulette.RoulettePlayService;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 

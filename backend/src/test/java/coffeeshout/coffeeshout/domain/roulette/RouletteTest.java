@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import coffeeshout.coffeeshout.domain.fixture.PlayersFixture;
 import coffeeshout.coffeeshout.domain.fixture.RouletteFixture;
 import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
 import org.junit.jupiter.api.Test;
 
 class RouletteTest {
@@ -14,10 +14,10 @@ class RouletteTest {
     void 당첨자를_뽑는다() {
         // given
         Roulette roulette = RouletteFixture.고정_끝값_반환();
-        Players players = PlayersFixture.꾹이_루키_엠제이_한스();
+        PlayersWithProbability playersWithProbability = PlayersFixture.꾹이_루키_엠제이_한스();
 
         // when
-        Player result = roulette.spin(players);
+        Player result = roulette.spin(playersWithProbability);
 
         // then
         assertThat(result).isEqualTo(PlayersFixture.playerList.getLast());

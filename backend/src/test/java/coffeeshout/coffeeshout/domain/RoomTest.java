@@ -5,7 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.RouletteFixture;
+import coffeeshout.coffeeshout.domain.game.MiniGame;
 import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.room.JoinCode;
+import coffeeshout.coffeeshout.domain.room.Room;
+import coffeeshout.coffeeshout.domain.room.RoomState;
 import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -33,7 +37,7 @@ class RoomTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
             softly.assertThat(room.getHost()).isEqualTo(호스트_한스);
-            softly.assertThat(room.getPlayers().getPlayerCount()).isEqualTo(1);
+            softly.assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(1);
         });
     }
 
@@ -41,7 +45,7 @@ class RoomTest {
     void READY_상태에서는_플레이어가_참여할_수_있다() {
         room.joinPlayer(게스트_꾹이);
 
-        assertThat(room.getPlayers().getPlayerCount()).isEqualTo(2);
+        assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(2);
     }
 
     @Test

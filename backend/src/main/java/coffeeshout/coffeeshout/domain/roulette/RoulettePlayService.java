@@ -1,8 +1,8 @@
-package coffeeshout.coffeeshout.domain.service;
+package coffeeshout.coffeeshout.domain.roulette;
 
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.coffeeshout.domain.Room;
+import coffeeshout.coffeeshout.domain.room.Room;
 import coffeeshout.coffeeshout.domain.player.Player;
 
 public class RoulettePlayService {

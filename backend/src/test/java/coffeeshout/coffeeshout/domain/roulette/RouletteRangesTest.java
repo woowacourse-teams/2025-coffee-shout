@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
 import org.junit.jupiter.api.Test;
 
 class RouletteRangesTest {
@@ -14,12 +14,12 @@ class RouletteRangesTest {
         // given
         final Player player1 = PlayerFixture.한스();
         final Player player2 = PlayerFixture.꾹이();
-        final Players players = new Players();
+        final PlayersWithProbability playersWithProbability = new PlayersWithProbability();
 
-        players.join(player1);
-        players.join(player2);
+        playersWithProbability.join(player1);
+        playersWithProbability.join(player2);
 
-        final RouletteRanges rouletteRanges = new RouletteRanges(players);
+        final RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
         // when
         final Player result1 = rouletteRanges.pickPlayer(1500);
@@ -33,10 +33,10 @@ class RouletteRangesTest {
     @Test
     void 범위를_벗어난_숫자를_입력하면_예외가_발생한다() {
         final Player player = PlayerFixture.엠제이();
-        final Players players = new Players();
-        players.join(player);
+        final PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+        playersWithProbability.join(player);
 
-        final RouletteRanges rouletteRanges = new RouletteRanges(players);
+        final RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
         assertThatThrownBy(() -> rouletteRanges.pickPlayer(10002))
                 .isInstanceOf(IllegalStateException.class);
@@ -44,9 +44,9 @@ class RouletteRangesTest {
 
     @Test
     void 값이_없을_경우_endValue는_0을_반환한다() {
-        final Players players = new Players();
+        final PlayersWithProbability playersWithProbability = new PlayersWithProbability();
 
-        final RouletteRanges rouletteRanges = new RouletteRanges(players);
+        final RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
         final int endValue = rouletteRanges.endValue();
 
@@ -58,12 +58,12 @@ class RouletteRangesTest {
         // given
         final Player player1 = PlayerFixture.루키();
         final Player player2 = PlayerFixture.엠제이();
-        final Players players = new Players();
+        final PlayersWithProbability playersWithProbability = new PlayersWithProbability();
 
-        players.join(player1);
-        players.join(player2);
+        playersWithProbability.join(player1);
+        playersWithProbability.join(player2);
 
-        final RouletteRanges rouletteRanges = new RouletteRanges(players);
+        final RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
         // when
         final int result = rouletteRanges.endValue();

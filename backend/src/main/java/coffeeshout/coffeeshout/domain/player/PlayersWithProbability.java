@@ -1,18 +1,15 @@
 package coffeeshout.coffeeshout.domain.player;
 
-import static org.springframework.util.Assert.*;
 import static org.springframework.util.Assert.isTrue;
 
-import coffeeshout.coffeeshout.domain.MiniGameResult;
+import coffeeshout.coffeeshout.domain.game.MiniGameResult;
 import coffeeshout.coffeeshout.domain.roulette.Probability;
 import coffeeshout.coffeeshout.domain.roulette.ProbabilityAdjuster;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
-public class Players {
+public class PlayersWithProbability {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
 
@@ -29,13 +26,9 @@ public class Players {
         for (Player player : adjustedProbabilities.keySet()) {
             int rank = miniGameResult.getRank(player);
             Probability adjustProbability = probabilityAdjuster.getAdjustProbability(rank);
-            adjustedProbabilities.put(player, getProbability(player).plus(adjustProbability));
+            Probability totalProbability = getProbability(player).plus(adjustProbability);
+            adjustedProbabilities.put(player, totalProbability);
         }
-    }
-
-    public void updateInitialProbabilities() {
-        Probability initialProbability = ProbabilityAdjuster.initialProbability(getPlayerCount());
-        adjustedProbabilities.keySet().forEach(player -> adjustedProbabilities.put(player, initialProbability));
     }
 
     public int getPlayerCount() {
@@ -47,11 +40,12 @@ public class Players {
         return adjustedProbabilities.get(player);
     }
 
-    public Stream<Entry<Player, Probability>> entryStream() {
-        return adjustedProbabilities.entrySet().stream();
-    }
-
     public void forEach(BiConsumer<Player, Probability> biConsumer) {
         adjustedProbabilities.forEach(biConsumer);
+    }
+
+    private void updateInitialProbabilities() {
+        Probability initialProbability = ProbabilityAdjuster.initialProbability(getPlayerCount());
+        adjustedProbabilities.keySet().forEach(player -> adjustedProbabilities.put(player, initialProbability));
     }
 }

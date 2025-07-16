@@ -2,8 +2,9 @@ package coffeeshout.coffeeshout.domain.service;
 
 import static org.assertj.core.api.Assertions.*;
 
-import coffeeshout.coffeeshout.domain.MiniGame;
-import coffeeshout.coffeeshout.domain.Room;
+import coffeeshout.coffeeshout.domain.game.MiniGame;
+import coffeeshout.coffeeshout.domain.game.MiniGamePlayService;
+import coffeeshout.coffeeshout.domain.room.Room;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.RoomFixture;
 import coffeeshout.coffeeshout.domain.player.Player;

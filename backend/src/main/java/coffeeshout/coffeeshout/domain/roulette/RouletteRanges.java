@@ -1,7 +1,7 @@
 package coffeeshout.coffeeshout.domain.roulette;
 
 import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +9,8 @@ public class RouletteRanges {
 
     private final List<RouletteRange> values = new ArrayList<>();
 
-    public RouletteRanges(Players players) {
-        players.forEach((player, probability) -> {
+    public RouletteRanges(PlayersWithProbability playersWithProbability) {
+        playersWithProbability.forEach((player, probability) -> {
             int start = endValue() + 1;
             values.add(new RouletteRange(start, start + probability.value(), player));
         });

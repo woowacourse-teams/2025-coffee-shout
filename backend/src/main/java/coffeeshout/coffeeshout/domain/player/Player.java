@@ -1,19 +1,16 @@
 package coffeeshout.coffeeshout.domain.player;
 
-import coffeeshout.coffeeshout.domain.Menu;
-import coffeeshout.coffeeshout.domain.Room;
 import java.util.Objects;
+import lombok.ToString;
 
+@ToString
 public class Player {
-
-    private Long id;
 
     private String name;
 
     private Menu menu;
 
-    public Player(Long id, String name, Menu menu) {
-        this.id = id;
+    public Player(String name, Menu menu) {
         this.name = name;
         this.menu = menu;
     }
@@ -30,11 +27,11 @@ public class Player {
         if (!(object instanceof Player player)) {
             return false;
         }
-        return Objects.equals(id, player.id);
+        return Objects.equals(name, player.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(name);
     }
 }

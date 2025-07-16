@@ -1,7 +1,7 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
-import coffeeshout.coffeeshout.domain.JoinCode;
-import coffeeshout.coffeeshout.domain.Room;
+import coffeeshout.coffeeshout.domain.room.JoinCode;
+import coffeeshout.coffeeshout.domain.room.Room;
 
 public final class RoomFixture {
 

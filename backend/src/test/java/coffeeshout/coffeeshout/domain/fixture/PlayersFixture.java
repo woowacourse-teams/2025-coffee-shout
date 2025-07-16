@@ -1,7 +1,7 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
 import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
 import java.util.List;
 
 public final class PlayersFixture {
@@ -10,18 +10,15 @@ public final class PlayersFixture {
             PlayerFixture.꾹이(),
             PlayerFixture.루키(),
             PlayerFixture.엠제이(),
-            PlayerFixture.한스());
+            PlayerFixture.한스()
+    );
 
     private PlayersFixture() {
     }
 
-    public static Players 꾹이_루키_엠제이_한스(){
-        Players players = new Players();
-
-        for (Player player : playerList){
-            players.join(player);
-        }
-
-        return players;
+    public static PlayersWithProbability 꾹이_루키_엠제이_한스(){
+        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+        playerList.forEach(playersWithProbability::join);
+        return playersWithProbability;
     }
 }
