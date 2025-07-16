@@ -1,10 +1,12 @@
 package coffeeshout.coffeeshout.domain.player;
 
+import static org.springframework.util.Assert.*;
 import static org.springframework.util.Assert.isTrue;
 
+import coffeeshout.coffeeshout.domain.MiniGameResult;
 import coffeeshout.coffeeshout.domain.roulette.Probability;
 import coffeeshout.coffeeshout.domain.roulette.ProbabilityAdjuster;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
@@ -14,21 +16,42 @@ public class Players {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
 
-    private final Map<Player, Probability> adjustedProbabilities = new HashMap<>();
+    private final Map<Player, Probability> adjustedProbabilities = new LinkedHashMap<>();
 
     public void join(Player joinPlayer) {
         isTrue(adjustedProbabilities.size() < MAXIMUM_GUEST_COUNT, "게임은 최대 9명까지 참여할 수 있습니다.");
-        isTrue(adjustedProbabilities.containsKey(joinPlayer), "이미 존재하는 플레이어 이름입니다.");
+        isTrue(!adjustedProbabilities.containsKey(joinPlayer), "이미 존재하는 플레이어 이름입니다.");
         adjustedProbabilities.put(joinPlayer, new Probability(0));
         updateInitialProbabilities();
     }
 
+    public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityAdjuster probabilityAdjuster) {
+        for (Player player : adjustedProbabilities.keySet()) {
+            int rank = miniGameResult.getRank(player);
+            Probability adjustProbability = probabilityAdjuster.getAdjustProbability(rank);
+            adjustedProbabilities.put(player, getProbability(player).plus(adjustProbability));
+        }
+    }
+
     public void updateInitialProbabilities() {
-        Probability initialProbability = ProbabilityAdjuster.initialProbability(playerCount());
+        Probability initialProbability = ProbabilityAdjuster.initialProbability(getPlayerCount());
         adjustedProbabilities.keySet().forEach(player -> adjustedProbabilities.put(player, initialProbability));
     }
 
-    public int playerCount() {
+    public int getPlayerCount() {
         return adjustedProbabilities.size();
+    }
+
+    public Probability getProbability(Player player) {
+        isTrue(adjustedProbabilities.containsKey(player), "존재하지 않는 사용자입니다.");
+        return adjustedProbabilities.get(player);
+    }
+
+    public Stream<Entry<Player, Probability>> entryStream() {
+        return adjustedProbabilities.entrySet().stream();
+    }
+
+    public void forEach(BiConsumer<Player, Probability> biConsumer) {
+        adjustedProbabilities.forEach(biConsumer);
     }
 }

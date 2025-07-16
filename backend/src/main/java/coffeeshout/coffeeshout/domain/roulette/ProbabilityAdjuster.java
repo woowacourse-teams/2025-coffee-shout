@@ -9,21 +9,17 @@ import java.util.stream.IntStream;
 public class ProbabilityAdjuster {
 
     private final Integer playerCount;
+
     private final Integer roundCount;
+
     private final Map<Integer, Probability> adjustedProbabilities;
 
     public ProbabilityAdjuster(Integer playerCount, Integer roundCount) {
         validate(playerCount, roundCount);
         this.playerCount = playerCount;
         this.roundCount = roundCount;
-        adjustProbabilities = initialAdjustProbability();
+        adjustedProbabilities = initialAdjustProbabilities();
         adjustProbabilities();
-    }
-
-    private Map<Integer, Probability> initialAdjustProbabilities() {
-        Map<Integer, Probability> probability = HashMap.newHashMap(playerCount);
-        IntStream.rangeClosed(1, playerCount).forEach(rank -> probability.put(rank, new Probability(0)));
-        return probability;
     }
 
     public Probability getAdjustProbability(int rank) {
@@ -31,9 +27,13 @@ public class ProbabilityAdjuster {
         return adjustedProbabilities.get(rank);
     }
 
+    public static Probability initialProbability(int playerCount) {
+        return new Probability(10000 / playerCount);
+    }
+
     private void adjustProbabilities() {
-        adjustTopPlayerProbabilities();
         adjustBottomPlayerProbabilities();
+        adjustTopPlayerProbabilities();
     }
 
     private void adjustBottomPlayerProbabilities() {
@@ -65,12 +65,14 @@ public class ProbabilityAdjuster {
         return getMaxAdjustableRangePerRound().divide(countEffectivePlayer());
     }
 
-    public static Probability initialProbability(int playerCount) {
-        return new Probability(10000 / playerCount);
-    }
-
     private int countEffectivePlayer() {
         return playerCount / 2;
+    }
+
+    private Map<Integer, Probability> initialAdjustProbabilities() {
+        Map<Integer, Probability> probability = HashMap.newHashMap(playerCount);
+        IntStream.rangeClosed(1, playerCount).forEach(rank -> probability.put(rank, new Probability(0)));
+        return probability;
     }
 
     private void validate(Integer playerCount, Integer roundCount) {

@@ -5,5 +5,4 @@ public enum RoomState {
     PLAYING,
     DONE,
     ;
-
 }

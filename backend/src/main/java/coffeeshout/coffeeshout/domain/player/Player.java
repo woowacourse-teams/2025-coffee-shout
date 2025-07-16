@@ -12,13 +12,10 @@ public class Player {
 
     private Menu menu;
 
-    protected Room room;
-
-    public Player(Long id, String name, Menu menu, Room room) {
+    public Player(Long id, String name, Menu menu) {
         this.id = id;
         this.name = name;
         this.menu = menu;
-        this.room = room;
     }
 
     public boolean isSameName(Player player) {

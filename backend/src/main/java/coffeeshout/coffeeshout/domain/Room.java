@@ -5,9 +5,11 @@ import static org.springframework.util.Assert.state;
 
 import coffeeshout.coffeeshout.domain.player.Player;
 import coffeeshout.coffeeshout.domain.player.Players;
+import coffeeshout.coffeeshout.domain.roulette.ProbabilityAdjuster;
 import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -30,22 +32,13 @@ public class Room {
     public static final int MAXIMUM_GUEST_COUNT = 9;
     public static final int MINIMUM_GUEST_COUNT = 2;
 
-    public Room(JoinCode joinCode, Roulette roulette) {
-        this.joinCode = joinCode;
-        this.roulette = roulette;
-        this.roomState = RoomState.READY;
-    }
-
+    @Builder
     public Room(JoinCode joinCode, Roulette roulette, Player host) {
         this.joinCode = joinCode;
         this.roulette = roulette;
         this.host = host;
         players.join(host);
         this.roomState = RoomState.READY;
-    }
-
-    public void changeHost(Player host) {
-        this.host = host;
     }
 
     public void joinPlayer(Player joinPlayer) {
@@ -56,6 +49,11 @@ public class Room {
     public void setMiniGame(List<MiniGame> miniGames) {
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
         this.miniGames = miniGames;
+    }
+
+    // TODO 미니게임 결과 반영
+    public void applyMiniGameResult(MiniGameResult miniGameResult){
+        players.adjustProbabilities(miniGameResult, new ProbabilityAdjuster(players.getPlayerCount(), miniGames.size()));
     }
 
     // TODO: 플레이어가 방에서 나가는 로직 필요
@@ -69,7 +67,7 @@ public class Room {
     }
 
     public boolean hasEnoughPlayers() {
-        return players.playerCount() >= MINIMUM_GUEST_COUNT && players.playerCount() <= MAXIMUM_GUEST_COUNT;
+        return players.getPlayerCount() >= MINIMUM_GUEST_COUNT && players.getPlayerCount() <= MAXIMUM_GUEST_COUNT;
     }
 
     public Player startRoulette() {
@@ -83,4 +81,13 @@ public class Room {
     public boolean isHost(Player player) {
         return host.equals(player);
     }
+
+//    TODO: 미니게임 플레이 어떻게 할까
+//    public void playMiniGame(int miniGameIndex) {
+//       MiniGameResult result = miniGames.get(miniGameIndex).play();
+//       this.roomState = RoomState.PLAYING;
+//       applyMiniGameResult(result);
+//    }
+
+    // 이벤트 수신하는 메서드
 }

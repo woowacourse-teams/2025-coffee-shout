@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
-class ProbabilityCalculatorTest {
+class ProbabilityAdjusterTest {
 
     @Test
     void 방에_참여한_인원수에_따라_각_플레이어의_초기_확률을_계산한다() {
