@@ -42,8 +42,8 @@ export default [
       react,
       'react-hooks': reactHooks,
       prettier,
-      jest: jest,
-      cypress: cypress,
+      jest,
+      cypress,
     },
     rules: {
       ...typescript.configs.recommended.rules,
