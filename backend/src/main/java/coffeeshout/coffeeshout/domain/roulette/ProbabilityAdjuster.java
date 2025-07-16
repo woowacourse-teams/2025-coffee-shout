@@ -13,7 +13,6 @@ public class ProbabilityAdjuster {
     private final Map<Integer, Probability> adjustedProbabilities;
 
     public ProbabilityAdjuster(Integer playerCount, Integer roundCount) {
-        // 생성자가 비대해서 정팩메 고려?
         validate(playerCount, roundCount);
         this.playerCount = playerCount;
         this.roundCount = roundCount;
@@ -22,7 +21,7 @@ public class ProbabilityAdjuster {
     }
 
     private Map<Integer, Probability> initialAdjustProbabilities() {
-        Map<Integer, Probability> probability = new HashMap<>(playerCount);
+        Map<Integer, Probability> probability = HashMap.newHashMap(playerCount);
         IntStream.rangeClosed(1, playerCount).forEach(rank -> probability.put(rank, new Probability(0)));
         return probability;
     }
@@ -37,19 +36,23 @@ public class ProbabilityAdjuster {
         adjustBottomPlayerProbabilities();
     }
 
-    private void adjustBottomPlayerProbabilities1() {
+    private void adjustBottomPlayerProbabilities() {
         Probability current = getMaxAdjustableRangePerRound();
-        for (int i = playerCount; i >= playerCount - countEffectivePlayer(); i--) {
-            adjustProbabilities.put(i, current);
-            current -= computeAdjustProbabilityStep();
+        final int startRank = playerCount;
+        final int endRank = playerCount - countEffectivePlayer();
+        for (int rank = startRank; rank >= endRank; rank--) {
+            adjustedProbabilities.put(rank, current);
+            current = current.minus(computeAdjustProbabilityStep());
         }
     }
 
     private void adjustTopPlayerProbabilities() {
         Probability invertCurrent = getMaxAdjustableRangePerRound().invert();
-        for (int i = 1; i <= countEffectivePlayer(); i++) {
-            adjustProbabilities.put(i, -current);
-            current += computeAdjustProbabilityStep();
+        final int startRank = 1;
+        final int endRank = countEffectivePlayer();
+        for (int rank = startRank; rank <= endRank; rank++) {
+            adjustedProbabilities.put(rank, invertCurrent);
+            invertCurrent = invertCurrent.plus(computeAdjustProbabilityStep());
         }
     }
 

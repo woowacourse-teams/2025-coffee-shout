@@ -17,6 +17,4 @@ public record Probability(Integer value) {
     public Probability invert(){
         return new Probability(-value);
     }
-
-
 }

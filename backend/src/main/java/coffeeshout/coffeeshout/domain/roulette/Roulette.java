@@ -1,12 +1,7 @@
 package coffeeshout.coffeeshout.domain.roulette;
 
-import coffeeshout.coffeeshout.domain.MiniGameResult;
 import coffeeshout.coffeeshout.domain.player.Player;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.util.Assert;
+import coffeeshout.coffeeshout.domain.player.Players;
 
 public class Roulette {
 
@@ -29,26 +24,10 @@ public class Roulette {
         this.probabilityCalculator = new ProbabilityAdjuster(players.size(), roundCount);
     }
 
-    private void validate(List<Player> players, int round) {
-        Assert.state(players.size() > MINIMUM_PLAYER_COUNT, "플레이어 인원 수는 2명 이상이여야 합니다.");
-        Assert.state(round > 0, "라운드 수는 양수여야 합니다.");
-    }
-
-    public Player spin() {
-        int randomNumber = randomGenerator.nextInt(getTotalProbability());
-
-        for (Map.Entry<Player, Integer> entry : playerProbabilities.entrySet()) {
-            Player player = entry.getKey();
-            int probability = entry.getValue();
-
-            randomNumber -= probability;
-
-            if (randomNumber < 0) {
-                return player;
-            }
-        }
-
-        throw new IllegalStateException("잘못된 당첨 번호입니다. randomNumber = " + randomNumber);
+    public Player spin(Players players) {
+        RouletteRanges rouletteRanges = new RouletteRanges(players);
+        int randomNumber = randomGenerator.nextInt(1, rouletteRanges.endValue());
+        return rouletteRanges.pickPlayer(randomNumber);
     }
 
     public Map<Player, Double> getPlayerProbabilities() {

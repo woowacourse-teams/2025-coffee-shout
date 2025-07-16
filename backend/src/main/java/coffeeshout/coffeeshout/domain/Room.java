@@ -21,7 +21,7 @@ public class Room {
 
     private Players players = new Players();
 
-//    private Roulette roulette;
+    private Roulette roulette;
 
     private List<MiniGame> miniGames = new ArrayList<>();
 
@@ -72,8 +72,12 @@ public class Room {
         return players.playerCount() >= MINIMUM_GUEST_COUNT && players.playerCount() <= MAXIMUM_GUEST_COUNT;
     }
 
-    public void setPlaying() {
-        roomState = RoomState.PLAYING;
+    public Player startRoulette() {
+        state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
+        state(isInPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
+        Player losePlayer = roulette.spin(players);
+        roomState = RoomState.DONE;
+        return losePlayer;
     }
 
     public boolean isHost(Player player) {

@@ -31,7 +31,7 @@ class RoulettePlayServiceTest {
     void 룰렛_정상_시작_조건_충족() {
         // given
         room.joinPlayer(guest);
-        room.setPlaying();
+        room.startRoulette();
 
         // when
         service.playRoulette(host, room);
@@ -44,7 +44,7 @@ class RoulettePlayServiceTest {
     void 호스트가_아니면_룰렛_시작_불가() {
         // given
         room.joinPlayer(guest);
-        room.setPlaying();
+        room.startRoulette();
 
         // when & then
         assertThatThrownBy(() -> service.playRoulette(guest, room))
@@ -54,7 +54,7 @@ class RoulettePlayServiceTest {
     @Test
     void 플레이어_수_부족하면_룰렛_시작_불가() {
         // given: 플레이어 1명만 참여한 상태
-        room.setPlaying();
+        room.startRoulette();
 
         // when & then
         assertThatThrownBy(() -> service.playRoulette(host, room))
