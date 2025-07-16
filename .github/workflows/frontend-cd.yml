@@ -1,0 +1,67 @@
+name: frontend-cd.yml
+on:
+  # fe/prod 에 브랜치가 푸시될 때
+  push:
+    branches:
+      - fe/prod
+
+env:
+  FE_PROD_PATH: fe-prod
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    # 동일한 워크플로가 실행되었을 시 이전 껏을 취소하고 실행
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Node.js 버젼 확인해야함
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm' # 자동 npm 캐시 관리
+
+      # npm으로 실행 확인 바람
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project with Webpack
+        run: npm run build
+
+      - name: Upload build files to tmp artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build
+          path: ./build
+
+  deploy:
+    needs: build
+    runs-on: [ self-hosted, Linux, ARM64 ]
+    steps:
+      - name: Remove previous version app
+        working-directory: .
+        run: rm -rf frontend/
+
+      - name: Download the built file to AWS EC2
+        uses: actions/download-artifact@v4
+        with:
+          name: Build
+          path: frontend
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync frontend s3://techcourse-project-2025/coffee-shout/${{ env.FE_PROD_PATH }}/ --delete
+
+      # 캐시 무효화를 통해서 클라우드 프론트에 최신 버젼으로 노출될 수 있도록 함
+      - name: CloudFront invalidation
+        run: |
+          aws cloudfront create-invalidation \
+                --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} \
+                --paths "/${{ env.FE_PROD_PATH }}/*"
