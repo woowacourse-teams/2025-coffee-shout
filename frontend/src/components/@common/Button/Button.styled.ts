@@ -21,15 +21,6 @@ export const Container = styled.button<Props>`
 
   ${({ variant, theme }) => {
     switch (variant) {
-      case 'primary':
-      default:
-        return `
-          background: ${theme.color.point[400]};
-          color: ${theme.color.white};
-          &:hover { background: ${theme.color.point[500]}; }
-          &:active { background: ${theme.color.point[500]}; }
-        `;
-
       case 'secondary':
         return `
           background: ${theme.color.gray[50]};
@@ -51,6 +42,15 @@ export const Container = styled.button<Props>`
           color: ${theme.color.white};
           cursor: not-allowed;
           opacity: 0.7;
+        `;
+
+      case 'primary':
+      default:
+        return `
+          background: ${theme.color.point[400]};
+          color: ${theme.color.white};
+          &:hover { background: ${theme.color.point[500]}; }
+          &:active { background: ${theme.color.point[500]}; }
         `;
     }
   }}
