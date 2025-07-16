@@ -41,39 +41,10 @@ public class CardGameController {
         cardGameService.checkRound(message.roomId());
     }
 
+    @MessageMapping("/cardGame/rank")
+    public void getRank(CardGameRankMessage message) {
+        final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(message.roomId());
 
-    private void sendGameState(CardGame cardGame, Long roomId) {
-        final Map<Long, Integer> scores = generatePlayerScores(cardGame);
-        final Map<CardDto, Long> playerSelections = generatePlayerSelections(cardGame);
-
-        GameStateMessage stateMessage = new GameStateMessage(
-                roomId,
-                cardGame.getRound().getValue(),
-                playerSelections,
-                scores,
-                cardGame.isFirstRoundFinished()
-        );
-
-        messagingTemplate.convertAndSend("/topic/gameState/" + roomId, stateMessage);
-    }
-
-    private Map<CardDto, Long> generatePlayerSelections(CardGame cardGame) {
-        Map<CardDto, Long> playerSelections = new HashMap<>();
-        cardGame.getCards()
-                .forEach(card -> playerSelections.put(
-                        CardDto.from(card),
-                        cardGame.findCardHolder(card, cardGame.getRound().getValue()).getId()
-                ));
-
-        return playerSelections;
-    }
-
-    private Map<Long, Integer> generatePlayerScores(CardGame cardGame) {
-        Map<Long, Integer> scores = new HashMap<>();
-
-        cardGame.calculateScores()
-                .forEach((player, score) -> scores.put(player.getId(), score));
-
-        return scores;
+        messagingTemplate.convertAndSend("/topic/gameRanks/", MiniGameRanksMessage.from(miniGameResult));
     }
 }

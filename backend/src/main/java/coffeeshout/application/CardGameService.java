@@ -44,6 +44,12 @@ public class CardGameService {
         }
     }
 
+    public MiniGameResult getMiniGameResult(Long roomId) {
+        final CardGame cardGame = cardGames.get(roomId);
+
+        return cardGame.getResult();
+    }
+
     public CardGame getCardGame(Long roomId) {
         return cardGames.get(roomId);
     }
