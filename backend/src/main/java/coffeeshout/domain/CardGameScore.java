@@ -13,12 +13,12 @@ public class CardGameScore implements Comparable<CardGameScore> {
     }
 
     public void addCard(Card card) {
-        if (card instanceof AdditionCard) {
-            addition += card.getValue();
+        if (card.getType() == CardType.ADDITION) {
+            addition += card.value();
         }
 
-        if (card instanceof MultiplierCard) {
-            multiplier *= card.getValue();
+        if (card.getType() == CardType.MULTIPLIER) {
+            multiplier *= card.value();
         }
     }
 

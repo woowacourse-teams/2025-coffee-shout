@@ -4,5 +4,5 @@ public interface Card {
 
     CardType getType();
 
-    Integer getValue();
+    Integer value();
 }
