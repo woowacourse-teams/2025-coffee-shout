@@ -3,6 +3,7 @@ package coffeeshout.domain;
 import static org.springframework.util.Assert.isTrue;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -21,7 +22,7 @@ public class PlayersWithProbability {
 
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
         for (Player player : adjustedProbabilities.keySet()) {
-            final int rank = miniGameResult.getRank(player);
+            final int rank = miniGameResult.getPlayerRank(player);
             final Probability probability = probabilityCalculator.calculateAdjustProbability(getPlayerCount(), rank);
             final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
             final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
@@ -45,5 +46,9 @@ public class PlayersWithProbability {
     private void updateInitialProbabilities() {
         final Probability initialProbability = ProbabilityCalculator.computeInitialProbability(getPlayerCount());
         adjustedProbabilities.keySet().forEach(player -> adjustedProbabilities.put(player, initialProbability));
+    }
+
+    public List<Player> getPlayers() {
+        return adjustedProbabilities.keySet().stream().toList();
     }
 }

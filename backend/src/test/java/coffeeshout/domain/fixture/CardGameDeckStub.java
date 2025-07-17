@@ -1,4 +1,4 @@
-package coffeeshout.Fixture;
+package coffeeshout.domain.fixture;
 
 import coffeeshout.domain.AdditionCard;
 import coffeeshout.domain.Card;
@@ -6,7 +6,7 @@ import coffeeshout.domain.CardGameDeckGenerator;
 import coffeeshout.domain.MultiplierCard;
 import java.util.List;
 
-public class CardGameDeckStub implements CardGameDeckGenerator {
+public final class CardGameDeckStub implements CardGameDeckGenerator {
 
     private int count = 0;
 

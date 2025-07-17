@@ -114,6 +114,13 @@ public class CardGame implements Playable {
         return cardGameScore;
     }
 
+    public Player findPlayerByName(String playerName) {
+        return playerCards.keySet().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    }
+
     public boolean isFirstRound() {
         return round == CardGameRound.FIRST;
     }

@@ -5,6 +5,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.domain.CardGame;
 import coffeeshout.domain.CardGameRandomDeckGenerator;
 import coffeeshout.domain.MiniGameResult;
+import coffeeshout.domain.Player;
 import coffeeshout.domain.Room;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,9 +17,6 @@ import org.springframework.stereotype.Service;
 public class CardGameService {
 
     private final RoomQueryService roomQueryService;
-
-    private final PlayerQueryService playerQueryService;
-
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
 
     public void start(Long roomId) {
@@ -30,10 +28,11 @@ public class CardGameService {
         cardGames.put(roomId, cardGame);
     }
 
-    public void selectCard(Long roomId, Long playerId, Integer cardPosition) {
+    public void selectCard(Long roomId, String playerName, Integer cardIndex) {
         final CardGame cardGame = cardGames.get(roomId);
+        final Player player = cardGame.findPlayerByName(playerName);
 
-        cardGame.selectCard(playerQueryService.findById(playerId), cardPosition);
+        cardGame.selectCard(player, cardIndex);
     }
 
     public void checkAndMoveRound(Long roomId) {

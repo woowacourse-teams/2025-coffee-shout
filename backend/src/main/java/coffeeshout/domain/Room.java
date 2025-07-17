@@ -3,7 +3,6 @@ package coffeeshout.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
-import jakarta.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -21,11 +20,11 @@ public class Room {
 
     private Player host;
 
-    private PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+    private PlayersWithProbability playersWithProbability;
 
     private Roulette roulette;
 
-    private List<MiniGame> miniGames = new ArrayList<>();
+    private List<MiniGame> miniGames;
 
     private RoomState roomState;
 
@@ -34,8 +33,11 @@ public class Room {
         this.joinCode = joinCode;
         this.roulette = roulette;
         this.host = host;
-        playersWithProbability.join(host);
+        this.playersWithProbability = new PlayersWithProbability();
         this.roomState = RoomState.READY;
+        this.miniGames = new ArrayList<>();
+
+        playersWithProbability.join(host);
     }
 
     public void joinPlayer(Player joinPlayer) {
@@ -49,8 +51,9 @@ public class Room {
     }
 
     // TODO 미니게임 결과 반영
-    public void applyMiniGameResult(MiniGameResult miniGameResult){
-        playersWithProbability.adjustProbabilities(miniGameResult, new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
+    public void applyMiniGameResult(MiniGameResult miniGameResult) {
+        playersWithProbability.adjustProbabilities(miniGameResult,
+                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
     }
 
     public boolean hasNoMiniGames() {
@@ -62,7 +65,8 @@ public class Room {
     }
 
     public boolean hasEnoughPlayers() {
-        return playersWithProbability.getPlayerCount() >= MINIMUM_GUEST_COUNT && playersWithProbability.getPlayerCount() <= MAXIMUM_GUEST_COUNT;
+        return playersWithProbability.getPlayerCount() >= MINIMUM_GUEST_COUNT
+                && playersWithProbability.getPlayerCount() <= MAXIMUM_GUEST_COUNT;
     }
 
     public Player startRoulette() {
@@ -75,6 +79,17 @@ public class Room {
 
     public boolean isHost(Player player) {
         return host.equals(player);
+    }
+
+    public List<Player> getPlayers() {
+        return playersWithProbability.getPlayers();
+    }
+
+    public Player findPlayer(String playerName) {
+        return playersWithProbability.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까

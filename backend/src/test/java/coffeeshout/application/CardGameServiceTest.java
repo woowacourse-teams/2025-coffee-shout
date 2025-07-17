@@ -4,14 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.Fixture.CardGameDeckStub;
-import coffeeshout.Fixture.PlayerFixture;
 import coffeeshout.domain.AdditionCard;
 import coffeeshout.domain.CardGame;
 import coffeeshout.domain.CardGameRound;
 import coffeeshout.domain.MiniGameResult;
 import coffeeshout.domain.Player;
 import coffeeshout.domain.Room;
+import coffeeshout.domain.fixture.CardGameDeckStub;
+import coffeeshout.domain.fixture.PlayersFixture;
+import coffeeshout.domain.fixture.RoomFixture;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,11 +29,10 @@ class CardGameServiceTest {
     @Mock
     RoomQueryService roomQueryService;
 
-    @Mock
-    PlayerQueryService playerQueryService;
-
     @InjectMocks
     CardGameService cardGameService;
+
+    Room room;
 
     Long roomId;
 
@@ -40,14 +40,16 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
+        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
         roomId = 1L;
-        players = PlayerFixture.getPlayers();
+        room = RoomFixture.호스트_꾹이();
+
+        ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
         CardGame cardGame = new CardGame(players, new CardGameDeckStub());
         cardGame.start();
         cardGames.put(roomId, cardGame);
-
         ReflectionTestUtils.setField(cardGameService, "cardGames", cardGames);
     }
 
@@ -55,8 +57,6 @@ class CardGameServiceTest {
     void 게임을_시작한다() {
         // given
         long roomId = 2L;
-        Room room = new Room();
-        ReflectionTestUtils.setField(room, "players", PlayerFixture.getPlayers());
         when(roomQueryService.findById(roomId)).thenReturn(room);
 
         // when
@@ -72,31 +72,25 @@ class CardGameServiceTest {
     @Test
     void 카드를_고른다() {
         // given
-        long playerId = 1L;
-
-        when(playerQueryService.findById(playerId)).thenReturn(players.getFirst());
+        String playerName = "루키";
+        Player 루키 = players.stream().filter(p -> p.getName().equals(playerName)).findFirst().get();
 
         // when
-        cardGameService.selectCard(roomId, playerId, 0);
+        cardGameService.selectCard(roomId, playerName, 0);
 
         // then
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(players.getFirst())).hasSize(1);
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(players.getFirst()).getFirst()).isEqualTo(
+        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키)).hasSize(1);
+        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키).getFirst()).isEqualTo(
                 new AdditionCard(40));
     }
 
     @Test
     void 라운드1이_종료되었는지_검사한다() {
         // given
-        when(playerQueryService.findById(1L)).thenReturn(players.get(0));
-        when(playerQueryService.findById(2L)).thenReturn(players.get(1));
-        when(playerQueryService.findById(3L)).thenReturn(players.get(2));
-        when(playerQueryService.findById(4L)).thenReturn(players.get(3));
-
-        cardGameService.selectCard(roomId, players.get(0).getId(), 0);
-        cardGameService.selectCard(roomId, players.get(1).getId(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getId(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getId(), 3);
+        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
 
         // when
         cardGameService.checkAndMoveRound(roomId);
@@ -108,21 +102,16 @@ class CardGameServiceTest {
     @Test
     void 라운드2가_종료되었는지_검사한다() {
         // given
-        when(playerQueryService.findById(1L)).thenReturn(players.get(0));
-        when(playerQueryService.findById(2L)).thenReturn(players.get(1));
-        when(playerQueryService.findById(3L)).thenReturn(players.get(2));
-        when(playerQueryService.findById(4L)).thenReturn(players.get(3));
-
-        cardGameService.selectCard(roomId, players.get(0).getId(), 0);
-        cardGameService.selectCard(roomId, players.get(1).getId(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getId(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getId(), 3);
+        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
         cardGameService.checkAndMoveRound(roomId);
 
-        cardGameService.selectCard(roomId, players.get(0).getId(), 4);
-        cardGameService.selectCard(roomId, players.get(1).getId(), 5);
-        cardGameService.selectCard(roomId, players.get(2).getId(), 6);
-        cardGameService.selectCard(roomId, players.get(3).getId(), 7);
+        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
 
         // when
         cardGameService.checkAndMoveRound(roomId);
@@ -134,21 +123,16 @@ class CardGameServiceTest {
     @Test
     void 게임결과를_계산한다() {
         // given
-        when(playerQueryService.findById(1L)).thenReturn(players.get(0));
-        when(playerQueryService.findById(2L)).thenReturn(players.get(1));
-        when(playerQueryService.findById(3L)).thenReturn(players.get(2));
-        when(playerQueryService.findById(4L)).thenReturn(players.get(3));
-
-        cardGameService.selectCard(roomId, players.get(1).getId(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getId(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getId(), 3);
-        cardGameService.selectCard(roomId, players.get(0).getId(), 0);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
+        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
         cardGameService.checkAndMoveRound(roomId);
 
-        cardGameService.selectCard(roomId, players.get(0).getId(), 4);
-        cardGameService.selectCard(roomId, players.get(1).getId(), 5);
-        cardGameService.selectCard(roomId, players.get(2).getId(), 6);
-        cardGameService.selectCard(roomId, players.get(3).getId(), 7);
+        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
         cardGameService.checkAndMoveRound(roomId);
 
         // when

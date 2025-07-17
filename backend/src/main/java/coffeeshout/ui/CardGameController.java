@@ -33,7 +33,7 @@ public class CardGameController {
 
     @MessageMapping("/cardGame/select")
     public void selectCard(CardGameSelectMessage message) {
-        cardGameService.selectCard(message.roomId(), message.playerId(), message.cardPosition());
+        cardGameService.selectCard(message.roomId(), message.playerName(), message.cardIndex());
 
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 

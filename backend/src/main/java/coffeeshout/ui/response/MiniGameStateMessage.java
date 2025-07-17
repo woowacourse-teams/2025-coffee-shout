@@ -11,15 +11,15 @@ import java.util.Map.Entry;
 public record MiniGameStateMessage(
         Long roomId,
         int currentRound,
-        Map<Card, Long> playerSelections,
-        Map<Long, Integer> scores,
+        Map<Card, String> playerSelections,
+        Map<String, Integer> scores,
         Boolean allSelected
 ) {
 
     public static Object of(final CardGame cardGame, final Long roomId) {
 
-        final Map<Card, Long> playerSelections = generatePlayerSelections(cardGame);
-        final Map<Long, Integer> scores = generatePlayerScores(cardGame);
+        final Map<Card, String> playerSelections = generatePlayerSelections(cardGame);
+        final Map<String, Integer> scores = generatePlayerScores(cardGame);
 
         return new MiniGameStateMessage(
                 roomId,
@@ -30,22 +30,22 @@ public record MiniGameStateMessage(
         );
     }
 
-    private static Map<Card, Long> generatePlayerSelections(CardGame cardGame) {
-        final Map<Card, Long> playerSelections = new HashMap<>();
+    private static Map<Card, String> generatePlayerSelections(CardGame cardGame) {
+        final Map<Card, String> playerSelections = new HashMap<>();
 
         cardGame.getCards()
                 .forEach(card -> playerSelections.put(
                         card,
-                        findCardHolderId(cardGame, card)
+                        findCardHolderName(cardGame, card)
                 ));
 
         return playerSelections;
     }
 
-    private static Long findCardHolderId(CardGame cardGame, Card card) {
+    private static String findCardHolderName(CardGame cardGame, Card card) {
         for (Entry<Player, List<Card>> playerCardsEntry : cardGame.getPlayerCards().entrySet()) {
             if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
-                return playerCardsEntry.getKey().getId();
+                return playerCardsEntry.getKey().getName();
             }
         }
         return null;
@@ -56,11 +56,11 @@ public record MiniGameStateMessage(
         return playerCardsEntry.getValue().get(cardGame.getRound().getValue()).equals(card);
     }
 
-    private static Map<Long, Integer> generatePlayerScores(CardGame cardGame) {
-        final Map<Long, Integer> scores = new HashMap<>();
+    private static Map<String, Integer> generatePlayerScores(CardGame cardGame) {
+        final Map<String, Integer> scores = new HashMap<>();
 
         cardGame.calculateScores()
-                .forEach((player, score) -> scores.put(player.getId(), score.getResult()));
+                .forEach((player, score) -> scores.put(player.getName(), score.getResult()));
 
         return scores;
     }

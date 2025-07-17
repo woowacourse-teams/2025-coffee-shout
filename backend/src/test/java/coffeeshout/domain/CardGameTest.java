@@ -2,8 +2,8 @@ package coffeeshout.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import coffeeshout.Fixture.CardGameDeckStub;
-import coffeeshout.Fixture.PlayerFixture;
+import coffeeshout.domain.fixture.CardGameDeckStub;
+import coffeeshout.domain.fixture.PlayersFixture;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,7 @@ class CardGameTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayerFixture.getPlayers();
+        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
         cardGame = new CardGame(players, new CardGameDeckStub());
 
         cardGame.start();
