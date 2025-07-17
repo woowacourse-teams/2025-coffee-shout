@@ -95,13 +95,16 @@ class RoomTest {
 
     @Test
     void 룰렛을_시작하면_상태가_DONE으로_변하고_한_명은_선택된다() {
+        // given
         room.joinPlayer(게스트_꾹이);
+
         room.joinPlayer(게스트_루키);
         room.joinPlayer(게스트_엠제이);
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         Player loser = room.startRoulette();
 
+        // when & then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
             softly.assertThat(loser).isEqualTo(게스트_엠제이);
@@ -110,6 +113,8 @@ class RoomTest {
 
     @Test
     void 룰렛은_2명_이상이어야_돌릴_수_있다() {
+        // given
+
         // when & then
         assertThatThrownBy(() -> room.startRoulette())
                 .isInstanceOf(IllegalStateException.class);
@@ -127,7 +132,9 @@ class RoomTest {
 
     @Test
     void 호스트_판별이_가능하다() {
-        // then
+        // given
+
+        // when & then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(room.isHost(호스트_한스)).isTrue();
             softly.assertThat(room.isHost(게스트_꾹이)).isFalse();
