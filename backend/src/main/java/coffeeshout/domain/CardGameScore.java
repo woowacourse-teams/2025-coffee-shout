@@ -4,12 +4,12 @@ import java.util.Objects;
 
 public class CardGameScore implements Comparable<CardGameScore> {
 
-    private int sum;
-    private int mul;
+    private int addition;
+    private int multiplier;
 
     public CardGameScore() {
-        this.sum = 0;
-        this.mul = 1;
+        this.addition = 0;
+        this.multiplier = 1;
     }
 
     public void addCard(Card card) {
@@ -23,7 +23,7 @@ public class CardGameScore implements Comparable<CardGameScore> {
     }
 
     public int getResult() {
-        return sum * mul;
+        return addition * multiplier;
     }
 
     @Override
