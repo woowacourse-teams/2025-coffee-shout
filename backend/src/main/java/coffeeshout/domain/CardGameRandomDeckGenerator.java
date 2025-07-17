@@ -27,13 +27,13 @@ public class CardGameRandomDeckGenerator implements CardGameDeckGenerator {
 
     @Override
     public List<Card> spreadCards() {
-        List<Card> generalCopy = new ArrayList<>(GENERAL_CARDS);
-        List<Card> specialCopy = new ArrayList<>(SPECIAL_CARDS);
+        final List<Card> generalCopy = new ArrayList<>(GENERAL_CARDS);
+        final List<Card> specialCopy = new ArrayList<>(SPECIAL_CARDS);
 
         Collections.shuffle(generalCopy);
         Collections.shuffle(specialCopy);
 
-        List<Card> selectedCards = new ArrayList<>();
+        final List<Card> selectedCards = new ArrayList<>();
         selectedCards.addAll(generalCopy.subList(0, 6));
         selectedCards.addAll(specialCopy.subList(0, 3));
 

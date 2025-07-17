@@ -17,7 +17,7 @@ public record JoinCode(String value) {
     }
 
     public static JoinCode generate() {
-        final List<Integer> asciiCodes = convertAsciiList(CHARSET);
+        final List<Integer> asciiCodes = convertAsciiList();
         Collections.shuffle(asciiCodes);
         return new JoinCode(asciiCodes.stream()
                 .limit(CODE_LENGTH)
@@ -25,8 +25,8 @@ public record JoinCode(String value) {
                 .collect(Collectors.joining()));
     }
 
-    private static List<Integer> convertAsciiList(String target) {
-        return target.chars().boxed().collect(Collectors.toList());
+    private static List<Integer> convertAsciiList() {
+        return JoinCode.CHARSET.chars().boxed().collect(Collectors.toList());
     }
 
     private static String convertAsciiToString(int asciiCode) {

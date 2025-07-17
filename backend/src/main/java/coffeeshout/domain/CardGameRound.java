@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardGameRound {
+
     FIRST(1),
     SECOND(2),
     END(-1);

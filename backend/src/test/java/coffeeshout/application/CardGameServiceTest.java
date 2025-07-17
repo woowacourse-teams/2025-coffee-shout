@@ -87,10 +87,7 @@ class CardGameServiceTest {
     @Test
     void 라운드1이_종료되었는지_검사한다() {
         // given
-        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
+        selectFirstCardEveryPlayer();
 
         // when
         cardGameService.checkAndMoveRound(roomId);
@@ -102,16 +99,10 @@ class CardGameServiceTest {
     @Test
     void 라운드2가_종료되었는지_검사한다() {
         // given
-        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
+        selectFirstCardEveryPlayer();
         cardGameService.checkAndMoveRound(roomId);
 
-        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
+        selectSecondCardEveryPlayer();
 
         // when
         cardGameService.checkAndMoveRound(roomId);
@@ -123,16 +114,10 @@ class CardGameServiceTest {
     @Test
     void 게임결과를_계산한다() {
         // given
-        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
-        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
+        selectFirstCardEveryPlayer();
         cardGameService.checkAndMoveRound(roomId);
 
-        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
+        selectSecondCardEveryPlayer();
         cardGameService.checkAndMoveRound(roomId);
 
         // when
@@ -149,5 +134,19 @@ class CardGameServiceTest {
         assertThat(miniGameResult.getRank().get(players.get(1))).isEqualTo(3);
         assertThat(miniGameResult.getRank().get(players.get(2))).isEqualTo(1);
         assertThat(miniGameResult.getRank().get(players.get(3))).isEqualTo(3);
+    }
+
+    private void selectFirstCardEveryPlayer() {
+        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
+    }
+
+    private void selectSecondCardEveryPlayer() {
+        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
+        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
+        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
+        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
     }
 }

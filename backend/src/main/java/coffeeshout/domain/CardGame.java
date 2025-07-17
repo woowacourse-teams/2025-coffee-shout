@@ -12,12 +12,9 @@ import lombok.Getter;
 public class CardGame implements Playable {
 
     private final Map<Player, List<Card>> playerCards;
-
-    private List<Card> cards;
-
-    private CardGameRound round;
-
     private final CardGameDeckGenerator cardGameDeckGenerator;
+    private List<Card> cards;
+    private CardGameRound round;
 
     public CardGame(List<Player> players, CardGameDeckGenerator cardGameDeckGenerator) {
         this.playerCards = initPlayerCards(players);

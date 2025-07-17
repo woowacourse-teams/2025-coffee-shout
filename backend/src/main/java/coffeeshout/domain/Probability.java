@@ -1,6 +1,6 @@
 package coffeeshout.domain;
 
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.state;
 
 /*
     - 확률은 100.00 형태에 100을 곱해서 소수점을 없앤 형태로 사용한다.
@@ -8,10 +8,10 @@ import static org.springframework.util.Assert.*;
  */
 public record Probability(Integer value) {
 
-    private static final int MIN_PROBABILITY = 0;
-    private static final int MAX_PROBABILITY = 10000;
     public static final Probability ZERO_PERCENT = new Probability(0);
     public static final Probability CERTAIN = new Probability(10000);
+    private static final int MIN_PROBABILITY = 0;
+    private static final int MAX_PROBABILITY = 10000;
 
     public Probability {
         state(value >= MIN_PROBABILITY && value <= MAX_PROBABILITY, "확률은 0 ~ 10000 사이어야 합니다.");

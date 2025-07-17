@@ -11,7 +11,11 @@ public class PlayersWithProbability {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
 
-    private final Map<Player, Probability> adjustedProbabilities = new LinkedHashMap<>();
+    private final Map<Player, Probability> adjustedProbabilities;
+
+    public PlayersWithProbability() {
+        this.adjustedProbabilities = new LinkedHashMap<>();
+    }
 
     public void join(Player joinPlayer) {
         isTrue(adjustedProbabilities.size() < MAXIMUM_GUEST_COUNT, "게임은 최대 9명까지 참여할 수 있습니다.");

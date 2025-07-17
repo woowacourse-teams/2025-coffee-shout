@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class Player {
 
     private String name;
-
     private Menu menu;
 
     public Player(String name) {
