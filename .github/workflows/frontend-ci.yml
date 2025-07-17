@@ -63,9 +63,10 @@ jobs:
           npm run build
           echo "success=true" >> $GITHUB_OUTPUT
 
+      # 빌드 결과물을 artifact로 업로드 (CD에서 사용)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: ./frontend/dist
+          path: ./dist
           retention-days: 1

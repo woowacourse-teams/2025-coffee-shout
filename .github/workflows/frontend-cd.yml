@@ -12,12 +12,10 @@ env:
   FE_PROD_PATH: fe-prod
 
 jobs:
-  # 1️⃣ CI 워크플로우 호출 (lint, test, build 포함)
   ci:
     uses: ./.github/workflows/frontend-ci.yml
-    
-  # 2️⃣ 배포 작업 (CI 완료 후 실행)
-  deploy:
+
+  cd:
     needs: ci
     runs-on: [ self-hosted, Linux, ARM64 ]
     
@@ -36,6 +34,7 @@ jobs:
         with:
           name: frontend-build
           path: frontend
+        timeout-minutes: 5
 
       - name: Upload to S3
         run: |
