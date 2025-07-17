@@ -49,9 +49,7 @@ const SelectBox = ({
     if (disabled) return;
 
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      onFocus?.();
-    }
+    if (!isOpen) onFocus?.();
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -71,9 +69,7 @@ const SelectBox = ({
       }
       case 'ArrowDown': {
         e.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-        }
+        if (!isOpen) setIsOpen(true);
         break;
       }
       case 'ArrowUp': {
