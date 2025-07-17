@@ -44,7 +44,9 @@ class CardGameServiceTest {
         players = PlayerFixture.getPlayers();
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
-        cardGames.put(roomId, new CardGame(players, new CardGameDeckStub()));
+        CardGame cardGame = new CardGame(players, new CardGameDeckStub());
+        cardGame.start();
+        cardGames.put(roomId, cardGame);
 
         ReflectionTestUtils.setField(cardGameService, "cardGames", cardGames);
     }
@@ -80,7 +82,7 @@ class CardGameServiceTest {
         // then
         assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(players.getFirst())).hasSize(1);
         assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(players.getFirst()).getFirst()).isEqualTo(
-                new GeneralCard(40));
+                new AdditionCard(40));
     }
 
     @Test
@@ -100,7 +102,7 @@ class CardGameServiceTest {
         cardGameService.checkRound(roomId);
 
         // then
-        assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.TWO);
+        assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.SECOND);
     }
 
     @Test
