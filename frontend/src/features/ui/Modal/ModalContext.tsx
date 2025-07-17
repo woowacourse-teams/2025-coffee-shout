@@ -30,28 +30,17 @@ export const ModalProvider = ({ children }: Props) => {
     setOptions({});
   };
 
-  const rendercontent = () => {
-    const { title, showCloseButton = true, hasHeader = true } = options;
-
-    const shouldRenderHeader = hasHeader && (title || showCloseButton);
-
-    if (shouldRenderHeader) {
-      return (
-        <>
-          <Modal.Header title={title} onClose={closeModal} showCloseButton={showCloseButton} />
-          {content}
-        </>
-      );
-    }
-
-    return content;
-  };
-
   return (
     <ModalContext.Provider value={{ openModal, closeModal }}>
       {children}
-      <Modal isOpen={content !== null} onClose={closeModal}>
-        {rendercontent()}
+      <Modal
+        isOpen={content !== null}
+        onClose={closeModal}
+        title={options.title}
+        showCloseButton={options.showCloseButton}
+        hasHeader={options.hasHeader}
+      >
+        {content}
       </Modal>
     </ModalContext.Provider>
   );
