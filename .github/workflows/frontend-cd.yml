@@ -6,7 +6,6 @@ on:
     branches:
       - fe/prod
       - main
-      - ci-cd/**
 
 env:
   FE_PROD_PATH: fe-prod
