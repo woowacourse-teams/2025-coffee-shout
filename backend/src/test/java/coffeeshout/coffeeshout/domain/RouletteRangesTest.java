@@ -33,24 +33,29 @@ class RouletteRangesTest {
 
     @Test
     void 범위를_벗어난_숫자를_입력하면_예외가_발생한다() {
+        // given
         Player player = PlayerFixture.엠제이();
         PlayersWithProbability playersWithProbability = new PlayersWithProbability();
         playersWithProbability.join(player);
 
         RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
+        // when & then
         assertThatThrownBy(() -> rouletteRanges.pickPlayer(10002))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void 값이_없을_경우_endValue는_0을_반환한다() {
+        // given
         PlayersWithProbability playersWithProbability = new PlayersWithProbability();
 
         RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
 
-        final int endValue = rouletteRanges.endValue();
+        // when
+        int endValue = rouletteRanges.endValue();
 
+        // then
         assertThat(endValue).isEqualTo(0);
     }
 

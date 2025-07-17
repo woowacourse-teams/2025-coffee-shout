@@ -34,6 +34,7 @@ class MiniGameResultTypeTest {
             "7, 4"
     })
     void 플레이어수가_홀수이고_중간순위일_경우_UNDECIDED를_반환한다(int playerCount, int rank) {
+        // given
         // when
         MiniGameResultType resultType = MiniGameResultType.of(playerCount, rank);
 
@@ -50,7 +51,6 @@ class MiniGameResultTypeTest {
     })
     void 순위가_하위일_경우_LOSER를_반환한다(int playerCount, int rank) {
         // given
-
         // when
         MiniGameResultType resultType = MiniGameResultType.of(playerCount, rank);
 

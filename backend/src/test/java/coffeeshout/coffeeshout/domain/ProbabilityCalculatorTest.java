@@ -11,6 +11,7 @@ class ProbabilityCalculatorTest {
 
     @Test
     void 방에_참여한_인원수에_따라_각_플레이어의_초기_확률을_계산한다() {
+        // given
         // when
         Probability probability = ProbabilityCalculator.computeInitialProbability(4);
 

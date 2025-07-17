@@ -23,7 +23,6 @@ class PlayersWithProbabilityTest {
             softly.assertThat(playersWithProbability.getProbability(PlayerFixture.루키())).isEqualTo(new Probability(2250));
             softly.assertThat(playersWithProbability.getProbability(PlayerFixture.꾹이())).isEqualTo(new Probability(2750));
             softly.assertThat(playersWithProbability.getProbability(PlayerFixture.엠제이())).isEqualTo(new Probability(3000));
-
         });
     }
 }
