@@ -7,22 +7,22 @@ import java.util.List;
 public class CardGameRandomDeckGenerator implements CardGameDeckGenerator {
 
     private static final List<Card> GENERAL_CARDS = List.of(
-            new GeneralCard(-40),
-            new GeneralCard(-30),
-            new GeneralCard(-20),
-            new GeneralCard(-10),
-            new GeneralCard(0),
-            new GeneralCard(10),
-            new GeneralCard(20),
-            new GeneralCard(30),
-            new GeneralCard(40)
+            new AdditionCard(-40),
+            new AdditionCard(-30),
+            new AdditionCard(-20),
+            new AdditionCard(-10),
+            new AdditionCard(0),
+            new AdditionCard(10),
+            new AdditionCard(20),
+            new AdditionCard(30),
+            new AdditionCard(40)
     );
 
     private static final List<Card> SPECIAL_CARDS = List.of(
-            new SpecialCard(4),
-            new SpecialCard(2),
-            new SpecialCard(0),
-            new SpecialCard(-1)
+            new MultiplierCard(4),
+            new MultiplierCard(2),
+            new MultiplierCard(0),
+            new MultiplierCard(-1)
     );
 
     @Override

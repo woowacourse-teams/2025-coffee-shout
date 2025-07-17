@@ -1,9 +1,9 @@
 package coffeeshout.Fixture;
 
+import coffeeshout.domain.AdditionCard;
 import coffeeshout.domain.Card;
 import coffeeshout.domain.CardGameDeckGenerator;
-import coffeeshout.domain.GeneralCard;
-import coffeeshout.domain.SpecialCard;
+import coffeeshout.domain.MultiplierCard;
 import java.util.List;
 
 public class CardGameDeckStub implements CardGameDeckGenerator {
@@ -14,15 +14,15 @@ public class CardGameDeckStub implements CardGameDeckGenerator {
     public List<Card> spreadCards() {
         count++;
         return List.of(
-                new GeneralCard(40),
-                new GeneralCard(30),
-                new GeneralCard(20),
-                new GeneralCard(10),
-                new GeneralCard(0),
-                new GeneralCard(-10),
-                new SpecialCard(4),
-                new SpecialCard(2),
-                new SpecialCard(0)
+                new AdditionCard(40),
+                new AdditionCard(30),
+                new AdditionCard(20),
+                new AdditionCard(10),
+                new AdditionCard(0),
+                new AdditionCard(-10),
+                new MultiplierCard(4),
+                new MultiplierCard(2),
+                new MultiplierCard(0)
         );
     }
 }

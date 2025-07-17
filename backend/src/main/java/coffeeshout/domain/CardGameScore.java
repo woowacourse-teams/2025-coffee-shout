@@ -15,10 +15,12 @@ public class CardGameScore implements Comparable<CardGameScore> {
     public void addCard(Card card) {
         if (card instanceof GeneralCard) {
             sum += card.getValue();
+        if (card instanceof AdditionCard) {
         }
 
         if (card instanceof SpecialCard) {
             mul *= card.getValue();
+        if (card instanceof MultiplierCard) {
         }
     }
 

@@ -4,12 +4,13 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class SpecialCard implements Card {
+public class AdditionCard implements Card {
+
     private final Integer value;
 
     @Override
     public CardType getType() {
-        return CardType.SPECIAL;
+        return CardType.GENERAL;
     }
 
     @Override
@@ -22,7 +23,7 @@ public class SpecialCard implements Card {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SpecialCard that = (SpecialCard) o;
+        AdditionCard that = (AdditionCard) o;
         return Objects.equals(value, that.value);
     }
 

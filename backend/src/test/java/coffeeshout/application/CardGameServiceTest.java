@@ -6,9 +6,9 @@ import static org.mockito.Mockito.when;
 
 import coffeeshout.Fixture.CardGameDeckStub;
 import coffeeshout.Fixture.PlayerFixture;
+import coffeeshout.domain.AdditionCard;
 import coffeeshout.domain.CardGame;
 import coffeeshout.domain.CardGameRound;
-import coffeeshout.domain.GeneralCard;
 import coffeeshout.domain.MiniGameResult;
 import coffeeshout.domain.Player;
 import coffeeshout.domain.Room;

@@ -17,12 +17,12 @@ class CardGameRandomDeckGeneratorTest {
         assertThat(cards).hasSize(9);
 
         long generalCardCount = cards.stream()
-                .filter(card -> card instanceof GeneralCard)
+                .filter(card -> card instanceof AdditionCard)
                 .count();
         assertThat(generalCardCount).isEqualTo(6);
 
         long specialCardCount = cards.stream()
-                .filter(card -> card instanceof SpecialCard)
+                .filter(card -> card instanceof MultiplierCard)
                 .count();
         assertThat(specialCardCount).isEqualTo(3);
     }
