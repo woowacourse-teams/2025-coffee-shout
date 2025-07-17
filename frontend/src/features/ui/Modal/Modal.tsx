@@ -3,14 +3,14 @@ import { MouseEvent, PropsWithChildren } from 'react';
 import * as S from './Modal.styled';
 
 type Props = {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
 } & PropsWithChildren;
 
-const Modal = ({ open, onClose, children }: Props) => {
+const Modal = ({ isOpen, onClose, children }: Props) => {
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
-  if (!open) return null;
+  if (!isOpen) return null;
 
   return (
     <Portal containerId="modal-root">
