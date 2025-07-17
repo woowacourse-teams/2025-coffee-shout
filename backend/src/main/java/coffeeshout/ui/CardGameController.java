@@ -27,7 +27,8 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 
-        messagingTemplate.convertAndSend("/topic/gameState/", MiniGameStateMessage.of(cardGame, message.roomId()));
+        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/gameState",
+                MiniGameStateMessage.of(cardGame, message.roomId()));
     }
 
     @MessageMapping("/cardGame/select")
@@ -36,7 +37,8 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(message.roomId());
 
-        messagingTemplate.convertAndSend("/topic/gameState/", MiniGameStateMessage.of(cardGame, message.roomId()));
+        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/gameState",
+                MiniGameStateMessage.of(cardGame, message.roomId()));
 
         cardGameService.checkRound(message.roomId());
     }
@@ -45,6 +47,7 @@ public class CardGameController {
     public void getRank(CardGameRankMessage message) {
         final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(message.roomId());
 
-        messagingTemplate.convertAndSend("/topic/gameRanks/", MiniGameRanksMessage.from(miniGameResult));
+        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/  ",
+                MiniGameRanksMessage.from(miniGameResult));
     }
 }
