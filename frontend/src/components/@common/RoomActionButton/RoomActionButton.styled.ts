@@ -5,12 +5,15 @@ export const Container = styled.button`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 28px 20px;
   gap: 20px;
-  width: 331px;
+
+  width: 100%;
+  min-width: 310px;
   height: 135px;
   background-color: ${({ theme }) => theme.color.gray[50]};
   border-radius: 12px;
+  padding: 28px 20px;
+
   &:hover,
   &:active {
     background-color: ${({ theme }) => theme.color.gray[200]};
