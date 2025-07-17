@@ -2,6 +2,7 @@ import Portal from '@/components/@common/Portal/Portal';
 import useEscapeKey from '@/hooks/useEscapeKey';
 import { MouseEvent, PropsWithChildren } from 'react';
 import * as S from './Modal.styled';
+import ModalHeader from './ModalHeader';
 
 type Props = {
   isOpen: boolean;
@@ -17,12 +18,12 @@ const Modal = ({ isOpen, onClose, children }: Props) => {
   return (
     <Portal containerId="modal-root">
       <S.Backdrop onClick={onClose}>
-        <S.Container onClick={stopPropagation}>
-          <S.Content>{children}</S.Content>
-        </S.Container>
+        <S.Container onClick={stopPropagation}>{children}</S.Container>
       </S.Backdrop>
     </Portal>
   );
 };
+
+Modal.Header = ModalHeader;
 
 export default Modal;

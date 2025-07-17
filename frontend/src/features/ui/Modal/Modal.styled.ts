@@ -14,25 +14,14 @@ export const Backdrop = styled.div`
 `;
 
 export const Container = styled.div`
-  display: flex;
   width: 100%;
-  height: 66%;
-  overflow: hidden;
+  max-height: 90%;
   margin: 0 24px;
-  flex-direction: column;
-  gap: 5px;
-  padding: 32px;
-  background-color: #fff;
-  border-radius: 10px;
+  padding: 16px;
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.color.white};
+  border-radius: 12px;
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.16),
     0 3px 6px rgba(0, 0, 0, 0.23);
-`;
-
-export const Content = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 `;
