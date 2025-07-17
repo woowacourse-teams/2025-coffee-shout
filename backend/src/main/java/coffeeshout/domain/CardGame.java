@@ -20,7 +20,7 @@ public class CardGame implements Playable {
 
     public CardGame(List<Player> players, CardGameDeckGenerator cardGameDeckGenerator) {
         this.playerCards = initPlayerCards(players);
-        this.round = CardGameRound.ONE;
+        this.round = CardGameRound.FIRST;
         this.cardGameDeckGenerator = cardGameDeckGenerator;
         this.cards = new ArrayList<>();
     }
@@ -131,10 +131,10 @@ public class CardGame implements Playable {
     }
 
     public boolean isFirstRound() {
-        return round == CardGameRound.ONE;
+        return round == CardGameRound.FIRST;
     }
 
     public boolean isSecondRound() {
-        return round == CardGameRound.TWO;
+        return round == CardGameRound.SECOND;
     }
 }

@@ -42,11 +42,11 @@ class CardGameTest {
         // given
 
         // when
-        assertThat(cardGame.getRound()).isEqualTo(CardGameRound.ONE);
+        assertThat(cardGame.getRound()).isEqualTo(CardGameRound.FIRST);
         cardGame.nextRound();
 
         // then
-        assertThat(cardGame.getRound()).isEqualTo(CardGameRound.TWO);
+        assertThat(cardGame.getRound()).isEqualTo(CardGameRound.SECOND);
     }
 
     @Test
