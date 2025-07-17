@@ -26,14 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Node.js 버젼 확인해야함
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm' # 자동 npm 캐시 관리
 
-      # npm으로 실행 확인 바람
       - name: Install dependencies
         run: npm install
 
