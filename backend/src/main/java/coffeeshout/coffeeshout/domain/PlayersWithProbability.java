@@ -1,10 +1,7 @@
-package coffeeshout.coffeeshout.domain.player;
+package coffeeshout.coffeeshout.domain;
 
 import static org.springframework.util.Assert.isTrue;
 
-import coffeeshout.coffeeshout.domain.game.MiniGameResult;
-import coffeeshout.coffeeshout.domain.roulette.Probability;
-import coffeeshout.coffeeshout.domain.roulette.ProbabilityCalculator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -24,10 +21,11 @@ public class PlayersWithProbability {
 
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
         for (Player player : adjustedProbabilities.keySet()) {
-            int rank = miniGameResult.getRank(player);
-            Probability adjustProbability = probabilityCalculator.getAdjustProbability(rank);
-            Probability totalProbability = getProbability(player).plus(adjustProbability);
-            adjustedProbabilities.put(player, totalProbability);
+            final int rank = miniGameResult.getRank(player);
+            final Probability probability = probabilityCalculator.calculateAdjustProbability(getPlayerCount(), rank);
+            final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
+            final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
+            adjustedProbabilities.put(player, adjustedProbability);
         }
     }
 
@@ -45,7 +43,7 @@ public class PlayersWithProbability {
     }
 
     private void updateInitialProbabilities() {
-        Probability initialProbability = ProbabilityCalculator.computeInitialProbability(getPlayerCount());
+        final Probability initialProbability = ProbabilityCalculator.computeInitialProbability(getPlayerCount());
         adjustedProbabilities.keySet().forEach(player -> adjustedProbabilities.put(player, initialProbability));
     }
 }

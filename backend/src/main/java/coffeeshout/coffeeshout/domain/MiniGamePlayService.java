@@ -1,9 +1,6 @@
-package coffeeshout.coffeeshout.domain.game;
+package coffeeshout.coffeeshout.domain;
 
 import static org.springframework.util.Assert.state;
-
-import coffeeshout.coffeeshout.domain.room.Room;
-import coffeeshout.coffeeshout.domain.player.Player;
 
 public class MiniGamePlayService {
 

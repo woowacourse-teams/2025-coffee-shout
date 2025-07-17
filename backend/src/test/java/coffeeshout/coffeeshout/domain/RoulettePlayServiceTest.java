@@ -1,21 +1,21 @@
-package coffeeshout.coffeeshout.domain.service;
+package coffeeshout.coffeeshout.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import coffeeshout.coffeeshout.domain.room.Room;
-import coffeeshout.coffeeshout.domain.room.RoomState;
+import coffeeshout.coffeeshout.domain.Room;
+import coffeeshout.coffeeshout.domain.RoomState;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.RoomFixture;
-import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.roulette.RoulettePlayService;
+import coffeeshout.coffeeshout.domain.Player;
+import coffeeshout.coffeeshout.domain.RoulettePlayService;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class RoulettePlayServiceTest {
-    private final RoulettePlayService roulettePlayService = new RoulettePlayService();
-    private final Player 한스 = PlayerFixture.한스();
-    private final Player 꾹이 = PlayerFixture.꾹이();
-    private final Room room = RoomFixture.호스트_꾹이();
+    private RoulettePlayService roulettePlayService = new RoulettePlayService();
+    private Player 한스 = PlayerFixture.한스();
+    private Player 꾹이 = PlayerFixture.꾹이();
+    private Room room = RoomFixture.호스트_꾹이();
 
     @Test
     void 룰렛_정상_시작_조건_충족() {

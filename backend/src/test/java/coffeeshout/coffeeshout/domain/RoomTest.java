@@ -5,12 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.RouletteFixture;
-import coffeeshout.coffeeshout.domain.game.MiniGame;
-import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.room.JoinCode;
-import coffeeshout.coffeeshout.domain.room.Room;
-import coffeeshout.coffeeshout.domain.room.RoomState;
-import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,8 +1,8 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
-import coffeeshout.coffeeshout.domain.roulette.FixedLastValueGenerator;
-import coffeeshout.coffeeshout.domain.roulette.JavaRandomGenerator;
-import coffeeshout.coffeeshout.domain.roulette.Roulette;
+import coffeeshout.coffeeshout.domain.FixedLastValueGenerator;
+import coffeeshout.coffeeshout.domain.JavaRandomGenerator;
+import coffeeshout.coffeeshout.domain.Roulette;
 
 public final class RouletteFixture {
 

@@ -1,11 +1,12 @@
-package coffeeshout.coffeeshout.domain.roulette;
+package coffeeshout.coffeeshout.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
+import coffeeshout.coffeeshout.domain.Roulette;
 import coffeeshout.coffeeshout.domain.fixture.PlayersFixture;
 import coffeeshout.coffeeshout.domain.fixture.RouletteFixture;
-import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
+import coffeeshout.coffeeshout.domain.Player;
+import coffeeshout.coffeeshout.domain.PlayersWithProbability;
 import org.junit.jupiter.api.Test;
 
 class RouletteTest {

@@ -1,6 +1,4 @@
-package coffeeshout.coffeeshout.domain.roulette;
-
-import coffeeshout.coffeeshout.domain.player.Player;
+package coffeeshout.coffeeshout.domain;
 
 public record RouletteRange(int start, int end, Player player) {
 

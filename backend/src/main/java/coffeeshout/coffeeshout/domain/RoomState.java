@@ -1,4 +1,4 @@
-package coffeeshout.coffeeshout.domain.room;
+package coffeeshout.coffeeshout.domain;
 
 public enum RoomState {
     READY,

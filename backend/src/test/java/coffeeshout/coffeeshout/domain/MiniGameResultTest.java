@@ -1,7 +1,6 @@
 package coffeeshout.coffeeshout.domain;
 
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
-import coffeeshout.coffeeshout.domain.player.Player;
 
 class MiniGameResultTest {
 

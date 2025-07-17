@@ -1,4 +1,4 @@
-package coffeeshout.coffeeshout.domain.room;
+package coffeeshout.coffeeshout.domain;
 
 import static org.springframework.util.Assert.state;
 

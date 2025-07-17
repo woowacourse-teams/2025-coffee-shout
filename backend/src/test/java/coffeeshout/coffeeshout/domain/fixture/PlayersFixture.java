@@ -1,7 +1,7 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
-import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
+import coffeeshout.coffeeshout.domain.Player;
+import coffeeshout.coffeeshout.domain.PlayersWithProbability;
 import java.util.List;
 
 public final class PlayersFixture {

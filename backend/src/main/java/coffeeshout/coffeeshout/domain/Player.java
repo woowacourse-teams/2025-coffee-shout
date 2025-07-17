@@ -1,10 +1,12 @@
-package coffeeshout.coffeeshout.domain.player;
+package coffeeshout.coffeeshout.domain;
 
 import java.util.Objects;
 import lombok.ToString;
 
 @ToString
 public class Player {
+
+    private Long id;
 
     private String name;
 

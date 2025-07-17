@@ -1,14 +1,8 @@
-package coffeeshout.coffeeshout.domain.room;
+package coffeeshout.coffeeshout.domain;
 
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.coffeeshout.domain.game.MiniGame;
-import coffeeshout.coffeeshout.domain.game.MiniGameResult;
-import coffeeshout.coffeeshout.domain.player.Player;
-import coffeeshout.coffeeshout.domain.player.PlayersWithProbability;
-import coffeeshout.coffeeshout.domain.roulette.ProbabilityCalculator;
-import coffeeshout.coffeeshout.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -73,7 +67,7 @@ public class Room {
     public Player startRoulette() {
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isInPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        Player losePlayer = roulette.spin(playersWithProbability);
+        final Player losePlayer = roulette.spin(playersWithProbability);
         roomState = RoomState.DONE;
         return losePlayer;
     }

@@ -1,6 +1,6 @@
 package coffeeshout.coffeeshout.domain.fixture;
 
-import coffeeshout.coffeeshout.domain.player.Player;
+import coffeeshout.coffeeshout.domain.Player;
 
 public final class PlayerFixture {
 

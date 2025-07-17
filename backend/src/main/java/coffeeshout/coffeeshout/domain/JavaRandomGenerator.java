@@ -1,4 +1,4 @@
-package coffeeshout.coffeeshout.domain.roulette;
+package coffeeshout.coffeeshout.domain;
 
 import java.util.Random;
 

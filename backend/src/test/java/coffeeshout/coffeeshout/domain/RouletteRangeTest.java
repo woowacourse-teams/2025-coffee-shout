@@ -1,7 +1,8 @@
-package coffeeshout.coffeeshout.domain.roulette;
+package coffeeshout.coffeeshout.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import coffeeshout.coffeeshout.domain.RouletteRange;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,10 @@ class RouletteRangeTest {
     @ValueSource(ints = {10, 15, 20})
     void 숫자가_범위에_포함되면_true를_반환한다(int number) {
         // given
-        final RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
+        RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
 
         // when
-        final boolean result = range.isBetween(number);
+        boolean result = range.isBetween(number);
 
         // then
         assertThat(result).isTrue();
@@ -27,10 +28,10 @@ class RouletteRangeTest {
     @ValueSource(ints = {9, 21, -100, 100})
     void 숫자가_범위에_포함되지_않으면_false를_반환한다(int number) {
         // given
-        final RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
+        RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
 
         // when
-        final boolean result = range.isBetween(number);
+        boolean result = range.isBetween(number);
 
         // then
         assertThat(result).isFalse();
@@ -38,7 +39,7 @@ class RouletteRangeTest {
 
     @Test
     void 시작값과_끝값도_범위에_포함된다() {
-        final RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
+        RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(range.isBetween(10)).isTrue();

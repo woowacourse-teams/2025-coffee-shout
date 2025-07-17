@@ -1,4 +1,4 @@
-package coffeeshout.coffeeshout.domain.player;
+package coffeeshout.coffeeshout.domain;
 
 public class Menu {
 
