@@ -24,3 +24,8 @@ export const CloseButton = styled.button`
   right: 0;
   top: 0;
 `;
+
+export const CloseIcon = styled.img`
+  -webkit-user-drag: none;
+  user-select: none;
+`;
