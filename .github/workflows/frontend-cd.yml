@@ -1,61 +1,40 @@
-name: frontend-cd.yml
+name: Frontend CD
+
 on:
   # fe/prod 에 브랜치가 푸시될 때
   push:
     branches:
       - fe/prod
       - main
+      - ci-cd/**
 
 env:
   FE_PROD_PATH: fe-prod
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
-
-    defaults:
-      run:
-        working-directory: ./frontend
-
+  # 1️⃣ CI 워크플로우 호출 (lint, test, build 포함)
+  ci:
+    uses: ./.github/workflows/frontend-ci.yml
+    
+  # 2️⃣ 배포 작업 (CI 완료 후 실행)
+  deploy:
+    needs: ci
+    runs-on: [ self-hosted, Linux, ARM64 ]
+    
     # 동일한 워크플로가 실행되었을 시 이전 워크플로를 취소하고 최신 버젼을 실행
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: true
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm' # 자동 npm 캐시 관리
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project with Webpack
-        run: npm run build
-
-      - name: Upload build files to tmp artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Build
-          path: ./build
-
-  deploy:
-    needs: build
-    runs-on: [ self-hosted, Linux, ARM64 ]
+    
     steps:
       - name: Remove previous version app
         working-directory: .
         run: rm -rf frontend/
 
-      - name: Download the built file to AWS EC2
+      - name: Download the built file from CI
         uses: actions/download-artifact@v4
         with:
-          name: Build
+          name: frontend-build
           path: frontend
 
       - name: Upload to S3
