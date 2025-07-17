@@ -99,7 +99,7 @@ class CardGameServiceTest {
         cardGameService.selectCard(roomId, players.get(3).getId(), 3);
 
         // when
-        cardGameService.checkRound(roomId);
+        cardGameService.checkAndMoveRound(roomId);
 
         // then
         assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.SECOND);
@@ -117,7 +117,7 @@ class CardGameServiceTest {
         cardGameService.selectCard(roomId, players.get(1).getId(), 1);
         cardGameService.selectCard(roomId, players.get(2).getId(), 2);
         cardGameService.selectCard(roomId, players.get(3).getId(), 3);
-        cardGameService.checkRound(roomId);
+        cardGameService.checkAndMoveRound(roomId);
 
         cardGameService.selectCard(roomId, players.get(0).getId(), 4);
         cardGameService.selectCard(roomId, players.get(1).getId(), 5);
@@ -125,7 +125,7 @@ class CardGameServiceTest {
         cardGameService.selectCard(roomId, players.get(3).getId(), 7);
 
         // when
-        cardGameService.checkRound(roomId);
+        cardGameService.checkAndMoveRound(roomId);
 
         // then
         assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.END);
@@ -143,13 +143,13 @@ class CardGameServiceTest {
         cardGameService.selectCard(roomId, players.get(2).getId(), 2);
         cardGameService.selectCard(roomId, players.get(3).getId(), 3);
         cardGameService.selectCard(roomId, players.get(0).getId(), 0);
-        cardGameService.checkRound(roomId);
+        cardGameService.checkAndMoveRound(roomId);
 
         cardGameService.selectCard(roomId, players.get(0).getId(), 4);
         cardGameService.selectCard(roomId, players.get(1).getId(), 5);
         cardGameService.selectCard(roomId, players.get(2).getId(), 6);
         cardGameService.selectCard(roomId, players.get(3).getId(), 7);
-        cardGameService.checkRound(roomId);
+        cardGameService.checkAndMoveRound(roomId);
 
         // when
         MiniGameResult miniGameResult = cardGameService.getMiniGameResult(roomId);

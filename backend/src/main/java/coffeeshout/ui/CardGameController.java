@@ -40,7 +40,7 @@ public class CardGameController {
         messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/gameState",
                 MiniGameStateMessage.of(cardGame, message.roomId()));
 
-        cardGameService.checkRound(message.roomId());
+        cardGameService.checkAndMoveRound(message.roomId());
     }
 
     @MessageMapping("/cardGame/rank")

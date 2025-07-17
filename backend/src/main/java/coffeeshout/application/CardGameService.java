@@ -36,7 +36,7 @@ public class CardGameService {
         cardGame.selectCard(playerQueryService.findById(playerId), cardPosition);
     }
 
-    public void checkRound(Long roomId) {
+    public void checkAndMoveRound(Long roomId) {
         final CardGame cardGame = cardGames.get(roomId);
 
         if (cardGame.isFirstRoundFinished()) {
