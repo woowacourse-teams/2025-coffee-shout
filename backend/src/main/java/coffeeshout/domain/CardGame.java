@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -72,8 +73,8 @@ public class CardGame implements Playable {
         this.cards = cardGameDeckGenerator.spreadCards();
     }
 
-    public void selectCard(Player player, Integer cardPosition) {
-        playerCards.get(player).add(cards.get(cardPosition));
+    public void selectCard(Player player, Integer cardIndex) {
+        playerCards.get(player).add(cards.get(cardIndex));
     }
 
     public Map<Player, CardGameScore> calculateScores() {
@@ -87,37 +88,20 @@ public class CardGame implements Playable {
     }
 
     public boolean isFirstRoundFinished() {
-        final boolean allSelected = true;
-
-        for (List<Card> cards : playerCards.values()) {
-            if (cards.size() != 1) {
-                return false;
-            }
-        }
-
-        return allSelected;
+        return playerCards.values().stream()
+                .allMatch(cards -> cards.size() == 1);
     }
 
     public boolean isSecondRoundFinished() {
-        final boolean allSelected = true;
-
-        for (List<Card> cards : playerCards.values()) {
-            if (cards.size() != 2) {
-                return false;
-            }
-        }
-
-        return allSelected;
+        return playerCards.values().stream()
+                .allMatch(cards -> cards.size() == 2);
     }
 
     private Map<Player, List<Card>> initPlayerCards(List<Player> players) {
-        final Map<Player, List<Card>> playerCards = new HashMap<>();
-
-        for (Player player : players) {
-            playerCards.put(player, new ArrayList<>());
-        }
-
-        return playerCards;
+        return players.stream().collect(Collectors.toMap(
+                player -> player,
+                player -> new ArrayList<>()
+        ));
     }
 
     private CardGameScore sumCards(List<Card> cards) {
