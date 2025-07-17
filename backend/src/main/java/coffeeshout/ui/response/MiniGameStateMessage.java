@@ -11,14 +11,14 @@ import java.util.Map.Entry;
 public record MiniGameStateMessage(
         Long roomId,
         int currentRound,
-        Map<CardDto, Long> playerSelections,
+        Map<Card, Long> playerSelections,
         Map<Long, Integer> scores,
         Boolean allSelected
 ) {
 
     public static Object of(final CardGame cardGame, final Long roomId) {
 
-        final Map<CardDto, Long> playerSelections = generatePlayerSelections(cardGame);
+        final Map<Card, Long> playerSelections = generatePlayerSelections(cardGame);
         final Map<Long, Integer> scores = generatePlayerScores(cardGame);
 
         return new MiniGameStateMessage(
@@ -30,12 +30,12 @@ public record MiniGameStateMessage(
         );
     }
 
-    private static Map<CardDto, Long> generatePlayerSelections(CardGame cardGame) {
-        final Map<CardDto, Long> playerSelections = new HashMap<>();
+    private static Map<Card, Long> generatePlayerSelections(CardGame cardGame) {
+        final Map<Card, Long> playerSelections = new HashMap<>();
 
         cardGame.getCards()
                 .forEach(card -> playerSelections.put(
-                        CardDto.from(card),
+                        card,
                         findCardHolderId(cardGame, card)
                 ));
 
@@ -44,11 +44,16 @@ public record MiniGameStateMessage(
 
     private static Long findCardHolderId(CardGame cardGame, Card card) {
         for (Entry<Player, List<Card>> playerCardsEntry : cardGame.getPlayerCards().entrySet()) {
-            if (playerCardsEntry.getValue().get(cardGame.getRound().getValue()).equals(card)) {
+            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
                 return playerCardsEntry.getKey().getId();
             }
         }
         return null;
+    }
+
+    private static boolean hasSameCardInCurrentRound(CardGame cardGame, Card card,
+                                                     Entry<Player, List<Card>> playerCardsEntry) {
+        return playerCardsEntry.getValue().get(cardGame.getRound().getValue()).equals(card);
     }
 
     private static Map<Long, Integer> generatePlayerScores(CardGame cardGame) {
