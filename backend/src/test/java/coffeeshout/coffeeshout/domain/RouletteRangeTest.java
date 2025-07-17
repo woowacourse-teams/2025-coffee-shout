@@ -39,8 +39,10 @@ class RouletteRangeTest {
 
     @Test
     void 시작값과_끝값도_범위에_포함된다() {
+        // given
         RouletteRange range = new RouletteRange(10, 20, PlayerFixture.한스());
 
+        // when & then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(range.isBetween(10)).isTrue();
             softly.assertThat(range.isBetween(20)).isTrue();
