@@ -1,19 +1,19 @@
 package coffeeshout.domain;
 
-import static org.springframework.util.Assert.*;
-
+import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
+@Getter
 public class MiniGameResult {
 
-    private final Map<Player, Integer> ranks;
+    private final Map<Player, Integer> rank;
 
-    public MiniGameResult(Map<Player, Integer> ranks) {
-        this.ranks = ranks;
+    public MiniGameResult() {
+        this.rank = new HashMap<>();
     }
 
-    public int getRank(Player player) {
-        state(ranks.containsKey(player), "존재하지 않는 player입니다. player=" + player);
-        return ranks.get(player);
+    public void setRank(Integer rank, Player player) {
+        this.rank.put(player, rank);
     }
 }

@@ -3,6 +3,7 @@ package coffeeshout.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
+import jakarta.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
