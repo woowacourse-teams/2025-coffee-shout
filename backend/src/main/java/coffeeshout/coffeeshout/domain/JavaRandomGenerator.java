@@ -3,6 +3,7 @@ package coffeeshout.coffeeshout.domain;
 import java.util.Random;
 
 public class JavaRandomGenerator implements RandomGenerator {
+
     private final Random random = new Random();
 
     @Override

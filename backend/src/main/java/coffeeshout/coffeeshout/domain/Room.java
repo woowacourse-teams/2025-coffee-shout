@@ -25,9 +25,6 @@ public class Room {
 
     private RoomState roomState;
 
-    public static final int MAXIMUM_GUEST_COUNT = 9;
-    public static final int MINIMUM_GUEST_COUNT = 2;
-
     @Builder
     public Room(JoinCode joinCode, Roulette roulette, Player host) {
         this.joinCode = joinCode;

@@ -20,7 +20,7 @@ public record JoinCode(String value) {
         final List<Integer> asciiCodes = convertAsciiList(CHARSET);
         Collections.shuffle(asciiCodes);
         return new JoinCode(asciiCodes.stream()
-                .limit(5)
+                .limit(CODE_LENGTH)
                 .map(JoinCode::convertAsciiToString)
                 .collect(Collectors.joining()));
     }

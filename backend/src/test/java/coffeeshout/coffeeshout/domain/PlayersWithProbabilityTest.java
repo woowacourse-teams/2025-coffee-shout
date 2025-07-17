@@ -1,12 +1,8 @@
 package coffeeshout.coffeeshout.domain;
 
-import coffeeshout.coffeeshout.domain.MiniGameResult;
-import coffeeshout.coffeeshout.domain.PlayersWithProbability;
 import coffeeshout.coffeeshout.domain.fixture.MiniGameResultFixture;
 import coffeeshout.coffeeshout.domain.fixture.PlayerFixture;
 import coffeeshout.coffeeshout.domain.fixture.PlayersFixture;
-import coffeeshout.coffeeshout.domain.Probability;
-import coffeeshout.coffeeshout.domain.ProbabilityCalculator;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
