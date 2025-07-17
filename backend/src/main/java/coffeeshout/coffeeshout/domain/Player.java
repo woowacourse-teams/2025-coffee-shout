@@ -25,7 +25,7 @@ public class Player {
         if (!(object instanceof Player player)) {
             return false;
         }
-        return Objects.equals(name, player.name);
+        return Objects.equals(id, player.id);
     }
 
     @Override

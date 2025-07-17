@@ -8,7 +8,6 @@ import static org.springframework.util.Assert.state;
 public class ProbabilityCalculator {
 
     private final Integer playerCount;
-
     private final Integer roundCount;
 
     public ProbabilityCalculator(Integer playerCount, Integer roundCount) {

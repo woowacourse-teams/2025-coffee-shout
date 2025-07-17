@@ -18,6 +18,8 @@ class MiniGameResultTypeTest {
             "4, 2"
     })
     void 순위가_상위일_경우_WINNER를_반환한다(int playerCount, int rank) {
+        // given
+
         // when
         MiniGameResultType resultType = MiniGameResultType.of(playerCount, rank);
 
@@ -47,6 +49,8 @@ class MiniGameResultTypeTest {
             "4, 4"
     })
     void 순위가_하위일_경우_LOSER를_반환한다(int playerCount, int rank) {
+        // given
+
         // when
         MiniGameResultType resultType = MiniGameResultType.of(playerCount, rank);
 

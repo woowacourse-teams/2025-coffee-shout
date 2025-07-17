@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class RoulettePlayServiceTest {
+
     private RoulettePlayService roulettePlayService = new RoulettePlayService();
     private Player 한스 = PlayerFixture.한스();
     private Player 꾹이 = PlayerFixture.꾹이();

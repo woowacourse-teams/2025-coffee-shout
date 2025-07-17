@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class RoomTest {
+
     private JoinCode joinCode = new JoinCode("ABCDF");
     private Roulette roulette = RouletteFixture.고정_끝값_반환();
     private Player 호스트_한스 = PlayerFixture.한스();

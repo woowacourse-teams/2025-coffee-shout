@@ -1,6 +1,7 @@
 package coffeeshout.coffeeshout.domain;
 
 public enum MiniGameResultType {
+
     WINNER,
     UNDECIDED,
     LOSER,

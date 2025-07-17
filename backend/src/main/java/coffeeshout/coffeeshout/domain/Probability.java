@@ -10,7 +10,6 @@ public record Probability(Integer value) {
 
     private static final int MIN_PROBABILITY = 0;
     private static final int MAX_PROBABILITY = 10000;
-
     public static final Probability ZERO_PERCENT = new Probability(0);
     public static final Probability CERTAIN = new Probability(10000);
 

@@ -11,6 +11,9 @@ import lombok.Getter;
 @Getter
 public class Room {
 
+    private static final int MAXIMUM_GUEST_COUNT = 9;
+    private static final int MINIMUM_GUEST_COUNT = 2;
+
     private Long id;
 
     private JoinCode joinCode;

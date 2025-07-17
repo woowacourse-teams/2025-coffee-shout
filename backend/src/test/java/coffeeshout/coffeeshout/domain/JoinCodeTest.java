@@ -21,6 +21,8 @@ class JoinCodeTest {
     @ParameterizedTest
     @ValueSource(strings = {"ABCDEF", "A1LB2", "#ABCD"})
     void 조인코드가_규칙에_맞지_않는다면_예외를_발생한다(String address) {
+        // given
+        // when & then
         assertThatThrownBy(() -> new JoinCode(address))
                 .isInstanceOf(IllegalStateException.class);
     }
