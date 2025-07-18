@@ -48,12 +48,12 @@ export const Trigger = styled.div<TriggerProps>`
       return theme.color.gray[200];
     }};
 
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   user-select: none;
 
   &:hover:not(:disabled) {
-    border-bottom-color: ${({ theme, isOpen }) => {
-      if (isOpen) return theme.color.gray[400];
+    border-bottom-color: ${({ theme, disabled }) => {
+      if (disabled) return theme.color.gray[200];
       return theme.color.gray[400];
     }};
   }
@@ -118,7 +118,7 @@ export const Content = styled.ul<ContentProps>`
 
 export const Item = styled.li<ItemProps>`
   padding: 8px 12px;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 
   background-color: ${({ selected, theme }) => (selected ? theme.color.gray[100] : 'transparent')};
 
