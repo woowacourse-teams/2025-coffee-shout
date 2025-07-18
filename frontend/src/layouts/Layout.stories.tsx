@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
 import Button from '../components/@common/Button/Button';
 import Title from './contentLayouts/Title/Title';
-import Info from './contentLayouts/Info/Info';
+import DescriptionArea from './contentLayouts/DescriptionArea/DescriptionArea';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
 
@@ -85,9 +85,9 @@ export const TopBarAndButton: Story = {
         <Title>
           <Headline2>타이틀 예시</Headline2>
         </Title>
-        <Info>
+        <DescriptionArea>
           <Description>정보 예시</Description>
-        </Info>
+        </DescriptionArea>
       </>
     ),
   },
