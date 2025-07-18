@@ -133,6 +133,8 @@ table {
 
 /* Button reset */
 button {
+  padding: 0;
+  margin: 0;
   background: none;
   cursor: pointer;
   outline: none;
