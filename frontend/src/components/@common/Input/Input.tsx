@@ -10,13 +10,13 @@ const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Prop
   const hasValue = Boolean(value && String(value).length > 0);
 
   return (
-    <S.Container height={height} hasValue={hasValue}>
+    <S.Container $height={height} $hasValue={hasValue}>
       <S.Input ref={ref} value={value} onChange={onChange} {...rest} />
       <S.ClearButton
         type="button"
         onClick={onClear}
         aria-label="입력 내용 지우기"
-        hasValue={hasValue}
+        $hasValue={hasValue}
       >
         <S.CloseIcon src={'/images/close-icon.svg'} />
       </S.ClearButton>

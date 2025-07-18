@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
 
-type ContainerProps = { height: string; hasValue: boolean };
-type ClearButtonProps = { hasValue: boolean };
+type ContainerProps = { $height: string; $hasValue: boolean };
+type ClearButtonProps = { $hasValue: boolean };
 
 export const Container = styled.div<ContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  height: ${({ height }) => height};
-  border-bottom: ${({ theme, hasValue }) =>
-    `2px solid ${hasValue ? theme.color.gray[400] : theme.color.gray[200]}`};
+  height: ${({ $height }) => $height};
+  border-bottom: ${({ theme, $hasValue }) =>
+    `2px solid ${$hasValue ? theme.color.gray[400] : theme.color.gray[200]}`};
 `;
 
 export const Input = styled.input`
@@ -52,7 +52,7 @@ export const ClearButton = styled.button<ClearButtonProps>`
   border: none;
   outline: none;
   cursor: pointer;
-  visibility: ${({ hasValue }) => (hasValue ? 'visible' : 'hidden')};
+  visibility: ${({ $hasValue }) => ($hasValue ? 'visible' : 'hidden')};
 `;
 
 export const CloseIcon = styled.img`
