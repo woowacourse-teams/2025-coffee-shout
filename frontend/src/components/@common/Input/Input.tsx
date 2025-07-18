@@ -6,12 +6,12 @@ type Props = ComponentProps<'input'> & {
   onClear: () => void;
 };
 
-const Input = ({ height = '32px', onClear, value, onChange, ref, ...restProps }: Props) => {
+const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Props) => {
   const hasValue = Boolean(value && String(value).length > 0);
 
   return (
     <S.Container height={height} hasValue={hasValue}>
-      <S.Input ref={ref} value={value} onChange={onChange} {...restProps} />
+      <S.Input ref={ref} value={value} onChange={onChange} {...rest} />
       <S.ClearButton
         type="button"
         onClick={() => onClear()}
