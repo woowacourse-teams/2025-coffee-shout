@@ -24,7 +24,6 @@ const meta: Meta<typeof GameActionButton> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// 기본 상태 (선택되지 않은 상태)
 export const Default: Story = {
   args: {
     isSelected: false,
@@ -32,7 +31,6 @@ export const Default: Story = {
   },
 };
 
-// 선택된 상태
 export const Selected: Story = {
   args: {
     isSelected: true,

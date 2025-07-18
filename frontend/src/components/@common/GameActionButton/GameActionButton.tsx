@@ -5,8 +5,8 @@ import * as S from './GameActionButton.styled';
 type Props = {
   onClick: () => void;
   isSelected: boolean;
-  gameName: string; // 추가: 게임 이름을 props로 받기
-} & Omit<ComponentProps<'button'>, 'onClick'>; // onClick은 이미 정의되어 있으므로 제외
+  gameName: string;
+} & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const GameActionButton = ({ onClick, isSelected, gameName, ...restProps }: Props) => {
   return (
