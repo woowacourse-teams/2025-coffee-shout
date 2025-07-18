@@ -2,9 +2,11 @@ package coffeeshout.minigame.application;
 
 import static org.springframework.util.Assert.state;
 
+import coffeeshout.minigame.domain.cardgame.CardGameRound;
+import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.room.domain.RoomFinder;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
+import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Room;
@@ -22,10 +24,9 @@ public class CardGameService {
 
     public void start(Long roomId) {
         final Room room = roomFinder.findById(roomId);
-        final CardGame cardGame = new CardGame(room.getPlayers(), new CardGameRandomDeckGenerator());
-
+        final CardGameDeckGenerator deckGenerator = new CardGameRandomDeckGenerator();
+        final CardGame cardGame = new CardGame(deckGenerator.generate(), room.getPlayers());
         cardGame.start();
-
         cardGames.put(roomId, cardGame);
     }
 
@@ -39,13 +40,13 @@ public class CardGameService {
     public void checkAndMoveRound(Long roomId) {
         final CardGame cardGame = cardGames.get(roomId);
 
-        if (cardGame.isFirstRoundFinished()) {
+        if (cardGame.isFinished(CardGameRound.FIRST)) {
             state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
             cardGame.nextRound();
-            cardGame.shuffle();
+            cardGame.initGame();
         }
 
-        if (cardGame.isSecondRoundFinished()) {
+        if (cardGame.isFinished(CardGameRound.SECOND)) {
             state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
             cardGame.nextRound();
         }

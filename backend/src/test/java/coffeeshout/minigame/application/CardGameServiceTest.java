@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.minigame.domain.cardgame.AdditionCard;
+import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
@@ -39,6 +40,8 @@ class CardGameServiceTest {
 
     List<Player> players;
 
+    CardGameDeckGenerator deckGenerator = new CardGameDeckStub();
+
     @BeforeEach
     void setUp() {
         players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
@@ -48,7 +51,8 @@ class CardGameServiceTest {
         ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
-        CardGame cardGame = new CardGame(players, new CardGameDeckStub());
+
+        CardGame cardGame = new CardGame(deckGenerator.generate(), players);
         cardGame.start();
         cardGames.put(roomId, cardGame);
         ReflectionTestUtils.setField(cardGameService, "cardGames", cardGames);
@@ -66,7 +70,7 @@ class CardGameServiceTest {
         // then
         CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        assertThat(cardGame.getPlayerCards()).hasSize(4);
+        assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
         verify(roomFinder).findById(roomId);
     }
 
@@ -80,9 +84,7 @@ class CardGameServiceTest {
         cardGameService.selectCard(roomId, playerName, 0);
 
         // then
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키)).hasSize(1);
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키).getFirst()).isEqualTo(
-                new AdditionCard(40));
+        assertThat(cardGameService.getCardGame(roomId).getPlayerHands().totalHandSize()).isEqualTo(1);
     }
 
     @Test

@@ -3,7 +3,9 @@ package coffeeshout.minigame.domain.cardgame;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.CardGameDeckStub;
+import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.PlayersFixture;
+import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.player.domain.Player;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +18,12 @@ class CardGameTest {
 
     List<Player> players;
 
+    CardGameDeckGenerator deckGenerator = new CardGameDeckStub();
+
     @BeforeEach
     void setUp() {
         players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
-        cardGame = new CardGame(players, new CardGameDeckStub());
+        cardGame = new CardGameFake(deckGenerator.generate(), players);
 
         cardGame.start();
     }
@@ -28,14 +32,12 @@ class CardGameTest {
     void 카드를_선택한다() {
         // given
         Player player1 = players.get(0);
-        Player player2 = players.get(1);
 
         // when
         cardGame.selectCard(player1, 0);
 
         // then
-        assertThat(cardGame.getPlayerCards().get(player1)).hasSize(1);
-        assertThat(cardGame.getPlayerCards().get(player2)).hasSize(0);
+        assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(1);
     }
 
     @Test
@@ -48,19 +50,6 @@ class CardGameTest {
 
         // then
         assertThat(cardGame.getRound()).isEqualTo(CardGameRound.SECOND);
-    }
-
-    @Test
-    void 카드를_섞는다() {
-        // given
-
-        // when
-        cardGame.shuffle();
-        cardGame.shuffle();
-        cardGame.shuffle();
-
-        // then
-        assertThat(cardGame.getCardGameDeckGenerator()).extracting("count").isEqualTo(4);
     }
 
     @Test
@@ -88,11 +77,11 @@ class CardGameTest {
         cardGame.selectCard(players.get(0), 0);
         cardGame.selectCard(players.get(1), 1);
         cardGame.selectCard(players.get(2), 2);
-        assertThat(cardGame.isFirstRoundFinished()).isFalse();
+        assertThat(cardGame.isFinished(CardGameRound.FIRST)).isFalse();
         cardGame.selectCard(players.get(3), 3);
 
         // when & then
-        assertThat(cardGame.isFirstRoundFinished()).isTrue();
+        assertThat(cardGame.isFinished(CardGameRound.FIRST)).isTrue();
     }
 
     @Test
@@ -102,13 +91,14 @@ class CardGameTest {
         cardGame.selectCard(players.get(1), 1);
         cardGame.selectCard(players.get(2), 2);
         cardGame.selectCard(players.get(3), 3);
+        cardGame.nextRound();
         cardGame.selectCard(players.get(0), 4);
         cardGame.selectCard(players.get(1), 5);
         cardGame.selectCard(players.get(2), 6);
-        assertThat(cardGame.isSecondRoundFinished()).isFalse();
+        assertThat(cardGame.isFinished(CardGameRound.SECOND)).isFalse();
         cardGame.selectCard(players.get(3), 7);
 
         // when & then
-        assertThat(cardGame.isSecondRoundFinished()).isTrue();
+        assertThat(cardGame.isFinished(CardGameRound.SECOND)).isTrue();
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 public class CardGameController {
 
     private final SimpMessagingTemplate messagingTemplate;
-
     private final CardGameService cardGameService;
 
     @MessageMapping("/cardGame/start")

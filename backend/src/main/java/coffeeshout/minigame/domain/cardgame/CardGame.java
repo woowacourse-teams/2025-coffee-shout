@@ -1,124 +1,62 @@
 package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.room.domain.Playable;
+import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.player.domain.Player;
-import java.util.ArrayList;
-import java.util.HashMap;
+import coffeeshout.room.domain.Playable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class CardGame implements Playable {
 
-    private final Map<Player, List<Card>> playerCards;
-    private final CardGameDeckGenerator cardGameDeckGenerator;
-    private List<Card> cards;
+    private final PlayerHands playerHands;
+    private final Deck deck;
     private CardGameRound round;
 
-    public CardGame(List<Player> players, CardGameDeckGenerator cardGameDeckGenerator) {
-        this.playerCards = initPlayerCards(players);
+    public CardGame(
+            @NonNull Deck deck,
+            @NonNull List<Player> players
+    ) {
+        this.playerHands = new PlayerHands(players);
+        this.deck = deck;
         this.round = CardGameRound.FIRST;
-        this.cardGameDeckGenerator = cardGameDeckGenerator;
-        this.cards = new ArrayList<>();
     }
 
     @Override
     public void start() {
-        shuffle();
+        initGame();
     }
 
     @Override
     public MiniGameResult getResult() {
-        final MiniGameResult miniGameResult = new MiniGameResult();
-
-        final Map<Player, CardGameScore> scores = calculateScores();
-
-        // 점수순으로 플레이어들을 정렬 (높은 점수부터)
-        final List<Map.Entry<Player, CardGameScore>> sortedEntries = scores.entrySet()
-                .stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
-                .toList();
-
-        // 동점자를 고려한 순위 매기기
-        int currentRank = 1;
-        CardGameScore previousScore = null;
-        int playersWithSameRank = 0;
-
-        for (Map.Entry<Player, CardGameScore> entry : sortedEntries) {
-            final CardGameScore currentScore = entry.getValue();
-
-            // 이전 점수와 다르면 순위 업데이트
-            if (previousScore != null && currentScore.compareTo(previousScore) != 0) {
-                currentRank += playersWithSameRank;
-                playersWithSameRank = 0;
-            }
-
-            miniGameResult.setRank(currentRank, entry.getKey());
-            playersWithSameRank++;
-            previousScore = currentScore;
-        }
-
-        return miniGameResult;
+        return MiniGameResult.from(calculateScores());
     }
 
     public void nextRound() {
         this.round = round.next();
     }
 
-    public void shuffle() {
-        this.cards = cardGameDeckGenerator.spreadCards();
+    public void initGame() {
+        deck.shuffle();
     }
 
     public void selectCard(Player player, Integer cardIndex) {
-        playerCards.get(player).add(cards.get(cardIndex));
+        playerHands.put(player, deck.pick(cardIndex));
     }
 
     public Map<Player, CardGameScore> calculateScores() {
-        final Map<Player, CardGameScore> scores = new HashMap<>();
-
-        for (Entry<Player, List<Card>> playerCardEntry : playerCards.entrySet()) {
-            scores.put(playerCardEntry.getKey(), sumCards(playerCardEntry.getValue()));
-        }
-
-        return scores;
+        return playerHands.scoreByPlayer();
     }
 
-    public boolean isFirstRoundFinished() {
-        return playerCards.values().stream()
-                .allMatch(cards -> cards.size() == 1);
+    public boolean isFinished(CardGameRound targetRound) {
+        return round == targetRound && playerHands.isRoundFinished();
     }
 
-    public boolean isSecondRoundFinished() {
-        return playerCards.values().stream()
-                .allMatch(cards -> cards.size() == 2);
-    }
-
-    private Map<Player, List<Card>> initPlayerCards(List<Player> players) {
-        return players.stream().collect(Collectors.toMap(
-                player -> player,
-                player -> new ArrayList<>()
-        ));
-    }
-
-    private CardGameScore sumCards(List<Card> cards) {
-        final CardGameScore cardGameScore = new CardGameScore();
-
-        for (Card card : cards) {
-            cardGameScore.addCard(card);
-        }
-
-        return cardGameScore;
-    }
-
-    public Player findPlayerByName(String playerName) {
-        return playerCards.keySet().stream()
-                .filter(p -> p.getName().equals(playerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    public Player findPlayerByName(String name) {
+        return playerHands.findPlayerByName(name);
     }
 
     public boolean isFirstRound() {

@@ -1,9 +1,12 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
 import java.util.Objects;
 
 public class CardGameScore implements Comparable<CardGameScore> {
 
+    public final static CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
     private int addition;
     private int multiplier;
 
@@ -12,13 +15,23 @@ public class CardGameScore implements Comparable<CardGameScore> {
         this.multiplier = 1;
     }
 
-    public void addCard(Card card) {
+    public CardGameScore(int addition) {
+        this.addition = addition;
+    }
+
+    public CardGameScore(CardHand hand) {
+        this.addition = 0;
+        this.multiplier = 1;
+        hand.forEach(this::updateScore);
+    }
+
+    public void updateScore(Card card) {
         if (card.getType() == CardType.ADDITION) {
-            addition += card.value();
+            addition += card.getValue();
         }
 
         if (card.getType() == CardType.MULTIPLIER) {
-            multiplier *= card.value();
+            multiplier *= card.getValue();
         }
     }
 
