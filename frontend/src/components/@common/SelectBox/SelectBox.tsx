@@ -1,14 +1,14 @@
 import { ComponentProps, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import * as S from './SelectBox.styled';
 
-export type OptionType = {
+export type Option = {
   value: string;
   label: string;
   disabled?: boolean;
 };
 
 export type Props = Omit<ComponentProps<'div'>, 'onChange'> & {
-  options: OptionType[];
+  options: Option[];
   value?: string;
   placeholder?: string;
   disabled?: boolean;
