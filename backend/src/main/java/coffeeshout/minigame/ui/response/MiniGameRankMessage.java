@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.response;
 
 public record MiniGameRankMessage(
         Integer rank,

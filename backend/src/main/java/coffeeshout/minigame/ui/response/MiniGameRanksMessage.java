@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.response;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import java.util.List;

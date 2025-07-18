@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.request;
 
 public record CardGameRankMessage(
         Long roomId

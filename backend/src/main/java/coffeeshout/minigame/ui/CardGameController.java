@@ -3,6 +3,11 @@ package coffeeshout.minigame.ui;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.ui.request.CardGameRankMessage;
+import coffeeshout.minigame.ui.request.CardGameSelectMessage;
+import coffeeshout.minigame.ui.request.CardGameStartMessage;
+import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
+import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -43,6 +48,6 @@ public class CardGameController {
         final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(message.roomId());
 
         messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/  ",
-                coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult));
+                MiniGameRanksMessage.from(miniGameResult));
     }
 }
