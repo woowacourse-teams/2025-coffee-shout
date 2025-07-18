@@ -46,6 +46,9 @@ export const ClearButton = styled.button<ClearButtonProps>`
   background-color: white;
   width: 20%;
   font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border: none;
   outline: none;
   cursor: pointer;
@@ -53,5 +56,6 @@ export const ClearButton = styled.button<ClearButtonProps>`
 `;
 
 export const CloseIcon = styled.img`
-  color: ${({ theme }) => theme.color.gray[300]};
+  -webkit-user-drag: none;
+  user-select: none;
 `;
