@@ -1,4 +1,4 @@
-const EntryName = () => {
+const EntryNamePage = () => {
   return (
     <div>
       <h1>이름 입력</h1>
@@ -9,4 +9,4 @@ const EntryName = () => {
   );
 };
 
-export default EntryName;
+export default EntryNamePage;

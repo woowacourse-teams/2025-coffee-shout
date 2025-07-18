@@ -1,4 +1,4 @@
-const EntryMenu = () => {
+const EntryMenuPage = () => {
   return (
     <div>
       <h1>메뉴 설정</h1>
@@ -22,4 +22,4 @@ const EntryMenu = () => {
   );
 };
 
-export default EntryMenu;
+export default EntryMenuPage;

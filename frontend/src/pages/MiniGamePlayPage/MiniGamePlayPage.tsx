@@ -1,4 +1,4 @@
-const MiniGamePlay = () => {
+const MiniGamePlayPage = () => {
   return (
     <div>
       <h1>미니게임 진행</h1>
@@ -13,4 +13,4 @@ const MiniGamePlay = () => {
   );
 };
 
-export default MiniGamePlay;
+export default MiniGamePlayPage;

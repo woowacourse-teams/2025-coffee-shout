@@ -1,4 +1,4 @@
-const RouletteResult = () => {
+const RouletteResultPage = () => {
   return (
     <div>
       <h1>룰렛 결과</h1>
@@ -12,4 +12,4 @@ const RouletteResult = () => {
   );
 };
 
-export default RouletteResult;
+export default RouletteResultPage;

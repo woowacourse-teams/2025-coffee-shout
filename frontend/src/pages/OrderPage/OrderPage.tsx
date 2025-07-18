@@ -1,4 +1,4 @@
-const Order = () => {
+const OrderPage = () => {
   return (
     <div>
       <h1>주문 페이지</h1>
@@ -16,4 +16,4 @@ const Order = () => {
   );
 };
 
-export default Order;
+export default OrderPage;

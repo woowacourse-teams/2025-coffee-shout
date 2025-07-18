@@ -1,4 +1,4 @@
-const Lobby = () => {
+const LobbyPage = () => {
   return (
     <div>
       <h1>게임 로비</h1>
@@ -16,4 +16,4 @@ const Lobby = () => {
   );
 };
 
-export default Lobby;
+export default LobbyPage;
