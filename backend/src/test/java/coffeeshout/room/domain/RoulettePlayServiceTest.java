@@ -1,6 +1,7 @@
 package coffeeshout.room.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.RoomFixture;
@@ -18,7 +19,7 @@ class RoulettePlayServiceTest {
     @Test
     void 룰렛_정상_시작_조건_충족() {
         // given
-        room.joinPlayer(한스);
+        room.joinGuest(한스);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when
@@ -31,7 +32,7 @@ class RoulettePlayServiceTest {
     @Test
     void 호스트가_아니면_룰렛_시작_불가() {
         // given
-        room.joinPlayer(한스);
+        room.joinGuest(한스);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then

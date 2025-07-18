@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.RoomFixture;
@@ -35,7 +35,7 @@ class MiniGamePlayServiceTest {
         // given
         Player 한스 = PlayerFixture.한스();
 
-        room.joinPlayer(한스);
+        room.joinGuest(한스);
         room.setMiniGame(List.of(new MiniGame()));
 
         // when & then
@@ -47,7 +47,7 @@ class MiniGamePlayServiceTest {
     void 미니게임_없으면_시작_불가() {
         // given
         Player 한스 = PlayerFixture.한스();
-        room.joinPlayer(한스);
+        room.joinGuest(한스);
 
         // when & then
         assertThatThrownBy(() -> service.playMiniGame(host, room))

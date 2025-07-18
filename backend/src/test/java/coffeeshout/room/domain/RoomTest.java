@@ -26,7 +26,8 @@ class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, roulette, 호스트_한스);
+        room = new Room(joinCode, 호스트_한스);
+        ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 
     @Test
@@ -43,7 +44,7 @@ class RoomTest {
     @Test
     void READY_상태에서는_플레이어가_참여할_수_있다() {
         // given
-        room.joinPlayer(게스트_꾹이);
+        room.joinGuest(게스트_꾹이);
 
         // when & then
         assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(2);
@@ -52,11 +53,11 @@ class RoomTest {
     @Test
     void READY_상태가_아니면_참여할_수_없다() {
         // given
-        room.joinPlayer(게스트_꾹이);
+        room.joinGuest(게스트_꾹이);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then
-        assertThatThrownBy(() -> room.joinPlayer(게스트_엠제이))
+        assertThatThrownBy(() -> room.joinGuest(게스트_엠제이))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -98,10 +99,10 @@ class RoomTest {
     @Test
     void 룰렛을_시작하면_상태가_DONE으로_변하고_한_명은_선택된다() {
         // given
-        room.joinPlayer(게스트_꾹이);
+        room.joinGuest(게스트_꾹이);
 
-        room.joinPlayer(게스트_루키);
-        room.joinPlayer(게스트_엠제이);
+        room.joinGuest(게스트_루키);
+        room.joinGuest(게스트_엠제이);
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         Player loser = room.startRoulette();
@@ -125,7 +126,7 @@ class RoomTest {
     @Test
     void 룰렛은_게임_중일때만_돌릴_수_있다() {
         // given
-        room.joinPlayer(게스트_꾹이);
+        room.joinGuest(게스트_꾹이);
 
         // when & then
         assertThatThrownBy(() -> room.startRoulette())

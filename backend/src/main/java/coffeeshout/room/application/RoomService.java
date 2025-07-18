@@ -6,7 +6,8 @@ import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.JoinCodeGenerator;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.room.domain.RoomSaver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final RoomRepository roomRepository;
+    private final RoomFinder roomFinder;
+    private final RoomSaver roomSaver;
     private final MenuFinder menuFinder;
     private final JoinCodeGenerator joinCodeGenerator;
 
@@ -25,6 +27,16 @@ public class RoomService {
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = new Room(joinCode, host);
 
-        return roomRepository.save(room);
+        return roomSaver.save(room);
+    }
+
+    public Room enterRoom(String joinCode, String guestName, Long menuId) {
+        final Menu menu = menuFinder.findById(menuId);
+        final Player guest = new Player(guestName, menu);
+
+        final Room room = roomFinder.findByJoinCode(new JoinCode(joinCode));
+        room.joinGuest(guest);
+
+        return roomSaver.save(room);
     }
 }

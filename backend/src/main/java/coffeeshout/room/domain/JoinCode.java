@@ -2,13 +2,16 @@ package coffeeshout.room.domain;
 
 import static org.springframework.util.Assert.state;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Embeddable
-public record JoinCode(String value) {
+public record JoinCode(
+        @Column(name = "join_code") String value
+) {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;

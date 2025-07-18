@@ -6,8 +6,11 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.minigame.domain.MiniGame;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,9 +20,12 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NaturalIdCache
 @Getter
 public class Room {
 
@@ -30,6 +36,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NaturalId
     @Embedded
     private JoinCode joinCode;
 
@@ -42,8 +49,11 @@ public class Room {
     @Transient
     private Roulette roulette;
 
+    @Transient
     private List<MiniGame> miniGames;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "room_state")
     private RoomState roomState;
 
     public Room(JoinCode joinCode, Player host) {
@@ -57,7 +67,7 @@ public class Room {
 
     }
 
-    public void joinPlayer(Player joinPlayer) {
+    public void joinGuest(Player joinPlayer) {
         isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
         playersWithProbability.join(joinPlayer);
     }

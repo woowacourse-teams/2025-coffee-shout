@@ -14,4 +14,9 @@ public class RoomFinder {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다."));
     }
+
+    public Room findByJoinCode(JoinCode joinCode) {
+        return roomRepository.findByJoinCode(joinCode)
+                .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다."));
+    }
 }
