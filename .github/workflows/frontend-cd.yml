@@ -1,28 +1,33 @@
 name: Frontend CD
 
 on:
-  # fe/prod 에 브랜치가 푸시될 때
-  push:
+  pull_request:
+    types: [closed]  # PR이 닫힐 때만 실행
     branches:
       - fe/prod
       - main
+    paths:
+      - "frontend/**"  # frontend 변경사항만
 
 env:
   FE_PROD_PATH: fe-prod
 
 jobs:
   ci:
+    # PR이 실제로 merge되었을 때만 CI 실행
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/frontend-ci.yml
 
   cd:
     needs: ci
-    runs-on: [ self-hosted, Linux, ARM64 ]
-    
-    # 동일한 워크플로가 실행되었을 시 이전 워크플로를 취소하고 최신 버젼을 실행
+    # PR이 merge되었고 CI가 성공했을 때만 실행
+    if: github.event.pull_request.merged == true && needs.ci.result == 'success'
+    runs-on: [self-hosted, Linux, ARM64]
+
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: true
-    
+
     steps:
       - name: Remove previous version app
         working-directory: .
@@ -39,7 +44,6 @@ jobs:
         run: |
           aws s3 sync frontend s3://techcourse-project-2025/coffee-shout/${{ env.FE_PROD_PATH }}/ --delete
 
-      # 캐시 무효화를 통해서 클라우드 프론트에 최신 버젼으로 노출될 수 있도록 함
       - name: CloudFront invalidation
         run: |
           aws cloudfront create-invalidation \
