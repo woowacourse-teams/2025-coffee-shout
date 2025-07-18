@@ -1,12 +1,9 @@
 import { createContext, PropsWithChildren, ReactNode, useState } from 'react';
 import Modal from './Modal';
 
-type Props = PropsWithChildren;
-
 type Options = {
   title?: string;
   showCloseButton?: boolean;
-  hasHeader?: boolean;
 };
 
 type ModalContextType = {
@@ -16,7 +13,7 @@ type ModalContextType = {
 
 export const ModalContext = createContext<ModalContextType | null>(null);
 
-export const ModalProvider = ({ children }: Props) => {
+export const ModalProvider = ({ children }: PropsWithChildren) => {
   const [content, setContent] = useState<ReactNode | null>(null);
   const [options, setOptions] = useState<Options>({});
 
@@ -38,7 +35,6 @@ export const ModalProvider = ({ children }: Props) => {
         onClose={closeModal}
         title={options.title}
         showCloseButton={options.showCloseButton}
-        hasHeader={options.hasHeader}
       >
         {content}
       </Modal>

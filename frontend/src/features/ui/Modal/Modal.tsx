@@ -9,23 +9,15 @@ type Props = {
   onClose: () => void;
   title?: string;
   showCloseButton?: boolean;
-  hasHeader?: boolean;
 } & PropsWithChildren;
 
-const Modal = ({
-  isOpen,
-  onClose,
-  children,
-  title,
-  showCloseButton = true,
-  hasHeader = true,
-}: Props) => {
+const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Props) => {
   useEscapeKey({ onEscape: onClose, enabled: isOpen });
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
   if (!isOpen) return null;
 
-  const shouldRenderHeader = hasHeader && (title || showCloseButton);
+  const shouldRenderHeader = title || showCloseButton;
 
   return (
     <Portal containerId="modal-root">

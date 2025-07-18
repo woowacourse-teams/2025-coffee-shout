@@ -133,7 +133,7 @@ export const WithoutHeader: Story = {
     };
 
     const handleOpen = () => {
-      openModal(ModalContent(), { hasHeader: false });
+      openModal(ModalContent(), { showCloseButton: false });
     };
 
     return <Button onClick={handleOpen}>헤더 없는 모달</Button>;
