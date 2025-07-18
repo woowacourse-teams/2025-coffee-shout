@@ -124,3 +124,17 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Button reset */
+button {
+  background: none;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
