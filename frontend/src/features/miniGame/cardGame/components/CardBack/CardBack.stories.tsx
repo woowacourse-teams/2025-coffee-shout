@@ -1,0 +1,33 @@
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import CardBack from './CardBack';
+
+const meta = {
+  title: 'Features/MiniGame/CardGame/CardBack',
+  component: CardBack,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+} satisfies Meta<typeof CardBack>;
+
+export default meta;
+
+type Story = StoryObj<typeof CardBack>;
+
+export const Small: Story = {
+  args: {
+    size: 'small',
+  },
+};
+
+export const Medium: Story = {
+  args: {
+    size: 'medium',
+  },
+};
+
+export const Large: Story = {
+  args: {
+    size: 'large',
+  },
+};
