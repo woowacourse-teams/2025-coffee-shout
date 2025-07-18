@@ -8,9 +8,9 @@ type Props = {
   gameName: string;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const GameActionButton = ({ onClick, isSelected, gameName, ...restProps }: Props) => {
+const GameActionButton = ({ onClick, isSelected, gameName, ...rest }: Props) => {
   return (
-    <S.Container onClick={onClick} isSelected={isSelected} {...restProps}>
+    <S.Container onClick={onClick} isSelected={isSelected} {...rest}>
       <S.GameNameWrapper>
         <Headline4 color={isSelected ? 'white' : 'point-400'}>{gameName}</Headline4>
       </S.GameNameWrapper>
