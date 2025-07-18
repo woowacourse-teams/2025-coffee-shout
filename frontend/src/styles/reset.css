@@ -133,18 +133,8 @@ table {
 
 /* Button reset */
 button {
-  margin: 0;
-  padding: 0;
-  border: none;
   background: none;
   cursor: pointer;
   outline: none;
-}
-
-button:focus {
-  outline: none;
-}
-
-button:disabled {
-  cursor: not-allowed;
+  border: none;
 }
