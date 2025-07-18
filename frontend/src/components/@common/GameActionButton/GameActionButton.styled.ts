@@ -21,25 +21,25 @@ const getAdjustedPadding = (isSelected: boolean) => {
 };
 
 type Props = {
-  isSelected: boolean;
+  $isSelected: boolean;
 };
 
 export const Container = styled.button<Props>`
   position: relative;
   display: flex;
   justify-content: space-between;
-  background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.color.point[400] : theme.color.white};
+  background-color: ${({ theme, $isSelected }) =>
+    $isSelected ? theme.color.point[400] : theme.color.white};
 
-  border: ${({ theme, isSelected }) =>
-    isSelected ? `3px solid ${theme.color.point[200]}` : `1px solid ${theme.color.point[200]}`};
+  border: ${({ theme, $isSelected }) =>
+    $isSelected ? `3px solid ${theme.color.point[200]}` : `1px solid ${theme.color.point[200]}`};
   border-radius: 12px;
 
   width: 100%;
   min-width: 310px;
   height: 130px;
-  padding: ${({ isSelected }) => getAdjustedPadding(isSelected).vertical}px
-    ${({ isSelected }) => getAdjustedPadding(isSelected).horizontal}px;
+  padding: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px
+    ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
 `;
 
 export const GameNameWrapper = styled.div``;
@@ -51,6 +51,6 @@ export const InfoIcon = styled.img`
 
 export const GameIcon = styled.div<Props>`
   position: absolute;
-  bottom: ${({ isSelected }) => getAdjustedPadding(isSelected).vertical}px;
-  right: ${({ isSelected }) => getAdjustedPadding(isSelected).horizontal}px;
+  bottom: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px;
+  right: ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
 `;

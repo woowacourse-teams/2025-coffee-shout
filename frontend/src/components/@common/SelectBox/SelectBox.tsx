@@ -92,11 +92,11 @@ const SelectBox = ({
   }, [onBlur]);
 
   return (
-    <S.Container ref={containerRef} width={width} height={height} {...restProps}>
+    <S.Container ref={containerRef} $width={width} $height={height} {...restProps}>
       <S.Trigger
         ref={triggerRef}
-        disabled={disabled}
-        isOpen={isOpen}
+        $disabled={disabled}
+        $isOpen={isOpen}
         onClick={handleTriggerClick}
         onKeyDown={handleKeyDown}
         tabIndex={disabled ? -1 : 0}
@@ -105,18 +105,18 @@ const SelectBox = ({
         aria-haspopup="listbox"
         aria-label={selectedOption ? selectedOption.label : placeholder}
       >
-        <S.SelectText hasValue={!!selectedOption} disabled={disabled}>
+        <S.SelectText $hasValue={!!selectedOption} $disabled={disabled}>
           {selectedOption ? selectedOption.label : placeholder}
         </S.SelectText>
-        <S.ArrowIcon isOpen={isOpen} disabled={disabled} />
+        <S.ArrowIcon $isOpen={isOpen} $disabled={disabled} />
       </S.Trigger>
 
-      <S.Content isOpen={isOpen} role="listbox">
+      <S.Content $isOpen={isOpen} role="listbox">
         {options.map((option) => (
           <S.Item
             key={option.value}
-            disabled={option.disabled}
-            selected={option.value === value}
+            $disabled={option.disabled}
+            $selected={option.value === value}
             onClick={() => !option.disabled && handleOptionClick(option.value)}
             role="option"
             aria-selected={option.value === value}
