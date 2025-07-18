@@ -9,3 +9,12 @@ body {
 
   color: #364153;
 }
+
+#root {
+  /* //430으로 수정 */
+  max-width: 375px;
+  width: 100%;
+  height: 100dvh;
+  margin: 0 auto;
+  background: rgb(185, 38, 38);
+}
