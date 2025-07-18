@@ -20,13 +20,6 @@ export const Default: Story = {
   },
 };
 
-export const Statistics: Story = {
-  args: {
-    currentView: 'statistics',
-    onClick: () => console.log('Switch to roulette'),
-  },
-};
-
 export const Roulette: Story = {
   args: {
     currentView: 'roulette',
