@@ -1,6 +1,5 @@
 package coffeeshout.room.domain;
 
-import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.MiniGame;
@@ -67,7 +66,7 @@ public class Room {
     }
 
     public void joinGuest(Player joinPlayer) {
-        isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
+        state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
         playersWithProbability.join(joinPlayer);
     }
 

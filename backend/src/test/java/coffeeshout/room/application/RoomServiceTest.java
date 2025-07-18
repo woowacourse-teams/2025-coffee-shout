@@ -109,6 +109,20 @@ class RoomServiceTest {
     }
 
     @Test
+    void 게임_중인_방에_입장할_수_없다() {
+        // given
+        String existingJoinCode = "TEST2";
+        String guestName = "더미게스트";
+        Long menuId = 2L;
+
+        testDataHelper.createDummyPlayingRoom(existingJoinCode, "더미호스트");
+
+        // when & then
+        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void 동일한_조인코드로_여러_게스트가_입장_가능() {
         // given
         String hostName = "호스트짱";

@@ -58,7 +58,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
