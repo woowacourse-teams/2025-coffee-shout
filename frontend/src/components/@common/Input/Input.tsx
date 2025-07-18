@@ -1,10 +1,10 @@
 import { ComponentProps } from 'react';
 import * as S from './Input.styled';
 
-type Props = ComponentProps<'input'> & {
+type Props = {
   height?: string;
   onClear: () => void;
-};
+} & ComponentProps<'input'>;
 
 const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Props) => {
   const hasValue = Boolean(value && String(value).length > 0);
