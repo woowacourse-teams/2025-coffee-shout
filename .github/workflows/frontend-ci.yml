@@ -13,9 +13,21 @@ on:
     paths:
       - "frontend/**"
 
+  # 다른 워크플로우에서 호출할 수 있도록 설정
+  workflow_call:
+    outputs:
+      # 빌드 결과를 다른 워크플로우에서 사용할 수 있도록 출력
+      build-success:
+        description: "Build completion status"
+        value: ${{ jobs.ci.outputs.build-success }}
+
 jobs:
   ci:
     runs-on: ubuntu-latest
+
+    # 출력 설정
+    outputs:
+      build-success: ${{ steps.build.outputs.success }}
 
     # frontend 폴더를 기본 작업 디렉토리로 설정
     defaults:
@@ -46,4 +58,15 @@ jobs:
           CI: true
 
       - name: Run Build
-        run: npm run build
+        id: build
+        run: |
+          npm run build
+          echo "success=true" >> $GITHUB_OUTPUT
+
+      # 빌드 결과물을 artifact로 업로드 (CD에서 사용)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: ./frontend/dist
+          retention-days: 1
