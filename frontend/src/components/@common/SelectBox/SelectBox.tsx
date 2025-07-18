@@ -24,7 +24,7 @@ const SelectBox = ({
   value,
   placeholder = '선택하세요',
   disabled = false,
-  width = '200px',
+  width = '100%',
   height = '32px',
   onChange,
   onFocus,
