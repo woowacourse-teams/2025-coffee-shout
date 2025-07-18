@@ -1,7 +1,11 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import * as S from './ButtonBar.styled';
 
-const Button = ({ children }: PropsWithChildren) => {
+type Props = {
+  children: React.ReactElement | [React.ReactElement, React.ReactElement];
+};
+
+const Button = ({ children }: Props) => {
   const buttonCount = Array.isArray(children) ? children.length : 1;
 
   if (buttonCount === 1) {

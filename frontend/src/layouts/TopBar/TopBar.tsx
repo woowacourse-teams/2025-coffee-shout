@@ -1,7 +1,11 @@
-import { PropsWithChildren } from 'react';
+import React from 'react';
 import { TopContainer } from './TopBar.styled';
 
-const Top = ({ children }: PropsWithChildren) => {
+type Props = {
+  children: React.ReactElement;
+};
+
+const Top = ({ children }: Props) => {
   return <TopContainer>{children}</TopContainer>;
 };
 

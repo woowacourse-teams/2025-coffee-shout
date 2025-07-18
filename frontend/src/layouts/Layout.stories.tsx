@@ -57,11 +57,15 @@ const Template = ({ showTopBar, showBanner, bannerHeight, buttonCount, color, co
     )}
     {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
     <Layout.Content>{content}</Layout.Content>
-    {buttonCount > 0 && (
+    {buttonCount === 1 && (
       <Layout.ButtonBar>
-        {Array.from({ length: buttonCount }).map((_, i) => (
-          <Button key={i} variant="primary">{`버튼${i + 1}`}</Button>
-        ))}
+        <Button variant="primary">버튼1</Button>
+      </Layout.ButtonBar>
+    )}
+    {buttonCount === 2 && (
+      <Layout.ButtonBar>
+        <Button variant="primary">버튼1</Button>
+        <Button variant="primary">버튼2</Button>
       </Layout.ButtonBar>
     )}
   </Layout>
