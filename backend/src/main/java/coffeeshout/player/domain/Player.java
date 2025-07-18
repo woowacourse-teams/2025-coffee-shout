@@ -1,15 +1,12 @@
 package coffeeshout.player.domain;
 
 import java.util.Objects;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Player {
 
-    private String name;
+    private final String name;
     private Menu menu;
 
     public Player(String name) {
@@ -18,6 +15,10 @@ public class Player {
 
     public Player(String name, Menu menu) {
         this.name = name;
+        this.menu = menu;
+    }
+
+    public void selectMenu(Menu menu) {
         this.menu = menu;
     }
 

@@ -2,10 +2,12 @@ package coffeeshout.room.domain;
 
 import static org.springframework.util.Assert.state;
 
+import jakarta.persistence.Embeddable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Embeddable
 public record JoinCode(String value) {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

@@ -6,41 +6,55 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.minigame.domain.MiniGame;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Room {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Embedded
     private JoinCode joinCode;
 
+    @Transient
     private Player host;
 
+    @Transient
     private PlayersWithProbability playersWithProbability;
 
+    @Transient
     private Roulette roulette;
 
     private List<MiniGame> miniGames;
 
     private RoomState roomState;
 
-    @Builder
-    public Room(JoinCode joinCode, Roulette roulette, Player host) {
+    public Room(JoinCode joinCode, Player host) {
         this.joinCode = joinCode;
-        this.roulette = roulette;
+        this.roulette = new Roulette(new JavaRandomGenerator());
         this.host = host;
         this.playersWithProbability = new PlayersWithProbability();
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
-
         playersWithProbability.join(host);
+
     }
 
     public void joinPlayer(Player joinPlayer) {
