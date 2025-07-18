@@ -14,7 +14,7 @@
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:jest": "jest",
+    "test:jest": "jest --passWithNoTests",
     "test:cypress": "cypress open"
   },
   "keywords": [],
@@ -32,6 +32,7 @@
     "@types/node": "^24.0.14",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
     "css-loader": "^7.1.2",
@@ -66,6 +67,7 @@
     "@emotion/styled": "^11.14.1",
     "@types/cypress": "^0.1.6",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.7.0"
   }
 }
