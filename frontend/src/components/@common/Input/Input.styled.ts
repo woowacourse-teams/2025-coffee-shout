@@ -28,7 +28,7 @@ export const Input = styled.input`
   }
 
   &:disabled {
-    cursor: not-allowed;
+    cursor: default;
   }
 
   &::placeholder {
