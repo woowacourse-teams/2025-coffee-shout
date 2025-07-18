@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
-import SelectBox, { OptionType } from './SelectBox';
+import SelectBox, { Option } from './SelectBox';
 
 const meta = {
   title: 'Common/SelectBox',
@@ -45,7 +45,7 @@ export default meta;
 
 type Story = StoryObj<typeof SelectBox>;
 
-const basicOptions: OptionType[] = [
+const basicOptions: Option[] = [
   { value: 'apple', label: '사과' },
   { value: 'banana', label: '바나나' },
   { value: 'orange', label: '오렌지' },
@@ -78,7 +78,7 @@ export const Disabled: Story = {
 export const Interactive = () => {
   const [selectedValue, setSelectedValue] = useState<string>('');
 
-  const coffeeOptions: OptionType[] = [
+  const coffeeOptions: Option[] = [
     { value: 'americano', label: '아이스 아메리카노' },
     { value: 'latte', label: '카페 라떼' },
     { value: 'cappuccino', label: '카푸치노' },
