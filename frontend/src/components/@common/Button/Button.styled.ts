@@ -33,14 +33,14 @@ export const Container = styled.button<Props>`
         return `
           background: ${theme.color.point[200]};
           color: ${theme.color.white};
-          cursor: wait;
+          cursor: default;
         `;
 
       case 'disabled':
         return `
           background: ${theme.color.gray[200]};
           color: ${theme.color.white};
-          cursor: not-allowed;
+          cursor: default;
           opacity: 0.7;
         `;
 
