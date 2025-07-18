@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Z_INDEX } from '@/constants/zIndex';
 
 type ThumbProps = {
   index: number;
@@ -29,7 +30,7 @@ export const Option = styled.button`
   justify-content: center;
   flex: 1;
   height: 100%;
-  z-index: 1;
+  z-index: ${Z_INDEX.TOGGLE_BUTTON_OPTION};
   cursor: pointer;
 `;
 
@@ -41,5 +42,5 @@ export const Thumb = styled.div<ThumbProps>`
   border-radius: 20px;
   left: ${({ index, optionCount }) => `${(100 / optionCount) * index}%`};
   transition: left 0.2s;
-  z-index: 0;
+  z-index: ${Z_INDEX.TOGGLE_BUTTON_THUMB};
 `;
