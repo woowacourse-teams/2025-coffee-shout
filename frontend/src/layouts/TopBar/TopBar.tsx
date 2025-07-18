@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 import { TopContainer } from './TopBar.styled';
 
-const Top = ({ hasBackIcon = true }: { hasBackIcon?: boolean }) => (
-  <TopContainer>{hasBackIcon && <img src="/images/back-icon.svg" alt="뒤로가기" />}</TopContainer>
-);
+const Top = ({ children }: PropsWithChildren) => {
+  return <TopContainer>{children}</TopContainer>;
+};
 
 export default Top;

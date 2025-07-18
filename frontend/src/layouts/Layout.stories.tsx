@@ -5,6 +5,7 @@ import Title from './contentLayouts/Title/Title';
 import DescriptionArea from './contentLayouts/DescriptionArea/DescriptionArea';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
+import BackButton from '@/components/@common/BackButton/BackButton';
 
 const meta: Meta<any> = {
   title: 'Layouts/Layout',
@@ -28,7 +29,6 @@ const meta: Meta<any> = {
   ],
   argTypes: {
     showTopBar: { control: 'boolean', name: 'TopBar 표시' },
-    hasBackIcon: { control: 'boolean', name: '뒤로가기 버튼' },
     showBanner: { control: 'boolean', name: 'Banner 표시' },
     bannerHeight: { control: 'text', name: 'Banner Height' },
     buttonCount: { control: { type: 'radio' }, options: [0, 1, 2], name: 'ButtonBar 버튼 개수' },
@@ -37,7 +37,6 @@ const meta: Meta<any> = {
   },
   args: {
     showTopBar: true,
-    hasBackIcon: true,
     showBanner: false,
     bannerHeight: '6rem',
     buttonCount: 1,
@@ -49,17 +48,13 @@ const meta: Meta<any> = {
 export default meta;
 type Story = StoryObj<any>;
 
-const Template = ({
-  showTopBar,
-  hasBackIcon,
-  showBanner,
-  bannerHeight,
-  buttonCount,
-  color,
-  content,
-}: any) => (
+const Template = ({ showTopBar, showBanner, bannerHeight, buttonCount, color, content }: any) => (
   <Layout color={color}>
-    {showTopBar && <Layout.Top hasBackIcon={hasBackIcon} />}
+    {showTopBar && (
+      <Layout.Top>
+        <BackButton />
+      </Layout.Top>
+    )}
     {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
     <Layout.Content>{content}</Layout.Content>
     {buttonCount > 0 && (
@@ -76,7 +71,6 @@ export const TopBarAndButton: Story = {
   render: Template,
   args: {
     showTopBar: true,
-    hasBackIcon: true,
     showBanner: false,
     buttonCount: 1,
     color: 'white',
@@ -102,7 +96,6 @@ export const BannerAndButton: Story = {
   render: Template,
   args: {
     showTopBar: false,
-    hasBackIcon: false,
     showBanner: true,
     bannerHeight: '40%',
     buttonCount: 1,
@@ -115,7 +108,6 @@ export const ContentOnlyPointColor: Story = {
   render: Template,
   args: {
     showTopBar: false,
-    hasBackIcon: false,
     showBanner: false,
     buttonCount: 0,
     color: 'point-400',
