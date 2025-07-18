@@ -17,9 +17,9 @@ const ToggleButton = <Option extends string>({
   return (
     <S.Container>
       <S.Track>
-        {options.map((option, idx) => (
+        {options.map((option, index) => (
           <S.Option key={option} onClick={() => onSelectOption(option)}>
-            <Headline4 color={selectedIndex === idx ? 'white' : 'gray-400'}>{option}</Headline4>
+            <Headline4 color={selectedIndex === index ? 'white' : 'gray-400'}>{option}</Headline4>
           </S.Option>
         ))}
         <S.Thumb index={selectedIndex} optionCount={options.length} />
