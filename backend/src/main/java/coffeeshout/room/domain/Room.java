@@ -64,7 +64,6 @@ public class Room {
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
         playersWithProbability.join(host);
-
     }
 
     public void joinGuest(Player joinPlayer) {
@@ -113,10 +112,7 @@ public class Room {
     }
 
     public Player findPlayer(String playerName) {
-        return playersWithProbability.getPlayers().stream()
-                .filter(p -> p.getName().equals(playerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
+        return playersWithProbability.getPlayer(playerName);
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까

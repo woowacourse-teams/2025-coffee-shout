@@ -61,4 +61,12 @@ public class PlayersWithProbability {
     public List<Player> getPlayers() {
         return adjustedProbabilities.keySet().stream().toList();
     }
+
+    public Player getPlayer(String playerName) {
+        return adjustedProbabilities.keySet()
+                .stream()
+                .filter(player -> player.sameName(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
+    }
 }

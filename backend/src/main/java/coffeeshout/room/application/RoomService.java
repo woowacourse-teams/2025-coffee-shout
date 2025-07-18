@@ -8,6 +8,7 @@ import coffeeshout.room.domain.JoinCodeGenerator;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomFinder;
 import coffeeshout.room.domain.RoomSaver;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +39,21 @@ public class RoomService {
         room.joinGuest(guest);
 
         return roomSaver.save(room);
+    }
+
+    public List<Player> getAllPlayers(Long roomId) {
+        final Room room = roomFinder.findById(roomId);
+
+        return room.getPlayers();
+    }
+
+    public List<Player> selectMenu(Long roomId, String playerName, Long menuId) {
+        final Room room = roomFinder.findById(roomId);
+        final Menu menu = menuFinder.findById(menuId);
+
+        final Player player = room.findPlayer(playerName);
+        player.selectMenu(menu);
+
+        return room.getPlayers();
     }
 }
