@@ -13,8 +13,10 @@ type Story = StoryObj<typeof ToggleButton>;
 
 export const Default: Story = {
   render: (args) => {
-    const [selected, setSelected] = useState(args.selectedOption);
-    return <ToggleButton {...args} selectedOption={selected} onSelectOption={setSelected} />;
+    const [selectedOption, setSelectedOption] = useState(args.selectedOption);
+    return (
+      <ToggleButton {...args} selectedOption={selectedOption} onSelectOption={setSelectedOption} />
+    );
   },
   args: {
     options: ['Option 1', 'Option 2', 'Option 3'],
@@ -24,8 +26,10 @@ export const Default: Story = {
 
 export const TwoOptions: Story = {
   render: (args) => {
-    const [selected, setSelected] = useState(args.selectedOption);
-    return <ToggleButton {...args} selectedOption={selected} onSelectOption={setSelected} />;
+    const [selectedOption, setSelectedOption] = useState(args.selectedOption);
+    return (
+      <ToggleButton {...args} selectedOption={selectedOption} onSelectOption={setSelectedOption} />
+    );
   },
   args: {
     options: ['A', 'B'],
