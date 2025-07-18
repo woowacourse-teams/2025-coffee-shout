@@ -1,6 +1,7 @@
 package coffeeshout.player.domain;
 
 import coffeeshout.player.domain.repository.MenuRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,5 +14,9 @@ public class MenuFinder {
     public Menu findById(Long menuId) {
         return menuRepository.findById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("메뉴가 존재하지 않습니다."));
+    }
+
+    public List<Menu> findAll() {
+        return menuRepository.findAll();
     }
 }
