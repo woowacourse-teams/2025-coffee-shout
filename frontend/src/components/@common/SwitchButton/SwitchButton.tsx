@@ -6,12 +6,12 @@ type Props = {
   onClick: () => void;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const SwitchButton = ({ currentView, onClick, ...props }: Props) => {
+const SwitchButton = ({ currentView, onClick, ...rest }: Props) => {
   const currentIcon =
     currentView === 'statistics' ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg';
 
   return (
-    <S.Container onClick={onClick} {...props}>
+    <S.Container onClick={onClick} {...rest}>
       <S.Icon src={currentIcon} alt={currentView} />
     </S.Container>
   );
