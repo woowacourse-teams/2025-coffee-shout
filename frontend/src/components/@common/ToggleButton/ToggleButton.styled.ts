@@ -10,7 +10,7 @@ export const Container = styled.div`
   width: 100%;
   height: 42px;
   background-color: ${({ theme }) => theme.color.gray[100]};
-  padding: 2px;
+  padding: 4px;
   border-radius: 20px;
   cursor: pointer;
 `;
