@@ -5,7 +5,6 @@ on:
     types: [closed]  # PR이 닫힐 때만 실행
     branches:
       - fe/prod
-      - main
     paths:
       - "frontend/**"  # frontend 변경사항만
 
