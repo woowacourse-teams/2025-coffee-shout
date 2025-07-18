@@ -2,11 +2,11 @@ import React from 'react';
 import { TopContainer } from './TopBar.styled';
 
 type Props = {
-  children: React.ReactElement;
+  backButton?: React.ReactElement;
 };
 
-const Top = ({ children }: Props) => {
-  return <TopContainer>{children}</TopContainer>;
+const Top = ({ backButton }: Props) => {
+  return <TopContainer>{backButton}</TopContainer>;
 };
 
 export default Top;

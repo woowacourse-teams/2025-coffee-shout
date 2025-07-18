@@ -50,11 +50,7 @@ type Story = StoryObj<any>;
 
 const Template = ({ showTopBar, showBanner, bannerHeight, buttonCount, color, content }: any) => (
   <Layout color={color}>
-    {showTopBar && (
-      <Layout.Top>
-        <BackButton />
-      </Layout.Top>
-    )}
+    {showTopBar && <Layout.Top backButton={<BackButton />} />}
     {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
     <Layout.Content>{content}</Layout.Content>
     {buttonCount === 1 && (
