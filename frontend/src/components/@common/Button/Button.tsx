@@ -1,12 +1,16 @@
 import type { ComponentProps } from 'react';
 import * as S from './Button.styled';
 
-type Props = Omit<ComponentProps<'button'>, 'disabled'> & S.Props;
+type Props = {
+  variant: S.ButtonVariant;
+  width: string;
+  height: 'small' | 'medium' | 'large';
+} & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({
   variant = 'primary',
-  width = '328px',
-  height = '50px',
+  width = '100%',
+  height = 'large',
   children,
   ...rest
 }: Props) => {
@@ -15,9 +19,9 @@ const Button = ({
   return (
     <S.Container
       type="button"
-      variant={variant}
-      width={width}
-      height={height}
+      $variant={variant}
+      $width={width}
+      $height={height}
       disabled={isDisabled}
       {...rest}
     >

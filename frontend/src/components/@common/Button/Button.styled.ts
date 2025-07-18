@@ -1,16 +1,27 @@
 import styled from '@emotion/styled';
 
-type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading';
+export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading';
 
-export type Props = {
-  variant?: ButtonVariant;
-  width?: string;
-  height?: string;
+type Props = {
+  $height: 'small' | 'medium' | 'large';
+  $variant: ButtonVariant;
+  $width: string;
 };
 
 export const Container = styled.button<Props>`
-  width: ${({ width }) => width || '328px'};
-  height: ${({ height }) => height || '50px'};
+  width: ${({ $width }) => $width};
+  height: ${({ $height }) => {
+    switch ($height) {
+      case 'small':
+        return '40px';
+      case 'medium':
+        return '45px';
+      case 'large':
+        return '50px';
+      default:
+        return '50px';
+    }
+  }};
   ${({ theme }) => theme.typography.h4}
   display: flex;
   align-items: center;
@@ -19,8 +30,8 @@ export const Container = styled.button<Props>`
   border-radius: 12px;
   cursor: pointer;
 
-  ${({ variant, theme }) => {
-    switch (variant) {
+  ${({ $variant, theme }) => {
+    switch ($variant) {
       case 'secondary':
         return `
           background: ${theme.color.gray[50]};
