@@ -1,16 +1,17 @@
 import { ComponentProps } from 'react';
 import Headline3 from '../Headline3/Headline3';
-import * as S from './RoomActionButton.styled';
 import Description from '../Description/Description';
+import * as S from './RoomActionButton.styled';
 
 type Props = {
   title: string;
   descriptions: string[];
-} & ComponentProps<'button'>;
+  onClick: () => void;
+} & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const RoomActionButton = ({ title, descriptions }: Props) => {
+const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
   return (
-    <S.Container>
+    <S.Container onClick={onClick} {...rest}>
       <Headline3>{title}</Headline3>
       <div>
         {descriptions.map((description, index) => (
