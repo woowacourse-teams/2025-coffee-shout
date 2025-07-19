@@ -6,14 +6,11 @@ type Props = {
 };
 
 export const Container = styled.div<Props>`
-  width: calc(100% + 2rem);
+  width: calc(100% + ${LAYOUT_PADDING} * 2);
   height: ${({ $height }) => $height};
   background-color: ${({ theme }) => theme.color.point[400]};
 
-  margin-top: -${LAYOUT_PADDING};
-  margin-left: -${LAYOUT_PADDING};
-  margin-right: -${LAYOUT_PADDING};
-  margin-bottom: ${LAYOUT_PADDING};
+  margin: -${LAYOUT_PADDING} -${LAYOUT_PADDING} ${LAYOUT_PADDING};
 
   border-radius: 0 0 12px 12px;
 `;
