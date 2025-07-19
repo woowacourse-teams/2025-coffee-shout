@@ -12,6 +12,7 @@ type LayoutStoryArgs = {
   showBanner: boolean;
   bannerHeight: string;
   buttonCount: 0 | 1 | 2;
+  buttonRatio: 'default' | '4:1';
   color: ColorKey;
   content: ReactNode;
 };
@@ -41,6 +42,12 @@ const meta: Meta<LayoutStoryArgs> = {
     showBanner: { control: 'boolean', name: 'Banner 표시' },
     bannerHeight: { control: 'text', name: 'Banner Height' },
     buttonCount: { control: { type: 'radio' }, options: [0, 1, 2], name: 'ButtonBar 버튼 개수' },
+    buttonRatio: {
+      control: { type: 'radio' },
+      options: ['default', '4:1'],
+      name: '버튼 비율',
+      if: { arg: 'buttonCount', eq: 2 },
+    },
     color: { control: 'text', name: '배경색(ColorKey)' },
     content: { control: 'text', name: 'Content 텍스트' },
   },
@@ -49,6 +56,7 @@ const meta: Meta<LayoutStoryArgs> = {
     showBanner: false,
     bannerHeight: '6rem',
     buttonCount: 1,
+    buttonRatio: 'default',
     color: 'white',
     content: '메인 컨텐츠 영역',
   },
@@ -57,8 +65,20 @@ const meta: Meta<LayoutStoryArgs> = {
 export default meta;
 type Story = StoryObj<LayoutStoryArgs>;
 
+const getButtonWidths = (buttonCount: number, ratio: string): number[] => {
+  if (buttonCount === 1) return [1];
+
+  switch (ratio) {
+    case '4:1':
+      return [4, 1];
+    default:
+      return [1, 1];
+  }
+};
+
 const Template = (args: LayoutStoryArgs) => {
-  const { showTopBar, showBanner, bannerHeight, buttonCount, color, content } = args;
+  const { showTopBar, showBanner, bannerHeight, buttonCount, buttonRatio, color, content } = args;
+        const flexRatios = getButtonWidths(buttonCount, buttonRatio);
 
   return (
     <Layout color={color}>
@@ -66,12 +86,12 @@ const Template = (args: LayoutStoryArgs) => {
       {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
       <Layout.Content>{content}</Layout.Content>
       {buttonCount === 1 && (
-        <Layout.ButtonBar>
+        <Layout.ButtonBar flexRatios={flexRatios}>
           <Button variant="primary">버튼1</Button>
         </Layout.ButtonBar>
       )}
       {buttonCount === 2 && (
-        <Layout.ButtonBar>
+        <Layout.ButtonBar flexRatios={flexRatios}>
           <Button variant="primary">버튼1</Button>
           <Button variant="primary">버튼2</Button>
         </Layout.ButtonBar>
@@ -86,6 +106,7 @@ export const TopBarAndButton: Story = {
     showTopBar: true,
     showBanner: false,
     buttonCount: 1,
+    buttonRatio: 'default',
     color: 'white',
     content: (
       <>
@@ -108,6 +129,7 @@ export const BannerAndButton: Story = {
     showBanner: true,
     bannerHeight: '40%',
     buttonCount: 1,
+    buttonRatio: 'default',
     color: 'white',
     content: '메인 컨텐츠 영역',
   },
@@ -119,6 +141,7 @@ export const ContentOnlyPointColor: Story = {
     showTopBar: false,
     showBanner: false,
     buttonCount: 0,
+    buttonRatio: 'default',
     color: 'point-400',
     content: '포인트 컬러 배경의 컨텐츠만 있는 레이아웃',
   },
