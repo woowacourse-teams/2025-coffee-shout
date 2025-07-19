@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 type WrapperProps = {
-  $flexRatio: number; // $width → $flexRatio로 변경
+  $flexRatio: number;
 };
 
 export const Container = styled.div`

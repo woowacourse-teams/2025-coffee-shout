@@ -1,11 +1,9 @@
 import { Children, ReactElement } from 'react';
 import * as S from './ButtonBar.styled';
 
-type FlexRatio = number & { __brand: 'positive' };
-
 type ButtonBarProps = {
   children: ReactElement | ReactElement[];
-  flexRatios?: FlexRatio[];
+  flexRatios?: number[];
 };
 
 const ButtonBar = ({ children, flexRatios }: ButtonBarProps) => {
