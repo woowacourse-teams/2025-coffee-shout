@@ -1,14 +1,25 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
 import Button from '../components/@common/Button/Button';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
 import BackButton from '@/components/@common/BackButton/BackButton';
+import { ColorKey } from '@/constants/color';
 
-const meta: Meta<any> = {
+type LayoutStoryArgs = {
+  showTopBar: boolean;
+  showBanner: boolean;
+  bannerHeight: string;
+  buttonCount: 0 | 1 | 2;
+  color: ColorKey;
+  content: React.ReactNode;
+};
+
+const meta: Meta<LayoutStoryArgs> = {
   title: 'Layouts/Layout',
   component: Layout,
-  tags: ['autodocs'], // ✅ 이렇게 추가!
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <div
@@ -39,31 +50,35 @@ const meta: Meta<any> = {
     bannerHeight: '6rem',
     buttonCount: 1,
     color: 'white',
-    contentText: '메인 컨텐츠 영역',
+    content: '메인 컨텐츠 영역',
   },
 };
 
 export default meta;
-type Story = StoryObj<any>;
+type Story = StoryObj<LayoutStoryArgs>;
 
-const Template = ({ showTopBar, showBanner, bannerHeight, buttonCount, color, content }: any) => (
-  <Layout color={color}>
-    {showTopBar && <Layout.TopBar backButton={<BackButton />} />}
-    {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
-    <Layout.Content>{content}</Layout.Content>
-    {buttonCount === 1 && (
-      <Layout.ButtonBar>
-        <Button variant="primary">버튼1</Button>
-      </Layout.ButtonBar>
-    )}
-    {buttonCount === 2 && (
-      <Layout.ButtonBar>
-        <Button variant="primary">버튼1</Button>
-        <Button variant="primary">버튼2</Button>
-      </Layout.ButtonBar>
-    )}
-  </Layout>
-);
+const Template = (args: LayoutStoryArgs) => {
+  const { showTopBar, showBanner, bannerHeight, buttonCount, color, content } = args;
+
+  return (
+    <Layout color={color}>
+      {showTopBar && <Layout.TopBar backButton={<BackButton />} />}
+      {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
+      <Layout.Content>{content}</Layout.Content>
+      {buttonCount === 1 && (
+        <Layout.ButtonBar>
+          <Button variant="primary">버튼1</Button>
+        </Layout.ButtonBar>
+      )}
+      {buttonCount === 2 && (
+        <Layout.ButtonBar>
+          <Button variant="primary">버튼1</Button>
+          <Button variant="primary">버튼2</Button>
+        </Layout.ButtonBar>
+      )}
+    </Layout>
+  );
+};
 
 export const TopBarAndButton: Story = {
   render: Template,
