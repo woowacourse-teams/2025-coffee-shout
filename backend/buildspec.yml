@@ -1,58 +1,19 @@
 version: 0.2
 
-env:
-  variables:
-    JAVA_HOME: "/usr/lib/jvm/java-21-amazon-corretto"
-    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-    PROJECT_NAME: "coffee-shout"
-
-
 phases:
   install:
     runtime-versions:
       java: corretto21
-
-  pre_build:
     commands:
-      - echo "Pre-build phase starting..."
-      - echo "Build Architecture:" $(uname -m)
-      - echo "Java Version:" $(java -version 2>&1 | head -1)
       - cd backend
       - chmod +x gradlew
-      - echo "Gradle wrapper permissions:" && ls -la gradlew
-      - echo "Testing Gradle wrapper..."
-      - ./gradlew --version
 
   build:
     commands:
-      - echo "Build phase starting..."
       - cd backend
-      - echo "Running tests..."
-      - ./gradlew clean test
-      - echo "Building JAR..."
-      - ./gradlew build -x test
-      - echo "Build artifacts created:"
-      - ls -la build/libs/
-      - echo "Copying JAR to root directory..."
+      - ./gradlew clean build
       - cp build/libs/*.jar ../coffee-shout-backend.jar
-
-  post_build:
-    commands:
-      - echo "Post-build phase starting..."
-      - cd ..
-      - echo "Verifying final JAR file..."
-      - ls -la coffee-shout-backend.jar
-      - file coffee-shout-backend.jar
-      - echo "JAR file size:" $(du -h coffee-shout-backend.jar)
-      - echo "Build completed successfully!"
 
 artifacts:
   files:
     - coffee-shout-backend.jar
-#    - appspec.yml
-#    - scripts/*
-  name: coffee-shout-backend-$(date +%Y%m%d-%H%M%S)
-
-cache:
-  paths:
-    - '/root/.gradle/caches/**/*'
