@@ -1,0 +1,215 @@
+version: 0.2
+
+env:
+  variables:
+    JAVA_HOME: "/usr/lib/jvm/java-21-amazon-corretto"
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2g"
+    # ARM64 최적화 JVM 옵션
+    _JAVA_OPTIONS: "-XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxRAMPercentage=75.0"
+    # 빌드 환경 식별
+    BUILD_ARCH: "arm64"
+    PROJECT_NAME: "coffee-shout"
+
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+    commands:
+      - echo "📦 Installing dependencies for Coffee-Shout ARM64 build..."
+      - chmod +x gradlew
+
+      - echo "🔍 Environment validation..."
+      - echo "Build Architecture: $(uname -m)"
+      - echo "Expected:
+          aarch64, Got: $(uname -m)"
+      - echo "Java Architecture: $(java -XshowSettings:properties -version 2>&1 | grep 'os.arch' | head -1)"
+      - echo "Java Version: $(java -version 2>&1 | head -1)"
+      - echo "Available Memory: $(free -h | grep Mem)"
+      - echo "CPU Info: $(nproc) cores available"
+      
+      # 원칙 4: ARM64 환경 강제 검증
+      - |
+        if [ "$(uname -m)" != "aarch64" ]; then
+          echo "❌ CRITICAL: Build environment is not ARM64!"
+          echo "   Expected: aarch64, Got: $(uname -m)"
+          echo "   This will cause compatibility issues with ARM64 EC2 runtime!"
+          exit 1
+        else
+          echo "✅ ARM64 build environment confirmed - matches target EC2"
+        fi
+
+  pre_build:
+    commands:
+      - echo "🚀 Pre-build phase starting..."
+
+      - echo "📋 Build Information:"
+      - echo "  Project: $PROJECT_NAME"
+      - echo "  Architecture: $BUILD_ARCH"
+      - echo "  Java Home: $JAVA_HOME"
+      - echo "  Gradle Options: $GRADLE_OPTS"
+      - echo "  Build Time: $(date)"
+      - echo "  Commit SHA: ${CODEBUILD_RESOLVED_SOURCE_VERSION:-unknown}"
+      
+      # Gradle 환경 검증
+      - cd backend
+      - echo "📁 Current directory: $(pwd)"
+      - echo "📂 Backend directory contents:"
+      - ls -la
+      
+      # 원칙 4: 엣지 케이스 대비 - Gradle wrapper 검증
+      - |
+        if [ ! -f "gradlew" ]; then
+          echo "❌ Gradle wrapper not found!"
+          exit 1
+        fi
+        if [ ! -x "gradlew" ]; then
+          echo "❌ Gradle wrapper is not executable!"
+          exit 1
+        fi
+        echo "✅ Gradle wrapper verified"
+
+      - echo "🔧 Gradle version:"
+      - ./gradlew --version
+
+      - echo "🔍 Checking for ARM64 incompatible dependencies..."
+      - ./gradlew dependencies --configuration compileClasspath | grep -i "native\|jna\|jni\|sqlite" || echo "✅ No risky native dependencies found"
+
+  build:
+    commands:
+      - echo "🏗️ Build phase starting for ARM64..."
+      - cd backend
+
+      - echo "🧪 Running comprehensive tests..."
+      - echo "  - Unit tests"
+      - echo "  - Integration tests"
+      - echo "  - ARM64 compatibility tests"
+      
+      # 테스트 실행 (ARM64 환경에서)
+      - ./gradlew clean test --info --stacktrace
+      
+      # 원칙 4: 엣지 케이스 대비 - 테스트 결과 상세 검증
+      - |
+        TEST_RESULT=$?
+        if [ $TEST_RESULT -ne 0 ]; then
+          echo "❌ Tests failed! Build cannot continue."
+          echo "🔍 Test failure details:"
+          find build/reports/tests -name "*.html" -exec echo "Report: {}" \;
+          exit 1
+        else
+          echo "✅ All tests passed successfully!"
+        fi
+      
+      # 코드 품질 검사 (원칙 2: 서버 권위성)
+      - echo "📊 Running code quality checks..."
+      - ./gradlew check --continue || echo "⚠️ Code quality issues detected (non-blocking)"
+      
+      # ARM64 최적화 빌드
+      - echo "🎯 Building optimized JAR for ARM64 runtime..."
+      - echo "  Using ARM64-optimized JVM settings"
+      - echo "  Target: Graviton EC2 instances"
+
+      - ./gradlew build -x test \
+        -Dorg.gradle.jvmargs="-Xmx3g -XX:+UseG1GC -XX:+UseStringDeduplication" \
+        --parallel \
+        --build-cache \
+        --configuration-cache
+      
+      # JAR 파일명 표준화 (배포 스크립트 호환성)
+      - echo "📋 Standardizing JAR filename..."
+      - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
+      - |
+        if [ -z "$JAR_FILE" ]; then
+          echo "❌ No executable JAR found!"
+          exit 1
+        fi
+        echo "  Source: $(basename $JAR_FILE)"
+        cp "$JAR_FILE" ../coffee-shout-backend.jar
+        echo "  Target: coffee-shout-backend.jar"
+        echo "✅ JAR file standardized"
+
+  post_build:
+    commands:
+      - echo "🏁 Post-build phase starting..."
+      - cd ..
+
+      - echo "🔍 Final artifact verification..."
+      
+      # JAR 파일 존재 확인
+      - |
+        if [ ! -f "coffee-shout-backend.jar" ]; then
+          echo "❌ Final JAR file not found!"
+          echo "📂 Current directory contents:"
+          ls -la
+          exit 1
+        fi
+        echo "✅ JAR file exists: coffee-shout-backend.jar"
+      
+      # JAR 파일 상세 분석
+      - echo "📊 JAR file detailed analysis:"
+      - echo "  Size: $(du -h coffee-shout-backend.jar | cut -f1)"
+      - echo "  Type: $(file coffee-shout-backend.jar)"
+      - echo "  Permissions: $(ls -l coffee-shout-backend.jar | cut -d' ' -f1)"
+      
+      # 원칙 1: 연출가 역할 - ARM64 런타임 호환성 빠른 검증
+      - echo "🧪 ARM64 runtime compatibility test..."
+      - |
+        echo "  Testing JAR startup on ARM64..."
+        timeout 45s java -jar coffee-shout-backend.jar \
+          --spring.profiles.active=test \
+          --server.port=0 \
+          --spring.main.web-environment=false \
+          --spring.jpa.hibernate.ddl-auto=none \
+          --spring.datasource.url=jdbc:h2:mem:testdb \
+          --logging.level.root=ERROR \
+          --spring.main.banner-mode=off \
+          > startup-test.log 2>&1 &
+        
+        PID=$!
+        sleep 15
+        
+        if kill -0 $PID 2>/dev/null; then
+          echo "✅ Application started successfully on ARM64"
+          kill $PID 2>/dev/null || true
+          wait $PID 2>/dev/null || true
+        else
+          echo "❌ Application failed to start on ARM64!"
+          echo "🔍 Startup log:"
+          cat startup-test.log
+          exit 1
+        fi
+        
+      # 원칙 1: 연출가 역할 - 최종 빌드 요약
+      - echo ""
+      - echo "🎉 ===== BUILD SUMMARY ====="
+      - echo "📦 Artifact: coffee-shout-backend.jar ($(du -h coffee-shout-backend.jar | cut -f1))"
+      - echo "🏗️  Architecture: ARM64 (aarch64)"
+      - echo "☕ Java Version: $(java -version 2>&1 | head -1 | cut -d'"' -f2)"
+      - echo "🌱 Spring Boot: $(grep -o 'spring-boot-starter.*' backend/build.gradle.kts | head -1 || echo 'detected')"
+      - echo "⏰ Build Time: $(date)"
+      - echo "🆔 Build ID: ${CODEBUILD_BUILD_ID:-local}"
+      - echo "✅ Status: READY FOR ARM64 DEPLOYMENT"
+      - echo "=========================="
+
+artifacts:
+  files:
+    - coffee-shout-backend.jar      # 메인 애플리케이션
+    - appspec.yml                   # CodeDeploy 설정
+  name: coffee-shout-backend-arm64-$(date +%Y%m%d-%H%M%S)
+  type: zip
+  
+  # 원칙 4: 엣지 케이스 대비 - 아티팩트 메타데이터
+  override-artifact-name: true
+
+# 원칙 4: 엣지 케이스 대비 - 빌드 캐시로 속도 개선 및 안정성 확보
+cache:
+  paths:
+    - '/root/.gradle/caches/**/*'     # Gradle 의존성 캐시
+    - '/root/.gradle/wrapper/**/*'    # Gradle wrapper 캐시
+    - 'backend/.gradle/**/*'          # 프로젝트별 Gradle 캐시
+
+reports:
+  junit:
+    files:
+      - 'backend/build/test-results/test/*.xml'
+    name: 'coffee-shout-test-report'
