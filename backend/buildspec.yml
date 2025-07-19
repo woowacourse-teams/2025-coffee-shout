@@ -151,7 +151,7 @@ phases:
       - echo "  Type: $(file coffee-shout-backend.jar)"
       - echo "  Permissions: $(ls -l coffee-shout-backend.jar | cut -d' ' -f1)"
       
-      # 원칙 1: 연출가 역할 - ARM64 런타임 호환성 빠른 검증
+      # ARM64 런타임 호환성 빠른 검증
       - echo "🧪 ARM64 runtime compatibility test..."
       - |
         echo "  Testing JAR startup on ARM64..."
@@ -179,7 +179,7 @@ phases:
           exit 1
         fi
         
-      # 원칙 1: 연출가 역할 - 최종 빌드 요약
+      # 최종 빌드 요약
       - echo ""
       - echo "🎉 ===== BUILD SUMMARY ====="
       - echo "📦 Artifact: coffee-shout-backend.jar ($(du -h coffee-shout-backend.jar | cut -f1))"
@@ -194,14 +194,14 @@ phases:
 artifacts:
   files:
     - coffee-shout-backend.jar      # 메인 애플리케이션
-    - appspec.yml                   # CodeDeploy 설정
+#    - appspec.yml                   # CodeDeploy 설정
   name: coffee-shout-backend-arm64-$(date +%Y%m%d-%H%M%S)
   type: zip
   
-  # 원칙 4: 엣지 케이스 대비 - 아티팩트 메타데이터
+  # 아티팩트 메타데이터
   override-artifact-name: true
 
-# 원칙 4: 엣지 케이스 대비 - 빌드 캐시로 속도 개선 및 안정성 확보
+# 빌드 캐시로 속도 개선 및 안정성 확보
 cache:
   paths:
     - '/root/.gradle/caches/**/*'     # Gradle 의존성 캐시
