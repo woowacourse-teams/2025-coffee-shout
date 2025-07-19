@@ -3,8 +3,8 @@ import * as S from './Button.styled';
 
 type Props = {
   variant: S.ButtonVariant;
-  width: string;
-  height: 'small' | 'medium' | 'large';
+  width?: string;
+  height?: 'small' | 'medium' | 'large';
 } & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({

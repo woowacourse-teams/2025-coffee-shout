@@ -9,3 +9,10 @@ body {
 
   color: #364153;
 }
+
+#root {
+  max-width: 430px;
+  width: 100%;
+  height: 100dvh;
+  margin: 0 auto;
+}
