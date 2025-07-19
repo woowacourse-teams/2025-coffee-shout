@@ -1,7 +1,14 @@
 //TODO: 구현 필요
-const BackButton = () => {
+
+import { ComponentProps } from 'react';
+
+type Props = {
+  onClick: () => void;
+} & ComponentProps<'button'>;
+
+const BackButton = ({ onClick, ...props }: Props) => {
   return (
-    <button>
+    <button onClick={onClick} {...props}>
       <img src="/images/back-icon.svg" alt="뒤로가기" />
     </button>
   );

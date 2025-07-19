@@ -62,7 +62,7 @@ const Template = (args: LayoutStoryArgs) => {
 
   return (
     <Layout color={color}>
-      {showTopBar && <Layout.TopBar backButton={<BackButton />} />}
+      {showTopBar && <Layout.TopBar backButton={<BackButton onClick={() => {}} />} />}
       {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
       <Layout.Content>{content}</Layout.Content>
       {buttonCount === 1 && (
