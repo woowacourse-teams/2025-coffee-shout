@@ -5,24 +5,24 @@ type Props = {
   children: React.ReactElement | [React.ReactElement, React.ReactElement];
 };
 
-const Button = ({ children }: Props) => {
+const ButtonBar = ({ children }: Props) => {
   const buttonCount = Array.isArray(children) ? children.length : 1;
 
   if (buttonCount === 1) {
-    return <S.ButtonContainer>{children}</S.ButtonContainer>;
+    return <S.Container>{children}</S.Container>;
   }
 
   if (buttonCount === 2) {
     const [firstButton, secondButton] = React.Children.toArray(children);
     return (
-      <S.ButtonContainer>
+      <S.Container>
         <S.FirstButtonWrapper>{firstButton}</S.FirstButtonWrapper>
         <S.SquareButtonWrapper>{secondButton}</S.SquareButtonWrapper>
-      </S.ButtonContainer>
+      </S.Container>
     );
   }
 
-  return <S.ButtonContainer>{children}</S.ButtonContainer>;
+  return <S.Container>{children}</S.Container>;
 };
 
-export default Button;
+export default ButtonBar;

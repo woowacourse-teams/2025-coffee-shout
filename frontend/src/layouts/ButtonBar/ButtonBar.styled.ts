@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const ButtonContainer = styled.div`
+export const Container = styled.div`
   width: 100%;
   height: 4rem;
   display: flex;
