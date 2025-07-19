@@ -13,7 +13,10 @@ phases:
       java: corretto21
     commands:
       - echo "Installing dependencies for Coffee-Shout ARM64 build..."
-      - chmod +x gradlew
+      - echo "Current working directory:" $(pwd)
+      - echo "Directory contents:" && ls -la
+      - echo "Backend directory contents:" && ls -la backend/
+      - chmod +x backend/gradlew
 
   pre_build:
     commands:
@@ -21,9 +24,9 @@ phases:
       - echo "Build Architecture:" $(uname -m)
       - echo "Java Version:" $(java -version 2>&1 | head -1)
       - cd backend
-      - echo "Current directory:" $(pwd)
-      - ls -la
-      - echo "Gradle version:"
+      - echo "Changed to backend directory:" $(pwd)
+      - echo "Gradle wrapper permissions:" && ls -la gradlew
+      - echo "Testing Gradle wrapper..."
       - ./gradlew --version
 
   build:
@@ -34,17 +37,19 @@ phases:
       - ./gradlew clean test
       - echo "Building JAR..."
       - ./gradlew build -x test
-      - echo "Build artifacts:"
+      - echo "Build artifacts created:"
       - ls -la build/libs/
+      - echo "Copying JAR to root directory..."
       - cp build/libs/*.jar ../coffee-shout-backend.jar
 
   post_build:
     commands:
-      - echo "Post-build phase..."
+      - echo "Post-build phase starting..."
       - cd ..
-      - echo "Verifying JAR file..."
+      - echo "Verifying final JAR file..."
       - ls -la coffee-shout-backend.jar
       - file coffee-shout-backend.jar
+      - echo "JAR file size:" $(du -h coffee-shout-backend.jar)
       - echo "Build completed successfully!"
 
 artifacts:
