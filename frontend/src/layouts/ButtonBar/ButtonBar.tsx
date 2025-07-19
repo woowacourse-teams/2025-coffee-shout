@@ -1,8 +1,8 @@
-import React from 'react';
+import { Children, ReactElement } from 'react';
 import * as S from './ButtonBar.styled';
 
 type Props = {
-  children: React.ReactElement | [React.ReactElement, React.ReactElement];
+  children: ReactElement | [ReactElement, ReactElement];
 };
 
 const ButtonBar = ({ children }: Props) => {
@@ -13,7 +13,7 @@ const ButtonBar = ({ children }: Props) => {
   }
 
   if (buttonCount === 2) {
-    const [firstButton, secondButton] = React.Children.toArray(children);
+    const [firstButton, secondButton] = Children.toArray(children);
     return (
       <S.Container>
         <S.FirstButtonWrapper>{firstButton}</S.FirstButtonWrapper>
