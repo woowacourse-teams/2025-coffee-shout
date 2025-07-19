@@ -8,44 +8,40 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class Room {
 
-    private static final int MAXIMUM_GUEST_COUNT = 9;
-    private static final int MINIMUM_GUEST_COUNT = 2;
-
-    private Long id;
-
-    private JoinCode joinCode;
-
-    private Player host;
-
-    private PlayersWithProbability playersWithProbability;
-
-    private Roulette roulette;
-
+    private final JoinCode joinCode;
+    private final Player host;
+    private final Players players;
+    private final Roulette roulette;
     private List<MiniGame> miniGames;
-
+    private Long id;
     private RoomState roomState;
 
-    @Builder
-    public Room(JoinCode joinCode, Roulette roulette, Player host) {
+    public Room(JoinCode joinCode, PlayerInfos playerInfos) {
         this.joinCode = joinCode;
-        this.roulette = roulette;
-        this.host = host;
-        this.playersWithProbability = new PlayersWithProbability();
+        this.roulette = new Roulette(playerInfos, new JavaRandomGenerator());
+        this.host = playerInfos.getHost();
+        this.players = new Players(playerInfos);
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
+    }
 
-        playersWithProbability.join(host);
+    public Room(JoinCode joinCode, PlayerInfos playerInfos, RandomGenerator randomGenerator) {
+        this.joinCode = joinCode;
+        this.roulette = new Roulette(playerInfos, randomGenerator);
+        this.host = playerInfos.getHost();
+        this.players = new Players(playerInfos);
+        this.roomState = RoomState.READY;
+        this.miniGames = new ArrayList<>();
     }
 
     public void joinPlayer(Player joinPlayer) {
         isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        playersWithProbability.join(joinPlayer);
+        players.join(joinPlayer);
     }
 
     public void setMiniGame(List<MiniGame> miniGames) {
@@ -55,8 +51,7 @@ public class Room {
 
     // TODO 미니게임 결과 반영
     public void applyMiniGameResult(MiniGameResult miniGameResult) {
-        playersWithProbability.adjustProbabilities(miniGameResult,
-                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
+        roulette.adjustProbabilities(miniGameResult, miniGames.size());
     }
 
     public boolean hasNoMiniGames() {
@@ -68,16 +63,16 @@ public class Room {
     }
 
     public boolean hasEnoughPlayers() {
-        return playersWithProbability.getPlayerCount() >= MINIMUM_GUEST_COUNT
-                && playersWithProbability.getPlayerCount() <= MAXIMUM_GUEST_COUNT;
+        return players.hasEnoughPlayers();
     }
 
     public Player startRoulette() {
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isInPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        final Player losePlayer = roulette.spin(playersWithProbability);
+
+        final Player winner = roulette.spin();
         roomState = RoomState.DONE;
-        return losePlayer;
+        return winner;
     }
 
     public boolean isHost(Player player) {
@@ -85,14 +80,11 @@ public class Room {
     }
 
     public List<Player> getPlayers() {
-        return playersWithProbability.getPlayers();
+        return players.getPlayers();
     }
 
     public Player findPlayer(String playerName) {
-        return playersWithProbability.getPlayers().stream()
-                .filter(p -> p.getName().equals(playerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
+        return players.getPlayer(playerName);
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까

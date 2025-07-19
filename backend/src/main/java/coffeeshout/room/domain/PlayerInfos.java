@@ -1,6 +1,7 @@
 package coffeeshout.room.domain;
 
 import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameResultType;
@@ -10,19 +11,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class PlayersWithProbability {
+public class PlayerInfos {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
 
     private final Map<Player, Probability> adjustedProbabilities;
 
-    public PlayersWithProbability() {
+    public PlayerInfos() {
         this.adjustedProbabilities = new LinkedHashMap<>();
+    }
+
+    public PlayerInfos(Player player) {
+        this.adjustedProbabilities = new LinkedHashMap<>();
+        join(player);
     }
 
     public void join(Player joinPlayer) {
         isTrue(adjustedProbabilities.size() < MAXIMUM_GUEST_COUNT, "게임은 최대 9명까지 참여할 수 있습니다.");
         isTrue(!adjustedProbabilities.containsKey(joinPlayer), "이미 존재하는 플레이어 이름입니다.");
+
         adjustedProbabilities.put(joinPlayer, new Probability(0));
         updateInitialProbabilities();
     }
@@ -56,6 +63,22 @@ public class PlayersWithProbability {
     }
 
     public List<Player> getPlayers() {
-        return adjustedProbabilities.keySet().stream().toList();
+        return adjustedProbabilities.keySet()
+                .stream()
+                .toList();
+    }
+
+    public Player getPlayer(String playerName) {
+        return adjustedProbabilities.keySet()
+                .stream()
+                .filter(player -> player.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플레이어 이름입니다. playerName=" + playerName));
+    }
+
+    public Player getHost() {
+        state(!adjustedProbabilities.isEmpty(), "호스트가 존재하지 않습니다.");
+
+        return adjustedProbabilities.entrySet().iterator().next().getKey();
     }
 }

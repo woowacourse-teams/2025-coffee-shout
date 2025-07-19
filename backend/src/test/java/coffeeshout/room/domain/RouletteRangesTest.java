@@ -13,12 +13,12 @@ class RouletteRangesTest {
         // given
         Player player1 = PlayerFixture.한스();
         Player player2 = PlayerFixture.꾹이();
-        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+        PlayerInfos playerInfos = new PlayerInfos();
 
-        playersWithProbability.join(player1);
-        playersWithProbability.join(player2);
+        playerInfos.join(player1);
+        playerInfos.join(player2);
 
-        RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
+        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
 
         // when
         Player result1 = rouletteRanges.pickPlayer(1500);
@@ -33,10 +33,10 @@ class RouletteRangesTest {
     void 범위를_벗어난_숫자를_입력하면_예외가_발생한다() {
         // given
         Player player = PlayerFixture.엠제이();
-        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
-        playersWithProbability.join(player);
+        PlayerInfos playerInfos = new PlayerInfos();
+        playerInfos.join(player);
 
-        RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
+        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
 
         // when & then
         assertThatThrownBy(() -> rouletteRanges.pickPlayer(10002))
@@ -46,9 +46,9 @@ class RouletteRangesTest {
     @Test
     void 값이_없을_경우_endValue는_0을_반환한다() {
         // given
-        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+        PlayerInfos playerInfos = new PlayerInfos();
 
-        RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
+        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
 
         // when
         int endValue = rouletteRanges.endValue();
@@ -62,12 +62,12 @@ class RouletteRangesTest {
         // given
         Player player1 = PlayerFixture.루키();
         Player player2 = PlayerFixture.엠제이();
-        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
+        PlayerInfos playerInfos = new PlayerInfos();
 
-        playersWithProbability.join(player1);
-        playersWithProbability.join(player2);
+        playerInfos.join(player1);
+        playerInfos.join(player2);
 
-        RouletteRanges rouletteRanges = new RouletteRanges(playersWithProbability);
+        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
 
         // when
         int result = rouletteRanges.endValue();

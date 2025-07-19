@@ -4,15 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import coffeeshout.fixture.CardGameDeckStub;
+import coffeeshout.fixture.PlayerInfosFixture;
+import coffeeshout.fixture.RoomFixture;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.AdditionCard;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Room;
-import coffeeshout.fixture.CardGameDeckStub;
-import coffeeshout.fixture.PlayersFixture;
-import coffeeshout.fixture.RoomFixture;
 import coffeeshout.room.domain.RoomFinder;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,11 +41,10 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
+        players = PlayerInfosFixture.꾹이_루키_엠제이_한스().getPlayers();
         roomId = 1L;
-        room = RoomFixture.호스트_꾹이();
 
-        ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
+        room = RoomFixture.꾹이_루키_엠제이_한스();
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
         CardGame cardGame = new CardGame(players, new CardGameDeckStub());
