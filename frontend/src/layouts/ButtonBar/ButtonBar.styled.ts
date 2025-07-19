@@ -4,9 +4,13 @@ type WrapperProps = {
   $flexRatio: number;
 };
 
-export const Container = styled.div`
+type ContainerProps = {
+  $height: string;
+};
+
+export const Container = styled.div<ContainerProps>`
   width: 100%;
-  height: 4rem;
+  height: ${({ $height }) => $height};
   display: flex;
   gap: 1.5rem;
 `;

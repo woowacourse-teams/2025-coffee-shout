@@ -2,11 +2,12 @@ import { Children, ReactElement } from 'react';
 import * as S from './ButtonBar.styled';
 
 type ButtonBarProps = {
-  children: ReactElement | ReactElement[];
+  height?: string;
   flexRatios?: number[];
+  children: ReactElement | ReactElement[];
 };
 
-const ButtonBar = ({ children, flexRatios }: ButtonBarProps) => {
+const ButtonBar = ({ height = '4rem', flexRatios, children }: ButtonBarProps) => {
   if (flexRatios?.some((ratio) => ratio <= 0)) {
     throw new Error('flexRatio는 0보다 큰 양수여야 합니다');
   }
@@ -15,7 +16,7 @@ const ButtonBar = ({ children, flexRatios }: ButtonBarProps) => {
   const defaultRatio = 1;
 
   return (
-    <S.Container>
+    <S.Container $height={height}>
       {buttons.map((button, index) => {
         const ratio = flexRatios?.[index] ?? defaultRatio;
 

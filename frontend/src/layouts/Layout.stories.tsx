@@ -2,8 +2,6 @@ import { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
 import Button from '@/components/@common/Button/Button';
-import Headline2 from '@/components/@common/Headline2/Headline2';
-import Description from '@/components/@common/Description/Description';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import { ColorKey } from '@/constants/color';
 
@@ -58,7 +56,7 @@ const meta: Meta<LayoutStoryArgs> = {
     buttonCount: 1,
     buttonRatio: 'default',
     color: 'white',
-    content: '메인 컨텐츠 영역',
+    content: <div>컨텐츠</div>,
   },
 };
 
@@ -82,13 +80,7 @@ const Template = (args: LayoutStoryArgs) => {
 
   return (
     <Layout color={color}>
-      {showTopBar && (
-        <Layout.TopBar
-          left={<BackButton onClick={() => {}} />}
-          center={<Headline2>중앙</Headline2>}
-          right={<div>컴포넌트</div>}
-        />
-      )}
+      {showTopBar && <Layout.TopBar left={<BackButton onClick={() => {}} />} />}
       {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
       <Layout.Content>{content}</Layout.Content>
       {buttonCount === 1 && (
@@ -114,12 +106,7 @@ export const TopBarAndButton: Story = {
     buttonCount: 1,
     buttonRatio: 'default',
     color: 'white',
-    content: (
-      <>
-        <Headline2>타이틀 예시</Headline2>
-        <Description>정보 예시</Description>
-      </>
-    ),
+    content: <div>컨텐츠</div>,
   },
   parameters: {
     controls: {
@@ -150,5 +137,96 @@ export const ContentOnlyPointColor: Story = {
     buttonRatio: 'default',
     color: 'point-400',
     content: '포인트 컬러 배경의 컨텐츠만 있는 레이아웃',
+  },
+};
+
+export const ModalWithLayout: Story = {
+  render: () => (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '12px',
+          width: '90%',
+          maxWidth: '400px',
+          maxHeight: '80vh',
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        }}
+      >
+        <Layout color="white">
+          <Layout.TopBar
+            center={<div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>음료 변경</div>}
+            right={
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  padding: '0.25rem',
+                }}
+              >
+                ×
+              </button>
+            }
+            align={['center', 'center', 'start']}
+          />
+          <Layout.Content>
+            <div style={{ padding: '1rem' }}>
+              <p
+                style={{
+                  margin: '0 0 1rem 0',
+                  color: '#666',
+                  fontSize: '0.9rem',
+                }}
+              >
+                변경할 메뉴를 선택해주세요
+              </p>
+
+              <div
+                style={{
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  padding: '0.75rem',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: '#f9f9f9',
+                }}
+              >
+                <span>아이스 아메리카노</span>
+                <span style={{ fontSize: '0.8rem' }}>▼</span>
+              </div>
+            </div>
+          </Layout.Content>
+          <Layout.ButtonBar flexRatios={[1, 1]}>
+            <Button variant="secondary">취소</Button>
+            <Button variant="primary" style={{ background: '#ff6b6b' }}>
+              변경
+            </Button>
+          </Layout.ButtonBar>
+        </Layout>
+      </div>
+    </div>
+  ),
+  parameters: {
+    controls: {
+      exclude: ['showBanner', 'bannerHeight', 'buttonCount', 'buttonRatio'],
+    },
   },
 };
