@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import Top from './TopBar/TopBar';
+import TopBar from './TopBar/TopBar';
 import Banner from './Banner/Banner';
 import Content from './Content/Content';
 import ButtonBar from './ButtonBar/ButtonBar';
@@ -14,7 +14,7 @@ const Layout = ({ color = 'white', children }: LayoutProps) => (
   <S.LayoutContainer $color={COLOR_MAP[color]}>{children}</S.LayoutContainer>
 );
 
-Layout.Top = Top;
+Layout.TopBar = TopBar;
 Layout.Banner = Banner;
 Layout.Content = Content;
 Layout.ButtonBar = ButtonBar;

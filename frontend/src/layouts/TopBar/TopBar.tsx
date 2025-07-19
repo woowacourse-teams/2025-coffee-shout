@@ -5,8 +5,8 @@ type Props = {
   backButton?: React.ReactElement;
 };
 
-const Top = ({ backButton }: Props) => {
+const TopBar = ({ backButton }: Props) => {
   return <Container>{backButton}</Container>;
 };
 
-export default Top;
+export default TopBar;
