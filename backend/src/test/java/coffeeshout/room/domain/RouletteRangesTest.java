@@ -13,9 +13,8 @@ class RouletteRangesTest {
         // given
         Player player1 = PlayerFixture.한스();
         Player player2 = PlayerFixture.꾹이();
-        PlayerInfos playerInfos = new PlayerInfos();
+        PlayerInfos playerInfos = new PlayerInfos(player1);
 
-        playerInfos.join(player1);
         playerInfos.join(player2);
 
         RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
@@ -33,8 +32,7 @@ class RouletteRangesTest {
     void 범위를_벗어난_숫자를_입력하면_예외가_발생한다() {
         // given
         Player player = PlayerFixture.엠제이();
-        PlayerInfos playerInfos = new PlayerInfos();
-        playerInfos.join(player);
+        PlayerInfos playerInfos = new PlayerInfos(player);
 
         RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
 
@@ -43,28 +41,26 @@ class RouletteRangesTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @Test
-    void 값이_없을_경우_endValue는_0을_반환한다() {
-        // given
-        PlayerInfos playerInfos = new PlayerInfos();
-
-        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
-
-        // when
-        int endValue = rouletteRanges.endValue();
-
-        // then
-        assertThat(endValue).isEqualTo(0);
-    }
+//    @Test
+//    void 값이_없을_경우_endValue는_0을_반환한다() {
+//        // given
+//        PlayerInfos playerInfos = new PlayerInfos();
+//
+//        RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);
+//
+//        // when
+//        int endValue = rouletteRanges.endValue();
+//
+//        // then
+//        assertThat(endValue).isEqualTo(0);
+//    }
 
     @Test
     void 마지막_범위의_end값을_반환한다() {
         // given
         Player player1 = PlayerFixture.루키();
         Player player2 = PlayerFixture.엠제이();
-        PlayerInfos playerInfos = new PlayerInfos();
-
-        playerInfos.join(player1);
+        PlayerInfos playerInfos = new PlayerInfos(player1);
         playerInfos.join(player2);
 
         RouletteRanges rouletteRanges = new RouletteRanges(playerInfos);

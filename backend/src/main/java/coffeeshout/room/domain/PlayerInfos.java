@@ -17,13 +17,9 @@ public class PlayerInfos {
 
     private final Map<Player, Probability> adjustedProbabilities;
 
-    public PlayerInfos() {
+    public PlayerInfos(Player host) {
         this.adjustedProbabilities = new LinkedHashMap<>();
-    }
-
-    public PlayerInfos(Player player) {
-        this.adjustedProbabilities = new LinkedHashMap<>();
-        join(player);
+        join(host);
     }
 
     public void join(Player joinPlayer) {

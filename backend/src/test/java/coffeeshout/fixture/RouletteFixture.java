@@ -10,11 +10,11 @@ public final class RouletteFixture {
     private RouletteFixture() {
     }
 
-    public static Roulette 고정_끝값_반환() {
-        return new Roulette(new PlayerInfos(), new FixedLastValueGenerator());
+    public static Roulette 고정_끝값_반환(PlayerInfos playerInfos) {
+        return new Roulette(playerInfos, new FixedLastValueGenerator());
     }
 
-    public static Roulette 랜덤_반환() {
-        return new Roulette(new PlayerInfos(), new JavaRandomGenerator());
+    public static Roulette 랜덤_반환(PlayerInfos playerInfos) {
+        return new Roulette(playerInfos, new JavaRandomGenerator());
     }
 }
