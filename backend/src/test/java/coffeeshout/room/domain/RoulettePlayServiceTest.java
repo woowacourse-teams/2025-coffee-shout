@@ -22,10 +22,10 @@ class RoulettePlayServiceTest {
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when
-        Player loser = roulettePlayService.playRoulette(꾹이, room);
+        Player winner = roulettePlayService.playRoulette(꾹이, room);
 
         // then
-        assertThat(loser).isEqualTo(한스);
+        assertThat(winner).isEqualTo(한스);
     }
 
     @Test

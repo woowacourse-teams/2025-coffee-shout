@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.minigame.domain.MiniGame;
 import coffeeshout.player.domain.Player;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 class RoomTest {
 
     private JoinCode joinCode = new JoinCode("ABCDF");
-    private Roulette roulette = RouletteFixture.고정_끝값_반환();
     private Player 호스트_한스 = PlayerFixture.한스();
     private Player 게스트_루키 = PlayerFixture.루키();
     private Player 게스트_꾹이 = PlayerFixture.꾹이();
@@ -26,7 +24,8 @@ class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, roulette, 호스트_한스);
+        PlayerInfos playerInfos = new PlayerInfos(호스트_한스);
+        room = new Room(joinCode, playerInfos, new FixedLastValueGenerator());
     }
 
     @Test
@@ -36,7 +35,7 @@ class RoomTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
             softly.assertThat(room.getHost()).isEqualTo(호스트_한스);
-            softly.assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(1);
+            softly.assertThat(room.getPlayers().size()).isEqualTo(1);
         });
     }
 
@@ -46,7 +45,7 @@ class RoomTest {
         room.joinPlayer(게스트_꾹이);
 
         // when & then
-        assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(2);
+        assertThat(room.getPlayers().size()).isEqualTo(2);
     }
 
     @Test

@@ -3,7 +3,7 @@ package coffeeshout.minigame.domain.cardgame;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.CardGameDeckStub;
-import coffeeshout.fixture.PlayersFixture;
+import coffeeshout.fixture.PlayerInfosFixture;
 import coffeeshout.player.domain.Player;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ class CardGameTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
+        players = PlayerInfosFixture.꾹이_루키_엠제이_한스().getPlayers();
         cardGame = new CardGame(players, new CardGameDeckStub());
 
         cardGame.start();
