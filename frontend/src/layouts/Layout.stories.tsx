@@ -1,7 +1,7 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
-import Button from '../components/@common/Button/Button';
+import Button from '@/components/@common/Button/Button';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
 import BackButton from '@/components/@common/BackButton/BackButton';
@@ -13,7 +13,7 @@ type LayoutStoryArgs = {
   bannerHeight: string;
   buttonCount: 0 | 1 | 2;
   color: ColorKey;
-  content: React.ReactNode;
+  content: ReactNode;
 };
 
 const meta: Meta<LayoutStoryArgs> = {
