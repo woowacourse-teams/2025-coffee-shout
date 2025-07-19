@@ -5,14 +5,13 @@ phases:
     runtime-versions:
       java: corretto21
     commands:
-      - cd backend
-      - chmod +x gradlew
+      - ls -la
+      - chmod +x backend/gradlew
 
   build:
     commands:
-      - cd backend
-      - ./gradlew clean build
-      - cp build/libs/*.jar ../coffee-shout-backend.jar
+      - cd backend && ./gradlew clean build
+      - cp backend/build/libs/*.jar coffee-shout-backend.jar
 
 artifacts:
   files:
