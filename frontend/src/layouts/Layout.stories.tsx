@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
 import Button from '../components/@common/Button/Button';
-import Title from './contentLayouts/Title/Title';
-import DescriptionArea from './contentLayouts/DescriptionArea/DescriptionArea';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
 import BackButton from '@/components/@common/BackButton/BackButton';
@@ -50,7 +48,7 @@ type Story = StoryObj<any>;
 
 const Template = ({ showTopBar, showBanner, bannerHeight, buttonCount, color, content }: any) => (
   <Layout color={color}>
-    {showTopBar && <Layout.Top backButton={<BackButton />} />}
+    {showTopBar && <Layout.TopBar backButton={<BackButton />} />}
     {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
     <Layout.Content>{content}</Layout.Content>
     {buttonCount === 1 && (
@@ -76,12 +74,8 @@ export const TopBarAndButton: Story = {
     color: 'white',
     content: (
       <>
-        <Title>
-          <Headline2>타이틀 예시</Headline2>
-        </Title>
-        <DescriptionArea>
-          <Description>정보 예시</Description>
-        </DescriptionArea>
+        <Headline2>타이틀 예시</Headline2>
+        <Description>정보 예시</Description>
       </>
     ),
   },
