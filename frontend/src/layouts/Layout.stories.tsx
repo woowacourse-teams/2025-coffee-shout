@@ -78,11 +78,17 @@ const getButtonWidths = (buttonCount: number, ratio: string): number[] => {
 
 const Template = (args: LayoutStoryArgs) => {
   const { showTopBar, showBanner, bannerHeight, buttonCount, buttonRatio, color, content } = args;
-        const flexRatios = getButtonWidths(buttonCount, buttonRatio);
+  const flexRatios = getButtonWidths(buttonCount, buttonRatio);
 
   return (
     <Layout color={color}>
-      {showTopBar && <Layout.TopBar backButton={<BackButton onClick={() => {}} />} />}
+      {showTopBar && (
+        <Layout.TopBar
+          left={<BackButton onClick={() => {}} />}
+          center={<Headline2>중앙</Headline2>}
+          right={<div>컴포넌트</div>}
+        />
+      )}
       {showBanner && <Layout.Banner height={bannerHeight}>배너 영역</Layout.Banner>}
       <Layout.Content>{content}</Layout.Content>
       {buttonCount === 1 && (
