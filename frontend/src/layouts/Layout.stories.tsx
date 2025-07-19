@@ -167,7 +167,7 @@ export const ModalWithLayout: Story = {
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
         }}
       >
-        <Layout color="white">
+        <Layout color="white" padding="1rem">
           <Layout.TopBar
             center={<div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>음료 변경</div>}
             right={
@@ -214,7 +214,7 @@ export const ModalWithLayout: Story = {
               </div>
             </div>
           </Layout.Content>
-          <Layout.ButtonBar flexRatios={[1, 1]}>
+          <Layout.ButtonBar flexRatios={[1, 1]} height="100%">
             <Button variant="secondary">취소</Button>
             <Button variant="primary" style={{ background: '#ff6b6b' }}>
               변경

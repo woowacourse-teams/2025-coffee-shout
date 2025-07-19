@@ -1,8 +1,8 @@
-import { LAYOUT_PADDING } from '@/constants/padding';
 import styled from '@emotion/styled';
 
 type Props = {
   $color?: string;
+  $padding?: string;
 };
 
 export const LayoutContainer = styled.div<Props>`
@@ -10,6 +10,6 @@ export const LayoutContainer = styled.div<Props>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: ${LAYOUT_PADDING};
+  padding: ${({ $padding }) => $padding};
   background-color: ${({ $color }) => $color};
 `;
