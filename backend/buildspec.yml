@@ -11,10 +11,10 @@ phases:
   build:
     commands:
       - cd backend && ./gradlew clean build
-      - ls -la backend/build/libs/
-      - JAR_FILE=$(find backend/build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
+      - ls -la build/libs/
+      - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE
-      - cp "$JAR_FILE" coffee-shout-backend.jar
+      - cp "$JAR_FILE" ../coffee-shout-backend.jar
 
 artifacts:
   files:
