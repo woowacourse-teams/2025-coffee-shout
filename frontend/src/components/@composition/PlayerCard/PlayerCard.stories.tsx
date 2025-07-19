@@ -28,6 +28,22 @@ export const WithIcon: Story = {
   },
 };
 
+export const LongNameWithText: Story = {
+  args: {
+    name: '매우매우매우매우긴이름을가진플레이어',
+    iconSrc: '/images/profile-red.svg',
+    children: <Headline4>15%</Headline4>,
+  },
+};
+
+export const LongNameWithIcon: Story = {
+  args: {
+    name: '아주아주아주아주아주긴이름의사용자님',
+    iconSrc: '/images/profile-red.svg',
+    children: <img src="/images/juice.svg" alt="juice" />,
+  },
+};
+
 export const MultipleCards: Story = {
   render: () => (
     <>

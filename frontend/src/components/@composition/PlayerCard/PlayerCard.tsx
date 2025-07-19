@@ -12,7 +12,9 @@ const PlayerCard = ({ name, iconSrc, children }: Props) => {
     <S.Container>
       <S.Wrapper>
         <S.PlayerIcon src={iconSrc} alt={`player-${name}-icon`} />
-        <Headline4>{name}</Headline4>
+        <S.NameWrapper>
+          <Headline4>{name}</Headline4>
+        </S.NameWrapper>
       </S.Wrapper>
       {children}
     </S.Container>

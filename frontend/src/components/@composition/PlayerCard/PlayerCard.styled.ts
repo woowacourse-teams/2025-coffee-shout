@@ -12,6 +12,20 @@ export const Wrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  flex: 1;
+  min-width: 0;
+`;
+
+export const NameWrapper = styled.div`
+  padding-right: 20px;
+  flex: 1;
+  min-width: 0;
+
+  h4 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const PlayerIcon = styled.img`
