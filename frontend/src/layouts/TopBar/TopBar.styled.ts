@@ -14,6 +14,7 @@ export const Container = styled.div<ContainerProps>`
   height: ${({ $height }) => $height};
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  flex-shrink: 0;
 `;
 
 export const LeftSection = styled.div<SectionProps>`
