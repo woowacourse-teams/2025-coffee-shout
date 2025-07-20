@@ -15,14 +15,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    currentView: 'statistics',
+    targetView: 'statistics',
     onClick: () => console.log('Switch to roulette'),
   },
 };
 
 export const Roulette: Story = {
   args: {
-    currentView: 'roulette',
+    targetView: 'roulette',
     onClick: () => console.log('Switch to statistics'),
   },
 };

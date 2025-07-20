@@ -29,7 +29,7 @@ export const RouletteSection = () => {
     <>
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
       <S.SwitchButtonWrapper>
-        <SwitchButton currentView={currentView} onClick={handleViewChange} />
+        <SwitchButton targetView={currentView} onClick={handleViewChange} />
       </S.SwitchButtonWrapper>
       {renderContent()}
     </>

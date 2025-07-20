@@ -7,16 +7,17 @@ const ICONS = {
 };
 
 type Props = {
-  currentView: 'statistics' | 'roulette';
+  targetView: 'statistics' | 'roulette';
   onClick: () => void;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const SwitchButton = ({ currentView, onClick, ...rest }: Props) => {
-  const currentIcon = ICONS[currentView];
+const SwitchButton = ({ targetView, onClick, ...rest }: Props) => {
+  const currentIcon = ICONS[targetView];
+  const viewName = targetView === 'statistics' ? '통계' : '룰렛';
 
   return (
     <S.Container onClick={onClick} {...rest}>
-      <S.Icon src={currentIcon} alt={currentView} />
+      <S.Icon src={currentIcon} alt={`${viewName} 보기`} />
     </S.Container>
   );
 };
