@@ -18,8 +18,9 @@ const OrderPage = () => {
   ];
 
   const detailOrderItems = [
-    { person: '다이앤', drink: '복숭아아이스티' },
-    { person: '메리', drink: '복숭아아이스티' },
+    { person: '다이앤', drink: '복숭아 아이스티' },
+    { person: '메리', drink: '복숭아 아이스티' },
+    { person: '니야', drink: '아이스 아메리카노' },
     { person: '엠제이', drink: '초코칩 프라푸치노' },
     { person: '꾹이', drink: '복숭아 아이스티' },
     { person: '한스', drink: '아이스 아메리카노' },
