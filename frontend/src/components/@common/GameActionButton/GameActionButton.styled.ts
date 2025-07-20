@@ -36,7 +36,6 @@ export const Container = styled.button<Props>`
   border-radius: 12px;
 
   width: 100%;
-  min-width: 310px;
   height: 130px;
   padding: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px
     ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
