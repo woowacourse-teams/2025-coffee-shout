@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { ReactElement, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Layout from '@/layouts/Layout';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
-import Layout from '@/layouts/Layout';
 import { ParticipantSection } from './ParticipantSection/ParticipantSection';
 import { RouletteSection } from './RouletteSection/RouletteSection';
 import { MiniGameSection } from './MiniGameSection/MiniGameSection';
@@ -10,28 +11,26 @@ import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 
+type SectionComponents = {
+  [K in SectionType]: ReactElement;
+};
+
+const SECTIONS: SectionComponents = {
+  참가자: <ParticipantSection />,
+  룰렛: <RouletteSection />,
+  미니게임: <MiniGameSection />,
+} as const;
+
 const LobbyPage = () => {
+  const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   const handleClickButton = () => {
-    console.log('게임 시작!');
+    navigate('/room/:roomId/:miniGameId/ready');
   };
 
   const handleSectionChange = (option: string) => {
     setCurrentSection(option as SectionType);
-  };
-
-  const renderSection = () => {
-    switch (currentSection) {
-      case '참가자':
-        return <ParticipantSection />;
-      case '룰렛':
-        return <RouletteSection />;
-      case '미니게임':
-        return <MiniGameSection />;
-      default:
-        return <ParticipantSection />;
-    }
   };
 
   return (
@@ -39,7 +38,7 @@ const LobbyPage = () => {
       <Layout.TopBar left={<BackButton onClick={() => {}} />} />
       <Layout.Content>
         <S.Container>
-          {renderSection()}
+          {SECTIONS[currentSection]}
           <S.Wrapper>
             <ToggleButton
               options={['참가자', '룰렛', '미니게임']}

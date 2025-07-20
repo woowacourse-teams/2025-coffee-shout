@@ -16,10 +16,9 @@ export const RouletteSection = () => {
 
   const renderContent = () => {
     switch (currentView) {
-      case 'roulette':
-        return <RouletteWheel />;
       case 'statistics':
         return <ProbabilityList />;
+      case 'roulette':
       default:
         return <RouletteWheel />;
     }
