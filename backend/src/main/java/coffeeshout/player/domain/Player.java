@@ -17,7 +17,7 @@ public class Player {
     public Player(String name, Menu menu) {
         this.name = name;
         this.menu = menu;
-        this.probability = new Probability(0);
+        this.probability = new Probability(10000);
     }
 
     public void selectMenu(Menu menu) {

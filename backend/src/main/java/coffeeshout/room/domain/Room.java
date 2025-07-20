@@ -66,18 +66,16 @@ public class Room {
     }
 
     public static Room createNewRoom(JoinCode joinCode, String hostName, Menu menu) {
-        final Room room = new Room(joinCode, hostName, menu);
-        room.adjustProbability();
-        return room;
+        return new Room(joinCode, hostName, menu);
     }
 
     public void joinGuest(String guestName, Menu menu) {
         state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        players.add(new Player(guestName, menu));
-        adjustProbability();
+        addGuestAndAdjustProbability(new Player(guestName, menu));
     }
 
-    private void adjustProbability() {
+    private void addGuestAndAdjustProbability(Player guest) {
+        players.add(guest);
         players.forEach(player -> player.setProbability(new Probability(10000 / players.size())));
     }
 
