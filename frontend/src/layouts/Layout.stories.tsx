@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Layout from './Layout';
 import Button from '@/components/@common/Button/Button';
 import BackButton from '@/components/@common/BackButton/BackButton';
+import { ModalProvider } from '@/features/ui/Modal/ModalContext';
+import useModal from '@/features/ui/Modal/useModal';
 import { ColorKey } from '@/constants/color';
 
 type LayoutStoryArgs = {
@@ -140,31 +142,17 @@ export const ContentOnlyPointColor: Story = {
   },
 };
 
-export const ModalWithLayout: Story = {
-  render: () => (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}
-    >
+const ModalWithLayoutComponent = () => {
+  const { openModal, closeModal } = useModal();
+
+  const handleOpenModal = () => {
+    openModal(
       <div
         style={{
-          background: 'white',
-          borderRadius: '12px',
-          width: '90%',
-          maxWidth: '400px',
           maxHeight: '80vh',
           overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <Layout color="white" padding="1rem">
@@ -172,15 +160,18 @@ export const ModalWithLayout: Story = {
             center={<div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>음료 변경</div>}
             right={
               <button
+                onClick={closeModal}
                 style={{
                   background: 'none',
                   border: 'none',
-                  fontSize: '1.5rem',
                   cursor: 'pointer',
                   padding: '0.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                ×
+                <img src="/images/close.svg" alt="닫기" width="19" height="19" />
               </button>
             }
             align={['center', 'center', 'start']}
@@ -214,15 +205,30 @@ export const ModalWithLayout: Story = {
               </div>
             </div>
           </Layout.Content>
-          <Layout.ButtonBar flexRatios={[1, 1]} height="100%">
+          <Layout.ButtonBar height="100%">
             <Button variant="secondary">취소</Button>
-            <Button variant="primary" style={{ background: '#ff6b6b' }}>
-              변경
-            </Button>
+            <Button variant="primary">변경</Button>
           </Layout.ButtonBar>
         </Layout>
-      </div>
+      </div>,
+      { showCloseButton: false }
+    );
+  };
+
+  return (
+    <div style={{ padding: '2rem' }}>
+      <Button variant="primary" onClick={handleOpenModal}>
+        모달 열기
+      </Button>
     </div>
+  );
+};
+
+export const ModalWithLayout: Story = {
+  render: () => (
+    <ModalProvider>
+      <ModalWithLayoutComponent />
+    </ModalProvider>
   ),
   parameters: {
     controls: {
