@@ -17,12 +17,10 @@ type Props = {
   card: Card;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const getCardImageSrc = (card: Card) => {
+const getCardText = (card: Card) => {
   const { type, value } = card;
-  const prefix = value < 0 ? 'minus' : value > 0 ? 'plus' : '';
-  const absValue = Math.abs(value);
-
-  return `/images/cards/${type}-${prefix}${absValue}.svg`;
+  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
+  else return value === -1 ? null : `x${value}`;
 };
 
 const getPlayerIconSrc = (iconColor: IconColor) => {
@@ -30,13 +28,18 @@ const getPlayerIconSrc = (iconColor: IconColor) => {
 };
 
 const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
+  const isSignInversionCard = card.type === 'multiplier' && card.value === -1;
+
   return (
     <S.Container $size={size} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
-        <S.CardImage
-          src={getCardImageSrc(card)}
-          alt={`${card.type} ${card.value > 0 && '+'}${card.value}`}
-        />
+        {isSignInversionCard ? (
+          <S.CardIcon src={'/images/sign-inversion-icon.svg'} alt="부호 반전" />
+        ) : (
+          <S.CardText $size={size} $card={card}>
+            {getCardText(card)}
+          </S.CardText>
+        )}
       </S.Circle>
       {player && (
         <S.Player $size={size}>
