@@ -69,7 +69,7 @@ public class PlayerInfos {
                 .stream()
                 .filter(player -> player.getName().equals(playerName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플레이어 이름입니다. playerName=" + playerName));
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다. playerName=" + playerName));
     }
 
     public Player getHost() {
