@@ -14,18 +14,15 @@ import lombok.Getter;
 @Getter
 public class Room {
 
-    private static final int MAXIMUM_GUEST_COUNT = 9;
-    private static final int MINIMUM_GUEST_COUNT = 2;
-
     private Long id;
 
-    private JoinCode joinCode;
+    private final JoinCode joinCode;
 
-    private Player host;
+    private final Player host;
 
-    private PlayersWithProbability playersWithProbability;
+    private final Players players;
 
-    private Roulette roulette;
+    private final Roulette roulette;
 
     private List<MiniGame> miniGames;
 
@@ -36,16 +33,17 @@ public class Room {
         this.joinCode = joinCode;
         this.roulette = roulette;
         this.host = host;
-        this.playersWithProbability = new PlayersWithProbability();
+        this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
 
-        playersWithProbability.join(host);
+        players.add(host);
     }
 
     public void joinPlayer(Player joinPlayer) {
         isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
         playersWithProbability.join(joinPlayer);
+        players.add(joinPlayer);
     }
 
     public void setMiniGame(List<MiniGame> miniGames) {
@@ -68,8 +66,7 @@ public class Room {
     }
 
     public boolean hasEnoughPlayers() {
-        return playersWithProbability.getPlayerCount() >= MINIMUM_GUEST_COUNT
-                && playersWithProbability.getPlayerCount() <= MAXIMUM_GUEST_COUNT;
+        return players.hasEnoughPlayers();
     }
 
     public Player startRoulette() {
@@ -85,14 +82,11 @@ public class Room {
     }
 
     public List<Player> getPlayers() {
-        return playersWithProbability.getPlayers();
+        return players.getPlayers();
     }
 
     public Player findPlayer(String playerName) {
-        return playersWithProbability.getPlayers().stream()
-                .filter(p -> p.getName().equals(playerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
+        return players.findPlayer(playerName);
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까

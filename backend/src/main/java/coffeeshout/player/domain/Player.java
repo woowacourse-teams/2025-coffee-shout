@@ -36,4 +36,8 @@ public class Player {
     public int hashCode() {
         return Objects.hashCode(name);
     }
+
+    public boolean isSameName(String name) {
+        return this.name.equals(name);
+    }
 }
