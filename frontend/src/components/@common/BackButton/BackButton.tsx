@@ -6,9 +6,9 @@ type Props = {
   onClick: () => void;
 } & ComponentProps<'button'>;
 
-const BackButton = ({ onClick, ...props }: Props) => {
+const BackButton = ({ onClick, ...rest }: Props) => {
   return (
-    <button onClick={onClick} {...props}>
+    <button onClick={onClick} {...rest}>
       <img src="/images/back-icon.svg" alt="뒤로가기" />
     </button>
   );
