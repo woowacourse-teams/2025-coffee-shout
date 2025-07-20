@@ -1,7 +1,7 @@
 package coffeeshout.fixture;
 
 import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.PlayersWithProbability;
+import coffeeshout.room.domain.Players;
 import java.util.List;
 
 public final class PlayersFixture {
@@ -16,9 +16,9 @@ public final class PlayersFixture {
     private PlayersFixture() {
     }
 
-    public static PlayersWithProbability 꾹이_루키_엠제이_한스() {
-        PlayersWithProbability playersWithProbability = new PlayersWithProbability();
-        playerList.forEach(playersWithProbability::join);
+    public static Players 꾹이_루키_엠제이_한스() {
+        Players playersWithProbability = new Players();
+        playerList.forEach(playersWithProbability::add);
         return playersWithProbability;
     }
 }

@@ -24,10 +24,6 @@ public class Players {
         players.add(joinPlayer);
     }
 
-    public int getPlayerCount() {
-        return players.size();
-    }
-
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
     }
