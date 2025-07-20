@@ -1,13 +1,13 @@
-import React from 'react';
+import { ReactElement } from 'react';
 import * as S from './TopBar.styled';
 
 type AlignType = 'start' | 'center' | 'end' | 'stretch';
 
 type TopBarProps = {
   height?: string;
-  left?: React.ReactElement;
-  center?: React.ReactElement;
-  right?: React.ReactElement;
+  left?: ReactElement;
+  center?: ReactElement;
+  right?: ReactElement;
   align?: [AlignType, AlignType, AlignType];
 };
 
