@@ -6,32 +6,27 @@ type Props = {
 };
 
 const fontSize = {
-  small: '2.0vw',
-  medium: '2.67vw',
-  large: '4.0vw',
-
-  // TODO: clamp로 최소 및 최댓값 설정하여 너무 작거나 커지지 않도록 조정
-  // small: 'clamp(12px, 2.0vw, 16px)',
-  // medium: 'clamp(14px, 2.67vw, 20px)',
-  // large: 'clamp(18px, 4.0vw, 28px)',
+  small: '0.625rem', // ~10px
+  medium: '0.875rem', // ~14px
+  large: '1rem', // ~16px
 };
 
 const iconSize = {
-  small: '2.0vw',
-  medium: '2.67vw',
-  large: '4.0vw',
+  small: '0.625rem', // ~10px
+  medium: '0.875rem', // ~14px
+  large: '1rem', // ~16px
 };
 
 const playerMarginTop = {
-  small: '1.0vw',
-  medium: '1.33vw',
-  large: '2.0vw',
+  small: '0.1875rem', // ~3px
+  medium: '0.375rem', // ~6px
+  large: '0.5rem', // ~8px
 };
 
 const playerNameMaxWidth = {
-  small: '8vw',
-  medium: '10vw',
-  large: '14vw',
+  small: '2rem', // ~32px
+  medium: '3rem', // ~48px
+  large: '4.5rem', // ~72px
 };
 
 export const Container = styled.button<Props>`
@@ -61,6 +56,7 @@ export const Circle = styled.div<Props>`
   background-color: ${({ theme }) => theme.color.point[50]};
   width: ${({ $size }) => circleVariants[$size || 'large']};
   height: ${({ $size }) => circleVariants[$size || 'large']};
+
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -78,6 +74,7 @@ export const Player = styled.div<Props>`
 export const PlayerName = styled.span<Props>`
   font-size: ${({ $size }) => fontSize[$size || 'large']};
   max-width: ${({ $size }) => playerNameMaxWidth[$size || 'large']};
+
   line-height: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -87,6 +84,7 @@ export const PlayerName = styled.span<Props>`
 export const PlayerIcon = styled.img<Props>`
   width: ${({ $size }) => iconSize[$size || 'large']};
   height: ${({ $size }) => iconSize[$size || 'large']};
+
   border-radius: 50%;
   display: block;
   flex-shrink: 0;
