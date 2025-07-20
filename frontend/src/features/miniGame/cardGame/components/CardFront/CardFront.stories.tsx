@@ -18,6 +18,7 @@ export const Small: Story = {
   args: {
     size: 'small',
     onClick: () => {},
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -25,6 +26,7 @@ export const Medium: Story = {
   args: {
     size: 'medium',
     onClick: () => {},
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -32,6 +34,7 @@ export const Large: Story = {
   args: {
     size: 'large',
     onClick: () => {},
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -43,6 +46,7 @@ export const WithPlayerSmall: Story = {
       name: '홍길동전',
       iconColor: 'red',
     },
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -54,6 +58,7 @@ export const WithPlayerMedium: Story = {
       name: '홍길동전',
       iconColor: 'red',
     },
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -65,6 +70,7 @@ export const WithPlayerLarge: Story = {
       name: '홍길동전',
       iconColor: 'red',
     },
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -76,6 +82,7 @@ export const LongName: Story = {
       name: '매우매우매우매우매우긴이름입니다람쥐 ',
       iconColor: 'red',
     },
+    card: { type: 'addition', value: -40 },
   },
 };
 
@@ -96,7 +103,12 @@ export const Grid: Story = {
         }}
       >
         {Array.from({ length: 9 }, (_, index) => (
-          <CardFront key={index} onClick={() => {}} player={playerMap[index]} />
+          <CardFront
+            key={index}
+            onClick={() => {}}
+            player={playerMap[index]}
+            card={{ type: 'addition', value: -40 }}
+          />
         ))}
       </div>
     );

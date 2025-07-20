@@ -64,6 +64,11 @@ export const Circle = styled.div<Props>`
   flex-shrink: 0;
 `;
 
+export const CardImage = styled.img`
+  width: 100%;
+  height: 100%;
+`;
+
 export const Player = styled.div<Props>`
   display: flex;
   align-items: center;
