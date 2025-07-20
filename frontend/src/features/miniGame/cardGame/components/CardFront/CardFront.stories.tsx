@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import CardFront from './CardFront';
+import CardFront, { IconColor } from './CardFront';
 
 const meta = {
   title: 'Features/MiniGame/CardGame/CardFront',
@@ -41,7 +41,7 @@ export const WithPlayerSmall: Story = {
     onClick: () => {},
     player: {
       name: '홍길동전',
-      iconSrc: '/images/profile-red.svg',
+      iconColor: 'red',
     },
   },
 };
@@ -52,7 +52,7 @@ export const WithPlayerMedium: Story = {
     onClick: () => {},
     player: {
       name: '홍길동전',
-      iconSrc: '/images/profile-red.svg',
+      iconColor: 'red',
     },
   },
 };
@@ -63,7 +63,7 @@ export const WithPlayerLarge: Story = {
     onClick: () => {},
     player: {
       name: '홍길동전',
-      iconSrc: '/images/profile-red.svg',
+      iconColor: 'red',
     },
   },
 };
@@ -74,16 +74,16 @@ export const LongName: Story = {
     onClick: () => {},
     player: {
       name: '매우매우매우매우매우긴이름입니다람쥐 ',
-      iconSrc: '/images/profile-red.svg',
+      iconColor: 'red',
     },
   },
 };
 
 export const Grid: Story = {
   render: () => {
-    const playerMap: Record<number, { name: string; iconSrc: string }> = {
-      4: { name: '사용자명', iconSrc: '/images/profile-red.svg' },
-      8: { name: '매우긴이름입니다', iconSrc: '/images/profile-red.svg' },
+    const playerMap: Record<number, { name: string; iconColor: IconColor }> = {
+      4: { name: '사용자명', iconColor: 'red' },
+      8: { name: '매우긴이름입니다', iconColor: 'red' },
     };
 
     return (
