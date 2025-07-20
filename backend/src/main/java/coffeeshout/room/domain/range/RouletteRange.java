@@ -1,4 +1,4 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.range;
 
 import coffeeshout.player.domain.Player;
 

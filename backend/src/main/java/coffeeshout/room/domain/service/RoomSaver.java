@@ -1,5 +1,6 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.service;
 
+import coffeeshout.room.domain.RouletteRoom;
 import coffeeshout.room.domain.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ public class RoomSaver {
 
     private final RoomRepository roomRepository;
 
-    public Room save(Room room) {
+    public RouletteRoom save(RouletteRoom room) {
         return roomRepository.save(room);
     }
 }

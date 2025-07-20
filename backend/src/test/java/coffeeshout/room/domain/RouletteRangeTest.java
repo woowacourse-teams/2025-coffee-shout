@@ -3,6 +3,7 @@ package coffeeshout.room.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.room.domain.range.RouletteRange;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

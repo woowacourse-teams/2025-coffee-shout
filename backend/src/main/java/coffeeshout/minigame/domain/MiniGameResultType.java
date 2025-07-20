@@ -1,6 +1,7 @@
 package coffeeshout.minigame.domain;
 
-import coffeeshout.room.domain.Probability;
+import coffeeshout.room.domain.probability.AdjustmentProbability;
+import coffeeshout.room.domain.probability.Probability;
 
 public enum MiniGameResultType {
 
@@ -19,11 +20,14 @@ public enum MiniGameResultType {
         return LOSER;
     }
 
-    public Probability adjustProbability(int rankCount, int relativeRank, Probability step) {
+    public AdjustmentProbability adjustProbability(int rankCount, int relativeRank, Probability step) {
         if (this == UNDECIDED) {
-            return Probability.ZERO_PERCENT;
+            return AdjustmentProbability.ZERO_PERCENT;
         }
-        return step.multiple(rankCount - relativeRank + 1);
+        if (this == WINNER) {
+            return new AdjustmentProbability(step.multiple(rankCount - relativeRank + 1).value());
+        }
+        return new AdjustmentProbability(-step.multiple(rankCount - relativeRank + 1).value());
     }
 
     private static boolean isWinner(int playerCount, int rank) {

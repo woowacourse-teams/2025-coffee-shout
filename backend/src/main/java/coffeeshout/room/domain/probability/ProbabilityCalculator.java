@@ -1,4 +1,4 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.probability;
 
 import static org.springframework.util.Assert.state;
 
@@ -22,7 +22,7 @@ public class ProbabilityCalculator {
         return Probability.CERTAIN.divide(playerCount);
     }
 
-    public Probability calculateAdjustProbability(int playerCount, int rank) {
+    public AdjustmentProbability computeAdjustProbability(int rank) {
         final MiniGameResultType resultType = MiniGameResultType.of(playerCount, rank);
         return resultType.adjustProbability(countAdjustableRanks(), relativeRank(rank), computeAdjustmentStep());
     }

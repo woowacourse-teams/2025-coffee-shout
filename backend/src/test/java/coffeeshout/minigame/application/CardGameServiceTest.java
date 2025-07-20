@@ -9,11 +9,11 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.Room;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.fixture.RoomFixture;
-import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.room.domain.RouletteRoom;
+import coffeeshout.room.domain.service.RoomFinder;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class CardGameServiceTest {
     @InjectMocks
     CardGameService cardGameService;
 
-    Room room;
+    RouletteRoom room;
 
     Long roomId;
 
@@ -41,11 +41,9 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
+        players = PlayersFixture.꾹이_루키_엠제이_한스;
         roomId = 1L;
         room = RoomFixture.호스트_꾹이();
-
-        ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
         CardGame cardGame = new CardGame(players, new CardGameDeckStub());

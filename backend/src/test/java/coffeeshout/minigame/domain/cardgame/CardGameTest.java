@@ -18,7 +18,7 @@ class CardGameTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
+        players = PlayersFixture.꾹이_루키_엠제이_한스;
         cardGame = new CardGame(players, new CardGameDeckStub());
 
         cardGame.start();

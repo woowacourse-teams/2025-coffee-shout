@@ -1,4 +1,4 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.probability;
 
 import static org.springframework.util.Assert.state;
 
@@ -33,6 +33,10 @@ public record Probability(Integer value) {
 
     public Probability plus(Probability other) {
         return new Probability(this.value + other.value);
+    }
+
+    public Probability adjust(AdjustmentProbability adjustmentProbability) {
+        return new Probability(this.value + adjustmentProbability.value());
     }
 
     public Probability adjust(MiniGameResultType resultType, Probability adjustProbability) {

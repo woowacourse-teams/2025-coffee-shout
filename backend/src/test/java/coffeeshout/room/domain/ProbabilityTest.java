@@ -3,6 +3,7 @@ package coffeeshout.room.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.minigame.domain.MiniGameResultType;
+import coffeeshout.room.domain.probability.Probability;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

@@ -1,6 +1,7 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.range;
 
 import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.probability.PlayersWithProbability;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +11,10 @@ public class RouletteRanges {
 
     public RouletteRanges(PlayersWithProbability probabilities) {
         probabilities.forEach((player, probability) -> ranges.add(generateRange(
-                endValue() + 1,
+                calculateStartValue(),
                 probability.value(),
-                player)
-        ));
+                player
+        )));
     }
 
     public Player pickPlayer(int number) {
@@ -22,14 +23,18 @@ public class RouletteRanges {
                 .player();
     }
 
-    public int endValue() {
+    public int calculateStartValue() {
         if (ranges.isEmpty()) {
-            return 0;
+            return 1;
         }
-        return ranges.getLast().end();
+        return ranges.getLast().end() + 1;
     }
 
     private RouletteRange generateRange(int start, int gap, Player player) {
-        return new RouletteRange(start, start + gap, player);
+        return new RouletteRange(start, start + gap - 1, player);
+    }
+
+    public int endValue() {
+        return ranges.getLast().end();
     }
 }

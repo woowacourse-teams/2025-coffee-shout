@@ -1,5 +1,6 @@
-package coffeeshout.room.domain;
+package coffeeshout.room.domain.service;
 
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

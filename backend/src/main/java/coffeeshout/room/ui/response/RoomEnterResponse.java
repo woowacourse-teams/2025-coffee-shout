@@ -1,10 +1,10 @@
 package coffeeshout.room.ui.response;
 
-import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RouletteRoom;
 
 public record RoomEnterResponse(Long roomId) {
 
-    public static RoomEnterResponse from(Room room) {
+    public static RoomEnterResponse from(RouletteRoom room) {
         return new RoomEnterResponse(room.getId());
     }
 }

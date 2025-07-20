@@ -1,17 +1,17 @@
 package coffeeshout.room.domain.repository;
 
 import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RouletteRoom;
 import java.util.Optional;
 import org.springframework.data.repository.Repository;
 
-public interface RoomRepository extends Repository<Room, Long> {
+public interface RoomRepository extends Repository<RouletteRoom, Long> {
 
-    Optional<Room> findById(Long roomId);
+    Optional<RouletteRoom> findById(Long roomId);
 
-    Optional<Room> findByJoinCode(JoinCode joinCode);
+    Optional<RouletteRoom> findByJoinCode(JoinCode joinCode);
 
     boolean existsByJoinCode(JoinCode joinCode);
 
-    Room save(Room room);
+    RouletteRoom save(RouletteRoom room);
 }

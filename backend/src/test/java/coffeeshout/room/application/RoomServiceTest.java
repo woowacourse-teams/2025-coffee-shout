@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.room.TestDataHelper;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
+import coffeeshout.room.domain.RouletteRoom;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +32,7 @@ class RoomServiceTest {
         Long menuId = 1L;
 
         // when
-        Room room = roomService.createRoom(hostName, menuId);
+        RouletteRoom room = roomService.createRoom(hostName, menuId);
 
         // then
         assertThat(room).isNotNull();
@@ -65,11 +65,11 @@ class RoomServiceTest {
         Long guestMenuId = 2L;
 
         // 방 먼저 생성
-        Room createdRoom = roomService.createRoom(hostName, hostMenuId);
+        RouletteRoom createdRoom = roomService.createRoom(hostName, hostMenuId);
         String joinCode = createdRoom.getJoinCode().value();
 
         // when
-        Room room = roomService.enterRoom(joinCode, guestName, guestMenuId);
+        RouletteRoom room = roomService.enterRoom(joinCode, guestName, guestMenuId);
 
         // then
         assertThat(room.getId()).isEqualTo(createdRoom.getId());
@@ -101,7 +101,7 @@ class RoomServiceTest {
         testDataHelper.createDummyRoom(existingJoinCode, "더미호스트");
 
         // when
-        Room room = roomService.enterRoom(existingJoinCode, guestName, menuId);
+        RouletteRoom room = roomService.enterRoom(existingJoinCode, guestName, menuId);
 
         // then
         assertThat(room.getJoinCode().value()).isEqualTo(existingJoinCode);
@@ -127,13 +127,13 @@ class RoomServiceTest {
         // given
         String hostName = "호스트짱";
         Long menuId = 1L;
-        Room createdRoom = roomService.createRoom(hostName, menuId);
+        RouletteRoom createdRoom = roomService.createRoom(hostName, menuId);
         String joinCode = createdRoom.getJoinCode().value();
 
         // when
         roomService.enterRoom(joinCode, "게스트1", 2L);
         roomService.enterRoom(joinCode, "게스트2", 3L);
-        Room result = roomService.enterRoom(joinCode, "게스트3", 4L);
+        RouletteRoom result = roomService.enterRoom(joinCode, "게스트3", 4L);
 
         // then
         assertThat(result.getPlayers()).hasSize(4);
@@ -146,7 +146,7 @@ class RoomServiceTest {
     void 최대_인원에서_입장을_하면_예외를_반환한다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        RouletteRoom createdRoom = roomService.createRoom(hostName, 1L);
         String joinCode = createdRoom.getJoinCode().value();
 
         // 최대 9명까지니까 8명 더 넣어보기
@@ -163,7 +163,7 @@ class RoomServiceTest {
     void 중복된_이름으로_입장할_수_없다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        RouletteRoom createdRoom = roomService.createRoom(hostName, 1L);
         String joinCode = createdRoom.getJoinCode().value();
         roomService.enterRoom(joinCode, "게스트", 2L);
 
@@ -177,7 +177,7 @@ class RoomServiceTest {
     void 잘못된_메뉴_ID로_게스트_입장하면_예외가_발생한다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        RouletteRoom createdRoom = roomService.createRoom(hostName, 1L);
         String joinCode = createdRoom.getJoinCode().value();
 
         // when & then
