@@ -38,6 +38,10 @@ public record JoinCode(
         return String.valueOf((char) asciiCode);
     }
 
+    public static JoinCode from(String joinCode) {
+        return new JoinCode(joinCode);
+    }
+
     private boolean isValidCharacter(int charCode) {
         return CHARSET.indexOf(charCode) > -1;
     }

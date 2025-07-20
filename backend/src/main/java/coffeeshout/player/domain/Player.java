@@ -1,7 +1,9 @@
 package coffeeshout.player.domain;
 
+import coffeeshout.room.domain.Probability;
 import java.util.Objects;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Player {
@@ -9,13 +11,13 @@ public class Player {
     private final String name;
     private Menu menu;
 
-    public Player(String name) {
-        this.name = name;
-    }
+    @Setter
+    private Probability probability;
 
     public Player(String name, Menu menu) {
         this.name = name;
         this.menu = menu;
+        this.probability = new Probability(0);
     }
 
     public void selectMenu(Menu menu) {

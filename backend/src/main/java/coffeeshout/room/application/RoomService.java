@@ -23,20 +23,17 @@ public class RoomService {
 
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuFinder.findById(menuId);
-        final Player host = new Player(hostName, menu);
-
         final JoinCode joinCode = joinCodeGenerator.generate();
-        final Room room = new Room(joinCode, host);
+        final Room room = Room.createNewRoom(joinCode, hostName, menu);
 
         return roomSaver.save(room);
     }
 
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
         final Menu menu = menuFinder.findById(menuId);
-        final Player guest = new Player(guestName, menu);
+        final Room room = roomFinder.findByJoinCode(JoinCode.from(joinCode));
 
-        final Room room = roomFinder.findByJoinCode(new JoinCode(joinCode));
-        room.joinGuest(guest);
+        room.joinGuest(guestName, menu);
 
         return roomSaver.save(room);
     }

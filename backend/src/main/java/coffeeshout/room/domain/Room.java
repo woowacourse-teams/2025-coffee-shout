@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.MiniGame;
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.player.domain.Menu;
 import coffeeshout.player.domain.Player;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -43,10 +44,10 @@ public class Room {
     private Player host;
 
     @Transient
-    private PlayersWithProbability playersWithProbability;
+    private List<Player> players;
 
     @Transient
-    private Roulette roulette;
+    private RandomGenerator randomGenerator;
 
     @Transient
     private List<MiniGame> miniGames;
@@ -55,19 +56,29 @@ public class Room {
     @Column(nullable = false, name = "room_state")
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, Player host) {
+    public Room(JoinCode joinCode, String hostName, Menu menu) {
         this.joinCode = joinCode;
-        this.roulette = new Roulette(new JavaRandomGenerator());
-        this.host = host;
-        this.playersWithProbability = new PlayersWithProbability();
+        this.randomGenerator = new JavaRandomGenerator();
+        this.host = new Player(hostName, menu);
+        this.players = List.of(host);
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
-        playersWithProbability.join(host);
     }
 
-    public void joinGuest(Player joinPlayer) {
+    public static Room createNewRoom(JoinCode joinCode, String hostName, Menu menu) {
+        final Room room = new Room(joinCode, hostName, menu);
+        room.adjustProbability();
+        return room;
+    }
+
+    public void joinGuest(String guestName, Menu menu) {
         state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        playersWithProbability.join(joinPlayer);
+        players.add(new Player(guestName, menu));
+        adjustProbability();
+    }
+
+    private void adjustProbability() {
+        players.forEach(player -> player.setProbability(new Probability(10000 / players.size())));
     }
 
     public void setMiniGame(List<MiniGame> miniGames) {
