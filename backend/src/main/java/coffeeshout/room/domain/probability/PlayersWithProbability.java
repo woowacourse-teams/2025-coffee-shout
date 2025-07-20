@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -14,7 +15,7 @@ public class PlayersWithProbability {
     private final Map<Player, Probability> adjustedProbabilities;
 
     public PlayersWithProbability(Map<Player, Probability> playerProbabilityMap) {
-        this.adjustedProbabilities = playerProbabilityMap;
+        this.adjustedProbabilities = new LinkedHashMap<>(playerProbabilityMap);
     }
 
     public static PlayersWithProbability probability(
@@ -23,9 +24,12 @@ public class PlayersWithProbability {
             ProbabilityCalculator calculator
     ) {
         return new PlayersWithProbability(players.stream().collect(Collectors.toMap(
-                player -> player,
-                player -> ProbabilityCalculator.computeInitialProbability(players.size()).adjust(computeAdjustProbability(player, miniGameResults, calculator))
-        )));
+                        player -> player,
+                        player -> ProbabilityCalculator.computeInitialProbability(players.size()).adjust(computeAdjustProbability(player, miniGameResults, calculator)),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ))
+        );
     }
 
     private static AdjustmentProbability computeAdjustProbability(

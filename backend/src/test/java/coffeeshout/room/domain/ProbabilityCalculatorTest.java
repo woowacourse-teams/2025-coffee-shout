@@ -15,17 +15,10 @@ class ProbabilityCalculatorTest {
     class 생성자_검증 {
 
         @Test
-        void 플레이어가_2명_이하면_예외() {
-            assertThatThrownBy(() -> new ProbabilityCalculator(2, 3))
+        void 플레이어가_2명_미만이면_예외() {
+            assertThatThrownBy(() -> new ProbabilityCalculator(1, 3))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("플레이어는 2명 이상이어야 합니다.");
-        }
-
-        @Test
-        void 라운드가_0이하면_예외() {
-            assertThatThrownBy(() -> new ProbabilityCalculator(4, 0))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("라운드 수는 양수여야 합니다.");
         }
 
         @Test

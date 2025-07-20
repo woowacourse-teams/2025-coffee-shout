@@ -154,6 +154,7 @@ class RoomServiceTest {
             roomService.enterRoom(joinCode, "게스트" + i, 1L);
         }
 
+        roomService.enterRoom(joinCode, "dsa", 1L);
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트9", 1L))
                 .isInstanceOf(IllegalStateException.class);
@@ -165,11 +166,10 @@ class RoomServiceTest {
         String hostName = "호스트짱";
         RouletteRoom createdRoom = roomService.createRoom(hostName, 1L);
         String joinCode = createdRoom.getJoinCode().value();
-        roomService.enterRoom(joinCode, "게스트", 2L);
 
         // when & then
         // Player 생성에서 중복 체크 하는지 모르겠지만 일단 테스트
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "호스트짱", 3L))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

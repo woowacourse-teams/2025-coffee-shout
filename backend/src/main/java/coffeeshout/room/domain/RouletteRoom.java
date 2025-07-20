@@ -70,39 +70,24 @@ public class RouletteRoom {
     }
 
     public void joinGuest(Player joinPlayer) {
+        state(players.size() <= 9, "정원 초과(최대인원-9명)");
         state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        boolean existPlayer = !players.stream().anyMatch(player -> player.sameName(joinPlayer.getName()));
+        boolean existPlayer = players.stream().noneMatch(player -> player.sameName(joinPlayer.getName()));
         isTrue(existPlayer, "이미 존재하는 플레이어입니다.");
         players.add(joinPlayer);
     }
 
     public void setMiniGame(List<Playable> miniGames) {
-        state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
+        state(!miniGames.isEmpty() && miniGames.size() <= 5, "미니게임은 1~5개 이하여야 합니다.");
         this.miniGames = miniGames;
     }
 
     public PlayersWithProbability getProbabilities() {
-        return PlayersWithProbability.probability(players, miniGameResults, new ProbabilityCalculator(players.size(), miniGames.size()));
-    }
-
-    public int totalRound() {
-        return miniGames.size();
+        return PlayersWithProbability.probability(players, miniGameResults, new ProbabilityCalculator(players.size(), totalRound()));
     }
 
     public void addMiniGameResult(MiniGameResult miniGameResult) {
         miniGameResults.add(miniGameResult);
-    }
-
-    public boolean hasNoMiniGames() {
-        return miniGames.isEmpty();
-    }
-
-    public boolean isInPlayingState() {
-        return roomState == RoomState.PLAYING;
-    }
-
-    public boolean hasEnoughPlayers() {
-        return players.size() >= MINIMUM_GUEST_COUNT && players.size() <= MAXIMUM_GUEST_COUNT;
     }
 
     public Player spin() {
@@ -124,5 +109,17 @@ public class RouletteRoom {
                 .filter(player -> player.sameName(playerName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 플레이어입니다."));
+    }
+
+    private int totalRound() {
+        return miniGames.size();
+    }
+
+    private boolean isInPlayingState() {
+        return roomState == RoomState.PLAYING;
+    }
+
+    private boolean hasEnoughPlayers() {
+        return players.size() >= MINIMUM_GUEST_COUNT && players.size() <= MAXIMUM_GUEST_COUNT;
     }
 }
