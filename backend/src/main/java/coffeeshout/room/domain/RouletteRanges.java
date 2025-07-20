@@ -8,11 +8,12 @@ public class RouletteRanges {
 
     private final List<RouletteRange> ranges = new ArrayList<>();
 
-    public RouletteRanges(PlayersWithProbability probabilities) {
+    public RouletteRanges(RouletteProbabilities probabilities) {
         probabilities.forEach((player, probability) -> ranges.add(generateRange(
-                endValue() + 1,
-                probability.value(),
-                player)
+                        endValue() + 1,
+                        probability.value(),
+                        player
+                )
         ));
     }
 

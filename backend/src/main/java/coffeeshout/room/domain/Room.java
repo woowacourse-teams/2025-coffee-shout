@@ -42,8 +42,8 @@ public class Room {
 
     public void joinPlayer(Player joinPlayer) {
         isTrue(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        playersWithProbability.join(joinPlayer);
         players.add(joinPlayer);
+        roulette.join(joinPlayer);
     }
 
     public void setMiniGame(List<MiniGame> miniGames) {
@@ -51,10 +51,8 @@ public class Room {
         this.miniGames = miniGames;
     }
 
-    // TODO 미니게임 결과 반영
     public void applyMiniGameResult(MiniGameResult miniGameResult) {
-        playersWithProbability.adjustProbabilities(miniGameResult,
-                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
+        roulette.adjustProbabilities(miniGameResult, miniGames.size());
     }
 
     public boolean hasNoMiniGames() {
@@ -72,7 +70,7 @@ public class Room {
     public Player startRoulette() {
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isInPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        final Player losePlayer = roulette.spin(playersWithProbability);
+        final Player losePlayer = roulette.spin();
         roomState = RoomState.DONE;
         return losePlayer;
     }
