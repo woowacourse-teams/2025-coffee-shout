@@ -67,3 +67,41 @@ export const WithPlayerLarge: Story = {
     },
   },
 };
+
+export const LongName: Story = {
+  args: {
+    size: 'large',
+    onClick: () => {},
+    player: {
+      name: '매우매우매우매우매우긴이름입니다람쥐 ',
+      iconSrc: '/images/profile-red.svg',
+    },
+  },
+};
+
+export const Grid: Story = {
+  render: () => {
+    const playerMap: Record<number, { name: string; iconSrc: string }> = {
+      4: { name: '사용자명', iconSrc: '/images/profile-red.svg' },
+      8: { name: '매우긴이름입니다', iconSrc: '/images/profile-red.svg' },
+    };
+
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '10px',
+          placeItems: 'center',
+        }}
+      >
+        {Array.from({ length: 9 }, (_, index) => (
+          <CardFront key={index} onClick={() => {}} player={playerMap[index]} />
+        ))}
+      </div>
+    );
+  },
+  parameters: {
+    layout: 'centered',
+  },
+};

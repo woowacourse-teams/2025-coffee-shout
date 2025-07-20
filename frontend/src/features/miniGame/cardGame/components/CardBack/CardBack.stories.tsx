@@ -31,3 +31,25 @@ export const Large: Story = {
     size: 'large',
   },
 };
+
+export const Grid: Story = {
+  render: () => {
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '10px',
+          placeItems: 'center',
+        }}
+      >
+        {Array.from({ length: 9 }, (_, index) => (
+          <CardBack key={index} onClick={() => {}} />
+        ))}
+      </div>
+    );
+  },
+  parameters: {
+    layout: 'centered',
+  },
+};
