@@ -10,7 +10,8 @@ export const Banner = styled.div`
   text-align: center;
 `;
 
-export const Description = styled.p`
-  ${({ theme }) => theme.typography.small}
-  color: white;
+export const DescriptionWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 `;
