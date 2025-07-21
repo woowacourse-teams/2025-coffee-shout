@@ -37,7 +37,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
         autoFocus
       />
       <S.ButtonContainer>
-        <Button variant="secondary" onClick={() => onClose()}>
+        <Button variant="secondary" onClick={onClose}>
           취소
         </Button>
         <Button variant="primary" onClick={handleEnter}>
