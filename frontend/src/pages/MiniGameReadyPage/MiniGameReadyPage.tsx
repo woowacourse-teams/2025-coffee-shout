@@ -14,19 +14,20 @@ const MiniGameReadyPage = () => {
   const { roomId, miniGameId } = useParams();
 
   useEffect(() => {
+    if (countdown <= 0) return;
+
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate(`/room/${roomId}/${miniGameId}/play`);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setCountdown((prev) => prev - 1);
     }, COUNTDOWN_INTERVAL);
 
     return () => clearInterval(timer);
-  }, [navigate, roomId, miniGameId]);
+  }, [countdown]);
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      navigate(`/room/${roomId}/${miniGameId}/play`);
+    }
+  }, [countdown, navigate, roomId, miniGameId]);
 
   return (
     <Layout color="point-400">
