@@ -3,13 +3,13 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
 import * as S from './SectionTitle.styled';
 
-type SectionTitleProps = {
+type Props = {
   title: string;
   description: string;
   suffix?: React.ReactNode;
 };
 
-const SectionTitle = ({ title, description, suffix }: SectionTitleProps) => {
+const SectionTitle = ({ title, description, suffix }: Props) => {
   return (
     <S.Container>
       <S.Wrapper>
