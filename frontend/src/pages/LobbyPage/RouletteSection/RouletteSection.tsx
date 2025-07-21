@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import SwitchButton from '@/components/@common/SwitchButton/SwitchButton';
+import { useState } from 'react';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { RouletteWheel } from './RouletteWheel/RouletteWheel';
 import { ProbabilityList } from './ProbabilityList/ProbabilityList';
 import * as S from './RouletteSection.styled';
+import IconButton from '@/components/@common/IconButton/IconButton';
 
 type RouletteView = 'roulette' | 'statistics';
 
@@ -14,26 +14,28 @@ export const RouletteSection = () => {
     setCurrentView(currentView === 'roulette' ? 'statistics' : 'roulette');
   };
 
-  const renderContent = () => {
-    switch (currentView) {
-      case 'statistics':
-        return <ProbabilityList />;
-      case 'roulette':
-      default:
-        return <RouletteWheel />;
-    }
-  };
-
   return (
     <>
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
-      <S.SwitchButtonWrapper>
-        <SwitchButton
-          targetView={currentView === 'roulette' ? 'statistics' : 'roulette'}
+      <S.IconButtonWrapper>
+        <IconButton
+          iconSrc={
+            currentView === 'roulette' ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg'
+          }
           onClick={handleViewChange}
         />
-      </S.SwitchButtonWrapper>
-      {renderContent()}
+      </S.IconButtonWrapper>
+      {renderContent(currentView)}
     </>
   );
+};
+
+const renderContent = (currentView: RouletteView) => {
+  switch (currentView) {
+    case 'statistics':
+      return <ProbabilityList />;
+    case 'roulette':
+    default:
+      return <RouletteWheel />;
+  }
 };
