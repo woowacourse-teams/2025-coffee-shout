@@ -23,12 +23,12 @@ export const ProgressRing = styled.svg`
 
 export const BackgroundCircle = styled.circle`
   stroke: ${({ theme }) => theme.color.gray[200]};
-  stroke-width: 8;
+  stroke-width: 10;
 `;
 
 export const ProgressCircle = styled.circle`
   stroke: ${({ theme }) => theme.color.point[400]};
-  stroke-width: 8;
+  stroke-width: 10;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.3s ease;
 `;
