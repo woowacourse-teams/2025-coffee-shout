@@ -16,7 +16,7 @@ if ! command -v docker &> /dev/null; then
     sudo apt install -y docker.io
     sudo systemctl start docker
     sudo systemctl enable docker
-    sudo usermod -a -G docker ec2-user
+    sudo usermod -a -G docker ubuntu
 else
     echo "Docker가 이미 설치되어 있습니다"
     systemctl start docker
@@ -46,6 +46,6 @@ fi
 
 # 배포 디렉토리 생성 및 정리
 sudo mkdir -p /opt/coffee-shout/{app,scripts,logs}
-sudo chown -R ec2-user:ec2-user /opt/coffee-shout
+sudo chown -R ubuntu:ubuntu /opt/coffee-shout
 
 echo "=== [BEFORE_INSTALL] 완료 ==="
