@@ -24,8 +24,8 @@ export const ParticipantSection = () => {
             아이콘
           </PlayerCard>
         ))}
-        <div style={{ height: '3rem' }}></div>
       </S.ScrollableWrapper>
+      <S.BottomGap />
     </>
   );
 };

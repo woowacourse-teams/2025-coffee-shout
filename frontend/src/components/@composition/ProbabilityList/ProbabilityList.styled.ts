@@ -17,3 +17,7 @@ export const DividerWrapper = styled.div`
 export const ProbabilityText = styled(Headline4)`
   color: #666;
 `;
+
+export const BottomGap = styled.div`
+  height: 3rem;
+`;

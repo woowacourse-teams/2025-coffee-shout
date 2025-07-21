@@ -33,8 +33,8 @@ const LobbyPage = () => {
     navigate('/room/:roomId/:miniGameId/ready');
   };
 
-  const handleSectionChange = (option: string) => {
-    setCurrentSection(option as SectionType);
+  const handleSectionChange = (option: SectionType) => {
+    setCurrentSection(option);
   };
 
   return (

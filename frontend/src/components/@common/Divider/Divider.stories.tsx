@@ -29,23 +29,37 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  render: (args) => (
+    <div
+      style={{
+        width: 300,
+        height: 40,
+        background: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <Divider {...args} />
+    </div>
+  ),
   args: {},
 };
 
-export const CustomColor: Story = {
-  args: {
-    color: '#ff0000',
-  },
-};
-
-export const ThickDivider: Story = {
+export const CustomHeight: Story = {
+  render: (args) => (
+    <div
+      style={{
+        width: 300,
+        height: 40,
+        background: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <Divider {...args} />
+    </div>
+  ),
   args: {
     height: '4px',
-  },
-};
-
-export const NarrowWidth: Story = {
-  args: {
-    width: '50%',
   },
 };
