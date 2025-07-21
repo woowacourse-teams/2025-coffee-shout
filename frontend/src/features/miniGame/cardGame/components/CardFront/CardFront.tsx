@@ -17,16 +17,6 @@ type Props = {
   card: Card;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const getCardText = (card: Card) => {
-  const { type, value } = card;
-  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
-  else return value === -1 ? null : `x${value}`;
-};
-
-const getPlayerIconSrc = (iconColor: IconColor) => {
-  return `/images/profile-${iconColor}.svg`;
-};
-
 const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
   const isSignInversionCard = card.type === 'multiplier' && card.value === -1;
 
@@ -56,3 +46,13 @@ const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
 };
 
 export default CardFront;
+
+const getCardText = (card: Card) => {
+  const { type, value } = card;
+  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
+  else return value === -1 ? null : `x${value}`;
+};
+
+const getPlayerIconSrc = (iconColor: IconColor) => {
+  return `/images/profile-${iconColor}.svg`;
+};
