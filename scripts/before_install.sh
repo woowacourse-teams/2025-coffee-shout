@@ -12,11 +12,11 @@ fi
 # Docker 설치 확인 및 설치
 if ! command -v docker &> /dev/null; then
     echo "Docker를 설치합니다..."
-    yum update -y
-    yum install -y docker
-    systemctl start docker
-    systemctl enable docker
-    usermod -a -G docker ec2-user
+    sudo apt update -y
+    sudo apt install -y docker.io
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -a -G docker ec2-user
 else
     echo "Docker가 이미 설치되어 있습니다"
     systemctl start docker
