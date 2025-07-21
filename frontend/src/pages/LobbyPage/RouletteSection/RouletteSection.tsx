@@ -4,8 +4,7 @@ import RouletteWheel from '../../../components/@composition/RouletteWheel/Roulet
 import ProbabilityList from '../../../components/@composition/ProbabilityList/ProbabilityList';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import * as S from './RouletteSection.styled';
-
-type RouletteView = 'roulette' | 'statistics';
+import { RouletteView } from '@/types/roulette';
 
 export const RouletteSection = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');

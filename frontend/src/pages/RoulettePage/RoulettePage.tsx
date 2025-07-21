@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import RouletteWheel from '@/components/@composition/RouletteWheel/RouletteWheel';
 import Layout from '@/layouts/Layout';
 import Button from '@/components/@common/Button/Button';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import Headline4 from '@/components/@common/Headline4/Headline4';
 import * as S from './RoulettePage.styled';
 import IconButton from '@/components/@common/IconButton/IconButton';
+import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
+import { RouletteView } from '@/types/roulette';
+import RoulettePlaySection from './RoulettePlaySection/RoulettePlaySection';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
   const [spinning, setSpinning] = useState(false);
-  const [currentView, setCurrentView] = useState<'roulette' | 'statistics'>('roulette');
+  const [currentView, setCurrentView] = useState<RouletteView>('roulette');
+
+  const isRouletteView = currentView === 'roulette';
 
   const handleSpinClick = () => {
     setSpinning(true);
@@ -23,7 +26,7 @@ const RoulettePage = () => {
   };
 
   const handleViewChange = () => {
-    setCurrentView(currentView === 'roulette' ? 'statistics' : 'roulette');
+    setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
 
   return (
@@ -32,22 +35,13 @@ const RoulettePage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
+          {isRouletteView ? <RoulettePlaySection spinning={spinning} /> : <ProbabilityList />}
           <S.IconButtonWrapper>
             <IconButton
-              iconSrc={
-                currentView === 'roulette'
-                  ? '/images/statistics-icon.svg'
-                  : '/images/roulette-icon.svg'
-              }
+              iconSrc={isRouletteView ? '/images/roulette-icon.svg' : '/images/statistics-icon.svg'}
               onClick={handleViewChange}
             />
           </S.IconButtonWrapper>
-          <S.Wrapper>
-            <RouletteWheel spinning={spinning} />
-            <S.ProbabilityText>
-              <Headline4>당첨 확률 +10%</Headline4>
-            </S.ProbabilityText>
-          </S.Wrapper>
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
