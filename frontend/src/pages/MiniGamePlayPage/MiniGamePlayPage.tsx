@@ -5,19 +5,24 @@ import CardBack from '@/features/miniGame/cardGame/components/CardBack/CardBack'
 import CircularProgress from '@/features/miniGame/cardGame/components/CircularProgress/CircularProgress';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGamePlayPage.styled';
 
 const TOTAL_COUNT = 10;
 
 const MiniGamePlayPage = () => {
   const [current, setCurrent] = useState(TOTAL_COUNT);
+  const navigate = useNavigate();
+  const { roomId, miniGameId } = useParams();
 
   useEffect(() => {
     if (current > 0) {
       const timer = setTimeout(() => setCurrent(current - 1), 1000);
       return () => clearTimeout(timer);
+    } else if (current === 0) {
+      navigate(`/room/${roomId}/${miniGameId}/result`);
     }
-  }, [current]);
+  }, [current, miniGameId, navigate, roomId]);
 
   return (
     <Layout>
