@@ -29,24 +29,10 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const FullProgress: Story = {
-  args: {
-    current: 0,
-    total: 10,
-  },
-};
-
-export const NoProgress: Story = {
-  args: {
-    current: 10,
-    total: 10,
-  },
-};
-
 export const CountdownAnimation: Story = {
   render: () => {
-    const [current, setCurrent] = useState(10);
     const [key, setKey] = useState(0);
+    const [current, setCurrent] = useState(10);
 
     useEffect(() => {
       if (current > 0) {
