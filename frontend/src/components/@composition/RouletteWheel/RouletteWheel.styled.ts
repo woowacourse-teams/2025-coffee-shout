@@ -1,5 +1,9 @@
 import styled from '@emotion/styled';
 
+type WrapperProps = {
+  $spinning?: boolean;
+};
+
 export const Container = styled.div`
   display: flex;
   flex: 1;
@@ -8,7 +12,7 @@ export const Container = styled.div`
   margin-bottom: 6rem;
 `;
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<WrapperProps>`
   width: 300px;
   height: 300px;
   border-radius: 50%;
@@ -20,4 +24,20 @@ export const Wrapper = styled.div`
   justify-content: center;
   font-size: 1.2rem;
   color: #666;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+  ${({ $spinning }) =>
+    $spinning &&
+    `
+      animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
+    `}
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(1080deg);
+    }
+  }
 `;
