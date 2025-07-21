@@ -1,15 +1,48 @@
+import Description from '@/components/@common/Description/Description';
+import Headline2 from '@/components/@common/Headline2/Headline2';
+import Headline4 from '@/components/@common/Headline4/Headline4';
+import CardBack from '@/features/miniGame/cardGame/components/CardBack/CardBack';
+import CircularProgress from '@/features/miniGame/cardGame/components/CircularProgress/CircularProgress';
+import Layout from '@/layouts/Layout';
+import { useEffect, useState } from 'react';
+import * as S from './MiniGamePlayPage.styled';
+
+const TOTAL_COUNT = 10;
+
 const MiniGamePlayPage = () => {
+  const [current, setCurrent] = useState(TOTAL_COUNT);
+
+  useEffect(() => {
+    if (current > 0) {
+      const timer = setTimeout(() => setCurrent(current - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [current]);
+
   return (
-    <div>
-      <h1>미니게임 진행</h1>
-      <p>미니게임이 진행되는 화면입니다.</p>
-      <div style={{ padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
-        <h3>게임 진행 중...</h3>
-        <p>시간: 30초</p>
-        <p>점수: 100점</p>
-      </div>
-      <button>게임 종료</button>
-    </div>
+    <Layout>
+      <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
+      <Layout.Content>
+        <S.TitleContainer>
+          <S.TitleWrapper>
+            <Headline2>Round1</Headline2>
+            <Description>카드를 골라주세요!</Description>
+          </S.TitleWrapper>
+          <S.CircularProgressWrapper>
+            <CircularProgress current={current} total={TOTAL_COUNT} />
+          </S.CircularProgressWrapper>
+        </S.TitleContainer>
+        <S.MyCardContainer>
+          <CardBack size="medium" onClick={() => {}} />
+          <CardBack size="medium" onClick={() => {}} />
+        </S.MyCardContainer>
+        <S.CardContainer>
+          {Array.from({ length: 9 }, (_, index) => (
+            <CardBack key={index} onClick={() => {}} />
+          ))}
+        </S.CardContainer>
+      </Layout.Content>
+    </Layout>
   );
 };
 
