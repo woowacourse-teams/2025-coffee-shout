@@ -20,8 +20,12 @@ phases:
       - cp compose.yaml ../compose.yaml
 
       # 스크립트 복사
-      - mkdir -p ../scripts/
+      - cp -r backend/scripts ../scripts/
       - chmod +x ../scripts/*.sh
+
+      # appspec 복사
+      - cp appspec.yml ../appspec.yml
+
 
 artifacts:
   files:

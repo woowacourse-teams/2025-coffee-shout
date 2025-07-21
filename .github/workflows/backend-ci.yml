@@ -39,6 +39,3 @@ jobs:
 
       - name: Check Application Properties
         run: ./gradlew bootJar --dry-run
-
-#      - name: Run Tests
-#        run: ./gradlew test
