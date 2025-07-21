@@ -23,8 +23,8 @@ phases:
 artifacts:
   files:
     - coffee-shout-backend.jar
-    - backend/scripts/*
-    - backend/appspec.yml
+    - scripts/*
+    - appspec.yml
 
 cache:
   paths:
