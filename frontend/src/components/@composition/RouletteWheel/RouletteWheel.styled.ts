@@ -6,7 +6,6 @@ type WrapperProps = {
 
 export const Container = styled.div`
   display: flex;
-  flex: 1;
   justify-content: center;
   align-items: center;
 `;
@@ -39,4 +38,9 @@ export const Wrapper = styled.div<WrapperProps>`
       transform: rotate(1080deg);
     }
   }
+`;
+
+export const CenterImage = styled.img`
+  width: 64px;
+  height: 64px;
 `;
