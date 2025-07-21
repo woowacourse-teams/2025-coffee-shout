@@ -9,7 +9,7 @@ export const Container = styled.div`
   padding: 0 20px;
 `;
 
-export const TextContainer = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,7 +17,7 @@ export const TextContainer = styled.div`
   margin-bottom: 30px;
 `;
 
-export const Time = styled.span`
+export const Timer = styled.span`
   font-size: 150px;
   font-weight: 900;
   color: white;
