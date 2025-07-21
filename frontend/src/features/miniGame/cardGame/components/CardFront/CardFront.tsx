@@ -1,0 +1,58 @@
+import { ComponentProps } from 'react';
+import * as S from './CardFront.styled';
+import { Card } from '../../constants/cards';
+
+// TODO: 색상 추가 필요, PlayerCard 부분과 합칠 것
+export type IconColor = 'red';
+
+type Player = {
+  name: string;
+  iconColor: IconColor;
+};
+
+type Props = {
+  size?: 'small' | 'medium' | 'large';
+  onClick: () => void;
+  player?: Player;
+  card: Card;
+} & Omit<ComponentProps<'button'>, 'onClick'>;
+
+const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
+  const isSignInversionCard = card.type === 'multiplier' && card.value === -1;
+
+  return (
+    <S.Container $size={size} onClick={onClick} {...rest}>
+      <S.Circle $size={size}>
+        {isSignInversionCard ? (
+          <S.CardIcon src={'/images/sign-inversion-icon.svg'} alt="부호 반전" />
+        ) : (
+          <S.CardText $size={size} $card={card}>
+            {getCardText(card)}
+          </S.CardText>
+        )}
+      </S.Circle>
+      {player && (
+        <S.Player $size={size}>
+          <S.PlayerIcon
+            src={getPlayerIconSrc(player.iconColor)}
+            alt={`player-${player.name}-icon`}
+            $size={size}
+          />
+          <S.PlayerName $size={size}>{player.name}</S.PlayerName>
+        </S.Player>
+      )}
+    </S.Container>
+  );
+};
+
+export default CardFront;
+
+const getCardText = (card: Card) => {
+  const { type, value } = card;
+  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
+  else return value === -1 ? null : `x${value}`;
+};
+
+const getPlayerIconSrc = (iconColor: IconColor) => {
+  return `/images/profile-${iconColor}.svg`;
+};
