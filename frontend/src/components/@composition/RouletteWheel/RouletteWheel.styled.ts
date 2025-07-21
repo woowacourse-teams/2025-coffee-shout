@@ -40,3 +40,8 @@ export const Wrapper = styled.div<WrapperProps>`
     }
   }
 `;
+
+export const CenterImage = styled.img`
+  width: 64px;
+  height: 64px;
+`;
