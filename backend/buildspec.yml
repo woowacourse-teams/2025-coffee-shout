@@ -25,6 +25,7 @@ artifacts:
     - coffee-shout-backend.jar
     - scripts/*
     - appspec.yml
+    - backend/compose.yaml
 
 cache:
   paths:

@@ -13,6 +13,11 @@ files:
     destination: /opt/coffee-shout/scripts
     file_exists_behavior: OVERWRITE
 
+  # Docker Compose 파일 복사
+  - source: compose.yaml
+    destination: /opt/coffee-shout/app
+    file_exists_behavior: OVERWRITE
+
 # 파일 권한 설정
 permissions:
   - object: /opt/coffee-shout/app
