@@ -12,7 +12,7 @@ public final class CardGameDeckStub implements CardGameDeckGenerator {
     private int count = 0;
 
     @Override
-    public Deck generate() {
+    public Deck generate(int additionCardCount, int multiplierCardCount) {
         List<Card> additionCards = List.of(
                 new AdditionCard(40),
                 new AdditionCard(30),

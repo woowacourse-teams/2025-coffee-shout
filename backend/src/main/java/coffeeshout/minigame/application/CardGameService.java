@@ -19,13 +19,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CardGameService {
 
+    private static final int ADDITION_CARD_COUNT = 6;
+    private static final int MULTIPLIER_CARD_COUNT = 3;
+
     private final RoomFinder roomFinder;
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
+
 
     public void start(Long roomId) {
         final Room room = roomFinder.findById(roomId);
         final CardGameDeckGenerator deckGenerator = new CardGameRandomDeckGenerator();
-        final CardGame cardGame = new CardGame(deckGenerator.generate(), room.getPlayers());
+        final CardGame cardGame = new CardGame(deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT), room.getPlayers());
         cardGame.start();
         cardGames.put(roomId, cardGame);
     }
