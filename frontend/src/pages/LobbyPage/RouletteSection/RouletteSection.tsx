@@ -9,9 +9,10 @@ type RouletteView = 'roulette' | 'statistics';
 
 export const RouletteSection = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
+  const isRouletteView = currentView === 'roulette';
 
   const handleViewChange = () => {
-    setCurrentView(currentView === 'roulette' ? 'statistics' : 'roulette');
+    setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
 
   return (
@@ -19,9 +20,7 @@ export const RouletteSection = () => {
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
       <S.IconButtonWrapper>
         <IconButton
-          iconSrc={
-            currentView === 'roulette' ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg'
-          }
+          iconSrc={isRouletteView ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg'}
           onClick={handleViewChange}
         />
       </S.IconButtonWrapper>
