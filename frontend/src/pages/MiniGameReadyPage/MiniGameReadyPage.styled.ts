@@ -17,6 +17,12 @@ export const Wrapper = styled.div`
   margin-bottom: 30px;
 `;
 
+export const DescriptionWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
 export const Timer = styled.span`
   font-size: 150px;
   font-weight: 900;

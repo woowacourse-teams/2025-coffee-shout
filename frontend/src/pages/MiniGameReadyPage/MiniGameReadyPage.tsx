@@ -33,11 +33,10 @@ const MiniGameReadyPage = () => {
       <S.Container>
         <S.Wrapper>
           <Headline1 color="white">곧 게임이 시작돼요</Headline1>
-          <Description color="white">
-            게임이 시작될 때까지
-            <br />
-            조금만 기다려주세요
-          </Description>
+          <S.DescriptionWrapper>
+            <Description color="white">게임이 시작될 때까지</Description>
+            <Description color="white">조금만 기다려주세요</Description>
+          </S.DescriptionWrapper>
         </S.Wrapper>
         <S.Timer>{countdown}</S.Timer>
       </S.Container>
