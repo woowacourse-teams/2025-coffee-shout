@@ -1,9 +1,11 @@
 import * as S from './RouletteWheel.styled';
 
-export const RouletteWheel = () => {
+const RouletteWheel = () => {
   return (
     <S.Container>
       <S.Wrapper />
     </S.Container>
   );
 };
+
+export default RouletteWheel;

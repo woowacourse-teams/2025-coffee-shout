@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import { RouletteWheel } from './RouletteWheel/RouletteWheel';
-import { ProbabilityList } from './ProbabilityList/ProbabilityList';
-import * as S from './RouletteSection.styled';
+import RouletteWheel from './RouletteWheel/RouletteWheel';
+import ProbabilityList from './ProbabilityList/ProbabilityList';
 import IconButton from '@/components/@common/IconButton/IconButton';
+import * as S from './RouletteSection.styled';
 
 type RouletteView = 'roulette' | 'statistics';
 

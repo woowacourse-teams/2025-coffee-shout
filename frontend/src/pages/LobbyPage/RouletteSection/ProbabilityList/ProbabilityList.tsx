@@ -2,7 +2,7 @@ import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import Divider from '@/components/@common/Divider/Divider';
 import * as S from './ProbabilityList.styled';
 
-export const ProbabilityList = () => {
+const ProbabilityList = () => {
   return (
     <>
       <PlayerCard name="홍길동" iconColor="red">
@@ -23,3 +23,5 @@ export const ProbabilityList = () => {
     </>
   );
 };
+
+export default ProbabilityList;
