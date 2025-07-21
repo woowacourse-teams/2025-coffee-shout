@@ -1,16 +1,38 @@
+import Button from '@/components/@common/Button/Button';
+import Headline2 from '@/components/@common/Headline2/Headline2';
+import Layout from '@/layouts/Layout';
+import * as S from './MiniGameResultPage.styled';
+import { useNavigate, useParams } from 'react-router-dom';
+import Description from '@/components/@common/Description/Description';
+
 const MiniGameResultPage = () => {
+  const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+
+  const handleViewRouletteResult = () => {
+    if (roomId) {
+      navigate(`/room/${roomId}/roulette/result`);
+    }
+  };
+
   return (
-    <div>
-      <h1>미니게임 결과</h1>
-      <p>게임 결과를 확인하세요!</p>
-      <div style={{ padding: '20px', backgroundColor: '#e8f5e8', borderRadius: '8px' }}>
-        <h3>결과</h3>
-        <p>최종 점수: 1500점</p>
-        <p>순위: 1위</p>
-      </div>
-      <button>다음 게임</button>
-      <button>로비로 돌아가기</button>
-    </div>
+    <Layout>
+      <Layout.Banner height="30%">
+        <S.Banner>
+          <Headline2 color="white">게임 결과</Headline2>
+          <S.DescriptionWrapper>
+            <Description color="white">게임 결과를 통해</Description>
+            <Description color="white">룰렛 가중치가 조정됩니다</Description>
+          </S.DescriptionWrapper>
+        </S.Banner>
+      </Layout.Banner>
+      <Layout.Content></Layout.Content>
+      <Layout.ButtonBar>
+        <Button variant="primary" onClick={handleViewRouletteResult}>
+          룰렛 현황 보러가기
+        </Button>
+      </Layout.ButtonBar>
+    </Layout>
   );
 };
 
