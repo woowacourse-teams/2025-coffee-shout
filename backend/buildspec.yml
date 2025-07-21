@@ -17,8 +17,8 @@ phases:
       - cp "$JAR_FILE" ../coffee-shout-backend.jar
 
       # 스크립트 복사
-      - mkdir -p scripts/
-      - chmod +x scripts/*.sh
+      - mkdir -p ../scripts/
+      - chmod +x ../scripts/*.sh
 
 artifacts:
   files:
