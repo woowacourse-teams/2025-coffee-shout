@@ -33,10 +33,9 @@ permissions:
     mode: 755
 
   - object: /opt/coffee-shout/compose.yaml
-    pattern: "*"
     owner: ubuntu
     group: ubuntu
-    mode: 755
+    mode: 644
 
 # 배포 생명주기 훅
 hooks:
