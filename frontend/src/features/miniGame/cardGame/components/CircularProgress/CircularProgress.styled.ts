@@ -30,7 +30,7 @@ export const ProgressCircle = styled.circle`
   stroke: ${({ theme }) => theme.color.point[400]};
   stroke-width: 10;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset 1.1s linear;
 `;
 
 export const CountText = styled.span`
