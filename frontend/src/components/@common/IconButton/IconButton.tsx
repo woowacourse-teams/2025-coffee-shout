@@ -9,7 +9,7 @@ type Props = {
 const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
   return (
     <S.Container onClick={onClick} {...rest}>
-      <S.Icon src={iconSrc} alt={iconSrc} />
+      <S.Icon src={iconSrc} alt={'icon-button'} />
     </S.Container>
   );
 };
