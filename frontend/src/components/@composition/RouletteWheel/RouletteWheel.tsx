@@ -1,9 +1,15 @@
 import * as S from './RouletteWheel.styled';
 
-const RouletteWheel = () => {
+type Props = {
+  spinning?: boolean;
+};
+
+const RouletteWheel = ({ spinning = false }: Props) => {
   return (
     <S.Container>
-      <S.Wrapper />
+      <S.Wrapper $spinning={spinning}>
+        <img src="/images/profile-red.svg" alt="Profile" style={{ width: 64, height: 64 }} />
+      </S.Wrapper>
     </S.Container>
   );
 };
