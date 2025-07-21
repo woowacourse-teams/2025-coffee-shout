@@ -21,7 +21,7 @@ health_check() {
 
     while [ $attempt -le $max_attempts ]; do
         # 방법 1: 기본 루트 경로로 확인 (404여도 서버 응답하면 OK)
-        if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ | grep -E "200|404" > /dev/null; then
+        if curl -s -o /dev/null -w "%{http_code}" http://localhost:80/ | grep -E "200|404" > /dev/null; then
             echo "✅ 서버 응답 확인됨 (시도: $attempt/$max_attempts)"
             return 0
         fi
