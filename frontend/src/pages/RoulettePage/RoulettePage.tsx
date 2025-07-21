@@ -4,9 +4,8 @@ import RouletteWheel from '@/components/@composition/RouletteWheel/RouletteWheel
 import Layout from '@/layouts/Layout';
 import Button from '@/components/@common/Button/Button';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import * as S from './RoulettePage.styled';
-import Description from '@/components/@common/Description/Description';
 import Headline4 from '@/components/@common/Headline4/Headline4';
+import * as S from './RoulettePage.styled';
 
 const RoulettePage = () => {
   const [spinning, setSpinning] = useState(false);
