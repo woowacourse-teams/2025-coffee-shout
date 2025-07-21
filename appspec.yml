@@ -15,7 +15,7 @@ files:
 
   # Docker Compose 파일 복사
   - source: compose.yaml
-    destination: /opt/coffee-shout/app
+    destination: /opt/coffee-shout
     file_exists_behavior: OVERWRITE
 
 # 파일 권한 설정
