@@ -12,3 +12,7 @@ export const ScrollableWrapper = styled.div`
 export const DividerWrapper = styled.div`
   padding: 0 16px;
 `;
+
+export const BottomGap = styled.div`
+  height: 3rem;
+`;

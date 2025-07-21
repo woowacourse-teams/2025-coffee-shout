@@ -18,8 +18,8 @@ const ProbabilityList = () => {
             <S.ProbabilityText>15%</S.ProbabilityText>
           </PlayerCard>
         ))}
-        <div style={{ height: '3rem' }}></div>
       </S.ScrollableWrapper>
+      <S.BottomGap />
     </>
   );
 };
