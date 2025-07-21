@@ -4,7 +4,7 @@ import coffeeshout.room.domain.Room;
 import java.util.Optional;
 import org.springframework.data.repository.Repository;
 
-public interface RoomRepository extends Repository<Long, Room> {
+public interface RoomRepository {
 
     Optional<Room> findById(Long roomId);
 }

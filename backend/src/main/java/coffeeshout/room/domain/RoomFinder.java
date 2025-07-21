@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RoomFinder {
 
-    private final RoomRepository roomRepository;
+//    private final RoomRepository roomRepository;
 
     public Room findById(Long roomId) {
         Player player1 = new Player("꾹이");
