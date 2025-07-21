@@ -9,7 +9,6 @@ export const Container = styled.div`
   flex: 1;
   justify-content: center;
   align-items: center;
-  margin-bottom: 6rem;
 `;
 
 export const Wrapper = styled.div<WrapperProps>`

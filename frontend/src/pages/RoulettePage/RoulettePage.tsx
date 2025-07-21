@@ -1,54 +1,38 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import IconButton from '@/components/@common/IconButton/IconButton';
-import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import RouletteWheel from '@/components/@composition/RouletteWheel/RouletteWheel';
 import Layout from '@/layouts/Layout';
 import Button from '@/components/@common/Button/Button';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import * as S from './RoulettePage.styled';
-
-type RouletteView = 'roulette' | 'statistics';
+import Description from '@/components/@common/Description/Description';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 
 const RoulettePage = () => {
+  const [spinning, setSpinning] = useState(false);
   const navigate = useNavigate();
 
-  const [currentView, setCurrentView] = useState<RouletteView>('roulette');
-
-  const handleViewChange = () => {
-    setCurrentView(currentView === 'roulette' ? 'statistics' : 'roulette');
-  };
-
-  const handleClickButton = () => {
-    navigate('/room/:roomId/roulette/result');
+  const handleSpinClick = () => {
+    setSpinning(true);
+    setTimeout(() => {
+      setSpinning(false);
+      navigate('/room/:roomId/roulette/result');
+    }, 3000);
   };
 
   return (
     <Layout>
       <Layout.TopBar />
       <Layout.Content>
-        <S.Container>
-          <SectionTitle
-            title="룰렛 현황"
-            description="이전 미니게임을 통해 당첨 확률이 조정되었습니다"
-          />
-
-          <S.IconButtonWrapper>
-            <IconButton
-              iconSrc={
-                currentView === 'roulette'
-                  ? '/images/statistics-icon.svg'
-                  : '/images/roulette-icon.svg'
-              }
-              onClick={handleViewChange}
-            />
-          </S.IconButtonWrapper>
-          {renderContent(currentView)}
-        </S.Container>
+        <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
+        <RouletteWheel spinning={spinning} />
+        <S.ProbabilityText>
+          <Headline4>당첨 확률 +10%</Headline4>
+        </S.ProbabilityText>
       </Layout.Content>
-      <Layout.ButtonBar flexRatios={[5.5, 1]}>
-        <Button variant="primary" onClick={handleClickButton}>
-          룰렛돌리기
+      <Layout.ButtonBar>
+        <Button variant={spinning ? 'disabled' : 'primary'} onClick={handleSpinClick}>
+          룰렛 돌리기
         </Button>
       </Layout.ButtonBar>
     </Layout>
@@ -56,13 +40,3 @@ const RoulettePage = () => {
 };
 
 export default RoulettePage;
-
-const renderContent = (currentView: RouletteView) => {
-  switch (currentView) {
-    case 'statistics':
-      return <ProbabilityList />;
-    case 'roulette':
-    default:
-      return <RouletteWheel />;
-  }
-};

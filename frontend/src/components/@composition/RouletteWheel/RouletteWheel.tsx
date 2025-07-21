@@ -1,10 +1,10 @@
 import * as S from './RouletteWheel.styled';
 
-interface RouletteWheelProps {
-  spinning: boolean;
-}
+type Props = {
+  spinning?: boolean;
+};
 
-const RouletteWheel = ({ spinning }: RouletteWheelProps) => {
+const RouletteWheel = ({ spinning = false }: Props) => {
   return (
     <S.Container>
       <S.Wrapper $spinning={spinning}>

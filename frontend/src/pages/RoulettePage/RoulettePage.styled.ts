@@ -19,3 +19,10 @@ export const Wrapper = styled.div`
   left: 2rem;
   right: 2rem;
 `;
+
+export const ProbabilityText = styled.div`
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+`;
