@@ -2,11 +2,10 @@ import Layout from '@/layouts/Layout';
 import * as S from './RouletteResultPage.styled';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import { useLocation } from 'react-router-dom';
 
 const RouletteResultPage = () => {
-  const location = useLocation();
-  const winner = location.state?.winner || '당첨자';
+  // TODO: 당첨자 받아오는 로직 구현
+  const winner = '당첨자';
 
   return (
     <Layout color="point-400">
