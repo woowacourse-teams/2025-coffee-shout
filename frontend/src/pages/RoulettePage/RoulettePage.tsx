@@ -38,7 +38,7 @@ const RoulettePage = () => {
           {isRouletteView ? <RoulettePlaySection spinning={spinning} /> : <ProbabilityList />}
           <S.IconButtonWrapper>
             <IconButton
-              iconSrc={isRouletteView ? '/images/roulette-icon.svg' : '/images/statistics-icon.svg'}
+              iconSrc={isRouletteView ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg'}
               onClick={handleViewChange}
             />
           </S.IconButtonWrapper>
