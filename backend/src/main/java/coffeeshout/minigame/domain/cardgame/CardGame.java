@@ -1,6 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Playable;
@@ -65,5 +66,13 @@ public class CardGame implements Playable {
 
     public boolean isSecondRound() {
         return round == CardGameRound.SECOND;
+    }
+
+    public void assignRandomCardsToUnselectedPlayers(){
+        List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
+        for (Player player : unselectedPlayers) {
+            Card card = deck.pickRandom();
+            playerHands.put(player, card);
+        }
     }
 }

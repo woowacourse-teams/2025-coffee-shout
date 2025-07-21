@@ -36,11 +36,11 @@ public record MiniGameStateMessage(
     }
 
     private static String findCardHolderName(CardGame cardGame, Card card) {
-        for (Entry<Player, CardHand> playerCardsEntry : cardGame.getPlayerHands().entrySet()) {
-            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
-                return playerCardsEntry.getKey().getName();
-            }
-        }
+//        for (Entry<Player, CardHand> playerCardsEntry : cardGame.getPlayerHands().entrySet()) {
+//            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
+//                return playerCardsEntry.getKey().getName();
+//            }
+//        }
         return null;
     }
 

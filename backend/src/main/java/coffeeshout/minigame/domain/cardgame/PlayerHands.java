@@ -2,6 +2,7 @@ package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.player.domain.Player;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,5 +53,15 @@ public class PlayerHands {
                 Entry::getKey,
                 entry -> entry.getValue().calculateCardGameScore()
         ));
+    }
+
+    public List<Player> getUnselectedPlayers(CardGameRound round) {
+        List<Player> players = new ArrayList<>();
+        playerHands.forEach((player, hand) -> {
+            if (!hand.isSelected(round)) {
+                players.add(player);
+            }
+        });
+        return players;
     }
 }

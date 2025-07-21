@@ -3,6 +3,7 @@ package coffeeshout.minigame.application;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
+import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameRanksMessage;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
@@ -14,6 +15,10 @@ import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Room;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -27,6 +32,8 @@ public class CardGameService {
 
     private final RoomFinder roomFinder;
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
+    private final Map<Long, ScheduledFuture<?>> timers = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
     private final SimpMessagingTemplate messagingTemplate;
 
     public void start(Long roomId) {
@@ -34,6 +41,8 @@ public class CardGameService {
         final CardGameDeckGenerator deckGenerator = new CardGameRandomDeckGenerator();
         final CardGame cardGame = new CardGame(deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT), room.getPlayers());
         cardGame.start();
+        timers.put(roomId, createTimer(cardGame, roomId));
+
         cardGames.put(roomId, cardGame);
     }
 
@@ -50,14 +59,22 @@ public class CardGameService {
         if (cardGame.isFinished(CardGameRound.FIRST)) {
             state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
             cardGame.nextRound();
-            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState", MiniGameStateMessage.of(cardGame, roomId));
+            sendCardGameState(cardGame, roomId);
             cardGame.initGame();
+            if(timers.containsKey(roomId)){
+                timers.get(roomId).cancel(true);
+                timers.put(roomId, createTimer(cardGame, roomId));
+            }
         }
 
         if (cardGame.isFinished(CardGameRound.SECOND)) {
             state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
             cardGame.nextRound();
-            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/finish", MiniGameRanksMessage.from(cardGame.getResult()));
+            sendCardGameResult(cardGame, roomId);
+            if(timers.containsKey(roomId)){
+                timers.get(roomId).cancel(true);
+                timers.remove(roomId);
+            }
             // TODO: Room으로 결과 이벤트 전달
         }
     }
@@ -70,5 +87,23 @@ public class CardGameService {
 
     public CardGame getCardGame(Long roomId) {
         return cardGames.get(roomId);
+    }
+
+    private void roundTimeout(CardGame cardGame, Long roomId) {
+        cardGame.assignRandomCardsToUnselectedPlayers();
+        sendCardGameState(cardGame, roomId);
+        checkAndMoveRound(roomId);
+    }
+
+    private void sendCardGameState(CardGame cardGame, Long roomId) {
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState", MiniGameStateMessage.of(cardGame, roomId));
+    }
+
+    private void sendCardGameResult(CardGame cardGame, Long roomId){
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/finish", MiniGameRanksMessage.from(cardGame.getResult()));
+    }
+
+    private ScheduledFuture<?> createTimer(CardGame cardGame, Long roomId){
+        return scheduledExecutorService.schedule(() -> roundTimeout(cardGame, roomId), 10, java.util.concurrent.TimeUnit.SECONDS);
     }
 }

@@ -32,5 +32,9 @@ public class CardHand {
     public Card getCard(int index){
         return hand.get(index);
     }
+
+    public boolean isSelected(CardGameRound round){
+        return round.ordinal() + 1 == hand.size();
+    }
 }
 
