@@ -2,19 +2,45 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import Layout from '@/layouts/Layout';
 import * as S from './HomePage.styled';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
+import { useEffect, useState } from 'react';
+import Splash from '@/pages/HomePage/Splash/Splash';
 
 const HomePage = () => {
+  const [showSplash, setShowSplash] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkFirstVisit = () => {
+      try {
+        const hasVisited = sessionStorage.getItem('coffee-shout-visited');
+
+        if (!hasVisited) {
+          setShowSplash(true);
+          sessionStorage.setItem('coffee-shout-visited', 'true');
+        }
+      } catch (error) {
+        console.error('sessionStorage 오류 : ', error);
+        setShowSplash(true);
+      }
+    };
+
+    checkFirstVisit();
+  }, []);
+
+  if (showSplash) {
+    return <Splash onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
     <Layout>
       <Layout.Banner>
-        <S.BannerContainer>
+        <S.Banner>
           <Headline3 color="white">
             초대받은 방에 참가하거나
             <br />
             새로운 방을 만들어보세요
           </Headline3>
           <S.Logo src="/images/logo-main.svg" />
-        </S.BannerContainer>
+        </S.Banner>
       </Layout.Banner>
       <S.ButtonContainer>
         <RoomActionButton

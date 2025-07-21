@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const BannerContainer = styled.div`
+export const Banner = styled.div`
   height: 100%;
   padding: 40px;
   line-height: 30px;
