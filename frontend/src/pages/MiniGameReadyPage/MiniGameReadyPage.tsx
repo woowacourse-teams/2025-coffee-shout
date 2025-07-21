@@ -1,18 +1,47 @@
+import Description from '@/components/@common/Description/Description';
+import Headline1 from '@/components/@common/Headline1/Headline1';
+import Layout from '@/layouts/Layout';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import * as S from './MiniGameReadyPage.styled';
+
+const INITIAL_COUNTDOWN_SECONDS = 3;
+const COUNTDOWN_INTERVAL = 1000;
+
 const MiniGameReadyPage = () => {
+  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
+  const navigate = useNavigate();
+  const { roomId, miniGameId } = useParams();
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, COUNTDOWN_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      navigate(`/room/${roomId}/${miniGameId}/play`);
+    }
+  }, [countdown, navigate, roomId, miniGameId]);
+
   return (
-    <div>
-      <h1>미니게임 준비</h1>
-      <p>미니게임을 시작하기 전 준비 화면입니다.</p>
-      <div>
-        <h3>게임 규칙</h3>
-        <ul>
-          <li>규칙 1</li>
-          <li>규칙 2</li>
-          <li>규칙 3</li>
-        </ul>
-      </div>
-      <button>준비 완료</button>
-    </div>
+    <Layout color="point-400">
+      <S.Container>
+        <S.Wrapper>
+          <Headline1 color="white">곧 게임이 시작돼요</Headline1>
+          <S.DescriptionWrapper>
+            <Description color="white">게임이 시작될 때까지</Description>
+            <Description color="white">조금만 기다려주세요</Description>
+          </S.DescriptionWrapper>
+        </S.Wrapper>
+        <S.Timer>{countdown}</S.Timer>
+      </S.Container>
+    </Layout>
   );
 };
 

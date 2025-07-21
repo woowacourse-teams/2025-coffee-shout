@@ -25,7 +25,11 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
-  const handleClickButton = () => {
+  const handleClickBackButton = () => {
+    navigate(-1);
+  };
+
+  const handleClickGameStartButton = () => {
     navigate('/room/:roomId/:miniGameId/ready');
   };
 
@@ -35,7 +39,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={() => {}} />} />
+      <Layout.TopBar left={<BackButton onClick={handleClickBackButton} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}
@@ -49,10 +53,10 @@ const LobbyPage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
-        <Button variant="primary" onClick={handleClickButton}>
+        <Button variant="primary" onClick={handleClickGameStartButton}>
           게임 시작
         </Button>
-        <Button variant="primary" onClick={handleClickButton}>
+        <Button variant="primary" onClick={() => {}}>
           <img src="/images/share-icon.svg" alt="공유" />
         </Button>
       </Layout.ButtonBar>

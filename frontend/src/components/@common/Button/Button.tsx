@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react';
 import * as S from './Button.styled';
 
 type Props = {
-  variant: S.ButtonVariant;
+  variant?: S.ButtonVariant;
   width?: string;
   height?: 'small' | 'medium' | 'large';
 } & Omit<ComponentProps<'button'>, 'disabled'>;

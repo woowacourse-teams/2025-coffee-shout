@@ -1,14 +1,20 @@
+import Layout from '@/layouts/Layout';
+import * as S from './RouletteResultPage.styled';
+import Headline1 from '@/components/@common/Headline1/Headline1';
+import Headline3 from '@/components/@common/Headline3/Headline3';
+
 const RouletteResultPage = () => {
+  // TODO: 당첨자 받아오는 로직 구현
+  const winner = '당첨자';
+
   return (
-    <div>
-      <h1>룰렛 결과</h1>
-      <p>선택된 미니게임:</p>
-      <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-        <h2>미니게임 이름</h2>
-        <p>게임 설명</p>
-      </div>
-      <button>게임 시작</button>
-    </div>
+    <Layout color="point-400">
+      <S.Container>
+        <S.Logo src="/images/bread-logo-white.svg" />
+        <Headline1 color="white">{winner}</Headline1>
+        <Headline3 color="white">님이 당첨되었습니다!</Headline3>
+      </S.Container>
+    </Layout>
   );
 };
 

@@ -12,7 +12,6 @@ const ProbabilityList = () => {
       <S.DividerWrapper>
         <Divider />
       </S.DividerWrapper>
-
       <S.ScrollableWrapper>
         {['다이앤', '니야', '메리', '루키', '한스', '꾹이', '엠제이'].map((name) => (
           <PlayerCard key={name} name={name} iconColor="red">
