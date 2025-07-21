@@ -28,7 +28,7 @@ const MiniGameResultPage = () => {
       </Layout.Banner>
       <Layout.Content></Layout.Content>
       <Layout.ButtonBar>
-        <Button variant="primary" onClick={() => handleViewRouletteResult()}>
+        <Button variant="primary" onClick={handleViewRouletteResult}>
           룰렛 현황 보러가기
         </Button>
       </Layout.ButtonBar>
