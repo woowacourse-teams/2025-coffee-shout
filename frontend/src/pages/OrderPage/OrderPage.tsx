@@ -7,8 +7,10 @@ import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
 import * as S from './OrderPage.styled';
+import { useNavigate } from 'react-router-dom';
 
 const OrderPage = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
 
   const simpleOrderItems = [
@@ -77,8 +79,10 @@ const OrderPage = () => {
         </S.ListHeader>
         {viewMode === 'simple' ? renderSimpleView() : renderDetailView()}
       </Layout.Content>
-      <Layout.ButtonBar flexRatios={[4, 1]}>
-        <Button variant="primary">메인 화면으로 가기</Button>
+      <Layout.ButtonBar flexRatios={[5.5, 1]}>
+        <Button variant="primary" onClick={() => navigate('/')}>
+          메인 화면으로 가기
+        </Button>
         <Button variant="primary">
           <img src="/images/download-icon.svg" />
         </Button>
