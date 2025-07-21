@@ -5,8 +5,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameReadyPage.styled';
 
+const INITIAL_COUNTDOWN_SECONDS = 3;
+const COUNTDOWN_INTERVAL = 1000;
+
 const MiniGameReadyPage = () => {
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
   const navigate = useNavigate();
   const { roomId, miniGameId } = useParams();
 
@@ -20,7 +23,7 @@ const MiniGameReadyPage = () => {
         }
         return prev - 1;
       });
-    }, 1000);
+    }, COUNTDOWN_INTERVAL);
 
     return () => clearInterval(timer);
   }, [navigate, roomId, miniGameId]);
@@ -28,15 +31,15 @@ const MiniGameReadyPage = () => {
   return (
     <Layout color="point-400">
       <S.Container>
-        <S.TextContainer>
+        <S.Wrapper>
           <Headline1 color="white">곧 게임이 시작돼요</Headline1>
           <Description color="white">
             게임이 시작될 때까지
             <br />
             조금만 기다려주세요
           </Description>
-        </S.TextContainer>
-        <S.Time>{countdown}</S.Time>
+        </S.Wrapper>
+        <S.Timer>{countdown}</S.Timer>
       </S.Container>
     </Layout>
   );
