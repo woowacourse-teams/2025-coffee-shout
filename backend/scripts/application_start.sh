@@ -88,7 +88,7 @@ JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
 nohup java $JVM_OPTS \
-    -jar app/coffee-shout-backend.jar \
+    -jar app/coffee-shout-backend.jar --server.port=80 \
     > logs/application.log 2>&1 &
 
 # PID 저장
