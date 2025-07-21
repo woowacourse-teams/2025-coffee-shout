@@ -10,22 +10,24 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+// CardGameStateMessage
 public record MiniGameStateMessage(
-        Long roomId,
+        Long roomId, // 필요 없을듯
         int currentRound,
-        Map<Card, String> playerSelections,
+        Map<Card, String> playerSelections, // Card대신 Message객체 만드는건 어떤지
+        // List<CardInfo> CardInfos -> CardType, value, selected, playerName
         Boolean allSelected
 ) {
 
     public static MiniGameStateMessage of(final CardGame cardGame, final Long roomId) {
-
-        final Map<Card, String> playerSelections = generatePlayerSelections(cardGame);
-        return new MiniGameStateMessage(
-                roomId,
-                cardGame.getRound().ordinal(),
-                playerSelections,
-                cardGame.isFinished(cardGame.getRound())
-        );
+        return new MiniGameStateMessage(1L, 1, null, true);
+//        final Map<Card, String> playerSelections = generatePlayerSelections(cardGame);
+//        return new MiniGameStateMessage(
+//                roomId,
+//                cardGame.getRound().ordinal(),
+//                playerSelections,
+//                cardGame.isFinished(cardGame.getRound())
+//        );
     }
 
     private static Map<Card, String> generatePlayerSelections(CardGame cardGame) {

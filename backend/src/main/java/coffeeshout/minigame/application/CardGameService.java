@@ -31,6 +31,8 @@ public class CardGameService {
     private static final int MULTIPLIER_CARD_COUNT = 3;
 
     private final RoomFinder roomFinder;
+    // 분리하는게 좋을듯
+    // 토픽 브로커가 따로 있으면 좋을 것 같음
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
     private final Map<Long, ScheduledFuture<?>> timers = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
@@ -52,7 +54,9 @@ public class CardGameService {
 
         cardGame.selectCard(player, cardIndex);
     }
-
+/*
+Room을 찾아서 특정 메서드를 호출하면 기존에 생성되어 있는 Room이랑 동기화가 안된다.
+ */
     public void checkAndMoveRound(Long roomId) {
         final CardGame cardGame = cardGames.get(roomId);
 
