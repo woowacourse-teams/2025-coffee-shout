@@ -11,10 +11,12 @@ export const Logo = styled.img`
   position: absolute;
   bottom: 20px;
   right: 20px;
+  -webkit-user-drag: none;
+  user-select: none;
 `;
 
 export const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 `;

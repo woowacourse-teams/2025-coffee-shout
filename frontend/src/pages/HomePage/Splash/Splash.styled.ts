@@ -10,6 +10,8 @@ export const Container = styled.div`
 
 export const LogoImage = styled.img`
   width: 200px;
+  -webkit-user-drag: none;
+  user-select: none;
 `;
 
 export const LogoText = styled.span`
