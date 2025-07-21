@@ -44,7 +44,6 @@ export const Input = styled.input`
 
 export const ClearButton = styled.button<ClearButtonProps>`
   background-color: white;
-  width: 20%;
   font-size: 20px;
   display: flex;
   justify-content: center;
