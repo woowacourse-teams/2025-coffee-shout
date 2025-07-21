@@ -2,7 +2,7 @@
 
 echo "=== [APPLICATION_STOP] 애플리케이션 종료 ==="
 
-cd /opt/coffee-bread
+cd /opt/coffee-shout
 
 if [ -f "compose.yaml" ]; then
     echo "compose.yaml 서비스를 종료합니다..."

@@ -3,7 +3,7 @@ set -e
 
 echo "=== [VALIDATE_SERVICE] 서비스 상태 검증 ==="
 
-cd /opt/coffee-bread
+cd /opt/coffee-shout
 
 # 컨테이너 실행 확인
 if ! docker-compose -f compose.yaml ps | grep -q "Up"; then

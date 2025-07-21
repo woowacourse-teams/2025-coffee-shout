@@ -3,7 +3,7 @@ set -e
 
 echo "=== [AFTER_INSTALL] 애플리케이션 설정 ==="
 
-cd /opt/coffee-bread
+cd /opt/coffee-shout
 
 # TODO 환경 변수에 따른 설정 파일 선택 설정 필요
 #ENVIRONMENT=${DEPLOYMENT_GROUP_NAME:-dev}

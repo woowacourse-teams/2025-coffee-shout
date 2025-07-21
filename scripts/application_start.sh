@@ -2,7 +2,7 @@
 
 echo "=== [APPLICATION_STOP] 애플리케이션 종료 ==="
 
-cd /opt/coffee-bread
+cd /opt/coffee-shout
 
 # Docker Compose로 서비스 시작
 echo "compose.yaml을 사용하여 서비스를 시작합니다..."
