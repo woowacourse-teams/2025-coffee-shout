@@ -1,6 +1,7 @@
 package coffeeshout.minigame.ui;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardHand;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.player.domain.Player;
 import java.util.HashMap;
@@ -13,20 +14,16 @@ public record MiniGameStateMessage(
         Long roomId,
         int currentRound,
         Map<Card, String> playerSelections,
-        Map<String, Integer> scores,
         Boolean allSelected
 ) {
 
     public static MiniGameStateMessage of(final CardGame cardGame, final Long roomId) {
 
         final Map<Card, String> playerSelections = generatePlayerSelections(cardGame);
-        final Map<String, Integer> scores = generatePlayerScores(cardGame);
-
         return new MiniGameStateMessage(
                 roomId,
                 cardGame.getRound().ordinal(),
                 playerSelections,
-                scores,
                 cardGame.isFinished(cardGame.getRound())
         );
     }
@@ -39,11 +36,11 @@ public record MiniGameStateMessage(
     }
 
     private static String findCardHolderName(CardGame cardGame, Card card) {
-//        for (Entry<Player, CardHand> playerCardsEntry : cardGame.getPlayerHands().entrySet()) {
-//            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
-//                return playerCardsEntry.getKey().getName();
-//            }
-//        }
+        for (Entry<Player, CardHand> playerCardsEntry : cardGame.getPlayerHands().entrySet()) {
+            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
+                return playerCardsEntry.getKey().getName();
+            }
+        }
         return null;
     }
 

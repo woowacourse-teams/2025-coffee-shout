@@ -4,6 +4,8 @@ import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
+import coffeeshout.minigame.ui.MiniGameRanksMessage;
+import coffeeshout.minigame.ui.MiniGameStateMessage;
 import coffeeshout.room.domain.RoomFinder;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
@@ -13,6 +15,7 @@ import coffeeshout.room.domain.Room;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,7 +27,7 @@ public class CardGameService {
 
     private final RoomFinder roomFinder;
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
-
+    private final SimpMessagingTemplate messagingTemplate;
 
     public void start(Long roomId) {
         final Room room = roomFinder.findById(roomId);
@@ -47,12 +50,15 @@ public class CardGameService {
         if (cardGame.isFinished(CardGameRound.FIRST)) {
             state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
             cardGame.nextRound();
+            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState", MiniGameStateMessage.of(cardGame, roomId));
             cardGame.initGame();
         }
 
         if (cardGame.isFinished(CardGameRound.SECOND)) {
             state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
             cardGame.nextRound();
+            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/finish", MiniGameRanksMessage.from(cardGame.getResult()));
+            // TODO: Room으로 결과 이벤트 전달
         }
     }
 
