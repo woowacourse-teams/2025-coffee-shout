@@ -14,15 +14,15 @@ export const IconButtonWrapper = styled.div`
 `;
 
 export const Wrapper = styled.div`
-  position: absolute;
-  bottom: 2rem;
-  left: 2rem;
-  right: 2rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const ProbabilityText = styled.div`
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-  font-weight: 600;
   text-align: center;
 `;
