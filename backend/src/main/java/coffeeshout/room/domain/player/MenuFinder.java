@@ -1,0 +1,22 @@
+package coffeeshout.room.domain.player;
+
+import coffeeshout.room.domain.repository.MenuRepository;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class MenuFinder {
+
+    private final MenuRepository menuRepository;
+
+    public Menu findById(Long menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴가 존재하지 않습니다."));
+    }
+
+    public List<Menu> findAll() {
+        return menuRepository.findAll();
+    }
+}

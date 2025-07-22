@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain;
 
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain;
 
-import coffeeshout.room.domain.Probability;
+import coffeeshout.room.domain.roulette.Probability;
 
 public enum MiniGameResultType {
 
@@ -21,7 +21,7 @@ public enum MiniGameResultType {
 
     public Probability adjustProbability(int rankCount, int relativeRank, Probability step) {
         if (this == UNDECIDED) {
-            return Probability.ZERO_PERCENT;
+            return Probability.ZERO;
         }
         return step.multiple(rankCount - relativeRank + 1);
     }

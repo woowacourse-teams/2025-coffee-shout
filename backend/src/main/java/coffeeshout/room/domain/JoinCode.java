@@ -2,11 +2,16 @@ package coffeeshout.room.domain;
 
 import static org.springframework.util.Assert.state;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record JoinCode(String value) {
+@Embeddable
+public record JoinCode(
+        @Column(name = "join_code") String value
+) {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
@@ -14,6 +19,10 @@ public record JoinCode(String value) {
     public JoinCode {
         state(value.length() == CODE_LENGTH, "코드는 5자리여야 합니다.");
         value.chars().forEach(charCode -> state(isValidCharacter(charCode), "허용되지 않는 문자가 포함되어 있습니다."));
+    }
+
+    public static JoinCode from(String joinCode) {
+        return new JoinCode(joinCode);
     }
 
     public static JoinCode generate() {
