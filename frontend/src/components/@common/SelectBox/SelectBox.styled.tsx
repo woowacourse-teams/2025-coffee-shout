@@ -39,7 +39,7 @@ export const Trigger = styled.div<TriggerProps>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px;
+  padding: 8px 0;
   background-color: ${({ $disabled, theme }) => ($disabled ? theme.color.gray[50] : 'white')};
 
   border-bottom: 2px solid

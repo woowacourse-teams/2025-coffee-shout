@@ -18,6 +18,7 @@ const EntryNamePage = () => {
 
   return (
     <Layout>
+      <Layout.TopBar />
       <Layout.Content>
         <S.Container>
           <Headline3>닉네임을 입력해주세요</Headline3>
