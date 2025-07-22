@@ -1,4 +1,4 @@
-import LogoMainIcon from '@/assets/logo-main.svg';
+import LogoMainIcon from '@/assets/images/logo-main.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
 import useModal from '@/features/ui/Modal/useModal';

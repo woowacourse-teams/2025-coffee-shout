@@ -1,5 +1,5 @@
-import RouletteIcon from '@/assets/roulette-icon.svg';
-import StatisticsIcon from '@/assets/statistics-icon.svg';
+import RouletteIcon from '@/assets/images/roulette-icon.svg';
+import StatisticsIcon from '@/assets/images/statistics-icon.svg';
 import Button from '@/components/@common/Button/Button';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';

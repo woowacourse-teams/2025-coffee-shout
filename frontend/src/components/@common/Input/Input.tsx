@@ -1,4 +1,4 @@
-import CloseIcon from '@/assets/close-icon.svg';
+import CloseIcon from '@/assets/images/close-icon.svg';
 import { ComponentProps } from 'react';
 import * as S from './Input.styled';
 
