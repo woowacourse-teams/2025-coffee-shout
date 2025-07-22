@@ -18,7 +18,7 @@ const Splash = ({ onComplete }: Props) => {
   return (
     <Layout color="point-400">
       <S.Container>
-        <S.LogoImage src="/images/logo-splash.svg" />
+        <S.LogoImage src="./images/logo-splash.svg" />
         <S.LogoText>커피빵</S.LogoText>
       </S.Container>
     </Layout>

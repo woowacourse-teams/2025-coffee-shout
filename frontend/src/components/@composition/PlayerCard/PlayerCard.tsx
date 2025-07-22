@@ -14,7 +14,7 @@ const PlayerCard = ({ name, iconColor, children }: Props) => {
   return (
     <S.Container>
       <S.Wrapper>
-        <S.PlayerIcon src={`/images/profile-${iconColor}.svg`} alt={`player-${name}-icon`} />
+        <S.PlayerIcon src={`./images/profile-${iconColor}.svg`} alt={`player-${name}-icon`} />
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
         </S.NameWrapper>
