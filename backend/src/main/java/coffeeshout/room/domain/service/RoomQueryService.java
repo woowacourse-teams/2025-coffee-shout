@@ -13,7 +13,7 @@ public class RoomQueryService {
     private final RoomRepository roomRepository;
 
     public Room findById(Long roomId) {
-        return roomRepository.findById(roomId)
+        return roomRepository.findByIdWithAssociations(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다."));
     }
 

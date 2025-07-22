@@ -2,7 +2,14 @@ package coffeeshout.room.domain.player;
 
 import static org.springframework.util.Assert.isTrue;
 
-public record PlayerName(String value) {
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public record PlayerName(
+        @Column(name = "player_name")
+        String value
+) {
 
     private static final int MAX_NAME_LENGTH = 10;
 

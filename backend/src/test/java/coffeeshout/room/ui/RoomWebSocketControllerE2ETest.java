@@ -2,16 +2,17 @@ package coffeeshout.room.ui;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import coffeeshout.fixture.MenuFixture;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.ui.response.PlayerResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,6 +29,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -41,8 +43,8 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * RoomWebSocketController의 실제 E2E 테스트 실제 Room과 Player 데이터를 생성하여 WebSocket 통신 테스트
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-// @Transactional 제거! 웹소켓은 다른 스레드에서 실행되므로 트랜잭션 격리 문제 발생
 class RoomWebSocketControllerE2ETest {
 
     @LocalServerPort
@@ -50,6 +52,9 @@ class RoomWebSocketControllerE2ETest {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     private WebSocketStompClient stompClient;
     private StompSession stompSession;
@@ -91,7 +96,7 @@ class RoomWebSocketControllerE2ETest {
 
     private void setupTestData() {
         // 메뉴 생성
-        testMenu = MenuFixture.아메리카노();
+        testMenu = menuRepository.findById(1L).orElse(null);
 
         // 방 생성 - 호스트와 함께
         JoinCode joinCode = new JoinCode("TEST2"); // 5자리로 수정
@@ -127,27 +132,27 @@ class RoomWebSocketControllerE2ETest {
 
         assertThat(players).isNotNull();
         assertThat(players).hasSize(4); // 호스트 + 게스트 3명
-//
-//        // 호스트 확인
-//        PlayerResponse host = players.stream()
-//                .filter(p -> p.playerName().equals("호스트꾹이"))
-//                .findFirst()
-//                .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
-//
-//        assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
-//        assertThat(host.menuResponse().image()).isEqualTo("sample-image1.png");
-//
-//        // 게스트들 확인
-//        List<String> playerNames = players.stream()
-//                .map(PlayerResponse::playerName)
-//                .toList();
-//
-//        assertThat(playerNames).containsExactlyInAnyOrder(
-//                "호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이"
-//        );
-//
-//        System.out.println("✅ 플레이어 목록 응답 성공:");
-//        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
+
+        // 호스트 확인
+        PlayerResponse host = players.stream()
+                .filter(p -> p.playerName().equals("호스트꾹이"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
+
+        assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
+        assertThat(host.menuResponse().image()).isEqualTo("americano.jpg");
+
+        // 게스트들 확인
+        List<String> playerNames = players.stream()
+                .map(PlayerResponse::playerName)
+                .toList();
+
+        assertThat(playerNames).containsExactlyInAnyOrder(
+                "호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이"
+        );
+
+        System.out.println("✅ 플레이어 목록 응답 성공:");
+        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
     }
 
     @Test
@@ -260,16 +265,17 @@ class RoomWebSocketControllerE2ETest {
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
-            return String.class;
+            return Object.class;
         }
 
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
             try {
-                String jsonPayload = (String) payload;
-                System.out.println("🎯 수신된 플레이어 목록 JSON: " + jsonPayload);
+                byte[] bytes = (byte[]) payload;
+                String jsonString = new String(bytes, StandardCharsets.UTF_8);
+                System.out.println("🎯 수신된 플레이어 목록 JSON: " + jsonString);
 
-                List<PlayerResponse> players = objectMapper.readValue(jsonPayload,
+                List<PlayerResponse> players = objectMapper.readValue(jsonString,
                         new TypeReference<List<PlayerResponse>>() {
                         });
                 queue.offer(players);

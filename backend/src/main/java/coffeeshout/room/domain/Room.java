@@ -6,10 +6,10 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -18,6 +18,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +50,8 @@ public class Room {
     @Transient
     private Player host;
 
-    @Transient
-    private Players players;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Player> players;
 
     @Transient
     private Roulette roulette;
@@ -62,10 +63,10 @@ public class Room {
     @Column(nullable = false, name = "room_state")
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
+    private Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
         this.joinCode = joinCode;
         this.host = new Player(hostName, menu);
-        this.players = new Players();
+        this.players = new ArrayList<>();
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
         this.roulette = new Roulette(new RoulettePicker());
@@ -122,12 +123,10 @@ public class Room {
         return host.equals(player);
     }
 
-    public List<Player> getPlayers() {
-        return players.getPlayers();
-    }
-
     public Player findPlayer(PlayerName playerName) {
-        return players.getPlayer(playerName);
+        return players.stream()
+                .filter(player -> player.getName().equals(playerName)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("플레이어가 존재하지 않습니다."));
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까
@@ -139,7 +138,8 @@ public class Room {
     // 이벤트 수신하는 메서드
 
     private void join(Player player) {
-        players.join(player);
+        player.assignRoom(this);  // 양방향 연관관계 설정
+        players.add(player);
         roulette.join(player);
     }
 
@@ -152,14 +152,21 @@ public class Room {
     }
 
     private boolean hasEnoughPlayers() {
-        return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
+        return players.size() >= MINIMUM_GUEST_COUNT && players.size() <= MAXIMUM_GUEST_COUNT;
     }
 
     private boolean canJoin() {
-        return players.getPlayerCount() < MAXIMUM_GUEST_COUNT;
+        return players.size() < MAXIMUM_GUEST_COUNT;
     }
 
     private boolean checkName(PlayerName guestName) {
-        return players.notExistPlayerName(guestName);
+        return players.stream().noneMatch(player -> player.getName().equals(guestName));
+    }
+
+    public void load() {
+        this.roulette = new Roulette(new RoulettePicker());
+        for (final Player player : players) {
+            roulette.join(player);
+        }
     }
 }

@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class RoomServiceTest {
 
     @Autowired
     TestDataHelper testDataHelper;
+
+    @Autowired
+    EntityManager entityManager;
 
     @Test
     void 방을_생성한다() {
@@ -72,6 +76,9 @@ class RoomServiceTest {
         // 방 먼저 생성
         Room createdRoom = roomService.createRoom(hostName, hostMenuId);
         String joinCode = createdRoom.getJoinCode().value();
+
+        entityManager.flush();
+        entityManager.clear();
 
         // when
         Room room = roomService.enterRoom(joinCode, guestName, guestMenuId);

@@ -38,6 +38,7 @@ public class RoomService {
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
         final Menu menu = menuFinder.findById(menuId);
         final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        room.load();
 
         room.joinGuest(PlayerName.from(guestName), menu);
 

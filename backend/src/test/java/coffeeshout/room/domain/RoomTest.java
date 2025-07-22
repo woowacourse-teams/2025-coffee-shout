@@ -14,7 +14,6 @@ import coffeeshout.room.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -31,7 +30,7 @@ class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, 호스트_한스, MenuFixture.아메리카노());
+        room = Room.createNewRoom(joinCode, 호스트_한스, MenuFixture.아메리카노());
         ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 
