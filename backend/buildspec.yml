@@ -10,7 +10,7 @@ phases:
 
   build:
     commands:
-      - cd backend && ./gradlew build --no-daemon --parallel
+      - cd backend && ./gradlew build --no-daemon --parallel --info
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE
