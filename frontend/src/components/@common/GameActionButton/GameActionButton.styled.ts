@@ -39,6 +39,12 @@ export const Container = styled.button<Props>`
   height: 130px;
   padding: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px
     ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
+
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
 `;
 
 export const GameNameWrapper = styled.div``;
