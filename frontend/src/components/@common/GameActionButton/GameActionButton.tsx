@@ -1,5 +1,5 @@
-import InfoGrayIcon from '@/assets/info-gray.svg';
-import InfoWhiteIcon from '@/assets/info-white.svg';
+import InfoGrayIcon from '@/assets/gray-info.svg';
+import InfoWhiteIcon from '@/assets/white-info.svg';
 import { ComponentProps } from 'react';
 import Headline4 from '../Headline4/Headline4';
 import * as S from './GameActionButton.styled';
