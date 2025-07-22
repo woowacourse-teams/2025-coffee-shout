@@ -1,6 +1,6 @@
 import Layout from '@/layouts/Layout';
-import * as S from './Splash.styled';
 import { useEffect } from 'react';
+import * as S from './Splash.styled';
 
 type Props = {
   onComplete: () => void;
@@ -18,7 +18,7 @@ const Splash = ({ onComplete }: Props) => {
   return (
     <Layout color="point-400">
       <S.Container>
-        <S.LogoImage src="./images/logo-splash.svg" />
+        <S.LogoImage src="/images/logo-splash.svg" />
         <S.LogoText>커피빵</S.LogoText>
       </S.Container>
     </Layout>

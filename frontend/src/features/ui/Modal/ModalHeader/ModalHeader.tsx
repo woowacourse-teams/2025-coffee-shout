@@ -13,7 +13,7 @@ const ModalHeader = ({ title, onClose, showCloseButton = true }: Props) => {
       <Headline3>{title}</Headline3>
       {showCloseButton && (
         <S.CloseButton onClick={onClose}>
-          <S.CloseIcon src={'./images/close.svg'} alt="close-icon" />
+          <S.CloseIcon src={'/images/close.svg'} alt="close-icon" />
         </S.CloseButton>
       )}
     </S.Container>

@@ -9,7 +9,7 @@ type Props = {
 const BackButton = ({ onClick, ...rest }: Props) => {
   return (
     <button onClick={onClick} {...rest}>
-      <img src="./images/back-icon.svg" alt="뒤로가기" />
+      <img src="/images/back-icon.svg" alt="뒤로가기" />
     </button>
   );
 };

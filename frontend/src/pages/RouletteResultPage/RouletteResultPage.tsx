@@ -27,7 +27,7 @@ const RouletteResultPage = () => {
   return (
     <Layout color="point-400">
       <S.Container>
-        <S.Logo src="./images/bread-logo-white.svg" />
+        <S.Logo src="/images/bread-logo-white.svg" />
         <Headline1 color="white">{winner}</Headline1>
         <Headline3 color="white">님이 당첨되었습니다!</Headline3>
       </S.Container>

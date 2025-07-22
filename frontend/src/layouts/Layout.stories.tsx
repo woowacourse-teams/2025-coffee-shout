@@ -171,7 +171,7 @@ const ModalWithLayoutComponent = () => {
                   justifyContent: 'center',
                 }}
               >
-                <img src="./images/close.svg" alt="닫기" width="19" height="19" />
+                <img src="/images/close.svg" alt="닫기" width="19" height="19" />
               </button>
             }
             align={['center', 'center', 'start']}

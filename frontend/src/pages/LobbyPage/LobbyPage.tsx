@@ -57,7 +57,7 @@ const LobbyPage = () => {
           게임 시작
         </Button>
         <Button variant="primary" onClick={() => {}}>
-          <img src="./images/share-icon.svg" alt="공유" />
+          <img src="/images/share-icon.svg" alt="공유" />
         </Button>
       </Layout.ButtonBar>
     </Layout>

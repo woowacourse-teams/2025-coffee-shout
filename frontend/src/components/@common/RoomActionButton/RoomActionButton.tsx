@@ -20,7 +20,7 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
           </S.DescriptionBox>
         ))}
       </div>
-      <S.NextStepIcon src={'./images/next-step-icon.svg'} alt="next-step-icon" />
+      <S.NextStepIcon src={'/images/next-step-icon.svg'} alt="next-step-icon" />
     </S.Container>
   );
 };

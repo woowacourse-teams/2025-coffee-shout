@@ -67,7 +67,7 @@ const OrderPage = () => {
     <Layout>
       <Layout.Banner>
         <S.BannerContent>
-          <S.Logo src="./images/bread-logo-white.svg" />
+          <S.Logo src="/images/bread-logo-white.svg" />
           <Headline1 color="white">다이앤</Headline1>
           <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
@@ -76,7 +76,7 @@ const OrderPage = () => {
       <Layout.Content>
         <S.ListHeader>
           <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
-          <IconButton iconSrc="./images/detail-icon.svg" onClick={handleToggle} />
+          <IconButton iconSrc="/images/detail-icon.svg" onClick={handleToggle} />
         </S.ListHeader>
         {viewMode === 'simple' ? renderSimpleView() : renderDetailView()}
       </Layout.Content>
@@ -85,7 +85,7 @@ const OrderPage = () => {
           메인 화면으로 가기
         </Button>
         <Button variant="primary">
-          <img src="./images/download-icon.svg" />
+          <img src="/images/download-icon.svg" />
         </Button>
       </Layout.ButtonBar>
     </Layout>
