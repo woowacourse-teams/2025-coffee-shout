@@ -1,4 +1,4 @@
-import CardIcon from '@/assets/sign-inversion-icon.svg';
+import CardIcon from '@/assets/images/sign-inversion-icon.svg';
 import { ComponentProps } from 'react';
 import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
@@ -55,5 +55,5 @@ const getCardText = (card: Card) => {
 };
 
 const getPlayerIconSrc = (iconColor: IconColor) => {
-  return `@/assets/profile-${iconColor}.svg`;
+  return `@/assets/images/profile-${iconColor}.svg`;
 };

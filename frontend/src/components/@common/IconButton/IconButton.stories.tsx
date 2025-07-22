@@ -1,4 +1,4 @@
-import StatisticsIcon from '@/assets/statistics-icon.svg';
+import StatisticsIcon from '@/assets/images/statistics-icon.svg';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import IconButton from './IconButton';
 

@@ -1,4 +1,4 @@
-import BackIcon from '@/assets/back-icon.svg';
+import BackIcon from '@/assets/images/back-icon.svg';
 import { ComponentProps } from 'react';
 
 type Props = {

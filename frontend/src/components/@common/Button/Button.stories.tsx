@@ -1,4 +1,4 @@
-import ShareIcon from '@/assets/share-icon.svg';
+import ShareIcon from '@/assets/images/share-icon.svg';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Button from './Button';
 

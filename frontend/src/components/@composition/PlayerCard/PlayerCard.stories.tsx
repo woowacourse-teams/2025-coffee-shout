@@ -1,4 +1,4 @@
-import JuiceIcon from '@/assets/juice.svg';
+import JuiceIcon from '@/assets/images/juice.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import PlayerCard from './PlayerCard';
