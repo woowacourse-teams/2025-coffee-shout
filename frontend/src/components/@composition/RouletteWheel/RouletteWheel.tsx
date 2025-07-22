@@ -1,4 +1,4 @@
-import RouletteWheelIcon from '@/assets/images/profile-red.svg';
+import RouletteWheelIcon from '@/assets/profile-red.svg';
 import * as S from './RouletteWheel.styled';
 
 type Props = {

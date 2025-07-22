@@ -1,4 +1,4 @@
-import CloseIcon from '@/assets/images/close.svg';
+import CloseIcon from '@/assets/close.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import * as S from './ModalHeader.styled';
 

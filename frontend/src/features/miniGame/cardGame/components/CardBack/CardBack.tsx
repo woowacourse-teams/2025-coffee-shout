@@ -1,4 +1,4 @@
-import CoffeeIcon from '@/assets/images/coffee-white.svg';
+import CoffeeIcon from '@/assets/coffee-white.svg';
 import { ComponentProps } from 'react';
 import * as S from './CardBack.styled';
 

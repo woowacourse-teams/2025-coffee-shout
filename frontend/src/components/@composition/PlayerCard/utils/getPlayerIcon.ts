@@ -1,7 +1,7 @@
-import ProfileRedIcon from '@/assets/images/profile-red.svg';
-// import ProfileBlueIcon from '@/assets/images/profile-blue.svg';
-// import ProfileGreenIcon from '@/assets/images/profile-green.svg';
-// import ProfileYellowIcon from '@/assets/images/profile-yellow.svg';
+import ProfileRedIcon from '@/assets/profile-red.svg';
+// import ProfileBlueIcon from '@/assets/profile-blue.svg';
+// import ProfileGreenIcon from '@/assets/profile-green.svg';
+// import ProfileYellowIcon from '@/assets/profile-yellow.svg';
 
 export type IconColor = 'red';
 
