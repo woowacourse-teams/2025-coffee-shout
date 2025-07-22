@@ -4,7 +4,9 @@ import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -13,36 +15,35 @@ import org.springframework.stereotype.Controller;
 public class CardGameController {
 
     private final SimpMessagingTemplate messagingTemplate;
-
     private final CardGameService cardGameService;
 
-    @MessageMapping("/cardGame/start")
-    public void startGame(CardGameStartMessage message) {
-        cardGameService.start(message.roomId());
+    @MessageMapping("/room/{roomId}/cardGame/start")
+    public void startGame(@DestinationVariable Long roomId) {
+        cardGameService.start(roomId);
 
-        final CardGame cardGame = cardGameService.getCardGame(message.roomId());
+        final CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/gameState",
-                MiniGameStateMessage.of(cardGame, message.roomId()));
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
+                MiniGameStateMessage.from(cardGame));
     }
 
-    @MessageMapping("/cardGame/select")
-    public void selectCard(CardGameSelectMessage message) {
-        cardGameService.selectCard(message.roomId(), message.playerName(), message.cardIndex());
+    @MessageMapping("/room/{roomId}/cardGame/select")
+    public void selectCard(@DestinationVariable Long roomId, @Payload CardGameSelectMessage message) {
+        cardGameService.selectCard(roomId, message.playerName(), message.cardIndex());
 
-        final CardGame cardGame = cardGameService.getCardGame(message.roomId());
+        final CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/gameState",
-                MiniGameStateMessage.of(cardGame, message.roomId()));
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
+                MiniGameStateMessage.from(cardGame));
 
-        cardGameService.checkAndMoveRound(message.roomId());
+        cardGameService.checkAndMoveRound(roomId);
     }
 
-    @MessageMapping("/cardGame/rank")
-    public void getRank(CardGameRankMessage message) {
-        final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(message.roomId());
+    @MessageMapping("/room/{roomid}/cardGame/rank")
+    public void getRank(@DestinationVariable Long roomId) {
+        final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/  ",
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/  ",
                 coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult));
     }
 }

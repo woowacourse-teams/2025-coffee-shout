@@ -1,8 +1,4 @@
 package coffeeshout.minigame.ui;
 
-public record CardGameSelectMessage(
-        Long roomId,
-        String playerName,
-        Integer cardIndex
-) {
+public record CardGameSelectMessage(String playerName, Integer cardIndex) {
 }

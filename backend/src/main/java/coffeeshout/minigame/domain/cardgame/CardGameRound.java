@@ -5,19 +5,18 @@ import lombok.Getter;
 @Getter
 public enum CardGameRound {
 
-    FIRST(1),
-    SECOND(2),
-    END(-1);
-
-    final private Integer value;
-
-    CardGameRound(Integer value) {
-        this.value = value;
-    }
+    FIRST,
+    SECOND,
+    END,
+    ;
 
     public CardGameRound next() {
         final int currentRound = this.ordinal();
         CardGameRound[] values = values();
         return values[currentRound + 1];
+    }
+
+    public int toInteger() {
+        return ordinal() + 1;
     }
 }
