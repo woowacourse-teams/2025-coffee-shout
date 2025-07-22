@@ -7,6 +7,7 @@ import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
+import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import jakarta.persistence.Column;
@@ -20,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -131,6 +133,10 @@ public class Room {
     private void join(Player player) {
         players.join(player);
         roulette.join(player);
+    }
+
+    public Map<Player, Probability> getProbabilities() {
+        return roulette.getProbabilities();
     }
 
     private boolean hasEnoughPlayers() {

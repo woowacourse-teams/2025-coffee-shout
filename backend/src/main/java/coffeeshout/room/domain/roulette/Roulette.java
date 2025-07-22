@@ -47,4 +47,8 @@ public class Roulette {
     private int getPlayerCount() {
         return playerProbabilities.size();
     }
+
+    public Map<Player, Probability> getProbabilities() {
+        return Map.copyOf(playerProbabilities);
+    }
 }

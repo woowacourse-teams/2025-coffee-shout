@@ -6,10 +6,12 @@ import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.MenuFinder;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +41,6 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-
     public List<Player> getAllPlayers(Long roomId) {
         final Room room = roomQueryService.findById(roomId);
 
@@ -54,5 +55,11 @@ public class RoomService {
         player.selectMenu(menu);
 
         return room.getPlayers();
+    }
+
+    public Map<Player, Probability> getProbabilities(Long roomId) {
+        final Room room = roomQueryService.findById(roomId);
+
+        return room.getProbabilities();
     }
 }
