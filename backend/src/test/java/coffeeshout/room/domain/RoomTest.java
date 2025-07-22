@@ -3,12 +3,13 @@ package coffeeshout.room.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.fixture.MenuFixture;
+import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
-import coffeeshout.minigame.domain.MiniGame;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.roulette.Roulette;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -17,16 +18,16 @@ class RoomTest {
 
     private JoinCode joinCode = new JoinCode("ABCDF");
     private Roulette roulette = RouletteFixture.고정_끝값_반환();
-    private Player 호스트_한스 = PlayerFixture.한스();
-    private Player 게스트_루키 = PlayerFixture.루키();
-    private Player 게스트_꾹이 = PlayerFixture.꾹이();
-    private Player 게스트_엠제이 = PlayerFixture.엠제이();
+    private PlayerName 호스트_한스 = PlayerName.from("한스");
+    private PlayerName 게스트_루키 = PlayerName.from("루키");
+    private PlayerName 게스트_꾹이 = PlayerName.from("꾹이");
+    private PlayerName 게스트_엠제이 = PlayerName.from("엠제이");
 
     private Room room;
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, 호스트_한스);
+        room = new Room(joinCode, 호스트_한스, MenuFixture.아메리카노());
         ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 
@@ -34,42 +35,39 @@ class RoomTest {
     void 방_생성시_상태는_READY이고_호스트가_추가된다() {
         // given
         // when & then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
-            softly.assertThat(room.getHost()).isEqualTo(호스트_한스);
-            softly.assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(1);
-        });
+        assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
+        assertThat(room.getHost()).isEqualTo(new Player(호스트_한스));
     }
 
     @Test
     void READY_상태에서는_플레이어가_참여할_수_있다() {
         // given
-        room.joinGuest(게스트_꾹이);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
 
         // when & then
-        assertThat(room.getPlayersWithProbability().getPlayerCount()).isEqualTo(2);
+        assertThat(room.getPlayers()).hasSize(2);
     }
 
     @Test
     void READY_상태가_아니면_참여할_수_없다() {
         // given
-        room.joinGuest(게스트_꾹이);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then
-        assertThatThrownBy(() -> room.joinGuest(게스트_엠제이))
+        assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, MenuFixture.아메리카노()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void 미니게임은_5개_이하여야_한다() {
         // given
-        List<MiniGame> miniGames = List.of(
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame()
+        List<Playable> miniGames = List.of(
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy()
         );
 
         // when
@@ -82,13 +80,13 @@ class RoomTest {
     @Test
     void 미니게임이_6개_이상이면_예외가_발생한다() {
         // given
-        List<MiniGame> miniGames = List.of(
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame(),
-                new MiniGame()
+        List<Playable> miniGames = List.of(
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy(),
+                new MiniGameDummy()
         );
 
         // when & then
@@ -99,19 +97,16 @@ class RoomTest {
     @Test
     void 룰렛을_시작하면_상태가_DONE으로_변하고_한_명은_선택된다() {
         // given
-        room.joinGuest(게스트_꾹이);
-
-        room.joinGuest(게스트_루키);
-        room.joinGuest(게스트_엠제이);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        room.joinGuest(게스트_루키, MenuFixture.아메리카노());
+        room.joinGuest(게스트_엠제이, MenuFixture.아메리카노());
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
-        Player loser = room.startRoulette();
+        Player winner = room.startRoulette();
 
         // when & then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-            softly.assertThat(loser).isEqualTo(게스트_엠제이);
-        });
+        assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
+        assertThat(winner).isEqualTo(new Player(PlayerName.from("한스"), MenuFixture.아메리카노()));
     }
 
     @Test
@@ -126,7 +121,7 @@ class RoomTest {
     @Test
     void 룰렛은_게임_중일때만_돌릴_수_있다() {
         // given
-        room.joinGuest(게스트_꾹이);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
 
         // when & then
         assertThatThrownBy(() -> room.startRoulette())
@@ -138,9 +133,7 @@ class RoomTest {
         // given
 
         // when & then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(room.isHost(호스트_한스)).isTrue();
-            softly.assertThat(room.isHost(게스트_꾹이)).isFalse();
-        });
+        assertThat(room.isHost(new Player(호스트_한스, MenuFixture.아메리카노()))).isTrue();
+        assertThat(room.isHost(new Player(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
     }
 }

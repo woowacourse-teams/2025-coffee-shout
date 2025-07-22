@@ -2,7 +2,7 @@ package coffeeshout.minigame.ui.response;
 
 import coffeeshout.minigame.domain.cardgame.Card;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public record MiniGameStateMessage(
     private static String findCardHolderName(CardGame cardGame, Card card) {
         for (Entry<Player, List<Card>> playerCardsEntry : cardGame.getPlayerCards().entrySet()) {
             if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
-                return playerCardsEntry.getKey().getName();
+                return playerCardsEntry.getKey().getName().value();
             }
         }
         return null;
@@ -60,7 +60,7 @@ public record MiniGameStateMessage(
         final Map<String, Integer> scores = new HashMap<>();
 
         cardGame.calculateScores()
-                .forEach((player, score) -> scores.put(player.getName(), score.getResult()));
+                .forEach((player, score) -> scores.put(player.getName().value(), score.getResult()));
 
         return scores;
     }

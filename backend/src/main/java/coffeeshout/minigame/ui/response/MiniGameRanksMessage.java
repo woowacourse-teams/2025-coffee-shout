@@ -10,7 +10,7 @@ public record MiniGameRanksMessage(
     public static MiniGameRanksMessage from(final MiniGameResult miniGameResult) {
         final List<MiniGameRankMessage> message = miniGameResult.getRank().entrySet()
                 .stream()
-                .map(entry -> new MiniGameRankMessage(entry.getValue(), entry.getKey().getName()))
+                .map(entry -> new MiniGameRankMessage(entry.getValue(), entry.getKey().getName().value()))
                 .toList();
 
         return new MiniGameRanksMessage(message);

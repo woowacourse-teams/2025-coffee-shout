@@ -1,8 +1,8 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.player.ui.response.PlayerResponse;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
+import coffeeshout.room.ui.response.PlayerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

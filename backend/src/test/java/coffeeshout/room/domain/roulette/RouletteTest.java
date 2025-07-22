@@ -1,0 +1,47 @@
+package coffeeshout.room.domain.roulette;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import coffeeshout.fixture.MiniGameResultFixture;
+import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.RouletteFixture;
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.room.domain.player.Player;
+import org.junit.jupiter.api.Test;
+
+class RouletteTest {
+
+    @Test
+    void 당첨자를_뽑는다() {
+        // given
+        Roulette roulette = RouletteFixture.고정_끝값_반환();
+
+        // when
+        Player result = roulette.spin();
+
+        // then
+        assertThat(result).isEqualTo(PlayerProbabilities.PLAYERS.getLast());
+    }
+
+    @Test
+    void 순위를_기반으로_확률을_조정한다() {
+        // given
+        MiniGameResult miniGameResult = MiniGameResultFixture.한스_루키_꾹이_엠제이();
+        Roulette roulette = RouletteFixture.랜덤_반환();
+
+        // when
+        roulette.adjustProbabilities(miniGameResult, new ProbabilityCalculator(4, 5));
+
+        // then
+        assertThat(roulette.getProbability(PlayerFixture.한스()))
+                .isEqualTo(new Probability(2000));
+        assertThat(roulette.getProbability(PlayerFixture.루키()))
+                .isEqualTo(new Probability(2250));
+        assertThat(roulette.getProbability(PlayerFixture.꾹이()))
+                .isEqualTo(new Probability(2750));
+        assertThat(roulette.getProbability(PlayerFixture.엠제이()))
+                .isEqualTo(new Probability(3000));
+
+    }
+}

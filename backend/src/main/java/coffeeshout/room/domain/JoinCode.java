@@ -21,6 +21,10 @@ public record JoinCode(
         value.chars().forEach(charCode -> state(isValidCharacter(charCode), "허용되지 않는 문자가 포함되어 있습니다."));
     }
 
+    public static JoinCode from(String joinCode) {
+        return new JoinCode(joinCode);
+    }
+
     public static JoinCode generate() {
         final List<Integer> asciiCodes = convertAsciiList();
         Collections.shuffle(asciiCodes);

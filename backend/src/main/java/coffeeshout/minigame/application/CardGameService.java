@@ -2,12 +2,12 @@ package coffeeshout.minigame.application;
 
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CardGameService {
 
-    private final RoomFinder roomFinder;
+    private final RoomQueryService roomQueryService;
     private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
 
     public void start(Long roomId) {
-        final Room room = roomFinder.findById(roomId);
+        final Room room = roomQueryService.findById(roomId);
         final CardGame cardGame = new CardGame(room.getPlayers(), new CardGameRandomDeckGenerator());
 
         cardGame.start();

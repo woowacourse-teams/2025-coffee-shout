@@ -2,7 +2,7 @@ package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.Playable;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

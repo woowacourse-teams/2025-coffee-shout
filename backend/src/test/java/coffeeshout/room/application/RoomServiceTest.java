@@ -3,7 +3,7 @@ package coffeeshout.room.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.room.TestDataHelper;
+import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class RoomServiceTest {
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
 
         assertThat(room.getPlayers()).hasSize(1);
-        assertThat(room.getPlayers().get(0).getName()).isEqualTo(hostName);
+        assertThat(room.getPlayers().get(0).getName().value()).isEqualTo(hostName);
         assertThat(room.isHost(room.getPlayers().get(0))).isTrue();
     }
 
@@ -75,7 +75,7 @@ class RoomServiceTest {
         assertThat(room.getId()).isEqualTo(createdRoom.getId());
         assertThat(room.getPlayers()).hasSize(2);
         assertThat(room.getPlayers().stream()
-                .anyMatch(p -> p.getName().equals(guestName))).isTrue();
+                .anyMatch(p -> p.getName().value().equals(guestName))).isTrue();
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
     }
 
@@ -138,7 +138,7 @@ class RoomServiceTest {
         // then
         assertThat(result.getPlayers()).hasSize(4);
         assertThat(result.getPlayers().stream()
-                .map(p -> p.getName()))
+                .map(p -> p.getName().value()))
                 .contains(hostName, "게스트1", "게스트2", "게스트3");
     }
 
@@ -150,12 +150,12 @@ class RoomServiceTest {
         String joinCode = createdRoom.getJoinCode().value();
 
         // 최대 9명까지니까 8명 더 넣어보기
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 2; i <= 9; i++) {
             roomService.enterRoom(joinCode, "게스트" + i, 1L);
         }
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트9", 1L))
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
                 .isInstanceOf(IllegalStateException.class);
     }
 
