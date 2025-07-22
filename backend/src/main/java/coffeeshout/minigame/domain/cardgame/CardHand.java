@@ -34,7 +34,11 @@ public class CardHand {
     }
 
     public boolean isSelected(CardGameRound round){
-        return round.ordinal() + 1 == hand.size();
+        return round.toInteger() == hand.size();
+    }
+
+    public boolean isAssign(Card card, CardGameRound round) {
+        return hand.get(round.toInteger()).equals(card);
     }
 }
 

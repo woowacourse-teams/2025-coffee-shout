@@ -1,62 +1,47 @@
 package coffeeshout.minigame.ui;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardHand;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.player.domain.Player;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import lombok.NonNull;
 
-// CardGameStateMessage
 public record MiniGameStateMessage(
-        Long roomId, // 필요 없을듯
         int currentRound,
-        Map<Card, String> playerSelections, // Card대신 Message객체 만드는건 어떤지
-        // List<CardInfo> CardInfos -> CardType, value, selected, playerName
+        List<CardInfoMessage> cardInfoMessages,
         Boolean allSelected
 ) {
+    public record CardInfoMessage(
+            String cardType,
+            int value,
+            boolean selected,
+            String playerName
+    ) {
+        public static List<CardInfoMessage> from(@NonNull CardGame cardGame) {
+            return cardGame.getDeck().getCards().stream()
+                    .map(card -> {
+                        Optional<Player> player = cardGame.findCardOwnerInCurrentRound(card);
+                        String name = player.map(Player::getName).orElse(null);
+                        return CardInfoMessage.of(card, player.isPresent(), name);
+                    }).toList();
+        }
 
-    public static MiniGameStateMessage of(final CardGame cardGame, final Long roomId) {
-        return new MiniGameStateMessage(1L, 1, null, true);
-//        final Map<Card, String> playerSelections = generatePlayerSelections(cardGame);
-//        return new MiniGameStateMessage(
-//                roomId,
-//                cardGame.getRound().ordinal(),
-//                playerSelections,
-//                cardGame.isFinished(cardGame.getRound())
-//        );
+        public static CardInfoMessage of(@NonNull Card card, boolean isSelected, String name) {
+            return new CardInfoMessage(
+                    card.getType().name(),
+                    card.getValue(),
+                    isSelected,
+                    name
+            );
+        }
     }
 
-    private static Map<Card, String> generatePlayerSelections(CardGame cardGame) {
-        return cardGame.getDeck().stream().collect(Collectors.toMap(
-                card -> card,
-                card -> findCardHolderName(cardGame, card)
-        ));
-    }
-
-    private static String findCardHolderName(CardGame cardGame, Card card) {
-//        for (Entry<Player, CardHand> playerCardsEntry : cardGame.getPlayerHands().entrySet()) {
-//            if (hasSameCardInCurrentRound(cardGame, card, playerCardsEntry)) {
-//                return playerCardsEntry.getKey().getName();
-//            }
-//        }
-        return null;
-    }
-
-    private static boolean hasSameCardInCurrentRound(CardGame cardGame, Card card,
-                                                     Entry<Player, List<Card>> playerCardsEntry) {
-        return playerCardsEntry.getValue().get(cardGame.getRound().ordinal()).equals(card);
-    }
-
-    private static Map<String, Integer> generatePlayerScores(CardGame cardGame) {
-        final Map<String, Integer> scores = new HashMap<>();
-
-        cardGame.calculateScores()
-                .forEach((player, score) -> scores.put(player.getName(), score.getResult()));
-
-        return scores;
+    public static MiniGameStateMessage from(@NonNull CardGame cardGame) {
+        return new MiniGameStateMessage(
+                cardGame.getRound().toInteger(),
+                CardInfoMessage.from(cardGame),
+                cardGame.getPlayerHands().isRoundFinished()
+        );
     }
 }

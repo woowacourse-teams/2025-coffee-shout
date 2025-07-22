@@ -24,7 +24,7 @@ public class CardGameController {
         final CardGame cardGame = cardGameService.getCardGame(roomId);
 
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
-                MiniGameStateMessage.of(cardGame, roomId));
+                MiniGameStateMessage.from(cardGame));
     }
 
     @MessageMapping("/room/{roomId}/cardGame/select")
@@ -39,16 +39,16 @@ public class CardGameController {
         // select가 끝나면 그냥 바로 시작되도 되는건가?
 
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
-                MiniGameStateMessage.of(cardGame, roomId));
+                MiniGameStateMessage.from(cardGame));
 
         cardGameService.checkAndMoveRound(roomId);
     }
 
-    @MessageMapping("/cardGame/rank")
-    public void getRank(CardGameRankMessage message) {
-        final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(message.roomId());
+    @MessageMapping("/room/{roomid}/cardGame/rank")
+    public void getRank(@DestinationVariable Long roomId) {
+        final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + message.roomId() + "/  ",
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/  ",
                 coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult));
     }
 }

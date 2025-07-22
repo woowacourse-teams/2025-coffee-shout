@@ -15,4 +15,8 @@ public enum CardGameRound {
         CardGameRound[] values = values();
         return values[currentRound + 1];
     }
+
+    public int toInteger() {
+        return ordinal() + 1;
+    }
 }

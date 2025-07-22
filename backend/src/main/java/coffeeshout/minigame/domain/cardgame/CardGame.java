@@ -7,6 +7,7 @@ import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Playable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -74,5 +75,9 @@ public class CardGame implements Playable {
             Card card = deck.pickRandom();
             playerHands.put(player, card);
         }
+    }
+
+    public Optional<Player> findCardOwnerInCurrentRound(Card card) {
+        return playerHands.findCardOwner(card, round);
     }
 }

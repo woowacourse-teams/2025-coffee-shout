@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PlayerHands {
@@ -63,5 +64,12 @@ public class PlayerHands {
             }
         });
         return players;
+    }
+
+    public Optional<Player> findCardOwner(Card card, CardGameRound round) {
+        return playerHands.entrySet().stream()
+                .filter(entry -> entry.getValue().isAssign(card, round))
+                .findFirst()
+                .map(Entry::getKey);
     }
 }

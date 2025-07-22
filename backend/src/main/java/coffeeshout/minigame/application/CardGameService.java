@@ -3,7 +3,6 @@ package coffeeshout.minigame.application;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameRanksMessage;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
@@ -15,7 +14,6 @@ import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Room;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -100,7 +98,7 @@ Room을 찾아서 특정 메서드를 호출하면 기존에 생성되어 있는
     }
 
     private void sendCardGameState(CardGame cardGame, Long roomId) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState", MiniGameStateMessage.of(cardGame, roomId));
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState", MiniGameStateMessage.from(cardGame));
     }
 
     private void sendCardGameResult(CardGame cardGame, Long roomId){

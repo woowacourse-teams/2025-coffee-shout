@@ -1,14 +1,15 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.state;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import lombok.Getter;
 import lombok.NonNull;
-import org.springframework.util.Assert;
 
+@Getter
 public class Deck {
 
     private final List<Card> cards;
