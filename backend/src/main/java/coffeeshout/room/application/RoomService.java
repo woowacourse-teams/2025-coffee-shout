@@ -71,22 +71,22 @@ public class RoomService {
                 .toList();
     }
 
-    public List<MiniGameType> selectMiniGame(Long roomId, MiniGameType miniGameType) {
+    public List<MiniGameType> selectMiniGame(Long roomId, String hostName, MiniGameType miniGameType) {
         final Room room = roomQueryService.findById(roomId);
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
-        room.addMiniGame(miniGame);
+        room.addMiniGame(PlayerName.from(hostName), miniGame);
 
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
     }
 
-    public List<MiniGameType> unselectMiniGame(Long roomId, MiniGameType miniGameType) {
+    public List<MiniGameType> unselectMiniGame(Long roomId, String hostName, MiniGameType miniGameType) {
         final Room room = roomQueryService.findById(roomId);
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
-        room.removeMiniGame(miniGame);
+        room.removeMiniGame(PlayerName.from(hostName), miniGame);
 
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)

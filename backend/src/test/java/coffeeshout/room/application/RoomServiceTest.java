@@ -265,7 +265,8 @@ class RoomServiceTest {
         Room createdRoom = roomService.createRoom(hostName, 1L);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getId(), MiniGameType.CARD_GAME);
+        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getId(), hostName,
+                MiniGameType.CARD_GAME);
 
         // then
         assertThat(selectedMiniGames).hasSize(1);
@@ -277,13 +278,43 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.selectMiniGame(createdRoom.getId(), MiniGameType.CARD_GAME);
+        roomService.selectMiniGame(createdRoom.getId(), hostName, MiniGameType.CARD_GAME);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.unselectMiniGame(createdRoom.getId(),
-                MiniGameType.CARD_GAME);
+        List<MiniGameType> selectedMiniGames = roomService.unselectMiniGame(
+                createdRoom.getId(),
+                hostName,
+                MiniGameType.CARD_GAME
+        );
 
         // then
         assertThat(selectedMiniGames).isEmpty();
+    }
+
+    @Test
+    void 호스트가_아닌_플레이어가_미니게임을_선택하면_예외가_발생한다() {
+        // given
+        String hostName = "호스트";
+        String guestName = "게스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+
+        // when & then
+        assertThatThrownBy(() -> roomService.selectMiniGame(createdRoom.getId(), guestName, MiniGameType.CARD_GAME))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 호스트가_아닌_플레이어가_미니게임을_선택_취소하면_예외가_발생한다() {
+        // given
+        String hostName = "호스트";
+        String guestName = "게스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+        roomService.selectMiniGame(createdRoom.getId(), hostName, MiniGameType.CARD_GAME);
+
+        // when & then
+        assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getId(), guestName, MiniGameType.CARD_GAME))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -14,6 +14,7 @@ import coffeeshout.room.domain.roulette.Roulette;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -74,7 +75,7 @@ class RoomTest {
         ReflectionTestUtils.setField(room, "miniGames", miniGames);
 
         // when
-        room.addMiniGame(new MiniGameDummy());
+        room.addMiniGame(호스트_한스, new MiniGameDummy());
 
         // then
         assertThat(room.getMiniGames()).hasSize(5);
@@ -96,7 +97,7 @@ class RoomTest {
 
         MiniGameDummy miniGameDummy = new MiniGameDummy();
         // when & then
-        assertThatThrownBy(() -> room.addMiniGame(miniGameDummy))
+        assertThatThrownBy(() -> room.addMiniGame(호스트_한스, miniGameDummy))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -104,10 +105,10 @@ class RoomTest {
     void 미니게임을_제거한다() {
         // given
         CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
-        room.addMiniGame(cardGame);
+        room.addMiniGame(호스트_한스, cardGame);
 
         // when
-        room.removeMiniGame(cardGame);
+        room.removeMiniGame(호스트_한스, cardGame);
 
         // then
         assertThat(room.getMiniGames()).isEmpty();
@@ -117,12 +118,12 @@ class RoomTest {
     void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
         // given
         CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
-        room.addMiniGame(cardGame);
+        room.addMiniGame(호스트_한스, cardGame);
         MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
         assertThatThrownBy(() -> {
-            room.removeMiniGame(miniGameDummy);
+            room.removeMiniGame(호스트_한스, miniGameDummy);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -167,5 +168,28 @@ class RoomTest {
         // when & then
         assertThat(room.isHost(new Player(호스트_한스, MenuFixture.아메리카노()))).isTrue();
         assertThat(room.isHost(new Player(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
+    }
+
+    @Test
+    void 호스트가_아니면_미니게임을_추가할_수_없다() {
+        // given
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        MiniGameDummy miniGameDummy = new MiniGameDummy();
+
+        // when & then
+        assertThatThrownBy(() -> room.addMiniGame(게스트_꾹이, miniGameDummy))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 호스트가_아니면_미니게임을_제거할_수_없다() {
+        // given
+        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        room.addMiniGame(호스트_한스, cardGame);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+
+        // when & then
+        assertThatThrownBy(() -> room.removeMiniGame(게스트_꾹이, cardGame))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

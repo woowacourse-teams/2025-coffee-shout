@@ -3,8 +3,6 @@ package coffeeshout.room.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -22,7 +20,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -87,12 +84,14 @@ public class Room {
         join(new Player(guestName, menu));
     }
 
-    public void addMiniGame(Playable miniGame) {
+    public void addMiniGame(PlayerName hostName, Playable miniGame) {
+        isTrue(host.sameName(hostName), "호스트가 아닙니다.");
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
         miniGames.add(miniGame);
     }
 
-    public void removeMiniGame(Playable miniGame) {
+    public void removeMiniGame(PlayerName hostName, Playable miniGame) {
+        isTrue(host.sameName(hostName), "호스트가 아닙니다.");
         isTrue(miniGames.stream().anyMatch(m -> m.getMiniGameType() == miniGame.getMiniGameType()), "미니게임이 존재하지 않습니다.");
         miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
     }

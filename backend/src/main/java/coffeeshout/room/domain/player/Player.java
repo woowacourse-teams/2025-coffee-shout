@@ -33,6 +33,10 @@ public class Player {
         return Objects.equals(name, player.name);
     }
 
+    public boolean sameName(PlayerName playerName) {
+        return Objects.equals(name, playerName);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
