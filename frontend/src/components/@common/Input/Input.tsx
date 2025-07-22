@@ -18,7 +18,7 @@ const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Prop
         aria-label="입력 내용 지우기"
         $hasValue={hasValue}
       >
-        <S.CloseIcon src={'/images/close-icon.svg'} />
+        <S.CloseIcon src={'./images/close-icon.svg'} />
       </S.ClearButton>
     </S.Container>
   );

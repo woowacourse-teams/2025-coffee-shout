@@ -8,7 +8,7 @@ const RouletteWheel = ({ spinning = false }: Props) => {
   return (
     <S.Container>
       <S.Wrapper $spinning={spinning}>
-        <S.CenterImage src="/images/profile-red.svg" alt="roulette-center" />
+        <S.CenterImage src="./images/profile-red.svg" alt="roulette-center" />
       </S.Wrapper>
     </S.Container>
   );

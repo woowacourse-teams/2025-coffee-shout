@@ -10,7 +10,7 @@ const CardBack = ({ size, onClick, ...rest }: Props) => {
   return (
     <S.Container $size={size} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
-        <S.CoffeeIcon src={'/images/coffee-white.svg'} alt="coffee-icon" />
+        <S.CoffeeIcon src={'./images/coffee-white.svg'} alt="coffee-icon" />
       </S.Circle>
     </S.Container>
   );
