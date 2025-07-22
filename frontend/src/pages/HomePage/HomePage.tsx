@@ -4,9 +4,14 @@ import * as S from './HomePage.styled';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
 import { useEffect, useState } from 'react';
 import Splash from '@/pages/HomePage/Splash/Splash';
+import { useNavigate } from 'react-router-dom';
+import useModal from '@/features/ui/Modal/useModal';
+import EnterRoomModal from './EnterRoomModal/EnterRoomModal';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
     const checkFirstVisit = () => {
@@ -25,6 +30,13 @@ const HomePage = () => {
 
     checkFirstVisit();
   }, []);
+
+  const handleEnterRoom = () => {
+    openModal(<EnterRoomModal onClose={closeModal} />, {
+      title: '방 참가하기',
+      showCloseButton: true,
+    });
+  };
 
   if (showSplash) {
     return <Splash onComplete={() => setShowSplash(false)} />;
@@ -46,12 +58,14 @@ const HomePage = () => {
         <RoomActionButton
           title="방 만들기"
           descriptions={['새로운 방을 만들어', '재미있는 커피내기를 시작해보세요 ']}
-          onClick={() => {}}
+          onClick={() => {
+            navigate('/entry/name');
+          }}
         />
         <RoomActionButton
           title="방 참가하러 가기"
           descriptions={['받은 초대 코드를 입력해서', '방으로 들어가보세요']}
-          onClick={() => {}}
+          onClick={handleEnterRoom}
         />
       </S.ButtonContainer>
     </Layout>
