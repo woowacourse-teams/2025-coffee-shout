@@ -2,14 +2,14 @@ name: Frontend CD
 
 on:
   pull_request:
-    types: [closed]  # PR이 닫힐 때만 실행
+    types: [closed] # PR이 닫힐 때만 실행
     branches:
       - fe/prod
     paths:
-      - "frontend/**"  # frontend 변경사항만
+      - "frontend/**" # frontend 변경사항만
 
 env:
-  FE_PROD_PATH: fe-prod
+  FE_PROD_PATH: /*
 
 jobs:
   ci:
