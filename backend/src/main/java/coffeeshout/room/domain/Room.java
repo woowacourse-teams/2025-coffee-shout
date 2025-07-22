@@ -93,7 +93,7 @@ public class Room {
     }
 
     public void removeMiniGame(Playable miniGame) {
-        isTrue(miniGames.contains(miniGame), "미니게임이 존재하지 않습니다.");
+        isTrue(miniGames.stream().anyMatch(m -> m.getMiniGameType() == miniGame.getMiniGameType()), "미니게임이 존재하지 않습니다.");
         miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
     }
 

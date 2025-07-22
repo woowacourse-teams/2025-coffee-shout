@@ -4,8 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.TestDataHelper;
+import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.roulette.Probability;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,8 +57,8 @@ class RoomServiceTest {
         Long invalidMenuId = 999L;
 
         // when & then
-        assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -74,8 +79,7 @@ class RoomServiceTest {
         // then
         assertThat(room.getId()).isEqualTo(createdRoom.getId());
         assertThat(room.getPlayers()).hasSize(2);
-        assertThat(room.getPlayers().stream()
-                .anyMatch(p -> p.getName().value().equals(guestName))).isTrue();
+        assertThat(room.getPlayers().stream().anyMatch(p -> p.getName().value().equals(guestName))).isTrue();
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
     }
 
@@ -87,8 +91,8 @@ class RoomServiceTest {
         Long menuId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -118,8 +122,8 @@ class RoomServiceTest {
         testDataHelper.createDummyPlayingRoom(existingJoinCode, "더미호스트");
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId)).isInstanceOf(
+                IllegalStateException.class);
     }
 
     @Test
@@ -137,9 +141,8 @@ class RoomServiceTest {
 
         // then
         assertThat(result.getPlayers()).hasSize(4);
-        assertThat(result.getPlayers().stream()
-                .map(p -> p.getName().value()))
-                .contains(hostName, "게스트1", "게스트2", "게스트3");
+        assertThat(result.getPlayers().stream().map(p -> p.getName().value())).contains(hostName, "게스트1", "게스트2",
+                "게스트3");
     }
 
     @Test
@@ -155,8 +158,8 @@ class RoomServiceTest {
         }
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L)).isInstanceOf(
+                IllegalStateException.class);
     }
 
     @Test
@@ -169,8 +172,8 @@ class RoomServiceTest {
 
         // when & then
         // Player 생성에서 중복 체크 하는지 모르겠지만 일단 테스트
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -181,9 +184,106 @@ class RoomServiceTest {
         String joinCode = createdRoom.getJoinCode().value();
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
-e
+    @Test
+    void 방에_있는_모든_플레이어를_조회한다() {
+        // given
+        String hostName = "호스트";
+        String guestName = "게스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+
+        // when
+        List<Player> players = roomService.getAllPlayers(createdRoom.getId());
+
+        // then
+        assertThat(players).hasSize(2);
+        assertThat(players.stream().map(p -> p.getName().value())).containsExactlyInAnyOrder(hostName, guestName);
+    }
+
+    @Test
+    void 플레이어가_메뉴를_선택한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        Long newMenuId = 3L;
+
+        // when
+        List<Player> players = roomService.selectMenu(createdRoom.getId(), hostName, newMenuId);
+        Player host = players.get(0);
+
+        // then
+        assertThat(host.getMenu().getId()).isEqualTo(newMenuId);
+    }
+
+    @Test
+    void 존재하지_않는_플레이어가_메뉴를_선택하면_예외가_발생한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        String invalidPlayerName = "없는사람";
+        Long newMenuId = 3L;
+
+        // when & then
+        assertThatThrownBy(
+                () -> roomService.selectMenu(createdRoom.getId(), invalidPlayerName, newMenuId)).isInstanceOf(
+                IllegalArgumentException.class);
+    }
+
+    @Test
+    void 플레이어들의_확률을_조회한다() {
+        // given
+        String hostName = "호스트";
+        String guestName = "게스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+
+        // when
+        Map<Player, Probability> probabilities = roomService.getProbabilities(createdRoom.getId());
+
+        // then
+        assertThat(probabilities).hasSize(2);
+        assertThat(probabilities.values().stream().mapToDouble(Probability::value).sum()).isEqualTo(10000.0);
+    }
+
+    @Test
+    void 모든_미니게임_목록을_조회한다() {
+        // when
+        List<MiniGameType> miniGames = roomService.getAllMiniGames();
+
+        // then
+        assertThat(miniGames).containsExactlyInAnyOrder(MiniGameType.values());
+    }
+
+    @Test
+    void 미니게임을_선택한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+
+        // when
+        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getId(), MiniGameType.CARD_GAME);
+
+        // then
+        assertThat(selectedMiniGames).hasSize(1);
+        assertThat(selectedMiniGames.get(0)).isEqualTo(MiniGameType.CARD_GAME);
+    }
+
+    @Test
+    void 미니게임을_선택_취소한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.selectMiniGame(createdRoom.getId(), MiniGameType.CARD_GAME);
+
+        // when
+        List<MiniGameType> selectedMiniGames = roomService.unselectMiniGame(createdRoom.getId(),
+                MiniGameType.CARD_GAME);
+
+        // then
+        assertThat(selectedMiniGames).isEmpty();
+    }
 }
