@@ -3,12 +3,8 @@ package coffeeshout.room.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.minigame.domain.MiniGame;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.player.domain.Player;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -30,7 +26,7 @@ public class Room {
 
     private Roulette roulette;
 
-    private List<MiniGame> miniGames;
+    private List<Playable> miniGames;
 
     private RoomState roomState;
 
@@ -51,7 +47,7 @@ public class Room {
         playersWithProbability.join(joinPlayer);
     }
 
-    public void setMiniGame(List<MiniGame> miniGames) {
+    public void setMiniGame(List<Playable> miniGames) {
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
         this.miniGames = miniGames;
     }

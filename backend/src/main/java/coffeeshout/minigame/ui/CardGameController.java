@@ -33,11 +33,6 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        // 선택만 하면 될듯
-        // 다음 라운드 진행은 호스트가 결정하는거 아닌가?
-        // 아니면 클라이언트가 결정?
-        // select가 끝나면 그냥 바로 시작되도 되는건가?
-
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
                 MiniGameStateMessage.from(cardGame));
 
