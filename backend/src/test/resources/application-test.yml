@@ -9,11 +9,23 @@ spring:
       mode: always
       data-locations: classpath:test.sql
 
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
   jpa:
-    show-sql: false
     hibernate:
       ddl-auto: create-drop
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
+    coffeeshout: DEBUG
