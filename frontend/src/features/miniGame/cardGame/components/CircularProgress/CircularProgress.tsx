@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import * as S from './CircularProgress.styled';
 
 type Props = {
@@ -6,20 +7,31 @@ type Props = {
   size?: string;
 };
 
+const RADIUS = 45;
+const circumference = 2 * Math.PI * RADIUS;
+
 const CircularProgress = ({ current, total, size = '2rem' }: Props) => {
-  const progress = total > 0 ? (total - current) / total : 0;
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
+  const [strokeDashoffset, setStrokeDashoffset] = useState(circumference);
+
+  useEffect(() => {
+    if (total <= 0) {
+      setStrokeDashoffset(circumference);
+      return;
+    }
+
+    const progress = Math.min(1, (total - current + 1) / total);
+    const newStrokeDashoffset = circumference * (1 - progress);
+    setStrokeDashoffset(newStrokeDashoffset);
+  }, [current, total]);
 
   return (
     <S.Container $size={size}>
       <S.ProgressRing width="100%" height="100%" viewBox="0 0 100 100">
-        <S.BackgroundCircle cx="50" cy="50" r={radius} fill="none" />
+        <S.BackgroundCircle cx="50" cy="50" r={RADIUS} fill="none" />
         <S.ProgressCircle
           cx="50"
           cy="50"
-          r={radius}
+          r={RADIUS}
           fill="none"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}

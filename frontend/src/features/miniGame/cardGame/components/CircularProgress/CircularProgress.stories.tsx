@@ -29,35 +29,27 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const FullProgress: Story = {
-  args: {
-    current: 0,
-    total: 10,
-  },
-};
-
-export const NoProgress: Story = {
-  args: {
-    current: 10,
-    total: 10,
-  },
-};
-
 export const CountdownAnimation: Story = {
   render: () => {
+    const [key, setKey] = useState(0);
     const [current, setCurrent] = useState(10);
 
     useEffect(() => {
       if (current > 0) {
-        const timer = setTimeout(() => setCurrent(current - 1), 1_000);
+        const timer = setTimeout(() => setCurrent(current - 1), 1000);
         return () => clearTimeout(timer);
       }
     }, [current]);
 
+    const handleReset = () => {
+      setCurrent(10);
+      setKey((prev) => prev + 1);
+    };
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-        <CircularProgress current={current} total={10} />
-        <button onClick={() => setCurrent(10)}>리셋 버튼</button>
+        <CircularProgress key={key} current={current} total={10} />
+        <button onClick={handleReset}>리셋 버튼</button>
       </div>
     );
   },
