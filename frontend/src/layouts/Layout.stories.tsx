@@ -1,4 +1,4 @@
-import CloseIcon from '@/assets/images/close.svg';
+import CloseIcon from '@/assets/close.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import { ColorKey } from '@/constants/color';

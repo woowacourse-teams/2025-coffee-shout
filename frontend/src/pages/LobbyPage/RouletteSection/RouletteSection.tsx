@@ -1,5 +1,5 @@
-import RouletteIcon from '@/assets/images/roulette-icon.svg';
-import StatisticsIcon from '@/assets/images/statistics-icon.svg';
+import RouletteIcon from '@/assets/roulette-icon.svg';
+import StatisticsIcon from '@/assets/statistics-icon.svg';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useState } from 'react';

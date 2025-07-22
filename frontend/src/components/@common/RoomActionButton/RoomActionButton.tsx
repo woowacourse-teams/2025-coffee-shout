@@ -1,4 +1,4 @@
-import NextStepIcon from '@/assets/images/next-step-icon.svg';
+import NextStepIcon from '@/assets/next-step-icon.svg';
 import { ComponentProps } from 'react';
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';

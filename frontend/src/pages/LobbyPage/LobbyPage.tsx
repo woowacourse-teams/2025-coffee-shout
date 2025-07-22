@@ -1,4 +1,4 @@
-import ShareIcon from '@/assets/images/share-icon.svg';
+import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
