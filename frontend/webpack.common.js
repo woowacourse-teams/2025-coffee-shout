@@ -9,6 +9,7 @@ const __dirname = dirname(__filename);
 export default {
   entry: './src/main.tsx',
   output: {
+    publicPath: '/',
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].js',
     clean: true,
@@ -46,5 +47,6 @@ export default {
     port: 3000,
     hot: true,
     open: true,
+    historyApiFallback: true,
   },
 };
