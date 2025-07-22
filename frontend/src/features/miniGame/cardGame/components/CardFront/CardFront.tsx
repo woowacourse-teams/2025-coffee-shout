@@ -24,7 +24,7 @@ const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
     <S.Container $size={size} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
         {isSignInversionCard ? (
-          <S.CardIcon src={'/images/sign-inversion-icon.svg'} alt="부호 반전" />
+          <S.CardIcon src={'./images/sign-inversion-icon.svg'} alt="부호 반전" />
         ) : (
           <S.CardText $size={size} $card={card}>
             {getCardText(card)}
@@ -54,5 +54,5 @@ const getCardText = (card: Card) => {
 };
 
 const getPlayerIconSrc = (iconColor: IconColor) => {
-  return `/images/profile-${iconColor}.svg`;
+  return `./images/profile-${iconColor}.svg`;
 };

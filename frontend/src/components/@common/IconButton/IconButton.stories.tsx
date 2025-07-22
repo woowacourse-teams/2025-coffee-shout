@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    iconSrc: '/images/statistics-icon.svg',
+    iconSrc: './images/statistics-icon.svg',
     onClick: () => console.log('IconButton clicked'),
   },
 };

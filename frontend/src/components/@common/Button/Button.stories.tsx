@@ -59,7 +59,7 @@ export const Loading: Story = {
 export const IconButton: Story = {
   args: {
     variant: 'primary',
-    children: <img src={'/images/share-icon.svg'} alt="icon" />,
+    children: <img src={'./images/share-icon.svg'} alt="icon" />,
     width: '40px',
     height: 'small',
   },
