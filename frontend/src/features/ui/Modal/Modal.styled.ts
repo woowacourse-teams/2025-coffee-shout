@@ -11,6 +11,11 @@ export const Backdrop = styled.div`
   inset: 0;
   position: fixed;
   z-index: ${Z_INDEX.MODAL};
+
+  max-width: 430px;
+  width: 100%;
+  height: 100dvh;
+  margin: 0 auto;
 `;
 
 export const Container = styled.div`
