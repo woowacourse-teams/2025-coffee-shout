@@ -46,4 +46,9 @@ public class RoomWebSocketController {
 
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/roulette", responses);
     }
+
+    @MessageMapping("/room/{roomId}/minigames/")
+    public void selectMinigames(@DestinationVariable Long roomId, ) {
+
+    }
 }

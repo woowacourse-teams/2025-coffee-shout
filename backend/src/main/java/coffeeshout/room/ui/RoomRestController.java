@@ -3,8 +3,10 @@ package coffeeshout.room.ui;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomCreateRequest;
+import coffeeshout.room.ui.response.MiniGameResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,5 +39,14 @@ public class RoomRestController {
         final Room room = roomService.enterRoom(joinCode, guestName, menuId);
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
+    }
+
+    @GetMapping("/minigames")
+    public ResponseEntity<List<MiniGameResponse>> getMiniGames() {
+        final List<MiniGameResponse> responses = roomService.getAllMiniGames().stream()
+                .map(MiniGameResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 }

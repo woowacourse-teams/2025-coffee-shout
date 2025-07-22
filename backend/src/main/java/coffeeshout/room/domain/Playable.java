@@ -7,4 +7,6 @@ public interface Playable {
     void start();
 
     MiniGameResult getResult();
+
+    MiniGameType getMiniGameType();
 }

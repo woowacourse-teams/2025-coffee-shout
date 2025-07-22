@@ -1,6 +1,7 @@
 package coffeeshout.room.application;
 
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.MenuFinder;
@@ -10,6 +11,7 @@ import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +63,10 @@ public class RoomService {
         final Room room = roomQueryService.findById(roomId);
 
         return room.getProbabilities();
+    }
+
+    public List<MiniGameType> getAllMiniGames() {
+        return Arrays.stream(MiniGameType.values())
+                .toList();
     }
 }
