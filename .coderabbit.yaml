@@ -10,6 +10,7 @@ reviews:
   auto_review:
     enabled: true               # PR 자동 리뷰 활성화
     drafts: false               # draft PR에는 리뷰하지 않음
-    base_branches: ["*"]        # 모든 브랜치 대상
+    base_branches:              # 모든 브랜치 대상
+      - ".*"
 chat:
   auto_reply: true              # PR 코멘트에 자동 답변
