@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGamePlayPage.styled';
 
 const TOTAL_COUNT = 1;
+const CARD_GRID_SIZE = 9;
 
 // TODO: 게임 종류에 따라서 분기처리 되도록 수정 (이전 페이지에서 입력된 미니게임 종류를 토대로 화면이 바뀌어야 함 - 미니게임 종류에 대하여 Context로 관리 필요)
 // TODO: 라운드가 총 2개이므로 2개의 라운드에 맞춰 이동 루트 추가
@@ -46,7 +47,7 @@ const MiniGamePlayPage = () => {
           <CardBack size="medium" onClick={() => {}} />
         </S.MyCardContainer>
         <S.CardContainer>
-          {Array.from({ length: 9 }, (_, index) => (
+          {Array.from({ length: CARD_GRID_SIZE }, (_, index) => (
             <CardBack key={index} onClick={() => {}} />
           ))}
         </S.CardContainer>
