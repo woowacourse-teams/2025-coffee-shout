@@ -3,6 +3,8 @@ package coffeeshout.room.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
+import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -20,6 +22,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -83,9 +87,14 @@ public class Room {
         join(new Player(guestName, menu));
     }
 
-    public void setMiniGame(List<Playable> miniGames) {
+    public void addMiniGame(Playable miniGame) {
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
-        this.miniGames = miniGames;
+        miniGames.add(miniGame);
+    }
+
+    public void removeMiniGame(Playable miniGame) {
+        isTrue(miniGames.contains(miniGame), "미니게임이 존재하지 않습니다.");
+        miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
     }
 
     // TODO 미니게임 결과 반영
@@ -137,6 +146,10 @@ public class Room {
 
     public Map<Player, Probability> getProbabilities() {
         return roulette.getProbabilities();
+    }
+
+    public List<Playable> getAllMiniGame() {
+        return Collections.unmodifiableList(miniGames);
     }
 
     private boolean hasEnoughPlayers() {

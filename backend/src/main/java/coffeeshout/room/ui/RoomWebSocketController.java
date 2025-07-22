@@ -1,6 +1,7 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
@@ -47,8 +48,18 @@ public class RoomWebSocketController {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/roulette", responses);
     }
 
-    @MessageMapping("/room/{roomId}/minigames/")
-    public void selectMinigames(@DestinationVariable Long roomId, ) {
+    @MessageMapping("/room/{roomId}/minigames/select")
+    public void selectMinigames(@DestinationVariable Long roomId, MiniGameType miniGameType) {
+        final List<MiniGameType> responses = roomService.selectMiniGame(roomId, miniGameType);
 
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/minigame", responses);
     }
+
+    @MessageMapping("/room/{roomId}/minigames/unselect")
+    public void unselectMinigames(@DestinationVariable Long roomId, MiniGameType miniGameType) {
+        final List<MiniGameType> responses = roomService.unselectMiniGame(roomId, miniGameType);
+
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/minigame", responses);
+    }
+
 }

@@ -1,7 +1,10 @@
 package coffeeshout.room.application;
 
+import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.MiniGameType;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.MenuFinder;
@@ -11,6 +14,7 @@ import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +71,28 @@ public class RoomService {
 
     public List<MiniGameType> getAllMiniGames() {
         return Arrays.stream(MiniGameType.values())
+                .toList();
+    }
+
+    public List<MiniGameType> selectMiniGame(Long roomId, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findById(roomId);
+        final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
+
+        room.addMiniGame(miniGame);
+
+        return room.getAllMiniGame().stream()
+                .map(Playable::getMiniGameType)
+                .toList();
+    }
+
+    public List<MiniGameType> unselectMiniGame(Long roomId, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findById(roomId);
+        final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
+
+        room.removeMiniGame(miniGame);
+
+        return room.getAllMiniGame().stream()
+                .map(Playable::getMiniGameType)
                 .toList();
     }
 }
