@@ -67,6 +67,7 @@ const OrderPage = () => {
     <Layout>
       <Layout.Banner>
         <S.BannerContent>
+          <S.Logo src="/images/bread-logo-white.svg" />
           <Headline1 color="white">다이앤</Headline1>
           <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>

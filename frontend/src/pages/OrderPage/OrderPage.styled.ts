@@ -60,3 +60,8 @@ export const DetailItem = styled.div`
   align-items: center;
   padding: 0.5rem 0;
 `;
+
+export const Logo = styled.img`
+  width: 100px;
+  margin-bottom: 1rem;
+`;
