@@ -1,13 +1,14 @@
-import { ReactElement, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '@/layouts/Layout';
+import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
+import Layout from '@/layouts/Layout';
+import { ReactElement, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as S from './LobbyPage.styled';
+import { MiniGameSection } from './MiniGameSection/MiniGameSection';
 import { ParticipantSection } from './ParticipantSection/ParticipantSection';
 import { RouletteSection } from './RouletteSection/RouletteSection';
-import { MiniGameSection } from './MiniGameSection/MiniGameSection';
-import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 
@@ -57,7 +58,7 @@ const LobbyPage = () => {
           게임 시작
         </Button>
         <Button variant="primary" onClick={() => {}}>
-          <img src="./images/share-icon.svg" alt="공유" />
+          <img src={ShareIcon} alt="공유" />
         </Button>
       </Layout.ButtonBar>
     </Layout>

@@ -1,15 +1,15 @@
-//TODO: 구현 필요
-
+import BackIcon from '@/assets/back-icon.svg';
 import { ComponentProps } from 'react';
 
 type Props = {
   onClick: () => void;
 } & ComponentProps<'button'>;
 
+//TODO: 구현 필요
 const BackButton = ({ onClick, ...rest }: Props) => {
   return (
     <button onClick={onClick} {...rest}>
-      <img src="./images/back-icon.svg" alt="뒤로가기" />
+      <img src={BackIcon} alt="뒤로가기" />
     </button>
   );
 };

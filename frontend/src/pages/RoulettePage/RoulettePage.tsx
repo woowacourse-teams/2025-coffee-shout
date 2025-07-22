@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '@/layouts/Layout';
+import RouletteIcon from '@/assets/roulette-icon.svg';
+import StatisticsIcon from '@/assets/statistics-icon.svg';
 import Button from '@/components/@common/Button/Button';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import * as S from './RoulettePage.styled';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import Layout from '@/layouts/Layout';
 import { RouletteView } from '@/types/roulette';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as S from './RoulettePage.styled';
 import RoulettePlaySection from './RoulettePlaySection/RoulettePlaySection';
 
 const RoulettePage = () => {
@@ -38,9 +40,7 @@ const RoulettePage = () => {
           {isRouletteView ? <RoulettePlaySection spinning={spinning} /> : <ProbabilityList />}
           <S.IconButtonWrapper>
             <IconButton
-              iconSrc={
-                isRouletteView ? './images/statistics-icon.svg' : './images/roulette-icon.svg'
-              }
+              iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
               onClick={handleViewChange}
             />
           </S.IconButtonWrapper>

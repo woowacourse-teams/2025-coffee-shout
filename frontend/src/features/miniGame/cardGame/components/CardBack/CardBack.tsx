@@ -1,3 +1,4 @@
+import CoffeeIcon from '@/assets/coffee-white.svg';
 import { ComponentProps } from 'react';
 import * as S from './CardBack.styled';
 
@@ -10,7 +11,7 @@ const CardBack = ({ size, onClick, ...rest }: Props) => {
   return (
     <S.Container $size={size} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
-        <S.CoffeeIcon src={'./images/coffee-white.svg'} alt="coffee-icon" />
+        <S.CoffeeIcon src={CoffeeIcon} alt="coffee-icon" />
       </S.Circle>
     </S.Container>
   );

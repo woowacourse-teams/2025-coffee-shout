@@ -1,6 +1,7 @@
+import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { ComponentProps } from 'react';
-import * as S from './CardFront.styled';
 import { Card } from '../../constants/cards';
+import * as S from './CardFront.styled';
 
 // TODO: 색상 추가 필요, PlayerCard 부분과 합칠 것
 export type IconColor = 'red';
@@ -24,7 +25,7 @@ const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
     <S.Container $size={size} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
         {isSignInversionCard ? (
-          <S.CardIcon src={'./images/sign-inversion-icon.svg'} alt="부호 반전" />
+          <S.CardIcon src={CardIcon} alt="부호 반전" />
         ) : (
           <S.CardText $size={size} $card={card}>
             {getCardText(card)}
@@ -54,5 +55,5 @@ const getCardText = (card: Card) => {
 };
 
 const getPlayerIconSrc = (iconColor: IconColor) => {
-  return `./images/profile-${iconColor}.svg`;
+  return `@/assets/profile-${iconColor}.svg`;
 };

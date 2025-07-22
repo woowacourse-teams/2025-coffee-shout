@@ -1,6 +1,7 @@
+import NextStepIcon from '@/assets/next-step-icon.svg';
 import { ComponentProps } from 'react';
-import Headline3 from '../Headline3/Headline3';
 import Description from '../Description/Description';
+import Headline3 from '../Headline3/Headline3';
 import * as S from './RoomActionButton.styled';
 
 type Props = {
@@ -20,7 +21,7 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
           </S.DescriptionBox>
         ))}
       </div>
-      <S.NextStepIcon src={'./images/next-step-icon.svg'} alt="next-step-icon" />
+      <S.NextStepIcon src={NextStepIcon} alt="next-step-icon" />
     </S.Container>
   );
 };

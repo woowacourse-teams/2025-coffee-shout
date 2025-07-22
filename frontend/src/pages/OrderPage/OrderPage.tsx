@@ -1,3 +1,6 @@
+import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
+import DetailIcon from '@/assets/detail-icon.svg';
+import DownloadIcon from '@/assets/download-icon.svg';
 import Button from '@/components/@common/Button/Button';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
@@ -6,8 +9,8 @@ import IconButton from '@/components/@common/IconButton/IconButton';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
-import * as S from './OrderPage.styled';
 import { useNavigate } from 'react-router-dom';
+import * as S from './OrderPage.styled';
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -67,7 +70,7 @@ const OrderPage = () => {
     <Layout>
       <Layout.Banner>
         <S.BannerContent>
-          <S.Logo src="./images/bread-logo-white.svg" />
+          <S.Logo src={BreadLogoWhiteIcon} />
           <Headline1 color="white">다이앤</Headline1>
           <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
@@ -76,7 +79,7 @@ const OrderPage = () => {
       <Layout.Content>
         <S.ListHeader>
           <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
-          <IconButton iconSrc="./images/detail-icon.svg" onClick={handleToggle} />
+          <IconButton iconSrc={DetailIcon} onClick={handleToggle} />
         </S.ListHeader>
         {viewMode === 'simple' ? renderSimpleView() : renderDetailView()}
       </Layout.Content>
@@ -85,7 +88,7 @@ const OrderPage = () => {
           메인 화면으로 가기
         </Button>
         <Button variant="primary">
-          <img src="./images/download-icon.svg" />
+          <img src={DownloadIcon} />
         </Button>
       </Layout.ButtonBar>
     </Layout>
