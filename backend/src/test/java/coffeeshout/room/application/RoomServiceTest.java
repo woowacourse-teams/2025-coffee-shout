@@ -184,4 +184,6 @@ class RoomServiceTest {
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+e
 }

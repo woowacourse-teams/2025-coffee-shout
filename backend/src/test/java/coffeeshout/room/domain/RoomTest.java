@@ -6,9 +6,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
+import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Roulette;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,16 +65,16 @@ class RoomTest {
     @Test
     void 미니게임은_5개_이하여야_한다() {
         // given
-        List<Playable> miniGames = List.of(
-                new MiniGameDummy(),
+        List<Playable> miniGames = new ArrayList<>(List.of(
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy()
-        );
+        ));
+        ReflectionTestUtils.setField(room, "miniGames", miniGames);
 
         // when
-        room.setMiniGame(miniGames);
+        room.addMiniGame(new MiniGameDummy());
 
         // then
         assertThat(room.getMiniGames()).hasSize(5);
@@ -80,18 +83,47 @@ class RoomTest {
     @Test
     void 미니게임이_6개_이상이면_예외가_발생한다() {
         // given
-        List<Playable> miniGames = List.of(
+        List<Playable> miniGames = new ArrayList<>(List.of(
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy(),
                 new MiniGameDummy()
-        );
+        ));
+
+        ReflectionTestUtils.setField(room, "miniGames", miniGames);
+
+        MiniGameDummy miniGameDummy = new MiniGameDummy();
+        // when & then
+        assertThatThrownBy(() -> room.addMiniGame(miniGameDummy))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 미니게임을_제거한다() {
+        // given
+        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        room.addMiniGame(cardGame);
+
+        // when
+        room.removeMiniGame(cardGame);
+
+        // then
+        assertThat(room.getMiniGames()).isEmpty();
+    }
+
+    @Test
+    void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
+        // given
+        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        room.addMiniGame(cardGame);
+        MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
-        assertThatThrownBy(() -> room.setMiniGame(miniGames))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> {
+            room.removeMiniGame(miniGameDummy);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
