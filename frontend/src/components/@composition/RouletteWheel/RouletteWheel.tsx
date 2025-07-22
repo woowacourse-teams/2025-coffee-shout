@@ -1,3 +1,4 @@
+import RouletteWheelIcon from '@/assets/profile-red.svg';
 import * as S from './RouletteWheel.styled';
 
 type Props = {
@@ -8,7 +9,7 @@ const RouletteWheel = ({ spinning = false }: Props) => {
   return (
     <S.Container>
       <S.Wrapper $spinning={spinning}>
-        <S.CenterImage src="/images/profile-red.svg" alt="roulette-center" />
+        <S.CenterImage src={RouletteWheelIcon} alt="roulette-center" />
       </S.Wrapper>
     </S.Container>
   );

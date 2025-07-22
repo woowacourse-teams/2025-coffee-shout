@@ -1,12 +1,13 @@
+import LogoMainIcon from '@/assets/logo-main.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import Layout from '@/layouts/Layout';
-import * as S from './HomePage.styled';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
-import { useEffect, useState } from 'react';
-import Splash from '@/pages/HomePage/Splash/Splash';
-import { useNavigate } from 'react-router-dom';
 import useModal from '@/features/ui/Modal/useModal';
+import Layout from '@/layouts/Layout';
+import Splash from '@/pages/HomePage/Splash/Splash';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from './EnterRoomModal/EnterRoomModal';
+import * as S from './HomePage.styled';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const HomePage = () => {
             <br />
             새로운 방을 만들어보세요
           </Headline3>
-          <S.Logo src="/images/logo-main.svg" />
+          <S.Logo src={LogoMainIcon} />
         </S.Banner>
       </Layout.Banner>
       <S.ButtonContainer>

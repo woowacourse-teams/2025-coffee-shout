@@ -1,3 +1,4 @@
+import ShareIcon from '@/assets/share-icon.svg';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Button from './Button';
 
@@ -59,7 +60,7 @@ export const Loading: Story = {
 export const IconButton: Story = {
   args: {
     variant: 'primary',
-    children: <img src={'/images/share-icon.svg'} alt="icon" />,
+    children: <img src={ShareIcon} alt="icon" />,
     width: '40px',
     height: 'small',
   },

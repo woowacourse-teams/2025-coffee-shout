@@ -1,3 +1,4 @@
+import JuiceIcon from '@/assets/juice.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import PlayerCard from './PlayerCard';
@@ -25,7 +26,7 @@ export const WithIcon: Story = {
     name: '김철수',
     iconColor: 'red',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분 (juice 이미지는 임시용)
-    children: <img src="/images/juice.svg" alt="juice" />,
+    children: <img src={JuiceIcon} alt="juice" />,
   },
 };
 
@@ -42,7 +43,7 @@ export const LongNameWithIcon: Story = {
     name: '아주아주아주아주아주긴이름의사용자님',
     iconColor: 'red',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분 (juice 이미지는 임시용)
-    children: <img src="/images/juice.svg" alt="juice" />,
+    children: <img src={JuiceIcon} alt="juice" />,
   },
 };
 

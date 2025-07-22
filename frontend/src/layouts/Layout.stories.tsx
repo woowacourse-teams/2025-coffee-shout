@@ -1,11 +1,12 @@
-import { ReactNode } from 'react';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import Layout from './Layout';
-import Button from '@/components/@common/Button/Button';
+import CloseIcon from '@/assets/close.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
+import Button from '@/components/@common/Button/Button';
+import { ColorKey } from '@/constants/color';
 import { ModalProvider } from '@/features/ui/Modal/ModalContext';
 import useModal from '@/features/ui/Modal/useModal';
-import { ColorKey } from '@/constants/color';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { ReactNode } from 'react';
+import Layout from './Layout';
 
 type LayoutStoryArgs = {
   showTopBar: boolean;
@@ -171,7 +172,7 @@ const ModalWithLayoutComponent = () => {
                   justifyContent: 'center',
                 }}
               >
-                <img src="/images/close.svg" alt="닫기" width="19" height="19" />
+                <img src={CloseIcon} alt="닫기" width="19" height="19" />
               </button>
             }
             align={['center', 'center', 'start']}

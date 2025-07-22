@@ -1,3 +1,4 @@
+import StatisticsIcon from '@/assets/statistics-icon.svg';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import IconButton from './IconButton';
 
@@ -15,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    iconSrc: '/images/statistics-icon.svg',
+    iconSrc: StatisticsIcon,
     onClick: () => console.log('IconButton clicked'),
   },
 };

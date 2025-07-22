@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import RouletteWheel from '../../../components/@composition/RouletteWheel/RouletteWheel';
-import ProbabilityList from '../../../components/@composition/ProbabilityList/ProbabilityList';
+import RouletteIcon from '@/assets/roulette-icon.svg';
+import StatisticsIcon from '@/assets/statistics-icon.svg';
 import IconButton from '@/components/@common/IconButton/IconButton';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { useState } from 'react';
+import ProbabilityList from '../../../components/@composition/ProbabilityList/ProbabilityList';
+import RouletteWheel from '../../../components/@composition/RouletteWheel/RouletteWheel';
 import * as S from './RouletteSection.styled';
 
 type RouletteView = 'roulette' | 'statistics';
@@ -20,7 +22,7 @@ export const RouletteSection = () => {
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
       <S.IconButtonWrapper>
         <IconButton
-          iconSrc={isRouletteView ? '/images/statistics-icon.svg' : '/images/roulette-icon.svg'}
+          iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
           onClick={handleViewChange}
         />
       </S.IconButtonWrapper>
