@@ -19,7 +19,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -115,7 +114,6 @@ class RoomWebSocketControllerE2ETest {
     }
 
     @Test
-    @DisplayName("방 입장 시나리오: getPlayers 요청 후 플레이어 목록 응답 확인")
     void 방_입장_시나리오_getPlayers_요청() throws Exception {
         // given
         Long roomId = testRoom.getId();
@@ -156,7 +154,6 @@ class RoomWebSocketControllerE2ETest {
     }
 
     @Test
-    @DisplayName("여러 클라이언트가 같은 방을 구독하고 플레이어 목록 브로드캐스트 확인")
     void 여러_클라이언트_플레이어_목록_브로드캐스트() throws Exception {
         // given - 추가 클라이언트 생성
         List<Transport> transports = List.of(
@@ -202,7 +199,6 @@ class RoomWebSocketControllerE2ETest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 방 ID로 요청 시 에러 처리")
     void 존재하지_않는_방_ID_요청_테스트() throws Exception {
         // given
         Long nonExistentRoomId = 99999L;
