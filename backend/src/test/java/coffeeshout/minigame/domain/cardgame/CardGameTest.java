@@ -78,11 +78,10 @@ class CardGameTest {
         cardGame.selectCard(players.get(0), 0);
         cardGame.selectCard(players.get(1), 1);
         cardGame.selectCard(players.get(2), 2);
-        assertThat(cardGame.isFinished(CardGameRound.FIRST)).isFalse();
         cardGame.selectCard(players.get(3), 3);
 
         // when & then
-        assertThat(cardGame.isFinished(CardGameRound.FIRST)).isTrue();
+        assertThat(cardGame.isRoundFinished()).isTrue();
     }
 
     @Test
@@ -96,10 +95,9 @@ class CardGameTest {
         cardGame.selectCard(players.get(0), 4);
         cardGame.selectCard(players.get(1), 5);
         cardGame.selectCard(players.get(2), 6);
-        assertThat(cardGame.isFinished(CardGameRound.SECOND)).isFalse();
         cardGame.selectCard(players.get(3), 7);
 
         // when & then
-        assertThat(cardGame.isFinished(CardGameRound.SECOND)).isTrue();
+        assertThat(cardGame.isRoundFinished()).isTrue();
     }
 }
