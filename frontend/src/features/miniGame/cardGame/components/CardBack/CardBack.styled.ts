@@ -38,7 +38,6 @@ export const Circle = styled.div<Props>`
   height: ${({ $size }) => circleVariants[$size || 'large']};
 
   border-radius: 50%;
-  margin: auto;
   position: absolute;
   top: 50%;
   left: 50%;
