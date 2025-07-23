@@ -2,7 +2,6 @@ package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
@@ -36,31 +35,36 @@ public class CardGameService {
         startRound(roomId);
     }
 
+    public void selectCard(Long roomId, String playerName, Integer cardIndex) {
+        final CardGame cardGame = getCardGame(roomId);
+        final Player player = cardGame.findPlayerByName(playerName);
+        cardGame.selectCard(player, cardIndex);
+        sendCardGameState(cardGame, roomId);
+
+        if (cardGame.isRoundFinished()) {
+            changeScoreBoard(roomId, cardGame);
+        }
+    }
+
+    public MiniGameResult getMiniGameResult(Long roomId) {
+        final CardGame cardGame = getCardGame(roomId);
+        return cardGame.getResult();
+    }
+
+    public CardGame getCardGame(Long roomId) {
+        return cardGameRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
+    }
+
     private void startRound(Long roomId) {
-        CardGame cardGame = cardGameRepository.findByRoomId(roomId).orElseThrow(() -> new NoSuchElementException(
-                "해당 룸에는 카드게임이 존재하지 않습니다."));
+        final CardGame cardGame = getCardGame(roomId);
         cardGame.startRound();
         sendCardGameState(cardGame, roomId);
         roomTimers.start(roomId, () -> roundTimeout(cardGame, roomId), cardGame.getState().getDuration());
     }
 
-    public void selectCard(Long roomId, String playerName, Integer cardIndex) {
-        final CardGame cardGame = cardGameRepository.findByRoomId(roomId)
-                .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
-        final Player player = cardGame.findPlayerByName(playerName);
-        cardGame.selectCard(player, cardIndex);
-        sendCardGameState(cardGame, roomId);
-
-        if (cardGame.isFinished(CardGameRound.FIRST)) {
-            changeScoreBoard(roomId, cardGame);
-        }
-        if (cardGame.isFinished(CardGameRound.SECOND)) {
-            changeScoreBoard(roomId, cardGame);
-        }
-    }
-
     private void changeScoreBoard(Long roomId, CardGame cardGame) {
-        cancelTimer(roomId);
+        roomTimers.cancel(roomId);
         cardGame.changeState(CardGameState.SCORE_BOARD);
         sendCardGameState(cardGame, roomId);
         sendCardGameResult(cardGame, roomId);
@@ -82,25 +86,12 @@ public class CardGameService {
     }
 
     private void roundTimeout(CardGame cardGame, Long roomId) {
+        roomTimers.cancel(roomId);
         cardGame.assignRandomCardsToUnselectedPlayers();
         sendCardGameState(cardGame, roomId);
         changeScoreBoard(roomId, cardGame);
     }
 
-    private void cancelTimer(Long roomId) {
-        roomTimers.cancel(roomId);
-    }
-
-    public MiniGameResult getMiniGameResult(Long roomId) {
-        final CardGame cardGame = cardGameRepository.findByRoomId(roomId)
-                .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
-        return cardGame.getResult();
-    }
-
-    public CardGame getCardGame(Long roomId) {
-        return cardGameRepository.findByRoomId(roomId)
-                .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
-    }
 
     private void sendCardGameState(CardGame cardGame, Long roomId) {
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);

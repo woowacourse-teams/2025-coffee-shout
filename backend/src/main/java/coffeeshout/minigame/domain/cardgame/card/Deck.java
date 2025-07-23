@@ -14,8 +14,6 @@ public class Deck {
 
     private final List<Card> cards;
     private final List<Card> pickedCards;
-    // 어떤 플레이어가 뽑았는지 저장
-    // Map<Card, Player>
 
     public Deck(@NonNull List<Card> additionCards, @NonNull List<Card> multiplierCards) {
         this.cards = new ArrayList<>();
@@ -24,8 +22,9 @@ public class Deck {
         this.cards.addAll(multiplierCards);
     }
 
-    public  void shuffle() {
+    public void shuffle() {
         Collections.shuffle(cards);
+        pickedCards.clear();
     }
 
     public Card pick(int cardIndex) {
@@ -35,7 +34,7 @@ public class Deck {
         return pickedCard;
     }
 
-    public Card pickRandom(){
+    public Card pickRandom() {
         List<Card> cloned = new ArrayList<>(cards);
         cloned.removeAll(pickedCards);
         Collections.shuffle(cloned);
@@ -43,7 +42,7 @@ public class Deck {
         return pick(cards.indexOf(pickedCard));
     }
 
-    public boolean isPicked(Card card){
+    public boolean isPicked(Card card) {
         return pickedCards.contains(card);
     }
 

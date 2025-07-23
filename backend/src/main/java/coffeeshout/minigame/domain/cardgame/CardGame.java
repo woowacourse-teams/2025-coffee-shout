@@ -45,6 +45,9 @@ public class CardGame {
     }
 
     public void selectCard(Player player, Integer cardIndex) {
+        if (state != CardGameState.PLAYING) {
+            throw new IllegalStateException("게임이 진행중인 상태에서만 카드를 선택할 수 있습니다.");
+        }
 
         playerHands.put(player, deck.pick(cardIndex));
     }
@@ -53,8 +56,8 @@ public class CardGame {
         return playerHands.scoreByPlayer();
     }
 
-    public boolean isFinished(CardGameRound targetRound) {
-        return round == targetRound && playerHands.isRoundFinished();
+    public boolean isRoundFinished() {
+        return playerHands.isRoundFinished();
     }
 
     public Player findPlayerByName(String name) {
