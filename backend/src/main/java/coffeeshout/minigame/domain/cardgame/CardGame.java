@@ -2,6 +2,7 @@ package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.player.domain.Player;
 import java.util.List;
@@ -57,10 +58,6 @@ public class CardGame {
 
     public Player findPlayerByName(String name) {
         return playerHands.findPlayerByName(name);
-    }
-
-    public boolean isFirstRound() {
-        return round == CardGameRound.FIRST;
     }
 
     public boolean isSecondRound() {
