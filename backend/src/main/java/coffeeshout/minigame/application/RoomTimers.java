@@ -23,5 +23,6 @@ public class RoomTimers {
             return;
         }
         timers.get(roomId).cancel(true);
+        timers.remove(roomId);
     }
 }
