@@ -9,6 +9,7 @@ import coffeeshout.minigame.ui.MiniGameStateMessage.CardInfoMessage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.SoftAssertions;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 
 class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
@@ -17,7 +18,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드_게임을_시작한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-
         Long roomId = 1L;
 
         String subscribeUrlFormat = "/topic/room/%d/gameState";
@@ -45,9 +45,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드를_선택한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-
-        카드_게임을_시작한다();
         Long roomId = 1L;
+
+        startCardGame(session, roomId);
 
         String subscribeUrlFormat = "/topic/room/%d/gameState";
         String requestUrlFormat = "/app/room/%d/cardGame/select";
@@ -80,10 +80,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드_게임의_결과를_조회한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-
-        카드_게임을_시작한다();
-
         Long roomId = 1L;
+
+        startCardGame(session, roomId);
 
         String subscribeUrlFormat = "/topic/room/%d/rank";
         String requestUrlFormat = "/app/room/%d/cardGame/rank";
@@ -103,5 +102,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
             softly.assertThat(result.ranks()).extracting(MiniGameRankMessage::rank)
                     .containsExactly(1, 1, 1, 1);
         });
+    }
+
+    private void startCardGame(TestStompSession session, Long roomId){
+        String requestUrlFormat = "/app/room/%d/cardGame/start";
+        session.send(String.format(requestUrlFormat, roomId), "");
     }
 }
