@@ -32,6 +32,12 @@ export const Large: Story = {
   },
 };
 
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+};
+
 export const Grid: Story = {
   render: () => {
     return (

@@ -45,7 +45,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => 
               }
             />
           ) : (
-            <CardBack size="medium" />
+            <CardBack size="medium" disabled={true} />
           )}
           {selectedCardInfo[2].index !== -1 ? (
             <CardFront
@@ -58,7 +58,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => 
               }
             />
           ) : (
-            <CardBack size="medium" />
+            <CardBack size="medium" disabled={true} />
           )}
         </S.MyCardContainer>
         <S.CardContainer>

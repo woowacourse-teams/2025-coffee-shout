@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import { cardVariants, circleVariants } from '../../constants/variants';
+import { css } from '@emotion/react';
 
 type Props = {
   $size?: 'small' | 'medium' | 'large';
+  $disabled?: boolean;
 };
 
 export const Container = styled.button<Props>`
@@ -13,16 +15,21 @@ export const Container = styled.button<Props>`
   border-radius: 7px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
   position: relative;
-  cursor: pointer;
+  cursor: default;
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  ${({ $disabled }) =>
+    !$disabled &&
+    css`
+      cursor: pointer;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
+      &:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
+    `}
 `;
 
 export const Circle = styled.div<Props>`
