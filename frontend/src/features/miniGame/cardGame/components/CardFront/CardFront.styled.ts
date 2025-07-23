@@ -61,27 +61,17 @@ const cardTextFontSize = {
   large: '1.25rem', // ~20px
 };
 
-export const Container = styled.button<Props>`
+export const Container = styled.div<Props>`
   ${({ $size }) => cardVariants[$size || 'large']}
   background-color: ${({ theme }) => theme.color.point[200]};
 
   border-radius: 7px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
   position: relative;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
 `;
 
 export const Circle = styled.div<Props>`
