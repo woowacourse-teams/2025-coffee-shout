@@ -23,9 +23,3 @@ export const DescriptionWrapper = styled.div`
   align-items: center;
   gap: 12px;
 `;
-
-export const Timer = styled.span`
-  font-size: 150px;
-  font-weight: 900;
-  color: white;
-`;
