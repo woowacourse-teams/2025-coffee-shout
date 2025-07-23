@@ -16,7 +16,7 @@ const SectionTitle = ({ title, description, suffix }: Props) => {
         <Headline2>{title}</Headline2>
         {suffix}
       </S.Wrapper>
-      <Description>{description}</Description>
+      <Description color="gray-400">{description}</Description>
     </S.Container>
   );
 };

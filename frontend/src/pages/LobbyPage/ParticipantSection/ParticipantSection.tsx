@@ -15,9 +15,9 @@ export const ParticipantSection = () => {
       <PlayerCard name="홍길동" iconColor="red">
         아이콘
       </PlayerCard>
-      <S.DividerWrapper>
-        <Divider />
-      </S.DividerWrapper>
+
+      <Divider />
+
       <S.ScrollableWrapper>
         {['다이앤', '니야', '메리', '루키', '한스', '꾹이', '엠제이', '1'].map((name) => (
           <PlayerCard key={name} name={name} iconColor="red">

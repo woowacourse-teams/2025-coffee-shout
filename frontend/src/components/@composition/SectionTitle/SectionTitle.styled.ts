@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const Container = styled.div`
-  padding: 8px 16px 16px 16px;
+  padding-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 12px;
