@@ -10,56 +10,23 @@ import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@NaturalIdCache
 @Getter
 public class Room {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NaturalId
-    @Embedded
     private JoinCode joinCode;
-
-    @Transient
     private Player host;
-
-    @Transient
     private Players players;
-
-    @Transient
     private Roulette roulette;
-
-    @Transient
     private List<Playable> miniGames;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "room_state")
     private RoomState roomState;
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {

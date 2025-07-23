@@ -12,13 +12,13 @@ import coffeeshout.room.ui.response.PlayerResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,7 +42,6 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-// @Transactional 제거! 웹소켓은 다른 스레드에서 실행되므로 트랜잭션 격리 문제 발생
 class RoomWebSocketControllerE2ETest {
 
     @LocalServerPort
@@ -85,8 +84,6 @@ class RoomWebSocketControllerE2ETest {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
         }
-
-        // RoomRepository에 deleteById가 없으므로 H2 인메모리 DB에서 자동 정리됨
     }
 
     private void setupTestData() {
@@ -106,52 +103,50 @@ class RoomWebSocketControllerE2ETest {
         // 저장 후 실제 ID가 할당된 객체로 다시 받기
         testRoom = roomRepository.save(testRoom);
 
-        System.out.println("✅ 테스트 방 생성 완료 - ID: " + testRoom.getId());
+        System.out.println("✅ 테스트 방 생성 완료 - JoinCode: " + testRoom.getJoinCode());
     }
 
     @Test
-    @DisplayName("방 입장 시나리오: getPlayers 요청 후 플레이어 목록 응답 확인")
     void 방_입장_시나리오_getPlayers_요청() throws Exception {
         // given
-        Long roomId = testRoom.getId();
+        String joinCode = testRoom.getJoinCode().value();
         BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
 
         // when - 방 토픽 구독
-        stompSession.subscribe("/topic/room/" + roomId, new PlayerResponseFrameHandler(responseQueue));
+        stompSession.subscribe("/topic/room/" + joinCode, new PlayerResponseFrameHandler(responseQueue));
 
         // getPlayers 요청 메시지 전송
-        stompSession.send("/app/room/" + roomId + "/players", null);
+        stompSession.send("/app/room/" + joinCode + "/players", null);
 
         // then - 플레이어 목록 응답 확인
         List<PlayerResponse> players = responseQueue.poll(5, TimeUnit.SECONDS);
 
         assertThat(players).isNotNull();
         assertThat(players).hasSize(4); // 호스트 + 게스트 3명
-//
-//        // 호스트 확인
-//        PlayerResponse host = players.stream()
-//                .filter(p -> p.playerName().equals("호스트꾹이"))
-//                .findFirst()
-//                .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
-//
-//        assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
-//        assertThat(host.menuResponse().image()).isEqualTo("sample-image1.png");
-//
-//        // 게스트들 확인
-//        List<String> playerNames = players.stream()
-//                .map(PlayerResponse::playerName)
-//                .toList();
-//
-//        assertThat(playerNames).containsExactlyInAnyOrder(
-//                "호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이"
-//        );
-//
-//        System.out.println("✅ 플레이어 목록 응답 성공:");
-//        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
+
+        // 호스트 확인
+        PlayerResponse host = players.stream()
+                .filter(p -> p.playerName().equals("호스트꾹이"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
+
+        assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
+        assertThat(host.menuResponse().image()).isEqualTo("americano.jpg");
+
+        // 게스트들 확인
+        List<String> playerNames = players.stream()
+                .map(PlayerResponse::playerName)
+                .toList();
+
+        assertThat(playerNames).containsExactlyInAnyOrder(
+                "호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이"
+        );
+
+        System.out.println("✅ 플레이어 목록 응답 성공:");
+        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
     }
 
     @Test
-    @DisplayName("여러 클라이언트가 같은 방을 구독하고 플레이어 목록 브로드캐스트 확인")
     void 여러_클라이언트_플레이어_목록_브로드캐스트() throws Exception {
         // given - 추가 클라이언트 생성
         List<Transport> transports = List.of(
@@ -166,16 +161,16 @@ class RoomWebSocketControllerE2ETest {
                 new TestStompSessionHandler()).get(10, TimeUnit.SECONDS);
 
         try {
-            Long roomId = testRoom.getId();
+            String joinCode = testRoom.getJoinCode().value();
             BlockingQueue<List<PlayerResponse>> queue1 = new LinkedBlockingQueue<>();
             BlockingQueue<List<PlayerResponse>> queue2 = new LinkedBlockingQueue<>();
 
             // when - 두 클라이언트 모두 같은 방 구독
-            stompSession.subscribe("/topic/room/" + roomId, new PlayerResponseFrameHandler(queue1));
-            session2.subscribe("/topic/room/" + roomId, new PlayerResponseFrameHandler(queue2));
+            stompSession.subscribe("/topic/room/" + joinCode, new PlayerResponseFrameHandler(queue1));
+            session2.subscribe("/topic/room/" + joinCode, new PlayerResponseFrameHandler(queue2));
 
             // 한 클라이언트에서 플레이어 목록 요청
-            stompSession.send("/app/room/" + roomId + "/players", null);
+            stompSession.send("/app/room/" + joinCode + "/players", null);
 
             // then - 두 클라이언트 모두 같은 응답 받음
             List<PlayerResponse> response1 = queue1.poll(5, TimeUnit.SECONDS);
@@ -197,17 +192,16 @@ class RoomWebSocketControllerE2ETest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 방 ID로 요청 시 에러 처리")
     void 존재하지_않는_방_ID_요청_테스트() throws Exception {
         // given
-        Long nonExistentRoomId = 99999L;
+        String nonExistentJoinCode = "3434X";
         BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
 
         // when
-        stompSession.subscribe("/topic/room/" + nonExistentRoomId, new PlayerResponseFrameHandler(responseQueue));
+        stompSession.subscribe("/topic/room/" + nonExistentJoinCode, new PlayerResponseFrameHandler(responseQueue));
 
         try {
-            stompSession.send("/app/room/" + nonExistentRoomId + "/players", null);
+            stompSession.send("/app/room/" + nonExistentJoinCode + "/players", null);
 
             // then - 에러가 발생하거나 응답이 없어야 함
             List<PlayerResponse> response = responseQueue.poll(3, TimeUnit.SECONDS);
@@ -260,16 +254,17 @@ class RoomWebSocketControllerE2ETest {
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
-            return String.class;
+            return Object.class;
         }
 
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
             try {
-                String jsonPayload = (String) payload;
-                System.out.println("🎯 수신된 플레이어 목록 JSON: " + jsonPayload);
+                byte[] bytes = (byte[]) payload;
+                String jsonString = new String(bytes, StandardCharsets.UTF_8);
+                System.out.println("🎯 수신된 플레이어 목록 JSON: " + jsonString);
 
-                List<PlayerResponse> players = objectMapper.readValue(jsonPayload,
+                List<PlayerResponse> players = objectMapper.readValue(jsonString,
                         new TypeReference<List<PlayerResponse>>() {
                         });
                 queue.offer(players);

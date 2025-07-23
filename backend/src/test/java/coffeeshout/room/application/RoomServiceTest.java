@@ -8,19 +8,19 @@ import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Sql("/test.sql")
 @Transactional
 class RoomServiceTest {
 
@@ -29,6 +29,16 @@ class RoomServiceTest {
 
     @Autowired
     TestDataHelper testDataHelper;
+
+    @Autowired
+    MenuRepository menuRepository;
+
+    Long firstMenuId;
+
+    @BeforeEach
+    void setUp() {
+        firstMenuId = menuRepository.findAll().get(0).getId();
+    }
 
     @Test
     void 방을_생성한다() {
@@ -41,7 +51,6 @@ class RoomServiceTest {
 
         // then
         assertThat(room).isNotNull();
-        assertThat(room.getId()).isNotNull(); // DB에 저장되어 ID 생성됨
         assertThat(room.getJoinCode()).isNotNull();
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
 
@@ -57,8 +66,8 @@ class RoomServiceTest {
         Long invalidMenuId = 999L;
 
         // when & then
-        assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId)).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -77,7 +86,7 @@ class RoomServiceTest {
         Room room = roomService.enterRoom(joinCode, guestName, guestMenuId);
 
         // then
-        assertThat(room.getId()).isEqualTo(createdRoom.getId());
+        assertThat(room.getJoinCode().value()).isEqualTo(createdRoom.getJoinCode().value());
         assertThat(room.getPlayers()).hasSize(2);
         assertThat(room.getPlayers().stream().anyMatch(p -> p.getName().value().equals(guestName))).isTrue();
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
@@ -91,8 +100,8 @@ class RoomServiceTest {
         Long menuId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId)).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -122,8 +131,8 @@ class RoomServiceTest {
         testDataHelper.createDummyPlayingRoom(existingJoinCode, "더미호스트");
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId)).isInstanceOf(
-                IllegalStateException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -141,8 +150,8 @@ class RoomServiceTest {
 
         // then
         assertThat(result.getPlayers()).hasSize(4);
-        assertThat(result.getPlayers().stream().map(p -> p.getName().value())).contains(hostName, "게스트1", "게스트2",
-                "게스트3");
+        assertThat(result.getPlayers().stream().map(p -> p.getName().value()))
+                .contains(hostName, "게스트1", "게스트2", "게스트3");
     }
 
     @Test
@@ -158,8 +167,8 @@ class RoomServiceTest {
         }
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L)).isInstanceOf(
-                IllegalStateException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -172,8 +181,8 @@ class RoomServiceTest {
 
         // when & then
         // Player 생성에서 중복 체크 하는지 모르겠지만 일단 테스트
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L)).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -184,8 +193,8 @@ class RoomServiceTest {
         String joinCode = createdRoom.getJoinCode().value();
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L)).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -197,11 +206,12 @@ class RoomServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
 
         // when
-        List<Player> players = roomService.getAllPlayers(createdRoom.getId());
+        List<Player> players = roomService.getAllPlayers(createdRoom.getJoinCode().value());
 
         // then
         assertThat(players).hasSize(2);
-        assertThat(players.stream().map(p -> p.getName().value())).containsExactlyInAnyOrder(hostName, guestName);
+        assertThat(players.stream().map(p -> p.getName().value()))
+                .containsExactlyInAnyOrder(hostName, guestName);
     }
 
     @Test
@@ -212,7 +222,7 @@ class RoomServiceTest {
         Long newMenuId = 3L;
 
         // when
-        List<Player> players = roomService.selectMenu(createdRoom.getId(), hostName, newMenuId);
+        List<Player> players = roomService.selectMenu(createdRoom.getJoinCode().value(), hostName, newMenuId);
         Player host = players.get(0);
 
         // then
@@ -229,7 +239,8 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> roomService.selectMenu(createdRoom.getId(), invalidPlayerName, newMenuId)).isInstanceOf(
+                () -> roomService.selectMenu(createdRoom.getJoinCode().value(), invalidPlayerName,
+                        newMenuId)).isInstanceOf(
                 IllegalArgumentException.class);
     }
 
@@ -242,7 +253,7 @@ class RoomServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
 
         // when
-        Map<Player, Probability> probabilities = roomService.getProbabilities(createdRoom.getId());
+        Map<Player, Probability> probabilities = roomService.getProbabilities(createdRoom.getJoinCode().value());
 
         // then
         assertThat(probabilities).hasSize(2);
@@ -265,7 +276,7 @@ class RoomServiceTest {
         Room createdRoom = roomService.createRoom(hostName, 1L);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getId(), hostName,
+        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName,
                 MiniGameType.CARD_GAME);
 
         // then
@@ -278,11 +289,11 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.selectMiniGame(createdRoom.getId(), hostName, MiniGameType.CARD_GAME);
+        roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName, MiniGameType.CARD_GAME);
 
         // when
         List<MiniGameType> selectedMiniGames = roomService.unselectMiniGame(
-                createdRoom.getId(),
+                createdRoom.getJoinCode().value(),
                 hostName,
                 MiniGameType.CARD_GAME
         );
@@ -300,7 +311,8 @@ class RoomServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
 
         // when & then
-        assertThatThrownBy(() -> roomService.selectMiniGame(createdRoom.getId(), guestName, MiniGameType.CARD_GAME))
+        assertThatThrownBy(
+                () -> roomService.selectMiniGame(createdRoom.getJoinCode().value(), guestName, MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -311,10 +323,11 @@ class RoomServiceTest {
         String guestName = "게스트";
         Room createdRoom = roomService.createRoom(hostName, 1L);
         roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
-        roomService.selectMiniGame(createdRoom.getId(), hostName, MiniGameType.CARD_GAME);
+        roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName, MiniGameType.CARD_GAME);
 
         // when & then
-        assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getId(), guestName, MiniGameType.CARD_GAME))
+        assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getJoinCode().value(), guestName,
+                MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

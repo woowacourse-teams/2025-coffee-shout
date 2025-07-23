@@ -20,47 +20,49 @@ public class RoomWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
 
-    @MessageMapping("/room/{roomId}/players")
-    public void getPlayers(@DestinationVariable Long roomId) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(roomId).stream()
+    @MessageMapping("/room/{joinCode}/players")
+    public void getPlayers(@DestinationVariable String joinCode) {
+        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode).stream()
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId, responses);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode, responses);
     }
 
-    @MessageMapping("/room/{roomId}/menus")
-    public void getMenus(@DestinationVariable Long roomId, MenuChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.selectMenu(roomId, message.playerName(), message.menuId())
+    @MessageMapping("/room/{joinCode}/menus")
+    public void getMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
+        final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(), message.menuId())
                 .stream()
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId, responses);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode, responses);
     }
 
-    @MessageMapping("/room/{roomId}/probabilities")
-    public void getProbabilities(@DestinationVariable Long roomId) {
-        final List<ProbabilityResponse> responses = roomService.getProbabilities(roomId).entrySet()
+    @MessageMapping("/room/{joinCode}/probabilities")
+    public void getProbabilities(@DestinationVariable String joinCode) {
+        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
                 .stream()
                 .map(ProbabilityResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/roulette", responses);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette", responses);
     }
 
-    @MessageMapping("/room/{roomId}/minigames/select")
-    public void selectMinigames(@DestinationVariable Long roomId, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.selectMiniGame(roomId, message.hostName(), message.miniGameType());
+    @MessageMapping("/room/{joinCode}/minigames/select")
+    public void selectMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
+        final List<MiniGameType> responses = roomService.selectMiniGame(joinCode, message.hostName(),
+                message.miniGameType());
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/minigame", responses);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame", responses);
     }
 
-    @MessageMapping("/room/{roomId}/minigames/unselect")
-    public void unselectMinigames(@DestinationVariable Long roomId, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.unselectMiniGame(roomId, message.hostName(), message.miniGameType());
+    @MessageMapping("/room/{joinCode}/minigames/unselect")
+    public void unselectMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
+        final List<MiniGameType> responses = roomService.unselectMiniGame(joinCode, message.hostName(),
+                message.miniGameType());
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/minigame", responses);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame", responses);
     }
 
 }

@@ -22,6 +22,10 @@ public class Player {
         this.menu = menu;
     }
 
+    public boolean sameName(PlayerName playerName) {
+        return Objects.equals(name, playerName);
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) {
@@ -31,10 +35,6 @@ public class Player {
             return false;
         }
         return Objects.equals(name, player.name);
-    }
-
-    public boolean sameName(PlayerName playerName) {
-        return Objects.equals(name, playerName);
     }
 
     @Override

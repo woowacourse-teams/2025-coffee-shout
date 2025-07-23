@@ -1,7 +1,7 @@
 package coffeeshout.room.application;
 
 import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuFinder;
+import coffeeshout.room.domain.service.MenuQueryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MenuService {
 
-    private final MenuFinder menuFinder;
+    private final MenuQueryService menuQueryService;
 
     public List<Menu> getAll() {
-        return menuFinder.findAll();
+        return menuQueryService.findAll();
     }
 }

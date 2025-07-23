@@ -5,11 +5,11 @@ import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuFinder;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
+import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.Arrays;
@@ -24,11 +24,11 @@ public class RoomService {
 
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
-    private final MenuFinder menuFinder;
+    private final MenuQueryService menuQueryService;
     private final JoinCodeGenerator joinCodeGenerator;
 
     public Room createRoom(String hostName, Long menuId) {
-        final Menu menu = menuFinder.findById(menuId);
+        final Menu menu = menuQueryService.findById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, PlayerName.from(hostName), menu);
 
@@ -36,7 +36,7 @@ public class RoomService {
     }
 
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
-        final Menu menu = menuFinder.findById(menuId);
+        final Menu menu = menuQueryService.findById(menuId);
         final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
 
         room.joinGuest(PlayerName.from(guestName), menu);
@@ -44,15 +44,15 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-    public List<Player> getAllPlayers(Long roomId) {
-        final Room room = roomQueryService.findById(roomId);
+    public List<Player> getAllPlayers(String joinCode) {
+        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
 
         return room.getPlayers();
     }
 
-    public List<Player> selectMenu(Long roomId, String playerName, Long menuId) {
-        final Room room = roomQueryService.findById(roomId);
-        final Menu menu = menuFinder.findById(menuId);
+    public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
+        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Menu menu = menuQueryService.findById(menuId);
 
         final Player player = room.findPlayer(PlayerName.from(playerName));
         player.selectMenu(menu);
@@ -60,8 +60,8 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    public Map<Player, Probability> getProbabilities(Long roomId) {
-        final Room room = roomQueryService.findById(roomId);
+    public Map<Player, Probability> getProbabilities(String joinCode) {
+        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
 
         return room.getProbabilities();
     }
@@ -71,8 +71,8 @@ public class RoomService {
                 .toList();
     }
 
-    public List<MiniGameType> selectMiniGame(Long roomId, String hostName, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findById(roomId);
+    public List<MiniGameType> selectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
         room.addMiniGame(PlayerName.from(hostName), miniGame);
@@ -82,8 +82,8 @@ public class RoomService {
                 .toList();
     }
 
-    public List<MiniGameType> unselectMiniGame(Long roomId, String hostName, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findById(roomId);
+    public List<MiniGameType> unselectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
         room.removeMiniGame(PlayerName.from(hostName), miniGame);
