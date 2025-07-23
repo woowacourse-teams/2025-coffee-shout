@@ -13,17 +13,20 @@ import lombok.NonNull;
 @Getter
 public class CardGame {
 
+    private static final int ADDITION_CARD_COUNT = 6;
+    private static final int MULTIPLIER_CARD_COUNT = 3;
+
     private final PlayerHands playerHands;
     private final Deck deck;
     private CardGameRound round;
     private CardGameState state;
 
     public CardGame(
-            @NonNull Deck deck,
+            @NonNull CardGameDeckGenerator deckGenerator,
             @NonNull List<Player> players
     ) {
         this.playerHands = new PlayerHands(players);
-        this.deck = deck;
+        this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
         this.round = CardGameRound.READY;
         this.state = CardGameState.READY;
     }

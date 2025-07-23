@@ -4,7 +4,6 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
 import coffeeshout.player.domain.Player;
@@ -12,16 +11,12 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomFinder;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class CardGameService {
-
-    private static final int ADDITION_CARD_COUNT = 6;
-    private static final int MULTIPLIER_CARD_COUNT = 3;
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%d/gameState";
     private static final String CARD_GAME_RESULT_DESTINATION_FORMAT = "/topic/room/%d/gameState";
@@ -33,9 +28,8 @@ public class CardGameService {
 
     public void startGame(Long roomId) {
         final Room room = roomFinder.findById(roomId);
-        final CardGameDeckGenerator deckGenerator = new CardGameRandomDeckGenerator();
         final CardGame cardGame = new CardGame(
-                deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT),
+                new CardGameRandomDeckGenerator(),
                 room.getPlayers()
         );
         cardGameRepository.save(roomId, cardGame);

@@ -52,7 +52,7 @@ class CardGameServiceTest {
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
 
-        CardGame cardGame = new CardGame(deckGenerator.generate(additionCardCount, multiplierCardCount), players);
+        CardGame cardGame = new CardGame(deckGenerator, players);
         cardGame.startRound();
         cardGames.put(roomId, cardGame);
         ReflectionTestUtils.setField(cardGameService, "cardGames", cardGames);
