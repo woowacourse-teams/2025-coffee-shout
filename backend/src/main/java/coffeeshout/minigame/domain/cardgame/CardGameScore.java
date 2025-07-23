@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class CardGameScore implements Comparable<CardGameScore> {
 
-    public final static CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
+    public static final CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
     private int addition;
     private int multiplier;
 
@@ -17,6 +17,7 @@ public class CardGameScore implements Comparable<CardGameScore> {
 
     public CardGameScore(int addition) {
         this.addition = addition;
+        this.multiplier = 1;
     }
 
     public CardGameScore(CardHand hand) {

@@ -63,14 +63,6 @@ public class CardGame {
         return playerHands.findPlayerByName(name);
     }
 
-    public boolean isFirstRound() {
-        return round == CardGameRound.FIRST;
-    }
-
-    public boolean isSecondRound() {
-        return round == CardGameRound.SECOND;
-    }
-
     public void assignRandomCardsToUnselectedPlayers() {
         List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
