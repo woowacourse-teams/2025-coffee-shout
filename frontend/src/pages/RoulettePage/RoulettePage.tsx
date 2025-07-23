@@ -19,16 +19,20 @@ const RoulettePage = () => {
 
   const isRouletteView = currentView === 'roulette';
 
+  const handleViewChange = () => {
+    setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
+  };
+
   const handleSpinClick = () => {
+    if (currentView === 'statistics') {
+      handleViewChange();
+    }
+
     setSpinning(true);
     setTimeout(() => {
       setSpinning(false);
       navigate('/room/:roomId/roulette/result');
     }, 3000);
-  };
-
-  const handleViewChange = () => {
-    setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
 
   return (
