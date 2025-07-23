@@ -1,9 +1,12 @@
+import { IconColor } from '@/types/player';
 import styled from '@emotion/styled';
 import { Card } from '../../constants/cards';
 import { cardVariants, circleVariants } from '../../constants/variants';
+import { css } from '@emotion/react';
 
 type Props = {
   $size?: 'small' | 'medium' | 'large';
+  $playerIconColor?: IconColor;
   $card?: Card;
 };
 
@@ -12,6 +15,10 @@ const CARD_TEXT_COLORS = {
   NEGATIVE: '#FF6C6C',
   MULTIPLIER: '#81E121',
   DEFAULT: '#000',
+} as const;
+
+const CARD_BORDER_COLORS: Record<IconColor, string> = {
+  red: '#ff4f63',
 } as const;
 
 const getCardTextColor = ($card?: Card) => {
@@ -31,30 +38,6 @@ const getCardTextColor = ($card?: Card) => {
   }
 };
 
-const fontSize = {
-  small: '0.625rem', // ~10px
-  medium: '0.875rem', // ~14px
-  large: '1rem', // ~16px
-};
-
-const iconSize = {
-  small: '0.625rem', // ~10px
-  medium: '0.875rem', // ~14px
-  large: '1rem', // ~16px
-};
-
-const playerMarginTop = {
-  small: '0.1875rem', // ~3px
-  medium: '0.375rem', // ~6px
-  large: '0.5rem', // ~8px
-};
-
-const playerNameMaxWidth = {
-  small: '2rem', // ~32px
-  medium: '3rem', // ~48px
-  large: '4.5rem', // ~72px
-};
-
 const cardTextFontSize = {
   small: '0.75rem', // ~12px
   medium: '1rem', // ~16px
@@ -64,7 +47,11 @@ const cardTextFontSize = {
 export const Container = styled.div<Props>`
   ${({ $size }) => cardVariants[$size || 'large']}
   background-color: ${({ theme }) => theme.color.point[200]};
-
+  ${({ $playerIconColor }) =>
+    $playerIconColor &&
+    css`
+      border: 4px solid ${CARD_BORDER_COLORS[$playerIconColor]};
+    `};
   border-radius: 7px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
   position: relative;
@@ -97,30 +84,4 @@ export const CardText = styled.span<Props>`
   font-weight: 700;
   line-height: 1;
   text-align: center;
-`;
-
-export const Player = styled.div<Props>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: ${({ $size }) => playerMarginTop[$size || 'large']};
-`;
-
-export const PlayerName = styled.span<Props>`
-  font-size: ${({ $size }) => fontSize[$size || 'large']};
-  max-width: ${({ $size }) => playerNameMaxWidth[$size || 'large']};
-
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const PlayerIcon = styled.img<Props>`
-  width: ${({ $size }) => iconSize[$size || 'large']};
-  height: ${({ $size }) => iconSize[$size || 'large']};
-
-  border-radius: 50%;
-  display: block;
-  flex-shrink: 0;
 `;
