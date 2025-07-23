@@ -25,7 +25,7 @@ export const ResultList = styled.div`
 export const PlayerCardWrapper = styled.div<{ isHighlighted?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 24px;
   border-radius: 12px;
   background-color: ${({ isHighlighted, theme }) =>
     isHighlighted ? theme.color.point[100] : 'transparent'};
