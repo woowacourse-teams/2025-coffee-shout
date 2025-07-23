@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class MiniGameResult {
@@ -27,7 +28,7 @@ public class MiniGameResult {
         return rank.get(player);
     }
 
-    public static MiniGameResult from(Map<Player, CardGameScore> playerScores) {
+    public static MiniGameResult from(@NonNull Map<Player, CardGameScore> playerScores) {
         List<CardGameScore> sortedScores = playerScores.values().stream()
                 .sorted(Comparator.reverseOrder())
                 .toList();

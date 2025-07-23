@@ -1,7 +1,6 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
 import java.util.Objects;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter

@@ -6,17 +6,13 @@ import java.util.Objects;
 
 public class CardGameScore implements Comparable<CardGameScore> {
 
-    public final static CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
+    public static final CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
     private int addition;
     private int multiplier;
 
-    public CardGameScore() {
-        this.addition = 0;
-        this.multiplier = 1;
-    }
-
     public CardGameScore(int addition) {
         this.addition = addition;
+        this.multiplier = 1;
     }
 
     public CardGameScore(CardHand hand) {
@@ -25,7 +21,7 @@ public class CardGameScore implements Comparable<CardGameScore> {
         hand.forEach(this::updateScore);
     }
 
-    public void updateScore(Card card) {
+    private void updateScore(Card card) {
         if (card.getType() == CardType.ADDITION) {
             addition += card.getValue();
         }

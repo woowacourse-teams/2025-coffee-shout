@@ -22,9 +22,6 @@ class CardGameTest {
 
     @BeforeEach
     void setUp() {
-        int additionCardCount = 6;
-        int multiplierCardCount = 3;
-
         players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
         cardGame = new CardGameFake(deckGenerator, players);
 

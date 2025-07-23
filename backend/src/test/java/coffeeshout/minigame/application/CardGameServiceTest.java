@@ -45,9 +45,6 @@ class CardGameServiceTest {
         roomId = 1L;
         room = RoomFixture.호스트_꾹이();
 
-        int additionCardCount = 6;
-        int multiplierCardCount = 3;
-
         ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
 
         ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
