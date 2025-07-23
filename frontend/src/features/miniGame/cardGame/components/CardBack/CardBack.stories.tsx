@@ -44,7 +44,7 @@ export const Grid: Story = {
         }}
       >
         {Array.from({ length: 9 }, (_, index) => (
-          <CardBack key={index} onClick={() => {}} />
+          <CardBack key={index} />
         ))}
       </div>
     );

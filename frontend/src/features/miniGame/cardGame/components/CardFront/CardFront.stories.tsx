@@ -17,72 +17,65 @@ type Story = StoryObj<typeof CardFront>;
 export const Small: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
-    card: { type: 'addition', value: 40 },
+    card: { type: 'ADDITION', value: 10 },
   },
 };
 
 export const Medium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
-    card: { type: 'multiplier', value: -1 },
+    card: { type: 'MULTIPLIER', value: -1 },
   },
 };
 
 export const Large: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
-    card: { type: 'addition', value: 0 },
+    card: { type: 'ADDITION', value: 0 },
   },
 };
 
 export const WithPlayerSmall: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
     },
-    card: { type: 'multiplier', value: 0 },
+    card: { type: 'MULTIPLIER', value: 0 },
   },
 };
 
 export const WithPlayerMedium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
     },
-    card: { type: 'multiplier', value: 2 },
+    card: { type: 'MULTIPLIER', value: 2 },
   },
 };
 
 export const WithPlayerLarge: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
     },
-    card: { type: 'addition', value: -40 },
+    card: { type: 'ADDITION', value: -40 },
   },
 };
 
 export const LongName: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
     player: {
       name: '매우매우매우매우매우긴이름입니다람쥐 ',
       iconColor: 'red',
     },
-    card: { type: 'addition', value: 10 },
+    card: { type: 'ADDITION', value: 10 },
   },
 };
 
@@ -105,9 +98,8 @@ export const Grid: Story = {
         {Array.from({ length: 9 }, (_, index) => (
           <CardFront
             key={index}
-            onClick={() => {}}
             player={playerMap[index]}
-            card={{ type: 'multiplier', value: -1 }}
+            card={{ type: 'MULTIPLIER', value: -1 }}
           />
         ))}
       </div>

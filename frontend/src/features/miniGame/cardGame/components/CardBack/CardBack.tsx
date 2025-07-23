@@ -4,7 +4,7 @@ import * as S from './CardBack.styled';
 
 type Props = {
   size?: 'small' | 'medium' | 'large';
-  onClick: () => void;
+  onClick?: () => void;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const CardBack = ({ size, onClick, ...rest }: Props) => {
