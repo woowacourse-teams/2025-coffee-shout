@@ -1,6 +1,6 @@
 package coffeeshout.minigame.ui;
 
-import coffeeshout.minigame.application.CardGameQueryService;
+import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;

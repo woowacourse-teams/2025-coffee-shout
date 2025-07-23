@@ -1,6 +1,6 @@
-package coffeeshout.minigame.application;
+package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.application.CardGameRepository;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

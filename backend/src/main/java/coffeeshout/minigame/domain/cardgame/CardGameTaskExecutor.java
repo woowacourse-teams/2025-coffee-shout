@@ -1,21 +1,17 @@
-package coffeeshout.minigame.application;
+package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.cardgame.CardGameState;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class RoomTaskExecutor {
+public class CardGameTaskExecutor {
 
-    public record RoomTask(CardGameState state, Runnable task, Runnable postTask) {
+    public record CardGameTask(CardGameState state, Runnable mainTask, Runnable postTask) {
 
         public void run() {
             try {
-                task.run();
-                log.info(state.name());
+                mainTask.run();
                 Thread.sleep(state.getDuration());
                 postTask.run();
             } catch (InterruptedException e) {
@@ -25,23 +21,23 @@ public class RoomTaskExecutor {
     }
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final List<RoomTask> roomTasks;
+    private final List<CardGameTask> cardGameTasks;
     private Future<?> currentTask;
-    private RoomTask currentRoomTask;
+    private CardGameTask currentCardGameTask;
 
-    public RoomTaskExecutor(List<RoomTask> roomTasks) {
-        this.roomTasks = roomTasks;
+    public CardGameTaskExecutor(List<CardGameTask> cardGameTasks) {
+        this.cardGameTasks = cardGameTasks;
     }
 
     public void submits() {
-        for (RoomTask roomTask : roomTasks) {
-            this.currentRoomTask = roomTask;
-            this.currentTask = executor.submit(roomTask::run);
+        for (CardGameTask cardGameTask : cardGameTasks) {
+            this.currentCardGameTask = cardGameTask;
+            this.currentTask = executor.submit(cardGameTask::run);
         }
     }
 
     public void cancelPlaying() {
-        if (currentRoomTask.state == CardGameState.PLAYING) {
+        if (currentCardGameTask.state == CardGameState.PLAYING) {
             cancelCurrentTask();
         }
     }

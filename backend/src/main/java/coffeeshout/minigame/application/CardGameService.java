@@ -1,8 +1,11 @@
 package coffeeshout.minigame.application;
 
-import coffeeshout.minigame.application.RoomTaskExecutor.RoomTask;
+import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
@@ -28,7 +31,7 @@ public class CardGameService {
     private final RoomFinder roomFinder;
     private final CardGameRepository cardGameRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoomTaskExecutors roomTaskExecutors = new RoomTaskExecutors();
+    private final CardGameTaskExecutors cardGameTaskExecutors = new CardGameTaskExecutors();
 
     public void startGame(Long roomId) {
         final Room room = roomFinder.findById(roomId);
@@ -38,7 +41,7 @@ public class CardGameService {
                 room.getPlayers()
         );
         cardGameRepository.save(roomId, cardGame);
-        RoomTaskExecutor executor = new RoomTaskExecutor(List.of(
+        CardGameTaskExecutor executor = new CardGameTaskExecutor(List.of(
                 play(roomId), // 1라운드 시작
                 scoreBoard(roomId), // 1라운드 결과
                 loading(roomId), // 1라운드 끝나고 로딩
@@ -46,7 +49,7 @@ public class CardGameService {
                 scoreBoard(roomId), // 2라운드 끝나고 결과
                 done(roomId)
         ));
-        roomTaskExecutors.put(roomId, executor);
+        cardGameTaskExecutors.put(roomId, executor);
         executor.submits();
     }
 
@@ -56,34 +59,34 @@ public class CardGameService {
         cardGame.selectCard(player, cardIndex);
         sendCardGameState(roomId);
         if (cardGame.isFinishedThisRound()) {
-            roomTaskExecutors.get(roomId).cancelPlaying();
+            cardGameTaskExecutors.get(roomId).cancelPlaying();
         }
     }
 
-    private RoomTask play(Long roomId) {
+    private CardGameTask play(Long roomId) {
         CardGame cardGame = cardGameQueryService.getCardGame(roomId);
-        return new RoomTask(CardGameState.PLAYING, cardGame::startRound, () -> {
+        return new CardGameTask(CardGameState.PLAYING, cardGame::startRound, () -> {
             postTask(roomId);
             cardGame.assignRandomCardsToUnselectedPlayers();
         });
     }
 
-    private RoomTask scoreBoard(Long roomId) {
-        return new RoomTask(CardGameState.SCORE_BOARD, () -> {
+    private CardGameTask scoreBoard(Long roomId) {
+        return new CardGameTask(CardGameState.SCORE_BOARD, () -> {
             CardGame cardGame = cardGameQueryService.getCardGame(roomId);
             cardGame.changeScoreBoardState();
         }, postTask(roomId));
     }
 
-    private RoomTask loading(Long roomId) {
-        return new RoomTask(CardGameState.LOADING, () -> {
+    private CardGameTask loading(Long roomId) {
+        return new CardGameTask(CardGameState.LOADING, () -> {
             CardGame cardGame = cardGameQueryService.getCardGame(roomId);
             cardGame.changeLoadingState();
         }, postTask(roomId));
     }
 
-    private RoomTask done(Long roomId) {
-        return new RoomTask(CardGameState.DONE, () -> sendCardGameResult(roomId), () -> {});
+    private CardGameTask done(Long roomId) {
+        return new CardGameTask(CardGameState.DONE, () -> sendCardGameResult(roomId), () -> {});
     }
 
     private Runnable postTask(Long roomId) {
