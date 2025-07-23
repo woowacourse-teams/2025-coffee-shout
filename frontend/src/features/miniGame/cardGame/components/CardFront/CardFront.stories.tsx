@@ -17,7 +17,6 @@ type Story = StoryObj<typeof CardFront>;
 export const Small: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
     card: { type: 'ADDITION', value: 10 },
   },
 };
@@ -25,7 +24,6 @@ export const Small: Story = {
 export const Medium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
     card: { type: 'MULTIPLIER', value: -1 },
   },
 };
@@ -33,7 +31,6 @@ export const Medium: Story = {
 export const Large: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
     card: { type: 'ADDITION', value: 0 },
   },
 };
@@ -41,7 +38,6 @@ export const Large: Story = {
 export const WithPlayerSmall: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
@@ -53,7 +49,6 @@ export const WithPlayerSmall: Story = {
 export const WithPlayerMedium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
@@ -65,7 +60,6 @@ export const WithPlayerMedium: Story = {
 export const WithPlayerLarge: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
     player: {
       name: '홍길동전',
       iconColor: 'red',
@@ -77,7 +71,6 @@ export const WithPlayerLarge: Story = {
 export const LongName: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
     player: {
       name: '매우매우매우매우매우긴이름입니다람쥐 ',
       iconColor: 'red',
@@ -105,7 +98,6 @@ export const Grid: Story = {
         {Array.from({ length: 9 }, (_, index) => (
           <CardFront
             key={index}
-            onClick={() => {}}
             player={playerMap[index]}
             card={{ type: 'MULTIPLIER', value: -1 }}
           />
