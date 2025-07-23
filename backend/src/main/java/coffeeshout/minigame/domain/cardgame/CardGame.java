@@ -1,5 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import static org.springframework.util.Assert.state;
+
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
@@ -34,18 +36,23 @@ public class CardGame {
 
 
     public void startRound() {
-        this.round = round.next();
         deck.shuffle();
+        this.round = round.next();
         this.state = CardGameState.PLAYING;
     }
 
     public void selectCard(Player player, Integer cardIndex) {
+        state(state == CardGameState.PLAYING, "게임 진행중에만 뽑을 수 있습니다.");
 
         playerHands.put(player, deck.pick(cardIndex));
     }
 
     public Map<Player, CardGameScore> calculateScores() {
         return playerHands.scoreByPlayer();
+    }
+
+    public boolean isFinishedThisRound() {
+        return isFinished(round);
     }
 
     public boolean isFinished(CardGameRound targetRound) {
@@ -76,7 +83,12 @@ public class CardGame {
         return playerHands.findCardOwner(card, round);
     }
 
-    public void changeState(CardGameState state) {
-        this.state = state;
+    public void changeScoreBoardState() {
+        this.state = CardGameState.SCORE_BOARD;
     }
+
+    public void changeLoadingState() {
+        this.state = CardGameState.LOADING;
+    }
+
 }
