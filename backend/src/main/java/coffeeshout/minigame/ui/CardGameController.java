@@ -19,7 +19,7 @@ public class CardGameController {
 
     @MessageMapping("/room/{roomId}/cardGame/start")
     public void startGame(@DestinationVariable Long roomId) {
-        cardGameService.start(roomId);
+        cardGameService.startGame(roomId);
 
         final CardGame cardGame = cardGameService.getCardGame(roomId);
 
@@ -39,8 +39,6 @@ public class CardGameController {
                 "/topic/room/" + roomId + "/gameState",
                 MiniGameStateMessage.from(cardGame)
         );
-
-        cardGameService.checkAndMoveRound(roomId);
     }
 
     @MessageMapping("/room/{roomId}/cardGame/rank")

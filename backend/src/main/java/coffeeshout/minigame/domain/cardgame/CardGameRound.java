@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardGameRound {
-
+    READY,
     FIRST,
     SECOND,
     END,
@@ -17,6 +17,6 @@ public enum CardGameRound {
     }
 
     public int toInteger() {
-        return ordinal() + 1;
+        return ordinal();
     }
 }

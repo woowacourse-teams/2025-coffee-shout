@@ -2,6 +2,8 @@ package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameRound;
+import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
@@ -10,6 +12,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomFinder;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +31,23 @@ public class CardGameService {
     private final RoomTimers roomTimers;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void start(Long roomId) {
+    public void startGame(Long roomId) {
         final Room room = roomFinder.findById(roomId);
         final CardGameDeckGenerator deckGenerator = new CardGameRandomDeckGenerator();
         final CardGame cardGame = new CardGame(
                 deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT),
                 room.getPlayers()
         );
-        cardGame.start();
-        startRoundTimer(roomId, cardGame);
         cardGameRepository.save(roomId, cardGame);
+        startRound(roomId);
+    }
+
+    private void startRound(Long roomId) {
+        CardGame cardGame = cardGameRepository.findByRoomId(roomId).orElseThrow(() -> new NoSuchElementException(
+                "해당 룸에는 카드게임이 존재하지 않습니다."));
+        cardGame.startRound();
+        sendCardGameState(cardGame, roomId);
+        roomTimers.start(roomId, () -> roundTimeout(cardGame, roomId), cardGame.getState().getDuration());
     }
 
     public void selectCard(Long roomId, String playerName, Integer cardIndex) {
@@ -45,33 +55,46 @@ public class CardGameService {
                 .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
         final Player player = cardGame.findPlayerByName(playerName);
         cardGame.selectCard(player, cardIndex);
+        sendCardGameState(cardGame, roomId);
+
+        if (cardGame.isFinished(CardGameRound.FIRST)) {
+            changeScoreBoard(roomId, cardGame);
+        }
+        if (cardGame.isFinished(CardGameRound.SECOND)) {
+            changeScoreBoard(roomId, cardGame);
+        }
     }
 
-    public void checkAndMoveRound(Long roomId) {
-//        final CardGame cardGame = cardGameRepository.findByRoomId(roomId)
-//                .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
-//
-//        if (cardGame.isFinished(CardGameRound.FIRST)) {
-//            state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
-//            cardGame.nextRound();
-//            sendCardGameState(cardGame, roomId);
-//            cardGame.initGame();
-//            if (timers.containsKey(roomId)) {
-//                timers.get(roomId).cancel(true);
-//                timers.put(roomId, createTimer(cardGame, roomId));
-//            }
-//        }
-//
-//        if (cardGame.isFinished(CardGameRound.SECOND)) {
-//            state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
-//            cardGame.nextRound();
-//            sendCardGameResult(cardGame, roomId);
-//            if (timers.containsKey(roomId)) {
-//                timers.get(roomId).cancel(true);
-//                timers.remove(roomId);
-//            }
-//            // TODO: Room으로 결과 이벤트 전달
-//        }
+    private void changeScoreBoard(Long roomId, CardGame cardGame) {
+        cancelTimer(roomId);
+        cardGame.changeState(CardGameState.SCORE_BOARD);
+        sendCardGameState(cardGame, roomId);
+        sendCardGameResult(cardGame, roomId);
+        roomTimers.start(
+                roomId, () -> {
+                    if (cardGame.isSecondRound()) {
+                        // TODO 룸으로 이벤트 발행
+                        return;
+                    }
+                    changeLoading(roomId, cardGame);
+                }, cardGame.getState().getDuration()
+        );
+    }
+
+    private void changeLoading(Long roomId, CardGame cardGame) {
+        cardGame.changeState(CardGameState.LOADING);
+        sendCardGameState(cardGame, roomId);
+        roomTimers.start(roomId, () -> startRound(roomId), cardGame.getState().getDuration());
+    }
+
+    private void roundTimeout(CardGame cardGame, Long roomId) {
+        cardGame.assignRandomCardsToUnselectedPlayers();
+        sendCardGameState(cardGame, roomId);
+        changeScoreBoard(roomId, cardGame);
+    }
+
+    private void cancelTimer(Long roomId) {
+        roomTimers.cancel(roomId);
     }
 
     public MiniGameResult getMiniGameResult(Long roomId) {
@@ -85,12 +108,6 @@ public class CardGameService {
                 .orElseThrow(() -> new NoSuchElementException("해당 룸에는 카드게임이 존재하지 않습니다."));
     }
 
-    private void roundTimeout(CardGame cardGame, Long roomId) {
-        cardGame.assignRandomCardsToUnselectedPlayers();
-        sendCardGameState(cardGame, roomId);
-        checkAndMoveRound(roomId);
-    }
-
     private void sendCardGameState(CardGame cardGame, Long roomId) {
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
         String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, roomId);
@@ -101,9 +118,5 @@ public class CardGameService {
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
         String destination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, roomId);
         messagingTemplate.convertAndSend(destination, message);
-    }
-
-    private void startRoundTimer(Long roomId, CardGame cardGame) {
-        roomTimers.start(roomId, () -> roundTimeout(cardGame, roomId), 10000);
     }
 }

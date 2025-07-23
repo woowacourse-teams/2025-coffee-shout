@@ -8,7 +8,8 @@ import java.util.Optional;
 import lombok.NonNull;
 
 public record MiniGameStateMessage(
-        int currentRound,
+        String cardGameState,
+        String currentRound,
         List<CardInfoMessage> cardInfoMessages,
         Boolean allSelected
 ) {
@@ -39,7 +40,8 @@ public record MiniGameStateMessage(
 
     public static MiniGameStateMessage from(@NonNull CardGame cardGame) {
         return new MiniGameStateMessage(
-                cardGame.getRound().toInteger(),
+                cardGame.getState().name(),
+                cardGame.getRound().name(),
                 CardInfoMessage.from(cardGame),
                 cardGame.getPlayerHands().isRoundFinished()
         );

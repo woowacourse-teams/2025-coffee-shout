@@ -4,7 +4,6 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.Playable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,11 +11,12 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class CardGame implements Playable {
+public class CardGame {
 
     private final PlayerHands playerHands;
     private final Deck deck;
     private CardGameRound round;
+    private CardGameState state;
 
     public CardGame(
             @NonNull Deck deck,
@@ -24,28 +24,23 @@ public class CardGame implements Playable {
     ) {
         this.playerHands = new PlayerHands(players);
         this.deck = deck;
-        this.round = CardGameRound.FIRST;
+        this.round = CardGameRound.READY;
+        this.state = CardGameState.READY;
     }
 
-    @Override
-    public void start() {
-        initGame();
-    }
-
-    @Override
     public MiniGameResult getResult() {
         return MiniGameResult.from(calculateScores());
     }
 
-    public void nextRound() {
-        this.round = round.next();
-    }
 
-    public void initGame() {
+    public void startRound() {
+        this.round = round.next();
         deck.shuffle();
+        this.state = CardGameState.PLAYING;
     }
 
     public void selectCard(Player player, Integer cardIndex) {
+
         playerHands.put(player, deck.pick(cardIndex));
     }
 
@@ -69,7 +64,7 @@ public class CardGame implements Playable {
         return round == CardGameRound.SECOND;
     }
 
-    public void assignRandomCardsToUnselectedPlayers(){
+    public void assignRandomCardsToUnselectedPlayers() {
         List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
@@ -79,5 +74,9 @@ public class CardGame implements Playable {
 
     public Optional<Player> findCardOwnerInCurrentRound(Card card) {
         return playerHands.findCardOwner(card, round);
+    }
+
+    public void changeState(CardGameState state) {
+        this.state = state;
     }
 }

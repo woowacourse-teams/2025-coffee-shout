@@ -28,7 +28,7 @@ class CardGameTest {
         players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
         cardGame = new CardGameFake(deckGenerator.generate(additionCardCount, multiplierCardCount), players);
 
-        cardGame.start();
+        cardGame.startRound();
     }
 
     @Test
@@ -49,7 +49,7 @@ class CardGameTest {
 
         // when
         assertThat(cardGame.getRound()).isEqualTo(CardGameRound.FIRST);
-        cardGame.nextRound();
+        cardGame.startRound();
 
         // then
         assertThat(cardGame.getRound()).isEqualTo(CardGameRound.SECOND);
@@ -94,7 +94,7 @@ class CardGameTest {
         cardGame.selectCard(players.get(1), 1);
         cardGame.selectCard(players.get(2), 2);
         cardGame.selectCard(players.get(3), 3);
-        cardGame.nextRound();
+        cardGame.startRound();
         cardGame.selectCard(players.get(0), 4);
         cardGame.selectCard(players.get(1), 5);
         cardGame.selectCard(players.get(2), 6);

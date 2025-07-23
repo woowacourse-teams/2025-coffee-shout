@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.fixture;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -83,7 +83,7 @@ public abstract class WebSocketIntegrationTestSupport {
             queue.add(message);
         }
 
-        protected T get() {
+        public T get() {
             return get(DEFAULT_RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
 

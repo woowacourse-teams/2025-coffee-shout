@@ -1,6 +1,9 @@
 package coffeeshout.minigame.ui;
 
+import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.ui.MiniGameRanksMessage.MiniGameRankMessage;
+import coffeeshout.minigame.ui.MiniGameStateMessage.CardInfoMessage;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +29,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage result = responses.get();
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(result.currentRound()).isEqualTo(1);
+            softly.assertThat(result.currentRound()).isEqualTo(CardGameRound.FIRST.name());
             softly.assertThat(result.cardInfoMessages()).hasSize(9);
             softly.assertThat(result.allSelected()).isFalse();
         });
@@ -58,8 +61,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage result = responses.get();
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(result.currentRound()).isEqualTo(1);
-            softly.assertThat(result.cardInfoMessages().get(0).playerName()).isEqualTo("꾹이");
+            softly.assertThat(result.currentRound()).isEqualTo(CardGameRound.FIRST.name());
+            softly.assertThat(result.cardInfoMessages()).extracting(CardInfoMessage::playerName)
+                    .contains(playerName);
             softly.assertThat(result.allSelected()).isFalse();
         });
     }

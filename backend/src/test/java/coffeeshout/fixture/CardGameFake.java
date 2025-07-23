@@ -12,7 +12,4 @@ public class CardGameFake extends CardGame {
         super(deck, players);
     }
 
-    @Override
-    public void start() {
-    }
 }
