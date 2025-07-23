@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import org.hibernate.annotations.DialectOverride.Version;
 
 @Getter
 public class CardGame implements Playable {
