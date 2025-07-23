@@ -29,16 +29,20 @@ public class CardHand {
         hand.forEach(consumer);
     }
 
-    public Card getCard(int index){
+    public Card getCard(int index) {
         return hand.get(index);
     }
 
-    public boolean isSelected(CardGameRound round){
+    public boolean isSelected(CardGameRound round) {
         return round.toInteger() == hand.size();
     }
 
     public boolean isAssign(Card card, CardGameRound round) {
-        return hand.get(round.toInteger()).equals(card);
+        if (round.toInteger() > hand.size()) {
+            return false;
+        }
+
+        return hand.get(round.toInteger() - 1).equals(card);
     }
 }
 

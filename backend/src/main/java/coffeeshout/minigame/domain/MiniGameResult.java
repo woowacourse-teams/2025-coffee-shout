@@ -45,7 +45,7 @@ public class MiniGameResult {
         CardGameScore prevScore = CardGameScore.INF;
         for (CardGameScore score : sortedScores) {
             count++;
-            if (isNotTieScore(score, prevScore)) {
+            if (!isTieScore(score, prevScore)) {
                 rank = count;
                 prevScore = score;
             }
@@ -54,7 +54,7 @@ public class MiniGameResult {
         return ranks;
     }
 
-    private static boolean isNotTieScore(CardGameScore score, CardGameScore prevScore) {
-        return score != prevScore;
+    private static boolean isTieScore(CardGameScore score, CardGameScore prevScore) {
+        return score.equals(prevScore);
     }
 }

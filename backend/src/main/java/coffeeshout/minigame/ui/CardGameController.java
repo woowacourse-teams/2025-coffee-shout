@@ -23,8 +23,10 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
-                MiniGameStateMessage.from(cardGame));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId + "/gameState",
+                MiniGameStateMessage.from(cardGame)
+        );
     }
 
     @MessageMapping("/room/{roomId}/cardGame/select")
@@ -33,17 +35,21 @@ public class CardGameController {
 
         final CardGame cardGame = cardGameService.getCardGame(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/gameState",
-                MiniGameStateMessage.from(cardGame));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId + "/gameState",
+                MiniGameStateMessage.from(cardGame)
+        );
 
         cardGameService.checkAndMoveRound(roomId);
     }
 
-    @MessageMapping("/room/{roomid}/cardGame/rank")
+    @MessageMapping("/room/{roomId}/cardGame/rank")
     public void getRank(@DestinationVariable Long roomId) {
         final MiniGameResult miniGameResult = cardGameService.getMiniGameResult(roomId);
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/  ",
-                coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId + "/rank",
+                coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult)
+        );
     }
 }
