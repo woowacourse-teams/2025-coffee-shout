@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.PlayersFixture;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.player.domain.Player;
 import java.util.List;
@@ -64,11 +65,11 @@ class CardGameTest {
         cardGame.selectCard(player2, 3);
 
         // when
-        Map<Player, CardGameScore> scores = cardGame.calculateScores();
+        Map<Player, MiniGameScore> scores = cardGame.calculateScores();
 
         // then
-        assertThat(scores.get(player1).getResult()).isEqualTo(70);
-        assertThat(scores.get(player2).getResult()).isEqualTo(30);
+        assertThat(scores.get(player1).getValue()).isEqualTo(70);
+        assertThat(scores.get(player2).getValue()).isEqualTo(30);
     }
 
     @Test

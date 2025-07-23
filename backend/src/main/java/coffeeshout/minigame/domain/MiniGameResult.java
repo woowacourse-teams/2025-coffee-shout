@@ -28,23 +28,23 @@ public class MiniGameResult {
         return rank.get(player);
     }
 
-    public static MiniGameResult from(@NonNull Map<Player, CardGameScore> playerScores) {
-        List<CardGameScore> sortedScores = playerScores.values().stream()
+    public static MiniGameResult from(@NonNull Map<Player, MiniGameScore> playerScores) {
+        List<MiniGameScore> sortedScores = playerScores.values().stream()
                 .sorted(Comparator.reverseOrder())
                 .toList();
-        Map<CardGameScore, Integer> ranks = calculateRank(sortedScores);
+        Map<MiniGameScore, Integer> ranks = calculateRank(sortedScores);
         return new MiniGameResult(playerScores.entrySet().stream().collect(Collectors.toMap(
                 Entry::getKey,
                 entry -> ranks.get(entry.getValue())
         )));
     }
 
-    private static Map<CardGameScore, Integer> calculateRank(List<CardGameScore> sortedScores) {
-        Map<CardGameScore, Integer> ranks = new HashMap<>();
+    private static Map<MiniGameScore, Integer> calculateRank(List<MiniGameScore> sortedScores) {
+        Map<MiniGameScore, Integer> ranks = new HashMap<>();
         int rank = 1;
         int count = 0;
-        CardGameScore prevScore = CardGameScore.INF;
-        for (CardGameScore score : sortedScores) {
+        MiniGameScore prevScore = CardGameScore.INF;
+        for (MiniGameScore score : sortedScores) {
             count++;
             if (!isTieScore(score, prevScore)) {
                 rank = count;
@@ -55,7 +55,7 @@ public class MiniGameResult {
         return ranks;
     }
 
-    private static boolean isTieScore(CardGameScore score, CardGameScore prevScore) {
+    private static boolean isTieScore(MiniGameScore score, MiniGameScore prevScore) {
         return score.equals(prevScore);
     }
 }

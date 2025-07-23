@@ -1,6 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
@@ -48,7 +49,7 @@ public class CardGame {
         playerHands.put(player, deck.pick(cardIndex));
     }
 
-    public Map<Player, CardGameScore> calculateScores() {
+    public Map<Player, MiniGameScore> calculateScores() {
         return playerHands.scoreByPlayer();
     }
 

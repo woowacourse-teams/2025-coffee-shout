@@ -1,5 +1,6 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.player.domain.Player;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class PlayerHands {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
-    public Map<Player, CardGameScore> scoreByPlayer() {
+    public Map<Player, MiniGameScore> scoreByPlayer() {
         return playerHands.entrySet().stream().collect(Collectors.toMap(
                 Entry::getKey,
                 entry -> entry.getValue().calculateCardGameScore()

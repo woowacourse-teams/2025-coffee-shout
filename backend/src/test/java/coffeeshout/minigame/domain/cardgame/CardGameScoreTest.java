@@ -37,6 +37,6 @@ class CardGameScoreTest {
         CardGameScore cardGameScore = new CardGameScore(cardHand);
 
         // then
-        assertThat(cardGameScore.getResult()).isEqualTo(20);
+        assertThat(cardGameScore.getValue()).isEqualTo(20);
     }
 }

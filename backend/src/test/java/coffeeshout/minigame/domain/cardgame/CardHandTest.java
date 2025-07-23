@@ -22,7 +22,7 @@ class CardHandTest {
 
         // then
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(cardGameScore.getResult()).isEqualTo(-80);
+            softly.assertThat(cardGameScore.getValue()).isEqualTo(-80);
             softly.assertThat(cardHand.size()).isEqualTo(3);
         });
     }

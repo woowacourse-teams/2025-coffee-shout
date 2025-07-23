@@ -17,7 +17,7 @@ class MiniGameResultTest {
     @Test
     void 순위_목록을_반환한다() {
         // given
-        Map<Player, CardGameScore> playerScores = Map.of(
+        Map<Player, MiniGameScore> playerScores = Map.of(
                 게스트_엠제이, new CardGameScore(80),
                 호스트_한스, new CardGameScore(40),
                 게스트_루키, new CardGameScore(10),
@@ -46,7 +46,7 @@ class MiniGameResultTest {
     @Test
     void 해당_플레이어의_순위를_반환한다() {
         // given
-        Map<Player, CardGameScore> playerScores = Map.of(
+        Map<Player, MiniGameScore> playerScores = Map.of(
                 게스트_엠제이, new CardGameScore(80),
                 호스트_한스, new CardGameScore(40),
                 게스트_루키, new CardGameScore(10),
