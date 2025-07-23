@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
 const meta = {
-  title: '@composition/MiniGameTransition',
+  title: 'composition/MiniGameTransition',
   component: MiniGameTransition,
   parameters: {
     layout: 'centered',
