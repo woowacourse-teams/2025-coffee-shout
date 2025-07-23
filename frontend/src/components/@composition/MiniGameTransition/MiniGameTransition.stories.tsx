@@ -1,28 +1,45 @@
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import MiniGameTransition from './MiniGameTransition';
 import CardsStackIcon from '@/assets/card-stack-icon.svg';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
-export default {
+const meta = {
   title: '@composition/MiniGameTransition',
   component: MiniGameTransition,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+} satisfies Meta<typeof MiniGameTransition>;
+
+export default meta;
+
+type Story = StoryObj<typeof MiniGameTransition>;
+
+export const Default: Story = {
+  args: {
+    round: 2,
+    children: <img src={CardsStackIcon} alt="cards" />,
+  },
+  render: (args) => (
+    <RootContainer>
+      <MiniGameTransition {...args} />
+    </RootContainer>
+  ),
 };
 
-export const Default = () => (
-  <RootContainer>
-    <MiniGameTransition round={2}>
-      <img src={CardsStackIcon} alt="cards" />
-    </MiniGameTransition>
-  </RootContainer>
-);
-
-export const Animated = () => (
-  <AnimatedContainer>
-    <MiniGameTransition round={2}>
-      <img src={CardsStackIcon} alt="cards" />
-    </MiniGameTransition>
-  </AnimatedContainer>
-);
+export const Animated: Story = {
+  args: {
+    round: 2,
+    children: <img src={CardsStackIcon} alt="cards" />,
+  },
+  render: (args) => (
+    <AnimatedContainer>
+      <MiniGameTransition {...args} />
+    </AnimatedContainer>
+  ),
+};
 
 const RootContainer = styled.div`
   max-width: 430px;
