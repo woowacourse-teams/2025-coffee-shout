@@ -19,7 +19,7 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
-  const isSignInversionCard = card.type === 'multiplier' && card.value === -1;
+  const isSignInversionCard = card.type === 'MULTIPLIER' && card.value === -1;
 
   return (
     <S.Container $size={size} onClick={onClick} {...rest}>
@@ -50,7 +50,7 @@ export default CardFront;
 
 const getCardText = (card: Card) => {
   const { type, value } = card;
-  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
+  if (type === 'ADDITION') return value >= 0 ? `+${value}` : `${value}`;
   else return value === -1 ? null : `x${value}`;
 };
 

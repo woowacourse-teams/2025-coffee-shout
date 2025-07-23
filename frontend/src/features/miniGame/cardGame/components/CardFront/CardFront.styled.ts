@@ -20,10 +20,10 @@ const getCardTextColor = ($card?: Card) => {
   const { type, value } = $card;
 
   switch (type) {
-    case 'addition':
+    case 'ADDITION':
       return value >= 0 ? CARD_TEXT_COLORS.POSITIVE : CARD_TEXT_COLORS.NEGATIVE;
 
-    case 'multiplier':
+    case 'MULTIPLIER':
       return CARD_TEXT_COLORS.MULTIPLIER;
 
     default:
