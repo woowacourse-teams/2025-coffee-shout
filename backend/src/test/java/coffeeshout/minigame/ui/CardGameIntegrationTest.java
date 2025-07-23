@@ -1,29 +1,35 @@
 package coffeeshout.minigame.ui;
 
+import coffeeshout.fixture.TestStompSession;
+import coffeeshout.fixture.TestStompSession.MessageCollector;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.ui.MiniGameRanksMessage.MiniGameRankMessage;
 import coffeeshout.minigame.ui.MiniGameStateMessage.CardInfoMessage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
     @Test
-    void 카드_게임을_시작한다() {
+    void 카드_게임을_시작한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
+        TestStompSession session = createSession();
+
         Long roomId = 1L;
 
         String subscribeUrlFormat = "/topic/room/%d/gameState";
         String requestUrlFormat = "/app/room/%d/cardGame/start";
 
-        MessageCollector<MiniGameStateMessage> responses = subscribe(
+        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
                 String.format(subscribeUrlFormat, roomId),
                 MiniGameStateMessage.class
         );
 
         // when
-        send(String.format(requestUrlFormat, roomId), "");
+        session.send(String.format(requestUrlFormat, roomId), "");
 
         // then
         MiniGameStateMessage result = responses.get();
@@ -36,8 +42,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 카드를_선택한다() {
+    void 카드를_선택한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
+        TestStompSession session = createSession();
+
         카드_게임을_시작한다();
         Long roomId = 1L;
 
@@ -49,13 +57,13 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         CardGameSelectMessage request = new CardGameSelectMessage(playerName, cardIndex);
 
-        MessageCollector<MiniGameStateMessage> responses = subscribe(
+        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
                 String.format(subscribeUrlFormat, roomId),
                 MiniGameStateMessage.class
         );
 
         // when
-        send(String.format(requestUrlFormat, roomId), request);
+        session.send(String.format(requestUrlFormat, roomId), request);
 
         // then
         MiniGameStateMessage result = responses.get();
@@ -69,8 +77,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 카드_게임의_결과를_조회한다() {
+    void 카드_게임의_결과를_조회한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
+        TestStompSession session = createSession();
+
         카드_게임을_시작한다();
 
         Long roomId = 1L;
@@ -78,13 +88,13 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         String subscribeUrlFormat = "/topic/room/%d/rank";
         String requestUrlFormat = "/app/room/%d/cardGame/rank";
 
-        MessageCollector<MiniGameRanksMessage> responses = subscribe(
+        MessageCollector<MiniGameRanksMessage> responses = session.subscribe(
                 String.format(subscribeUrlFormat, roomId),
                 MiniGameRanksMessage.class
         );
 
         // when
-        send(String.format(requestUrlFormat, roomId), "");
+        session.send(String.format(requestUrlFormat, roomId), "");
 
         // then
         MiniGameRanksMessage result = responses.get();
