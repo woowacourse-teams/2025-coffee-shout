@@ -16,8 +16,8 @@ public class RoomTaskExecutor {
             try {
                 task.run();
                 log.info(state.name());
-                postTask.run();
                 Thread.sleep(state.getDuration());
+                postTask.run();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

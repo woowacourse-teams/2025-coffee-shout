@@ -14,8 +14,6 @@ public class Deck {
 
     private final List<Card> cards;
     private final List<Card> pickedCards;
-    // 어떤 플레이어가 뽑았는지 저장
-    // Map<Card, Player>
 
     public Deck(@NonNull List<Card> additionCards, @NonNull List<Card> multiplierCards) {
         this.cards = new ArrayList<>();
@@ -24,7 +22,7 @@ public class Deck {
         this.cards.addAll(multiplierCards);
     }
 
-    public  void shuffle() {
+    public void shuffle() {
         Collections.shuffle(cards);
     }
 

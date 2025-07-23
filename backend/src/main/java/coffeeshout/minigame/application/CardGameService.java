@@ -61,10 +61,11 @@ public class CardGameService {
     }
 
     private RoomTask play(Long roomId) {
-        return new RoomTask(CardGameState.PLAYING, () -> {
-            CardGame cardGame = cardGameQueryService.getCardGame(roomId);
-            cardGame.startRound();
-        }, postTask(roomId));
+        CardGame cardGame = cardGameQueryService.getCardGame(roomId);
+        return new RoomTask(CardGameState.PLAYING, cardGame::startRound, () -> {
+            postTask(roomId);
+            cardGame.assignRandomCardsToUnselectedPlayers();
+        });
     }
 
     private RoomTask scoreBoard(Long roomId) {
