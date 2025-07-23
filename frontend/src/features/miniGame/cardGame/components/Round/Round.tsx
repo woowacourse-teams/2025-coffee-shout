@@ -34,20 +34,32 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => 
           </S.CircularProgressWrapper>
         </S.TitleContainer>
         <S.MyCardContainer>
-          {selectedCardInfo[round].index !== -1 ? (
+          {selectedCardInfo[1].index !== -1 ? (
             <CardFront
               size="medium"
               card={
                 {
-                  type: selectedCardInfo[round].type as CardType,
-                  value: selectedCardInfo[round].value as CardValue,
+                  type: selectedCardInfo[1].type as CardType,
+                  value: selectedCardInfo[1].value as CardValue,
                 } as Card
               }
             />
           ) : (
             <CardBack size="medium" />
           )}
-          <CardBack size="medium" />
+          {selectedCardInfo[2].index !== -1 ? (
+            <CardFront
+              size="medium"
+              card={
+                {
+                  type: selectedCardInfo[2].type as CardType,
+                  value: selectedCardInfo[2].value as CardValue,
+                } as Card
+              }
+            />
+          ) : (
+            <CardBack size="medium" />
+          )}
         </S.MyCardContainer>
         <S.CardContainer>
           {mockCardInfoMessages.map((_, index) => {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Round from '../components/Round/Round';
 import { RoundKey } from '@/types/round';
 import { useNavigate, useParams } from 'react-router-dom';
+import MiniGameTransition from '@/components/@composition/MiniGameTransition/MiniGameTransition';
 
 // TODO: 게임 종류에 따라서 분기처리 되도록 수정 (이전 페이지에서 입력된 미니게임 종류를 토대로 화면이 바뀌어야 함 - 미니게임 종류에 대하여 Context로 관리 필요)
 // TODO: 라운드가 총 2개이므로 2개의 라운드에 맞춰 이동 루트 추가
@@ -23,6 +24,7 @@ const CardGamePlayPage = () => {
   const navigate = useNavigate();
   const { roomId, miniGameId } = useParams();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
+  const [isTransition, setIsTransition] = useState(false);
   const [currentRound, setCurrentRound] = useState<RoundKey>(1);
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
@@ -49,9 +51,13 @@ const CardGamePlayPage = () => {
       }));
 
       setTimeout(() => {
+        setIsTransition(true);
+      }, 2000);
+
+      setTimeout(() => {
+        setIsTransition(false);
         setCurrentRound(2);
-        navigate(`/room/${roomId}/${miniGameId}/result`);
-      }, 3000);
+      }, 4000);
 
       return;
     }
@@ -65,6 +71,10 @@ const CardGamePlayPage = () => {
           value: mockCardInfoMessages[cardIndex].value,
         },
       }));
+
+      setTimeout(() => {
+        navigate(`/room/${roomId}/${miniGameId}/result`);
+      }, 2000);
     }
   };
 
@@ -77,7 +87,9 @@ const CardGamePlayPage = () => {
     }
   }, [currentTime, navigate, roomId, miniGameId]);
 
-  return (
+  return isTransition ? (
+    <MiniGameTransition prevRound={currentRound} />
+  ) : (
     <Round
       key={currentRound}
       round={currentRound}
