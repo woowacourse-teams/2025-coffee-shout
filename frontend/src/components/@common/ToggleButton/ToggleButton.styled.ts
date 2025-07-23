@@ -13,6 +13,7 @@ export const Container = styled.div`
   padding: 4px;
   border-radius: 20px;
   cursor: pointer;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.15);
 `;
 
 export const Track = styled.div`
