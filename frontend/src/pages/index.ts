@@ -3,7 +3,7 @@ export { default as EntryNamePage } from '../features/entry/pages/EntryNamePage/
 export { default as HomePage } from '../features/home/pages/HomePage';
 export { default as LobbyPage } from '../features/room/pages/LobbyPage/LobbyPage';
 export { default as MiniGamePlayPage } from '../features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage';
-export { default as MiniGameReadyPage } from '../features/miniGame/pages/MiniGameReadyPage';
+export { default as MiniGameReadyPage } from '../features/miniGame/pages/MiniGameReady/MiniGameReadyPage';
 export { default as MiniGameResultPage } from '../features/miniGame/pages/MiniGameResultPage/MiniGameResultPage';
 export { default as NotFoundPage } from '../features/notFound/NotFoundPage/NotFoundPage';
 export { default as OrderPage } from '../features/room/pages/OrderPage/OrderPage';
