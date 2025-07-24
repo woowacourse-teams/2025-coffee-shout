@@ -12,13 +12,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MiniGameQueryService {
 
-
-
-
-    public Playable getCardGame(List<Player> players){
+    public Playable getCardGame(List<Player> players) {
         return new CardGame(players, new CardGameRandomDeckGenerator());
 
     }
-
 
 }
