@@ -23,7 +23,7 @@ const MiniGameResultPage = () => {
 
   const handleViewRouletteResult = () => {
     if (roomId) {
-      navigate(`/room/${roomId}/roulette`);
+      navigate(`/room/${roomId}/roulette/play`);
     }
   };
 

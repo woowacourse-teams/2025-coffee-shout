@@ -1,5 +1,5 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
-import RouletteWheel from '@/components/@composition/RouletteWheel/RouletteWheel';
+import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import * as S from './RoulettePlaySection.styled';
 
 const RoulettePlaySection = ({ spinning }: { spinning: boolean }) => {
