@@ -67,6 +67,11 @@ class CardGameServiceTest {
             cardGameService.startGame(joinCode);
             CardGame cardGame = cardGameQueryService.getCardGame(joinCode);
 
+            /*
+                READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
+                0~3000      3000~13000      13000~14500      14500~17500    17500~27500     27500~29000     29000~
+             */
+
             Thread.sleep(1000);
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
@@ -78,15 +83,15 @@ class CardGameServiceTest {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(9500);
+            Thread.sleep(8500);
             // 총 13.5초 지남 (LOADING 3초 + PLAYING 10초 + SCORE_BOARD 시작 후 0.5초)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
             });
 
-            Thread.sleep(2000);
-            // 총 15.5초 지남 (+ 1.5초 SCORE_BOARD + 0.5초 LOADING)
+            Thread.sleep(2500);
+            // 총 16.0초 지남 (+ 1.5초 SCORE_BOARD + 0.5초 LOADING)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
@@ -98,8 +103,8 @@ class CardGameServiceTest {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(10000);
-            // 총 29초 지남 (+ 10초 PLAYING)
+            Thread.sleep(9000);
+            // 총 28초 지남 (+ 10초 PLAYING)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(8);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
@@ -110,9 +115,7 @@ class CardGameServiceTest {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DONE);
             });
-
-            Thread.sleep(2000);
-            verify(messagingTemplate, atLeast(5))
+            verify(messagingTemplate, atLeast(6))
                     .convertAndSend(eq("/topic/room/" + joinCode.getValue() + "/gameState"), any(MiniGameStateMessage.class));
         }
     }

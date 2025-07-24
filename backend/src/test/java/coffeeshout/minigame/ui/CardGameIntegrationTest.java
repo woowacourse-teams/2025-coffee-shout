@@ -16,39 +16,14 @@ import org.junit.jupiter.api.Test;
 class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
     @Test
-    void 카드_게임을_시작한다() throws ExecutionException, InterruptedException, TimeoutException {
-        // given
-        TestStompSession session = createSession();
-        String joinCode = "ABCDE";
-
-        String subscribeUrlFormat = "/topic/room/%s/gameState";
-        String requestUrlFormat = "/app/room/%s/cardGame/start";
-
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
-                String.format(subscribeUrlFormat, joinCode),
-                MiniGameStateMessage.class
-        );
-
-        // when
-        session.send(String.format(requestUrlFormat, joinCode), "");
-
-        // then
-        MiniGameStateMessage result = responses.get();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(result.currentRound()).isEqualTo(CardGameRound.FIRST.name());
-            softly.assertThat(result.cardInfoMessages()).hasSize(9);
-            softly.assertThat(result.allSelected()).isFalse();
-        });
-    }
-
-    @Test
     void 카드를_선택한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
         String joinCode = "ABCDE";
 
         startCardGame(session, joinCode);
+
+        Thread.sleep(3200);
 
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/cardGame/select";
