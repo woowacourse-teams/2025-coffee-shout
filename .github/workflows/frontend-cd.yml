@@ -9,7 +9,7 @@ on:
       - "frontend/**" # frontend 변경사항만
 
 env:
-  FE_PROD_PATH: /*
+  FE_PROD_PATH: fe-prod
 
 jobs:
   ci:
