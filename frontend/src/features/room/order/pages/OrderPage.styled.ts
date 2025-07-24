@@ -23,7 +23,7 @@ export const ListHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 `;
 
 export const OrderList = styled.div`
@@ -50,15 +50,19 @@ export const TotalWrapper = styled.div`
 export const DetailGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  height: calc(100% - 5rem);
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const DetailItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
 `;
 
 export const Logo = styled.img`
