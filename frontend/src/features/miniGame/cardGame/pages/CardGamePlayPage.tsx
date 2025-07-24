@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Round from '../components/Round/Round';
 import { RoundKey } from '@/types/round';
 import { useNavigate, useParams } from 'react-router-dom';
-import MiniGameTransition from '@/components/@composition/MiniGameTransition/MiniGameTransition';
+import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
 
 // TODO: 게임 종류에 따라서 분기처리 되도록 수정 (이전 페이지에서 입력된 미니게임 종류를 토대로 화면이 바뀌어야 함 - 미니게임 종류에 대하여 Context로 관리 필요)
 // TODO: 라운드가 총 2개이므로 2개의 라운드에 맞춰 이동 루트 추가
