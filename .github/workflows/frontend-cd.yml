@@ -48,4 +48,4 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
                 --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} \
-                --paths "/${{ env.FE_PROD_PATH }}${{ env.FE_CACHE_PATH }}/*"
+                --paths "/${{ env.FE_PROD_PATH }}${{ env.FE_CACHE_PATH }}"
