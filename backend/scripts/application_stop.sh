@@ -55,38 +55,3 @@ if [ ! -z "$JAVA_PROCESS" ]; then
     echo "   🔫 포트 8080을 사용하는 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
     kill -9 $JAVA_PROCESS 2>/dev/null || true
 fi
-
-# ==========================================
-# 2단계: MySQL 서버 종료 (Docker Compose)
-# ==========================================
-echo ""
-echo "🗄️ 2. MySQL 서버 종료 중..."
-
-if [ -f "compose.yaml" ]; then
-    echo "   📄 compose.yaml을 사용하여 MySQL 서버를 종료합니다"
-
-    # 데이터 안전을 위한 MySQL 정상 종료 대기
-    echo "   💾 MySQL 데이터 정리 대기 중..."
-    if docker-compose -f compose.yaml ps mysql | grep -q "Up"; then
-        # MySQL 컨테이너에 정상 종료 신호
-        docker-compose -f compose.yaml exec mysql mysqladmin -u root -p${MYSQL_ROOT_PASSWORD:-root} shutdown 2>/dev/null || true
-        sleep 3
-    fi
-
-    # Docker Compose 서비스 종료
-    docker-compose -f compose.yaml down --timeout 30
-
-    # MySQL 관련 컨테이너 정리
-    echo "   🧹 MySQL 관련 리소스 정리 중..."
-
-    # 정지된 MySQL 컨테이너 제거
-    STOPPED_CONTAINERS=$(docker ps -a -q --filter "name=mysql" --filter "status=exited" 2>/dev/null || true)
-    if [ ! -z "$STOPPED_CONTAINERS" ]; then
-        docker rm $STOPPED_CONTAINERS 2>/dev/null || true
-        echo "   ✅ 정지된 MySQL 컨테이너 제거 완료"
-    fi
-
-    echo "   ✅ MySQL 서버 종료 완료"
-else
-    echo "   ❌ compose.yaml 파일이 없습니다"
-fi

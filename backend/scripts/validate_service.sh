@@ -5,15 +5,6 @@ echo "=== [VALIDATE_SERVICE] 서비스 상태 검증 ==="
 
 cd /opt/coffee-shout
 
-# 컨테이너 실행 확인
-if ! docker-compose -f compose.yaml ps | grep -q "Up"; then
-    echo "❌ 컨테이너가 실행되지 않습니다!"
-    docker-compose -f compose.yaml logs
-    exit 1
-fi
-
-echo "✅ 컨테이너가 실행 중입니다"
-
 # 헬스체크 (Actuator 없는 환경 대응)
 health_check() {
     local max_attempts=30
@@ -39,10 +30,8 @@ if health_check; then
     echo "🎉 커피빵 게임 서버 배포 완료!"
     echo ""
     echo "=== 서비스 정보 ==="
-    docker-compose -f compose.yaml ps
 else
     echo "💥 헬스체크 실패!"
-    docker-compose -f compose.yaml logs
     exit 1
 fi
 
