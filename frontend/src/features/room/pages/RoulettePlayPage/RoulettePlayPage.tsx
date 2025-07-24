@@ -8,7 +8,7 @@ import Layout from '@/layouts/Layout';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './RoulettePage.styled';
+import * as S from './RoulettePlayPage.styled';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 
 const RoulettePage = () => {
