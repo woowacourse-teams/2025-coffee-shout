@@ -4,12 +4,11 @@ import * as S from './CardBack.styled';
 
 type Props = {
   size?: 'small' | 'medium' | 'large';
-  onClick: () => void;
-} & Omit<ComponentProps<'button'>, 'onClick'>;
+} & ComponentProps<'button'>;
 
-const CardBack = ({ size, onClick, ...rest }: Props) => {
+const CardBack = ({ size, disabled, onClick, ...rest }: Props) => {
   return (
-    <S.Container $size={size} onClick={onClick} {...rest}>
+    <S.Container $size={size} $disabled={disabled} onClick={onClick} {...rest}>
       <S.Circle $size={size}>
         <S.CoffeeIcon src={CoffeeIcon} alt="coffee-icon" />
       </S.Circle>

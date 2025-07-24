@@ -1,7 +1,8 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
+import { IconColor } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
-import { getPlayerIcon, IconColor } from './utils/getPlayerIcon';
+import { getPlayerIcon } from './utils/getPlayerIcon';
 
 type Props = {
   name: string;

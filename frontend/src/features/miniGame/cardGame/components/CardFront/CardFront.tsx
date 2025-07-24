@@ -1,28 +1,19 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
-import { ComponentProps } from 'react';
+import { IconColor } from '@/types/player';
 import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
 
-// TODO: 색상 추가 필요, PlayerCard 부분과 합칠 것
-export type IconColor = 'red';
-
-type Player = {
-  name: string;
-  iconColor: IconColor;
-};
-
 type Props = {
   size?: 'small' | 'medium' | 'large';
-  onClick: () => void;
-  player?: Player;
+  playerIconColor?: IconColor;
   card: Card;
-} & Omit<ComponentProps<'button'>, 'onClick'>;
+};
 
-const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
-  const isSignInversionCard = card.type === 'multiplier' && card.value === -1;
+const CardFront = ({ size, playerIconColor, card }: Props) => {
+  const isSignInversionCard = card.type === 'MULTIPLIER' && card.value === -1;
 
   return (
-    <S.Container $size={size} onClick={onClick} {...rest}>
+    <S.Container $size={size} $playerIconColor={playerIconColor}>
       <S.Circle $size={size}>
         {isSignInversionCard ? (
           <S.CardIcon src={CardIcon} alt="부호 반전" />
@@ -32,16 +23,6 @@ const CardFront = ({ size, onClick, player, card, ...rest }: Props) => {
           </S.CardText>
         )}
       </S.Circle>
-      {player && (
-        <S.Player $size={size}>
-          <S.PlayerIcon
-            src={getPlayerIconSrc(player.iconColor)}
-            alt={`player-${player.name}-icon`}
-            $size={size}
-          />
-          <S.PlayerName $size={size}>{player.name}</S.PlayerName>
-        </S.Player>
-      )}
     </S.Container>
   );
 };
@@ -50,10 +31,6 @@ export default CardFront;
 
 const getCardText = (card: Card) => {
   const { type, value } = card;
-  if (type === 'addition') return value >= 0 ? `+${value}` : `${value}`;
+  if (type === 'ADDITION') return value >= 0 ? `+${value}` : `${value}`;
   else return value === -1 ? null : `x${value}`;
-};
-
-const getPlayerIconSrc = (iconColor: IconColor) => {
-  return `@/assets/profile-${iconColor}.svg`;
 };

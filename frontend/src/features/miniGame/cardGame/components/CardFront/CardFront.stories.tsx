@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import CardFront, { IconColor } from './CardFront';
+import CardFront from './CardFront';
+import { IconColor } from '@/types/player';
+import CardBack from '../CardBack/CardBack';
 
 const meta = {
   title: 'Features/MiniGame/CardGame/CardFront',
@@ -17,81 +19,61 @@ type Story = StoryObj<typeof CardFront>;
 export const Small: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
-    card: { type: 'addition', value: 40 },
+    card: { type: 'ADDITION', value: 10 },
   },
 };
 
 export const Medium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
-    card: { type: 'multiplier', value: -1 },
+    card: { type: 'MULTIPLIER', value: -1 },
   },
 };
 
 export const Large: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
-    card: { type: 'addition', value: 0 },
+    card: { type: 'ADDITION', value: 0 },
   },
 };
 
 export const WithPlayerSmall: Story = {
   args: {
     size: 'small',
-    onClick: () => {},
-    player: {
-      name: '홍길동전',
-      iconColor: 'red',
-    },
-    card: { type: 'multiplier', value: 0 },
+    playerIconColor: 'red',
+    card: { type: 'MULTIPLIER', value: 0 },
   },
 };
 
 export const WithPlayerMedium: Story = {
   args: {
     size: 'medium',
-    onClick: () => {},
-    player: {
-      name: '홍길동전',
-      iconColor: 'red',
-    },
-    card: { type: 'multiplier', value: 2 },
+    playerIconColor: 'red',
+    card: { type: 'MULTIPLIER', value: 2 },
   },
 };
 
 export const WithPlayerLarge: Story = {
   args: {
     size: 'large',
-    onClick: () => {},
-    player: {
-      name: '홍길동전',
-      iconColor: 'red',
-    },
-    card: { type: 'addition', value: -40 },
-  },
-};
-
-export const LongName: Story = {
-  args: {
-    size: 'large',
-    onClick: () => {},
-    player: {
-      name: '매우매우매우매우매우긴이름입니다람쥐 ',
-      iconColor: 'red',
-    },
-    card: { type: 'addition', value: 10 },
+    playerIconColor: 'red',
+    card: { type: 'ADDITION', value: -40 },
   },
 };
 
 export const Grid: Story = {
   render: () => {
-    const playerMap: Record<number, { name: string; iconColor: IconColor }> = {
-      4: { name: '사용자명', iconColor: 'red' },
-      8: { name: '매우긴이름입니다', iconColor: 'red' },
-    };
+    const playerIconColorMap = [
+      'red' as IconColor,
+      'red' as IconColor,
+      undefined,
+      undefined,
+      undefined,
+      'red' as IconColor,
+      undefined,
+      'red' as IconColor,
+      'red' as IconColor,
+    ];
 
     return (
       <div
@@ -102,14 +84,17 @@ export const Grid: Story = {
           placeItems: 'center',
         }}
       >
-        {Array.from({ length: 9 }, (_, index) => (
-          <CardFront
-            key={index}
-            onClick={() => {}}
-            player={playerMap[index]}
-            card={{ type: 'multiplier', value: -1 }}
-          />
-        ))}
+        {Array.from({ length: 9 }, (_, index) =>
+          playerIconColorMap[index] ? (
+            <CardFront
+              key={index}
+              playerIconColor={playerIconColorMap[index]}
+              card={{ type: 'MULTIPLIER', value: -1 }}
+            />
+          ) : (
+            <CardBack key={index} />
+          )
+        )}
       </div>
     );
   },
