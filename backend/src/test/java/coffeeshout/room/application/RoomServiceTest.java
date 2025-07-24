@@ -11,6 +11,7 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,7 +54,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -87,7 +88,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -179,7 +180,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test

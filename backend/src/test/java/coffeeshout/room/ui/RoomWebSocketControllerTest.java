@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.TypeReferenceFrameHandler;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Room;
@@ -64,36 +65,36 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
     void 방_입장_시나리오_getPlayers_요청() throws Exception {
         // given
         String joinCode = testRoom.getJoinCode().value();
-        BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
+        BlockingQueue<WebSocketResponse<List<PlayerResponse>>> responseQueue = new LinkedBlockingQueue<>();
 
         // when - 방 토픽 구독
         session.subscribe("/topic/room/" + joinCode, getHandler(responseQueue,
-                new TypeReference<List<PlayerResponse>>() {
+                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                 }));
 
         // getPlayers 요청 메시지 전송
         session.send("/app/room/" + joinCode + "/players", null);
 
         // then - 플레이어 목록 응답 확인
-        List<PlayerResponse> players = responseQueue.poll(5, TimeUnit.SECONDS);
+        WebSocketResponse<List<PlayerResponse>> players = responseQueue.poll(5, TimeUnit.SECONDS);
 
         assertThat(players).isNotNull();
-        assertThat(players).hasSize(4); // 호스트 + 게스트 3명
+        assertThat(players.data()).hasSize(4); // 호스트 + 게스트 3명
 
         // 호스트 확인
-        PlayerResponse host = players.stream().filter(p -> p.playerName().equals("호스트꾹이")).findFirst()
+        PlayerResponse host = players.data().stream().filter(p -> p.playerName().equals("호스트꾹이")).findFirst()
                 .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
 
         assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
         assertThat(host.menuResponse().image()).isEqualTo("americano.jpg");
 
         // 게스트들 확인
-        List<String> playerNames = players.stream().map(PlayerResponse::playerName).toList();
+        List<String> playerNames = players.data().stream().map(PlayerResponse::playerName).toList();
 
         assertThat(playerNames).containsExactlyInAnyOrder("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
 
         System.out.println("✅ 플레이어 목록 응답 성공:");
-        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
+        players.data().forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
     }
 
     @Test
@@ -103,33 +104,33 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
 
         try {
             String joinCode = testRoom.getJoinCode().value();
-            BlockingQueue<List<PlayerResponse>> queue1 = new LinkedBlockingQueue<>();
-            BlockingQueue<List<PlayerResponse>> queue2 = new LinkedBlockingQueue<>();
+            BlockingQueue<WebSocketResponse<List<PlayerResponse>>> queue1 = new LinkedBlockingQueue<>();
+            BlockingQueue<WebSocketResponse<List<PlayerResponse>>> queue2 = new LinkedBlockingQueue<>();
 
             // when - 두 클라이언트 모두 같은 방 구독
             session.subscribe(
                     "/topic/room/" + joinCode,
-                    getHandler(queue1, new TypeReference<List<PlayerResponse>>() {
+                    getHandler(queue1, new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                     }));
             session2.subscribe(
                     "/topic/room/" + joinCode,
-                    getHandler(queue2, new TypeReference<List<PlayerResponse>>() {
+                    getHandler(queue2, new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                     }));
 
             // 한 클라이언트에서 플레이어 목록 요청
             session.send("/app/room/" + joinCode + "/players", null);
 
             // then - 두 클라이언트 모두 같은 응답 받음
-            List<PlayerResponse> response1 = queue1.poll(5, TimeUnit.SECONDS);
-            List<PlayerResponse> response2 = queue2.poll(5, TimeUnit.SECONDS);
+            WebSocketResponse<List<PlayerResponse>> response1 = queue1.poll(5, TimeUnit.SECONDS);
+            WebSocketResponse<List<PlayerResponse>> response2 = queue2.poll(5, TimeUnit.SECONDS);
 
             assertThat(response1).isNotNull();
             assertThat(response2).isNotNull();
-            assertThat(response1).hasSize(4);
-            assertThat(response2).hasSize(4);
+            assertThat(response1.data()).hasSize(4);
+            assertThat(response2.data()).hasSize(4);
 
             // 두 응답이 동일한지 확인
-            assertThat(response1.get(0).playerName()).isEqualTo(response2.get(0).playerName());
+            assertThat(response1.data().get(0).playerName()).isEqualTo(response2.data().get(0).playerName());
 
             System.out.println("✅ 두 클라이언트 모두 동일한 플레이어 목록 수신 성공");
 
@@ -142,19 +143,19 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
     void 존재하지_않는_방_ID_요청_테스트() throws Exception {
         // given
         String nonExistentJoinCode = "3434X";
-        BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
+        BlockingQueue<WebSocketResponse<List<PlayerResponse>>> responseQueue = new LinkedBlockingQueue<>();
 
         // when
         session.subscribe(
                 "/topic/room/" + nonExistentJoinCode,
-                getHandler(responseQueue, new TypeReference<List<PlayerResponse>>() {
+                getHandler(responseQueue, new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                 }));
 
         try {
             session.send("/app/room/" + nonExistentJoinCode + "/players", null);
 
             // then - 에러가 발생하거나 응답이 없어야 함
-            List<PlayerResponse> response = responseQueue.poll(3, TimeUnit.SECONDS);
+            WebSocketResponse<List<PlayerResponse>> response = responseQueue.poll(3, TimeUnit.SECONDS);
 
             // 실제 구현에 따라 null이거나 예외가 발생할 수 있음
             System.out.println("존재하지 않는 방 요청 응답: " + response);
@@ -171,9 +172,9 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         String 한스 = "플레이어한스";
         Long changedMenuId = 2L;
         String joinCode = testRoom.getJoinCode().value();
-        BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
-        TypeReferenceFrameHandler<List<PlayerResponse>> handler = getHandler(responseQueue,
-                new TypeReference<List<PlayerResponse>>() {
+        BlockingQueue<WebSocketResponse<List<PlayerResponse>>> responseQueue = new LinkedBlockingQueue<>();
+        TypeReferenceFrameHandler<WebSocketResponse<List<PlayerResponse>>> handler = getHandler(responseQueue,
+                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                 });
 
         // when
@@ -182,11 +183,12 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         session.send("/app/room/" + joinCode + "/menus", message);
 
         // then
-        List<PlayerResponse> responses = responseQueue.poll(5, TimeUnit.SECONDS);
+        WebSocketResponse<List<PlayerResponse>> responses = responseQueue.poll(5, TimeUnit.SECONDS);
+        List<PlayerResponse> data = responses.data();
 
-        assertThat(responses).hasSize(4);
+        assertThat(data).hasSize(4);
 
-        Long resultMenuId = responses.stream().filter(p -> p.playerName().equals(한스))
+        Long resultMenuId = responses.data().stream().filter(p -> p.playerName().equals(한스))
                 .findFirst()
                 .get()
                 .menuResponse()
@@ -199,19 +201,19 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         // given
         String joinCode = testRoom.getJoinCode().value();
 
-        BlockingQueue<List<ProbabilityResponse>> responseQueue = new LinkedBlockingQueue<>();
-        TypeReferenceFrameHandler<List<ProbabilityResponse>> handler = getHandler(responseQueue,
-                new TypeReference<List<ProbabilityResponse>>() {
+        BlockingQueue<WebSocketResponse<List<ProbabilityResponse>>> responseQueue = new LinkedBlockingQueue<>();
+        TypeReferenceFrameHandler<WebSocketResponse<List<ProbabilityResponse>>> handler = getHandler(responseQueue,
+                new TypeReference<WebSocketResponse<List<ProbabilityResponse>>>() {
                 });
 
         // when
         session.subscribe("/topic/room/" + joinCode + "/roulette", handler);
         session.send("/app/room/" + joinCode + "/probabilities", null);
 
-        List<ProbabilityResponse> responses = responseQueue.poll(5, TimeUnit.SECONDS);
+        WebSocketResponse<List<ProbabilityResponse>> responses = responseQueue.poll(5, TimeUnit.SECONDS);
 
         // then
-        assertThat(responses)
+        assertThat(responses.data())
                 .hasSize(4)
                 .allSatisfy(response -> assertThat(response.probability()).isEqualTo(25.0));
     }
@@ -221,9 +223,9 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         // given
         String joinCode = testRoom.getJoinCode().value();
 
-        BlockingQueue<List<MiniGameType>> responseQueue = new LinkedBlockingQueue<>();
-        TypeReferenceFrameHandler<List<MiniGameType>> handler = getHandler(responseQueue,
-                new TypeReference<List<MiniGameType>>() {
+        BlockingQueue<WebSocketResponse<List<MiniGameType>>> responseQueue = new LinkedBlockingQueue<>();
+        TypeReferenceFrameHandler<WebSocketResponse<List<MiniGameType>>> handler = getHandler(responseQueue,
+                new TypeReference<WebSocketResponse<List<MiniGameType>>>() {
                 });
 
         // when
@@ -231,11 +233,11 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
         session.send("/app/room/" + joinCode + "/minigames/select", message);
 
-        List<MiniGameType> responses = responseQueue.poll(5, TimeUnit.SECONDS);
+        WebSocketResponse<List<MiniGameType>> responses = responseQueue.poll(5, TimeUnit.SECONDS);
 
         // then
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
+        assertThat(responses.data()).hasSize(1);
+        assertThat(responses.data().get(0)).isEqualTo(MiniGameType.CARD_GAME);
     }
 
     @Test
@@ -243,26 +245,26 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         // given
         String joinCode = testRoom.getJoinCode().value();
 
-        BlockingQueue<List<MiniGameType>> responseQueue = new LinkedBlockingQueue<>();
-        TypeReferenceFrameHandler<List<MiniGameType>> handler = getHandler(responseQueue,
-                new TypeReference<List<MiniGameType>>() {
+        BlockingQueue<WebSocketResponse<List<MiniGameType>>> responseQueue = new LinkedBlockingQueue<>();
+        TypeReferenceFrameHandler<WebSocketResponse<List<MiniGameType>>> handler = getHandler(responseQueue,
+                new TypeReference<WebSocketResponse<List<MiniGameType>>>() {
                 });
 
         session.subscribe("/topic/room/" + joinCode + "/minigame", handler);
         MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
         session.send("/app/room/" + joinCode + "/minigames/select", message);
-        List<MiniGameType> responses = responseQueue.poll(5, TimeUnit.SECONDS);
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
+        WebSocketResponse<List<MiniGameType>> responses = responseQueue.poll(5, TimeUnit.SECONDS);
+        assertThat(responses.data()).hasSize(1);
+        assertThat(responses.data().get(0)).isEqualTo(MiniGameType.CARD_GAME);
 
         // when
         MiniGameSelectMessage message2 = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
         session.send("/app/room/" + joinCode + "/minigames/unselect", message2);
 
-        List<MiniGameType> responses2 = responseQueue.poll(5, TimeUnit.SECONDS);
+        WebSocketResponse<List<MiniGameType>> responses2 = responseQueue.poll(5, TimeUnit.SECONDS);
 
         // then
-        assertThat(responses2).hasSize(0);
+        assertThat(responses2.data()).hasSize(0);
     }
 
     private <T> TypeReferenceFrameHandler<T> getHandler(BlockingQueue<T> responseQueue,
