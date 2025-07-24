@@ -1,7 +1,7 @@
 import LogoMainIcon from '@/assets/logo-main.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
-import useModal from '@/features/ui/Modal/useModal';
+import useModal from '@/components/@common/Modal/useModal';
 import Layout from '@/layouts/Layout';
 import Splash from '../components/Splash/Splash';
 import { useEffect, useState } from 'react';
