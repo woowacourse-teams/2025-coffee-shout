@@ -5,7 +5,7 @@ export { default as LobbyPage } from '../features/room/pages/LobbyPage/LobbyPage
 export { default as MiniGamePlayPage } from '../features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage';
 export { default as MiniGameReadyPage } from '../features/miniGame/pages/MiniGameReady/MiniGameReadyPage';
 export { default as MiniGameResultPage } from '../features/miniGame/pages/MiniGameResultPage/MiniGameResultPage';
-export { default as NotFoundPage } from '../features/notFound/NotFoundPage/NotFoundPage';
+export { default as NotFoundPage } from '../features/notFound/pages/NotFoundPage';
 export { default as OrderPage } from '../features/room/pages/OrderPage/OrderPage';
 export { default as RoulettePage } from '../features/room/pages/RoulettePlayPage/RoulettePlayPage';
 export { default as RouletteResultPage } from '../features/room/pages/RouletteResultPage/RouletteResultPage';
