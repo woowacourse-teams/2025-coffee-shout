@@ -1,13 +1,13 @@
 import Button from '@/components/@common/Button/Button';
-import Headline2 from '@/components/@common/Headline2/Headline2';
-import Layout from '@/layouts/Layout';
-import * as S from './MiniGameResultPage.styled';
-import { useNavigate, useParams } from 'react-router-dom';
 import Description from '@/components/@common/Description/Description';
+import Headline2 from '@/components/@common/Headline2/Headline2';
+import Headline3 from '@/components/@common/Headline3/Headline3';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
-import { IconColor } from '@/components/@composition/PlayerCard/utils/getPlayerIcon';
-import Headline3 from '@/components/@common/Headline3/Headline3';
+import Layout from '@/layouts/Layout';
+import { IconColor } from '@/types/player';
+import { useNavigate, useParams } from 'react-router-dom';
+import * as S from './MiniGameResultPage.styled';
 
 const gameResults = [
   { id: 1, name: '다이앤', score: 20, iconColor: 'red' as IconColor, rank: 1 },
