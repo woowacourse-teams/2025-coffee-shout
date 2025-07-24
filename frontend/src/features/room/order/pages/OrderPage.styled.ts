@@ -52,10 +52,6 @@ export const DetailGrid = styled.div`
   grid-template-columns: 1fr;
   height: calc(100% - 5rem);
   overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
 export const DetailItem = styled.div`

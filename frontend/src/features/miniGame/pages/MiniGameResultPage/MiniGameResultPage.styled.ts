@@ -22,10 +22,6 @@ export const ResultList = styled.div`
   gap: 8px;
   height: 100%;
   overflow: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
 export const PlayerCardWrapper = styled.div<{ isHighlighted?: boolean }>`
