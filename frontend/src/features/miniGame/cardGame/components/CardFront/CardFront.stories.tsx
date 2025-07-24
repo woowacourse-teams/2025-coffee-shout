@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import CardFront from './CardFront';
 import { IconColor } from '@/types/player';
+import CardBack from '../CardBack/CardBack';
 
 const meta = {
   title: 'Features/MiniGame/CardGame/CardFront',
@@ -83,13 +84,17 @@ export const Grid: Story = {
           placeItems: 'center',
         }}
       >
-        {Array.from({ length: 9 }, (_, index) => (
-          <CardFront
-            key={index}
-            playerIconColor={playerIconColorMap[index]}
-            card={{ type: 'MULTIPLIER', value: -1 }}
-          />
-        ))}
+        {Array.from({ length: 9 }, (_, index) =>
+          playerIconColorMap[index] ? (
+            <CardFront
+              key={index}
+              playerIconColor={playerIconColorMap[index]}
+              card={{ type: 'MULTIPLIER', value: -1 }}
+            />
+          ) : (
+            <CardBack key={index} />
+          )
+        )}
       </div>
     );
   },
