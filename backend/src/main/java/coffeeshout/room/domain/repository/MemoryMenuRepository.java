@@ -12,12 +12,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MemoryMenuRepository implements MenuRepository {
 
-    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
-
+    private final AtomicLong idGenerator;
     private final Map<Long, Menu> menus;
 
     public MemoryMenuRepository() {
         this.menus = new ConcurrentHashMap<>();
+        this.idGenerator = new AtomicLong(1);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class MemoryMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        menu.setId(ID_GENERATOR.getAndIncrement());
+        menu.setId(idGenerator.getAndIncrement());
         menus.put(menu.getId(), menu);
         return menus.get(menu.getId());
     }

@@ -169,7 +169,7 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
     void 플레이어들의_메뉴를_가져온다() throws Exception {
         // given
         String 한스 = "플레이어한스";
-        Long changedMenuId = testMenu.getId() + 1;
+        Long changedMenuId = 2L;
         String joinCode = testRoom.getJoinCode().value();
         BlockingQueue<List<PlayerResponse>> responseQueue = new LinkedBlockingQueue<>();
         TypeReferenceFrameHandler<List<PlayerResponse>> handler = getHandler(responseQueue,

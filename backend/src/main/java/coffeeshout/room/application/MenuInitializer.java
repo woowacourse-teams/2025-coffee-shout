@@ -2,7 +2,15 @@ package coffeeshout.room.application;
 
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.service.MenuCommandService;
+import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 @Component
 public class MenuInitializer {
@@ -11,14 +19,30 @@ public class MenuInitializer {
 
     public MenuInitializer(MenuCommandService menuCommandService) {
         this.menuCommandService = menuCommandService;
-        init();
     }
 
-    private void init() {
-        menuCommandService.save(new Menu("아메리카노", "americano.jpg"));
-        menuCommandService.save(new Menu("카페라떼", "latte.jpg"));
-        menuCommandService.save(new Menu("카푸치노", "cappuccino.jpg"));
-        menuCommandService.save(new Menu("에스프레소", "espresso.jpg"));
-        menuCommandService.save(new Menu("프라푸치노", "frappuccino.jpg"));
+    @PostConstruct
+    private void init() throws IOException {
+        Yaml yaml = new Yaml();
+        final InputStream inputStream = new ClassPathResource("data/menu-data.yml").getInputStream();
+        final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
+
+        menuDtos.getMenus().forEach(item ->
+                menuCommandService.save(new Menu(item.getName(), item.getImage()))
+        );
+    }
+
+    @Setter
+    @Getter
+    protected static class MenuDtos {
+        private List<MenuDto> menus;
+    }
+
+    @Setter
+    @Getter
+    protected static class MenuDto {
+        private String name;
+        private String image;
+
     }
 }

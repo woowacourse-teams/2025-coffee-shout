@@ -1,4 +1,4 @@
-package coffeeshout.room.ui;
+package coffeeshout.websocket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
