@@ -1,10 +1,7 @@
 package coffeeshout.room.domain;
 
 import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.repository.RoomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.Join;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +10,7 @@ public class RoomFinder {
 
 //    private final RoomRepository roomRepository;
 
-    public Room findById(Long roomId) {
+    public Room findByJoinCode(JoinCode joinCode) {
         Player player1 = new Player("꾹이");
         Player player2 = new Player("한스");
         Player player3 = new Player("루키");

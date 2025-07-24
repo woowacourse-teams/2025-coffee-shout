@@ -1,13 +1,14 @@
 package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.room.domain.JoinCode;
 import java.util.Optional;
 
 public interface CardGameRepository {
 
-    Optional<CardGame> findByRoomId(Long roomId);
+    Optional<CardGame> findByJoinCode(JoinCode joinCode);
 
-    CardGame save(Long roomId, CardGame cardGame);
+    CardGame save(JoinCode joinCode, CardGame cardGame);
 
-    void delete(Long roomId);
+    void delete(JoinCode joinCode);
 }

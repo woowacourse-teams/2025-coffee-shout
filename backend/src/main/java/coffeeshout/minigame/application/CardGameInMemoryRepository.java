@@ -1,6 +1,7 @@
 package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.room.domain.JoinCode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,20 +10,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CardGameInMemoryRepository implements CardGameRepository {
 
-    Map<Long, CardGame> cardGameMap = new ConcurrentHashMap<>();
+    Map<JoinCode, CardGame> cardGameMap = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<CardGame> findByRoomId(Long roomId) {
-        return Optional.ofNullable(cardGameMap.get(roomId));
+    public Optional<CardGame> findByJoinCode(JoinCode joinCode) {
+        return Optional.ofNullable(cardGameMap.get(joinCode));
     }
 
     @Override
-    public CardGame save(Long roomId, CardGame cardGame) {
-        return cardGameMap.put(roomId, cardGame);
+    public CardGame save(JoinCode joinCode, CardGame cardGame) {
+        return cardGameMap.put(joinCode, cardGame);
     }
 
     @Override
-    public void delete(Long roomId) {
-        cardGameMap.remove(roomId);
+    public void delete(JoinCode joinCode) {
+        cardGameMap.remove(joinCode);
     }
 }

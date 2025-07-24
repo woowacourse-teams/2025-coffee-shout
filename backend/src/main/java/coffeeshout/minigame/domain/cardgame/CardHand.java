@@ -38,7 +38,7 @@ public class CardHand {
     }
 
     public boolean isAssign(Card card, CardGameRound round) {
-        if (round.toInteger() > hand.size()) {
+        if (round == CardGameRound.READY || round.toInteger() > hand.size()) {
             return false;
         }
         return hand.get(round.toInteger() - 1).equals(card);

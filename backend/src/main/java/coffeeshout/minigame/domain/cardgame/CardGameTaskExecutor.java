@@ -9,11 +9,12 @@ import lombok.Getter;
 @Getter
 public class CardGameTaskExecutor {
 
-    public record CardGameTask(CardGameState state, Runnable mainTask, Runnable postTask) {
+    public record CardGameTask(CardGameState state, Runnable mainTask, Runnable messageTask, Runnable postTask) {
 
         public void run() {
             try {
                 mainTask.run();
+                messageTask.run();
                 Thread.sleep(state.getDuration());
                 postTask.run();
             } catch (InterruptedException e) {

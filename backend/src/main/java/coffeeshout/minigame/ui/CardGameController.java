@@ -4,6 +4,7 @@ import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.room.domain.JoinCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,28 +20,30 @@ public class CardGameController {
     private final CardGameService cardGameService;
     private final CardGameQueryService cardGameQueryService;
 
-    @MessageMapping("/room/{roomId}/cardGame/start")
-    public void startGame(@DestinationVariable Long roomId) {
-        cardGameService.startGame(roomId);
+    @MessageMapping("/room/{joinCode}/cardGame/start")
+    public void startGame(@DestinationVariable String joinCode) {
+        cardGameService.startGame(new JoinCode(joinCode));
     }
 
-    @MessageMapping("/room/{roomId}/cardGame/select")
-    public void selectCard(@DestinationVariable Long roomId, @Payload CardGameSelectMessage message) {
-        cardGameService.selectCard(roomId, message.playerName(), message.cardIndex());
+    @MessageMapping("/room/{joinCode}/cardGame/select")
+    public void selectCard(@DestinationVariable String joinCode, @Payload CardGameSelectMessage message) {
+        JoinCode roomJoinCode = new JoinCode(joinCode);
+        cardGameService.selectCard(roomJoinCode, message.playerName(), message.cardIndex());
 
-        final CardGame cardGame = cardGameQueryService.getCardGame(roomId);
+        final CardGame cardGame = cardGameQueryService.getCardGame(roomJoinCode);
         messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId + "/gameState",
+                "/topic/room/" + joinCode + "/gameState",
                 MiniGameStateMessage.from(cardGame)
         );
     }
 
-    @MessageMapping("/room/{roomId}/cardGame/rank")
-    public void getRank(@DestinationVariable Long roomId) {
-        final MiniGameResult miniGameResult = cardGameQueryService.getCardGame(roomId).getResult();
+    @MessageMapping("/room/{joinCode}/cardGame/rank")
+    public void getRank(@DestinationVariable String joinCode) {
+        JoinCode roomJoinCode = new JoinCode(joinCode);
+        final MiniGameResult miniGameResult = cardGameQueryService.getCardGame(roomJoinCode).getResult();
 
         messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId + "/rank",
+                "/topic/room/" + joinCode + "/rank",
                 coffeeshout.minigame.ui.MiniGameRanksMessage.from(miniGameResult)
         );
     }

@@ -6,6 +6,7 @@ import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.ui.MiniGameRanksMessage.MiniGameRankMessage;
 import coffeeshout.minigame.ui.MiniGameStateMessage.CardInfoMessage;
+import coffeeshout.room.domain.JoinCode;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.SoftAssertions;
@@ -18,18 +19,18 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드_게임을_시작한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-        Long roomId = 1L;
+        String joinCode = "ABCDE";
 
-        String subscribeUrlFormat = "/topic/room/%d/gameState";
-        String requestUrlFormat = "/app/room/%d/cardGame/start";
+        String subscribeUrlFormat = "/topic/room/%s/gameState";
+        String requestUrlFormat = "/app/room/%s/cardGame/start";
 
         MessageCollector<MiniGameStateMessage> responses = session.subscribe(
-                String.format(subscribeUrlFormat, roomId),
+                String.format(subscribeUrlFormat, joinCode),
                 MiniGameStateMessage.class
         );
 
         // when
-        session.send(String.format(requestUrlFormat, roomId), "");
+        session.send(String.format(requestUrlFormat, joinCode), "");
 
         // then
         MiniGameStateMessage result = responses.get();
@@ -45,12 +46,12 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드를_선택한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-        Long roomId = 1L;
+        String joinCode = "ABCDE";
 
-        startCardGame(session, roomId);
+        startCardGame(session, joinCode);
 
-        String subscribeUrlFormat = "/topic/room/%d/gameState";
-        String requestUrlFormat = "/app/room/%d/cardGame/select";
+        String subscribeUrlFormat = "/topic/room/%s/gameState";
+        String requestUrlFormat = "/app/room/%s/cardGame/select";
 
         String playerName = "꾹이";
         int cardIndex = 0;
@@ -58,12 +59,12 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         CardGameSelectMessage request = new CardGameSelectMessage(playerName, cardIndex);
 
         MessageCollector<MiniGameStateMessage> responses = session.subscribe(
-                String.format(subscribeUrlFormat, roomId),
+                String.format(subscribeUrlFormat, joinCode),
                 MiniGameStateMessage.class
         );
 
         // when
-        session.send(String.format(requestUrlFormat, roomId), request);
+        session.send(String.format(requestUrlFormat, joinCode), request);
 
         // then
         MiniGameStateMessage result = responses.get();
@@ -80,20 +81,20 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void 카드_게임의_결과를_조회한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
         TestStompSession session = createSession();
-        Long roomId = 1L;
+        String joinCode = "ABCDE";
 
-        startCardGame(session, roomId);
+        startCardGame(session, joinCode);
 
-        String subscribeUrlFormat = "/topic/room/%d/rank";
-        String requestUrlFormat = "/app/room/%d/cardGame/rank";
+        String subscribeUrlFormat = "/topic/room/%s/rank";
+        String requestUrlFormat = "/app/room/%s/cardGame/rank";
 
         MessageCollector<MiniGameRanksMessage> responses = session.subscribe(
-                String.format(subscribeUrlFormat, roomId),
+                String.format(subscribeUrlFormat, joinCode),
                 MiniGameRanksMessage.class
         );
 
         // when
-        session.send(String.format(requestUrlFormat, roomId), "");
+        session.send(String.format(requestUrlFormat, joinCode), "");
 
         // then
         MiniGameRanksMessage result = responses.get();
@@ -104,8 +105,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         });
     }
 
-    private void startCardGame(TestStompSession session, Long roomId){
-        String requestUrlFormat = "/app/room/%d/cardGame/start";
-        session.send(String.format(requestUrlFormat, roomId), "");
+    private void startCardGame(TestStompSession session, String joinCode){
+        String requestUrlFormat = "/app/room/%s/cardGame/start";
+        session.send(String.format(requestUrlFormat, joinCode), "");
     }
 }
