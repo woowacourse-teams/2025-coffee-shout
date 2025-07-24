@@ -6,7 +6,7 @@ import ProbabilityList from '@/components/@composition/ProbabilityList/Probabili
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import Layout from '@/layouts/Layout';
 import { RouletteView } from '@/types/roulette';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePage.styled';
 import RoulettePlaySection from './RoulettePlaySection/RoulettePlaySection';
@@ -24,17 +24,20 @@ const RoulettePage = () => {
   };
 
   const handleSpinClick = () => {
-    if (currentView === 'statistics') {
-      handleViewChange();
-    }
-
+    if (currentView === 'statistics') handleViewChange();
     setSpinning(true);
-    setTimeout(() => {
-      setSpinning(false);
-      navigate('/room/:roomId/roulette/result');
-    }, 3000);
   };
 
+  useEffect(() => {
+    if (spinning) {
+      const timer = setTimeout(() => {
+        setSpinning(false);
+        navigate('/room/:roomId/roulette/result');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [navigate, spinning]);
+  
   return (
     <Layout>
       <Layout.TopBar />
