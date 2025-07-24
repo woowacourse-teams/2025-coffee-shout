@@ -8,6 +8,7 @@ public enum CardGameState {
     LOADING(3000),
     PLAYING(10000),
     SCORE_BOARD(1500),
+    DONE(0),
     ;
 
     private final int duration;

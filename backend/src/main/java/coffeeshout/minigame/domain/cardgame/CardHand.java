@@ -21,24 +21,27 @@ public class CardHand {
         hand.add(card);
     }
 
-    public boolean isAssign(Card card, CardGameRound round) {
-        if (round.toInteger() > hand.size()) {
-            return false;
-        }
-
-        return hand.get(round.toInteger() - 1).equals(card);
-    }
-
-    public boolean isSelected(CardGameRound round) {
-        return round.toInteger() <= hand.size();
-    }
-
     public int size() {
         return hand.size();
     }
 
     public void forEach(Consumer<Card> consumer) {
         hand.forEach(consumer);
+    }
+
+    public Card getCard(int index) {
+        return hand.get(index);
+    }
+
+    public boolean isSelected(CardGameRound round) {
+        return round.toInteger() <= hand.size();
+    }
+
+    public boolean isAssign(Card card, CardGameRound round) {
+        if (round.toInteger() > hand.size()) {
+            return false;
+        }
+        return hand.get(round.toInteger() - 1).equals(card);
     }
 }
 
