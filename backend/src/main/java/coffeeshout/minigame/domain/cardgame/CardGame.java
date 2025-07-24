@@ -83,4 +83,7 @@ public class CardGame {
         this.state = CardGameState.LOADING;
     }
 
+    public void changeDoneState() {
+        this.state = CardGameState.DONE;
+    }
 }

@@ -22,12 +22,6 @@ public class CardGameController {
     @MessageMapping("/room/{roomId}/cardGame/start")
     public void startGame(@DestinationVariable Long roomId) {
         cardGameService.startGame(roomId);
-
-        final CardGame cardGame = cardGameQueryService.getCardGame(roomId);
-        messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId + "/gameState",
-                MiniGameStateMessage.from(cardGame)
-        );
     }
 
     @MessageMapping("/room/{roomId}/cardGame/select")

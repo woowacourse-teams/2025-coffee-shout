@@ -2,7 +2,9 @@ package coffeeshout.minigame.domain.cardgame;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CardGameTaskExecutors {
 
     private final Map<Long, CardGameTaskExecutor> roomTaskExecutorMap;

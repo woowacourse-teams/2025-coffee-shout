@@ -31,7 +31,7 @@ public class CardGameService {
     private final RoomFinder roomFinder;
     private final CardGameRepository cardGameRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final CardGameTaskExecutors cardGameTaskExecutors = new CardGameTaskExecutors();
+    private final CardGameTaskExecutors cardGameTaskExecutors;
 
     public void startGame(Long roomId) {
         final Room room = roomFinder.findById(roomId);
@@ -66,8 +66,8 @@ public class CardGameService {
     private CardGameTask play(Long roomId) {
         CardGame cardGame = cardGameQueryService.getCardGame(roomId);
         return new CardGameTask(CardGameState.PLAYING, cardGame::startRound, () -> {
-            postTask(roomId);
             cardGame.assignRandomCardsToUnselectedPlayers();
+            postTask(roomId).run();
         });
     }
 
@@ -86,7 +86,11 @@ public class CardGameService {
     }
 
     private CardGameTask done(Long roomId) {
-        return new CardGameTask(CardGameState.DONE, () -> sendCardGameResult(roomId), () -> {});
+        return new CardGameTask(CardGameState.DONE, () -> {
+            CardGame cardGame = cardGameQueryService.getCardGame(roomId);
+            sendCardGameResult(roomId);
+            cardGame.changeDoneState();
+        }, () -> {});
     }
 
     private Runnable postTask(Long roomId) {
