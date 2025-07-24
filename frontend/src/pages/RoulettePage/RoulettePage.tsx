@@ -37,7 +37,7 @@ const RoulettePage = () => {
       return () => clearTimeout(timer);
     }
   }, [navigate, spinning]);
-  
+
   return (
     <Layout>
       <Layout.TopBar />
