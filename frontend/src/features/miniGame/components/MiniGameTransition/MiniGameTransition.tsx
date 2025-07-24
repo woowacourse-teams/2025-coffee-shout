@@ -1,9 +1,9 @@
+import Description from '@/components/@common/Description/Description';
+import Headline1 from '@/components/@common/Headline1/Headline1';
+import Layout from '@/layouts/Layout';
+import { RoundKey } from '@/types/round';
 import { PropsWithChildren } from 'react';
 import * as S from './MiniGameTransition.styled';
-import Layout from '@/layouts/Layout';
-import Headline1 from '@/components/@common/Headline1/Headline1';
-import Description from '@/components/@common/Description/Description';
-import { RoundKey } from '@/types/round';
 
 type Props = {
   prevRound: RoundKey;
