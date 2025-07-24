@@ -5,10 +5,10 @@ import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
+import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
+import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
-import { MiniGameSection } from '../../components/MiniGameSection/MiniGameSection';
-import { ParticipantSection } from '../../components/ParticipantSection/ParticipantSection';
-import { RouletteSection } from '../../components/RouletteSection/RouletteSection';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 
