@@ -21,7 +21,7 @@ public class RoomWebSocketController {
     private final RoomService roomService;
 
     @MessageMapping("/room/{joinCode}/players")
-    public void getPlayers(@DestinationVariable String joinCode) {
+    public void broadcastPlayers(@DestinationVariable String joinCode) {
         final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode).stream()
                 .map(PlayerResponse::from)
                 .toList();
@@ -30,7 +30,7 @@ public class RoomWebSocketController {
     }
 
     @MessageMapping("/room/{joinCode}/menus")
-    public void getMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
+    public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
         final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(), message.menuId())
                 .stream()
                 .map(PlayerResponse::from)
@@ -40,7 +40,7 @@ public class RoomWebSocketController {
     }
 
     @MessageMapping("/room/{joinCode}/probabilities")
-    public void getProbabilities(@DestinationVariable String joinCode) {
+    public void broadcastProbabilities(@DestinationVariable String joinCode) {
         final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
                 .stream()
                 .map(ProbabilityResponse::from)
@@ -50,7 +50,7 @@ public class RoomWebSocketController {
     }
 
     @MessageMapping("/room/{joinCode}/minigames/select")
-    public void selectMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
+    public void broadcastSelectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         final List<MiniGameType> responses = roomService.selectMiniGame(joinCode, message.hostName(),
                 message.miniGameType());
 
@@ -58,7 +58,7 @@ public class RoomWebSocketController {
     }
 
     @MessageMapping("/room/{joinCode}/minigames/unselect")
-    public void unselectMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
+    public void broadcastUnselectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         final List<MiniGameType> responses = roomService.unselectMiniGame(joinCode, message.hostName(),
                 message.miniGameType());
 
