@@ -25,7 +25,7 @@ export const WithIcon: Story = {
   args: {
     name: '김철수',
     iconColor: 'red',
-    // TODO: 커피 아이콘 결정되면 이미지 대체할 부분 (juice 이미지는 임시용)
+    // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
 };
@@ -42,7 +42,7 @@ export const LongNameWithIcon: Story = {
   args: {
     name: '아주아주아주아주아주긴이름의사용자님',
     iconColor: 'red',
-    // TODO: 커피 아이콘 결정되면 이미지 대체할 부분 (juice 이미지는 임시용)
+    // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
 };
