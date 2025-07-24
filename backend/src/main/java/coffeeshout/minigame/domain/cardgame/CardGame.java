@@ -1,5 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import static org.springframework.util.Assert.state;
+
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
@@ -41,7 +43,7 @@ public class CardGame {
     }
 
     public void selectCard(Player player, Integer cardIndex) {
-
+        state(state == CardGameState.PLAYING, "현재 게임이 진행중인 상태가 아닙니다.");
         playerHands.put(player, deck.pick(cardIndex));
     }
 

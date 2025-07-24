@@ -98,7 +98,8 @@ class CardGameTest {
 
             // when & then
             assertThatThrownBy(() -> cardGame.selectCard(player, 0))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("현재 게임이 진행중인 상태가 아닙니다.");
         }
 
         @Test
