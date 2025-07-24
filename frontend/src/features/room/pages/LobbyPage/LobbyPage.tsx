@@ -6,9 +6,9 @@ import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './LobbyPage.styled';
-import { MiniGameSection } from './MiniGameSection/MiniGameSection';
-import { ParticipantSection } from './ParticipantSection/ParticipantSection';
-import { RouletteSection } from './RouletteSection/RouletteSection';
+import { MiniGameSection } from '../../components/MiniGameSection/MiniGameSection';
+import { ParticipantSection } from '../../components/ParticipantSection/ParticipantSection';
+import { RouletteSection } from '../../components/RouletteSection/RouletteSection';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 
