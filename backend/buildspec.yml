@@ -16,9 +16,6 @@ phases:
       - echo "Found JAR file:" $JAR_FILE
       - cp "$JAR_FILE" ../coffee-shout-backend.jar
 
-      ## 도커 파일 복사
-      - cp compose.yaml ../compose.yaml
-
       # 스크립트 복사
       - cp -r ./scripts ../scripts/
       - chmod +x ../scripts/*.sh
@@ -26,13 +23,11 @@ phases:
       # appspec 복사
       - cp appspec.yml ../appspec.yml
 
-
 artifacts:
   files:
     - coffee-shout-backend.jar
     - scripts/*
     - appspec.yml
-    - compose.yaml
 
 cache:
   paths:

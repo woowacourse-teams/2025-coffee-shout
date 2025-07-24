@@ -6,53 +6,9 @@ echo "=== [APPLICATION_START] 커피빵 게임 서버 시작 ==="
 cd /opt/coffee-shout
 
 # ==========================================
-# 1단계: MySQL 서버 시작 (Docker Compose)
+# 1단계: Spring Boot JAR 애플리케이션 시작
 # ==========================================
-echo ""
-echo "🗄️ 1. MySQL 서버 시작 중..."
-
-if [ -f "compose.yaml" ]; then
-    echo "   📄 compose.yaml 파일 확인됨"
-
-    # Docker Compose로 MySQL 시작
-    docker-compose -f compose.yaml up -d
-
-    # MySQL 컨테이너 상태 확인
-    echo "   📊 MySQL 컨테이너 상태 확인 중..."
-    sleep 10
-    docker-compose -f compose.yaml ps
-
-    # MySQL 준비 대기
-    echo "   ⏳ MySQL 서버 준비 대기 중..."
-    max_attempts=30
-    attempt=1
-
-    while [ $attempt -le $max_attempts ]; do
-        if docker-compose -f compose.yaml exec -T mysql mysqladmin ping --silent 2>/dev/null; then
-            echo "   ✅ MySQL 서버 준비 완료 (시도: $attempt/$max_attempts)"
-            break
-        fi
-
-        echo "   ⏳ MySQL 준비 중... (시도: $attempt/$max_attempts)"
-        sleep 2
-        attempt=$((attempt + 1))
-    done
-
-    if [ $attempt -gt $max_attempts ]; then
-        echo "   ⚠️ MySQL 준비 시간 초과, 계속 진행합니다"
-    fi
-
-    echo "   ✅ MySQL 서버 시작 완료"
-else
-    echo "   ❌ compose.yaml 파일이 없습니다!"
-    exit 1
-fi
-
-# ==========================================
-# 2단계: Spring Boot JAR 애플리케이션 시작
-# ==========================================
-echo ""
-echo "☕ 2. Spring Boot 애플리케이션 시작 중..."
+echo "☕ 1. Spring Boot 애플리케이션 시작 중..."
 
 # JAR 파일 확인
 if [ -f "app/coffee-shout-backend.jar" ]; then

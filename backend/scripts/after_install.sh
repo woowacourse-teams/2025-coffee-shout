@@ -26,12 +26,4 @@ else
     exit 1
 fi
 
-# compose.yaml 파일 확인
-if [ -f "compose.yaml" ]; then
-    echo "✅ compose.yaml 파일 확인됨"
-else
-    echo "❌ compose.yaml 파일을 찾을 수 없습니다!"
-    exit 1
-fi
-
 echo "=== [AFTER_INSTALL] 완료 ==="
