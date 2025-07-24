@@ -1,5 +1,5 @@
-import CloseIcon from '@/assets/close.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
+import CloseIcon from '../../CloseIcon/CloseIcon';
 import * as S from './ModalHeader.styled';
 
 type Props = {
@@ -14,7 +14,7 @@ const ModalHeader = ({ title, onClose, showCloseButton = true }: Props) => {
       <Headline3>{title}</Headline3>
       {showCloseButton && (
         <S.CloseButton onClick={onClose}>
-          <S.CloseIcon src={CloseIcon} alt="close-icon" />
+          <CloseIcon stroke="#585555" />
         </S.CloseButton>
       )}
     </S.Container>
