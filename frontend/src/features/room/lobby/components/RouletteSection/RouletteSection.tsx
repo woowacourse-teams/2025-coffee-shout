@@ -1,13 +1,12 @@
 import RouletteIcon from '@/assets/roulette-icon.svg';
 import StatisticsIcon from '@/assets/statistics-icon.svg';
 import IconButton from '@/components/@common/IconButton/IconButton';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import { useState } from 'react';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
+import { RouletteView } from '@/types/roulette';
+import { useState } from 'react';
 import * as S from './RouletteSection.styled';
-
-type RouletteView = 'roulette' | 'statistics';
 
 export const RouletteSection = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
