@@ -1,10 +1,22 @@
-import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
+import MenuIcon from '@/assets/juice.svg';
 import Divider from '@/components/@common/Divider/Divider';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
+import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import * as S from './ParticipantSection.styled';
+import useModal from '@/components/@common/Modal/useModal';
+import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 
 export const ParticipantSection = () => {
+  const { openModal, closeModal } = useModal();
+
+  const handleModifyMenu = () => {
+    openModal(<MenuModifyModal onClose={closeModal} />, {
+      title: '음료 변경',
+      showCloseButton: true,
+    });
+  };
+
   return (
     <>
       <SectionTitle
@@ -13,7 +25,7 @@ export const ParticipantSection = () => {
         suffix={<ProgressCounter current={7} total={9} />}
       />
       <PlayerCard name="홍길동" iconColor="red">
-        아이콘
+        <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
       </PlayerCard>
 
       <Divider />
@@ -21,7 +33,7 @@ export const ParticipantSection = () => {
       <S.ScrollableWrapper>
         {['다이앤', '니야', '메리', '루키', '한스', '꾹이', '엠제이', '1'].map((name) => (
           <PlayerCard key={name} name={name} iconColor="red">
-            아이콘
+            <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
           </PlayerCard>
         ))}
       </S.ScrollableWrapper>

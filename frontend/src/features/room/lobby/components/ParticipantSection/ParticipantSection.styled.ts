@@ -12,3 +12,7 @@ export const ScrollableWrapper = styled.div`
 export const BottomGap = styled.div`
   height: 3rem;
 `;
+
+export const Menu = styled.img`
+  cursor: pointer;
+`;
