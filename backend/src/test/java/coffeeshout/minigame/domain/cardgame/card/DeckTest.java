@@ -79,7 +79,6 @@ class DeckTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(pickedCard).isEqualTo(deck.getCards().get(cardIndex));
-                softly.assertThat(deck.isPicked(pickedCard)).isTrue();
                 softly.assertThat(deck.getPickedCards()).hasSize(1);
                 softly.assertThat(deck.getPickedCards()).contains(pickedCard);
             });
@@ -115,9 +114,6 @@ class DeckTest {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(deck.getPickedCards()).hasSize(3);
                 softly.assertThat(deck.getPickedCards()).containsExactly(firstCard, secondCard, thirdCard);
-                softly.assertThat(deck.isPicked(firstCard)).isTrue();
-                softly.assertThat(deck.isPicked(secondCard)).isTrue();
-                softly.assertThat(deck.isPicked(thirdCard)).isTrue();
             });
         }
     }
@@ -133,7 +129,6 @@ class DeckTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(pickedCard).isNotNull();
-                softly.assertThat(deck.isPicked(pickedCard)).isTrue();
                 softly.assertThat(deck.getPickedCards()).hasSize(1);
                 softly.assertThat(deck.getPickedCards()).contains(pickedCard);
                 softly.assertThat(deck.getCards()).contains(pickedCard);
@@ -166,9 +161,9 @@ class DeckTest {
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(deck.isPicked(card)).isFalse();
+                softly.assertThat(deck.getPickedCards().contains(card)).isFalse();
                 deck.pick(0);
-                softly.assertThat(deck.isPicked(card)).isTrue();
+                softly.assertThat(deck.getPickedCards().contains(card)).isTrue();
             });
         }
 
@@ -178,7 +173,7 @@ class DeckTest {
             Card cardNotInDeck = new AdditionCard(999);
 
             // when & then
-            assertThat(deck.isPicked(cardNotInDeck)).isFalse();
+            assertThat(deck.getPickedCards().contains(cardNotInDeck)).isFalse();
         }
     }
 }
