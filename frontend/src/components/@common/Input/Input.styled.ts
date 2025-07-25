@@ -53,8 +53,3 @@ export const ClearButton = styled.button<ClearButtonProps>`
   cursor: pointer;
   visibility: ${({ $hasValue }) => ($hasValue ? 'visible' : 'hidden')};
 `;
-
-export const CloseIcon = styled.img`
-  -webkit-user-drag: none;
-  user-select: none;
-`;
