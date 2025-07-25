@@ -27,7 +27,7 @@ public class Players {
 
     public Player getPlayer(PlayerName playerName) {
         return players.stream()
-                .filter(p -> p.getName().equals(playerName))
+                .filter(p -> p.sameName(playerName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
     }

@@ -97,6 +97,12 @@ public class Room {
         return players.getPlayer(playerName);
     }
 
+    public Playable playMiniGame(Integer gameIndex) {
+        final Playable miniGame = miniGames.get(gameIndex);
+        miniGame.assignPlayers(players);
+        return miniGame;
+    }
+
 //    TODO: 미니게임 플레이 어떻게 할까
 //    public void playMiniGame(int miniGameIndex) {
 //       MiniGameResult result = miniGames.get(miniGameIndex).play();

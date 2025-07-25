@@ -103,7 +103,7 @@ class RoomTest {
     @Test
     void 미니게임을_제거한다() {
         // given
-        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
 
         // when
@@ -116,7 +116,7 @@ class RoomTest {
     @Test
     void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
         // given
-        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
         MiniGameDummy miniGameDummy = new MiniGameDummy();
 
@@ -183,7 +183,7 @@ class RoomTest {
     @Test
     void 호스트가_아니면_미니게임을_제거할_수_없다() {
         // given
-        CardGame cardGame = new CardGame(List.of(), new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
         room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
 

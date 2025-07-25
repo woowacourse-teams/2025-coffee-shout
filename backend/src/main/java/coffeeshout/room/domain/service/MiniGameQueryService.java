@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class MiniGameQueryService {
 
     public Playable getCardGame(List<Player> players) {
-        return new CardGame(players, new CardGameRandomDeckGenerator());
+        return new CardGame(new CardGameRandomDeckGenerator());
 
     }
 

@@ -4,6 +4,7 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Players;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,16 +16,20 @@ import lombok.Getter;
 @Getter
 public class CardGame implements Playable {
 
-    private final Map<Player, List<Card>> playerCards;
+    private Map<Player, List<Card>> playerCards;
     private final CardGameDeckGenerator cardGameDeckGenerator;
     private List<Card> cards;
     private CardGameRound round;
 
-    public CardGame(List<Player> players, CardGameDeckGenerator cardGameDeckGenerator) {
-        this.playerCards = initPlayerCards(players);
+    public CardGame(CardGameDeckGenerator cardGameDeckGenerator) {
         this.round = CardGameRound.FIRST;
         this.cardGameDeckGenerator = cardGameDeckGenerator;
         this.cards = new ArrayList<>();
+    }
+
+    @Override
+    public void assignPlayers(Players players) {
+        this.playerCards = initPlayerCards(players.getPlayers());
     }
 
     @Override

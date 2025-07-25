@@ -73,7 +73,7 @@ public class RoomService {
 
     public List<MiniGameType> selectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
+        final Playable miniGame = miniGameType.createMiniGame();
 
         room.addMiniGame(new PlayerName(hostName), miniGame);
 
@@ -84,7 +84,7 @@ public class RoomService {
 
     public List<MiniGameType> unselectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
+        final Playable miniGame = miniGameType.createMiniGame();
 
         room.removeMiniGame(new PlayerName(hostName), miniGame);
 
