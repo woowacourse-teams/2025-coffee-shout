@@ -23,7 +23,6 @@ export const Container = styled.div`
   max-height: 90%;
   margin: 0 24px;
   padding: 16px;
-  overflow: hidden;
   background-color: ${({ theme }) => theme.color.white};
   border-radius: 12px;
   box-shadow:
