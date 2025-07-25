@@ -9,18 +9,18 @@ public final class PlayerFixture {
     }
 
     public static Player 한스() {
-        return new Player(PlayerName.from("한스"), null);
+        return new Player(new PlayerName("한스"), null);
     }
 
     public static Player 꾹이() {
-        return new Player(PlayerName.from("꾹이"), null);
+        return new Player(new PlayerName("꾹이"), null);
     }
 
     public static Player 루키() {
-        return new Player(PlayerName.from("루키"), null);
+        return new Player(new PlayerName("루키"), null);
     }
 
     public static Player 엠제이() {
-        return new Player(PlayerName.from("엠제이"), null);
+        return new Player(new PlayerName("엠제이"), null);
     }
 }

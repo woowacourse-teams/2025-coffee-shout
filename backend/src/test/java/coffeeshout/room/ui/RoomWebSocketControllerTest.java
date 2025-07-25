@@ -280,13 +280,13 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
 
         // 방 생성 - 호스트와 함께
         JoinCode joinCode = new JoinCode("TEST2"); // 5자리로 수정
-        PlayerName hostName = PlayerName.from("호스트꾹이");
+        PlayerName hostName = new PlayerName("호스트꾹이");
         testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
 
         // 게스트 플레이어들 추가
-        testRoom.joinGuest(PlayerName.from("플레이어한스"), testMenu);
-        testRoom.joinGuest(PlayerName.from("플레이어루키"), testMenu);
-        testRoom.joinGuest(PlayerName.from("플레이어엠제이"), testMenu);
+        testRoom.joinGuest(new PlayerName("플레이어한스"), testMenu);
+        testRoom.joinGuest(new PlayerName("플레이어루키"), testMenu);
+        testRoom.joinGuest(new PlayerName("플레이어엠제이"), testMenu);
 
         // 저장 후 실제 ID가 할당된 객체로 다시 받기
         testRoom = roomRepository.save(testRoom);

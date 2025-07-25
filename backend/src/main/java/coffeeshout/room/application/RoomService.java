@@ -39,7 +39,7 @@ public class RoomService {
         final Menu menu = menuQueryService.findById(menuId);
         final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
 
-        room.joinGuest(PlayerName.from(guestName), menu);
+        room.joinGuest(new PlayerName(guestName), menu);
 
         return roomCommandService.save(room);
     }

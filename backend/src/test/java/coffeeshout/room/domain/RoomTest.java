@@ -21,10 +21,10 @@ class RoomTest {
 
     private JoinCode joinCode = new JoinCode("ABCDF");
     private Roulette roulette = RouletteFixture.고정_끝값_반환();
-    private PlayerName 호스트_한스 = PlayerName.from("한스");
-    private PlayerName 게스트_루키 = PlayerName.from("루키");
-    private PlayerName 게스트_꾹이 = PlayerName.from("꾹이");
-    private PlayerName 게스트_엠제이 = PlayerName.from("엠제이");
+    private PlayerName 호스트_한스 = new PlayerName("한스");
+    private PlayerName 게스트_루키 = new PlayerName("루키");
+    private PlayerName 게스트_꾹이 = new PlayerName("꾹이");
+    private PlayerName 게스트_엠제이 = new PlayerName("엠제이");
 
     private Room room;
 
@@ -138,7 +138,7 @@ class RoomTest {
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-        assertThat(winner).isEqualTo(new Player(PlayerName.from("한스"), MenuFixture.아메리카노()));
+        assertThat(winner).isEqualTo(new Player(new PlayerName("한스"), MenuFixture.아메리카노()));
     }
 
     @Test

@@ -22,13 +22,13 @@ public class TestDataHelper {
 
     public Room createDummyRoom(String joinCode, String hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        Room room = new Room(new JoinCode(joinCode), PlayerName.from(hostName), menu);
+        Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName), menu);
         return roomRepository.save(room);
     }
 
     public Room createDummyPlayingRoom(String joinCode, String hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        Room room = new Room(new JoinCode(joinCode), PlayerName.from(hostName), menu);
+        Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName), menu);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         return roomRepository.save(room);
     }
