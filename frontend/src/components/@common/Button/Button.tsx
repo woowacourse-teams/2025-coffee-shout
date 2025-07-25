@@ -32,7 +32,7 @@ const Button = ({
     if (isDisabled) return;
 
     e.preventDefault();
-    e.stopPropagation();
+
     onClick(e);
   };
 

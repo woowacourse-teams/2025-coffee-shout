@@ -39,7 +39,7 @@ export const Container = styled.button<Props>`
           @media (hover: hover) and (pointer: fine) {
             &:hover { background: ${theme.color.gray[100]}; }
           }
-          @media (hover: none) and (pointer: coarse) {
+          @media (hover: none) {
             &:active { background: ${theme.color.gray[100]}; }
           }
         `;
@@ -67,9 +67,9 @@ export const Container = styled.button<Props>`
           @media (hover: hover) and (pointer: fine) {
             &:hover { background: ${theme.color.point[500]}; }
           }
-          @media (hover: none) and (pointer: coarse) {
+         
             &:active { background: ${theme.color.point[500]}; }
-          }
+          
         `;
     }
   }}
