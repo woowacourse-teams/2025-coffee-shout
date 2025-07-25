@@ -1,10 +1,12 @@
 import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
+import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import InviteCodeModal from '../components/InviteCodeModal/InviteCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
@@ -24,6 +26,7 @@ const SECTIONS: SectionComponents = {
 
 const LobbyPage = () => {
   const navigate = useNavigate();
+  const { openModal } = useModal();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   const handleClickBackButton = () => {
@@ -36,6 +39,13 @@ const LobbyPage = () => {
 
   const handleSectionChange = (option: SectionType) => {
     setCurrentSection(option);
+  };
+
+  const handleShare = () => {
+    openModal(<InviteCodeModal />, {
+      title: '초대 코드',
+      showCloseButton: true,
+    });
   };
 
   return (
@@ -57,7 +67,7 @@ const LobbyPage = () => {
         <Button variant="primary" onClick={handleClickGameStartButton}>
           게임 시작
         </Button>
-        <Button variant="primary" onClick={() => {}}>
+        <Button variant="primary" onClick={handleShare}>
           <img src={ShareIcon} alt="공유" />
         </Button>
       </Layout.ButtonBar>
