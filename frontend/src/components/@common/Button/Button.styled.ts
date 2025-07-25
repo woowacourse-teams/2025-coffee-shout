@@ -36,8 +36,12 @@ export const Container = styled.button<Props>`
         return `
           background: ${theme.color.gray[50]};
           color: ${theme.color.gray[700]};
-          &:hover { background: ${theme.color.gray[100]}; }
-          &:active { background: ${theme.color.gray[100]}; }
+          @media (hover: hover) and (pointer: fine) {
+            &:hover { background: ${theme.color.gray[100]}; }
+          }
+          @media (hover: none) and (pointer: coarse) {
+            &:active { background: ${theme.color.gray[100]}; }
+          }
         `;
 
       case 'loading':
@@ -60,8 +64,12 @@ export const Container = styled.button<Props>`
         return `
           background: ${theme.color.point[400]};
           color: ${theme.color.white};
-          &:hover { background: ${theme.color.point[500]}; }
-          &:active { background: ${theme.color.point[500]}; }
+          @media (hover: hover) and (pointer: fine) {
+            &:hover { background: ${theme.color.point[500]}; }
+          }
+          @media (hover: none) and (pointer: coarse) {
+            &:active { background: ${theme.color.point[500]}; }
+          }
         `;
     }
   }}

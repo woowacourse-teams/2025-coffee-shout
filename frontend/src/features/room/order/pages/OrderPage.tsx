@@ -87,7 +87,7 @@ const OrderPage = () => {
         <Button variant="primary" onClick={() => navigate('/')}>
           메인 화면으로 가기
         </Button>
-        <Button variant="primary">
+        <Button variant="primary" onClick={() => {}}>
           <img src={DownloadIcon} />
         </Button>
       </Layout.ButtonBar>
