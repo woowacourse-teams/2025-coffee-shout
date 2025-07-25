@@ -1,9 +1,10 @@
+import { Size } from '@/types/styles';
 import styled from '@emotion/styled';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading';
 
 type Props = {
-  $height: 'small' | 'medium' | 'large';
+  $height: Size;
   $variant: ButtonVariant;
   $width: string;
 };

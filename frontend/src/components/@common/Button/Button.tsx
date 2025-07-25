@@ -1,10 +1,11 @@
+import { Size } from '@/types/styles';
 import type { ComponentProps } from 'react';
 import * as S from './Button.styled';
 
 type Props = {
   variant?: S.ButtonVariant;
   width?: string;
-  height?: 'small' | 'medium' | 'large';
+  height?: Size;
 } & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({

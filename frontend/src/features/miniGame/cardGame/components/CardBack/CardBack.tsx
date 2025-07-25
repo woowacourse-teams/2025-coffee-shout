@@ -1,9 +1,10 @@
 import CoffeeIcon from '@/assets/coffee-white.svg';
+import { Size } from '@/types/styles';
 import { ComponentProps } from 'react';
 import * as S from './CardBack.styled';
 
 type Props = {
-  size?: 'small' | 'medium' | 'large';
+  size?: Size;
 } & ComponentProps<'button'>;
 
 const CardBack = ({ size, disabled, onClick, ...rest }: Props) => {

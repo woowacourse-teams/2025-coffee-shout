@@ -1,10 +1,11 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { IconColor } from '@/types/player';
+import { Size } from '@/types/styles';
 import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
 
 type Props = {
-  size?: 'small' | 'medium' | 'large';
+  size?: Size;
   playerIconColor?: IconColor;
   card: Card;
 };

@@ -1,9 +1,10 @@
+import { Size } from '@/types/styles';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { cardVariants, circleVariants } from '../../constants/variants';
-import { css } from '@emotion/react';
 
 type Props = {
-  $size?: 'small' | 'medium' | 'large';
+  $size?: Size;
   $disabled?: boolean;
 };
 
