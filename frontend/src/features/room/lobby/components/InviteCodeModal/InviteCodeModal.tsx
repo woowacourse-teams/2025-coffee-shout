@@ -18,7 +18,7 @@ const InviteCodeModal = () => {
         <Paragraph>친구들을 초대해보아요</Paragraph>
       </S.Wrapper>
       <S.CodeBox>
-        <S.EmptyBox></S.EmptyBox>
+        <S.EmptyBox />
         <Headline4>{inviteCode}</Headline4>
         <S.CopyIcon src={CopyIcon} onClick={handleCopy} />
       </S.CodeBox>
