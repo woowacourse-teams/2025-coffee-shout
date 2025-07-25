@@ -5,7 +5,7 @@ interface Props extends SVGProps<SVGSVGElement> {
   strokeWidth?: number;
 }
 
-const CloseIcon = ({ stroke = '#D1D5DC', strokeWidth = 2, ...rest }: Props) => {
+const CloseIcon = ({ stroke = '#99A1AF', strokeWidth = 2, ...rest }: Props) => {
   return (
     <svg
       width="19"
