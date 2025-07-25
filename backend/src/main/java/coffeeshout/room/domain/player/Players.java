@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.player;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ public class Players {
     private final List<Player> players;
 
     public Players() {
-        this.players = new LinkedList<>();
+        this.players = new ArrayList<>();
     }
 
     public void join(Player player) {

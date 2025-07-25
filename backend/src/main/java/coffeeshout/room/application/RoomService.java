@@ -30,14 +30,14 @@ public class RoomService {
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuQueryService.findById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
-        final Room room = Room.createNewRoom(joinCode, PlayerName.from(hostName), menu);
+        final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
 
         return roomCommandService.save(room);
     }
 
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
         final Menu menu = menuQueryService.findById(menuId);
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         room.joinGuest(new PlayerName(guestName), menu);
 
@@ -45,23 +45,23 @@ public class RoomService {
     }
 
     public List<Player> getAllPlayers(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         return room.getPlayers();
     }
 
     public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         final Menu menu = menuQueryService.findById(menuId);
 
-        final Player player = room.findPlayer(PlayerName.from(playerName));
+        final Player player = room.findPlayer(new PlayerName(playerName));
         player.selectMenu(menu);
 
         return room.getPlayers();
     }
 
     public Map<Player, Probability> getProbabilities(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         return room.getProbabilities();
     }
@@ -72,10 +72,10 @@ public class RoomService {
     }
 
     public List<MiniGameType> selectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
-        room.addMiniGame(PlayerName.from(hostName), miniGame);
+        room.addMiniGame(new PlayerName(hostName), miniGame);
 
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
@@ -83,10 +83,10 @@ public class RoomService {
     }
 
     public List<MiniGameType> unselectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findByJoinCode(JoinCode.from(joinCode));
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         final Playable miniGame = miniGameType.createMiniGame(room.getPlayers());
 
-        room.removeMiniGame(PlayerName.from(hostName), miniGame);
+        room.removeMiniGame(new PlayerName(hostName), miniGame);
 
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
