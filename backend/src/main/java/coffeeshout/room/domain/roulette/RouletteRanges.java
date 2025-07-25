@@ -13,12 +13,10 @@ public class RouletteRanges {
         this.ranges = new ArrayList<>();
 
         probabilities.forEach((player, probability) -> ranges.add(generateRange(
-                                endValue() + 1,
-                                probability.value(),
-                                player
-                        )
-                )
-        );
+                endValue() + 1,
+                probability.value(),
+                player
+        )));
     }
 
     public Player pickPlayer(int number) {
