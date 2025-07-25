@@ -30,13 +30,9 @@ public class RoomRestController {
         return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
 
-    @GetMapping("/enter")
-    public ResponseEntity<RoomEnterResponse> enterRoom(
-            @RequestParam String joinCode,
-            @RequestParam String guestName,
-            @RequestParam Long menuId
-    ) {
-        final Room room = roomService.enterRoom(joinCode, guestName, menuId);
+    @PostMapping("/enter")
+    public ResponseEntity<RoomEnterResponse> enterRoom(@RequestBody RoomEnterRequest request) {
+        final Room room = roomService.enterRoom(request.joinCode(), request.guestName(), request.menuId());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
     }
