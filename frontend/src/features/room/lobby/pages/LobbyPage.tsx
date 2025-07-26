@@ -11,8 +11,7 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
-
-type UserRole = 'HOST' | 'GUEST';
+import { UserRole } from '@/types/player';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -29,7 +28,7 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   //TODO: Context로 빼기
-  const [userRole, setUserRole] = useState<UserRole>('GUEST');
+  const [userRole] = useState<UserRole>('HOST');
 
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
