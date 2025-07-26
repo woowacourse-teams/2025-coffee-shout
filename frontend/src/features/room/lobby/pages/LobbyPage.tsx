@@ -11,9 +11,9 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
+import { UserRole } from '@/types/player';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
-
 type SectionComponents = {
   [K in SectionType]: ReactElement;
 };
@@ -27,6 +27,9 @@ const SECTIONS: SectionComponents = {
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
+  //TODO: Context로 빼기
+  const [userRole] = useState<UserRole>('HOST');
+
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   const handleClickBackButton = () => {
@@ -63,14 +66,20 @@ const LobbyPage = () => {
           </S.Wrapper>
         </S.Container>
       </Layout.Content>
-      <Layout.ButtonBar flexRatios={[5.5, 1]}>
-        <Button variant="primary" onClick={handleClickGameStartButton}>
-          게임 시작
-        </Button>
-        <Button variant="primary" onClick={handleShare}>
-          <img src={ShareIcon} alt="공유" />
-        </Button>
-      </Layout.ButtonBar>
+      {userRole === 'HOST' ? (
+        <Layout.ButtonBar flexRatios={[5.5, 1]}>
+          <Button variant="primary" onClick={handleClickGameStartButton}>
+            게임 시작
+          </Button>
+          <Button variant="primary" onClick={handleShare}>
+            <img src={ShareIcon} alt="공유" />
+          </Button>
+        </Layout.ButtonBar>
+      ) : (
+        <Layout.ButtonBar flexRatios={[5.5, 1]}>
+          <Button variant="loading">게임 대기중</Button>
+        </Layout.ButtonBar>
+      )}
     </Layout>
   );
 };

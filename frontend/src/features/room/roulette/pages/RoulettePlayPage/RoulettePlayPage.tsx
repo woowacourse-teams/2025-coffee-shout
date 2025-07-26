@@ -10,14 +10,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePlayPage.styled';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
+import { UserRole } from '@/types/player';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  const [spinning, setSpinning] = useState(false);
+  //TODO: Context로 빼기
+  const [userRole] = useState<UserRole>('HOST');
+  const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
 
   const isRouletteView = currentView === 'roulette';
+
+  const buttonVariant = isSpinning ? 'disabled' : userRole === 'GUEST' ? 'loading' : 'primary';
 
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
@@ -25,18 +30,18 @@ const RoulettePage = () => {
 
   const handleSpinClick = () => {
     if (currentView === 'statistics') handleViewChange();
-    setSpinning(true);
+    setIsSpinning(true);
   };
 
   useEffect(() => {
-    if (spinning) {
+    if (isSpinning) {
       const timer = setTimeout(() => {
-        setSpinning(false);
+        setIsSpinning(false);
         navigate('/room/:roomId/roulette/result');
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [navigate, spinning]);
+  }, [navigate, isSpinning]);
 
   return (
     <Layout>
@@ -44,7 +49,7 @@ const RoulettePage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
-          {isRouletteView ? <RoulettePlaySection spinning={spinning} /> : <ProbabilityList />}
+          {isRouletteView ? <RoulettePlaySection isSpinning={isSpinning} /> : <ProbabilityList />}
           <S.IconButtonWrapper>
             <IconButton
               iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
@@ -54,7 +59,7 @@ const RoulettePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={spinning ? 'disabled' : 'primary'} onClick={handleSpinClick}>
+        <Button variant={buttonVariant} onClick={handleSpinClick}>
           룰렛 돌리기
         </Button>
       </Layout.ButtonBar>
