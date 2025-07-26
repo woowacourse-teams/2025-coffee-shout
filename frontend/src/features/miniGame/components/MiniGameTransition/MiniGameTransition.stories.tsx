@@ -7,9 +7,7 @@ import { keyframes } from '@emotion/react';
 const meta = {
   title: 'composition/MiniGameTransition',
   component: MiniGameTransition,
-  parameters: {
-    layout: 'centered',
-  },
+
   tags: ['autodocs'],
 } satisfies Meta<typeof MiniGameTransition>;
 
