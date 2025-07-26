@@ -28,7 +28,7 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   //TODO: Context로 빼기
-  const [userRole] = useState<UserRole>('HOST');
+  const [userRole] = useState<UserRole>('GUEST');
 
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
@@ -68,15 +68,17 @@ const LobbyPage = () => {
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         {userRole === 'HOST' ? (
-          <Button variant="primary" onClick={handleClickGameStartButton}>
-            게임 시작
-          </Button>
+          <>
+            <Button variant="primary" onClick={handleClickGameStartButton}>
+              게임 시작
+            </Button>
+            <Button variant="primary" onClick={handleShare}>
+              <img src={ShareIcon} alt="공유" />
+            </Button>
+          </>
         ) : (
           <Button variant="loading">게임 대기중</Button>
         )}
-        <Button variant="primary" onClick={handleShare}>
-          <img src={ShareIcon} alt="공유" />
-        </Button>
       </Layout.ButtonBar>
     </Layout>
   );
