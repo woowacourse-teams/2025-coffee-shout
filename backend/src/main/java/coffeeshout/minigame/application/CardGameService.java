@@ -1,13 +1,16 @@
 package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
+import coffeeshout.minigame.domain.temp.CardGameTaskFactory;
+import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
+import coffeeshout.minigame.domain.temp.TaskExecutor;
+import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
 import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.JoinCode;
@@ -42,64 +45,26 @@ public class CardGameService {
                 room.getPlayers()
         );
         cardGameRepository.save(joinCode, cardGame);
-        CardGameTaskExecutor executor = new CardGameTaskExecutor(List.of(
-                loading(joinCode), // 로딩
-                play(joinCode), // 1라운드 시작
-                scoreBoard(joinCode), // 1라운드 결과
-                loading(joinCode), // 1라운드 끝나고 로딩
-                play(joinCode), // 2라운드 시작
-                scoreBoard(joinCode), // 2라운드 끝나고 결과
-                done(joinCode)
-        ));
+        TaskExecutor executor = new TaskExecutor();
         cardGameTaskExecutors.put(joinCode, executor);
-        executor.submits();
+        executor.submits(List.of(
+                new Task<>(new CardGameTaskInfo(CardGameState.LOADING, CardGameRound.READY), CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.PLAYING, CardGameRound.FIRST), CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.SCORE_BOARD, CardGameRound.FIRST), CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.LOADING, CardGameRound.FIRST),CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.PLAYING, CardGameRound.SECOND),CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.SCORE_BOARD, CardGameRound.SECOND),CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))),
+                new Task<>(new CardGameTaskInfo(CardGameState.DONE, CardGameRound.SECOND),CardGameTaskFactory.done(cardGame, () -> sendCardGameResult(joinCode)))
+        ));
     }
 
     public void selectCard(JoinCode joinCode, String playerName, Integer cardIndex) {
         final CardGame cardGame = cardGameQueryService.getCardGame(joinCode);
         final Player player = cardGame.findPlayerByName(playerName);
         cardGame.selectCard(player, cardIndex);
-        sendCardGameState(joinCode);
         if (cardGame.isFinishedThisRound()) {
-            cardGameTaskExecutors.get(joinCode).cancelPlaying();
+            cardGameTaskExecutors.get(joinCode).cancel(new CardGameTaskInfo(CardGameState.PLAYING, cardGame.getRound()));
         }
-    }
-
-    private CardGameTask play(JoinCode joinCode) {
-        CardGame cardGame = cardGameQueryService.getCardGame(joinCode);
-        return new CardGameTask(
-                CardGameState.PLAYING,
-                cardGame::startRound,
-                () -> sendCardGameState(joinCode),
-                cardGame::assignRandomCardsToUnselectedPlayers
-        );
-    }
-
-    private CardGameTask scoreBoard(JoinCode joinCode) {
-        return new CardGameTask(
-                CardGameState.SCORE_BOARD,
-                () -> cardGameQueryService.getCardGame(joinCode).changeScoreBoardState(),
-                () -> sendCardGameState(joinCode),
-                () -> {}
-        );
-    }
-
-    private CardGameTask loading(JoinCode joinCode) {
-        return new CardGameTask(
-                CardGameState.LOADING,
-                () -> cardGameQueryService.getCardGame(joinCode).changeLoadingState(),
-                () -> sendCardGameState(joinCode),
-                () -> {}
-        );
-    }
-
-    private CardGameTask done(JoinCode joinCode) {
-        return new CardGameTask(
-                CardGameState.DONE,
-                () -> cardGameQueryService.getCardGame(joinCode).changeDoneState(),
-                () -> sendCardGameResult(joinCode),
-                () -> {}
-        );
     }
 
     private void sendCardGameState(JoinCode joinCode) {

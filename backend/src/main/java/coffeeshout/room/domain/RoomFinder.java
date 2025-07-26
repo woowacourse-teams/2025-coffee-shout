@@ -17,9 +17,11 @@ public class RoomFinder {
         Player player4 = new Player("엠제이");
 
         Room room = new Room(new JoinCode("ABCDE"), new Roulette(new JavaRandomGenerator()), player1);
-        room.joinPlayer(player2);
+//        room.joinPlayer(player2);
+/*
         room.joinPlayer(player3);
         room.joinPlayer(player4);
+*/
         return room;
 //        return roomRepository.findById(roomId)
 //                .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다."));

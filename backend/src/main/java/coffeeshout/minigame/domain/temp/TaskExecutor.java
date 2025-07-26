@@ -1,34 +1,37 @@
 package coffeeshout.minigame.domain.temp;
 
-import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import lombok.Getter;
 
-public class TaskExecutor {
+@Getter
+public class TaskExecutor<T> {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final List<Task> tasks;
+    private final Map<T, Future<?>> futureTasks = new LinkedHashMap<>();
 
-    private Future<?> currentFuture;
-    private Task currentTask;
+    public record Task<T>(T info, Runnable task) {}
 
-    public TaskExecutor(List<Task> tasks) {
-        this.tasks = tasks;
+    public void submits(List<Task<T>> tasks) {
+        tasks.forEach(task -> futureTasks.put(task.info, executor.submit(task.task)));
     }
 
-    public void submits() {
-        for (Task task : tasks) {
-            this.currentTask = task;
-            this.currentFuture = executor.submit(currentTask::run);
+    public void cancel(T info) {
+        Future<?> future = futureTasks.get(info);
+        if (future != null && !future.isDone()) {
+            future.cancel(true);
         }
     }
 
-    public void cancelCurrentTask() {
-        if (currentFuture != null && !currentFuture.isDone()) {
-            currentFuture.cancel(true);
-        }
+    public void cancelAll() {
+        futureTasks.values().forEach(future -> {
+            if (!future.isDone()) {
+                future.cancel(true);
+            }
+        });
     }
 }

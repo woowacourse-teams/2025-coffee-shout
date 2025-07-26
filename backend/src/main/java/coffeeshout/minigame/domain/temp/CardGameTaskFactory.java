@@ -4,7 +4,7 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 
 public class CardGameTaskFactory {
 
-    private static Task play(CardGame cardGame, Runnable sendMessage) {
+    public static Runnable play(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.startRound();
             sendMessage.run();
@@ -13,7 +13,7 @@ public class CardGameTaskFactory {
         };
     }
 
-    private static Task scoreBoard(CardGame cardGame, Runnable sendMessage) {
+    public static Runnable scoreBoard(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeScoreBoardState();
             sendMessage.run();
@@ -21,7 +21,7 @@ public class CardGameTaskFactory {
         };
     }
 
-    private static Task loading(CardGame cardGame, Runnable sendMessage) {
+    public static Runnable loading(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeLoadingState();
             sendMessage.run();
@@ -29,7 +29,7 @@ public class CardGameTaskFactory {
         };
     }
 
-    private static Task done(CardGame cardGame, Runnable sendMessage) {
+    public static Runnable done(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeDoneState();
             sendMessage.run();
@@ -38,10 +38,11 @@ public class CardGameTaskFactory {
         };
     }
 
-    private static void sleep(long milliSecond) {
+    public static void sleep(long milliSecond) {
         try {
             Thread.sleep(milliSecond);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // ✅ interrupt 상태 복원
             throw new RuntimeException(e);
         }
     }

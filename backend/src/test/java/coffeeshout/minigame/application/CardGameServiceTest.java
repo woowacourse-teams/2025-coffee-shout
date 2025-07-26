@@ -3,13 +3,11 @@ package coffeeshout.minigame.application;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
@@ -58,7 +56,7 @@ class CardGameServiceTest {
                 CardGameTaskExecutor executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
 
-                softly.assertThat(executor.getCardGameTasks()).hasSize(7);
+                softly.assertThat(executor.getFutureTasks()).hasSize(7);
             });
         }
 

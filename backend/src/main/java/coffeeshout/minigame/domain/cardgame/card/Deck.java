@@ -5,6 +5,8 @@ import static org.springframework.util.Assert.state;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,18 +30,16 @@ public class Deck {
     }
 
     public Card pick(int cardIndex) {
-        Card pickedCard = cards.get(cardIndex);
-        state(!isPicked(pickedCard), "이미 뽑은 카드입니다.");
-        pickedCards.add(pickedCard);
-        return pickedCard;
+        Card selectedCard = cards.get(cardIndex);
+        state(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
+        pickedCards.add(selectedCard);
+        return selectedCard;
     }
 
     public Card pickRandom() {
-        List<Card> cloned = new ArrayList<>(cards);
-        cloned.removeAll(pickedCards);
-        Collections.shuffle(cloned);
-        Card pickedCard = cloned.getFirst();
-        return pick(cards.indexOf(pickedCard));
+        List<Card> remainingCards = getRemainingCards();
+        Card selected = pickRandom(remainingCards);
+        return pick(cards.indexOf(selected));
     }
 
     public boolean isPicked(Card card) {
@@ -52,5 +52,16 @@ public class Deck {
 
     public int size() {
         return cards.size();
+    }
+
+    private List<Card> getRemainingCards() {
+        List<Card> cloned = new ArrayList<>(cards);
+        cloned.removeAll(pickedCards);
+        return cloned;
+    }
+
+    private Card pickRandom(List<Card> cards) {
+        int randomNumber = ThreadLocalRandom.current().nextInt(0, cards.size());
+        return cards.get(randomNumber);
     }
 }
