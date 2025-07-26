@@ -1,0 +1,11 @@
+menus:
+  - name: "아메리카노"
+    image: "americano.jpg"
+  - name: "카페라떼"
+    image: "latte.jpg"
+  - name: "카푸치노"
+    image: "cappuccino.jpg"
+  - name: "에스프레소"
+    image: "espresso.jpg"
+  - name: "프라푸치노"
+    image: "frappuccino.jpg"

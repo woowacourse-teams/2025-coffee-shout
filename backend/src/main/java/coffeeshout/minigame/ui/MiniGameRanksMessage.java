@@ -1,7 +1,7 @@
 package coffeeshout.minigame.ui;
 
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.NonNull;
@@ -14,7 +14,7 @@ public record MiniGameRanksMessage(
             Integer rank
     ) {
         public static MiniGameRankMessage from(@NonNull Entry<Player, Integer> rankEntry) {
-           return new MiniGameRankMessage(rankEntry.getKey().getName(), rankEntry.getValue());
+           return new MiniGameRankMessage(rankEntry.getKey().getName().value(), rankEntry.getValue());
 
         }
     }

@@ -1,6 +1,5 @@
 package coffeeshout.minigame.ui;
 
-import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.TestStompSession.MessageCollector;
@@ -8,26 +7,19 @@ import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.ui.MiniGameRanksMessage.MiniGameRankMessage;
 import coffeeshout.minigame.ui.MiniGameStateMessage.CardInfoMessage;
 import coffeeshout.minigame.ui.handler.SelectCardCommand;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
-import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.FixedLastValueGenerator;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.Roulette;
+import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.SoftAssertions;
-import org.hibernate.Session;
-import org.hibernate.mapping.Join;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,16 +42,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void setUp() {
         joinCode = new JoinCode("ABCDE");
 
-        host = PlayerFixture.꾹이();
-
-        List<Player> guests = List.of(
-                PlayerFixture.루키(),
-                PlayerFixture.한스(),
-                PlayerFixture.엠제이()
-        );
-
-        Room room = new Room(joinCode, new Roulette(new FixedLastValueGenerator()), host);
-        guests.forEach(room::joinPlayer);
+        Room room = RoomFixture.호스트_꾹이();
+        host = room.getHost();
         roomRepository.save(room);
     }
 

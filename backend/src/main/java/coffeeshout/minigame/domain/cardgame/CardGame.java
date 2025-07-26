@@ -8,8 +8,10 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
-import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.Playable;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Players;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +24,8 @@ public class CardGame implements Playable {
     private static final int ADDITION_CARD_COUNT = 6;
     private static final int MULTIPLIER_CARD_COUNT = 3;
 
+    private final Deck deck;
     private PlayerHands playerHands;
-    private Deck deck;
     private CardGameRound round;
     private CardGameState state;
 
@@ -34,11 +36,6 @@ public class CardGame implements Playable {
     }
 
     @Override
-    public void startGame(List<Player> players){
-        this.playerHands = new PlayerHands(players);
-    }
-
-    @Override
     public MiniGameResult getResult() {
         return MiniGameResult.from(calculateScores());
     }
@@ -46,6 +43,11 @@ public class CardGame implements Playable {
     @Override
     public MiniGameType getMiniGameType() {
         return MiniGameType.CARD_GAME;
+    }
+
+    @Override
+    public void startGame(Players players) {
+        playerHands = new PlayerHands(players);
     }
 
     public void startRound() {
@@ -71,7 +73,7 @@ public class CardGame implements Playable {
         return round == targetRound && playerHands.isRoundFinished();
     }
 
-    public Player findPlayerByName(String name) {
+    public Player findPlayerByName(PlayerName name) {
         return playerHands.findPlayerByName(name);
     }
 

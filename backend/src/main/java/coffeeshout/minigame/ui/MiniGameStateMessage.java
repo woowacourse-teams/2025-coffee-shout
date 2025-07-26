@@ -2,7 +2,8 @@ package coffeeshout.minigame.ui;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.Card;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
@@ -23,17 +24,17 @@ public record MiniGameStateMessage(
             return cardGame.getDeck().getCards().stream()
                     .map(card -> {
                         Optional<Player> player = cardGame.findCardOwnerInCurrentRound(card);
-                        String name = player.map(Player::getName).orElse(null);
+                        PlayerName name = player.map(Player::getName).orElse(null);
                         return CardInfoMessage.of(card, player.isPresent(), name);
                     }).toList();
         }
 
-        public static CardInfoMessage of(@NonNull Card card, boolean isSelected, String name) {
+        public static CardInfoMessage of(@NonNull Card card, boolean isSelected, PlayerName name) {
             return new CardInfoMessage(
                     card.getType().name(),
                     card.getValue(),
                     isSelected,
-                    name
+                    name.value()
             );
         }
     }

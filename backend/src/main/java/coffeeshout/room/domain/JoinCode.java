@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record JoinCode(String value) {
+public record JoinCode(
+        String value
+) {
 
     public String getValue() {
         return value;

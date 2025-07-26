@@ -1,31 +1,16 @@
 package coffeeshout.minigame.application;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-
+import coffeeshout.fixture.FixedLastValueGenerator;
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
+import coffeeshout.fixture.RoomFixture;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.ui.MiniGameStateMessage;
-import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.FixedLastValueGenerator;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.RoomFinder;
-import coffeeshout.room.domain.Roulette;
+import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.roulette.Roulette;
 import java.util.List;
-import org.aspectj.lang.annotation.Before;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -52,17 +37,7 @@ class CardGameServiceTest {
     void setUp() {
         joinCode = new JoinCode("ABCDE");
 
-        List<Player> players = List.of(
-                PlayerFixture.꾹이(),
-                PlayerFixture.루키(),
-                PlayerFixture.한스(),
-                PlayerFixture.엠제이()
-        );
-
-        Room room = new Room(joinCode, new Roulette(new FixedLastValueGenerator()), players.get(0));
-        room.joinPlayer(players.get(1));
-        room.joinPlayer(players.get(2));
-        room.joinPlayer(players.get(3));
+        Room room = RoomFixture.호스트_꾹이();
         roomRepository.save(room);
     }
 //

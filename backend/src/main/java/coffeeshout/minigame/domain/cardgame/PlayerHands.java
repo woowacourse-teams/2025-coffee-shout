@@ -2,7 +2,9 @@ package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Players;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +16,8 @@ public class PlayerHands {
 
     private final Map<Player, CardHand> playerHands;
 
-    public PlayerHands(List<Player> players) {
-        this.playerHands = players.stream().collect(Collectors.toMap(
+    public PlayerHands(Players players) {
+        this.playerHands = players.getPlayers().stream().collect(Collectors.toMap(
                 player -> player,
                 player -> new CardHand()
         ));
@@ -43,9 +45,9 @@ public class PlayerHands {
         return totalHandSize() % playerCount() == 0;
     }
 
-    public Player findPlayerByName(String name) {
+    public Player findPlayerByName(PlayerName name) {
         return playerHands.keySet().stream()
-                .filter(player -> player.isSameName(name))
+                .filter(player -> player.sameName(name))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }

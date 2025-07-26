@@ -7,10 +7,11 @@ import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
-import coffeeshout.player.domain.Player;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +26,12 @@ public class CardGameService {
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
     private static final String CARD_GAME_RESULT_DESTINATION_FORMAT = "/topic/room/%s/rank";
 
-    private final RoomFinder roomFinder;
+    private final RoomQueryService roomQueryService;
     private final SimpMessagingTemplate messagingTemplate;
     private final CardGameTaskExecutors cardGameTaskExecutors;
 
     public void startGame(JoinCode joinCode) {
-        final Room room = roomFinder.findByJoinCode(joinCode);
+        final Room room = roomQueryService.findByJoinCode(joinCode);
 
         room.startGame(MiniGameType.CARD_GAME);
         CardGameTaskExecutor executor = new CardGameTaskExecutor(List.of(
@@ -49,7 +50,7 @@ public class CardGameService {
     public void selectCard(String joinCode, String playerName, Integer cardIndex) {
         JoinCode roomJoinCode = new JoinCode(joinCode);
         final CardGame cardGame = getCardGame(roomJoinCode);
-        final Player player = cardGame.findPlayerByName(playerName);
+        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
         cardGame.selectCard(player, cardIndex);
         sendCardGameState(roomJoinCode);
         if (cardGame.isFinishedThisRound()) {
@@ -88,7 +89,6 @@ public class CardGameService {
     }
 
     private CardGameTask done(JoinCode joinCode) {
-        CardGame cardGame = getCardGame(joinCode);
         return new CardGameTask(
                 CardGameState.DONE,
                 () -> getCardGame(joinCode).changeDoneState(),
@@ -101,6 +101,7 @@ public class CardGameService {
     private void sendCardGameState(JoinCode joinCode) {
         CardGame cardGame = getCardGame(joinCode);
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
+        log.info("sendCardGameState: joinCode={}, message={}", joinCode, message);
         String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.getValue());
         messagingTemplate.convertAndSend(destination, message);
     }
@@ -112,7 +113,7 @@ public class CardGameService {
     }
 
     private CardGame getCardGame(JoinCode joinCode) {
-        Room room = roomFinder.findByJoinCode(joinCode);
+        Room room = roomQueryService.findByJoinCode(joinCode);
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 }

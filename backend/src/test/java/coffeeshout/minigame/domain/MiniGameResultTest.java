@@ -2,7 +2,7 @@ package coffeeshout.minigame.domain;
 
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.minigame.domain.cardgame.CardGameScore;
-import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.player.Player;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
