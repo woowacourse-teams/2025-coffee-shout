@@ -4,9 +4,12 @@ import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.player.domain.Player;
+import coffeeshout.room.domain.Playable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,27 +17,36 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class CardGame {
+public class CardGame implements Playable {
 
-    private final PlayerHands playerHands;
-    private final Deck deck;
+    private static final int ADDITION_CARD_COUNT = 6;
+    private static final int MULTIPLIER_CARD_COUNT = 3;
+
+    private PlayerHands playerHands;
+    private Deck deck;
     private CardGameRound round;
     private CardGameState state;
 
-    public CardGame(
-            @NonNull Deck deck,
-            @NonNull List<Player> players
-    ) {
-        this.playerHands = new PlayerHands(players);
-        this.deck = deck;
+    public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
         this.round = CardGameRound.READY;
         this.state = CardGameState.READY;
+        this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
     }
 
+    @Override
+    public void startGame(List<Player> players){
+        this.playerHands = new PlayerHands(players);
+    }
+
+    @Override
     public MiniGameResult getResult() {
         return MiniGameResult.from(calculateScores());
     }
 
+    @Override
+    public MiniGameType getMiniGameType() {
+        return MiniGameType.CARD_GAME;
+    }
 
     public void startRound() {
         deck.shuffle();

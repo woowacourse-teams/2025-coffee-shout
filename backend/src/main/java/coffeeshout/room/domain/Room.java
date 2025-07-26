@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.player.domain.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,15 +48,24 @@ public class Room {
         playersWithProbability.join(joinPlayer);
     }
 
-    public void setMiniGame(List<Playable> miniGames) {
+    public void addMiniGame(String hostName, Playable miniGame) {
+        isTrue(host.isSameName(hostName), "호스트가 아닙니다.");
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
-        this.miniGames = miniGames;
+        miniGames.add(miniGame);
+    }
+
+    public void removeMiniGame(String hostName, Playable miniGame) {
+        isTrue(host.isSameName(hostName), "호스트가 아닙니다.");
+        isTrue(miniGames.stream().anyMatch(m -> m.getMiniGameType() == miniGame.getMiniGameType()), "미니게임이 존재하지 않습니다.");
+        miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
     }
 
     // TODO 미니게임 결과 반영
     public void applyMiniGameResult(MiniGameResult miniGameResult) {
-        playersWithProbability.adjustProbabilities(miniGameResult,
-                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
+        playersWithProbability.adjustProbabilities(
+                miniGameResult,
+                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size())
+        );
     }
 
     public boolean hasNoMiniGames() {
@@ -92,6 +102,17 @@ public class Room {
                 .filter(p -> p.getName().equals(playerName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("사용지가 존재하지 않습니다."));
+    }
+
+    public Playable findMiniGame(MiniGameType miniGameType) {
+        return miniGames.stream()
+                .filter(minigame -> minigame.getMiniGameType() == miniGameType)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 미니게임이 존재하지 않습니다."));
+    }
+
+    public void startGame(MiniGameType miniGameType) {
+        findMiniGame(miniGameType).startGame(getPlayers());
     }
 
 //    TODO: 미니게임 플레이 어떻게 할까
