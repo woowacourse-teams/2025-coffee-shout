@@ -88,19 +88,13 @@ const Template = (args: LayoutStoryArgs) => {
       <Layout.Content>{content}</Layout.Content>
       {buttonCount === 1 && (
         <Layout.ButtonBar flexRatios={flexRatios}>
-          <Button variant="primary" onClick={() => {}}>
-            버튼1
-          </Button>
+          <Button variant="primary">버튼1</Button>
         </Layout.ButtonBar>
       )}
       {buttonCount === 2 && (
         <Layout.ButtonBar flexRatios={flexRatios}>
-          <Button variant="primary" onClick={() => {}}>
-            버튼1
-          </Button>
-          <Button variant="primary" onClick={() => {}}>
-            버튼2
-          </Button>
+          <Button variant="primary">버튼1</Button>
+          <Button variant="primary">버튼2</Button>
         </Layout.ButtonBar>
       )}
     </Layout>
@@ -213,12 +207,8 @@ const ModalWithLayoutComponent = () => {
             </div>
           </Layout.Content>
           <Layout.ButtonBar height="100%">
-            <Button variant="secondary" onClick={() => {}}>
-              취소
-            </Button>
-            <Button variant="primary" onClick={() => {}}>
-              변경
-            </Button>
+            <Button variant="secondary">취소</Button>
+            <Button variant="primary">변경</Button>
           </Layout.ButtonBar>
         </Layout>
       </div>,

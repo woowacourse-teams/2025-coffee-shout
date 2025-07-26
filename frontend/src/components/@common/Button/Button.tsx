@@ -3,18 +3,18 @@ import * as S from './Button.styled';
 import { isTouchDevice } from '@/utils/isTouchDevice';
 
 type Props = {
-  onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
   variant?: S.ButtonVariant;
   width?: string;
   height?: 'small' | 'medium' | 'large';
 } & Omit<ComponentProps<'button'>, 'disabled' | 'onClick'>;
 
 const Button = ({
-  onClick,
   variant = 'primary',
   width = '100%',
   height = 'large',
   children,
+  onClick,
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
@@ -24,7 +24,7 @@ const Button = ({
     if (isTouch) return;
     if (isDisabled) return;
 
-    onClick(e);
+    onClick?.(e);
   };
 
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
@@ -33,7 +33,7 @@ const Button = ({
 
     e.preventDefault();
 
-    onClick(e);
+    onClick?.(e);
   };
 
   return (
