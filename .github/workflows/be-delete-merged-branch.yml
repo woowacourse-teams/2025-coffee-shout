@@ -31,7 +31,7 @@ jobs:
           BRANCH_NAME="${{ steps.branch-name.outputs.branch }}"
           
           # 보호된 브랜치들은 삭제하지 않음 (main, master, develop, be/dev 등)
-          PROTECTED_BRANCHES=("main" "master" "develop" "be/dev" "be/main" "staging" "production")
+          PROTECTED_BRANCHES=("main" "fe/dev" "fe/prod" "be/dev" "be/prod")
           
           for protected in "${PROTECTED_BRANCHES[@]}"; do
             if [[ "$BRANCH_NAME" == "$protected" ]]; then
