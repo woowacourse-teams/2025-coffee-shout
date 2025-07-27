@@ -1,7 +1,8 @@
-package coffeeshout.minigame.ui.handler;
+package coffeeshout.minigame.ui.command.handler;
 
 import coffeeshout.minigame.application.CardGameService;
-import coffeeshout.minigame.ui.MiniGameCommandHandler;
+import coffeeshout.minigame.ui.command.MiniGameCommandHandler;
+import coffeeshout.minigame.ui.request.command.SelectCardCommand;
 import org.springframework.stereotype.Component;
 
 @Component

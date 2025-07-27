@@ -1,7 +1,7 @@
 package coffeeshout.minigame.ui.request;
 
-import coffeeshout.minigame.ui.MiniGameCommand;
-import coffeeshout.minigame.ui.handler.SelectCardCommand;
+import coffeeshout.minigame.ui.command.MiniGameCommand;
+import coffeeshout.minigame.ui.request.command.SelectCardCommand;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

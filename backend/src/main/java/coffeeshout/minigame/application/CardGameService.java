@@ -6,7 +6,7 @@ import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.ui.MiniGameStateMessage;
+import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;

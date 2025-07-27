@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.command;
 
 
 import coffeeshout.minigame.domain.MiniGameType;

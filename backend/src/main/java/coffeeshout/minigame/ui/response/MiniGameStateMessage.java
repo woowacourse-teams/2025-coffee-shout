@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.response;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.Card;

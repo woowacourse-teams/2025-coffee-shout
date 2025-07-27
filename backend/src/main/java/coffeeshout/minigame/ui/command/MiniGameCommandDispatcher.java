@@ -1,4 +1,4 @@
-package coffeeshout.minigame.ui;
+package coffeeshout.minigame.ui.command;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,9 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class MiniGameCommandDispatcher {
 
-    private final Map<Class<? extends MiniGameCommand>, MiniGameCommandHandler<?>> handlers = new HashMap<>();
+    private final Map<Class<? extends MiniGameCommand>, MiniGameCommandHandler<?>> handlers;
 
     public MiniGameCommandDispatcher(List<MiniGameCommandHandler<?>> handlerList) {
+        handlers = new HashMap<>();
         for (MiniGameCommandHandler<?> handler : handlerList) {
             handlers.put(handler.getCommandType(), handler);
         }

@@ -1,5 +1,7 @@
 package coffeeshout.minigame.ui;
 
+import coffeeshout.minigame.ui.command.MiniGameCommand;
+import coffeeshout.minigame.ui.command.MiniGameCommandDispatcher;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import com.fasterxml.jackson.databind.JsonNode;
