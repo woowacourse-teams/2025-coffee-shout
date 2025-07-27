@@ -13,7 +13,7 @@ public enum CardGameRound {
     ;
 
     public CardGameRound next() {
-    state(this.ordinal() != values().length - 1, "마지막 라운드입니다.");
+        state(this.ordinal() != values().length - 1, "마지막 라운드입니다.");
         final int currentRound = this.ordinal();
         CardGameRound[] values = values();
         return values[currentRound + 1];

@@ -101,7 +101,6 @@ public class CardGameService {
     private void sendCardGameState(JoinCode joinCode) {
         CardGame cardGame = getCardGame(joinCode);
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
-        log.info("sendCardGameState: joinCode={}, message={}", joinCode, message);
         String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.getValue());
         messagingTemplate.convertAndSend(destination, message);
     }

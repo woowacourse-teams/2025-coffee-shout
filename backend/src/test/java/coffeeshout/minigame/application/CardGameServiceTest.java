@@ -1,15 +1,10 @@
 package coffeeshout.minigame.application;
 
-import coffeeshout.fixture.FixedLastValueGenerator;
-import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
-import coffeeshout.room.domain.roulette.Roulette;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

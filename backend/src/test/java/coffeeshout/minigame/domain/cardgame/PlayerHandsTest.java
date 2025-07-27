@@ -31,7 +31,6 @@ class PlayerHandsTest {
         players.join(PlayerFixture.루키());
         players.join(PlayerFixture.한스());
         players.join(PlayerFixture.엠제이());
-        Players players = new Players();
 
         playerHands = new PlayerHands(players);
     }
@@ -149,7 +148,7 @@ class PlayerHandsTest {
             Player foundPlayer = playerHands.findPlayerByName(new PlayerName(playerName));
 
             // then
-            assertThat(foundPlayer.getName()).isEqualTo(playerName);
+            assertThat(foundPlayer.getName().value()).isEqualTo(playerName);
         }
 
         @Test
@@ -215,7 +214,10 @@ class PlayerHandsTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(unselectedPlayers).hasSize(2);
-                softly.assertThat(unselectedPlayers).contains(players.getPlayer(new PlayerName("한스")), players.getPlayer(new PlayerName("엠제이")));
+                softly.assertThat(unselectedPlayers).contains(
+                        players.getPlayer(new PlayerName("한스")),
+                        players.getPlayer(new PlayerName("엠제이"))
+                );
             });
         }
 
@@ -236,7 +238,11 @@ class PlayerHandsTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(unselectedPlayers).hasSize(3);
-                softly.assertThat(unselectedPlayers).contains(players.getPlayer(new PlayerName("루키")), players.getPlayer(new PlayerName("한스")), players.getPlayer(new PlayerName("엠제이")));
+                softly.assertThat(unselectedPlayers).contains(
+                        players.getPlayer(new PlayerName("루키")),
+                        players.getPlayer(new PlayerName("한스")),
+                        players.getPlayer(new PlayerName("엠제이"))
+                );
             });
         }
 

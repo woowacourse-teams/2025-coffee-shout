@@ -1,6 +1,14 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
-import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.*;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.MINUS_10;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.MINUS_20;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.MINUS_30;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.MINUS_40;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.PLUS_10;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.PLUS_20;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.PLUS_30;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.PLUS_40;
+import static coffeeshout.minigame.domain.cardgame.card.AdditionCard.ZERO;
 import static org.springframework.util.Assert.isTrue;
 
 import java.util.ArrayList;

@@ -5,15 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
-import coffeeshout.fixture.RoomFixture;
+import coffeeshout.fixture.PlayerProbabilities;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.assertj.core.api.SoftAssertions;
@@ -26,11 +24,12 @@ class CardGameTest {
     CardGame cardGame;
     Players players;
     CardGameDeckGenerator deckGenerator = new CardGameDeckStub();
-    Room room;
 
     @BeforeEach
     void setUp() {
-        room = RoomFixture.호스트_꾹이();
+        players = new Players();
+        PlayerProbabilities.PLAYERS.forEach(players::join);
+
         cardGame = new CardGameFake(deckGenerator);
         cardGame.startGame(players);
     }
@@ -96,7 +95,7 @@ class CardGameTest {
         void 게임이_진행중이_아닐때_카드_선택시_예외_발생() {
             // given
             cardGame.changeScoreBoardState(); // PLAYING이 아닌 상태로 변경
-            Player player = players.getPlayer( new PlayerName("꾹이"));
+            Player player = players.getPlayer(new PlayerName("꾹이"));
 
             // when & then
             assertThatThrownBy(() -> cardGame.selectCard(player, 0))
@@ -166,7 +165,7 @@ class CardGameTest {
 
             // when - 두 번째 라운드 시작 가능한지 확인
             assertThat(cardGame.isFinished(CardGameRound.FIRST)).isTrue();
-            
+
             // then - 점수가 계산되는지 확인
             Map<Player, MiniGameScore> scores = cardGame.calculateScores();
             assertThat(scores).hasSize(4);
@@ -247,7 +246,7 @@ class CardGameTest {
             Player foundPlayer = cardGame.findPlayerByName(new PlayerName(playerName));
 
             // then
-            assertThat(foundPlayer.getName()).isEqualTo(playerName);
+            assertThat(foundPlayer.getName().value()).isEqualTo(playerName);
         }
 
         @Test

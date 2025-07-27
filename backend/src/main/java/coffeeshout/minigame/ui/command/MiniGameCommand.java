@@ -5,5 +5,5 @@ import coffeeshout.minigame.domain.MiniGameType;
 
 public interface MiniGameCommand {
 
-       MiniGameType getMiniGameType();
+    MiniGameType getMiniGameType();
 }

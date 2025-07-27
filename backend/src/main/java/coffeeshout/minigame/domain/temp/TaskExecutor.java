@@ -1,7 +1,5 @@
 package coffeeshout.minigame.domain.temp;
 
-import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutor.CardGameTask;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
