@@ -34,7 +34,7 @@ const Scroll = styled.div`
 `;
 
 const meta = {
-  title: 'Features/UI/Modal',
+  title: 'Common/Modal',
   component: Modal,
   parameters: {
     layout: 'centered',
