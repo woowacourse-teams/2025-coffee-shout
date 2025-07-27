@@ -1,6 +1,6 @@
 import Portal from '@/components/@common/Portal/Portal';
 import useEscapeKey from '@/hooks/useEscapeKey';
-import { MouseEvent, PropsWithChildren } from 'react';
+import { MouseEvent, PropsWithChildren, useId } from 'react';
 import * as S from './Modal.styled';
 import ModalHeader from './ModalHeader/ModalHeader';
 
@@ -13,6 +13,11 @@ type Props = {
 
 const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Props) => {
   useEscapeKey({ onEscape: onClose, enabled: isOpen });
+
+  const id = useId();
+  const titleId = `modal-title-${id}`;
+  const contentId = `modal-content-${id}`;
+
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
   if (!isOpen) return null;
@@ -21,12 +26,23 @@ const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Pro
 
   return (
     <Portal containerId="modal-root">
-      <S.Backdrop onClick={onClose}>
-        <S.Container onClick={stopPropagation}>
+      <S.Backdrop onClick={onClose} role="presentation">
+        <S.Container
+          onClick={stopPropagation}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
+          aria-describedby={contentId}
+        >
           {shouldRenderHeader && (
-            <ModalHeader title={title} onClose={onClose} showCloseButton={showCloseButton} />
+            <ModalHeader
+              id={titleId}
+              title={title}
+              onClose={onClose}
+              showCloseButton={showCloseButton}
+            />
           )}
-          {children}
+          <div id={contentId}>{children}</div>
         </S.Container>
       </S.Backdrop>
     </Portal>
