@@ -1,5 +1,6 @@
 import Portal from '@/components/@common/Portal/Portal';
 import useEscapeKey from '@/hooks/useEscapeKey';
+import useFocusTrap from '@/hooks/useFocusTrap';
 import { MouseEvent, PropsWithChildren, useId } from 'react';
 import * as S from './Modal.styled';
 import ModalHeader from './ModalHeader/ModalHeader';
@@ -18,6 +19,8 @@ const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Pro
   const titleId = `modal-title-${id}`;
   const contentId = `modal-content-${id}`;
 
+  const { containerRef } = useFocusTrap(isOpen);
+
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
   if (!isOpen) return null;
@@ -28,6 +31,7 @@ const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Pro
     <Portal containerId="modal-root">
       <S.Backdrop onClick={onClose} role="presentation">
         <S.Container
+          ref={containerRef}
           onClick={stopPropagation}
           role="dialog"
           aria-modal="true"
