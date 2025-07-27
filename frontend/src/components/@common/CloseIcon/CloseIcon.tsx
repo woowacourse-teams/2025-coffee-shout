@@ -1,9 +1,9 @@
 import { SVGProps } from 'react';
 
-interface Props extends SVGProps<SVGSVGElement> {
+type Props = {
   stroke?: string;
   strokeWidth?: number;
-}
+} & SVGProps<SVGSVGElement>;
 
 const CloseIcon = ({ stroke = '#99A1AF', strokeWidth = 2, ...rest }: Props) => {
   return (
