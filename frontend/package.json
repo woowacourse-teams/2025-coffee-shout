@@ -14,7 +14,7 @@
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:jest": "jest --passWithNoTests",
+    "test:jest": "jest --passWithNoTests --config jest.config.cjs",
     "test:cypress": "cypress open"
   },
   "keywords": [],
