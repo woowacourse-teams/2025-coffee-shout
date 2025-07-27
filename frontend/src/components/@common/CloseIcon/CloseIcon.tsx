@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import { SVGProps } from 'react';
 
 type Props = {
@@ -5,7 +6,10 @@ type Props = {
   strokeWidth?: number;
 } & SVGProps<SVGSVGElement>;
 
-const CloseIcon = ({ stroke = '#99A1AF', strokeWidth = 2, ...rest }: Props) => {
+const CloseIcon = ({ stroke, strokeWidth = 2, ...rest }: Props) => {
+  const theme = useTheme();
+  const iconStroke = stroke ?? theme.color.gray[400];
+
   return (
     <svg
       width="19"
@@ -17,14 +21,14 @@ const CloseIcon = ({ stroke = '#99A1AF', strokeWidth = 2, ...rest }: Props) => {
     >
       <path
         d="M14.8438 4.15625L4.15625 14.8438"
-        stroke={stroke}
+        stroke={iconStroke}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14.8438 14.8438L4.15625 4.15625"
-        stroke={stroke}
+        stroke={iconStroke}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
