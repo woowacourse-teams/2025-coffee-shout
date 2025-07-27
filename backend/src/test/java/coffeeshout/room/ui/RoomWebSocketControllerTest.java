@@ -17,7 +17,6 @@ import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -43,18 +42,13 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @ActiveProfiles("test")
-public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
+class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     @Autowired
     private RoomRepository roomRepository;
-
     @Autowired
     private MenuRepository menuRepository;
-
     private Room testRoom;
-    private Menu testMenu;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
@@ -151,19 +145,16 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
                 getHandler(responseQueue, new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
                 }));
 
-        try {
-            session.send("/app/room/" + nonExistentJoinCode + "/players", null);
+        session.send("/app/room/" + nonExistentJoinCode + "/players", null);
 
-            // then - 에러가 발생하거나 응답이 없어야 함
-            WebSocketResponse<List<PlayerResponse>> response = responseQueue.poll(3, TimeUnit.SECONDS);
+        // then - 에러가 발생하거나 응답이 없어야 함
+        WebSocketResponse<List<PlayerResponse>> response = responseQueue.poll(3, TimeUnit.SECONDS);
 
-            // 실제 구현에 따라 null이거나 예외가 발생할 수 있음
-            System.out.println("존재하지 않는 방 요청 응답: " + response);
-
-        } catch (Exception e) {
-            // 예외 발생이 정상적인 경우
-            System.out.println("✅ 예상된 예외 발생: " + e.getMessage());
-        }
+        // 실제 구현에 따라 null이거나 예외가 발생할 수 있음
+        assertThat(response).isNotNull();
+        assertThat(response.success())
+                .as("존재하지 않는 방에 대한 응답은 null이어야 합니다.")
+                .isFalse();
     }
 
     @Test
@@ -269,14 +260,12 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
 
     private <T> TypeReferenceFrameHandler<T> getHandler(BlockingQueue<T> responseQueue,
                                                         TypeReference<T> typeReference) {
-        TypeReferenceFrameHandler<T> handler = new TypeReferenceFrameHandler<>(responseQueue, typeReference,
-                objectMapper);
-        return handler;
+        return new TypeReferenceFrameHandler<>(responseQueue, typeReference);
     }
 
     private void setupTestData() {
         // 메뉴 생성
-        testMenu = menuRepository.findAll().get(0);
+        Menu testMenu = menuRepository.findAll().get(0);
 
         // 방 생성 - 호스트와 함께
         JoinCode joinCode = new JoinCode("TEST2"); // 5자리로 수정
@@ -292,6 +281,17 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         testRoom = roomRepository.save(testRoom);
 
         System.out.println("✅ 테스트 방 생성 완료 - JoinCode: " + testRoom.getJoinCode());
+    }
+
+    private StompSession getStompSession() throws InterruptedException, ExecutionException, TimeoutException {
+        List<Transport> transports = List.of(new WebSocketTransport(new StandardWebSocketClient()),
+                new RestTemplateXhrTransport());
+        WebSocketClient sockJsClient2 = new SockJsClient(transports);
+        WebSocketStompClient stompClient2 = new WebSocketStompClient(sockJsClient2);
+        stompClient2.setMessageConverter(new MappingJackson2MessageConverter());
+
+        return stompClient2.connectAsync("http://localhost:" + port + "/ws",
+                new TestStompSessionHandler()).get(10, TimeUnit.SECONDS);
     }
 
     private static class TestStompSessionHandler implements StompSessionHandler {
@@ -323,18 +323,5 @@ public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport
         public void handleFrame(StompHeaders headers, Object payload) {
             System.out.println("📨 프레임 수신: " + payload);
         }
-
-    }
-
-    private StompSession getStompSession() throws InterruptedException, ExecutionException, TimeoutException {
-        List<Transport> transports = List.of(new WebSocketTransport(new StandardWebSocketClient()),
-                new RestTemplateXhrTransport());
-        WebSocketClient sockJsClient2 = new SockJsClient(transports);
-        WebSocketStompClient stompClient2 = new WebSocketStompClient(sockJsClient2);
-        stompClient2.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompSession session2 = stompClient2.connectAsync("http://localhost:" + port + "/ws",
-                new TestStompSessionHandler()).get(10, TimeUnit.SECONDS);
-        return session2;
     }
 }

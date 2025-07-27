@@ -15,11 +15,10 @@ public class TypeReferenceFrameHandler<T> implements StompFrameHandler {
     private final ObjectMapper objectMapper;
 
     // 🎯 생성자에서 TypeReference를 직접 받음
-    public TypeReferenceFrameHandler(BlockingQueue<T> queue, TypeReference<T> typeReference,
-                                     ObjectMapper objectMapper) {
+    public TypeReferenceFrameHandler(BlockingQueue<T> queue, TypeReference<T> typeReference) {
         this.queue = queue;
         this.typeReference = typeReference;
-        this.objectMapper = objectMapper;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
