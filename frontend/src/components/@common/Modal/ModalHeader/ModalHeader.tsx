@@ -1,5 +1,5 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import CloseIcon from '../../CloseIcon/CloseIcon';
+import CloseIcon from '@/components/@common/CloseIcon/CloseIcon';
 import * as S from './ModalHeader.styled';
 
 type Props = {
