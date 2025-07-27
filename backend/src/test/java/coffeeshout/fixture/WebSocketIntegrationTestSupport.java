@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -21,6 +23,8 @@ public abstract class WebSocketIntegrationTestSupport {
 
     static final int CONNECT_TIMEOUT_SECONDS = 1;
     static final String WEBSOCKET_BASE_URL_FORMAT = "ws://localhost:%d/ws";
+    private static final Logger log = LoggerFactory.getLogger(WebSocketIntegrationTestSupport.class);
+
 
     @LocalServerPort
     private int port;
@@ -39,6 +43,7 @@ public abstract class WebSocketIntegrationTestSupport {
 
                             @Override
                             public void handleTransportError(StompSession session, Throwable exception) {
+                                log.error("STOMP TRANSPORT ERROR: " + exception.getMessage());
                                 throw new RuntimeException(exception);
                             }
 
@@ -50,6 +55,7 @@ public abstract class WebSocketIntegrationTestSupport {
                                     byte[] payload,
                                     Throwable exception
                             ) {
+                                log.error("STOMP EXCEPTION: " + exception.getMessage());
                                 throw new RuntimeException(exception);
                             }
                         }

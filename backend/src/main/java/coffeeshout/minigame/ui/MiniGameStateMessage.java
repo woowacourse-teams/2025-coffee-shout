@@ -34,7 +34,7 @@ public record MiniGameStateMessage(
                     card.getType().name(),
                     card.getValue(),
                     isSelected,
-                    name.value()
+                    name == null ? null : name.value()
             );
         }
     }
