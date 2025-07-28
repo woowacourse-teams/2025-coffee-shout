@@ -92,4 +92,8 @@ public class RoomService {
                 .map(Playable::getMiniGameType)
                 .toList();
     }
+
+    public boolean isRoomExists(String joinCode) {
+        return roomCommandService.existsByJoinCode(new JoinCode(joinCode));
+    }
 }

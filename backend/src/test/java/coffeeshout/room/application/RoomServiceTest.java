@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
@@ -314,5 +315,17 @@ class RoomServiceTest {
         assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getJoinCode().value(), guestName,
                 MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 방이_존재하는지_확인한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        // when & then
+        assertThat(roomService.isRoomExists(joinCode.value())).isTrue();
+        assertThat(roomService.isRoomExists("TRASH")).isFalse();
     }
 }

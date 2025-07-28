@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,6 +36,13 @@ public class RoomRestController {
         final Room room = roomService.enterRoom(request.joinCode(), request.guestName(), request.menuId());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkJoinCode(@RequestParam String joinCode) {
+        final boolean exists = roomService.isRoomExists(joinCode);
+
+        return ResponseEntity.ok(exists);
     }
 
     @GetMapping("/minigames")
