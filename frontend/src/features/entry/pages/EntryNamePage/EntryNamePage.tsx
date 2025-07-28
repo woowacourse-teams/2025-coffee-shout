@@ -15,7 +15,7 @@ const EntryNamePage = () => {
   const navigate = useNavigate();
 
   const handleNavigateToHome = () => navigate('/');
-    const handleNavigateToMenu = () =>
+  const handleNavigateToMenu = () =>
     navigate('/entry/menu', {
       state: {
         name,
