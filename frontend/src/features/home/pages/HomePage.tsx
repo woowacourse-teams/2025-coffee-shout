@@ -7,14 +7,14 @@ import Splash from '../components/Splash/Splash';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
-import { useUserRole } from '@/contexts/UserRoleContext';
+import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import * as S from './HomePage.styled';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
-  const { setHost, setGuest } = useUserRole();
+  const { setHost, setGuest } = usePlayerRole();
 
   useEffect(() => {
     const checkFirstVisit = () => {

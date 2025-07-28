@@ -6,7 +6,7 @@ import ProbabilityList from '@/components/@composition/ProbabilityList/Probabili
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import Layout from '@/layouts/Layout';
-import { useUserRole } from '@/contexts/UserRoleContext';
+import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,17 +15,17 @@ import * as S from './RoulettePlayPage.styled';
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  const { userRole } = useUserRole();
+  const { playerRole } = usePlayerRole();
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
 
   const isRouletteView = currentView === 'roulette';
 
-  const buttonVariant = isSpinning ? 'disabled' : userRole === 'GUEST' ? 'loading' : 'primary';
+  const buttonVariant = isSpinning ? 'disabled' : playerRole === 'GUEST' ? 'loading' : 'primary';
 
   //TODO: 다른 에러 처리방식을 찾아보기
-  if (!userRole) return null;
+  if (!playerRole) return null;
 
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));

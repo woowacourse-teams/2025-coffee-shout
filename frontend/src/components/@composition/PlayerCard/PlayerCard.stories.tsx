@@ -34,7 +34,7 @@ export const Host: Story = {
   args: {
     name: '홍길동',
     iconColor: 'red',
-    userRole: 'HOST',
+    playerRole: 'HOST',
   },
 };
 

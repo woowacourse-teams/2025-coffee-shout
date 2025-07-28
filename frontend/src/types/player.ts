@@ -1,3 +1,3 @@
-export type UserRole = 'HOST' | 'GUEST';
+export type PlayerRole = 'HOST' | 'GUEST';
 
 export type IconColor = 'red';
