@@ -5,12 +5,12 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
 
-type MiniGameType = 'CARD_GAME' | '31_GAME';
-
-const MINI_GAME_NAME_MAP: Record<MiniGameType, string> = {
+const MINI_GAME_NAME_MAP = {
   CARD_GAME: '카드게임',
   '31_GAME': '랜덤 31',
-};
+} as const;
+
+type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
 type MiniGames = {
   miniGameType: MiniGameType;
