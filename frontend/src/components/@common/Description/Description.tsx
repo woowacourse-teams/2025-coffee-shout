@@ -1,8 +1,8 @@
 import { COLOR_MAP, ColorKey } from '@/constants/color';
-import { PropsWithChildren } from 'react';
+import { ComponentProps } from 'react';
 import * as S from './Description.styled';
 
-type Props = { color?: ColorKey } & PropsWithChildren;
+type Props = { color?: ColorKey } & ComponentProps<'span'>;
 
 const Description = ({ children, color = 'gray-700' as ColorKey }: Props) => {
   const resolvedColor = COLOR_MAP[color];

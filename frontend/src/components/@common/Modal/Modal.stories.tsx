@@ -1,6 +1,9 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import styled from '@emotion/styled';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { expect } from '@storybook/jest';
+import type { Meta, StoryContext, StoryObj } from '@storybook/react-webpack5';
+import { userEvent, waitFor, within } from '@storybook/testing-library';
+import { useState } from 'react';
 import Modal from './Modal';
 import useModal from './useModal';
 
@@ -34,7 +37,7 @@ const Scroll = styled.div`
 `;
 
 const meta = {
-  title: 'Features/UI/Modal',
+  title: 'Common/Modal',
   component: Modal,
   parameters: {
     layout: 'centered',
@@ -164,5 +167,85 @@ export const WithScrollContent: Story = {
     };
 
     return <Button onClick={handleOpen}>스크롤 모달</Button>;
+  },
+};
+
+const ModalForInteraction = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeModal = () => setIsOpen(false);
+  const openModal = () => setIsOpen(true);
+
+  return (
+    <>
+      <Button type="button" onClick={openModal} data-testid="open-modal-btn">
+        모달 열기
+      </Button>
+      <Modal isOpen={isOpen} onClose={closeModal} title="모달 상호작용 테스트" data-testid="modal">
+        <div data-testid="modal-content">
+          <p>모달 내용</p>
+        </div>
+      </Modal>
+    </>
+  );
+};
+
+export const ModalOpenAndClose = {
+  render: () => <ModalForInteraction />,
+  play: async ({ canvasElement, step }: StoryContext) => {
+    const canvas = within(canvasElement);
+
+    await step('초기에 모달이 보이지 않는지 확인', async () => {
+      const modalContent = canvas.queryByTestId('modal-content');
+      expect(modalContent).not.toBeInTheDocument();
+    });
+
+    await step('모달 열기 버튼 클릭', async () => {
+      const openButton = canvas.getByTestId('open-modal-btn');
+      await userEvent.click(openButton);
+    });
+
+    await step('모달이 열렸는지 확인', async () => {
+      const modalContent = within(document.body).getByTestId('modal-content');
+      expect(modalContent).toBeInTheDocument();
+
+      const modalTitle = within(document.body).getByText('모달 상호작용 테스트');
+      expect(modalTitle).toBeInTheDocument();
+    });
+
+    await step('모달 내부의 닫기(아이콘) 버튼 클릭', async () => {
+      const closeIconButton = within(document.body).getByRole('button', { name: /close-icon/i });
+      await userEvent.click(closeIconButton);
+    });
+
+    await step('모달이 닫혔는지 확인', async () => {
+      await waitFor(() => {
+        const modalContent = within(document.body).queryByTestId('modal-content');
+        expect(modalContent).not.toBeInTheDocument();
+      });
+    });
+  },
+};
+
+export const ModalCloseWithEscapeKey = {
+  render: () => <ModalForInteraction />,
+  play: async ({ canvasElement, step }: StoryContext) => {
+    const canvas = within(canvasElement);
+
+    await step('모달 열기 버튼 클릭', async () => {
+      const openButton = canvas.getByTestId('open-modal-btn');
+      await userEvent.click(openButton);
+    });
+
+    await step('ESC 키를 눌러 모달 닫기', async () => {
+      await userEvent.keyboard('{Escape}');
+    });
+
+    await step('모달이 닫혔는지 확인', async () => {
+      await waitFor(() => {
+        const modalContent = within(document.body).queryByTestId('modal-content');
+        expect(modalContent).not.toBeInTheDocument();
+      });
+    });
   },
 };
