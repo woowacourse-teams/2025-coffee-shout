@@ -2,8 +2,8 @@ import { ComponentProps, KeyboardEvent, useEffect, useRef, useState } from 'reac
 import * as S from './SelectBox.styled';
 
 export type Option = {
-  value: string;
-  label: string;
+  id: number;
+  name: string;
   disabled?: boolean;
 };
 
@@ -14,7 +14,7 @@ export type Props = Omit<ComponentProps<'div'>, 'onChange'> & {
   disabled?: boolean;
   width?: string;
   height?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: Option) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 };
@@ -29,18 +29,18 @@ const SelectBox = ({
   onChange,
   onFocus,
   onBlur,
-  ...restProps
+  ...rest
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((option) => option.value === value);
+  const selectedOption = options.find((option) => option.name === value);
 
-  const handleOptionClick = (optionValue: string) => {
+  const handleOptionClick = (optionId: Option) => {
     if (disabled) return;
 
-    onChange?.(optionValue);
+    onChange?.(optionId);
     setIsOpen(false);
     triggerRef.current?.focus();
   };
@@ -92,7 +92,7 @@ const SelectBox = ({
   }, [onBlur]);
 
   return (
-    <S.Container ref={containerRef} $width={width} $height={height} {...restProps}>
+    <S.Container ref={containerRef} $width={width} $height={height} {...rest}>
       <S.Trigger
         ref={triggerRef}
         $disabled={disabled}
@@ -103,10 +103,10 @@ const SelectBox = ({
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-label={selectedOption ? selectedOption.label : placeholder}
+        aria-label={selectedOption ? selectedOption.name : placeholder}
       >
         <S.SelectText $hasValue={!!selectedOption} $disabled={disabled}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.name : placeholder}
         </S.SelectText>
         <S.ArrowIcon $isOpen={isOpen} $disabled={disabled} />
       </S.Trigger>
@@ -114,14 +114,14 @@ const SelectBox = ({
       <S.Content $isOpen={isOpen} role="listbox">
         {options.map((option) => (
           <S.Item
-            key={option.value}
+            key={option.id}
             $disabled={option.disabled}
-            $selected={option.value === value}
-            onClick={() => !option.disabled && handleOptionClick(option.value)}
+            $selected={option.name === value}
+            onClick={() => !option.disabled && handleOptionClick(option)}
             role="option"
-            aria-selected={option.value === value}
+            aria-selected={String(option.id) === value}
           >
-            {option.label}
+            {option.name}
           </S.Item>
         ))}
       </S.Content>

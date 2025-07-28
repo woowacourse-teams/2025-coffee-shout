@@ -19,7 +19,10 @@ type Props = {
 
 const MenuModifyModal = ({ onClose }: Props) => {
   // TODO: 현재 메뉴를 초깃값으로 설정 (웹소켓: 현재 본인 메뉴)
-  const [modifiedMenu, setModifiedMenu] = useState<string>('');
+  const [modifiedMenu, setModifiedMenu] = useState<Option>({
+    id: -1,
+    name: '',
+  });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,8 +34,8 @@ const MenuModifyModal = ({ onClose }: Props) => {
 
         const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
-          value: String(menu.id),
-          label: menu.name,
+          id: menu.id,
+          name: menu.name,
         }));
         setCoffeeOptions(options);
       } catch (error) {
@@ -68,7 +71,7 @@ const MenuModifyModal = ({ onClose }: Props) => {
         <div>{error}</div>
       ) : (
         <SelectBox
-          value={modifiedMenu}
+          value={modifiedMenu.name}
           options={coffeeOptions}
           onChange={(value) => setModifiedMenu(value)}
         />

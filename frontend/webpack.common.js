@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -5,6 +6,12 @@ import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const env = dotenv.config().parsed;
+
+const envKeys = Object.keys(env).reduce((acc, key) => {
+  acc[`process.env.${key}`] = JSON.stringify(env[key]);
+  return acc;
+}, {});
 
 export default {
   entry: './src/main.tsx',
@@ -41,9 +48,7 @@ export default {
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(process.env),
-    }),
+    new webpack.DefinePlugin(envKeys),
   ],
   devServer: {
     compress: true,

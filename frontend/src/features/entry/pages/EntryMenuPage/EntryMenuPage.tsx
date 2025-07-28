@@ -6,7 +6,7 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
@@ -16,12 +16,26 @@ type MenusResponse = {
   category: string;
 }[];
 
+type CreateRoomRequest = {
+  hostName: string;
+  menuId: number;
+};
+
+type CreateRoomResponse = {
+  joinCode: string;
+};
+
 const EntryMenuPage = () => {
-  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedValue, setSelectedValue] = useState<Option>({
+    id: -1,
+    name: '',
+  });
+
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   useEffect(() => {
     (async () => {
@@ -30,8 +44,8 @@ const EntryMenuPage = () => {
 
         const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
-          value: String(menu.id),
-          label: menu.name,
+          id: menu.id,
+          name: menu.name,
         }));
         setCoffeeOptions(options);
       } catch (error) {
@@ -49,8 +63,32 @@ const EntryMenuPage = () => {
   }, []);
 
   const handleNavigateToName = () => navigate('/entry/name');
-  const handleNavigateToLobby = () => navigate('/room/:roomId/lobby');
-  const isButtonDisabled = selectedValue === '';
+  const handleNavigateToLobby = async () => {
+    if (!state.name) {
+      alert('닉네임을 다시 입력해주세요.');
+      navigate(-1);
+      return;
+    }
+
+    const menuId = selectedValue.id;
+    if (menuId === -1) {
+      alert('메뉴를 선택하지 않았습니다.');
+      return;
+    }
+
+    const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
+      hostName: state.name,
+      menuId,
+    });
+
+    navigate('/room/:roomId/lobby', {
+      state: {
+        joinCode,
+      },
+    });
+  };
+
+  const isButtonDisabled = selectedValue.name === '';
 
   return (
     <Layout>
@@ -65,8 +103,8 @@ const EntryMenuPage = () => {
           ) : (
             <SelectBox
               options={coffeeOptions}
-              value={selectedValue}
-              onChange={setSelectedValue}
+              value={selectedValue.name}
+              onChange={(value: Option) => setSelectedValue(value)}
               placeholder="메뉴를 선택해주세요"
             />
           )}
