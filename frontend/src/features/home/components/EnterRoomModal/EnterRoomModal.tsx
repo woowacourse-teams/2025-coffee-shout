@@ -21,12 +21,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
 
     // joinCode 유효한지 검증하는 로직 추가
 
-    navigate(`/entry/name`, {
-      state: {
-        joinCode,
-      },
-    });
-
+    navigate(`/entry/name`, { state: { joinCode } });
     onClose();
   };
 

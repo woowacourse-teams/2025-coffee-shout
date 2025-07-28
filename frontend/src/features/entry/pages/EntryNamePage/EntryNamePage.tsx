@@ -20,18 +20,9 @@ const EntryNamePage = () => {
   const handleNavigateToHome = () => navigate('/');
   const handleNavigateToMenu = () => {
     if (playerRole === 'HOST') {
-      navigate('/entry/menu', {
-        state: {
-          name,
-        },
-      });
+      navigate('/entry/menu', { state: { name } });
     } else if (playerRole === 'GUEST') {
-      navigate('/entry/menu', {
-        state: {
-          name,
-          joinCode: state.joinCode,
-        },
-      });
+      navigate('/entry/menu', { state: { name, joinCode: state.joinCode } });
     }
   };
 
