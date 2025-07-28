@@ -88,34 +88,31 @@ const EntryMenuPage = () => {
       return;
     }
 
+    const handleHost = async () => {
+      const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
+        hostName: state.name,
+        menuId,
+      });
+
+      // todo: 암호화
+      navigate(`/room/${joinCode}/lobby`, {
+        state: { joinCode },
+      });
+    };
+
+    const handleGuest = async () => {
+      const { joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>('/rooms/enter', {
+        joinCode: state.joinCode,
+        guestName: state.name,
+        menuId,
+      });
+      navigate(`/room/${joinCode}/lobby`, { state: { joinCode } });
+    };
+
     try {
       setLoading(true);
-
-      if (playerRole === 'HOST') {
-        const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-          hostName: state.name,
-          menuId,
-        });
-
-        // todo: 암호화
-        navigate(`/room/${joinCode}/lobby`, {
-          state: {
-            joinCode,
-          },
-        });
-      } else if (playerRole === 'GUEST') {
-        const { joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>('/rooms/enter', {
-          joinCode: state.joinCode,
-          guestName: state.name,
-          menuId,
-        });
-
-        navigate(`/room/${joinCode}/lobby`, {
-          state: {
-            joinCode,
-          },
-        });
-      }
+      if (playerRole === 'HOST') return await handleHost();
+      if (playerRole === 'GUEST') return await handleGuest();
     } catch (error) {
       if (error instanceof ApiError) {
         alert('방 생성/참가에 실패했습니다.');
