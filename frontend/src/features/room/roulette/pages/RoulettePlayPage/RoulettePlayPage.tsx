@@ -4,26 +4,29 @@ import Button from '@/components/@common/Button/Button';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import Layout from '@/layouts/Layout';
+import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePlayPage.styled';
-import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
-import { UserRole } from '@/types/player';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  //TODO: Context로 빼기
-  const [userRole] = useState<UserRole>('HOST');
+  const { playerRole } = usePlayerRole();
+
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
 
   const isRouletteView = currentView === 'roulette';
 
-  const buttonVariant = isSpinning ? 'disabled' : userRole === 'GUEST' ? 'loading' : 'primary';
-
+  const getButtonVariant = () => {
+    if (isSpinning) return 'disabled';
+    if (playerRole === 'GUEST') return 'loading';
+    return 'primary';
+  };
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
@@ -43,6 +46,9 @@ const RoulettePage = () => {
     }
   }, [navigate, isSpinning]);
 
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!playerRole) return null;
+
   return (
     <Layout>
       <Layout.TopBar />
@@ -59,7 +65,7 @@ const RoulettePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={buttonVariant} onClick={handleSpinClick}>
+        <Button variant={getButtonVariant()} onClick={handleSpinClick}>
           룰렛 돌리기
         </Button>
       </Layout.ButtonBar>

@@ -10,8 +10,8 @@ import InviteCodeModal from '../components/InviteCodeModal/InviteCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
+import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import * as S from './LobbyPage.styled';
-import { UserRole } from '@/types/player';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -27,10 +27,13 @@ const SECTIONS: SectionComponents = {
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
-  //TODO: Context로 빼기
-  const [userRole] = useState<UserRole>('HOST');
+
+  const { playerRole } = usePlayerRole();
 
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
+
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!playerRole) return null;
 
   const handleClickBackButton = () => {
     navigate(-1);
@@ -66,7 +69,7 @@ const LobbyPage = () => {
           </S.Wrapper>
         </S.Container>
       </Layout.Content>
-      {userRole === 'HOST' ? (
+      {playerRole === 'HOST' ? (
         <Layout.ButtonBar flexRatios={[5.5, 1]}>
           <Button variant="primary" onClick={handleClickGameStartButton}>
             게임 시작
