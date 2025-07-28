@@ -9,7 +9,7 @@ src/
 ├── utils/
 │   ├── api/
 │   │   ├── error.ts      # 에러 클래스 정의
-│   │   ├── fetcher.ts    # API 요청 함수
+│   │   ├── apiRequest.ts    # API 요청 함수
 │   │   └── api.ts        # API 요청 함수를 래핑한 객체 (GET, POST, PUT 등)
 ```
 
@@ -30,7 +30,7 @@ API 통신 중 발생할 수 있는 에러들을 타입별로 분류하여 처�
 
 <br/>
 
-### 2. `fetcher.ts` - API 요청 함수
+### 2. `apiRequest.ts` - API 요청 함수
 
 HTTP 요청을 처리하는 핵심 함수가 포함되어 있습니다.
 
