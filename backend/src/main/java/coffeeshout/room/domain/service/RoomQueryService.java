@@ -17,4 +17,8 @@ public class RoomQueryService {
         return roomRepository.findByJoinCode(joinCode)
                 .orElseThrow(() -> new NoSuchElementException("방이 존재하지 않습니다."));
     }
+
+    public boolean existsByJoinCode(JoinCode joinCode) {
+        return roomRepository.existsByJoinCode(joinCode);
+    }
 }
