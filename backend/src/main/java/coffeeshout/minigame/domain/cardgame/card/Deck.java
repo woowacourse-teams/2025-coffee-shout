@@ -42,7 +42,7 @@ public class Deck {
         return pick(cards.indexOf(selected));
     }
 
-    public boolean isPicked(Card card) {
+    private boolean isPicked(Card card) {
         return pickedCards.contains(card);
     }
 
