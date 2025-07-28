@@ -136,6 +136,7 @@ public class Room {
 
     public void startGame(MiniGameType miniGameType) {
         findMiniGame(miniGameType).startGame(players);
+        this.roomState = RoomState.PLAYING;
     }
 
     private boolean hasEnoughPlayers() {

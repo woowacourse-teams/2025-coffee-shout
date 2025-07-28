@@ -244,6 +244,53 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         assertThat(responses2).hasSize(0);
     }
 
+    @Test
+    void 룰렛을_돌려서_당첨자를_선택한다() throws InterruptedException, ExecutionException, TimeoutException {
+        // given
+        TestStompSession session = createSession();
+        String joinCode = testRoom.getJoinCode().value();
+        String hostName = "호스트꾹이";
+
+        // 미니게임을 먼저 선택
+        MessageCollector<WebSocketResponse<List<MiniGameType>>> miniGameSubscribe = session.subscribe(
+                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
+                }
+        );
+        
+        MiniGameSelectMessage selectMessage = new MiniGameSelectMessage(hostName, MiniGameType.CARD_GAME);
+        session.send("/app/room/" + joinCode + "/minigames/select", selectMessage);
+        
+        // 미니게임 선택 응답 확인
+        List<MiniGameType> selectedGames = miniGameSubscribe.get().data();
+        assertThat(selectedGames).hasSize(1);
+        
+        // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
+        testRoom.startGame(MiniGameType.CARD_GAME);
+
+        // when - 룰렛 결과 구독
+        MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(
+                "/topic/room/" + joinCode + "/roulette",
+                new TypeReference<WebSocketResponse<PlayerResponse>>() {
+                }
+        );
+
+        session.send("/app/room/" + joinCode + "/roulette/spin", hostName);
+
+        WebSocketResponse<PlayerResponse> response = rouletteSubscribe.get();
+
+        // then
+        assertThat(response.success()).isTrue();
+        assertThat(response.data()).isNotNull();
+        
+        PlayerResponse winner = response.data();
+        assertThat(winner.playerName()).isNotBlank();
+        assertThat(winner.menuResponse()).isNotNull();
+        
+        // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
+        List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
+        assertThat(playerNames).contains(winner.playerName());
+    }
+
     private void setupTestData() {
         // 메뉴 생성
         testMenu = menuRepository.findAll().get(0);
