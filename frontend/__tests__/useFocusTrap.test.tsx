@@ -30,18 +30,16 @@ describe('useFocusTrap 훅 테스트: Modal 컴포넌트 활용', () => {
     const first = screen.getByText('첫번째');
     const second = screen.getByText('두번째');
 
-    // 첫 번째 버튼에 포커스
     expect(first).toHaveFocus();
 
-    // Tab → 두 번째 버튼
     await user.tab();
     expect(second).toHaveFocus();
 
-    // Tab → 다시 첫 번째 버튼 (순환)
+    // 순환
     await user.tab();
     expect(first).toHaveFocus();
 
-    // Shift+Tab → 두 번째 버튼 (역순환)
+    // 역순환
     await user.tab({ shift: true });
     expect(second).toHaveFocus();
   });
