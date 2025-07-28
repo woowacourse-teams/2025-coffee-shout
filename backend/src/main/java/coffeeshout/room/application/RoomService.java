@@ -94,6 +94,6 @@ public class RoomService {
     }
 
     public boolean isRoomExists(String joinCode) {
-        return roomCommandService.existsByJoinCode(new JoinCode(joinCode));
+        return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
     }
 }

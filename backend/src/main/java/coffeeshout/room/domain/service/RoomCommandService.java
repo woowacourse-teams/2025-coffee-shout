@@ -1,6 +1,5 @@
 package coffeeshout.room.domain.service;
 
-import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +13,5 @@ public class RoomCommandService {
 
     public Room save(Room room) {
         return roomRepository.save(room);
-    }
-
-    public boolean existsByJoinCode(JoinCode joinCode) {
-        return roomRepository.existsByJoinCode(joinCode);
     }
 }
