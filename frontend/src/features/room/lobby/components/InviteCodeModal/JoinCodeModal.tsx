@@ -2,10 +2,10 @@ import CopyIcon from '@/assets/copy-icon.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import { useState } from 'react';
-import * as S from './InviteCodeModal.styled';
+import * as S from './JoinCodeModal.styled';
 
-const InviteCodeModal = () => {
-  const [inviteCode] = useState('CODE1234!');
+const JoinCodeModal = () => {
+  const [joinCode] = useState('CODE1234!');
 
   const handleCopy = () => {
     alert('초대 코드가 복사되었습니다.');
@@ -19,11 +19,11 @@ const InviteCodeModal = () => {
       </S.Wrapper>
       <S.CodeBox>
         <S.EmptyBox />
-        <Headline4>{inviteCode}</Headline4>
+        <Headline4>{joinCode}</Headline4>
         <S.CopyIcon src={CopyIcon} onClick={handleCopy} />
       </S.CodeBox>
     </S.Container>
   );
 };
 
-export default InviteCodeModal;
+export default JoinCodeModal;
