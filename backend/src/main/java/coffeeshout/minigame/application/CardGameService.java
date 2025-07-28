@@ -32,6 +32,7 @@ public class CardGameService {
     public void startGame(String joinCode) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.findByJoinCode(roomJoinCode);
+        room.startGame(MiniGameType.CARD_GAME);
         CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
         TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
         cardGameTaskExecutors.put(roomJoinCode, executor);

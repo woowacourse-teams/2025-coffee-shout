@@ -3,16 +3,14 @@ package coffeeshout.minigame.ui.command.handler;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.ui.command.MiniGameCommandHandler;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class SelectCardCommandHandler implements MiniGameCommandHandler<SelectCardCommand> {
 
     private final CardGameService cardGameService;
-
-    public SelectCardCommandHandler(CardGameService cardGameService) {
-        this.cardGameService = cardGameService;
-    }
 
     @Override
     public void handle(String joinCode, SelectCardCommand command) {

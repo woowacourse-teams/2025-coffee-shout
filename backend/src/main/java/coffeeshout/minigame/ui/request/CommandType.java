@@ -2,6 +2,7 @@ package coffeeshout.minigame.ui.request;
 
 import coffeeshout.minigame.ui.command.MiniGameCommand;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
+import coffeeshout.minigame.ui.request.command.StartCardGameCommand;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,6 +10,7 @@ public enum CommandType {
 
     // 카드 게임
     SELECT_CARD(SelectCardCommand.class),
+    START_CARD_GAME(StartCardGameCommand.class)
     ;
 
     private final Class<?> commandRequestClass;
