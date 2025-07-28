@@ -42,7 +42,7 @@ public class CardGameTaskFactory {
         try {
             Thread.sleep(milliSecond);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // ✅ interrupt 상태 복원
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }

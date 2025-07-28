@@ -9,6 +9,8 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameQueryService;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
+import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.ui.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import org.assertj.core.api.SoftAssertions;
@@ -53,7 +55,7 @@ class CardGameServiceTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                CardGameTaskExecutor executor = cardGameTaskExecutors.get(joinCode);
+                TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
 
                 softly.assertThat(executor.getFutureTasks()).hasSize(7);

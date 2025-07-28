@@ -23,4 +23,8 @@ public class CardGameTaskExecutors {
     public TaskExecutor<CardGameTaskInfo> get(JoinCode joinCode) {
         return roomTaskExecutorMap.get(joinCode);
     }
+
+    public void cancelPlaying(JoinCode joinCode, CardGameRound round) {
+        roomTaskExecutorMap.get(joinCode).cancel(CardGameTaskInfo.getPlayingState(round));
+    }
 }
