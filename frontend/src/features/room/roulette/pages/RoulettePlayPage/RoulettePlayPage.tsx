@@ -24,9 +24,6 @@ const RoulettePage = () => {
 
   const buttonVariant = isSpinning ? 'disabled' : playerRole === 'GUEST' ? 'loading' : 'primary';
 
-  //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerRole) return null;
-
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
@@ -45,6 +42,9 @@ const RoulettePage = () => {
       return () => clearTimeout(timer);
     }
   }, [navigate, isSpinning]);
+
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!playerRole) return null;
 
   return (
     <Layout>

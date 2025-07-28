@@ -1,7 +1,6 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
