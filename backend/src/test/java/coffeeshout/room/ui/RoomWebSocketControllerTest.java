@@ -42,7 +42,7 @@
 //import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 //
 //@ActiveProfiles("test")
-//public class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
+//class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 //
 //    @Autowired
 //    private RoomRepository roomRepository;
