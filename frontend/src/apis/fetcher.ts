@@ -82,7 +82,7 @@ export const apiRequest = async <T, TData>(
             errorMessage = textError || errorMessage;
           }
         } catch (parseError) {
-          console.warn('응답 메세지 파싱 실패', parseError);
+          console.warn('응답 메시지 파싱 실패', parseError);
         }
 
         throw new ApiError(response.status, errorMessage, errorData);
