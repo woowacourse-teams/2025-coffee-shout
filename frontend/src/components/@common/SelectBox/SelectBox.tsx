@@ -103,7 +103,7 @@ const SelectBox = ({
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-name={selectedOption ? selectedOption.name : placeholder}
+        aria-label={selectedOption ? selectedOption.name : placeholder}
       >
         <S.SelectText $hasValue={!!selectedOption} $disabled={disabled}>
           {selectedOption ? selectedOption.name : placeholder}
