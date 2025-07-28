@@ -17,6 +17,9 @@ export const Wrapper = styled.div`
 `;
 
 export const NameWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding-right: 20px;
   flex: 1;
   min-width: 0;
@@ -26,6 +29,11 @@ export const NameWrapper = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`;
+export const CrownIcon = styled.img`
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
 `;
 
 export const PlayerIcon = styled.img`

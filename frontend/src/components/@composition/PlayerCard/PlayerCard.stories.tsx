@@ -30,6 +30,14 @@ export const WithIcon: Story = {
   },
 };
 
+export const Host: Story = {
+  args: {
+    name: '홍길동',
+    iconColor: 'red',
+    userRole: 'HOST',
+  },
+};
+
 export const LongNameWithText: Story = {
   args: {
     name: '매우매우매우매우긴이름을가진플레이어',
