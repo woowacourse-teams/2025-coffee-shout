@@ -1,47 +1,39 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import java.util.Objects;
+import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
 
-public class CardGameScore implements Comparable<CardGameScore> {
+public class CardGameScore extends MiniGameScore {
 
+    public static final CardGameScore INF = new CardGameScore(Integer.MAX_VALUE);
     private int addition;
     private int multiplier;
 
-    public CardGameScore() {
-        this.addition = 0;
+    public CardGameScore(int addition) {
+        this.addition = addition;
         this.multiplier = 1;
     }
 
-    public void addCard(Card card) {
+    public CardGameScore(CardHand hand) {
+        this.addition = 0;
+        this.multiplier = 1;
+        hand.forEach(this::updateScore);
+    }
+
+    private void updateScore(Card card) {
         if (card.getType() == CardType.ADDITION) {
-            addition += card.value();
+            addition += card.getValue();
         }
 
         if (card.getType() == CardType.MULTIPLIER) {
-            multiplier *= card.value();
+            multiplier *= card.getValue();
         }
     }
 
-    public int getResult() {
+    @Override
+    public int getValue() {
         return addition * multiplier;
-    }
-
-    @Override
-    public int compareTo(final CardGameScore o) {
-        return Integer.compare(this.getResult(), o.getResult());
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof final CardGameScore that)) {
-            return false;
-        }
-        return Objects.equals(this.getResult(), that.getResult());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getResult());
     }
 }
 

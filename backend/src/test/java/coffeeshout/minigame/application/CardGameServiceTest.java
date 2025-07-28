@@ -1,153 +1,154 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import coffeeshout.minigame.domain.cardgame.AdditionCard;
-import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.player.domain.Player;
-import coffeeshout.room.domain.Room;
-import coffeeshout.fixture.CardGameDeckStub;
-import coffeeshout.fixture.PlayersFixture;
+import coffeeshout.fixture.MenuFixture;
+import coffeeshout.fixture.PlayerProbabilities;
 import coffeeshout.fixture.RoomFixture;
-import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameState;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
+import coffeeshout.minigame.domain.temp.TaskExecutor;
+import coffeeshout.minigame.ui.response.MiniGameStateMessage;
+import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.service.RoomCommandService;
+import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class CardGameServiceTest {
 
-    @Mock
-    RoomFinder roomFinder;
+    @MockBean
+    SimpMessagingTemplate messagingTemplate;
 
-    @InjectMocks
+    @Autowired
     CardGameService cardGameService;
 
-    Room room;
+    @Autowired
+    RoomQueryService roomQueryService;
 
-    Long roomId;
+    @Autowired
+    RoomService roomService;
 
-    List<Player> players;
+    @Autowired
+    CardGameTaskExecutors cardGameTaskExecutors;
+
+    JoinCode joinCode;
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.꾹이_루키_엠제이_한스().getPlayers();
-        roomId = 1L;
-        room = RoomFixture.호스트_꾹이();
+        List<Player> players = PlayerProbabilities.PLAYERS;
+        Player host = players.get(0);
+        Room room = roomService.createRoom(host.getName().value(), 1L);
+        joinCode = room.getJoinCode();
+        room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
-        ReflectionTestUtils.setField(room, "playersWithProbability", PlayersFixture.꾹이_루키_엠제이_한스());
-
-        ConcurrentHashMap<Long, CardGame> cardGames = new ConcurrentHashMap<>();
-        CardGame cardGame = new CardGame(players, new CardGameDeckStub());
-        cardGame.start();
-        cardGames.put(roomId, cardGame);
-        ReflectionTestUtils.setField(cardGameService, "cardGames", cardGames);
+        for(int i = 1 ; i < players.size() ; i++) {
+            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
+        }
     }
 
-    @Test
-    void 게임을_시작한다() {
-        // given
-        long roomId = 2L;
-        when(roomFinder.findById(roomId)).thenReturn(room);
+    @Nested
+    class 카드게임_시작 {
 
-        // when
-        cardGameService.start(roomId);
+        @Test
+        void 카드게임을_시작한다() {
+            // given
+            cardGameService.startGame(joinCode.value());
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+            room.startGame(MiniGameType.CARD_GAME);
 
-        // then
-        CardGame cardGame = cardGameService.getCardGame(roomId);
+            // when & then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame).isNotNull();
+                softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
+                softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-        assertThat(cardGame.getPlayerCards()).hasSize(4);
-        verify(roomFinder).findById(roomId);
-    }
+                TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
+                softly.assertThat(executor).isNotNull();
 
-    @Test
-    void 카드를_고른다() {
-        // given
-        String playerName = "루키";
-        Player 루키 = players.stream().filter(p -> p.getName().equals(playerName)).findFirst().get();
+                softly.assertThat(executor.getFutureTasks()).hasSize(7);
+            });
+        }
 
-        // when
-        cardGameService.selectCard(roomId, playerName, 0);
+        @Test
+        void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            room.startGame(MiniGameType.CARD_GAME);
+            cardGameService.startGame(joinCode.value());
+            CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
 
-        // then
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키)).hasSize(1);
-        assertThat(cardGameService.getCardGame(roomId).getPlayerCards().get(루키).getFirst()).isEqualTo(
-                new AdditionCard(40));
-    }
+            /*
+                READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
+                0~3000      3000~13000      13000~14500      14500~17500    17500~27500     27500~29000     29000~
+             */
 
-    @Test
-    void 라운드1이_종료되었는지_검사한다() {
-        // given
-        selectFirstCardEveryPlayer();
+            Thread.sleep(1000);
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+            });
 
-        // when
-        cardGameService.checkAndMoveRound(roomId);
+            Thread.sleep(4000); // 총 5초 (LOADING 3초 + PLAYING 시작 후 1초)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(0);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
+            });
 
-        // then
-        assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.SECOND);
-    }
+            Thread.sleep(8500);
+            // 총 13.5초 지남 (LOADING 3초 + PLAYING 10초 + SCORE_BOARD 시작 후 0.5초)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
+            });
 
-    @Test
-    void 라운드2가_종료되었는지_검사한다() {
-        // given
-        selectFirstCardEveryPlayer();
-        cardGameService.checkAndMoveRound(roomId);
+            Thread.sleep(2500);
+            // 총 16.0초 지남 (+ 1.5초 SCORE_BOARD + 0.5초 LOADING)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+            });
 
-        selectSecondCardEveryPlayer();
+            Thread.sleep(3500);
+            // 총 19초 지남 (+ 3초 LOADING + 0.5초 PLAYING)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
+            });
 
-        // when
-        cardGameService.checkAndMoveRound(roomId);
+            Thread.sleep(9000);
+            // 총 28초 지남 (+ 10초 PLAYING)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(8);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
+            });
 
-        // then
-        assertThat(cardGameService.getCardGame(roomId).getRound()).isEqualTo(CardGameRound.END);
-    }
-
-    @Test
-    void 게임결과를_계산한다() {
-        // given
-        selectFirstCardEveryPlayer();
-        cardGameService.checkAndMoveRound(roomId);
-
-        selectSecondCardEveryPlayer();
-        cardGameService.checkAndMoveRound(roomId);
-
-        // when
-        MiniGameResult miniGameResult = cardGameService.getMiniGameResult(roomId);
-
-        // then
-        /*
-        0번 플레이어: 40 + 0 = 40 (2등),
-        1번 플레이어: 30 - 10 = 20 (3등),
-        2번 플레이어: 20 * 4 = 80 (1등),
-        3번 플레이어: 10 * 2 = 20 (3등)
-        * */
-        assertThat(miniGameResult.getRank().get(players.get(0))).isEqualTo(2);
-        assertThat(miniGameResult.getRank().get(players.get(1))).isEqualTo(3);
-        assertThat(miniGameResult.getRank().get(players.get(2))).isEqualTo(1);
-        assertThat(miniGameResult.getRank().get(players.get(3))).isEqualTo(3);
-    }
-
-    private void selectFirstCardEveryPlayer() {
-        cardGameService.selectCard(roomId, players.get(0).getName(), 0);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 1);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 2);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 3);
-    }
-
-    private void selectSecondCardEveryPlayer() {
-        cardGameService.selectCard(roomId, players.get(0).getName(), 4);
-        cardGameService.selectCard(roomId, players.get(1).getName(), 5);
-        cardGameService.selectCard(roomId, players.get(2).getName(), 6);
-        cardGameService.selectCard(roomId, players.get(3).getName(), 7);
+            Thread.sleep(2000);
+            // 총 31초 지남 (+ 1.5초 SCORE_BOARD 완료 후)
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DONE);
+            });
+            verify(messagingTemplate, atLeast(6))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                            any(MiniGameStateMessage.class)
+                    );
+        }
     }
 }

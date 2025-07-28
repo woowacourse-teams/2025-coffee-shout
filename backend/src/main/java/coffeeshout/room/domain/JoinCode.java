@@ -6,7 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record JoinCode(String value) {
+public record JoinCode(
+        String value
+) {
+
+    public String getValue() {
+        return value;
+    }
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
