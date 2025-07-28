@@ -5,6 +5,8 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const MINI_GAME_NAME_MAP = {
   CARD_GAME: '카드게임',
   '31_GAME': '랜덤 31',
@@ -12,7 +14,7 @@ const MINI_GAME_NAME_MAP = {
 
 type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
-type MiniGames = {
+type MiniGamesResponse = {
   miniGameType: MiniGameType;
 }[];
 
@@ -30,7 +32,7 @@ export const MiniGameSection = () => {
     (async () => {
       try {
         setLoading(true);
-        const _miniGames = await api.get<MiniGames>('http://api.coffee-shout.com/rooms/minigames');
+        const _miniGames = await api.get<MiniGamesResponse>(`${API_URL}/rooms/minigames`);
         setMiniGames(_miniGames.map((game) => game.miniGameType));
       } catch (error) {
         if (error instanceof ApiError) {
