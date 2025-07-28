@@ -14,7 +14,7 @@ export type Props = Omit<ComponentProps<'div'>, 'onChange'> & {
   disabled?: boolean;
   width?: string;
   height?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: Option) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 };
@@ -29,15 +29,15 @@ const SelectBox = ({
   onChange,
   onFocus,
   onBlur,
-  ...restProps
+  ...rest
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((option) => option.value === value);
+  const selectedOption = options.find((option) => option.label === value);
 
-  const handleOptionClick = (optionValue: string) => {
+  const handleOptionClick = (optionValue: Option) => {
     if (disabled) return;
 
     onChange?.(optionValue);
@@ -92,7 +92,7 @@ const SelectBox = ({
   }, [onBlur]);
 
   return (
-    <S.Container ref={containerRef} $width={width} $height={height} {...restProps}>
+    <S.Container ref={containerRef} $width={width} $height={height} {...rest}>
       <S.Trigger
         ref={triggerRef}
         $disabled={disabled}
@@ -116,8 +116,8 @@ const SelectBox = ({
           <S.Item
             key={option.value}
             $disabled={option.disabled}
-            $selected={option.value === value}
-            onClick={() => !option.disabled && handleOptionClick(option.value)}
+            $selected={option.label === value}
+            onClick={() => !option.disabled && handleOptionClick(option)}
             role="option"
             aria-selected={option.value === value}
           >

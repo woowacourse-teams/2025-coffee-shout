@@ -13,7 +13,12 @@ const EntryNamePage = () => {
   const [value, setValue] = useState('');
   const navigate = useNavigate();
 
-  const handleNavigateToMenu = () => navigate('/entry/menu');
+  const handleNavigateToMenu = () =>
+    navigate('/entry/menu', {
+      state: {
+        nickName: value,
+      },
+    });
   const isButtonDisabled = value.length === 0;
 
   return (

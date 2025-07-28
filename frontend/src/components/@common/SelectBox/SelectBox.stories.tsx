@@ -76,7 +76,10 @@ export const Disabled: Story = {
 };
 
 export const Interactive = () => {
-  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [selectedValue, setSelectedValue] = useState<Option>({
+    value: '',
+    label: '',
+  });
 
   const coffeeOptions: Option[] = [
     { value: 'americano', label: '아이스 아메리카노' },
@@ -95,7 +98,7 @@ export const Interactive = () => {
         </label>
         <SelectBox
           options={coffeeOptions}
-          value={selectedValue}
+          value={selectedValue.label}
           onChange={setSelectedValue}
           placeholder="커피를 선택하세요"
           width="300px"
