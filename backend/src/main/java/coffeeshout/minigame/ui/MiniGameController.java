@@ -24,7 +24,7 @@ public class MiniGameController {
         miniGameCommandDispatcher.dispatch(joinCode, map(command.commandType(), command.commandRequest()));
     }
 
-    public MiniGameCommand map(CommandType commandType, JsonNode json) {
+    private MiniGameCommand map(CommandType commandType, JsonNode json) {
         return commandType.toCommandRequest(objectMapper, json);
     }
 }
