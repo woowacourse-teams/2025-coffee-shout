@@ -64,7 +64,7 @@ const EntryMenuPage = () => {
 
   const handleNavigateToName = () => navigate('/entry/name');
   const handleNavigateToLobby = async () => {
-    if (!state.nickName) {
+    if (!state.name) {
       alert('닉네임을 다시 입력해주세요.');
       navigate(-1);
       return;
@@ -77,7 +77,7 @@ const EntryMenuPage = () => {
     }
 
     const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-      hostName: state.nickName,
+      hostName: state.name,
       menuId,
     });
 

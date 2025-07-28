@@ -10,16 +10,17 @@ import * as S from './EntryNamePage.styled';
 const MAX_NAME_LENGTH = 10;
 
 const EntryNamePage = () => {
-  const [value, setValue] = useState('');
+  const [name, setName] = useState('');
   const navigate = useNavigate();
 
   const handleNavigateToMenu = () =>
     navigate('/entry/menu', {
       state: {
-        nickName: value,
+        name,
       },
     });
-  const isButtonDisabled = value.length === 0;
+
+  const isButtonDisabled = name.length === 0;
 
   return (
     <Layout>
@@ -29,14 +30,14 @@ const EntryNamePage = () => {
           <Headline3>닉네임을 입력해주세요</Headline3>
           <S.Wrapper>
             <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onClear={() => setValue('')}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onClear={() => setName('')}
               placeholder="닉네임을 입력해주세요"
               maxLength={MAX_NAME_LENGTH}
             />
             <S.ProgressWrapper>
-              <ProgressCounter current={value.length} total={MAX_NAME_LENGTH} />
+              <ProgressCounter current={name.length} total={MAX_NAME_LENGTH} />
             </S.ProgressWrapper>
           </S.Wrapper>
         </S.Container>
