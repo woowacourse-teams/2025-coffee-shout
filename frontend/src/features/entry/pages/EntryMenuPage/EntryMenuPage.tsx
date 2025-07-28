@@ -8,6 +8,7 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
+import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -25,6 +26,16 @@ type CreateRoomResponse = {
   joinCode: string;
 };
 
+type EnterRoomRequest = {
+  joinCode: string;
+  guestName: string;
+  menuId: number;
+};
+
+type EnterRoomResponse = {
+  joinCode: string;
+};
+
 const EntryMenuPage = () => {
   const [selectedValue, setSelectedValue] = useState<Option>({
     id: -1,
@@ -36,6 +47,7 @@ const EntryMenuPage = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { state } = useLocation();
+  const { playerRole } = usePlayerRole();
 
   useEffect(() => {
     (async () => {
@@ -76,19 +88,49 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-      hostName: state.name,
-      menuId,
-    });
+    try {
+      setLoading(true);
 
-    navigate('/room/:roomId/lobby', {
-      state: {
-        joinCode,
-      },
-    });
+      if (playerRole === 'HOST') {
+        const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
+          hostName: state.name,
+          menuId,
+        });
+
+        // todo: 암호화
+        navigate(`/room/${joinCode}/lobby`, {
+          state: {
+            joinCode,
+          },
+        });
+      } else if (playerRole === 'GUEST') {
+        const { joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>('/rooms/enter', {
+          joinCode: state.joinCode,
+          guestName: state.name,
+          menuId,
+        });
+
+        navigate(`/room/${joinCode}/lobby`, {
+          state: {
+            joinCode,
+          },
+        });
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert('방 생성/참가에 실패했습니다.');
+      } else if (error instanceof NetworkError) {
+        alert('네트워크 연결을 확인해주세요.');
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const isButtonDisabled = selectedValue.name === '';
+  const isButtonDisabled = selectedValue.name === '' || loading;
+  const isHost = playerRole === 'HOST';
 
   return (
     <Layout>
@@ -112,7 +154,7 @@ const EntryMenuPage = () => {
       </Layout.Content>
       <Layout.ButtonBar>
         <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToLobby}>
-          방 만들러 가기
+          {isHost ? '방 만들러 가기' : '방 참가하기'}
         </Button>
       </Layout.ButtonBar>
     </Layout>
