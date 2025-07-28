@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Player;
@@ -59,7 +61,32 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, MenuFixture.아메리카노()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY);
+    }
+
+    @Test
+    void 중복된_이름으로_참여할_수_없다() {
+        // given
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+
+        // when & then
+        assertThatThrownBy(() -> room.joinGuest(게스트_꾹이, MenuFixture.라떼()))
+                .isInstanceOf(InvalidArgumentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.DUPLICATE_PLAYER_NAME);
+    }
+
+    @Test
+    void 방이_가득_차면_참여할_수_없다() {
+        // given
+        for (int i = 1; i < 9; i++) {
+            room.joinGuest(new PlayerName("guest" + i), MenuFixture.아메리카노());
+        }
+
+        // when & then
+        assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), MenuFixture.아메리카노()))
+                .isInstanceOf(InvalidStateException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
     }
 
     @Test

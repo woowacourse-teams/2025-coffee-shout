@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.TestDataHelper;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -120,7 +122,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -156,7 +158,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -169,7 +171,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidArgumentException.class);
     }
 
     @Test

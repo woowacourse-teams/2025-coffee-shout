@@ -3,6 +3,8 @@ package coffeeshout.room.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
@@ -46,9 +48,9 @@ public class Room {
     }
 
     public void joinGuest(PlayerName guestName, Menu menu) {
-        state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
-        state(canJoin(), "방에는 최대 9명만 입장가능합니다.");
-        isTrue(checkName(guestName), "중복된 닉네임은 들어올 수 없습니다.");
+        validateRoomReady();
+        validateCanJoin();
+        validatePlayerNameNotDuplicate(guestName);
         join(new Player(guestName, menu));
     }
 
@@ -147,4 +149,26 @@ public class Room {
     private boolean checkName(PlayerName guestName) {
         return players.notExistPlayerName(guestName);
     }
+
+    private void validateRoomReady() {
+        if (roomState != RoomState.READY) {
+            throw new InvalidStateException(RoomErrorCode.ROOM_NOT_READY,
+                    "READY 상태에서만 참여 가능합니다. 현재 상태: " + roomState);
+        }
+    }
+
+    private void validateCanJoin() {
+        if (!canJoin()) {
+            throw new InvalidStateException(RoomErrorCode.ROOM_FULL,
+                    "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount());
+        }
+    }
+
+    private void validatePlayerNameNotDuplicate(PlayerName guestName) {
+        if (!checkName(guestName)) {
+            throw new InvalidArgumentException(RoomErrorCode.DUPLICATE_PLAYER_NAME,
+                    "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value());
+        }
+    }
+
 }
