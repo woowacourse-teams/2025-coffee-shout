@@ -45,9 +45,8 @@ const useFocusTrap = (isActive: boolean): { containerRef: RefObject<HTMLDivEleme
 
 export default useFocusTrap;
 
-const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
-  return Array.from(container.querySelectorAll<HTMLElement>(focusableSelectors));
-};
+const getFocusableElements = (container: HTMLElement): HTMLElement[] =>
+  Array.from(container.querySelectorAll<HTMLElement>(focusableSelectors));
 
 const getFocusBoundaryElements = (container: HTMLElement) => {
   const all = getFocusableElements(container);
