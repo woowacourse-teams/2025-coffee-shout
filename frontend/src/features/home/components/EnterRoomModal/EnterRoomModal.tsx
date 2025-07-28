@@ -11,17 +11,22 @@ type Props = {
 
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
-  const [roomCode, setRoomCode] = useState('');
+  const [joinCode, setJoinCode] = useState('');
 
   const handleEnter = () => {
-    if (!roomCode.trim()) {
+    if (!joinCode.trim()) {
       alert('초대코드를 입력해주세요.');
       return;
     }
 
-    // roomCode 유효한지 검증하는 로직 추가
+    // joinCode 유효한지 검증하는 로직 추가
 
-    navigate(`/entry/name`);
+    navigate(`/entry/name`, {
+      state: {
+        joinCode,
+      },
+    });
+
     onClose();
   };
 
@@ -31,9 +36,9 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Input
         type="text"
         placeholder="ex) CODE1234"
-        value={roomCode}
-        onClear={() => setRoomCode('')}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value)}
+        value={joinCode}
+        onClear={() => setJoinCode('')}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setJoinCode(e.target.value)}
         autoFocus
       />
       <S.ButtonContainer>

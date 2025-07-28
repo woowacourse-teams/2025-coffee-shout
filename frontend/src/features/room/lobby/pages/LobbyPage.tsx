@@ -6,12 +6,12 @@ import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InviteCodeModal from '../components/InviteCodeModal/InviteCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import * as S from './LobbyPage.styled';
+import JoinCodeModal from '../components/InviteCodeModal/JoinCodeModal';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -48,7 +48,7 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<InviteCodeModal />, {
+    openModal(<JoinCodeModal />, {
       title: '초대 코드',
       showCloseButton: true,
     });
