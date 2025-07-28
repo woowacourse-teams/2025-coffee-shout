@@ -27,7 +27,7 @@ type CreateRoomResponse = {
 
 const EntryMenuPage = () => {
   const [selectedValue, setSelectedValue] = useState<Option>({
-    id: '',
+    id: -1,
     name: '',
   });
 
@@ -44,7 +44,7 @@ const EntryMenuPage = () => {
 
         const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
-          id: String(menu.id),
+          id: menu.id,
           name: menu.name,
         }));
         setCoffeeOptions(options);
@@ -70,7 +70,7 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const menuId = Number(selectedValue.id);
+    const menuId = selectedValue.id;
     if (menuId === -1) {
       alert('메뉴를 선택하지 않았습니다.');
       return;

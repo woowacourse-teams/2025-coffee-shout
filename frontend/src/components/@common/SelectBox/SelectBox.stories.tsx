@@ -46,10 +46,10 @@ export default meta;
 type Story = StoryObj<typeof SelectBox>;
 
 const basicOptions: Option[] = [
-  { id: '1', name: '사과' },
-  { id: '2', name: '바나나' },
-  { id: '3', name: '오렌지' },
-  { id: '4', name: '포도' },
+  { id: 1, name: '사과' },
+  { id: 2, name: '바나나' },
+  { id: 3, name: '오렌지' },
+  { id: 4, name: '포도' },
 ];
 
 export const Default: Story = {
@@ -77,17 +77,17 @@ export const Disabled: Story = {
 
 export const Interactive = () => {
   const [selectedValue, setSelectedValue] = useState<Option>({
-    id: '',
+    id: -1,
     name: '',
   });
 
   const coffeeOptions: Option[] = [
-    { id: '1', name: '아이스 아메리카노' },
-    { id: '2', name: '카페 라떼' },
-    { id: '3', name: '카푸치노' },
-    { id: '4', name: '마끼아또' },
-    { id: '5', name: '카페 모카' },
-    { id: '6', name: '에스프레소', disabled: true },
+    { id: 1, name: '아이스 아메리카노' },
+    { id: 2, name: '카페 라떼' },
+    { id: 3, name: '카푸치노' },
+    { id: 4, name: '마끼아또' },
+    { id: 5, name: '카페 모카' },
+    { id: 6, name: '에스프레소', disabled: true },
   ];
 
   return (

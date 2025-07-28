@@ -20,7 +20,7 @@ type Props = {
 const MenuModifyModal = ({ onClose }: Props) => {
   // TODO: 현재 메뉴를 초깃값으로 설정 (웹소켓: 현재 본인 메뉴)
   const [modifiedMenu, setModifiedMenu] = useState<Option>({
-    id: '',
+    id: -1,
     name: '',
   });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
@@ -34,7 +34,7 @@ const MenuModifyModal = ({ onClose }: Props) => {
 
         const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
-          id: String(menu.id),
+          id: menu.id,
           name: menu.name,
         }));
         setCoffeeOptions(options);

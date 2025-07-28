@@ -2,7 +2,7 @@ import { ComponentProps, KeyboardEvent, useEffect, useRef, useState } from 'reac
 import * as S from './SelectBox.styled';
 
 export type Option = {
-  id: string;
+  id: number;
   name: string;
   disabled?: boolean;
 };
@@ -119,7 +119,7 @@ const SelectBox = ({
             $selected={option.name === value}
             onClick={() => !option.disabled && handleOptionClick(option)}
             role="option"
-            aria-selected={option.id === value}
+            aria-selected={String(option.id) === value}
           >
             {option.name}
           </S.Item>
