@@ -22,6 +22,7 @@ const getAdjustedPadding = (isSelected: boolean) => {
 
 type Props = {
   $isSelected: boolean;
+  $disabled?: boolean;
 };
 
 export const Container = styled.button<Props>`
@@ -40,11 +41,15 @@ export const Container = styled.button<Props>`
   padding: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px
     ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
 
-  transition: transform 0.2s ease;
+  ${({ $disabled }) =>
+    !$disabled &&
+    `
+    transition: transform 0.2s ease;
 
-  &:active {
-    transform: scale(0.98);
-  }
+    &:active {
+      transform: scale(0.98);
+    }
+  `}
 `;
 
 export const GameNameWrapper = styled.div``;
