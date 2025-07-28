@@ -51,11 +51,21 @@ export const Trigger = styled.div<TriggerProps>`
   cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
   user-select: none;
 
-  &:hover:not(:disabled) {
-    border-bottom-color: ${({ theme, $disabled }) => {
-      if ($disabled) return theme.color.gray[200];
-      return theme.color.gray[400];
-    }};
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      border-bottom-color: ${({ theme, $disabled }) => {
+        if ($disabled) return theme.color.gray[200];
+        return theme.color.gray[400];
+      }};
+    }
+  }
+  @media (hover: none) {
+    &:active:not(:disabled) {
+      border-bottom-color: ${({ theme, $disabled }) => {
+        if ($disabled) return theme.color.gray[200];
+        return theme.color.gray[400];
+      }};
+    }
   }
 
   &:focus-within {
@@ -133,8 +143,16 @@ export const Item = styled.li<ItemProps>`
     if ($selected) return theme.typography.h4;
   }};
 
-  &:hover:not([disabled]) {
-    background-color: ${({ theme, $selected }) =>
-      $selected ? theme.color.gray[100] : theme.color.gray[50]};
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not([disabled]) {
+      background-color: ${({ theme, $selected }) =>
+        $selected ? theme.color.gray[100] : theme.color.gray[50]};
+    }
+  }
+  @media (hover: none) {
+    &:active:not([disabled]) {
+      background-color: ${({ theme, $selected }) =>
+        $selected ? theme.color.gray[100] : theme.color.gray[50]};
+    }
   }
 `;

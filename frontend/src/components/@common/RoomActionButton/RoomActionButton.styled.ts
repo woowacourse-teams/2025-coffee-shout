@@ -14,9 +14,15 @@ export const Container = styled.button`
   border-radius: 12px;
   padding: 28px 20px;
 
-  &:hover,
-  &:active {
-    background-color: ${({ theme }) => theme.color.gray[200]};
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray[200]};
+    }
+  }
+  @media (hover: none) {
+    &:active {
+      background-color: ${({ theme }) => theme.color.gray[200]};
+    }
   }
 `;
 
