@@ -4,7 +4,6 @@ import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.player.Players;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +15,8 @@ public class PlayerHands {
 
     private final Map<Player, CardHand> playerHands;
 
-    public PlayerHands(Players players) {
-        this.playerHands = players.getPlayers().stream().collect(Collectors.toMap(
+    public PlayerHands(List<Player> players) {
+        this.playerHands = players.stream().collect(Collectors.toMap(
                 player -> player,
                 player -> new CardHand()
         ));

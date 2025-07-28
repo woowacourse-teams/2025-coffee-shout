@@ -11,7 +11,6 @@ import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.player.Players;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public class CardGame implements Playable {
     }
 
     @Override
-    public void startGame(Players players) {
+    public void startGame(List<Player> players) {
         playerHands = new PlayerHands(players);
     }
 

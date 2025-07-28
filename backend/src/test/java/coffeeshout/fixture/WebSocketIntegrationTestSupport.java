@@ -1,11 +1,13 @@
 package coffeeshout.fixture;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -28,6 +30,9 @@ public abstract class WebSocketIntegrationTestSupport {
 
     @LocalServerPort
     private int port;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     protected TestStompSession createSession() throws InterruptedException, ExecutionException, TimeoutException {
         SockJsClient sockJsClient = new SockJsClient(List.of(
@@ -61,6 +66,6 @@ public abstract class WebSocketIntegrationTestSupport {
                         }
                 )
                 .get(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        return new TestStompSession(session);
+        return new TestStompSession(session, objectMapper);
     }
 }

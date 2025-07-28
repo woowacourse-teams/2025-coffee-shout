@@ -31,7 +31,7 @@ class CardGameTest {
         PlayerProbabilities.PLAYERS.forEach(players::join);
 
         cardGame = new CardGameFake(deckGenerator);
-        cardGame.startGame(players);
+        cardGame.startGame(players.getPlayers());
     }
 
     @Nested
