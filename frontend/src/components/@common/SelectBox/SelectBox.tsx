@@ -37,10 +37,10 @@ const SelectBox = ({
 
   const selectedOption = options.find((option) => option.name === value);
 
-  const handleOptionClick = (optionid: Option) => {
+  const handleOptionClick = (optionId: Option) => {
     if (disabled) return;
 
-    onChange?.(optionid);
+    onChange?.(optionId);
     setIsOpen(false);
     triggerRef.current?.focus();
   };
