@@ -22,8 +22,11 @@ const RoulettePage = () => {
 
   const isRouletteView = currentView === 'roulette';
 
-  const buttonVariant = isSpinning ? 'disabled' : playerRole === 'GUEST' ? 'loading' : 'primary';
-
+  const getButtonVariant = () => {
+    if (isSpinning) return 'disabled';
+    if (playerRole === 'GUEST') return 'loading';
+    return 'primary';
+  };
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
   };
@@ -62,7 +65,7 @@ const RoulettePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={buttonVariant} onClick={handleSpinClick}>
+        <Button variant={getButtonVariant()} onClick={handleSpinClick}>
           룰렛 돌리기
         </Button>
       </Layout.ButtonBar>
