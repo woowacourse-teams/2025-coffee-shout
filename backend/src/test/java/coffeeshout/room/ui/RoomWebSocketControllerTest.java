@@ -118,7 +118,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         System.out.println("✅ 두 클라이언트 모두 동일한 플레이어 목록 수신 성공");
     }
 
-   @Test
+    @Test
     void 존재하지_않는_방_ID_요청_테스트() throws Exception {
         // given
         TestStompSession session = createSession();
