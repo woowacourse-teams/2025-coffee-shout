@@ -1,4 +1,4 @@
-import { ApiConfig, apiRequest, ApiRequestOptions } from './fetcher';
+import { ApiConfig, apiRequest, ApiRequestOptions } from './apiRequest';
 
 export const api = {
   get: <T>(url: string, options: Omit<ApiRequestOptions<T>, 'method' | 'data'> = {}) =>
