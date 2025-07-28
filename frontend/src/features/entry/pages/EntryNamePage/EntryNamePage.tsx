@@ -1,3 +1,4 @@
+import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Input from '@/components/@common/Input/Input';
@@ -13,7 +14,8 @@ const EntryNamePage = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
 
-  const handleNavigateToMenu = () =>
+  const handleNavigateToHome = () => navigate('/');
+    const handleNavigateToMenu = () =>
     navigate('/entry/menu', {
       state: {
         name,
@@ -24,7 +26,7 @@ const EntryNamePage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
           <Headline3>닉네임을 입력해주세요</Headline3>
