@@ -1,25 +1,48 @@
+import { api } from '@/apis/api';
+import { ApiError, NetworkError } from '@/apis/error';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import Layout from '@/layouts/Layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 
-// TODO: 서버 데이터로 변경
-const coffeeOptions: Option[] = [
-  { value: 'americano', label: '아이스 아메리카노' },
-  { value: 'latte', label: '카페 라떼' },
-  { value: 'cappuccino', label: '카푸치노' },
-  { value: 'macchiato', label: '마끼아또' },
-  { value: 'mocha', label: '카페 모카' },
-  { value: 'espresso', label: '에스프레소', disabled: true },
-];
+type Menus = { id: number; name: string; category: string }[];
 
 const EntryMenuPage = () => {
   const [selectedValue, setSelectedValue] = useState('');
+  const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        setLoading(true);
+
+        const menus = await api.get<Menus>('http://api.coffee-shout.com/menus');
+        const options = menus.map((menu) => ({
+          value: String(menu.id),
+          label: menu.name,
+        }));
+        setCoffeeOptions(options);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          setError(error.message);
+        } else if (error instanceof NetworkError) {
+          setError('네트워크 연결을 확인해주세요');
+        } else {
+          setError('알 수 없는 오류가 발생했습니다');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMenus();
+  }, []);
 
   const handleNavigateToName = () => navigate('/entry/name');
   const handleNavigateToLobby = () => navigate('/room/:roomId/lobby');
@@ -31,12 +54,18 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           <Headline3>메뉴를 선택해주세요</Headline3>
-          <SelectBox
-            options={coffeeOptions}
-            value={selectedValue}
-            onChange={setSelectedValue}
-            placeholder="메뉴를 선택해주세요"
-          />
+          {loading ? (
+            <div>로딩 중...</div>
+          ) : error ? (
+            <div>{error}</div>
+          ) : (
+            <SelectBox
+              options={coffeeOptions}
+              value={selectedValue}
+              onChange={setSelectedValue}
+              placeholder="메뉴를 선택해주세요"
+            />
+          )}
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
