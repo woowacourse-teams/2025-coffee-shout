@@ -22,17 +22,15 @@ export const MiniGameSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGameClick = (gameType: string) => {
-    setSelectedMiniGame(gameType);
+  const handleMiniGameClick = (miniGameType: string) => {
+    setSelectedMiniGame(miniGameType);
   };
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-
         const _miniGames = await api.get<MiniGames>('http://api.coffee-shout.com/rooms/minigames');
-        console.log(_miniGames);
         setMiniGames(_miniGames.map((game) => game.miniGameType));
       } catch (error) {
         if (error instanceof ApiError) {
@@ -61,7 +59,7 @@ export const MiniGameSection = () => {
               key={miniGame}
               isSelected={selectedMiniGame === miniGame}
               gameName={MINI_GAME_NAME_MAP[miniGame]}
-              onClick={() => handleGameClick(miniGame)}
+              onClick={() => handleMiniGameClick(miniGame)}
             />
           ))}
       </S.Wrapper>
