@@ -5,13 +5,14 @@ import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import InviteCodeModal from '../components/InviteCodeModal/InviteCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import * as S from './LobbyPage.styled';
+import usePlayerList from '@/hooks/usePlayerList';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -25,10 +26,14 @@ const SECTIONS: SectionComponents = {
 } as const;
 
 const LobbyPage = () => {
+  const { state } = useLocation();
+  const joinCode = state.joinCode;
+
   const navigate = useNavigate();
   const { openModal } = useModal();
-
   const { playerRole } = usePlayerRole();
+  const players = usePlayerList(joinCode);
+  console.log('players', players);
 
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 

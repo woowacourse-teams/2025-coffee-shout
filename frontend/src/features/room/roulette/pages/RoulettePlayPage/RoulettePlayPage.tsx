@@ -6,7 +6,7 @@ import ProbabilityList from '@/components/@composition/ProbabilityList/Probabili
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import Layout from '@/layouts/Layout';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';

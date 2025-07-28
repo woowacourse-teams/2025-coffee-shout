@@ -1,5 +1,5 @@
-import { api } from '@/apis/api';
-import { ApiError, NetworkError } from '@/apis/error';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
@@ -8,6 +8,9 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
+import { useWebSocket } from '@/contexts/WebSocket/WebSocketContext';
+
+export let _joinCode: string | null = null;
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -26,6 +29,8 @@ type CreateRoomResponse = {
 };
 
 const EntryMenuPage = () => {
+  const { connect } = useWebSocket();
+
   const [selectedValue, setSelectedValue] = useState<Option>({
     id: -1,
     name: '',
@@ -76,16 +81,31 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-      hostName: state.name,
-      menuId,
-    });
+    try {
+      const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
+        hostName: state.name,
+        menuId,
+      });
+      //삭제 필요
+      _joinCode = joinCode;
 
-    navigate('/room/:roomId/lobby', {
-      state: {
-        joinCode,
-      },
-    });
+      // 웹소켓 연결
+      connect();
+
+      navigate('/room/:roomId/lobby', {
+        state: {
+          joinCode,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert(error.message);
+      } else if (error instanceof NetworkError) {
+        alert('네트워크 연결을 확인해주세요');
+      } else {
+        alert('방 생성 중 오류가 발생했습니다');
+      }
+    }
   };
 
   const isButtonDisabled = selectedValue.name === '';
