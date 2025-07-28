@@ -1,8 +1,8 @@
 import { PlayerRole } from '@/types/player';
 import { PlayerRoleContext } from './PlayerRoleContext';
-import { ReactNode, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
-export const PlayerRoleProvider = ({ children }: { children: ReactNode }) => {
+export const PlayerRoleProvider = ({ children }: PropsWithChildren) => {
   const [playerRole, setPlayerRole] = useState<PlayerRole | null>(null);
 
   const setGuest = () => {
