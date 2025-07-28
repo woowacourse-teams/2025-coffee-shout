@@ -3,7 +3,7 @@ import { PlayerRoleContext } from './PlayerRoleContext';
 import { PropsWithChildren, useState } from 'react';
 
 export const PlayerRoleProvider = ({ children }: PropsWithChildren) => {
-  const [playerRole, setPlayerRole] = useState<PlayerRole | null>(null);
+  const [playerRole, setPlayerRole] = useState<PlayerRole | null>('HOST');
 
   const setGuest = () => {
     setPlayerRole('GUEST');

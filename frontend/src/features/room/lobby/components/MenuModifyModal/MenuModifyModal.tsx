@@ -7,7 +7,11 @@ import { useEffect, useState } from 'react';
 import * as S from './MenuModifyModal.styled';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
-type Menus = { id: number; name: string; category: string }[];
+type MenusResponse = {
+  id: number;
+  name: string;
+  category: string;
+}[];
 
 type Props = {
   onClose: () => void;
@@ -25,7 +29,7 @@ const MenuModifyModal = ({ onClose }: Props) => {
       try {
         setLoading(true);
 
-        const menus = await api.get<Menus>('http://api.coffee-shout.com/menus');
+        const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
           value: String(menu.id),
           label: menu.name,
