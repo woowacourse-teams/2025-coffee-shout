@@ -25,7 +25,7 @@ public class RoomRestController {
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest request) {
-        final Room room = roomService.createRoom(request.hostName(), request.MenuId());
+        final Room room = roomService.createRoom(request.hostName(), request.menuId());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
