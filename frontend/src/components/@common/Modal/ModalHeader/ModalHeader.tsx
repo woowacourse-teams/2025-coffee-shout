@@ -1,7 +1,7 @@
 import CloseIcon from '@/components/@common/CloseIcon/CloseIcon';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import { useTheme } from '@emotion/react';
 import * as S from './ModalHeader.styled';
+import { useTheme } from '@emotion/react';
 
 type Props = {
   id?: string;
@@ -11,6 +11,8 @@ type Props = {
 };
 
 const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
+  const theme = useTheme();
+
   return (
     <S.Container>
       <Headline3 id={id}>{title}</Headline3>
