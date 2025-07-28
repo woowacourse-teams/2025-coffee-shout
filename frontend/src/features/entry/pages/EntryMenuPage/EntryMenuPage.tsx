@@ -20,7 +20,7 @@ const EntryMenuPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMenus = async () => {
+    (async () => {
       try {
         setLoading(true);
 
@@ -41,8 +41,7 @@ const EntryMenuPage = () => {
       } finally {
         setLoading(false);
       }
-    };
-    fetchMenus();
+    })();
   }, []);
 
   const handleNavigateToName = () => navigate('/entry/name');

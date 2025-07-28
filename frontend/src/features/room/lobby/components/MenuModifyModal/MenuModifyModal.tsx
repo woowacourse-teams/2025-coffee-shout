@@ -1,27 +1,51 @@
+import { api } from '@/apis/api';
+import { ApiError, NetworkError } from '@/apis/error';
 import Button from '@/components/@common/Button/Button';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { useState } from 'react';
-import * as S from './MenuModifyModal.styled';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
+import { useEffect, useState } from 'react';
+import * as S from './MenuModifyModal.styled';
+
+// TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
+type Menus = { id: number; name: string; category: string }[];
 
 type Props = {
   onClose: () => void;
 };
 
-const coffeeOptions: Option[] = [
-  { value: 'americano', label: '아이스 아메리카노' },
-  { value: 'latte', label: '카페 라떼' },
-  { value: 'cappuccino', label: '카푸치노' },
-  { value: 'macchiato', label: '마끼아또' },
-  { value: 'mocha', label: '카페 모카' },
-  { value: 'espresso', label: '에스프레소', disabled: true },
-];
-
 const MenuModifyModal = ({ onClose }: Props) => {
-  // TODO 현재 메뉴를 초깃값으로 설정
+  // TODO: 현재 메뉴를 초깃값으로 설정 (웹소켓: 현재 본인 메뉴)
   const [modifiedMenu, setModifiedMenu] = useState<string>('');
+  const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleModify = () => {
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+
+        const menus = await api.get<Menus>('http://api.coffee-shout.com/menus');
+        const options = menus.map((menu) => ({
+          value: String(menu.id),
+          label: menu.name,
+        }));
+        setCoffeeOptions(options);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          setError(error.message);
+        } else if (error instanceof NetworkError) {
+          setError('네트워크 연결을 확인해주세요');
+        } else {
+          setError('알 수 없는 오류가 발생했습니다');
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleModify = async () => {
     if (!modifiedMenu) {
       alert('변경할 메뉴를 선택해주세요.');
       return;
@@ -34,11 +58,17 @@ const MenuModifyModal = ({ onClose }: Props) => {
   return (
     <S.Container>
       <Paragraph>변경할 메뉴를 선택해주세요</Paragraph>
-      <SelectBox
-        value={modifiedMenu}
-        options={coffeeOptions}
-        onChange={(value) => setModifiedMenu(value)}
-      />
+      {loading ? (
+        <div>로딩 중...</div>
+      ) : error ? (
+        <div>{error}</div>
+      ) : (
+        <SelectBox
+          value={modifiedMenu}
+          options={coffeeOptions}
+          onChange={(value) => setModifiedMenu(value)}
+        />
+      )}
       <S.ButtonContainer>
         <Button variant="secondary" onClick={onClose}>
           취소
