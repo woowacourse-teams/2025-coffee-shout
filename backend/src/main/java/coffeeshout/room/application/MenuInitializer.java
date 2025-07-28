@@ -1,6 +1,7 @@
 package coffeeshout.room.application;
 
 import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.service.MenuCommandService;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class MenuInitializer {
         final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
 
         menuDtos.getMenus().forEach(item ->
-                menuCommandService.save(new Menu(item.getName(), item.getImage()))
+                menuCommandService.save(new Menu(item.getName(), item.getMenuType()))
         );
     }
 
@@ -42,7 +43,7 @@ public class MenuInitializer {
     @Getter
     protected static class MenuDto {
         private String name;
-        private String image;
+        private MenuType menuType;
 
     }
 }
