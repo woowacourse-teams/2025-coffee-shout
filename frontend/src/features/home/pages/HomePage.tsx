@@ -7,12 +7,14 @@ import Splash from '../components/Splash/Splash';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import * as S from './HomePage.styled';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
+  const { setHost } = useUserRole();
 
   useEffect(() => {
     const checkFirstVisit = () => {
@@ -32,6 +34,9 @@ const HomePage = () => {
     checkFirstVisit();
   }, []);
 
+  if (showSplash) {
+    return <Splash onComplete={() => setShowSplash(false)} />;
+  }
   const handleEnterRoom = () => {
     openModal(<EnterRoomModal onClose={closeModal} />, {
       title: '방 참가하기',
@@ -39,9 +44,10 @@ const HomePage = () => {
     });
   };
 
-  if (showSplash) {
-    return <Splash onComplete={() => setShowSplash(false)} />;
-  }
+  const handleClickHostButton = () => {
+    setHost();
+    navigate('/entry/name');
+  };
 
   return (
     <Layout>
@@ -59,9 +65,7 @@ const HomePage = () => {
         <RoomActionButton
           title="방 만들기"
           descriptions={['새로운 방을 만들어', '재미있는 커피내기를 시작해보세요 ']}
-          onClick={() => {
-            navigate('/entry/name');
-          }}
+          onClick={handleClickHostButton}
         />
         <RoomActionButton
           title="방 참가하러 가기"

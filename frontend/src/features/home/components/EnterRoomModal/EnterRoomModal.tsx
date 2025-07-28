@@ -1,6 +1,7 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
@@ -12,6 +13,7 @@ type Props = {
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const [roomCode, setRoomCode] = useState('');
+  const { setGuest } = useUserRole();
 
   const handleEnter = () => {
     if (!roomCode.trim()) {
@@ -21,6 +23,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
 
     // roomCode 유효한지 검증하는 로직 추가
 
+    setGuest();
     navigate(`/entry/name`);
     onClose();
   };

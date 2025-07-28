@@ -1,9 +1,9 @@
 import InfoGrayIcon from '@/assets/gray-info.svg';
 import InfoWhiteIcon from '@/assets/white-info.svg';
-import { ComponentProps, useState } from 'react';
+import { ComponentProps } from 'react';
 import Headline4 from '../Headline4/Headline4';
 import * as S from './GameActionButton.styled';
-import { UserRole } from '@/types/player';
+import { useUserRole } from '@/contexts/UserRoleContext';
 
 type Props = {
   onClick: () => void;
@@ -12,7 +12,10 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const GameActionButton = ({ onClick, isSelected, gameName, ...rest }: Props) => {
-  const [userRole] = useState<UserRole>('HOST');
+  const { userRole } = useUserRole();
+
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!userRole) return null;
 
   const handleClick = () => {
     if (userRole === 'GUEST') return;

@@ -4,19 +4,21 @@ import Button from '@/components/@common/Button/Button';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import Layout from '@/layouts/Layout';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePlayPage.styled';
-import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
-import { UserRole } from '@/types/player';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  //TODO: Context로 빼기
-  const [userRole] = useState<UserRole>('HOST');
+  const { userRole } = useUserRole();
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!userRole) return null;
+
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
 
