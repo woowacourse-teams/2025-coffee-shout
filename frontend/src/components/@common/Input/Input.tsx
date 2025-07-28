@@ -1,5 +1,5 @@
-import CloseIcon from '@/assets/close-icon.svg';
 import { ComponentProps } from 'react';
+import CloseIcon from '../CloseIcon/CloseIcon';
 import * as S from './Input.styled';
 
 type Props = {
@@ -19,7 +19,7 @@ const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Prop
         aria-label="입력 내용 지우기"
         $hasValue={hasValue}
       >
-        <S.CloseIcon src={CloseIcon} />
+        <CloseIcon />
       </S.ClearButton>
     </S.Container>
   );
