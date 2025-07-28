@@ -59,12 +59,8 @@ export const apiRequest = async <T, TData>(
       const fetchOptions: ApiConfig = {
         method: method,
         headers: defaultHeaders,
-        body: '',
+        body: method !== 'GET' && body ? body : null,
       };
-
-      if (body && method !== 'GET') {
-        fetchOptions.body = body;
-      }
 
       const response = await fetch(requestUrl, fetchOptions);
 
