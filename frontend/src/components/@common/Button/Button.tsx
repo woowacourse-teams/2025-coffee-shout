@@ -1,4 +1,5 @@
-import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
+import { Size } from '@/types/styles';
+import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
 import * as S from './Button.styled';
 import { isTouchDevice } from '@/utils/isTouchDevice';
 
@@ -6,8 +7,8 @@ type Props = {
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
   variant?: S.ButtonVariant;
   width?: string;
-  height?: 'small' | 'medium' | 'large';
-} & Omit<ComponentProps<'button'>, 'disabled' | 'onClick'>;
+  height?: Size;
+} & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({
   variant = 'primary',

@@ -1,11 +1,12 @@
 import { IconColor } from '@/types/player';
+import { Size } from '@/types/styles';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Card } from '../../constants/cards';
 import { cardVariants, circleVariants } from '../../constants/variants';
-import { css } from '@emotion/react';
 
 type Props = {
-  $size?: 'small' | 'medium' | 'large';
+  $size?: Size;
   $playerIconColor?: IconColor;
   $card?: Card;
 };
