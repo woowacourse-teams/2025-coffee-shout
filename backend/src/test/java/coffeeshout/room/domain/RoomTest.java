@@ -62,7 +62,7 @@ class RoomTest {
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, MenuFixture.아메리카노()))
                 .isInstanceOf(InvalidStateException.class)
-                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY);
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY_TO_JOIN);
     }
 
     @Test

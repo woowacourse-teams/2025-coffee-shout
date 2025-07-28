@@ -32,14 +32,14 @@ public record JoinCode(
 
     private void validateLength(String value) {
         if (value.length() != CODE_LENGTH) {
-            throw new InvalidStateException(RoomErrorCode.JOINCODE_ILLEGAL_LENGTH,
+            throw new InvalidStateException(RoomErrorCode.JOIN_CODE_ILLEGAL_LENGTH,
                     "5자리 코드여야 합니다. 현재 길이: " + value.length());
         }
     }
 
     private void validateCharacters(String value) {
         if (value.chars().anyMatch(charCode -> !isValidCharacter(charCode))) {
-            throw new InvalidStateException(RoomErrorCode.JOINCODE_ILLEGAL_CHARACTER,
+            throw new InvalidStateException(RoomErrorCode.JOIN_CODE_ILLEGAL_CHARACTER,
                     "허용되지 않는 문자가 포함되어 있습니다. 현재 코드: " + value);
         }
     }
