@@ -13,7 +13,6 @@ type Props = {
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const [roomCode, setRoomCode] = useState('');
-  const { setGuest } = useUserRole();
 
   const handleEnter = () => {
     if (!roomCode.trim()) {
@@ -23,7 +22,6 @@ const EnterRoomModal = ({ onClose }: Props) => {
 
     // roomCode 유효한지 검증하는 로직 추가
 
-    setGuest();
     navigate(`/entry/name`);
     onClose();
   };

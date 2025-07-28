@@ -14,7 +14,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
-  const { setHost } = useUserRole();
+  const { setHost, setGuest } = useUserRole();
 
   useEffect(() => {
     const checkFirstVisit = () => {
@@ -42,6 +42,7 @@ const HomePage = () => {
       title: '방 참가하기',
       showCloseButton: true,
     });
+    setGuest();
   };
 
   const handleClickHostButton = () => {
