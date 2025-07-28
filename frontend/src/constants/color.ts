@@ -23,3 +23,15 @@ export const COLOR_MAP = {
 } as const;
 
 export type ColorKey = keyof typeof COLOR_MAP;
+
+export const colorList = [
+  '#FF6B6B',
+  '#80d6d0',
+  '#45B7D1',
+  '#96CEB4',
+  '#FFEAA7',
+  '#DDA0DD',
+  '#98D8C8',
+  '#F7DC6F',
+  '#BB8FCE',
+];
