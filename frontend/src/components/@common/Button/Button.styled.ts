@@ -68,9 +68,9 @@ export const Container = styled.button<Props>`
           @media (hover: hover) and (pointer: fine) {
             &:hover { background: ${theme.color.point[500]}; }
           }
-         
+          @media (hover: none) {
             &:active { background: ${theme.color.point[500]}; }
-          
+          }
         `;
     }
   }}
