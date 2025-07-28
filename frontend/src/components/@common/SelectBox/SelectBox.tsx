@@ -2,8 +2,8 @@ import { ComponentProps, KeyboardEvent, useEffect, useRef, useState } from 'reac
 import * as S from './SelectBox.styled';
 
 export type Option = {
-  value: string;
-  label: string;
+  id: string;
+  name: string;
   disabled?: boolean;
 };
 
@@ -35,12 +35,12 @@ const SelectBox = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((option) => option.label === value);
+  const selectedOption = options.find((option) => option.name === value);
 
-  const handleOptionClick = (optionValue: Option) => {
+  const handleOptionClick = (optionid: Option) => {
     if (disabled) return;
 
-    onChange?.(optionValue);
+    onChange?.(optionid);
     setIsOpen(false);
     triggerRef.current?.focus();
   };
@@ -103,10 +103,10 @@ const SelectBox = ({
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-label={selectedOption ? selectedOption.label : placeholder}
+        aria-name={selectedOption ? selectedOption.name : placeholder}
       >
         <S.SelectText $hasValue={!!selectedOption} $disabled={disabled}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.name : placeholder}
         </S.SelectText>
         <S.ArrowIcon $isOpen={isOpen} $disabled={disabled} />
       </S.Trigger>
@@ -114,14 +114,14 @@ const SelectBox = ({
       <S.Content $isOpen={isOpen} role="listbox">
         {options.map((option) => (
           <S.Item
-            key={option.value}
+            key={option.id}
             $disabled={option.disabled}
-            $selected={option.label === value}
+            $selected={option.name === value}
             onClick={() => !option.disabled && handleOptionClick(option)}
             role="option"
-            aria-selected={option.value === value}
+            aria-selected={option.id === value}
           >
-            {option.label}
+            {option.name}
           </S.Item>
         ))}
       </S.Content>

@@ -26,9 +26,9 @@ type CreateRoomResponse = {
 };
 
 const EntryMenuPage = () => {
-  const [selectedValue, setSelectedValue] = useState({
-    value: '',
-    label: '',
+  const [selectedValue, setSelectedValue] = useState<Option>({
+    id: '',
+    name: '',
   });
 
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
@@ -44,8 +44,8 @@ const EntryMenuPage = () => {
 
         const menus = await api.get<MenusResponse>('/menus');
         const options = menus.map((menu) => ({
-          value: String(menu.id),
-          label: menu.name,
+          id: String(menu.id),
+          name: menu.name,
         }));
         setCoffeeOptions(options);
       } catch (error) {
@@ -70,7 +70,7 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const menuId = Number(selectedValue.value);
+    const menuId = Number(selectedValue.id);
     if (menuId === -1) {
       alert('메뉴를 선택하지 않았습니다.');
       return;
@@ -88,7 +88,7 @@ const EntryMenuPage = () => {
     });
   };
 
-  const isButtonDisabled = selectedValue.label === '';
+  const isButtonDisabled = selectedValue.name === '';
 
   return (
     <Layout>
@@ -103,7 +103,7 @@ const EntryMenuPage = () => {
           ) : (
             <SelectBox
               options={coffeeOptions}
-              value={selectedValue.label}
+              value={selectedValue.name}
               onChange={(value: Option) => setSelectedValue(value)}
               placeholder="메뉴를 선택해주세요"
             />
