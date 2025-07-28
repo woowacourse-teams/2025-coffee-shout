@@ -1,5 +1,7 @@
 import { ApiError, NetworkError } from './error';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type ApiRequestOptions<TData> = {
@@ -31,7 +33,8 @@ export const apiRequest = async <T, TData>(
     retry = { count: 0, delay: 1000 },
   } = options;
 
-  let requestUrl = url;
+  // let requestUrl = `${API_URL}url`;
+  let requestUrl = API_URL + url;
 
   if (params) {
     const searchParams = new URLSearchParams();
