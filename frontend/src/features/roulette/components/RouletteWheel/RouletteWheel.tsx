@@ -1,14 +1,40 @@
+import { useTheme } from '@emotion/react';
 import RouletteWheelIcon from '@/assets/profile-red.svg';
 import * as S from './RouletteWheel.styled';
+import { describeArc } from '../../utils/describeArc';
+import { colorList } from '@/constants/color';
+import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
+
+type Player = {
+  playerName: string;
+  probability: number;
+};
 
 type Props = {
+  players: Player[];
   spinning?: boolean;
 };
 
-const RouletteWheel = ({ spinning = false }: Props) => {
+const RouletteWheel = ({ players, spinning = false }: Props) => {
+  const theme = useTheme();
+  const totalProbability = players.reduce((sum, player) => sum + player.probability, 0);
+
+  const playersWithAngles = getPlayersWithAngles(players, totalProbability);
+
   return (
     <S.Container>
       <S.Wrapper $spinning={spinning}>
+        <svg width={300} height={300} viewBox="0 0 300 300">
+          {playersWithAngles.map((player, index) => (
+            <path
+              key={player.playerName}
+              d={describeArc(150, 150, 140, player.startAngle, player.endAngle)}
+              fill={colorList[index % colorList.length]}
+              stroke={theme.color.point[100]}
+              strokeWidth="1"
+            />
+          ))}
+        </svg>
         <S.CenterImage src={RouletteWheelIcon} alt="roulette-center" />
       </S.Wrapper>
     </S.Container>

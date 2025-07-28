@@ -1,3 +1,4 @@
+import { mockPlayers } from '@/features/room/lobby/components/RouletteSection/RouletteSection';
 import RouletteWheel from './RouletteWheel';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
@@ -19,7 +20,7 @@ export const Interactive: StoryObj<typeof RouletteWheel> = {
     };
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-        <RouletteWheel spinning={spinning} />
+      <RouletteWheel spinning={spinning} players={mockPlayers} />
         <button onClick={handleSpin} disabled={spinning} style={{ marginTop: 16 }}>
           {spinning ? '돌아가는 중...' : '돌리기'}
         </button>

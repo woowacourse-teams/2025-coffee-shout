@@ -17,16 +17,14 @@ export const Wrapper = styled.div<WrapperProps>`
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background-color: #f0f0f0;
-  border: 3px solid #ddd;
+  background-color: ${({ theme }) => theme.color.point[100]};
   margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  color: #666;
-  transition: box-shadow 0.2s;
+
   cursor: pointer;
+  position: relative;
   ${({ $spinning }) =>
     $spinning &&
     `
@@ -46,4 +44,9 @@ export const Wrapper = styled.div<WrapperProps>`
 export const CenterImage = styled.img`
   width: 64px;
   height: 64px;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
