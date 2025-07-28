@@ -16,8 +16,6 @@ const RoulettePage = () => {
   const navigate = useNavigate();
 
   const { userRole } = useUserRole();
-  //TODO: 다른 에러 처리방식을 찾아보기
-  if (!userRole) return null;
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
@@ -25,6 +23,9 @@ const RoulettePage = () => {
   const isRouletteView = currentView === 'roulette';
 
   const buttonVariant = isSpinning ? 'disabled' : userRole === 'GUEST' ? 'loading' : 'primary';
+
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!userRole) return null;
 
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));

@@ -30,10 +30,10 @@ const LobbyPage = () => {
 
   const { userRole } = useUserRole();
 
+  const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
+
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!userRole) return null;
-
-  const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   const handleClickBackButton = () => {
     navigate(-1);
