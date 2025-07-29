@@ -34,13 +34,13 @@ class RouletteTest {
         roulette.adjustProbabilities(miniGameResult, new ProbabilityCalculator(4, 5));
 
         // then
-        assertThat(roulette.getProbability(PlayerFixture.한스()))
+        assertThat(roulette.getProbability(PlayerFixture.호스트한스()))
                 .isEqualTo(new Probability(2000));
-        assertThat(roulette.getProbability(PlayerFixture.루키()))
+        assertThat(roulette.getProbability(PlayerFixture.호스트루키()))
                 .isEqualTo(new Probability(2250));
-        assertThat(roulette.getProbability(PlayerFixture.꾹이()))
+        assertThat(roulette.getProbability(PlayerFixture.호스트꾹이()))
                 .isEqualTo(new Probability(2750));
-        assertThat(roulette.getProbability(PlayerFixture.엠제이()))
+        assertThat(roulette.getProbability(PlayerFixture.호스트엠제이()))
                 .isEqualTo(new Probability(3000));
 
     }

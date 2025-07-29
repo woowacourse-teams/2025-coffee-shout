@@ -27,10 +27,10 @@ class PlayerHandsTest {
     @BeforeEach
     void setUp() {
         players = new Players();
-        players.join(PlayerFixture.꾹이());
-        players.join(PlayerFixture.루키());
-        players.join(PlayerFixture.한스());
-        players.join(PlayerFixture.엠제이());
+        players.join(PlayerFixture.호스트꾹이());
+        players.join(PlayerFixture.호스트루키());
+        players.join(PlayerFixture.호스트한스());
+        players.join(PlayerFixture.호스트엠제이());
 
         playerHands = new PlayerHands(players);
     }

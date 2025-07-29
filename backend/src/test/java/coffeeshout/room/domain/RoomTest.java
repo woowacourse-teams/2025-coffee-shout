@@ -39,7 +39,7 @@ class RoomTest {
         // given
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
-        assertThat(room.getHost()).isEqualTo(new Player(호스트_한스));
+        assertThat(room.getHost()).isEqualTo(Player.createHost(호스트_한스, MenuFixture.아메리카노()));
     }
 
     @Test
@@ -140,7 +140,7 @@ class RoomTest {
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-        assertThat(winner).isEqualTo(new Player(new PlayerName("한스"), MenuFixture.아메리카노()));
+        assertThat(winner).isEqualTo(Player.createHost(new PlayerName("한스"), MenuFixture.아메리카노()));
     }
 
     @Test
@@ -182,8 +182,8 @@ class RoomTest {
         // given
 
         // when & then
-        assertThat(room.isHost(new Player(호스트_한스, MenuFixture.아메리카노()))).isTrue();
-        assertThat(room.isHost(new Player(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
+        assertThat(room.isHost(Player.createHost(호스트_한스, MenuFixture.아메리카노()))).isTrue();
+        assertThat(room.isHost(Player.createGuest(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
     }
 
     @Test
