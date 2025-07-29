@@ -1,5 +1,6 @@
 package coffeeshout.minigame.application;
 
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
@@ -83,13 +84,13 @@ public class CardGameService implements MiniGameService {
         CardGame cardGame = getCardGame(joinCode);
         MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
         String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.value());
-        messagingTemplate.convertAndSend(destination, message);
+        messagingTemplate.convertAndSend(destination, WebSocketResponse.success(message));
     }
 
     private void sendCardGameResult(JoinCode joinCode) {
         CardGame cardGame = getCardGame(joinCode);
         String destination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, joinCode.value());
-        messagingTemplate.convertAndSend(destination, cardGame.getResult());
+        messagingTemplate.convertAndSend(destination, WebSocketResponse.success(cardGame.getResult()));
     }
 
     private CardGame getCardGame(JoinCode joinCode) {

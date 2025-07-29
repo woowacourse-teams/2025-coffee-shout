@@ -1,5 +1,6 @@
 package coffeeshout.minigame.ui;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import coffeeshout.fixture.RoomFixture;
@@ -24,6 +25,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -32,7 +34,6 @@ import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -93,9 +94,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                 objectMapper.valueToTree(new StartMiniGameCommand(host.getName().value()))
         );
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         // when
@@ -103,7 +105,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // then
         SoftAssertions.assertSoftly(softly -> {
-            MiniGameStateMessage loadingStateResponse = responses.get();
+            MiniGameStateMessage loadingStateResponse = responses.get().data();
             softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.LOADING.name());
             softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.READY.name());
         });
@@ -117,17 +119,18 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/minigame/command";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         sendStartGame(session, joinCode, host.getName().value());
 
-        MiniGameStateMessage loadingState = responses.get(); // 게임 로딩 state 응답 (LOADING)
+        MiniGameStateMessage loadingState = responses.get().data(); // 게임 로딩 state 응답 (LOADING)
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
-        MiniGameStateMessage playingState = responses.get(); // 게임 시작 state 응답 (PLAYING)
+        MiniGameStateMessage playingState = responses.get().data(); // 게임 시작 state 응답 (PLAYING)
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
 
         String playerName = "꾹이";
@@ -142,7 +145,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        MiniGameStateMessage result = responses.get();
+        MiniGameStateMessage result = responses.get().data();
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(result.currentRound()).isEqualTo(CardGameRound.FIRST.name());
@@ -162,20 +165,21 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         List<Player> players = roomRepository.findByJoinCode(joinCode).get().getPlayers();
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         // when & then
         sendStartGame(session, joinCode, host.getName().value());
 
         // LOADING 상태 확인
-        MiniGameStateMessage loadingState = responses.get();
+        MiniGameStateMessage loadingState = responses.get().data();
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
         // PLAYING 상태 확인
-        MiniGameStateMessage playingState = responses.get();
+        MiniGameStateMessage playingState = responses.get().data();
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
         assertThat(playingState.currentRound()).isEqualTo(CardGameRound.FIRST.name());
 
@@ -191,15 +195,15 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         }
 
         // 첫 번째 라운드 완료 후 SCORE_BOARD 상태로 변경
-        MiniGameStateMessage scoreBoardState = responses.get(10, TimeUnit.SECONDS);
+        MiniGameStateMessage scoreBoardState = responses.get(10, TimeUnit.SECONDS).data();
         assertThat(scoreBoardState.cardGameState()).isEqualTo(CardGameState.SCORE_BOARD.name());
 
         // 두 번째 라운드 시작
-        MiniGameStateMessage secondLoadingState = responses.get();
+        MiniGameStateMessage secondLoadingState = responses.get().data();
         assertThat(secondLoadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
         // 두 번째 라운드 시작
-        MiniGameStateMessage secondRoundState = responses.get();
+        MiniGameStateMessage secondRoundState = responses.get().data();
         assertThat(secondRoundState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
         assertThat(secondRoundState.currentRound()).isEqualTo(CardGameRound.SECOND.name());
     }
@@ -211,9 +215,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         String subscribeUrlFormat = "/topic/room/%s/gameState";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         sendStartGame(session, joinCode, host.getName().value());
@@ -223,7 +228,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         // when
 
         // then
-        MiniGameStateMessage result = responses.get(15, TimeUnit.SECONDS);
+        MiniGameStateMessage result = responses.get(15, TimeUnit.SECONDS).data();
         assertThat(result.allSelected()).isTrue(); // 단일 플레이어이므로 모든 선택 완료
     }
 
@@ -234,9 +239,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         String subscribeUrlFormat = "/topic/room/%s/gameState";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         // when
@@ -244,7 +250,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         responses.get(); // LOADING
 
         // then
-        MiniGameStateMessage playingState = responses.get(); // PLAYING
+        MiniGameStateMessage playingState = responses.get().data(); // PLAYING
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(playingState.cardInfoMessages()).isNotEmpty();
@@ -257,7 +263,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         });
     }
 
-    @Disabled
     @Test
     void 잘못된_카드_인덱스로_선택을_시도하면_예외가_발생한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
@@ -265,34 +270,30 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/minigame/command";
-        String errorUrlFormat = "/queue/errors";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
-
-        MessageCollector<WebSocketResponse> errorResponses = session.subscribe(errorUrlFormat, WebSocketResponse.class);
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
         responses.get(); // PLAYING
 
-        // when & then
+        // when
         MiniGameMessage request = new MiniGameMessage(
                 CommandType.SELECT_CARD,
                 objectMapper.valueToTree(new SelectCardCommand("꾹이", 999)) // 잘못된 인덱스
         );
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
-        WebSocketResponse errorResponse = errorResponses.get();
-
-        SoftAssertions.assertSoftly(softly -> {
-            // 에러 검증 추가하기 (비동기 스레드 예외 핸들러 처리 불가)
-        });
+        // then
+        assertThatThrownBy(() -> responses.get())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }
 
-    @Disabled
     @Test
     void 게임이_진행중이_아닐때_카드_선택을_시도하면_예외가_발생한다() throws ExecutionException, InterruptedException, TimeoutException {
         // given
@@ -301,9 +302,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/minigame/command";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         // 게임을 시작하지 않고 카드 선택 시도
@@ -312,13 +314,13 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                 objectMapper.valueToTree(new SelectCardCommand("꾹이", 0))
         );
 
-        // when & then
-        org.junit.jupiter.api.Assertions.assertThrows(
-                Exception.class, () -> {
-                    session.send(String.format(requestUrlFormat, joinCode.value()), request);
-                    responses.get(); // 예외가 발생해야 함
-                }
-        );
+        // when
+        session.send(String.format(requestUrlFormat, joinCode.value()), request);
+
+        // then
+        assertThatThrownBy(() -> responses.get())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }
 
     @Test
@@ -329,9 +331,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/minigame/command";
 
-        MessageCollector<MiniGameStateMessage> responses = session.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         sendStartGame(session, joinCode, host.getName().value());
@@ -350,7 +353,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        MiniGameStateMessage result = responses.get();
+        MiniGameStateMessage result = responses.get().data();
 
         SoftAssertions.assertSoftly(softly -> {
             // 선택된 카드가 있는지 확인
@@ -384,13 +387,15 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         room.addMiniGame(new PlayerName("플레이어1"), MiniGameType.CARD_GAME.createMiniGame());
         roomRepository.save(room);
 
-        MessageCollector<MiniGameStateMessage> responses1 = session1.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses1 = session1.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
-        MessageCollector<MiniGameStateMessage> responses2 = session2.subscribe(
+        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses2 = session2.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                MiniGameStateMessage.class
+                new TypeReference<>() {
+                }
         );
 
         sendStartGame(session1, joinCode, room.getHost().getName().value());
@@ -416,7 +421,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         }
 
         // then
-        MiniGameStateMessage finalState = responses1.get();
+        MiniGameStateMessage finalState = responses1.get().data();
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(finalState.allSelected()).isTrue();
