@@ -2,6 +2,7 @@ package coffeeshout.global.exception;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -34,6 +35,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(InvalidStateException.class)
     public ProblemDetail handleInvalidStateException(InvalidStateException exception) {
         return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
+    }
+
+    @ExceptionHandler(NotExistElementException.class)
+    public ProblemDetail handleNotExistElementException(NotExistElementException exception) {
+        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
     }
 
     private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {

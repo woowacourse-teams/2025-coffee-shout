@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -14,7 +15,6 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +57,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
@@ -91,7 +91,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
@@ -183,7 +183,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
