@@ -4,7 +4,7 @@ import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import Layout from '@/layouts/Layout';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
@@ -12,6 +12,8 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 import JoinCodeModal from '../components/InviteCodeModal/JoinCodeModal';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -26,14 +28,31 @@ const SECTIONS: SectionComponents = {
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const { openModal } = useModal();
 
+  const { joinCode } = useJoinCode();
+  const { subscribe, isConnected, send } = useWebSocket();
+  const hasSubscribed = useRef(false);
+  const { openModal } = useModal();
   const { playerRole } = usePlayerRole();
 
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
-  //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerRole) return null;
+  useEffect(() => {
+    if (!isConnected || hasSubscribed.current) return;
+
+    const subscription = subscribe(`/room/${joinCode}`, (payload) => {
+      console.log(payload);
+    });
+
+    hasSubscribed.current = true;
+
+    send(`/room/${joinCode}/players`);
+
+    return () => {
+      subscription.unsubscribe();
+      hasSubscribed.current = false;
+    };
+  }, [joinCode, isConnected, subscribe]);
 
   const handleClickBackButton = () => {
     navigate(-1);
@@ -54,6 +73,8 @@ const LobbyPage = () => {
     });
   };
 
+  //TODO: 다른 에러 처리방식을 찾아보기
+  if (!playerRole) return null;
   return (
     <Layout>
       <Layout.TopBar left={<BackButton onClick={handleClickBackButton} />} />

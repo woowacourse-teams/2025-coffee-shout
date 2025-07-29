@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -37,6 +39,9 @@ type EnterRoomResponse = {
 };
 
 const EntryMenuPage = () => {
+  const { startSocket, isConnected } = useWebSocket();
+  const { joinCode, setJoinCode } = useJoinCode();
+
   const [selectedValue, setSelectedValue] = useState<Option>({
     id: -1,
     name: '',
@@ -74,6 +79,15 @@ const EntryMenuPage = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    if (!isConnected) return;
+
+    // todo: 암호화
+    navigate(`/room/${joinCode}/lobby`, {
+      state: { joinCode },
+    });
+  }, [isConnected]);
+
   const handleNavigateToName = () => navigate('/entry/name');
   const handleNavigateToLobby = async () => {
     if (!state.name) {
@@ -94,10 +108,10 @@ const EntryMenuPage = () => {
         menuId,
       });
 
-      // todo: 암호화
-      navigate(`/room/${joinCode}/lobby`, {
-        state: { joinCode },
-      });
+      setJoinCode(joinCode);
+
+      // websocket 연결
+      startSocket();
     };
 
     const handleGuest = async () => {
@@ -106,6 +120,7 @@ const EntryMenuPage = () => {
         guestName: state.name,
         menuId,
       });
+
       navigate(`/room/${joinCode}/lobby`, { state: { joinCode } });
     };
 
