@@ -1,5 +1,5 @@
-import { api } from '@/apis/api';
-import { ApiError, NetworkError } from '@/apis/error';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useEffect, useState } from 'react';

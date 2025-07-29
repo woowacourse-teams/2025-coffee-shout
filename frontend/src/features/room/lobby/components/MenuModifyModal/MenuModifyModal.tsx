@@ -1,5 +1,5 @@
-import { api } from '@/apis/api';
-import { ApiError, NetworkError } from '@/apis/error';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import Button from '@/components/@common/Button/Button';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
