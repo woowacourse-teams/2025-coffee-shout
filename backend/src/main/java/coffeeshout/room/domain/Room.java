@@ -34,7 +34,7 @@ public class Room {
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
         this.joinCode = joinCode;
-        this.host = new Player(hostName, menu);
+        this.host = Player.createHost(hostName, menu);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
@@ -51,7 +51,7 @@ public class Room {
         validateRoomReady();
         validateCanJoin();
         validatePlayerNameNotDuplicate(guestName);
-        join(new Player(guestName, menu));
+        join(Player.createGuest(guestName, menu));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {

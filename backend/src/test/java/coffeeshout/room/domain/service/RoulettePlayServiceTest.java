@@ -14,8 +14,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 class RoulettePlayServiceTest {
 
     private RoulettePlayService roulettePlayService = new RoulettePlayService();
-    private Player 한스 = PlayerFixture.한스();
-    private Player 꾹이 = PlayerFixture.꾹이();
+    private Player 한스 = PlayerFixture.호스트한스();
+    private Player 꾹이 = PlayerFixture.호스트꾹이();
     private Room room = RoomFixture.호스트_꾹이();
 
     @Test

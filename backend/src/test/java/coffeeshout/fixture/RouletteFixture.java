@@ -12,10 +12,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 public final class RouletteFixture {
 
     private static final List<Player> playerList = List.of(
-            PlayerFixture.꾹이(),
-            PlayerFixture.루키(),
-            PlayerFixture.엠제이(),
-            PlayerFixture.한스()
+            PlayerFixture.호스트꾹이(),
+            PlayerFixture.호스트루키(),
+            PlayerFixture.호스트엠제이(),
+            PlayerFixture.호스트한스()
     );
 
     private RouletteFixture() {

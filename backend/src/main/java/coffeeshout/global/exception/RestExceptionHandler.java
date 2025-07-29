@@ -32,8 +32,8 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(InvalidStateException.class)
-    public ProblemDetail handleIllegalFormatException(InvalidStateException exception) {
-        return getProblemDetail(HttpStatus.UNPROCESSABLE_ENTITY, exception, exception.getErrorCode());
+    public ProblemDetail handleInvalidStateException(InvalidStateException exception) {
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
     }
 
     private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {

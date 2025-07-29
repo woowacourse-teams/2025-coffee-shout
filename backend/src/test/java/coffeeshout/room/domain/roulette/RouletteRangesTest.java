@@ -14,8 +14,8 @@ class RouletteRangesTest {
     @Test
     void 숫자에_해당하는_플레이어를_찾는다() {
         // given
-        Player player1 = PlayerFixture.한스();
-        Player player2 = PlayerFixture.꾹이();
+        Player player1 = PlayerFixture.호스트한스();
+        Player player2 = PlayerFixture.호스트꾹이();
         Map<Player, Probability> playerProbabilities = new LinkedHashMap<>();
         playerProbabilities.put(player1, new Probability(1500));
         playerProbabilities.put(player2, new Probability(8500));
@@ -34,7 +34,7 @@ class RouletteRangesTest {
     @Test
     void 범위를_벗어난_숫자를_입력하면_예외가_발생한다() {
         // given
-        Player player = PlayerFixture.엠제이();
+        Player player = PlayerFixture.호스트엠제이();
 
         Map<Player, Probability> playerProbabilities = new LinkedHashMap<>();
         playerProbabilities.put(player, new Probability(10000));
@@ -62,8 +62,8 @@ class RouletteRangesTest {
     @Test
     void 마지막_범위의_end값을_반환한다() {
         // given
-        Player player1 = PlayerFixture.한스();
-        Player player2 = PlayerFixture.꾹이();
+        Player player1 = PlayerFixture.호스트한스();
+        Player player2 = PlayerFixture.호스트꾹이();
         Map<Player, Probability> playerProbabilities = new LinkedHashMap<>();
         playerProbabilities.put(player1, new Probability(5000));
         playerProbabilities.put(player2, new Probability(5000));

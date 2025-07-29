@@ -7,11 +7,11 @@ public class Menu {
 
     private Long id;
     private final String name;
-    private final String image;
+    private final MenuType menuType;
 
-    public Menu(String name, String image) {
+    public Menu(String name, MenuType menuType) {
         this.name = name;
-        this.image = image;
+        this.menuType = menuType;
     }
 
     public void setId(long id) {
