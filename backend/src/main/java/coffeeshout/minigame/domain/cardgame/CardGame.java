@@ -77,7 +77,7 @@ public class CardGame implements Playable {
     }
 
     public void assignRandomCardsToUnselectedPlayers() {
-        List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
+        final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
             playerHands.put(player, card);

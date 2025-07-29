@@ -59,7 +59,7 @@ public class PlayerHands {
     }
 
     public List<Player> getUnselectedPlayers(CardGameRound round) {
-        List<Player> players = new ArrayList<>();
+        final List<Player> players = new ArrayList<>();
         playerHands.forEach((player, hand) -> {
             if (!hand.isSelected(round)) {
                 players.add(player);

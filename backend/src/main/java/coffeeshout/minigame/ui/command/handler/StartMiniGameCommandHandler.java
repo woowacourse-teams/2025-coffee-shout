@@ -24,7 +24,7 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
     public StartMiniGameCommandHandler(
             RoomQueryService roomQueryService,
             CardGameService cardGameService
-            ) {
+    ) {
         services = new EnumMap<>(MiniGameType.class);
         services.put(MiniGameType.CARD_GAME, cardGameService);
         this.roomQueryService = roomQueryService;
@@ -32,9 +32,9 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
 
     @Override
     public void handle(String joinCode, StartMiniGameCommand command) {
-        Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        Playable currentGame = room.startNextGame(command.hostName());
-        MiniGameType miniGameType = currentGame.getMiniGameType();
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Playable currentGame = room.startNextGame(command.hostName());
+        final MiniGameType miniGameType = currentGame.getMiniGameType();
         services.get(miniGameType).start(currentGame, joinCode);
     }
 
