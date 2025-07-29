@@ -2,7 +2,6 @@ import { useState, PropsWithChildren } from 'react';
 import { Client } from '@stomp/stompjs';
 import { createStompClient } from '../createStompClient';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
-import { getWebSocketUrl } from '../utils/getWebSocketUrl';
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [client, setClient] = useState<Client | null>(null);
@@ -43,30 +42,30 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     setIsConnected(false);
   };
 
-  const subscribe = <T,>(url: string, onPayload: (payload: T) => void) => {
+  const subscribe = <T,>(url: string, onData: (data: T) => void) => {
     if (!client || !isConnected) {
       throw new Error('❌ 구독 실패: WebSocket 연결 안됨');
     }
 
-    const requestUrl = getWebSocketUrl() + url;
+    const requestUrl = '/topic' + url;
 
     return client.subscribe(requestUrl, (message) => {
       try {
-        const parsedPayload = JSON.parse(message.body) as T;
-        onPayload(parsedPayload);
+        const parsedData = JSON.parse(message.body) as T;
+        onData(parsedData);
       } catch (error) {
-        console.error('❌ 페이로드 파싱 실패:', error);
+        console.error('❌ 데이터 파싱 실패:', error);
       }
     });
   };
 
-  const send = <T,>(url: string, body: T) => {
+  const send = <T,>(url: string, body: T | null = null) => {
     if (!client || !isConnected) {
       console.warn('❌ 메시지 전송 실패: WebSocket 연결 안됨');
       return;
     }
 
-    const requestUrl = getWebSocketUrl() + url;
+    const requestUrl = '/app' + url;
 
     client.publish({
       destination: requestUrl,
