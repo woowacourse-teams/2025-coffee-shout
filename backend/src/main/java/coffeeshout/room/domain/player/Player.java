@@ -8,14 +8,20 @@ public class Player {
 
     private final PlayerName name;
     private Menu menu;
+    private final PlayerType playerType;
 
-    public Player(PlayerName name) {
-        this.name = name;
-    }
-
-    public Player(PlayerName name, Menu menu) {
+    private Player(PlayerName name, Menu menu, PlayerType playerType) {
         this.name = name;
         this.menu = menu;
+        this.playerType = playerType;
+    }
+
+    public static Player host(PlayerName name, Menu menu) {
+        return new Player(name, menu, PlayerType.HOST);
+    }
+
+    public static Player guest(PlayerName name, Menu menu) {
+        return new Player(name, menu, PlayerType.GUEST);
     }
 
     public void selectMenu(Menu menu) {

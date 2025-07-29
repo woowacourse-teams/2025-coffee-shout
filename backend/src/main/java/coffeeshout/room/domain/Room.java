@@ -32,7 +32,7 @@ public class Room {
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
         this.joinCode = joinCode;
-        this.host = new Player(hostName, menu);
+        this.host = Player.host(hostName, menu);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new ArrayList<>();
@@ -49,7 +49,7 @@ public class Room {
         state(roomState == RoomState.READY, "READY 상태에서만 참여 가능합니다.");
         state(canJoin(), "방에는 최대 9명만 입장가능합니다.");
         isTrue(checkName(guestName), "중복된 닉네임은 들어올 수 없습니다.");
-        join(new Player(guestName, menu));
+        join(Player.guest(guestName, menu));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {

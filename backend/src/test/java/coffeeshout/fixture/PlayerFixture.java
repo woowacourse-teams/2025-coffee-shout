@@ -8,19 +8,35 @@ public final class PlayerFixture {
     private PlayerFixture() {
     }
 
-    public static Player 한스() {
-        return new Player(new PlayerName("한스"), null);
+    public static Player 호스트한스() {
+        return Player.host(new PlayerName("한스"), null);
     }
 
-    public static Player 꾹이() {
-        return new Player(new PlayerName("꾹이"), null);
+    public static Player 호스트꾹이() {
+        return Player.host(new PlayerName("꾹이"), null);
     }
 
-    public static Player 루키() {
-        return new Player(new PlayerName("루키"), null);
+    public static Player 호스트루키() {
+        return Player.host(new PlayerName("루키"), null);
     }
 
-    public static Player 엠제이() {
-        return new Player(new PlayerName("엠제이"), null);
+    public static Player 호스트엠제이() {
+        return Player.host(new PlayerName("엠제이"), null);
+    }
+
+    public static Player 게스트한스() {
+        return Player.guest(new PlayerName("한스"), null);
+    }
+
+    public static Player 게스트꾹이() {
+        return Player.guest(new PlayerName("꾹이"), null);
+    }
+
+    public static Player 게스트루키() {
+        return Player.guest(new PlayerName("루키"), null);
+    }
+
+    public static Player 게스트엠제이() {
+        return Player.guest(new PlayerName("엠제이"), null);
     }
 }
