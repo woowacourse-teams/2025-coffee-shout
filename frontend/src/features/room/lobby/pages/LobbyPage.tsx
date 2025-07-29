@@ -9,9 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import * as S from './LobbyPage.styled';
 import JoinCodeModal from '../components/InviteCodeModal/JoinCodeModal';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {

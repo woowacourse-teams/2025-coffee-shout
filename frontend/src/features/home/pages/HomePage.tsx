@@ -7,8 +7,8 @@ import Splash from '../components/Splash/Splash';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import * as S from './HomePage.styled';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
