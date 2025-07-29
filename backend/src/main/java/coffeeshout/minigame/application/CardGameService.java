@@ -63,7 +63,7 @@ public class CardGameService {
                 ),
                 new Task<>(
                         CardGameTaskInfo.GAME_FINISH,
-                        CardGameTaskFactory.done(cardGame, () -> sendCardGameResult(joinCode))
+                        CardGameTaskFactory.done(room, cardGame, () -> sendCardGameResult(joinCode))
                 )
         ));
     }

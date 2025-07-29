@@ -22,7 +22,7 @@ public class TaskExecutor<T> {
 
     public void cancel(T info) {
         Future<?> future = futureTasks.get(info);
-        if (future != null && !future.isDone()) {
+        if (future != null &&  !future.isDone()) {
             future.cancel(true);
         }
     }

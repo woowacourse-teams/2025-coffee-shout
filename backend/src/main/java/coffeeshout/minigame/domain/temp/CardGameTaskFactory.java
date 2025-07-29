@@ -1,49 +1,47 @@
 package coffeeshout.minigame.domain.temp;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.room.domain.Room;
 
 public class CardGameTaskFactory {
 
-    public static Runnable play(CardGame cardGame, Runnable sendMessage) {
+    private final ThreadSleeper threadSleeper;
+
+    public CardGameTaskFactory(ThreadSleeper threadSleeper) {
+        this.threadSleeper = threadSleeper;
+    }
+
+    public Runnable play(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.startRound();
             sendMessage.run();
-            sleep(cardGame.getState().getDuration());
+            threadSleeper.sleep(cardGame.getState().getDuration());
             cardGame.assignRandomCardsToUnselectedPlayers();
         };
     }
 
-    public static Runnable scoreBoard(CardGame cardGame, Runnable sendMessage) {
+    public Runnable scoreBoard(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeScoreBoardState();
             sendMessage.run();
-            sleep(cardGame.getState().getDuration());
+            threadSleeper.sleep(cardGame.getState().getDuration());
         };
     }
 
-    public static Runnable loading(CardGame cardGame, Runnable sendMessage) {
+    public Runnable loading(CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeLoadingState();
             sendMessage.run();
-            sleep(cardGame.getState().getDuration());
+            threadSleeper.sleep(cardGame.getState().getDuration());
         };
     }
 
-    public static Runnable done(CardGame cardGame, Runnable sendMessage) {
+    public Runnable done(Room room, CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeDoneState();
+            room.applyMiniGameResult(cardGame.getResult());
             sendMessage.run();
-            cardGame.assignRandomCardsToUnselectedPlayers();
-            sleep(cardGame.getState().getDuration());
+            threadSleeper.sleep(cardGame.getState().getDuration());
         };
-    }
-
-    public static void sleep(long milliSecond) {
-        try {
-            Thread.sleep(milliSecond);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -5,12 +5,14 @@ import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class Room {
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
         isTrue(host.sameName(hostName), "호스트가 아닙니다.");
-        state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
+        state(calculateRoundCount() <= 5, "미니게임은 5개 이하여야 합니다.");
         miniGames.add(miniGame);
     }
 
@@ -66,11 +68,17 @@ public class Room {
         miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
     }
 
-    // TODO 미니게임 결과 반영
-//    public void applyMiniGameResult(MiniGameResult miniGameResult) {
-//        playersWithProbability.adjustProbabilities(miniGameResult,
-//                new ProbabilityCalculator(playersWithProbability.getPlayerCount(), miniGames.size()));
-//    }
+    public void applyMiniGameResult(MiniGameResult miniGameResult) {
+        ProbabilityCalculator probabilityCalculator = new ProbabilityCalculator(
+                players.getPlayerCount(),
+                calculateRoundCount()
+        );
+        roulette.adjustProbabilities(miniGameResult, probabilityCalculator);
+    }
+
+    private int calculateRoundCount() {
+        return miniGames.size();
+    }
 
     public boolean hasNoMiniGames() {
         return miniGames.isEmpty();

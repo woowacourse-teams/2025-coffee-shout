@@ -2,12 +2,14 @@ package coffeeshout.minigame.application;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilities;
-import coffeeshout.fixture.RoomFixture;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
@@ -18,17 +20,16 @@ import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
-import coffeeshout.room.domain.service.RoomCommandService;
+import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
+import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -65,8 +66,9 @@ class CardGameServiceTest {
         for(int i = 1 ; i < players.size() ; i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
+        MockitoAnnotations.openMocks(this);
     }
-    @Disabled
+//    @Disabled
     @Nested
     class 카드게임_시작 {
 
@@ -91,7 +93,31 @@ class CardGameServiceTest {
             });
         }
 
-        @Disabled
+    @Test
+    void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException {
+        Room room = roomQueryService.findByJoinCode(joinCode);
+        room.startGame(MiniGameType.CARD_GAME);
+        cardGameService.startGame(joinCode.value());
+        CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+        CardGame cardGameSpy = spy(cardGame);
+
+        List<Player> players = room.getPlayers();
+        MiniGameResult result = new MiniGameResult(Map.of(
+                players.get(0), 1,
+                players.get(1), 2,
+                players.get(2), 3,
+                players.get(3), 4
+        ));
+
+        doReturn(result).when(cardGameSpy).getResult();
+
+        SoftAssertions.assertSoftly(softly -> {
+            Map<Player, Probability> probabilities = room.getProbabilities();
+            System.out.println(probabilities);
+        });
+
+    }
+
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);
