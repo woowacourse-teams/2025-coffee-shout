@@ -7,6 +7,7 @@ export const createStompClient = () => {
 
   const client = new Client({
     webSocketFactory: () => new SockJS(wsUrl),
+    debug: (msg) => console.log('[STOMP]', msg),
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
