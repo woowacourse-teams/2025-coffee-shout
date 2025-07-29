@@ -31,4 +31,9 @@ public class MemoryRoomRepository implements RoomRepository {
         rooms.put(room.getJoinCode(), room);
         return rooms.get(room.getJoinCode());
     }
+
+    @Override
+    public void deleteByJoinCode(JoinCode joinCode) {
+        rooms.remove(joinCode);
+    }
 }

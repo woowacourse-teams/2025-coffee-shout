@@ -11,4 +11,6 @@ public interface RoomRepository {
     boolean existsByJoinCode(JoinCode joinCode);
 
     Room save(Room room);
+
+    void deleteByJoinCode(JoinCode joinCode);
 }

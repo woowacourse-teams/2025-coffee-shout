@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -327,5 +328,22 @@ class RoomServiceTest {
         // when & then
         assertThat(roomService.isRoomExists(joinCode.value())).isTrue();
         assertThat(roomService.isRoomExists("TRASH")).isFalse();
+    }
+
+    @Test
+    void 룰렛을_돌려서_당첨자를_선택한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+
+        // when
+        Player losePlayer = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+
+        // then
+        assertThat(losePlayer).isNotNull();
+        assertThat(createdRoom.getPlayers()).contains(losePlayer);
     }
 }
