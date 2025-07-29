@@ -1,63 +1,98 @@
 package coffeeshout.minigame.application;
 
-import static org.springframework.util.Assert.state;
-
-import coffeeshout.room.domain.RoomFinder;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRandomDeckGenerator;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.player.domain.Player;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.temp.CardGameTaskFactory;
+import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
+import coffeeshout.minigame.domain.temp.TaskExecutor;
+import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
+import coffeeshout.minigame.ui.response.MiniGameStateMessage;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class CardGameService {
 
-    private final RoomFinder roomFinder;
-    private final Map<Long, CardGame> cardGames = new ConcurrentHashMap<>();
+    private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
+    private static final String CARD_GAME_RESULT_DESTINATION_FORMAT = "/topic/room/%s/rank";
 
-    public void start(Long roomId) {
-        final Room room = roomFinder.findById(roomId);
-        final CardGame cardGame = new CardGame(room.getPlayers(), new CardGameRandomDeckGenerator());
+    private final RoomQueryService roomQueryService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final CardGameTaskExecutors cardGameTaskExecutors;
 
-        cardGame.start();
-
-        cardGames.put(roomId, cardGame);
+    public void startGame(String joinCode) {
+        final JoinCode roomJoinCode = new JoinCode(joinCode);
+        final Room room = roomQueryService.findByJoinCode(roomJoinCode);
+        room.startGame(MiniGameType.CARD_GAME);
+        CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+        TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
+        cardGameTaskExecutors.put(roomJoinCode, executor);
+        executor.submits(List.of(
+                new Task<>(
+                        CardGameTaskInfo.WAITING_FOR_START,
+                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.FIRST_ROUND_PLAYING,
+                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.FIRST_ROUND_SCORE_BOARD,
+                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.FIRST_ROUND_LOADING,
+                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.SECOND_ROUND_PLAYING,
+                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.SECOND_ROUND_SCORE_BOARD,
+                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
+                ),
+                new Task<>(
+                        CardGameTaskInfo.GAME_FINISH,
+                        CardGameTaskFactory.done(cardGame, () -> sendCardGameResult(joinCode))
+                )
+        ));
     }
 
-    public void selectCard(Long roomId, String playerName, Integer cardIndex) {
-        final CardGame cardGame = cardGames.get(roomId);
-        final Player player = cardGame.findPlayerByName(playerName);
-
+    public void selectCard(String joinCode, String playerName, Integer cardIndex) {
+        JoinCode roomJoinCode = new JoinCode(joinCode);
+        final CardGame cardGame = getCardGame(roomJoinCode);
+        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
         cardGame.selectCard(player, cardIndex);
-    }
-
-    public void checkAndMoveRound(Long roomId) {
-        final CardGame cardGame = cardGames.get(roomId);
-
-        if (cardGame.isFirstRoundFinished()) {
-            state(cardGame.isFirstRound(), "게임이 1라운드가 아닙니다.");
-            cardGame.nextRound();
-            cardGame.shuffle();
-        }
-
-        if (cardGame.isSecondRoundFinished()) {
-            state(cardGame.isSecondRound(), "게임이 2라운드가 아닙니다.");
-            cardGame.nextRound();
+        if (cardGame.isFinishedThisRound()) {
+            cardGameTaskExecutors.cancelPlaying(roomJoinCode, cardGame.getRound());
         }
     }
 
-    public MiniGameResult getMiniGameResult(Long roomId) {
-        final CardGame cardGame = cardGames.get(roomId);
-
-        return cardGame.getResult();
+    private void sendCardGameState(String joinCode) {
+        CardGame cardGame = getCardGame(new JoinCode(joinCode));
+        MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
+        String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode);
+        messagingTemplate.convertAndSend(destination, message);
     }
 
-    public CardGame getCardGame(Long roomId) {
-        return cardGames.get(roomId);
+    private void sendCardGameResult(String joinCode) {
+        CardGame cardGame = getCardGame(new JoinCode(joinCode));
+        String destination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, joinCode);
+        messagingTemplate.convertAndSend(destination, cardGame.getResult());
+    }
+
+    private CardGame getCardGame(JoinCode joinCode) {
+        Room room = roomQueryService.findByJoinCode(joinCode);
+        return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 }

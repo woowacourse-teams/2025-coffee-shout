@@ -1,19 +1,25 @@
 package coffeeshout.room.domain;
 
-import static org.springframework.util.Assert.state;
-
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record JoinCode(String value) {
+public record JoinCode(
+        String value
+) {
+
+    public String getValue() {
+        return value;
+    }
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
 
     public JoinCode {
-        state(value.length() == CODE_LENGTH, "코드는 5자리여야 합니다.");
-        value.chars().forEach(charCode -> state(isValidCharacter(charCode), "허용되지 않는 문자가 포함되어 있습니다."));
+        validateLength(value);
+        validateCharacters(value);
     }
 
     public static JoinCode generate() {
@@ -25,8 +31,22 @@ public record JoinCode(String value) {
                 .collect(Collectors.joining()));
     }
 
+    private void validateLength(String value) {
+        if (value.length() != CODE_LENGTH) {
+            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_ILLEGAL_LENGTH,
+                    "5자리 코드여야 합니다. 현재 길이: " + value.length());
+        }
+    }
+
+    private void validateCharacters(String value) {
+        if (value.chars().anyMatch(charCode -> !isValidCharacter(charCode))) {
+            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_ILLEGAL_CHARACTER,
+                    "허용되지 않는 문자가 포함되어 있습니다. 현재 코드: " + value);
+        }
+    }
+
     private static List<Integer> convertAsciiList() {
-        return JoinCode.CHARSET.chars().boxed().collect(Collectors.toList());
+        return JoinCode.CHARSET.chars().boxed().collect(Collectors.toCollection(ArrayList::new));
     }
 
     private static String convertAsciiToString(int asciiCode) {
