@@ -18,6 +18,7 @@ import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
 import coffeeshout.minigame.ui.request.command.StartMiniGameCommand;
+import coffeeshout.minigame.ui.response.MinIGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage.CardInfoMessage;
 import coffeeshout.room.domain.JoinCode;
@@ -88,6 +89,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         String subscribeUrlFormat = "/topic/room/%s/gameState";
         String requestUrlFormat = "/app/room/%s/minigame/command";
+        String gameStartUrlFormat = "/topic/room/%s/round";
 
         MiniGameMessage startGameRequest = new MiniGameMessage(
                 CommandType.START_CARD_GAME,
@@ -100,11 +102,20 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
+        MessageCollector<WebSocketResponse<MinIGameStartMessage>> startResponses = session.subscribe(
+                String.format(gameStartUrlFormat, joinCode.value()),
+                new TypeReference<>() {
+                }
+        );
+
         // when
         session.send(String.format(requestUrlFormat, joinCode.value()), startGameRequest);
 
         // then
         SoftAssertions.assertSoftly(softly -> {
+            MinIGameStartMessage startResponse = startResponses.get().data();
+            softly.assertThat(startResponse.miniGameType()).isEqualTo(MiniGameType.CARD_GAME);
+
             MiniGameStateMessage loadingStateResponse = responses.get().data();
             softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.LOADING.name());
             softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.READY.name());
