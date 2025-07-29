@@ -9,10 +9,10 @@ import java.util.Map;
 public final class PlayerProbabilities {
 
     public static final List<Player> PLAYERS = List.of(
-            PlayerFixture.꾹이(),
-            PlayerFixture.루키(),
-            PlayerFixture.엠제이(),
-            PlayerFixture.한스()
+            PlayerFixture.호스트꾹이(),
+            PlayerFixture.게스트루키(),
+            PlayerFixture.게스트엠제이(),
+            PlayerFixture.게스트한스()
     );
 
     private PlayerProbabilities() {

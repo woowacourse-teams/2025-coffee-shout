@@ -4,18 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.TestDataHelper;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -54,7 +58,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
@@ -88,7 +92,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
@@ -119,7 +123,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -155,7 +159,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -168,7 +172,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidArgumentException.class);
     }
 
     @Test
@@ -180,7 +184,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotExistElementException.class);
     }
 
     @Test
@@ -314,5 +318,34 @@ class RoomServiceTest {
         assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getJoinCode().value(), guestName,
                 MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 방이_존재하는지_확인한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        // when & then
+        assertThat(roomService.isRoomExists(joinCode.value())).isTrue();
+        assertThat(roomService.isRoomExists("TRASH")).isFalse();
+    }
+
+    @Test
+    void 룰렛을_돌려서_당첨자를_선택한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+
+        // when
+        Player losePlayer = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+
+        // then
+        assertThat(losePlayer).isNotNull();
+        assertThat(createdRoom.getPlayers()).contains(losePlayer);
     }
 }

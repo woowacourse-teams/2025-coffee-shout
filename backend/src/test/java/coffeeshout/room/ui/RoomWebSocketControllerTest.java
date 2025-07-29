@@ -10,6 +10,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
@@ -69,7 +70,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
 
         assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
-        assertThat(host.menuResponse().image()).isEqualTo("americano.jpg");
+        assertThat(host.menuResponse().menuType()).isEqualTo(MenuType.COFFEE);
 
         // 게스트들 확인
         List<String> playerNames = players.stream().map(PlayerResponse::playerName).toList();
@@ -124,25 +125,20 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         String nonExistentJoinCode = "3434X";
 
         // when
-        MessageCollector<List<PlayerResponse>> subscribe = session.subscribe(
+        MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe = session.subscribe(
                 "/topic/room/" + nonExistentJoinCode,
-                new TypeReference<>() {
-                }
+                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {}
         );
 
-        try {
-            session.send("/app/room/" + nonExistentJoinCode + "/players", null);
+        // then
+        session.send("/app/room/" + nonExistentJoinCode + "/players", null);
 
-            // then - 에러가 발생하거나 응답이 없어야 함
-            List<PlayerResponse> response = subscribe.get();
+        WebSocketResponse<List<PlayerResponse>> response = subscribe.get();
 
-            // 실제 구현에 따라 null이거나 예외가 발생할 수 있음
-            System.out.println("존재하지 않는 방 요청 응답: " + response);
-
-        } catch (Exception e) {
-            // 예외 발생이 정상적인 경우
-            System.out.println("✅ 예상된 예외 발생: " + e.getMessage());
-        }
+        // 응답이 실패 상태이거나 데이터가 null이어야 함
+        assertThat(response).isNotNull();
+        assertThat(response.success()).isFalse();
+        assertThat(response.data()).isNull();
     }
 
     @Test
@@ -246,6 +242,53 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
         // then
         assertThat(responses2).hasSize(0);
+    }
+
+    @Test
+    void 룰렛을_돌려서_당첨자를_선택한다() throws InterruptedException, ExecutionException, TimeoutException {
+        // given
+        TestStompSession session = createSession();
+        String joinCode = testRoom.getJoinCode().value();
+        String hostName = "호스트꾹이";
+
+        // 미니게임을 먼저 선택
+        MessageCollector<WebSocketResponse<List<MiniGameType>>> miniGameSubscribe = session.subscribe(
+                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
+                }
+        );
+        
+        MiniGameSelectMessage selectMessage = new MiniGameSelectMessage(hostName, MiniGameType.CARD_GAME);
+        session.send("/app/room/" + joinCode + "/minigames/select", selectMessage);
+        
+        // 미니게임 선택 응답 확인
+        List<MiniGameType> selectedGames = miniGameSubscribe.get().data();
+        assertThat(selectedGames).hasSize(1);
+        
+        // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
+        testRoom.startNextGame(hostName);
+
+        // when - 룰렛 결과 구독
+        MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(
+                "/topic/room/" + joinCode + "/roulette",
+                new TypeReference<WebSocketResponse<PlayerResponse>>() {
+                }
+        );
+
+        session.send("/app/room/" + joinCode + "/roulette/spin", hostName);
+
+        WebSocketResponse<PlayerResponse> response = rouletteSubscribe.get();
+
+        // then
+        assertThat(response.success()).isTrue();
+        assertThat(response.data()).isNotNull();
+        
+        PlayerResponse winner = response.data();
+        assertThat(winner.playerName()).isNotBlank();
+        assertThat(winner.menuResponse()).isNotNull();
+        
+        // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
+        List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
+        assertThat(playerNames).contains(winner.playerName());
     }
 
     private void setupTestData() {

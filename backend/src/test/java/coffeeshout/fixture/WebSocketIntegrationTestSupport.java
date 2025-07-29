@@ -27,12 +27,11 @@ public abstract class WebSocketIntegrationTestSupport {
     static final String WEBSOCKET_BASE_URL_FORMAT = "ws://localhost:%d/ws";
     private static final Logger log = LoggerFactory.getLogger(WebSocketIntegrationTestSupport.class);
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @LocalServerPort
     private int port;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     protected TestStompSession createSession() throws InterruptedException, ExecutionException, TimeoutException {
         SockJsClient sockJsClient = new SockJsClient(List.of(
@@ -40,7 +39,9 @@ public abstract class WebSocketIntegrationTestSupport {
         ));
 
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter(objectMapper);
+        messageConverter.setStrictContentTypeMatch(false);
+        stompClient.setMessageConverter(messageConverter);
         String url = String.format(WEBSOCKET_BASE_URL_FORMAT, port);
         StompSession session = stompClient
                 .connectAsync(

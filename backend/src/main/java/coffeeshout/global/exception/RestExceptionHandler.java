@@ -1,7 +1,9 @@
 package coffeeshout.global.exception;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,31 +14,43 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(Exception exception) {
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception);
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, new ErrorCode() {
+            @Override
+            public String getCode() {
+                return "INTERNAL_SERVER_ERROR";
+            }
+
+            @Override
+            public String getMessage() {
+                return "서버 오류가 발생했습니다.";
+            }
+        });
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ProblemDetail handleNoSuchElementException(NoSuchElementException exception) {
-        return getProblemDetail(HttpStatus.NOT_FOUND, exception);
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ProblemDetail handleInvalidArgumentException(InvalidArgumentException exception) {
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ProblemDetail handleIllegalArgumentException(IllegalArgumentException exception) {
-        return getProblemDetail(HttpStatus.BAD_REQUEST, exception);
+    @ExceptionHandler(InvalidStateException.class)
+    public ProblemDetail handleInvalidStateException(InvalidStateException exception) {
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ProblemDetail handleIllegalStateException(IllegalStateException exception) {
-        return getProblemDetail(HttpStatus.UNPROCESSABLE_ENTITY, exception);
+    @ExceptionHandler(NotExistElementException.class)
+    public ProblemDetail handleNotExistElementException(NotExistElementException exception) {
+        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
     }
 
-    private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, exception.getMessage());
+    private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorCode.getMessage());
 
+        problemDetail.setProperty("errorCode", errorCode.getCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         problemDetail.setProperty("exception", exception.getClass().getSimpleName());
 
         return problemDetail;
     }
+
 }
 

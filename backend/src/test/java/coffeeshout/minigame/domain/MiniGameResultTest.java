@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 
 class MiniGameResultTest {
 
-    private final Player 호스트_한스 = PlayerFixture.한스();
-    private final Player 게스트_루키 = PlayerFixture.루키();
-    private final Player 게스트_꾹이 = PlayerFixture.꾹이();
-    private final Player 게스트_엠제이 = PlayerFixture.엠제이();
+    private final Player 호스트_한스 = PlayerFixture.호스트한스();
+    private final Player 게스트_루키 = PlayerFixture.호스트루키();
+    private final Player 게스트_꾹이 = PlayerFixture.호스트꾹이();
+    private final Player 게스트_엠제이 = PlayerFixture.호스트엠제이();
 
     @Test
     void 순위_목록을_반환한다() {

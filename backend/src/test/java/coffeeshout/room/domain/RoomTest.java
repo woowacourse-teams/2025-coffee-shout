@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Player;
@@ -39,7 +41,7 @@ class RoomTest {
         // given
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
-        assertThat(room.getHost()).isEqualTo(new Player(호스트_한스));
+        assertThat(room.getHost()).isEqualTo(Player.createHost(호스트_한스, MenuFixture.아메리카노()));
     }
 
     @Test
@@ -59,7 +61,32 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, MenuFixture.아메리카노()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidStateException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY_TO_JOIN);
+    }
+
+    @Test
+    void 중복된_이름으로_참여할_수_없다() {
+        // given
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+
+        // when & then
+        assertThatThrownBy(() -> room.joinGuest(게스트_꾹이, MenuFixture.라떼()))
+                .isInstanceOf(InvalidArgumentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.DUPLICATE_PLAYER_NAME);
+    }
+
+    @Test
+    void 방이_가득_차면_참여할_수_없다() {
+        // given
+        for (int i = 1; i < 9; i++) {
+            room.joinGuest(new PlayerName("guest" + i), MenuFixture.아메리카노());
+        }
+
+        // when & then
+        assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), MenuFixture.아메리카노()))
+                .isInstanceOf(InvalidStateException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
     }
 
     @Test
@@ -134,19 +161,35 @@ class RoomTest {
         room.joinGuest(게스트_엠제이, MenuFixture.아메리카노());
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
-        Player winner = room.startRoulette();
+        Player host = room.findPlayer(호스트_한스);
+
+        Player winner = room.spinRoulette(host);
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-        assertThat(winner).isEqualTo(new Player(new PlayerName("한스"), MenuFixture.아메리카노()));
+        assertThat(winner).isEqualTo(Player.createHost(new PlayerName("한스"), MenuFixture.아메리카노()));
+    }
+
+    @Test
+    void 룰렛은_호스트만_돌릴_수_있다() {
+        // given
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player guest = room.findPlayer(게스트_꾹이);
+
+        ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
+
+        // when & then
+        assertThatThrownBy(() -> room.spinRoulette(guest))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 룰렛은_2명_이상이어야_돌릴_수_있다() {
         // given
+        Player host = room.findPlayer(호스트_한스);
 
         // when & then
-        assertThatThrownBy(() -> room.startRoulette())
+        assertThatThrownBy(() -> room.spinRoulette(host))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -154,9 +197,10 @@ class RoomTest {
     void 룰렛은_게임_중일때만_돌릴_수_있다() {
         // given
         room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player host = room.findPlayer(호스트_한스);
 
         // when & then
-        assertThatThrownBy(() -> room.startRoulette())
+        assertThatThrownBy(() -> room.spinRoulette(host))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -165,8 +209,8 @@ class RoomTest {
         // given
 
         // when & then
-        assertThat(room.isHost(new Player(호스트_한스, MenuFixture.아메리카노()))).isTrue();
-        assertThat(room.isHost(new Player(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
+        assertThat(room.isHost(Player.createHost(호스트_한스, MenuFixture.아메리카노()))).isTrue();
+        assertThat(room.isHost(Player.createGuest(게스트_꾹이, MenuFixture.아메리카노()))).isFalse();
     }
 
     @Test

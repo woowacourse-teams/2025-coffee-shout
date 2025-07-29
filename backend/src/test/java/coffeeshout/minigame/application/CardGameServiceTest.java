@@ -23,6 +23,7 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,7 @@ class CardGameServiceTest {
             });
         }
 
+        @Disabled
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);

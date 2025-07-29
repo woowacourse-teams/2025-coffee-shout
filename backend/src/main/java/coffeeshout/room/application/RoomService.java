@@ -12,6 +12,7 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -91,5 +92,18 @@ public class RoomService {
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
+    }
+
+    public boolean isRoomExists(String joinCode) {
+        return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
+    }
+
+    public Player spinRoulette(String joinCode, String hostName) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Player host = room.findPlayer(new PlayerName(hostName));
+
+        roomCommandService.delayCleanUp(room, Duration.ofHours(1));
+
+        return room.spinRoulette(host);
     }
 }

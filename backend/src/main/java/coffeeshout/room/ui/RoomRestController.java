@@ -4,6 +4,7 @@ import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomCreateRequest;
 import coffeeshout.room.ui.request.RoomEnterRequest;
+import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.MiniGameResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,6 +37,13 @@ public class RoomRestController {
         final Room room = roomService.enterRoom(request.joinCode(), request.guestName(), request.menuId());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<JoinCodeExistResponse> checkJoinCode(@RequestParam String joinCode) {
+        final JoinCodeExistResponse response = new JoinCodeExistResponse(roomService.isRoomExists(joinCode));
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/minigames")
