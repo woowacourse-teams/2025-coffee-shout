@@ -3,6 +3,7 @@ package coffeeshout.room.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -24,6 +25,6 @@ class JoinCodeTest {
         // given
         // when & then
         assertThatThrownBy(() -> new JoinCode(address))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidArgumentException.class);
     }
 }

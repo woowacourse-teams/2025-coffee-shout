@@ -4,6 +4,7 @@ import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomCreateRequest;
 import coffeeshout.room.ui.request.RoomEnterRequest;
+import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.MiniGameResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
@@ -39,10 +40,10 @@ public class RoomRestController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkJoinCode(@RequestParam String joinCode) {
-        final boolean exists = roomService.isRoomExists(joinCode);
+    public ResponseEntity<JoinCodeExistResponse> checkJoinCode(@RequestParam String joinCode) {
+        final JoinCodeExistResponse response = new JoinCodeExistResponse(roomService.isRoomExists(joinCode));
 
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/minigames")
