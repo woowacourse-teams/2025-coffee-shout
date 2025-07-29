@@ -16,11 +16,11 @@ public class Player {
         this.playerType = playerType;
     }
 
-    public static Player host(PlayerName name, Menu menu) {
+    public static Player createHost(PlayerName name, Menu menu) {
         return new Player(name, menu, PlayerType.HOST);
     }
 
-    public static Player guest(PlayerName name, Menu menu) {
+    public static Player createGuest(PlayerName name, Menu menu) {
         return new Player(name, menu, PlayerType.GUEST);
     }
 
