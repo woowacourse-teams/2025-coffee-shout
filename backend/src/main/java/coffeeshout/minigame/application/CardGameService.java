@@ -28,6 +28,7 @@ public class CardGameService {
     private final RoomQueryService roomQueryService;
     private final SimpMessagingTemplate messagingTemplate;
     private final CardGameTaskExecutors cardGameTaskExecutors;
+    private final CardGameTaskFactory gameTaskFactory;
 
     public void startGame(String joinCode) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
@@ -39,31 +40,31 @@ public class CardGameService {
         executor.submits(List.of(
                 new Task<>(
                         CardGameTaskInfo.WAITING_FOR_START,
-                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_PLAYING,
-                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_SCORE_BOARD,
-                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_LOADING,
-                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.SECOND_ROUND_PLAYING,
-                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.play(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.SECOND_ROUND_SCORE_BOARD,
-                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
+                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(joinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.GAME_FINISH,
-                        CardGameTaskFactory.done(room, cardGame, () -> sendCardGameResult(joinCode))
+                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(joinCode))
                 )
         ));
     }

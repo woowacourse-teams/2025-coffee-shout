@@ -1,5 +1,8 @@
 package coffeeshout.minigame.domain.temp;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ThreadSleeperImpl implements ThreadSleeper {
 
     @Override

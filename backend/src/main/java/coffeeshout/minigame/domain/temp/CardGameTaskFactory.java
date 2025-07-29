@@ -1,8 +1,11 @@
 package coffeeshout.minigame.domain.temp;
 
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.room.domain.Room;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CardGameTaskFactory {
 
     private final ThreadSleeper threadSleeper;
@@ -39,7 +42,9 @@ public class CardGameTaskFactory {
     public Runnable done(Room room, CardGame cardGame, Runnable sendMessage) {
         return () -> {
             cardGame.changeDoneState();
-            room.applyMiniGameResult(cardGame.getResult());
+            MiniGameResult result = cardGame.getResult();
+            room.applyMiniGameResult(result);
+
             sendMessage.run();
             threadSleeper.sleep(cardGame.getState().getDuration());
         };
