@@ -5,11 +5,10 @@ import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import Layout from '@/layouts/Layout';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
-import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {

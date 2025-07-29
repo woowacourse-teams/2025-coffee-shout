@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
-import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
 
 const MAX_NAME_LENGTH = 10;
 
