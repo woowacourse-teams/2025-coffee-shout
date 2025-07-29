@@ -8,6 +8,7 @@ import coffeeshout.minigame.domain.temp.CardGameTaskFactory;
 import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
+import coffeeshout.minigame.ui.response.MinIGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -26,6 +27,7 @@ public class CardGameService implements MiniGameService {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
     private static final String CARD_GAME_RESULT_DESTINATION_FORMAT = "/topic/room/%s/rank";
+    private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final RoomQueryService roomQueryService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -33,6 +35,7 @@ public class CardGameService implements MiniGameService {
 
     @Override
     public void start(Playable playable, String joinCode) {
+        sendGameStartMessage(joinCode, playable.getMiniGameType());
         JoinCode roomJoinCode = new JoinCode(joinCode);
         CardGame cardGame = (CardGame) playable;
         TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
@@ -96,5 +99,9 @@ public class CardGameService implements MiniGameService {
     private CardGame getCardGame(JoinCode joinCode) {
         Room room = roomQueryService.findByJoinCode(joinCode);
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+    }
+
+    private void sendGameStartMessage(String joinCode, MiniGameType miniGameType) {
+        messagingTemplate.convertAndSend(String.format(GAME_START_DESTINATION_FORMAT, joinCode), WebSocketResponse.success(new MinIGameStartMessage(miniGameType)));
     }
 }

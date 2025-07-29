@@ -24,7 +24,7 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
     public StartMiniGameCommandHandler(
             RoomQueryService roomQueryService,
             CardGameService cardGameService
-    ) {
+            ) {
         services = new EnumMap<>(MiniGameType.class);
         services.put(MiniGameType.CARD_GAME, cardGameService);
         this.roomQueryService = roomQueryService;
