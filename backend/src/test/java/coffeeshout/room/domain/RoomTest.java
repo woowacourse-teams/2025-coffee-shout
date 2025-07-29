@@ -161,7 +161,9 @@ class RoomTest {
         room.joinGuest(게스트_엠제이, MenuFixture.아메리카노());
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
-        Player winner = room.startRoulette();
+        Player host = room.findPlayer(호스트_한스);
+
+        Player winner = room.spinRoulette(host);
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
@@ -169,11 +171,25 @@ class RoomTest {
     }
 
     @Test
-    void 룰렛은_2명_이상이어야_돌릴_수_있다() {
+    void 룰렛은_호스트만_돌릴_수_있다() {
         // given
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player guest = room.findPlayer(게스트_꾹이);
+
+        ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then
-        assertThatThrownBy(() -> room.startRoulette())
+        assertThatThrownBy(() -> room.spinRoulette(guest))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 룰렛은_2명_이상이어야_돌릴_수_있다() {
+        // given
+        Player host = room.findPlayer(호스트_한스);
+
+        // when & then
+        assertThatThrownBy(() -> room.spinRoulette(host))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -181,9 +197,10 @@ class RoomTest {
     void 룰렛은_게임_중일때만_돌릴_수_있다() {
         // given
         room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player host = room.findPlayer(호스트_한스);
 
         // when & then
-        assertThatThrownBy(() -> room.startRoulette())
+        assertThatThrownBy(() -> room.spinRoulette(host))
                 .isInstanceOf(IllegalStateException.class);
     }
 

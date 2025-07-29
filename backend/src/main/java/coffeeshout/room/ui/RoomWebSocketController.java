@@ -71,4 +71,12 @@ public class RoomWebSocketController {
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
                 WebSocketResponse.success(responses));
     }
+
+    @MessageMapping("/room/{joinCode}/roulette/spin")
+    public void broadcastRouletteSpin(@DestinationVariable String joinCode, String hostName) {
+        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, hostName));
+
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
+                WebSocketResponse.success(losePlayer));
+    }
 }
