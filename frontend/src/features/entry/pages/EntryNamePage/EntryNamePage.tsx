@@ -3,11 +3,11 @@ import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Input from '@/components/@common/Input/Input';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 const MAX_NAME_LENGTH = 10;
 

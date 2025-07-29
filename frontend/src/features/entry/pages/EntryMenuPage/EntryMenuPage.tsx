@@ -8,7 +8,7 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRoleContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
