@@ -1,5 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { getWebSocketUrl } from './utils/getWebSocketUrl';
 
 export const createStompClient = () => {
   const wsUrl = getWebSocketUrl();
@@ -12,13 +13,4 @@ export const createStompClient = () => {
   });
 
   return client;
-};
-
-const getWebSocketUrl = (): string => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  if (!apiUrl) {
-    throw new Error('REACT_APP_API_URL is not defined');
-  }
-
-  return `${apiUrl}/ws`;
 };
