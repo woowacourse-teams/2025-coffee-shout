@@ -94,25 +94,23 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const send = <T,>(url: string, body: T | null = null): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (!client || !isConnected) {
-        reject(new Error('❌ 메시지 전송 실패: WebSocket 연결 안됨'));
-        return;
-      }
+  const send = <T,>(url: string, body: T | null = null) => {
+    if (!client || !isConnected) {
+      throw new Error('❌ 메시지 전송 실패: WebSocket 연결 안됨');
+    }
 
-      try {
-        const requestUrl = '/app' + url;
+    const requestUrl = '/app' + url;
 
-        client.publish({
-          destination: requestUrl,
-          body: JSON.stringify(body),
-        });
+    if (body === null) {
+      client.publish({
+        destination: requestUrl,
+      });
+      return;
+    }
 
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
+    client.publish({
+      destination: requestUrl,
+      body: JSON.stringify(body),
     });
   };
 
