@@ -5,7 +5,7 @@ import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +39,7 @@ type EnterRoomResponse = {
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
-  const { playerRole } = usePlayerRole();
+  const { playerRole } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);

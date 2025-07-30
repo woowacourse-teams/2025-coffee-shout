@@ -3,7 +3,7 @@ import InfoWhiteIcon from '@/assets/white-info.svg';
 import { ComponentProps } from 'react';
 import Headline4 from '../Headline4/Headline4';
 import * as S from './GameActionButton.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 type Props = {
   onClick: () => void;
@@ -12,7 +12,7 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const GameActionButton = ({ onClick, isSelected, gameName, ...rest }: Props) => {
-  const { playerRole } = usePlayerRole();
+  const { playerRole } = usePlayerType();
 
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerRole) return null;

@@ -10,12 +10,12 @@ import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePlayPage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  const { playerRole } = usePlayerRole();
+  const { playerRole } = usePlayerType();
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
