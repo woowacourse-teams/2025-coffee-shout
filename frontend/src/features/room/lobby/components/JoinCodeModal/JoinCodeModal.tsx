@@ -1,11 +1,11 @@
 import CopyIcon from '@/assets/copy-icon.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { useState } from 'react';
+import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
 import * as S from './JoinCodeModal.styled';
 
 const JoinCodeModal = () => {
-  const [joinCode] = useState('CODE1234!');
+  const { joinCode } = useJoinCode();
 
   const handleCopy = () => {
     alert('초대 코드가 복사되었습니다.');
