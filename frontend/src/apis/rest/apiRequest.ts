@@ -7,7 +7,7 @@ type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type ApiRequestOptions<TData> = {
   method?: Method;
   headers?: Record<string, string>;
-  data?: TData;
+  body?: TData;
   params?: Record<string, string | number | boolean | null | undefined>;
   retry?: {
     count: number;
@@ -28,7 +28,7 @@ export const apiRequest = async <T, TData>(
   const {
     method = 'GET',
     headers = {},
-    data = null,
+    body = null,
     params = null,
     retry = { count: 0, delay: 1000 },
   } = options;
@@ -55,14 +55,14 @@ export const apiRequest = async <T, TData>(
     ...headers,
   };
 
-  const body = data ? JSON.stringify(data) : null;
+  const parsedBody = body ? JSON.stringify(body) : null;
 
   const makeRequest = async (retryCount = 0): Promise<T> => {
     try {
       const fetchOptions: ApiConfig = {
         method: method,
         headers: defaultHeaders,
-        body: method !== 'GET' && body ? body : null,
+        body: method !== 'GET' && parsedBody ? parsedBody : null,
       };
 
       const response = await fetch(requestUrl, fetchOptions);
