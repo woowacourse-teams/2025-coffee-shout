@@ -1,6 +1,9 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
-import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.*;
+import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.DOUBLE;
+import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.INVERT;
+import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.NULLIFY;
+import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.QUADRUPLE;
 import static org.springframework.util.Assert.isTrue;
 
 import java.util.ArrayList;

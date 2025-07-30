@@ -43,7 +43,7 @@ public class RestExceptionHandler {
     }
 
     private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorCode.getMessage());
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorCode.getMessage());
 
         problemDetail.setProperty("errorCode", errorCode.getCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());

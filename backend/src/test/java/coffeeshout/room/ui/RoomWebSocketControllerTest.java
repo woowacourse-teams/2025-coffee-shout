@@ -265,7 +265,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         assertThat(selectedGames).hasSize(1);
         
         // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
-        testRoom.startGame(MiniGameType.CARD_GAME);
+        testRoom.startNextGame(hostName);
 
         // when - 룰렛 결과 구독
         MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(

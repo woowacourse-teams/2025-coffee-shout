@@ -10,35 +10,43 @@ import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
+import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
-import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @Import({TestConfig.class})
 class CardGameServiceTest {
 
-    @MockBean
+    @MockitoBean
     SimpMessagingTemplate messagingTemplate;
 
     @Autowired
@@ -55,10 +63,12 @@ class CardGameServiceTest {
 
     JoinCode joinCode;
 
+    Player host;
+
     @BeforeEach
     void setUp() {
         List<Player> players = PlayerProbabilities.PLAYERS;
-        Player host = players.get(0);
+        host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
@@ -66,45 +76,69 @@ class CardGameServiceTest {
         for (int i = 1; i < players.size(); i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
-        MockitoAnnotations.openMocks(this);
     }
 
-    //    @Disabled
-    @Test
-    void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException {
-        Room room = roomQueryService.findByJoinCode(joinCode);
-        room.startGame(MiniGameType.CARD_GAME);
-        CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
-        CardGame cardGameSpy = spy(cardGame);
-        List<Player> players = room.getPlayers();
-        MiniGameResult result = new MiniGameResult(Map.of(
-                players.get(0), 1, // 꾹이 1등 / 확률: 0
-                players.get(1), 2, // 루키 2등 / 확률: 1250
-                players.get(2), 3, // 엠제이 3등 / 확률: 3750
-                players.get(3), 4 // 한스 4등 / 확률: 5000
-        ));
-        doReturn(result).when(cardGameSpy).getResult();
-        ReflectionTestUtils.setField(room, "miniGames", List.of(cardGameSpy));
-        cardGameService.startGame(joinCode.value());
-        Thread.sleep(500);
+    @Nested
+    class 카드게임_시작 {
 
-        Map<Player, Probability> probabilities = room.getProbabilities();
-        assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
+        @Test
+        void 카드게임을_시작한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            Playable currentGame = room.startNextGame(host.getName().value());
+            cardGameService.start(currentGame, joinCode.value());
+            CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+
+            // when & then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame).isNotNull();
+                softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
+                softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
+
+                TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
+                softly.assertThat(executor).isNotNull();
+
+                softly.assertThat(executor.getFutureTasks()).hasSize(7);
+            });
+        }
+
+        @Test
+        void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException {
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            CardGame cardGameSpy = spy(cardGame);
+            List<Player> players = room.getPlayers();
+            MiniGameResult result = new MiniGameResult(Map.of(
+                    players.get(0), 1, // 꾹이 1등 / 확률: 0
+                    players.get(1), 2, // 루키 2등 / 확률: 1250
+                    players.get(2), 3, // 엠제이 3등 / 확률: 3750
+                    players.get(3), 4 // 한스 4등 / 확률: 5000
+            ));
+            doReturn(result).when(cardGameSpy).getResult();
+            Deque<Playable> miniGames = new LinkedList<>();
+            miniGames.add(cardGame);
+            ReflectionTestUtils.setField(room, "miniGames", miniGames);
+            cardGameService.start(cardGameSpy, joinCode.value());
+            Thread.sleep(500);
+
+            Map<Player, Probability> probabilities = room.getProbabilities();
+            assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
                     players.get(0), new Probability(0),
                     players.get(1), new Probability(1250),
                     players.get(2), new Probability(3750),
                     players.get(3), new Probability(5000)));
-    }
+        }
 
-    @Test
-    void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
-        Room room = roomQueryService.findByJoinCode(joinCode);
-        room.startGame(MiniGameType.CARD_GAME);
-        cardGameService.startGame(joinCode.value());
-        verify(messagingTemplate, atLeast(6))
-                .convertAndSend(
-                        eq("/topic/room/" + joinCode.getValue() + "/gameState"),
-                        any(MiniGameStateMessage.class)
-                );
+        @Test
+        void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            Playable miniGame = room.startNextGame(host.getName().value());
+            cardGameService.start(miniGame, joinCode.value());
+            verify(messagingTemplate, atLeast(6))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                            any(WebSocketResponse.class)
+                    );
+        }
     }
 }

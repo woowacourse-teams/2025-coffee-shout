@@ -2,29 +2,24 @@ package coffeeshout.minigame.application;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilities;
-import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
-import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
-import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
-import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,13 +28,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
+@Disabled
 class CardGameServiceRealTimeTest {
 
-    @MockBean
+    @MockitoBean
     SimpMessagingTemplate messagingTemplate;
 
     @Autowired
@@ -56,10 +52,12 @@ class CardGameServiceRealTimeTest {
 
     JoinCode joinCode;
 
+    Player host;
+
     @BeforeEach
     void setUp() {
         List<Player> players = PlayerProbabilities.PLAYERS;
-        Player host = players.get(0);
+        host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
@@ -70,17 +68,16 @@ class CardGameServiceRealTimeTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Disabled
+//    @Disabled
     @Nested
     class 카드게임_시작 {
 
         @Test
         void 카드게임을_시작한다() {
             // given
-            cardGameService.startGame(joinCode.value());
             Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
-            room.startGame(MiniGameType.CARD_GAME);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGameService.start(cardGame, joinCode.value());
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
@@ -98,9 +95,8 @@ class CardGameServiceRealTimeTest {
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);
-            room.startGame(MiniGameType.CARD_GAME);
-            cardGameService.startGame(joinCode.value());
-            CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGameService.start(cardGame, joinCode.value());
 
             /*
                 READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
@@ -153,7 +149,7 @@ class CardGameServiceRealTimeTest {
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
                             eq("/topic/room/" + joinCode.getValue() + "/gameState"),
-                            any(MiniGameStateMessage.class)
+                            any(WebSocketResponse.class)
                     );
         }
     }

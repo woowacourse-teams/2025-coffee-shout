@@ -14,12 +14,14 @@ public record MiniGameStateMessage(
         List<CardInfoMessage> cardInfoMessages,
         Boolean allSelected
 ) {
+
     public record CardInfoMessage(
             String cardType,
             int value,
             boolean selected,
             String playerName
     ) {
+
         public static List<CardInfoMessage> from(@NonNull CardGame cardGame) {
             return cardGame.getDeck().getCards().stream()
                     .map(card -> {

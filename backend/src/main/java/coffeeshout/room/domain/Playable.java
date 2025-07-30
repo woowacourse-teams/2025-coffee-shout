@@ -2,7 +2,8 @@ package coffeeshout.room.domain;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.player.Players;
+import coffeeshout.room.domain.player.Player;
+import java.util.List;
 
 public interface Playable {
 
@@ -10,5 +11,5 @@ public interface Playable {
 
     MiniGameType getMiniGameType();
 
-    void startGame(Players players);
+    void startGame(List<Player> players);
 }

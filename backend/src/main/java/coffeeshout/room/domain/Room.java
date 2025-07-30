@@ -6,7 +6,6 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -17,8 +16,10 @@ import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import lombok.Getter;
 
 @Getter
@@ -27,11 +28,12 @@ public class Room {
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
-    private JoinCode joinCode;
-    private Player host;
-    private Players players;
-    private Roulette roulette;
-    private List<Playable> miniGames;
+    private final JoinCode joinCode;
+    private final Player host;
+    private final Players players;
+    private final Roulette roulette;
+    private final Queue<Playable> miniGames;
+    private final List<Playable> finishedGames;
     private RoomState roomState;
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
@@ -39,7 +41,8 @@ public class Room {
         this.host = Player.createHost(hostName, menu);
         this.players = new Players();
         this.roomState = RoomState.READY;
-        this.miniGames = new ArrayList<>();
+        this.miniGames = new LinkedList<>();
+        this.finishedGames = new ArrayList<>();
         this.roulette = new Roulette(new RoulettePicker());
 
         join(host);
@@ -110,20 +113,6 @@ public class Room {
         return players.getPlayer(playerName);
     }
 
-    public Playable playMiniGame(Integer gameIndex) {
-        final Playable miniGame = miniGames.get(gameIndex);
-        miniGame.startGame(players);
-        return miniGame;
-    }
-
-//    TODO: 미니게임 플레이 어떻게 할까
-//    public void playMiniGame(int miniGameIndex) {
-//       MiniGameResult result = miniGames.get(miniGameIndex).play();
-//       this.roomState = RoomState.PLAYING;
-//       applyMiniGameResult(result);
-    //    }
-    // 이벤트 수신하는 메서드
-
     private void join(Player player) {
         players.join(player);
         roulette.join(player);
@@ -134,19 +123,29 @@ public class Room {
     }
 
     public List<Playable> getAllMiniGame() {
-        return Collections.unmodifiableList(miniGames);
+        return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
     public Playable findMiniGame(coffeeshout.minigame.domain.MiniGameType miniGameType) {
-        return miniGames.stream()
+        return finishedGames.stream()
                 .filter(minigame -> minigame.getMiniGameType() == miniGameType)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 미니게임이 존재하지 않습니다."));
     }
 
-    public void startGame(MiniGameType miniGameType) {
-        findMiniGame(miniGameType).startGame(players);
-        this.roomState = RoomState.PLAYING;
+    public Playable startNextGame(String hostName) {
+        state(host.sameName(new PlayerName(hostName)), "호스트가 게임을 시작할 수 있습니다.");
+        state(!miniGames.isEmpty(), "시작할 게임이 없습니다.");
+        state(roomState == RoomState.READY, "게임을 시작할 수 있는 상태가 아닙니다.");
+
+        Playable currentGame = miniGames.poll();
+        finishedGames.add(currentGame);
+
+        currentGame.startGame(players.getPlayers());
+
+        roomState = RoomState.PLAYING;
+
+        return currentGame;
     }
 
     private boolean hasEnoughPlayers() {
@@ -163,22 +162,28 @@ public class Room {
 
     private void validateRoomReady() {
         if (roomState != RoomState.READY) {
-            throw new InvalidStateException(RoomErrorCode.ROOM_NOT_READY_TO_JOIN,
-                    "READY 상태에서만 참여 가능합니다. 현재 상태: " + roomState);
+            throw new InvalidStateException(
+                    RoomErrorCode.ROOM_NOT_READY_TO_JOIN,
+                    "READY 상태에서만 참여 가능합니다. 현재 상태: " + roomState
+            );
         }
     }
 
     private void validateCanJoin() {
         if (!canJoin()) {
-            throw new InvalidStateException(RoomErrorCode.ROOM_FULL,
-                    "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount());
+            throw new InvalidStateException(
+                    RoomErrorCode.ROOM_FULL,
+                    "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount()
+            );
         }
     }
 
     private void validatePlayerNameNotDuplicate(PlayerName guestName) {
         if (!checkName(guestName)) {
-            throw new InvalidArgumentException(RoomErrorCode.DUPLICATE_PLAYER_NAME,
-                    "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value());
+            throw new InvalidArgumentException(
+                    RoomErrorCode.DUPLICATE_PLAYER_NAME,
+                    "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
+            );
         }
     }
 
