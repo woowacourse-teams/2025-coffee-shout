@@ -22,12 +22,12 @@ type MiniGameResponse = string[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
+  const { send } = useWebSocket();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
-  const { joinCode } = useIdentifier();
-  const { send } = useWebSocket();
+  const { joinCode, myName } = useIdentifier();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
-  const [selectedMiniGames, setSelectedMiniGames] = useState<string[]>([]);
+  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameResponse>([]);
 
   const handleMiniGameData = useCallback((data: MiniGameResponse) => {
     setSelectedMiniGames(data);
@@ -63,13 +63,10 @@ const LobbyPage = () => {
 
     setSelectedMiniGames(updatedMiniGames);
 
-    send(
-      `/room/${joinCode}/update-minigames`,
-      JSON.stringify({
-        hostName: playerType,
-        miniGameType: updatedMiniGames,
-      })
-    );
+    send(`/room/${joinCode}/update-minigames`, {
+      hostName: myName,
+      miniGameTypes: updatedMiniGames,
+    });
   };
 
   const SECTIONS: SectionComponents = {
