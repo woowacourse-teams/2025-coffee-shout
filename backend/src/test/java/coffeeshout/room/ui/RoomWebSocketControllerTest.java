@@ -21,7 +21,6 @@ import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -210,42 +209,14 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
-        session.send("/app/room/" + joinCode + "/select-minigames", message);
+        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
+        session.send("/app/room/" + joinCode + "/update-minigames", message);
 
         List<MiniGameType> responses = subscribe.get().data();
 
         // then
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
-    }
-
-    @Test
-    void 미니게임을_취소한다() throws InterruptedException, ExecutionException, TimeoutException {
-        // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
-
-        MessageCollector<WebSocketResponse<List<MiniGameType>>> subscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
-                }
-        );
-
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
-        session.send("/app/room/" + joinCode + "/select-minigames", message);
-
-        List<MiniGameType> responses = subscribe.get().data();
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
-
-        // when
-        MiniGameSelectMessage message2 = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
-        session.send("/app/room/" + joinCode + "/unselect-minigames", message2);
-
-        List<MiniGameType> responses2 = subscribe.get().data();
-
-        // then
-        assertThat(responses2).hasSize(0);
     }
 
     @Test

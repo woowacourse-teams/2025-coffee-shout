@@ -55,19 +55,10 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/select-minigames")
-    public void broadcastSelectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.selectMiniGame(joinCode, message.hostName(),
-                message.miniGameType());
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
-                WebSocketResponse.success(responses));
-    }
-
-    @MessageMapping("/room/{joinCode}/unselect-minigames")
-    public void broadcastUnselectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.unselectMiniGame(joinCode, message.hostName(),
-                message.miniGameType());
+    @MessageMapping("/room/{joinCode}/update-minigames")
+    public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
+        final List<MiniGameType> responses = roomService.updateMiniGames(joinCode, message.hostName(),
+                message.miniGameTypes());
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
                 WebSocketResponse.success(responses));

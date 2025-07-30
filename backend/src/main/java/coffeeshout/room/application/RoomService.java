@@ -72,22 +72,14 @@ public class RoomService {
                 .toList();
     }
 
-    public List<MiniGameType> selectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
+    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = miniGameType.createMiniGame();
+        room.clearMiniGames();
 
-        room.addMiniGame(new PlayerName(hostName), miniGame);
-
-        return room.getAllMiniGame().stream()
-                .map(Playable::getMiniGameType)
-                .toList();
-    }
-
-    public List<MiniGameType> unselectMiniGame(String joinCode, String hostName, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = miniGameType.createMiniGame();
-
-        room.removeMiniGame(new PlayerName(hostName), miniGame);
+        miniGameTypes.forEach(miniGameType -> {
+            final Playable miniGame = miniGameType.createMiniGame();
+            room.addMiniGame(new PlayerName(hostName), miniGame);
+        });
 
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)

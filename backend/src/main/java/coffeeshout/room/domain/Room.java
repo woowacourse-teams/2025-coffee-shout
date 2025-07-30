@@ -144,6 +144,10 @@ public class Room {
         return currentGame;
     }
 
+    public void clearMiniGames() {
+        this.miniGames.clear();
+    }
+
     public boolean hasDuplicatePlayerName(PlayerName guestName) {
         return players.hasDuplicateName(guestName);
     }

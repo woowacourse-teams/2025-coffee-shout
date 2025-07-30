@@ -267,30 +267,12 @@ class RoomServiceTest {
         Room createdRoom = roomService.createRoom(hostName, 1L);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName,
-                MiniGameType.CARD_GAME);
+        List<MiniGameType> selectedMiniGames = roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName,
+                List.of(MiniGameType.CARD_GAME));
 
         // then
         assertThat(selectedMiniGames).hasSize(1);
         assertThat(selectedMiniGames.get(0)).isEqualTo(MiniGameType.CARD_GAME);
-    }
-
-    @Test
-    void 미니게임을_선택_취소한다() {
-        // given
-        String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName, MiniGameType.CARD_GAME);
-
-        // when
-        List<MiniGameType> selectedMiniGames = roomService.unselectMiniGame(
-                createdRoom.getJoinCode().value(),
-                hostName,
-                MiniGameType.CARD_GAME
-        );
-
-        // then
-        assertThat(selectedMiniGames).isEmpty();
     }
 
     @Test
@@ -303,7 +285,9 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> roomService.selectMiniGame(createdRoom.getJoinCode().value(), guestName, MiniGameType.CARD_GAME))
+                () -> roomService.updateMiniGames(createdRoom.getJoinCode().value(),
+                        guestName,
+                        List.of(MiniGameType.CARD_GAME)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -314,11 +298,11 @@ class RoomServiceTest {
         String guestName = "게스트";
         Room createdRoom = roomService.createRoom(hostName, 1L);
         roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
-        roomService.selectMiniGame(createdRoom.getJoinCode().value(), hostName, MiniGameType.CARD_GAME);
+        roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName, List.of(MiniGameType.CARD_GAME));
 
         // when & then
-        assertThatThrownBy(() -> roomService.unselectMiniGame(createdRoom.getJoinCode().value(), guestName,
-                MiniGameType.CARD_GAME))
+        assertThatThrownBy(() -> roomService.updateMiniGames(createdRoom.getJoinCode().value(), guestName,
+                List.of(MiniGameType.CARD_GAME)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
