@@ -28,7 +28,13 @@ const RouletteWheel = ({ players, isSpinning = false }: Props) => {
           {playersWithAngles.map((player, index) => (
             <path
               key={player.playerName}
-              d={describeArc(150, 150, 140, player.startAngle, player.endAngle)}
+              d={describeArc({
+                cx: 150,
+                cy: 150,
+                r: 140,
+                startAngle: player.startAngle,
+                endAngle: player.endAngle,
+              })}
               fill={colorList[index % colorList.length]}
               stroke={theme.color.point[100]}
               strokeWidth="1"

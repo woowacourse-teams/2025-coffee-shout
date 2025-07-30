@@ -3,10 +3,10 @@ type Player = {
   probability: number;
 };
 
-type PlayerWithAngle = Player & {
+type PlayerWithAngle = {
   startAngle: number;
   endAngle: number;
-};
+} & Player;
 
 export const getPlayersWithAngles = (
   players: Player[],
