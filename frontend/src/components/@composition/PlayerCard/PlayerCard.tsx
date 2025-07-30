@@ -8,17 +8,17 @@ import Crown from '@/assets/crown.svg';
 type Props = {
   name: string;
   iconColor: IconColor;
-  playerRole?: PlayerType;
+  playerType?: PlayerType;
 } & PropsWithChildren;
 
-const PlayerCard = ({ name, iconColor, playerRole = 'GUEST', children }: Props) => {
+const PlayerCard = ({ name, iconColor, playerType = 'GUEST', children }: Props) => {
   return (
     <S.Container>
       <S.Wrapper>
         <S.PlayerIcon src={getPlayerIcon(iconColor)} alt={`player-${name}-icon`} />
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
-          {playerRole === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}
+          {playerType === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}
         </S.NameWrapper>
       </S.Wrapper>
       {children}

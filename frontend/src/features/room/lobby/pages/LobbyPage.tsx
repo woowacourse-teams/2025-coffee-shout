@@ -3,7 +3,7 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
-import { usePlayerType } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,11 +27,11 @@ const SECTIONS: SectionComponents = {
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
-  const { playerRole } = usePlayerType();
+  const { playerType } = usePlayerType();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerRole) return null;
+  if (!playerType) return null;
 
   const handleClickBackButton = () => {
     navigate(-1);
@@ -67,7 +67,7 @@ const LobbyPage = () => {
           </S.Wrapper>
         </S.Container>
       </Layout.Content>
-      {playerRole === 'HOST' ? (
+      {playerType === 'HOST' ? (
         <Layout.ButtonBar flexRatios={[5.5, 1]}>
           <Button variant="primary" onClick={handleClickGameStartButton}>
             게임 시작
