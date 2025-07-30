@@ -6,9 +6,12 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
   const [myName, setMyName] = useState<string>('');
 
   const clearJoinCode = () => setJoinCode('');
+  const clearMyName = () => setMyName('');
 
   return (
-    <IdentifierContext.Provider value={{ joinCode, setJoinCode, clearJoinCode, myName, setMyName }}>
+    <IdentifierContext.Provider
+      value={{ joinCode, setJoinCode, clearJoinCode, myName, setMyName, clearMyName }}
+    >
       {children}
     </IdentifierContext.Provider>
   );
