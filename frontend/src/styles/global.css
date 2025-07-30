@@ -65,3 +65,8 @@ h5,
 h6 {
   -webkit-user-drag: none;
 }
+
+/* 스크롤바 제거 */
+::-webkit-scrollbar {
+  display: none;
+}

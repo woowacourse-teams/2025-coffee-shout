@@ -11,8 +11,15 @@ export const Container = styled.button`
   justify-content: center;
   cursor: pointer;
 
-  &:hover {
-    background-color: ${({ theme }) => theme.color.gray[200]};
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray[200]};
+    }
+  }
+  @media (hover: none) {
+    &:active {
+      background-color: ${({ theme }) => theme.color.gray[200]};
+    }
   }
 `;
 

@@ -1,7 +1,8 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ChangeEvent, useState } from 'react';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
 
@@ -11,15 +12,15 @@ type Props = {
 
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
-  const [roomCode, setRoomCode] = useState('');
+  const { joinCode, setJoinCode } = useIdentifier();
 
   const handleEnter = () => {
-    if (!roomCode.trim()) {
+    if (!joinCode.trim()) {
       alert('초대코드를 입력해주세요.');
       return;
     }
 
-    // roomCode 유효한지 검증하는 로직 추가
+    // TODO: joinCode 유효한지 검증하는 로직 추가
 
     navigate(`/entry/name`);
     onClose();
@@ -30,10 +31,10 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) CODE1234"
-        value={roomCode}
-        onClear={() => setRoomCode('')}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value)}
+        placeholder="ex) ABCDE"
+        value={joinCode}
+        onClear={() => setJoinCode('')}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setJoinCode(e.target.value)}
         autoFocus
       />
       <S.ButtonContainer>

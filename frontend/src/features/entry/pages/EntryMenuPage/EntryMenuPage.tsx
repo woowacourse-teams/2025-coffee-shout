@@ -1,29 +1,134 @@
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 
-// TODO: 서버 데이터로 변경
-const coffeeOptions: Option[] = [
-  { value: 'americano', label: '아이스 아메리카노' },
-  { value: 'latte', label: '카페 라떼' },
-  { value: 'cappuccino', label: '카푸치노' },
-  { value: 'macchiato', label: '마끼아또' },
-  { value: 'mocha', label: '카페 모카' },
-  { value: 'espresso', label: '에스프레소', disabled: true },
-];
+// TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
+type MenusResponse = {
+  id: number;
+  name: string;
+  category: string;
+}[];
+
+type CreateRoomRequest = {
+  hostName: string;
+  menuId: number;
+};
+
+type CreateRoomResponse = {
+  joinCode: string;
+};
+
+type EnterRoomRequest = {
+  joinCode: string;
+  guestName: string;
+  menuId: number;
+};
+
+type EnterRoomResponse = {
+  joinCode: string;
+};
 
 const EntryMenuPage = () => {
-  const [selectedValue, setSelectedValue] = useState('');
   const navigate = useNavigate();
+  const { playerRole } = usePlayerRole();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
+  const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
+  const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleNavigateToName = () => navigate('/entry/name');
-  const handleNavigateToLobby = () => navigate('/room/:roomId/lobby');
-  const isButtonDisabled = selectedValue === '';
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+
+        const menus = await api.get<MenusResponse>('/menus');
+        const options = menus.map((menu) => ({
+          id: menu.id,
+          name: menu.name,
+        }));
+        setCoffeeOptions(options);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          setError(error.message);
+        } else if (error instanceof NetworkError) {
+          setError('네트워크 연결을 확인해주세요');
+        } else {
+          setError('알 수 없는 오류가 발생했습니다');
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleNavigateToName = () => {
+    navigate('/entry/name');
+  };
+
+  const handleNavigateToLobby = async () => {
+    if (!myName) {
+      alert('닉네임을 다시 입력해주세요.');
+      navigate(-1);
+      return;
+    }
+
+    const menuId = selectedValue.id;
+    if (menuId === -1) {
+      alert('메뉴를 선택하지 않았습니다.');
+      return;
+    }
+
+    const handleHost = async () => {
+      const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
+        hostName: myName,
+        menuId,
+      });
+      setJoinCode(joinCode);
+      navigate(`/room/${joinCode}/lobby`);
+    };
+
+    const handleGuest = async () => {
+      const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
+        '/rooms/enter',
+        {
+          joinCode: joinCode,
+          guestName: myName,
+          menuId,
+        }
+      );
+      setJoinCode(_joinCode);
+      navigate(`/room/${_joinCode}/lobby`);
+    };
+
+    try {
+      setLoading(true);
+      if (playerRole === 'HOST') return await handleHost();
+      if (playerRole === 'GUEST') return await handleGuest();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert('방 생성/참가에 실패했습니다.');
+      } else if (error instanceof NetworkError) {
+        alert('네트워크 연결을 확인해주세요.');
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isButtonDisabled = selectedValue.name === '' || loading;
+  const isHost = playerRole === 'HOST';
 
   return (
     <Layout>
@@ -31,17 +136,23 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           <Headline3>메뉴를 선택해주세요</Headline3>
-          <SelectBox
-            options={coffeeOptions}
-            value={selectedValue}
-            onChange={setSelectedValue}
-            placeholder="메뉴를 선택해주세요"
-          />
+          {loading ? (
+            <div>로딩 중...</div>
+          ) : error ? (
+            <div>{error}</div>
+          ) : (
+            <SelectBox
+              options={coffeeOptions}
+              value={selectedValue.name}
+              onChange={(value: Option) => setSelectedValue(value)}
+              placeholder="메뉴를 선택해주세요"
+            />
+          )}
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
         <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToLobby}>
-          방 만들러 가기
+          {isHost ? '방 만들러 가기' : '방 참가하기'}
         </Button>
       </Layout.ButtonBar>
     </Layout>

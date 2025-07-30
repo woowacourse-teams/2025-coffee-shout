@@ -11,7 +11,7 @@ const RADIUS = 45;
 const circumference = 2 * Math.PI * RADIUS;
 
 const CircularProgress = ({ current, total, size = '2rem' }: Props) => {
-  const [strokeDashoffset, setStrokeDashoffset] = useState(circumference);
+  const [strokeDashoffset, setStrokeDashoffset] = useState(0);
 
   useEffect(() => {
     if (total <= 0) {
@@ -20,7 +20,7 @@ const CircularProgress = ({ current, total, size = '2rem' }: Props) => {
     }
 
     const progress = Math.min(1, (total - current + 1) / total);
-    const newStrokeDashoffset = circumference * (1 - progress);
+    const newStrokeDashoffset = circumference * progress;
     setStrokeDashoffset(newStrokeDashoffset);
   }, [current, total]);
 
@@ -35,7 +35,7 @@ const CircularProgress = ({ current, total, size = '2rem' }: Props) => {
           fill="none"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          transform="rotate(-90 50 50)"
+          transform="rotate(90 50 50) scale(-1,1) translate(-100, 0)"
         />
       </S.ProgressRing>
       <S.CountText>{current}</S.CountText>

@@ -35,6 +35,7 @@ export default [
       },
       globals: {
         ...globals.browser,
+        process: 'readonly',
       },
     },
     plugins: {
