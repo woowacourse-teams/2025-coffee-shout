@@ -13,9 +13,22 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
     setMyName('');
   }, []);
 
+  const clearIdentifier = useCallback(() => {
+    clearJoinCode();
+    clearMyName();
+  }, [clearJoinCode, clearMyName]);
+
   return (
     <IdentifierContext.Provider
-      value={{ joinCode, setJoinCode, clearJoinCode, myName, setMyName, clearMyName }}
+      value={{
+        joinCode,
+        setJoinCode,
+        clearJoinCode,
+        myName,
+        setMyName,
+        clearMyName,
+        clearIdentifier,
+      }}
     >
       {children}
     </IdentifierContext.Provider>

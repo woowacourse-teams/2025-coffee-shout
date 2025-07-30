@@ -16,12 +16,11 @@ const HomePage = () => {
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
   const { setHost, setGuest } = usePlayerRole();
-  const { clearJoinCode, clearMyName } = useIdentifier();
+  const { clearIdentifier } = useIdentifier();
 
   useEffect(() => {
-    clearJoinCode();
-    clearMyName();
-  }, [clearJoinCode, clearMyName]);
+    clearIdentifier();
+  }, [clearIdentifier]);
 
   useEffect(() => {
     const checkFirstVisit = () => {
