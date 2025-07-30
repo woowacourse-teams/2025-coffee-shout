@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  variables:
+    SNS_TOPIC_ARN : "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
+
 phases:
   install:
     runtime-versions:
@@ -22,6 +26,19 @@ phases:
 
       # appspec 복사
       - cp appspec.yml ../appspec.yml
+  post_build:
+    commands:
+      - echo "Build completed on $(date)"
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 0 ]; then
+          echo "Build failed, sending SNS notification..."
+        
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --subject "🚨 Build Failed: $CODEBUILD_INITIATOR" \
+            --message "Build $CODEBUILD_BUILD_ID failed at $(date)" \
+            --region "$AWS_DEFAULT_REGION"
+        fi
 
 artifacts:
   files:
