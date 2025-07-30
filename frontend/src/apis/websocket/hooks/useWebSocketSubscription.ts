@@ -35,5 +35,5 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
     };
   }, [isConnected, subscribe, destination, onData]);
 
-  return isSubscribed;
+  return { isSubscribed };
 };
