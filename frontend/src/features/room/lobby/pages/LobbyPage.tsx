@@ -27,9 +27,7 @@ const SECTIONS: SectionComponents = {
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
-
   const { playerRole } = usePlayerRole();
-
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
   //TODO: 다른 에러 처리방식을 찾아보기

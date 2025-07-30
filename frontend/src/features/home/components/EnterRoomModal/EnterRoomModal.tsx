@@ -1,7 +1,7 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
@@ -12,7 +12,7 @@ type Props = {
 
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
-  const { joinCode, setJoinCode } = useJoinCode();
+  const { joinCode, setJoinCode } = useIdentifier();
 
   const handleEnter = () => {
     if (!joinCode.trim()) {

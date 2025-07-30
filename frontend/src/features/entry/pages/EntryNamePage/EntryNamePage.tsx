@@ -7,15 +7,24 @@ import Layout from '@/layouts/Layout';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const MAX_NAME_LENGTH = 10;
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
+  const { setMyName } = useIdentifier();
 
-  const handleNavigateToHome = () => navigate('/');
-  const handleNavigateToMenu = () => navigate('/entry/menu', { state: { name } });
+  const handleNavigateToHome = () => {
+    navigate('/');
+  };
+
+  const handleNavigateToMenu = () => {
+    // TODO: 이름 유효성 검증 먼저 진행
+    setMyName(name);
+    navigate('/entry/menu');
+  };
 
   const isButtonDisabled = name.length === 0;
 
