@@ -9,6 +9,8 @@ import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
 import coffeeshout.minigame.ui.response.MinIGameStartMessage;
+import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
+import coffeeshout.minigame.ui.response.MiniGameScoresMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class CardGameService implements MiniGameService {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
+    private static final String CARD_GAME_SCORE_DESTINATION_FORMAT = "/topic/room/%s/score";
     private static final String CARD_GAME_RESULT_DESTINATION_FORMAT = "/topic/room/%s/rank";
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
@@ -94,8 +97,12 @@ public class CardGameService implements MiniGameService {
 
     private void sendCardGameResult(JoinCode joinCode) {
         final CardGame cardGame = getCardGame(joinCode);
-        final String destination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, joinCode.value());
-        messagingTemplate.convertAndSend(destination, WebSocketResponse.success(cardGame.getResult()));
+        final String scoreDestination = String.format(CARD_GAME_SCORE_DESTINATION_FORMAT, joinCode.value());
+        final String rankDestination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, joinCode.value());
+        messagingTemplate.convertAndSend(scoreDestination,
+                WebSocketResponse.success(MiniGameScoresMessage.from(cardGame.calculateScores())));
+        messagingTemplate.convertAndSend(rankDestination,
+                WebSocketResponse.success(MiniGameRanksMessage.from(cardGame.getResult())));
     }
 
     private void sendGameStartMessage(String joinCode, MiniGameType miniGameType) {
