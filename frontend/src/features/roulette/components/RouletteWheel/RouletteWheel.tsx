@@ -12,10 +12,10 @@ type Player = {
 
 type Props = {
   players: Player[];
-  spinning?: boolean;
+  isSpinning?: boolean;
 };
 
-const RouletteWheel = ({ players, spinning = false }: Props) => {
+const RouletteWheel = ({ players, isSpinning = false }: Props) => {
   const theme = useTheme();
   const totalProbability = players.reduce((sum, player) => sum + player.probability, 0);
 
@@ -23,7 +23,7 @@ const RouletteWheel = ({ players, spinning = false }: Props) => {
 
   return (
     <S.Container>
-      <S.Wrapper $spinning={spinning}>
+      <S.Wrapper $isSpinning={isSpinning}>
         <svg width={300} height={300} viewBox="0 0 300 300">
           {playersWithAngles.map((player, index) => (
             <path

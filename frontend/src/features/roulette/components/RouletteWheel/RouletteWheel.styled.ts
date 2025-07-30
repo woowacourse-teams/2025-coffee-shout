@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 type WrapperProps = {
-  $spinning?: boolean;
+  $isSpinning?: boolean;
 };
 
 export const Container = styled.div`
@@ -25,8 +25,8 @@ export const Wrapper = styled.div<WrapperProps>`
 
   cursor: pointer;
   position: relative;
-  ${({ $spinning }) =>
-    $spinning &&
+  ${({ $isSpinning }) =>
+    $isSpinning &&
     `
       animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
     `}

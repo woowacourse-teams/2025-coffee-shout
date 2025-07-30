@@ -6,7 +6,7 @@ import { mockPlayers } from '@/features/room/lobby/components/RouletteSection/Ro
 const RoulettePlaySection = ({ isSpinning }: { isSpinning: boolean }) => {
   return (
     <S.Container>
-      <RouletteWheel spinning={isSpinning} players={mockPlayers} />
+      <RouletteWheel isSpinning={isSpinning} players={mockPlayers} />
       <S.ProbabilityText>
         <Headline4>당첨 확률 +10%</Headline4>
       </S.ProbabilityText>
