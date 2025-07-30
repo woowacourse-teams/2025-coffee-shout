@@ -41,7 +41,6 @@ type EnterRoomResponse = {
 const EntryMenuPage = () => {
   const navigate = useNavigate();
 
-
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
 
