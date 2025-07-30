@@ -17,8 +17,9 @@ public class Players {
         this.players.add(player);
     }
 
-    public boolean notExistPlayerName(PlayerName playerName) {
-        return players.stream().noneMatch(player -> player.getName().equals(playerName));
+    public boolean hasDuplicateName(PlayerName playerName) {
+        return players.stream()
+                .anyMatch(player -> player.getName().equals(playerName));
     }
 
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {

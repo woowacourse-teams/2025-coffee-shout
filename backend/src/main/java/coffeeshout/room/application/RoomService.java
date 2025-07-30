@@ -94,7 +94,7 @@ public class RoomService {
                 .toList();
     }
 
-    public boolean isRoomExists(String joinCode) {
+    public boolean roomExists(String joinCode) {
         return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
     }
 
@@ -105,5 +105,11 @@ public class RoomService {
         roomCommandService.delayCleanUp(room, Duration.ofHours(1));
 
         return room.spinRoulette(host);
+    }
+
+    public boolean isGuestNameDuplicated(String joinCode, String guestName) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+
+        return room.hasDuplicatePlayerName(new PlayerName(guestName));
     }
 }
