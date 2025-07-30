@@ -8,7 +8,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
@@ -38,14 +38,13 @@ type EnterRoomResponse = {
 };
 
 const EntryMenuPage = () => {
+  const navigate = useNavigate();
+  const { playerRole } = usePlayerRole();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const { state } = useLocation();
-  const { playerRole } = usePlayerRole();
-  const { joinCode, setJoinCode } = useIdentifier();
 
   useEffect(() => {
     (async () => {
@@ -74,7 +73,7 @@ const EntryMenuPage = () => {
 
   const handleNavigateToName = () => navigate('/entry/name');
   const handleNavigateToLobby = async () => {
-    if (!state.name) {
+    if (!myName) {
       alert('닉네임을 다시 입력해주세요.');
       navigate(-1);
       return;
@@ -88,7 +87,7 @@ const EntryMenuPage = () => {
 
     const handleHost = async () => {
       const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-        hostName: state.name,
+        hostName: myName,
         menuId,
       });
       setJoinCode(joinCode);
@@ -100,7 +99,7 @@ const EntryMenuPage = () => {
         '/rooms/enter',
         {
           joinCode: joinCode,
-          guestName: state.name,
+          guestName: myName,
           menuId,
         }
       );
