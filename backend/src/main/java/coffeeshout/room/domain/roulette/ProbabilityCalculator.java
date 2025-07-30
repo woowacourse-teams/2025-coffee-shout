@@ -44,7 +44,7 @@ public class ProbabilityCalculator {
     }
 
     private void validate(Integer playerCount, Integer roundCount) {
-        state(playerCount > 2, "플레이어는 2명 이상이어야 합니다.");
+        state(playerCount >= 2, "플레이어는 2명 이상이어야 합니다.");
         state(roundCount > 0, "라운드 수는 양수여야 합니다.");
     }
 }

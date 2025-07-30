@@ -1,6 +1,6 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doReturn;
@@ -17,7 +17,6 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
-import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -33,10 +32,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -115,9 +112,6 @@ class CardGameServiceTest {
                     players.get(3), 4 // 한스 4등 / 확률: 5000
             ));
             doReturn(result).when(cardGameSpy).getResult();
-            Deque<Playable> miniGames = new LinkedList<>();
-            miniGames.add(cardGame);
-            ReflectionTestUtils.setField(room, "miniGames", miniGames);
             cardGameService.start(cardGameSpy, joinCode.value());
             Thread.sleep(500);
 
@@ -130,10 +124,33 @@ class CardGameServiceTest {
         }
 
         @Test
+        void 카드게임_종료되면_결과에_따른_점수를_응답한다() throws InterruptedException {
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            Playable playable = room.startNextGame(host.getName().value());
+            cardGameService.start(playable, joinCode.value());
+
+            Thread.sleep(300);
+
+            verify(messagingTemplate, atLeast(1))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/score"),
+                            any(WebSocketResponse.class)
+                    );
+
+            verify(messagingTemplate, atLeast(1))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/rank"),
+                            any(WebSocketResponse.class)
+                    );
+        }
+
+        @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);
             Playable miniGame = room.startNextGame(host.getName().value());
             cardGameService.start(miniGame, joinCode.value());
+
+            Thread.sleep(300);
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
                             eq("/topic/room/" + joinCode.getValue() + "/gameState"),
