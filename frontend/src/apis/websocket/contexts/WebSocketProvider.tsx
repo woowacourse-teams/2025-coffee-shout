@@ -3,6 +3,20 @@ import { Client } from '@stomp/stompjs';
 import { createStompClient } from '../createStompClient';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
+type WebSocketSuccess<T> = {
+  success: true;
+  data: T;
+  errorMessage: null;
+};
+
+type WebSocketError = {
+  success: false;
+  data: null;
+  errorMessage: string;
+};
+
+type WebSocketMessage<T> = WebSocketSuccess<T> | WebSocketError;
+
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -51,8 +65,16 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
     return client.subscribe(requestUrl, (message) => {
       try {
-        const parsedData = JSON.parse(message.body) as T;
-        onData(parsedData);
+        const parsedMessage = JSON.parse(message.body) as WebSocketMessage<T>;
+        const isSuccess = parsedMessage.success;
+
+        if (!isSuccess) {
+          throw new Error(parsedMessage.errorMessage);
+        }
+
+        const data = parsedMessage.data as T;
+
+        onData(data);
       } catch (error) {
         console.error('❌ 데이터 파싱 실패:', error);
       }
