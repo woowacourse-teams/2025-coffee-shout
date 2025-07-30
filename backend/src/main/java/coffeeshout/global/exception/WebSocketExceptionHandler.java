@@ -19,14 +19,6 @@ public class WebSocketExceptionHandler {
             @Header("simpSessionId") String sessionId,
             @Header("simpDestination") String destination
     ) {
-        // destination에서 joinCode 추출해서 해당 방으로 에러 메시지 전송
-        final String joinCode = extractJoinCodeFromDestination(destination);
-
-        if (joinCode != null) {
-            messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                    WebSocketResponse.error("처리 중 오류가 발생했습니다."));
-            return;
-        }
 
         messagingTemplate.convertAndSendToUser(
                 sessionId,

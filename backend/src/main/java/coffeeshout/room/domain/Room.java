@@ -83,10 +83,6 @@ public class Room {
         return finishedGames.size();
     }
 
-    public boolean hasNoMiniGames() {
-        return miniGames.isEmpty();
-    }
-
     public boolean isPlayingState() {
         return roomState == RoomState.PLAYING;
     }
