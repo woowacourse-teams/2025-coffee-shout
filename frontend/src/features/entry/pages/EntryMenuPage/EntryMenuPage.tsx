@@ -4,7 +4,7 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
-import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
@@ -45,7 +45,7 @@ const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { playerRole } = usePlayerRole();
-  const { joinCode, setJoinCode } = useJoinCode();
+  const { joinCode, setJoinCode } = useIdentifier();
 
   useEffect(() => {
     (async () => {
