@@ -80,7 +80,7 @@ public class Room {
     }
 
     private int calculateRoundCount() {
-        return miniGames.size() + 1;
+        return finishedGames.size();
     }
 
     public boolean hasNoMiniGames() {
