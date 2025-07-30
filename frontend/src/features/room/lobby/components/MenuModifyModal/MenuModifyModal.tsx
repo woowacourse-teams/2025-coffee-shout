@@ -5,13 +5,10 @@ import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useEffect, useState } from 'react';
 import * as S from './MenuModifyModal.styled';
+import { Menu } from '@/types/menu';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
-type MenusResponse = {
-  id: number;
-  name: string;
-  category: string;
-}[];
+type MenusResponse = Menu[];
 
 type Props = {
   onClose: () => void;
