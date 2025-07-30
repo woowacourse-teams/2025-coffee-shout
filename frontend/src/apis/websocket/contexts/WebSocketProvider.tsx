@@ -1,5 +1,5 @@
 import { useState, PropsWithChildren } from 'react';
-import { Client } from '@stomp/stompjs';
+import { Client, StompSubscription } from '@stomp/stompjs';
 import { createStompClient } from '../createStompClient';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
@@ -21,30 +21,35 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const startSocket = () => {
-    if (client && isConnected) {
-      return;
-    }
+  const startSocket = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (client && isConnected) {
+        resolve();
+        return;
+      }
 
-    const stompClient = createStompClient();
+      const stompClient = createStompClient();
 
-    stompClient.onConnect = () => {
-      setIsConnected(true);
-      console.log('✅WebSocket 연결');
-    };
+      stompClient.onConnect = () => {
+        setIsConnected(true);
+        console.log('✅WebSocket 연결');
+        resolve();
+      };
 
-    stompClient.onDisconnect = () => {
-      setIsConnected(false);
-      console.log('❌WebSocket 연결 해제');
-    };
+      stompClient.onDisconnect = () => {
+        setIsConnected(false);
+        console.log('❌WebSocket 연결 해제');
+      };
 
-    stompClient.onStompError = (frame) => {
-      console.error('❌STOMP 오류:', frame);
-      setIsConnected(false);
-    };
+      stompClient.onStompError = (frame) => {
+        console.error('❌STOMP 오류:', frame);
+        setIsConnected(false);
+        reject(new Error(`STOMP 오류: ${frame.headers.message}`));
+      };
 
-    setClient(stompClient);
-    stompClient.activate();
+      setClient(stompClient);
+      stompClient.activate();
+    });
   };
 
   const stopSocket = () => {
@@ -56,42 +61,58 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     setIsConnected(false);
   };
 
-  const subscribe = <T,>(url: string, onData: (data: T) => void) => {
-    if (!client || !isConnected) {
-      throw new Error('❌ 구독 실패: WebSocket 연결 안됨');
-    }
+  const subscribe = <T,>(url: string, onData: (data: T) => void): Promise<StompSubscription> => {
+    return new Promise((resolve, reject) => {
+      if (!client || !isConnected) {
+        reject(new Error('❌ 구독 실패: WebSocket 연결 안됨'));
+        return;
+      }
 
-    const requestUrl = '/topic' + url;
-
-    return client.subscribe(requestUrl, (message) => {
       try {
-        const parsedMessage = JSON.parse(message.body) as WebSocketMessage<T>;
-        const isSuccess = parsedMessage.success;
+        const requestUrl = '/topic' + url;
 
-        if (!isSuccess) {
-          throw new Error(parsedMessage.errorMessage);
-        }
+        const subscription = client.subscribe(requestUrl, (message) => {
+          try {
+            const parsedMessage = JSON.parse(message.body) as WebSocketMessage<T>;
+            const isSuccess = parsedMessage.success;
 
-        const data = parsedMessage.data as T;
+            if (!isSuccess) {
+              throw new Error(parsedMessage.errorMessage);
+            }
 
-        onData(data);
+            const data = parsedMessage.data as T;
+            onData(data);
+          } catch (error) {
+            console.error('❌ 데이터 파싱 실패:', error);
+          }
+        });
+
+        resolve(subscription);
       } catch (error) {
-        console.error('❌ 데이터 파싱 실패:', error);
+        reject(error);
       }
     });
   };
 
-  const send = <T,>(url: string, body: T | null = null) => {
-    if (!client || !isConnected) {
-      console.warn('❌ 메시지 전송 실패: WebSocket 연결 안됨');
-      return;
-    }
+  const send = <T,>(url: string, body: T | null = null): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!client || !isConnected) {
+        reject(new Error('❌ 메시지 전송 실패: WebSocket 연결 안됨'));
+        return;
+      }
 
-    const requestUrl = '/app' + url;
+      try {
+        const requestUrl = '/app' + url;
 
-    client.publish({
-      destination: requestUrl,
-      body: JSON.stringify(body),
+        client.publish({
+          destination: requestUrl,
+          body: JSON.stringify(body),
+        });
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
     });
   };
 
