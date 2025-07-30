@@ -148,16 +148,16 @@ public class Room {
         return currentGame;
     }
 
+    public boolean hasDuplicatePlayerName(PlayerName guestName) {
+        return players.hasDuplicateName(guestName);
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
 
     private boolean canJoin() {
         return players.getPlayerCount() < MAXIMUM_GUEST_COUNT;
-    }
-
-    private boolean checkName(PlayerName guestName) {
-        return players.notExistPlayerName(guestName);
     }
 
     private void validateRoomReady() {
@@ -179,12 +179,11 @@ public class Room {
     }
 
     private void validatePlayerNameNotDuplicate(PlayerName guestName) {
-        if (!checkName(guestName)) {
+        if (hasDuplicatePlayerName(guestName)) {
             throw new InvalidArgumentException(
                     RoomErrorCode.DUPLICATE_PLAYER_NAME,
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );
         }
     }
-
 }

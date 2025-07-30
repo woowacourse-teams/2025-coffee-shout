@@ -5,6 +5,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
@@ -21,7 +22,7 @@ public class RoomWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
 
-    @MessageMapping("/room/{joinCode}/players")
+    @MessageMapping("/room/{joinCode}/update-players")
     public void broadcastPlayers(@DestinationVariable String joinCode) {
         final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode).stream()
                 .map(PlayerResponse::from)
@@ -31,7 +32,7 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/menus")
+    @MessageMapping("/room/{joinCode}/update-menus")
     public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
         final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(),
                         message.menuId())
@@ -43,7 +44,7 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/probabilities")
+    @MessageMapping("/room/{joinCode}/get-probabilities")
     public void broadcastProbabilities(@DestinationVariable String joinCode) {
         final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
                 .stream()
@@ -54,7 +55,7 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/minigames/select")
+    @MessageMapping("/room/{joinCode}/select-minigames")
     public void broadcastSelectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         final List<MiniGameType> responses = roomService.selectMiniGame(joinCode, message.hostName(),
                 message.miniGameType());
@@ -63,7 +64,7 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/minigames/unselect")
+    @MessageMapping("/room/{joinCode}/unselect-minigames")
     public void broadcastUnselectedMinigames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         final List<MiniGameType> responses = roomService.unselectMiniGame(joinCode, message.hostName(),
                 message.miniGameType());
@@ -72,9 +73,9 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("/room/{joinCode}/roulette/spin")
-    public void broadcastRouletteSpin(@DestinationVariable String joinCode, String hostName) {
-        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, hostName));
+    @MessageMapping("/room/{joinCode}/spin-roulette")
+    public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
+        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
                 WebSocketResponse.success(losePlayer));

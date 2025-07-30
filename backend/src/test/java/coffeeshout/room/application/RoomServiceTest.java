@@ -3,6 +3,7 @@ package coffeeshout.room.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
@@ -12,6 +13,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
@@ -328,8 +330,23 @@ class RoomServiceTest {
         JoinCode joinCode = createdRoom.getJoinCode();
 
         // when & then
-        assertThat(roomService.isRoomExists(joinCode.value())).isTrue();
-        assertThat(roomService.isRoomExists("TRASH")).isFalse();
+        assertThat(roomService.roomExists(joinCode.value())).isTrue();
+        assertThat(roomService.roomExists("TRASH")).isFalse();
+    }
+
+    @Test
+    void 중복된_이름의_플레이어가_존재하는지_확인한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        PlayerName guestName = new PlayerName("게스트1");
+        createdRoom.joinGuest(guestName, MenuFixture.아메리카노());
+
+        // when & then
+        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "게스트1")).isTrue();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
     }
 
     @Test
