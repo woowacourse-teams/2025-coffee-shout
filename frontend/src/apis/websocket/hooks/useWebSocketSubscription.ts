@@ -7,9 +7,7 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
   const subscriptionRef = useRef<StompSubscription | null>(null);
 
   useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
+    if (!isConnected) return;
 
     try {
       const subscription = subscribe<T>(destination, onData);
