@@ -73,9 +73,14 @@ export const apiRequest = async <T, TData>(
 
         try {
           const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
+
+          if (
+            contentType &&
+            (contentType.includes('application/json') ||
+              contentType.includes('application/problem+json'))
+          ) {
             errorData = await response.json();
-            errorMessage = errorData.message || errorData.error || errorMessage;
+            errorMessage = errorData.detail;
           } else {
             const textError = await response.text();
             errorMessage = textError || errorMessage;
