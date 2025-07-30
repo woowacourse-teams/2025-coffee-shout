@@ -127,7 +127,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // when
         MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe = session.subscribe(
                 "/topic/room/" + nonExistentJoinCode,
-                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {}
+                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
+                }
         );
 
         // then
@@ -206,7 +207,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
+        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
         session.send("/app/room/" + joinCode + "/minigames/select", message);
 
         List<MiniGameType> responses = subscribe.get().data();
@@ -227,7 +228,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
+        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
         session.send("/app/room/" + joinCode + "/minigames/select", message);
 
         List<MiniGameType> responses = subscribe.get().data();
@@ -235,7 +236,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
 
         // when
-        MiniGameSelectMessage message2 = new MiniGameSelectMessage("호스트꾹이", MiniGameType.CARD_GAME);
+        MiniGameSelectMessage message2 = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
         session.send("/app/room/" + joinCode + "/minigames/unselect", message2);
 
         List<MiniGameType> responses2 = subscribe.get().data();
@@ -256,14 +257,14 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
                 }
         );
-        
-        MiniGameSelectMessage selectMessage = new MiniGameSelectMessage(hostName, MiniGameType.CARD_GAME);
+
+        MiniGameSelectMessage selectMessage = new MiniGameSelectMessage(hostName, List.of(MiniGameType.CARD_GAME));
         session.send("/app/room/" + joinCode + "/minigames/select", selectMessage);
-        
+
         // 미니게임 선택 응답 확인
         List<MiniGameType> selectedGames = miniGameSubscribe.get().data();
         assertThat(selectedGames).hasSize(1);
-        
+
         // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
         testRoom.startNextGame(hostName);
 
@@ -281,11 +282,11 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // then
         assertThat(response.success()).isTrue();
         assertThat(response.data()).isNotNull();
-        
+
         PlayerResponse winner = response.data();
         assertThat(winner.playerName()).isNotBlank();
         assertThat(winner.menuResponse()).isNotNull();
-        
+
         // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
         List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
         assertThat(playerNames).contains(winner.playerName());
