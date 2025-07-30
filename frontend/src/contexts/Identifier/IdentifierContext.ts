@@ -8,6 +8,8 @@ type IdentifierContextType = {
   myName: string;
   setMyName: (myName: string) => void;
   clearMyName: () => void;
+
+  clearIdentifier: () => void;
 };
 
 export const IdentifierContext = createContext<IdentifierContextType | null>(null);

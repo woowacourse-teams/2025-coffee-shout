@@ -1,20 +1,26 @@
 import LogoMainIcon from '@/assets/logo-main.svg';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
 import useModal from '@/components/@common/Modal/useModal';
+import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
-import Splash from '../components/Splash/Splash';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
+import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
   const { setHost, setGuest } = usePlayerRole();
+  const { clearIdentifier } = useIdentifier();
+
+  useEffect(() => {
+    clearIdentifier();
+  }, [clearIdentifier]);
 
   useEffect(() => {
     const checkFirstVisit = () => {
@@ -30,7 +36,6 @@ const HomePage = () => {
         setShowSplash(true);
       }
     };
-
     checkFirstVisit();
   }, []);
 
