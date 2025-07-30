@@ -71,7 +71,10 @@ const EntryMenuPage = () => {
     })();
   }, []);
 
-  const handleNavigateToName = () => navigate('/entry/name');
+  const handleNavigateToName = () => {
+    navigate('/entry/name');
+  };
+
   const handleNavigateToLobby = async () => {
     if (!myName) {
       alert('닉네임을 다시 입력해주세요.');

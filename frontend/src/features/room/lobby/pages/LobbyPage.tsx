@@ -33,9 +33,17 @@ const LobbyPage = () => {
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerRole) return null;
 
-  const handleClickBackButton = () => navigate(-1);
-  const handleClickGameStartButton = () => navigate('/room/:roomId/:miniGameId/ready');
-  const handleSectionChange = (option: SectionType) => setCurrentSection(option);
+  const handleClickBackButton = () => {
+    navigate(-1);
+  };
+
+  const handleClickGameStartButton = () => {
+    navigate('/room/:roomId/:miniGameId/ready');
+  };
+
+  const handleSectionChange = (option: SectionType) => {
+    setCurrentSection(option);
+  };
 
   const handleShare = () => {
     openModal(<JoinCodeModal />, {

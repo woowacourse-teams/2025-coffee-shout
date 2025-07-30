@@ -7,7 +7,9 @@ import * as S from './JoinCodeModal.styled';
 const JoinCodeModal = () => {
   const { joinCode } = useIdentifier();
 
-  const handleCopy = () => alert('초대 코드가 복사되었습니다.');
+  const handleCopy = () => {
+    alert('초대 코드가 복사되었습니다.');
+  };
 
   return (
     <S.Container>

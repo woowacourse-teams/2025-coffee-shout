@@ -16,7 +16,10 @@ const EntryNamePage = () => {
   const navigate = useNavigate();
   const { setMyName } = useIdentifier();
 
-  const handleNavigateToHome = () => navigate('/');
+  const handleNavigateToHome = () => {
+    navigate('/');
+  };
+
   const handleNavigateToMenu = () => {
     // TODO: 이름 유효성 검증 먼저 진행
     setMyName(name);

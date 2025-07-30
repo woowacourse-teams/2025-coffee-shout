@@ -5,8 +5,13 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
   const [joinCode, setJoinCode] = useState<string>('');
   const [myName, setMyName] = useState<string>('');
 
-  const clearJoinCode = () => setJoinCode('');
-  const clearMyName = () => setMyName('');
+  const clearJoinCode = () => {
+    setJoinCode('');
+  };
+
+  const clearMyName = () => {
+    setMyName('');
+  };
 
   return (
     <IdentifierContext.Provider
