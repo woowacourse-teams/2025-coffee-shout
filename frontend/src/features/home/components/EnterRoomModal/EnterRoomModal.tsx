@@ -1,7 +1,8 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ChangeEvent, useState } from 'react';
+import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
+import { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
 
@@ -11,7 +12,7 @@ type Props = {
 
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
-  const [joinCode, setJoinCode] = useState('');
+  const { joinCode, setJoinCode } = useJoinCode();
 
   const handleEnter = () => {
     if (!joinCode.trim()) {
@@ -19,9 +20,9 @@ const EnterRoomModal = ({ onClose }: Props) => {
       return;
     }
 
-    // joinCode 유효한지 검증하는 로직 추가
+    // TODO: joinCode 유효한지 검증하는 로직 추가
 
-    navigate(`/entry/name`, { state: { joinCode } });
+    navigate(`/entry/name`);
     onClose();
   };
 
@@ -30,7 +31,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) CODE1234"
+        placeholder="ex) CODE12"
         value={joinCode}
         onClear={() => setJoinCode('')}
         onChange={(e: ChangeEvent<HTMLInputElement>) => setJoinCode(e.target.value)}

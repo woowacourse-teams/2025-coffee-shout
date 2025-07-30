@@ -5,26 +5,17 @@ import Input from '@/components/@common/Input/Input';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 const MAX_NAME_LENGTH = 10;
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const { playerRole } = usePlayerRole();
 
   const handleNavigateToHome = () => navigate('/');
-  const handleNavigateToMenu = () => {
-    if (playerRole === 'HOST') {
-      navigate('/entry/menu', { state: { name } });
-    } else if (playerRole === 'GUEST') {
-      navigate('/entry/menu', { state: { name, joinCode: state.joinCode } });
-    }
-  };
+  const handleNavigateToMenu = () => navigate('/entry/menu', { state: { name } });
 
   const isButtonDisabled = name.length === 0;
 

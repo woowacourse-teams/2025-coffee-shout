@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 type JoinCodeContextType = {
-  joinCode: string | null;
+  joinCode: string;
   setJoinCode: (code: string) => void;
   clearJoinCode: () => void;
 };

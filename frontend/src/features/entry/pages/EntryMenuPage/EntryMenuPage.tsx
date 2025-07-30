@@ -4,11 +4,12 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
+import { useJoinCode } from '@/contexts/JoinCode/JoinCodeContext';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -37,17 +38,14 @@ type EnterRoomResponse = {
 };
 
 const EntryMenuPage = () => {
-  const [selectedValue, setSelectedValue] = useState<Option>({
-    id: -1,
-    name: '',
-  });
-
+  const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { state } = useLocation();
   const { playerRole } = usePlayerRole();
+  const { joinCode, setJoinCode } = useJoinCode();
 
   useEffect(() => {
     (async () => {
@@ -93,20 +91,21 @@ const EntryMenuPage = () => {
         hostName: state.name,
         menuId,
       });
-
-      // todo: 암호화
-      navigate(`/room/${joinCode}/lobby`, {
-        state: { joinCode },
-      });
+      setJoinCode(joinCode);
+      navigate(`/room/${joinCode}/lobby`);
     };
 
     const handleGuest = async () => {
-      const { joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>('/rooms/enter', {
-        joinCode: state.joinCode,
-        guestName: state.name,
-        menuId,
-      });
-      navigate(`/room/${joinCode}/lobby`, { state: { joinCode } });
+      const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
+        '/rooms/enter',
+        {
+          joinCode: joinCode,
+          guestName: state.name,
+          menuId,
+        }
+      );
+      setJoinCode(_joinCode);
+      navigate(`/room/${_joinCode}/lobby`);
     };
 
     try {

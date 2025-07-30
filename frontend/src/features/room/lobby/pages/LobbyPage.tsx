@@ -3,15 +3,15 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
+import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
-import JoinCodeModal from '../components/InviteCodeModal/JoinCodeModal';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
