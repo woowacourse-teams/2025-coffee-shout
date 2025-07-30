@@ -21,10 +21,7 @@ public class MiniGameController {
 
     @MessageMapping("/room/{joinCode}/minigame/command")
     public void commandGame(@DestinationVariable String joinCode, @Payload MiniGameMessage command) {
-        miniGameCommandDispatcher.dispatch(joinCode, map(command.commandType(), command.commandRequest()));
-    }
-
-    private MiniGameCommand map(CommandType commandType, JsonNode json) {
-        return commandType.toCommandRequest(objectMapper, json);
+        MiniGameCommand miniGameCommand = command.toCommand(objectMapper);
+        miniGameCommandDispatcher.dispatch(joinCode, miniGameCommand);
     }
 }
