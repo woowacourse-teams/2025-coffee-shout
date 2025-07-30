@@ -3,7 +3,11 @@ import RouletteWheel from '@/features/roulette/components/RouletteWheel/Roulette
 import * as S from './RoulettePlaySection.styled';
 import { mockPlayers } from '@/features/room/lobby/components/RouletteSection/RouletteSection';
 
-const RoulettePlaySection = ({ isSpinning }: { isSpinning: boolean }) => {
+type Props = {
+  isSpinning: boolean;
+};
+
+const RoulettePlaySection = ({ isSpinning }: Props) => {
   return (
     <S.Container>
       <RouletteWheel isSpinning={isSpinning} players={mockPlayers} />
