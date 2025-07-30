@@ -51,8 +51,16 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
     return client.subscribe(requestUrl, (message) => {
       try {
-        const parsedData = JSON.parse(message.body) as T;
-        onData(parsedData);
+        const parsedMessage = JSON.parse(message.body);
+        const isSuccess = parsedMessage.success;
+
+        if (!isSuccess) {
+          throw new Error(parsedMessage.errorMessage);
+        }
+
+        const data = parsedMessage.data as T;
+
+        onData(data);
       } catch (error) {
         console.error('❌ 데이터 파싱 실패:', error);
       }
