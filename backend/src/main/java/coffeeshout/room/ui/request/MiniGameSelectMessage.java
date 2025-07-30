@@ -7,5 +7,4 @@ public record MiniGameSelectMessage(
         String hostName,
         MiniGameType miniGameType
 ) {
-
 }

@@ -24,7 +24,7 @@ public class MenuInitializer {
 
     @PostConstruct
     private void init() throws IOException {
-        Yaml yaml = new Yaml();
+        final Yaml yaml = new Yaml();
         final InputStream inputStream = new ClassPathResource("data/menu-data.yml").getInputStream();
         final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
 

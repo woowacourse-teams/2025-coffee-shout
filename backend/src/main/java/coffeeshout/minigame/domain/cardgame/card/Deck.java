@@ -5,7 +5,6 @@ import static org.springframework.util.Assert.state;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -30,15 +29,15 @@ public class Deck {
     }
 
     public Card pick(int cardIndex) {
-        Card selectedCard = cards.get(cardIndex);
+        final Card selectedCard = cards.get(cardIndex);
         state(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
         pickedCards.add(selectedCard);
         return selectedCard;
     }
 
     public Card pickRandom() {
-        List<Card> remainingCards = getRemainingCards();
-        Card selected = pickRandom(remainingCards);
+        final List<Card> remainingCards = getRemainingCards();
+        final Card selected = pickRandom(remainingCards);
         return pick(cards.indexOf(selected));
     }
 
@@ -55,13 +54,13 @@ public class Deck {
     }
 
     private List<Card> getRemainingCards() {
-        List<Card> cloned = new ArrayList<>(cards);
+        final List<Card> cloned = new ArrayList<>(cards);
         cloned.removeAll(pickedCards);
         return cloned;
     }
 
     private Card pickRandom(List<Card> cards) {
-        int randomNumber = ThreadLocalRandom.current().nextInt(0, cards.size());
+        final int randomNumber = ThreadLocalRandom.current().nextInt(0, cards.size());
         return cards.get(randomNumber);
     }
 }

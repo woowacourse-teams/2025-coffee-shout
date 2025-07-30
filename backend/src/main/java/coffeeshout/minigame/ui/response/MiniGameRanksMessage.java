@@ -6,16 +6,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import lombok.NonNull;
 
-public record MiniGameRanksMessage(
-        List<MiniGameRankMessage> ranks
-) {
+public record MiniGameRanksMessage(List<MiniGameRankMessage> ranks) {
+
     public record MiniGameRankMessage(
             String playerName,
             Integer rank
     ) {
 
         public static MiniGameRankMessage from(@NonNull Entry<Player, Integer> rankEntry) {
-           return new MiniGameRankMessage(rankEntry.getKey().getName().value(), rankEntry.getValue());
+            return new MiniGameRankMessage(rankEntry.getKey().getName().value(), rankEntry.getValue());
         }
     }
 

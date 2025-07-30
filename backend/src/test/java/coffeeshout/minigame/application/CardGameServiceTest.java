@@ -16,6 +16,7 @@ import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -25,15 +26,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @SpringBootTest
 class CardGameServiceTest {
 
-    @MockBean
+    @Mock
     SimpMessagingTemplate messagingTemplate;
 
     @Autowired
@@ -50,29 +51,31 @@ class CardGameServiceTest {
 
     JoinCode joinCode;
 
+    Player host;
+
     @BeforeEach
     void setUp() {
         List<Player> players = PlayerProbabilities.PLAYERS;
-        Player host = players.get(0);
+        host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
-        for(int i = 1 ; i < players.size() ; i++) {
+        for (int i = 1; i < players.size(); i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
     }
-    @Disabled
+
     @Nested
     class 카드게임_시작 {
 
         @Test
         void 카드게임을_시작한다() {
             // given
-            cardGameService.startGame(joinCode.value());
             Room room = roomQueryService.findByJoinCode(joinCode);
+            Playable currentGame = room.startNextGame(host.getName().value());
+            cardGameService.start(currentGame, joinCode.value());
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
-            room.startGame(MiniGameType.CARD_GAME);
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
@@ -91,8 +94,8 @@ class CardGameServiceTest {
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);
-            room.startGame(MiniGameType.CARD_GAME);
-            cardGameService.startGame(joinCode.value());
+            Playable currentGame = room.startNextGame(host.getName().value());
+            cardGameService.start(currentGame, joinCode.value());
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
 
             /*

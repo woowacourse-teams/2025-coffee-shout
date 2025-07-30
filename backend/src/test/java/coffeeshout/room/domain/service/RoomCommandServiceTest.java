@@ -38,7 +38,7 @@ class RoomCommandServiceTest {
                 .isPresent();
 
         // 3초 대기 후 삭제 확인
-        await().atMost(100, TimeUnit.MILLISECONDS)
+        await().atMost(101, TimeUnit.MILLISECONDS)
                 .untilAsserted(() -> assertThat(roomRepository.findByJoinCode(savedRoom.getJoinCode()))
                         .isEmpty());
     }

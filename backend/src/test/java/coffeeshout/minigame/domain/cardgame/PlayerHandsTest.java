@@ -32,7 +32,7 @@ class PlayerHandsTest {
         players.join(PlayerFixture.호스트한스());
         players.join(PlayerFixture.호스트엠제이());
 
-        playerHands = new PlayerHands(players);
+        playerHands = new PlayerHands(players.getPlayers());
     }
 
     @Nested

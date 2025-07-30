@@ -20,7 +20,7 @@ public class WebSocketExceptionHandler {
             @Header("simpDestination") String destination
     ) {
         // destination에서 joinCode 추출해서 해당 방으로 에러 메시지 전송
-        String joinCode = extractJoinCodeFromDestination(destination);
+        final String joinCode = extractJoinCodeFromDestination(destination);
 
         if (joinCode != null) {
             messagingTemplate.convertAndSend("/topic/room/" + joinCode,
@@ -41,7 +41,7 @@ public class WebSocketExceptionHandler {
         }
 
         // "/app/room/{joinCode}/..." 패턴에서 joinCode 추출
-        String[] parts = destination.split("/");
+        final String[] parts = destination.split("/");
         if (parts.length >= 4 && "room".equals(parts[2])) {
             return parts[3];
         }

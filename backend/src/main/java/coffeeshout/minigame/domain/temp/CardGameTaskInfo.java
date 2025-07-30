@@ -15,8 +15,8 @@ public enum CardGameTaskInfo {
     GAME_FINISH(CardGameState.DONE, CardGameRound.SECOND),
     ;
 
-    CardGameState state;
-    CardGameRound round;
+    private final CardGameState state;
+    private final CardGameRound round;
 
     CardGameTaskInfo(CardGameState state, CardGameRound round) {
         this.state = state;
@@ -28,4 +28,5 @@ public enum CardGameTaskInfo {
                 .filter(taskInfo -> taskInfo.state == CardGameState.PLAYING && taskInfo.round == round)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 라운드는 PLAYING이 존재하지 않습니다." + round));
-    }}
+    }
+}
