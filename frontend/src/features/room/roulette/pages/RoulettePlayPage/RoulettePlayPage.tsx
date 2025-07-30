@@ -10,12 +10,12 @@ import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './RoulettePlayPage.styled';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const RoulettePage = () => {
   const navigate = useNavigate();
 
-  const { playerRole } = usePlayerRole();
+  const { playerType } = usePlayerType();
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
@@ -24,7 +24,7 @@ const RoulettePage = () => {
 
   const getButtonVariant = () => {
     if (isSpinning) return 'disabled';
-    if (playerRole === 'GUEST') return 'loading';
+    if (playerType === 'GUEST') return 'loading';
     return 'primary';
   };
   const handleViewChange = () => {
@@ -47,7 +47,7 @@ const RoulettePage = () => {
   }, [navigate, isSpinning]);
 
   //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerRole) return null;
+  if (!playerType) return null;
 
   return (
     <Layout>

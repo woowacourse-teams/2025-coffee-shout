@@ -5,7 +5,7 @@ import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -41,8 +41,10 @@ type EnterRoomResponse = {
 const EntryMenuPage = () => {
   const navigate = useNavigate();
 
+
   const { startSocket, isConnected } = useWebSocket();
-  const { playerRole } = usePlayerRole();
+  const { playerType } = usePlayerType();
+
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
@@ -121,8 +123,8 @@ const EntryMenuPage = () => {
 
     try {
       setLoading(true);
-      if (playerRole === 'HOST') return await handleHost();
-      if (playerRole === 'GUEST') return await handleGuest();
+      if (playerType === 'HOST') return await handleHost();
+      if (playerType === 'GUEST') return await handleGuest();
     } catch (error) {
       if (error instanceof ApiError) {
         alert('방 생성/참가에 실패했습니다.');
@@ -137,7 +139,7 @@ const EntryMenuPage = () => {
   };
 
   const isButtonDisabled = selectedValue.name === '' || loading;
-  const isHost = playerRole === 'HOST';
+  const isHost = playerType === 'HOST';
 
   return (
     <Layout>

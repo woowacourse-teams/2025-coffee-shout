@@ -3,7 +3,7 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import useModal from '@/components/@common/Modal/useModal';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
-  const { setHost, setGuest } = usePlayerRole();
+  const { setHost, setGuest } = usePlayerType();
   const { clearIdentifier } = useIdentifier();
 
   useEffect(() => {
