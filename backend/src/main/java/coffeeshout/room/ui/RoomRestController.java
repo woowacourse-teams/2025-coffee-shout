@@ -47,7 +47,7 @@ public class RoomRestController {
         return ResponseEntity.ok(JoinCodeExistResponse.from(exists));
     }
 
-    @GetMapping("/check-guest")
+    @GetMapping("/check-guestName")
     public ResponseEntity<GuestNameExistResponse> checkGuestName(
             @RequestParam String joinCode,
             @RequestParam String guestName
@@ -56,7 +56,7 @@ public class RoomRestController {
 
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
-    
+
     @GetMapping("/minigames")
     public ResponseEntity<List<MiniGameResponse>> getMiniGames() {
         final List<MiniGameResponse> responses = roomService.getAllMiniGames().stream()
