@@ -1,5 +1,5 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
-import { IconColor, PlayerRole } from '@/types/player';
+import { IconColor, PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
 import { getPlayerIcon } from './utils/getPlayerIcon';
@@ -8,7 +8,7 @@ import Crown from '@/assets/crown.svg';
 type Props = {
   name: string;
   iconColor: IconColor;
-  playerRole?: PlayerRole;
+  playerRole?: PlayerType;
 } & PropsWithChildren;
 
 const PlayerCard = ({ name, iconColor, playerRole = 'GUEST', children }: Props) => {
