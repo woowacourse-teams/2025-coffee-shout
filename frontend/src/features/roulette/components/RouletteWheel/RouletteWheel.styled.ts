@@ -1,7 +1,8 @@
+import { Z_INDEX } from '@/constants/zIndex';
 import styled from '@emotion/styled';
 
 type WrapperProps = {
-  $spinning?: boolean;
+  $isSpinning?: boolean;
 };
 
 export const Container = styled.div`
@@ -17,18 +18,16 @@ export const Wrapper = styled.div<WrapperProps>`
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background-color: #f0f0f0;
-  border: 3px solid #ddd;
+  background-color: ${({ theme }) => theme.color.point[100]};
   margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  color: #666;
-  transition: box-shadow 0.2s;
+
   cursor: pointer;
-  ${({ $spinning }) =>
-    $spinning &&
+  position: relative;
+  ${({ $isSpinning }) =>
+    $isSpinning &&
     `
       animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
     `}
@@ -46,4 +45,9 @@ export const Wrapper = styled.div<WrapperProps>`
 export const CenterImage = styled.img`
   width: 64px;
   height: 64px;
+  z-index: ${Z_INDEX.ROULETTE_WHEEL_CENTER_IMAGE};
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;

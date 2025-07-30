@@ -36,6 +36,21 @@ const renderContent = (currentView: RouletteView) => {
       return <ProbabilityList />;
     case 'roulette':
     default:
-      return <RouletteWheel />;
+      return <RouletteWheel players={mockPlayers} />;
   }
 };
+
+export const mockPlayers = [
+  {
+    playerName: '홍길동',
+    probability: 30.0,
+  },
+  {
+    playerName: '김철수',
+    probability: 30.0,
+  },
+  {
+    playerName: '이순신',
+    probability: 40.0,
+  },
+];
