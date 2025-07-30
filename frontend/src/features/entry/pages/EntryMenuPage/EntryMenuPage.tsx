@@ -1,5 +1,5 @@
-import { api } from '@/apis/api';
-import { ApiError, NetworkError } from '@/apis/error';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';

@@ -3,15 +3,21 @@ import { Outlet } from 'react-router-dom';
 import { ModalProvider } from './components/@common/Modal/ModalContext';
 import { theme } from './styles/theme';
 import { PlayerRoleProvider } from './contexts/PlayerRole/PlayerRoleProvider';
+import { WebSocketProvider } from './apis/websocket/contexts/WebSocketProvider';
+import { JoinCodeProvider } from './contexts/JoinCode/JoinCodeProvider';
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <PlayerRoleProvider>
-        <ModalProvider>
-          <Outlet />
-        </ModalProvider>
-      </PlayerRoleProvider>
+      <WebSocketProvider>
+        <JoinCodeProvider>
+          <PlayerRoleProvider>
+            <ModalProvider>
+              <Outlet />
+            </ModalProvider>
+          </PlayerRoleProvider>
+        </JoinCodeProvider>
+      </WebSocketProvider>
     </ThemeProvider>
   );
 };
