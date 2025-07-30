@@ -64,7 +64,7 @@ const LobbyPage = () => {
     setSelectedMiniGames(updatedMiniGames);
 
     send(
-      `/room/${joinCode}/select-minigames`,
+      `/room/${joinCode}/update-minigames`,
       JSON.stringify({
         hostName: playerType,
         miniGameType: updatedMiniGames,
