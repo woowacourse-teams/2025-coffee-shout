@@ -36,7 +36,7 @@ const LobbyPage = () => {
   useWebSocketSubscription<MiniGameResponse>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleClickBackButton = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   const handleClickGameStartButton = () => {
