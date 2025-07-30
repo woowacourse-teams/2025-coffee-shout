@@ -19,7 +19,7 @@ public class Players {
 
     public boolean hasDuplicateName(PlayerName playerName) {
         return players.stream()
-                .anyMatch(player -> player.getName().equals(playerName));
+                .anyMatch(player -> player.sameName(playerName));
     }
 
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {
