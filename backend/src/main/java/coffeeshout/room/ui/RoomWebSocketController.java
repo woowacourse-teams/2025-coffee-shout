@@ -5,6 +5,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
@@ -73,8 +74,8 @@ public class RoomWebSocketController {
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
-    public void broadcastRouletteSpin(@DestinationVariable String joinCode, String hostName) {
-        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, hostName));
+    public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
+        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
                 WebSocketResponse.success(losePlayer));
