@@ -17,11 +17,6 @@ public class Players {
         this.players.add(player);
     }
 
-    public boolean hasDuplicateName(PlayerName playerName) {
-        return players.stream()
-                .anyMatch(player -> player.sameName(playerName));
-    }
-
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {
         return players.size() >= minimumGuestCount && players.size() <= maximumGuestCount;
     }
@@ -35,5 +30,9 @@ public class Players {
 
     public int getPlayerCount() {
         return players.size();
+    }
+
+    public boolean hasDuplicateName(PlayerName playerNmae) {
+        return players.stream().anyMatch(player -> player.sameName(playerNmae));
     }
 }

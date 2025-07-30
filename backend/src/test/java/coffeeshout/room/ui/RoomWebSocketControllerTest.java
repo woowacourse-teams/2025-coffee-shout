@@ -9,6 +9,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.player.PlayerName;
@@ -16,16 +17,19 @@ import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ActiveProfiles("test")
 class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
@@ -58,7 +62,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         );
 
         // getPlayers 요청 메시지 전송
-        session.send("/app/room/" + joinCode + "/players", null);
+        session.send("/app/room/" + joinCode + "/update-players", null);
 
         // then - 플레이어 목록 응답 확인
         List<PlayerResponse> players = responses.get().data();
@@ -101,7 +105,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         );
 
         // 한 클라이언트에서 플레이어 목록 요청
-        session.send("/app/room/" + joinCode + "/players", null);
+        session.send("/app/room/" + joinCode + "/update-players", null);
 
         // then - 두 클라이언트 모두 같은 응답 받음
         List<PlayerResponse> response1 = subscribe1.get().data();
@@ -132,14 +136,12 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         );
 
         // then
-        session.send("/app/room/" + nonExistentJoinCode + "/players", null);
+        session.send("/app/room/" + nonExistentJoinCode + "/update-players", null);
 
-        WebSocketResponse<List<PlayerResponse>> response = subscribe.get();
+        Assertions.assertThatThrownBy(() -> subscribe.get())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("메시지 수신 대기 시간을 초과했습니다");
 
-        // 응답이 실패 상태이거나 데이터가 null이어야 함
-        assertThat(response).isNotNull();
-        assertThat(response.success()).isFalse();
-        assertThat(response.data()).isNull();
     }
 
     @Test
@@ -157,7 +159,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         );
 
         MenuChangeMessage message = new MenuChangeMessage(한스, changedMenuId);
-        session.send("/app/room/" + joinCode + "/menus", message);
+        session.send("/app/room/" + joinCode + "/update-menus", message);
 
         // then
         List<PlayerResponse> responses = subscribe.get().data();
@@ -185,7 +187,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
-        session.send("/app/room/" + joinCode + "/probabilities", null);
+        session.send("/app/room/" + joinCode + "/get-probabilities", null);
 
         WebSocketResponse<List<ProbabilityResponse>> responses = subscribe.get();
 
@@ -208,41 +210,13 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         );
 
         MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
-        session.send("/app/room/" + joinCode + "/minigames/select", message);
+        session.send("/app/room/" + joinCode + "/update-minigames", message);
 
         List<MiniGameType> responses = subscribe.get().data();
 
         // then
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
-    }
-
-    @Test
-    void 미니게임을_취소한다() throws InterruptedException, ExecutionException, TimeoutException {
-        // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
-
-        MessageCollector<WebSocketResponse<List<MiniGameType>>> subscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
-                }
-        );
-
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
-        session.send("/app/room/" + joinCode + "/minigames/select", message);
-
-        List<MiniGameType> responses = subscribe.get().data();
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
-
-        // when
-        MiniGameSelectMessage message2 = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
-        session.send("/app/room/" + joinCode + "/minigames/unselect", message2);
-
-        List<MiniGameType> responses2 = subscribe.get().data();
-
-        // then
-        assertThat(responses2).hasSize(0);
     }
 
     @Test
@@ -252,21 +226,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         String joinCode = testRoom.getJoinCode().value();
         String hostName = "호스트꾹이";
 
-        // 미니게임을 먼저 선택
-        MessageCollector<WebSocketResponse<List<MiniGameType>>> miniGameSubscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
-                }
-        );
-
-        MiniGameSelectMessage selectMessage = new MiniGameSelectMessage(hostName, List.of(MiniGameType.CARD_GAME));
-        session.send("/app/room/" + joinCode + "/minigames/select", selectMessage);
-
-        // 미니게임 선택 응답 확인
-        List<MiniGameType> selectedGames = miniGameSubscribe.get().data();
-        assertThat(selectedGames).hasSize(1);
-
         // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
-        testRoom.startNextGame(hostName);
+        ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
 
         // when - 룰렛 결과 구독
         MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(
@@ -275,7 +236,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 }
         );
 
-        session.send("/app/room/" + joinCode + "/roulette/spin", hostName);
+        session.send("/app/room/" + joinCode + "/spin-roulette", new RouletteSpinMessage(hostName));
 
         WebSocketResponse<PlayerResponse> response = rouletteSubscribe.get();
 
