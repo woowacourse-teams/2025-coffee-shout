@@ -78,7 +78,7 @@ const EntryMenuPage = () => {
     if (isConnected) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [isConnected]);
+  }, [isConnected, joinCode, navigate]);
 
   const handleNavigateToName = () => {
     navigate('/entry/name');
