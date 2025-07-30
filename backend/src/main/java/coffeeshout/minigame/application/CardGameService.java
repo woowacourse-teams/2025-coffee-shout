@@ -99,9 +99,9 @@ public class CardGameService implements MiniGameService {
         final CardGame cardGame = getCardGame(joinCode);
         final String scoreDestination = String.format(CARD_GAME_SCORE_DESTINATION_FORMAT, joinCode.value());
         final String rankDestination = String.format(CARD_GAME_RESULT_DESTINATION_FORMAT, joinCode.value());
-        messagingTemplate.convertAndSend(scoreDestination,
+        messagingTemplate.convertAndSend(String.format(scoreDestination, joinCode.value()),
                 WebSocketResponse.success(MiniGameScoresMessage.from(cardGame.calculateScores())));
-        messagingTemplate.convertAndSend(rankDestination,
+        messagingTemplate.convertAndSend(String.format(rankDestination, joinCode.value()),
                 WebSocketResponse.success(MiniGameRanksMessage.from(cardGame.getResult())));
     }
 

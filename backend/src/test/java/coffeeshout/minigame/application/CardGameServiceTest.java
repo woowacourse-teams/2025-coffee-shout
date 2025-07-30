@@ -112,9 +112,6 @@ class CardGameServiceTest {
                     players.get(3), 4 // 한스 4등 / 확률: 5000
             ));
             doReturn(result).when(cardGameSpy).getResult();
-            Deque<Playable> miniGames = new LinkedList<>();
-            miniGames.add(cardGame);
-            ReflectionTestUtils.setField(room, "miniGames", miniGames);
             cardGameService.start(cardGameSpy, joinCode.value());
             Thread.sleep(500);
 
@@ -127,10 +124,33 @@ class CardGameServiceTest {
         }
 
         @Test
+        void 카드게임_종료되면_결과에_따른_점수를_응답한다() throws InterruptedException {
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            Playable playable = room.startNextGame(host.getName().value());
+            cardGameService.start(playable, joinCode.value());
+
+            Thread.sleep(300);
+
+            verify(messagingTemplate, atLeast(1))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/score"),
+                            any(WebSocketResponse.class)
+                    );
+
+            verify(messagingTemplate, atLeast(1))
+                    .convertAndSend(
+                            eq("/topic/room/" + joinCode.getValue() + "/rank"),
+                            any(WebSocketResponse.class)
+                    );
+        }
+
+        @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
             Room room = roomQueryService.findByJoinCode(joinCode);
             Playable miniGame = room.startNextGame(host.getName().value());
             cardGameService.start(miniGame, joinCode.value());
+
+            Thread.sleep(300);
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
                             eq("/topic/room/" + joinCode.getValue() + "/gameState"),
