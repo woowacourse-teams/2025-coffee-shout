@@ -14,11 +14,14 @@ public class TaskExecutor<T> {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Map<T, Future<?>> futureTasks = new LinkedHashMap<>();
 
-    public record Task<T>(T info, Runnable task) {
+    public record Task<T>(T info, Runnable runnable) {
     }
 
     public void submits(List<Task<T>> tasks) {
-        tasks.forEach(task -> futureTasks.put(task.info, executor.submit(task.task)));
+        tasks.forEach(task -> {
+            Future<?> future = executor.submit(task.runnable);
+            futureTasks.put(task.info, future);
+        });
     }
 
     public void cancel(T info) {

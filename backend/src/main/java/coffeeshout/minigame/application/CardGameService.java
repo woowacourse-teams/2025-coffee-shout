@@ -32,42 +32,44 @@ public class CardGameService implements MiniGameService {
     private final RoomQueryService roomQueryService;
     private final SimpMessagingTemplate messagingTemplate;
     private final CardGameTaskExecutors cardGameTaskExecutors;
+    private final CardGameTaskFactory gameTaskFactory;
 
     @Override
     public void start(Playable playable, String joinCode) {
         sendGameStartMessage(joinCode, playable.getMiniGameType());
         final JoinCode roomJoinCode = new JoinCode(joinCode);
+        final Room room = roomQueryService.findByJoinCode(roomJoinCode);
         final CardGame cardGame = (CardGame) playable;
         final TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
         cardGameTaskExecutors.put(roomJoinCode, executor);
         executor.submits(List.of(
                 new Task<>(
                         CardGameTaskInfo.WAITING_FOR_START,
-                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_PLAYING,
-                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_SCORE_BOARD,
-                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.FIRST_ROUND_LOADING,
-                        CardGameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.SECOND_ROUND_PLAYING,
-                        CardGameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.SECOND_ROUND_SCORE_BOARD,
-                        CardGameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
+                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
                         CardGameTaskInfo.GAME_FINISH,
-                        CardGameTaskFactory.done(cardGame, () -> sendCardGameResult(roomJoinCode))
+                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(roomJoinCode))
                 )
         ));
     }
