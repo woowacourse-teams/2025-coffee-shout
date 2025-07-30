@@ -1,9 +1,9 @@
-import { PlayerRole } from '@/types/player';
+import { PlayerType } from '@/types/player';
 import { PlayerRoleContext } from './PlayerRoleContext';
 import { PropsWithChildren, useState } from 'react';
 
 export const PlayerRoleProvider = ({ children }: PropsWithChildren) => {
-  const [playerRole, setPlayerRole] = useState<PlayerRole | null>(null);
+  const [playerRole, setPlayerRole] = useState<PlayerType | null>(null);
 
   const setGuest = () => {
     setPlayerRole('GUEST');

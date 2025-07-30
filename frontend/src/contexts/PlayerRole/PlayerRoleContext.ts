@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
-import { PlayerRole } from '@/types/player';
+import { PlayerType } from '@/types/player';
 
 type PlayerRoleContextType = {
-  playerRole: PlayerRole | null;
+  playerRole: PlayerType | null;
   setGuest: () => void;
   setHost: () => void;
 };
