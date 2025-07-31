@@ -46,7 +46,7 @@ const LobbyPage = () => {
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   useEffect(() => {
-    if (playerType === 'GUEST' && joinCode) {
+    if (joinCode) {
       send(`/room/${joinCode}/update-players`);
     }
   }, [playerType, joinCode, send]);
