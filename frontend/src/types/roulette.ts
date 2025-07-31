@@ -6,3 +6,8 @@ export type Probability = {
   playerResponse: Player;
   probability: number;
 };
+
+export type PlayerProbability = {
+  playerName: string;
+  probability: number;
+};

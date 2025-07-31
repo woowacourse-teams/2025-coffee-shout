@@ -10,13 +10,13 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { Player } from '@/types/player';
-import { RouletteView } from '@/types/roulette';
-import { useEffect, useState } from 'react';
+import { PlayerProbability, Probability, RouletteView } from '@/types/roulette';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 
-const RoulettePage = () => {
+const RoulettePlayPage = () => {
   const navigate = useNavigate();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
@@ -26,9 +26,27 @@ const RoulettePage = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, (data) => {
+  // TODO: 나중에 외부 state 로 분리할 것
+  const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
+
+  const handleWinnerData = useCallback((data: Player) => {
     setWinner(data.playerName);
-  });
+  }, []);
+
+  const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
+    const parsedData = data.map((item) => ({
+      playerName: item.playerResponse.playerName,
+      probability: item.probability,
+    }));
+
+    setPlayerProbabilities(parsedData);
+  }, []);
+
+  useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);
+  useWebSocketSubscription<Probability[]>(
+    `/room/${joinCode}/roulette`,
+    handlePlayerProbabilitiesData
+  );
 
   const isRouletteView = currentView === 'roulette';
 
@@ -61,6 +79,12 @@ const RoulettePage = () => {
     }
   }, [isSpinning, winner, navigate, joinCode]);
 
+  useEffect(() => {
+    if (joinCode) {
+      send(`/room/${joinCode}/get-probabilities`);
+    }
+  }, [send, joinCode]);
+
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerType) return null;
 
@@ -70,7 +94,14 @@ const RoulettePage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
-          {isRouletteView ? <RoulettePlaySection isSpinning={isSpinning} /> : <ProbabilityList />}
+          {isRouletteView ? (
+            <RoulettePlaySection
+              playerProbabilities={playerProbabilities}
+              isSpinning={isSpinning}
+            />
+          ) : (
+            <ProbabilityList playerProbabilities={playerProbabilities} />
+          )}
           <S.IconButtonWrapper>
             <IconButton
               iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
@@ -88,4 +119,4 @@ const RoulettePage = () => {
   );
 };
 
-export default RoulettePage;
+export default RoulettePlayPage;

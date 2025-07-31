@@ -4,18 +4,18 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
+import { ColorList } from '@/constants/color';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
-import { IconColor } from '@/types/player';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const gameResults = [
-  { id: 1, name: '다이앤', score: 20, iconColor: 'red' as IconColor, rank: 1 },
-  { id: 2, name: '니야', score: 18, iconColor: 'red' as IconColor, rank: 2 },
-  { id: 3, name: '메리', score: 15, iconColor: 'red' as IconColor, rank: 3 },
-  { id: 4, name: '엠제이', score: 13, iconColor: 'red' as IconColor, rank: 4 },
-  { id: 5, name: '루키', score: 10, iconColor: 'red' as IconColor, rank: 5 },
+  { id: 1, name: '다이앤', score: 20, iconColor: '#FF6B6B' as ColorList, rank: 1 },
+  { id: 2, name: '니야', score: 18, iconColor: '#FF6B6B' as ColorList, rank: 2 },
+  { id: 3, name: '메리', score: 15, iconColor: '#FF6B6B' as ColorList, rank: 3 },
+  { id: 4, name: '엠제이', score: 13, iconColor: '#FF6B6B' as ColorList, rank: 4 },
+  { id: 5, name: '루키', score: 10, iconColor: '#FF6B6B' as ColorList, rank: 5 },
 ];
 
 const MiniGameResultPage = () => {

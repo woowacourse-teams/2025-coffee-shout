@@ -16,7 +16,7 @@ type Story = StoryObj<typeof PlayerCard>;
 export const WithText: Story = {
   args: {
     name: '홍길동',
-    iconColor: 'red',
+    iconColor: '#FF6B6B',
     children: <Headline4>10%</Headline4>,
   },
 };
@@ -24,7 +24,7 @@ export const WithText: Story = {
 export const WithIcon: Story = {
   args: {
     name: '김철수',
-    iconColor: 'red',
+    iconColor: '#FF6B6B',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
@@ -33,7 +33,7 @@ export const WithIcon: Story = {
 export const Host: Story = {
   args: {
     name: '홍길동',
-    iconColor: 'red',
+    iconColor: '#FF6B6B',
     playerType: 'HOST',
   },
 };
@@ -41,7 +41,7 @@ export const Host: Story = {
 export const LongNameWithText: Story = {
   args: {
     name: '매우매우매우매우긴이름을가진플레이어',
-    iconColor: 'red',
+    iconColor: '#FF6B6B',
     children: <Headline4>15%</Headline4>,
   },
 };
@@ -49,7 +49,7 @@ export const LongNameWithText: Story = {
 export const LongNameWithIcon: Story = {
   args: {
     name: '아주아주아주아주아주긴이름의사용자님',
-    iconColor: 'red',
+    iconColor: '#FF6B6B',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
@@ -59,7 +59,7 @@ export const MultipleCards: Story = {
   render: () => (
     <>
       {Array.from({ length: 6 }, (_, index) => (
-        <PlayerCard key={index} name="이영희" iconColor="red">
+        <PlayerCard key={index} name="이영희" iconColor="#FF6B6B">
           <Headline4>20점</Headline4>
         </PlayerCard>
       ))}
@@ -71,13 +71,13 @@ export const DifferentProfileIcons: Story = {
   // TODO: 색상별 이미지 추가 시 스토리 수정 필요 (아이콘 UI 테스트는 PlayerCard에서 진행함 - 아이콘 컴포넌트가 따로 없기 때문)
   render: () => (
     <>
-      <PlayerCard name="빨간색" iconColor="red">
+      <PlayerCard name="빨간색" iconColor="#FF6B6B">
         <Headline4>25%</Headline4>
       </PlayerCard>
-      <PlayerCard name="파란색" iconColor="red">
+      <PlayerCard name="파란색" iconColor="#FF6B6B">
         <Headline4>30%</Headline4>
       </PlayerCard>
-      <PlayerCard name="초록색" iconColor="red">
+      <PlayerCard name="초록색" iconColor="#FF6B6B">
         <Headline4>15%</Headline4>
       </PlayerCard>
     </>

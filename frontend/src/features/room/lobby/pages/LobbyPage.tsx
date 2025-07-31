@@ -9,7 +9,8 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
-import { ReactElement, useCallback, useState } from 'react';
+import { PlayerProbability, Probability } from '@/types/roulette';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
@@ -29,11 +30,27 @@ const LobbyPage = () => {
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
 
+  // TODO: 나중에 외부 state 로 분리할 것
+  const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
+
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
   }, []);
 
+  const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
+    const parsedData = data.map((item) => ({
+      playerName: item.playerResponse.playerName,
+      probability: item.probability,
+    }));
+
+    setPlayerProbabilities(parsedData);
+  }, []);
+
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+  useWebSocketSubscription<Probability[]>(
+    `/room/${joinCode}/roulette`,
+    handlePlayerProbabilitiesData
+  );
 
   const handleClickBackButton = () => {
     navigate('/');
@@ -70,9 +87,15 @@ const LobbyPage = () => {
     });
   };
 
+  useEffect(() => {
+    if (playerType === 'GUEST' && joinCode) {
+      send(`/room/${joinCode}/get-probabilities`);
+    }
+  }, [playerType, joinCode, send]);
+
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection />,
-    룰렛: <RouletteSection />,
+    룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
     미니게임: (
       <MiniGameSection
         selectedMiniGames={selectedMiniGames}

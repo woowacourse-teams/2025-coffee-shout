@@ -26,7 +26,7 @@ export const ParticipantSection = () => {
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
         suffix={<ProgressCounter current={7} total={9} />}
       />
-      <PlayerCard name={myName} iconColor="red">
+      <PlayerCard name={myName} iconColor="#FF6B6B">
         <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
       </PlayerCard>
 
@@ -34,7 +34,7 @@ export const ParticipantSection = () => {
 
       <S.ScrollableWrapper>
         {['다이앤', '니야', '메리', '루키', '한스', '꾹이', '엠제이', '1'].map((name) => (
-          <PlayerCard key={name} name={name} iconColor="red">
+          <PlayerCard key={name} name={name} iconColor="#FF6B6B">
             <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
           </PlayerCard>
         ))}
