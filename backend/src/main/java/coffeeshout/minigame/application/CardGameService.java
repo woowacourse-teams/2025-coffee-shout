@@ -47,7 +47,7 @@ public class CardGameService implements MiniGameService {
         cardGameTaskExecutors.put(roomJoinCode, executor);
         executor.submits(List.of(
                 new Task<>(
-                        CardGameTaskInfo.WAITING_FOR_START,
+                        CardGameTaskInfo.FIRST_ROUND_LOADING,
                         gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
@@ -59,7 +59,7 @@ public class CardGameService implements MiniGameService {
                         gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
-                        CardGameTaskInfo.FIRST_ROUND_LOADING,
+                        CardGameTaskInfo.SECOND_ROUND_LOADING,
                         gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
                 ),
                 new Task<>(
@@ -72,7 +72,10 @@ public class CardGameService implements MiniGameService {
                 ),
                 new Task<>(
                         CardGameTaskInfo.GAME_FINISH,
-                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(roomJoinCode))
+                        gameTaskFactory.done(room, cardGame, () -> {
+                            sendCardGameState(roomJoinCode);
+                            sendCardGameResult(roomJoinCode);
+                        })
                 )
         ));
     }
