@@ -21,6 +21,6 @@ public class RoomCommandService {
 
     public void delayCleanUp(Room room, Duration delay) {
         taskScheduler.schedule(() -> roomRepository.deleteByJoinCode(room.getJoinCode()),
-                Instant.now().plus(Duration.ofSeconds(1)));
+                Instant.now().plus(delay));
     }
 }
