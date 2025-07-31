@@ -31,14 +31,14 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'room/:roomId',
+        path: 'room/:joinCode',
         children: [
           { path: 'lobby', element: <LobbyPage /> },
           { path: 'roulette/play', element: <RoulettePage /> },
           { path: 'roulette/result', element: <RouletteResultPage /> },
           { path: 'order', element: <OrderPage /> },
           {
-            path: ':miniGameId',
+            path: ':miniGameType',
             children: [
               { path: 'ready', element: <MiniGameReadyPage /> },
               { path: 'play', element: <MiniGamePlayPage /> },

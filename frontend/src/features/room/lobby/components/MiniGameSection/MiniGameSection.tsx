@@ -2,29 +2,23 @@ import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { MINI_GAME_NAME_MAP, MiniGameType } from '@/types/miniGame';
 import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
-
-const MINI_GAME_NAME_MAP = {
-  CARD_GAME: '카드게임',
-  '31_GAME': '랜덤 31',
-} as const;
-
-type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
 type MiniGamesResponse = {
   miniGameType: MiniGameType;
 }[];
 
-export const MiniGameSection = () => {
-  const [selectedMiniGame, setSelectedMiniGame] = useState<string | null>(null);
+type Props = {
+  selectedMiniGames: MiniGameType[];
+  handleMiniGameClick: (miniGameType: MiniGameType) => void;
+};
+
+export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Props) => {
   const [miniGames, setMiniGames] = useState<MiniGameType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const handleMiniGameClick = (miniGameType: string) => {
-    setSelectedMiniGame(miniGameType);
-  };
 
   useEffect(() => {
     (async () => {
@@ -46,22 +40,21 @@ export const MiniGameSection = () => {
     })();
   }, []);
 
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <>
       <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
       <S.Wrapper>
-        {loading && <div>로딩 중...</div>}
-        {!loading && error && <div>{error}</div>}
-        {!loading &&
-          !error &&
-          miniGames.map((miniGame) => (
-            <GameActionButton
-              key={miniGame}
-              isSelected={selectedMiniGame === miniGame}
-              gameName={MINI_GAME_NAME_MAP[miniGame]}
-              onClick={() => handleMiniGameClick(miniGame)}
-            />
-          ))}
+        {miniGames.map((miniGame) => (
+          <GameActionButton
+            key={miniGame}
+            isSelected={selectedMiniGames.includes(miniGame)}
+            gameName={MINI_GAME_NAME_MAP[miniGame]}
+            onClick={() => handleMiniGameClick(miniGame)}
+          />
+        ))}
       </S.Wrapper>
     </>
   );

@@ -1,31 +1,24 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { ReactElement, useState } from 'react';
+import { MiniGameType } from '@/types/miniGame';
+import { ReactElement, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
-type SectionComponents = {
-  [K in SectionType]: ReactElement;
-};
-
-const SECTIONS: SectionComponents = {
-  참가자: <ParticipantSection />,
-  룰렛: <RouletteSection />,
-  미니게임: <MiniGameSection />,
-} as const;
+type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
@@ -35,17 +28,28 @@ const LobbyPage = () => {
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
-  const [selectedMiniGames, setSelectedMiniGames] = useState([]);
 
-  useWebSocketSubscription(`/room/${joinCode}/round`, (payload) => {
-    console.log(payload);
+  const handleGameStart = useCallback(
+    (nextMiniGame: MiniGameType) => {
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+    },
+    [joinCode]
+  );
+
+  useWebSocketSubscription(`/room/${joinCode}/round`, (nextMiniGame: MiniGameType) => {
+    handleGameStart(nextMiniGame);
   });
 
-  //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerType) return null;
+  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+
+  const handleMiniGameData = useCallback((data: MiniGameType[]) => {
+    setSelectedMiniGames(data);
+  }, []);
+
+  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleClickBackButton = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   const handleClickGameStartButton = () => {
@@ -55,8 +59,6 @@ const LobbyPage = () => {
         hostName: myName,
       },
     });
-
-    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
   };
 
   const handleSectionChange = (option: SectionType) => {
@@ -69,6 +71,34 @@ const LobbyPage = () => {
       showCloseButton: true,
     });
   };
+
+  const handleMiniGameClick = (miniGameType: MiniGameType) => {
+    if (playerType === 'GUEST') return;
+
+    const updatedMiniGames = selectedMiniGames.includes(miniGameType)
+      ? selectedMiniGames.filter((game) => game !== miniGameType)
+      : [...selectedMiniGames, miniGameType];
+
+    setSelectedMiniGames(updatedMiniGames);
+
+    send(`/room/${joinCode}/update-minigames`, {
+      hostName: myName,
+      miniGameTypes: updatedMiniGames,
+    });
+  };
+
+  const SECTIONS: SectionComponents = {
+    참가자: <ParticipantSection />,
+    룰렛: <RouletteSection />,
+    미니게임: (
+      <MiniGameSection
+        selectedMiniGames={selectedMiniGames}
+        handleMiniGameClick={handleMiniGameClick}
+      />
+    ),
+  };
+
+  if (!playerType) return null;
 
   return (
     <Layout>
