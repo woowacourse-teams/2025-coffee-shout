@@ -24,7 +24,7 @@ export const WithText: Story = {
 export const WithIcon: Story = {
   args: {
     name: '김철수',
-    iconColor: '#FF6B6B',
+    iconColor: '#80d6d0',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
@@ -33,7 +33,7 @@ export const WithIcon: Story = {
 export const Host: Story = {
   args: {
     name: '홍길동',
-    iconColor: '#FF6B6B',
+    iconColor: '#45B7D1',
     playerType: 'HOST',
   },
 };
@@ -41,7 +41,7 @@ export const Host: Story = {
 export const LongNameWithText: Story = {
   args: {
     name: '매우매우매우매우긴이름을가진플레이어',
-    iconColor: '#FF6B6B',
+    iconColor: '#96CEB4',
     children: <Headline4>15%</Headline4>,
   },
 };
@@ -49,7 +49,7 @@ export const LongNameWithText: Story = {
 export const LongNameWithIcon: Story = {
   args: {
     name: '아주아주아주아주아주긴이름의사용자님',
-    iconColor: '#FF6B6B',
+    iconColor: '#FFEAA7',
     // TODO: 커피 아이콘 결정되면 이미지 대체할 부분(juice 이미지는 임시용)
     children: <img src={JuiceIcon} alt="juice" />,
   },
@@ -59,7 +59,7 @@ export const MultipleCards: Story = {
   render: () => (
     <>
       {Array.from({ length: 6 }, (_, index) => (
-        <PlayerCard key={index} name="이영희" iconColor="#FF6B6B">
+        <PlayerCard key={index} name="이영희" iconColor="#DDA0DD">
           <Headline4>20점</Headline4>
         </PlayerCard>
       ))}
@@ -74,10 +74,10 @@ export const DifferentProfileIcons: Story = {
       <PlayerCard name="빨간색" iconColor="#FF6B6B">
         <Headline4>25%</Headline4>
       </PlayerCard>
-      <PlayerCard name="파란색" iconColor="#FF6B6B">
+      <PlayerCard name="파란색" iconColor="#45B7D1">
         <Headline4>30%</Headline4>
       </PlayerCard>
-      <PlayerCard name="초록색" iconColor="#FF6B6B">
+      <PlayerCard name="초록색" iconColor="#96CEB4">
         <Headline4>15%</Headline4>
       </PlayerCard>
     </>
