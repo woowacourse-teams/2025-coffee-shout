@@ -9,19 +9,12 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { Menu } from '@/types/menu';
-import { PlayerType } from '@/types/player';
+import { Player } from '@/types/player';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
-
-type RouletteResultResponse = {
-  playerName: string;
-  menuResponse: Menu;
-  playerType: PlayerType;
-};
 
 const RoulettePage = () => {
   const navigate = useNavigate();
@@ -33,7 +26,7 @@ const RoulettePage = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  useWebSocketSubscription<RouletteResultResponse>(`/room/${joinCode}/roulette`, (data) => {
+  useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, (data) => {
     setWinner(data.playerName);
   });
 
