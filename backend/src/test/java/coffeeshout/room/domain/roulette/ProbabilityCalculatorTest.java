@@ -30,10 +30,10 @@ class ProbabilityCalculatorTest {
         Probability probability4 = probabilityCalculator.calculateAdjustProbability(playerCount, 4);
 
         // then
-        assertThat(probability1).isEqualTo(new Probability(832));
-        assertThat(probability2).isEqualTo(new Probability(416));
-        assertThat(probability3).isEqualTo(new Probability(416));
-        assertThat(probability4).isEqualTo(new Probability(832));
+        assertThat(probability1).isEqualTo(new Probability(832).multiple(0.7));
+        assertThat(probability2).isEqualTo(new Probability(416).multiple(0.7));
+        assertThat(probability3).isEqualTo(new Probability(416).multiple(0.7));
+        assertThat(probability4).isEqualTo(new Probability(832).multiple(0.7));
 
     }
 }

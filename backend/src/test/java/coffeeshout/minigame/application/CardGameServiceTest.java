@@ -106,10 +106,10 @@ class CardGameServiceTest {
             CardGame cardGameSpy = spy(cardGame);
             List<Player> players = room.getPlayers();
             MiniGameResult result = new MiniGameResult(Map.of(
-                    players.get(0), 1, // 꾹이 1등 / 확률: 0
-                    players.get(1), 2, // 루키 2등 / 확률: 1250
-                    players.get(2), 3, // 엠제이 3등 / 확률: 3750
-                    players.get(3), 4 // 한스 4등 / 확률: 5000
+                    players.get(0), 1, // 꾹이 1등 / 가중치: -2500 * 0.7 = -1750 => 750
+                    players.get(1), 2, // 루키 2등 / 가중치: -1250 * 0.7 = -875 => 1625
+                    players.get(2), 3, // 엠제이 3등 / 가중치: +1250 * 0.7 = +875 => 3375
+                    players.get(3), 4 // 한스 4등 / 가중치: +2500 * 0.7 = +4250
             ));
             doReturn(result).when(cardGameSpy).getResult();
             cardGameService.start(cardGameSpy, joinCode.value());
@@ -117,10 +117,10 @@ class CardGameServiceTest {
 
             Map<Player, Probability> probabilities = room.getProbabilities();
             assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
-                    players.get(0), new Probability(0),
-                    players.get(1), new Probability(1250),
-                    players.get(2), new Probability(3750),
-                    players.get(3), new Probability(5000)));
+                    players.get(0), new Probability(750),
+                    players.get(1), new Probability(1625),
+                    players.get(2), new Probability(3375),
+                    players.get(3), new Probability(4250)));
         }
 
         @Test
