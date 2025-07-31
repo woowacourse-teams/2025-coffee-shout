@@ -94,8 +94,6 @@ public class RoomService {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
-        roomCommandService.delayCleanUp(room, Duration.ofHours(1));
-
         return room.spinRoulette(host);
     }
 
@@ -103,5 +101,11 @@ public class RoomService {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         return room.hasDuplicatePlayerName(new PlayerName(guestName));
+    }
+
+    public void delayCleanUp(String joinCode) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+
+        roomCommandService.delayCleanUp(room, Duration.ofHours(1));
     }
 }

@@ -8,7 +8,7 @@ import coffeeshout.minigame.domain.temp.CardGameTaskFactory;
 import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
 import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
-import coffeeshout.minigame.ui.response.MinIGameStartMessage;
+import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
 import coffeeshout.minigame.ui.response.MiniGameScoresMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
@@ -108,7 +108,7 @@ public class CardGameService implements MiniGameService {
     private void sendGameStartMessage(String joinCode, MiniGameType miniGameType) {
         messagingTemplate.convertAndSend(
                 String.format(GAME_START_DESTINATION_FORMAT, joinCode),
-                WebSocketResponse.success(new MinIGameStartMessage(miniGameType))
+                WebSocketResponse.success(new MiniGameStartMessage(miniGameType))
         );
     }
 

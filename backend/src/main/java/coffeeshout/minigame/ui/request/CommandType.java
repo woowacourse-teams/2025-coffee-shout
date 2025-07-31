@@ -8,9 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public enum CommandType {
 
+    START_MINI_GAME(StartMiniGameCommand.class),
+
     // 카드 게임
-    SELECT_CARD(SelectCardCommand.class),
-    START_CARD_GAME(StartMiniGameCommand.class)
+    SELECT_CARD(SelectCardCommand.class)
     ;
 
     private final Class<?> commandRequestClass;
@@ -21,11 +22,11 @@ public enum CommandType {
 
     public MiniGameCommand toCommandRequest(ObjectMapper objectMapper, JsonNode jsonNode) {
         return switch (this) {
-            case SELECT_CARD -> (SelectCardCommand) objectMapper.convertValue(jsonNode, this.commandRequestClass);
-            case START_CARD_GAME -> (StartMiniGameCommand) objectMapper.convertValue(
+            case START_MINI_GAME -> (StartMiniGameCommand) objectMapper.convertValue(
                     jsonNode,
                     this.commandRequestClass
             );
+            case SELECT_CARD -> (SelectCardCommand) objectMapper.convertValue(jsonNode, this.commandRequestClass);
             default -> throw new IllegalArgumentException("지원하지 않는 명령 타입입니다: " + this);
         };
     }
