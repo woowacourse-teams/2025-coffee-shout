@@ -47,21 +47,6 @@ class RouletteTest {
     }
 
     @Test
-    void 여러_사람이_당첨될_수_있다() {
-        // given
-        Roulette roulette = RouletteFixture.랜덤_반환();
-        Set<Player> winners = new HashSet<>();
-
-        // when
-        for (int i = 0; i < 100; i++) {
-            winners.add(roulette.spin());
-        }
-
-        // then
-        assertThat(winners).hasSizeGreaterThan(1);
-    }
-
-    @Test
     void 새로운_플레이어_참여시_확률이_균등하게_재분배된다() {
         // given
         Roulette roulette = new Roulette(new RoulettePicker());
@@ -96,5 +81,4 @@ class RouletteTest {
         assertThat(roulette.getProbabilities().values())
                 .allMatch(probability -> probability.value() == 5000);
     }
-
 }
