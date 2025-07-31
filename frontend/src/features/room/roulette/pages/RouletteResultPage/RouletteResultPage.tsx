@@ -3,15 +3,14 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Layout from '@/layouts/Layout';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as S from './RouletteResultPage.styled';
 
 const RouletteResultPage = () => {
-  // TODO: 당첨자 받아오는 로직 구현
   const navigate = useNavigate();
   const { roomId } = useParams();
-
-  const winner = '당첨자';
+  const location = useLocation();
+  const winner = location.state?.winner ?? '당첨자';
 
   useEffect(() => {
     const timer = setTimeout(() => {
