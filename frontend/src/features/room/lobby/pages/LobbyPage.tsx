@@ -8,6 +8,7 @@ import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
+import { MiniGameType } from '@/types/miniGame';
 import { ReactElement, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
@@ -16,9 +17,8 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 
-export type SectionType = '참가자' | '룰렛' | '미니게임';
+type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
-type MiniGameResponse = string[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
@@ -27,20 +27,21 @@ const LobbyPage = () => {
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
-  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameResponse>([]);
+  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
 
-  const handleMiniGameData = useCallback((data: MiniGameResponse) => {
+  const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
   }, []);
 
-  useWebSocketSubscription<MiniGameResponse>(`/room/${joinCode}/minigame`, handleMiniGameData);
+  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleClickBackButton = () => {
     navigate('/');
   };
 
   const handleClickGameStartButton = () => {
-    navigate('/room/:roomId/:miniGameId/ready');
+    // TODO: 지금 시작할 게임 타입을 서버에서 웹소켓으로 받아서 selectedMiniGames[0]를 넣어주기
+    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
   };
 
   const handleSectionChange = (option: SectionType) => {
@@ -54,7 +55,7 @@ const LobbyPage = () => {
     });
   };
 
-  const handleMiniGameClick = (miniGameType: string) => {
+  const handleMiniGameClick = (miniGameType: MiniGameType) => {
     if (playerType === 'GUEST') return;
 
     const updatedMiniGames = selectedMiniGames.includes(miniGameType)
