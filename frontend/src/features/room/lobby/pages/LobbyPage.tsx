@@ -12,6 +12,9 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = {
@@ -26,9 +29,17 @@ const SECTIONS: SectionComponents = {
 
 const LobbyPage = () => {
   const navigate = useNavigate();
+
+  const { send } = useWebSocket();
+  const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
+  const [selectedMiniGames, setSelectedMiniGames] = useState([]);
+
+  useWebSocketSubscription(`/room/${joinCode}/round`, (payload) => {
+    console.log(payload);
+  });
 
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerType) return null;
@@ -38,7 +49,14 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
-    navigate('/room/:roomId/:miniGameId/ready');
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'START_MINI_GAME',
+      commandRequest: {
+        hostName: myName,
+      },
+    });
+
+    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
   };
 
   const handleSectionChange = (option: SectionType) => {
