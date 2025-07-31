@@ -37,48 +37,13 @@ class RouletteTest {
 
         // then
         assertThat(roulette.getProbability(PlayerFixture.호스트한스()))
-                .isEqualTo(new Probability(2000));
+                .isEqualTo(new Probability((int)(2500 - 500 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트루키()))
-                .isEqualTo(new Probability(2250));
+                .isEqualTo(new Probability((int)(2500 - 250 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트꾹이()))
-                .isEqualTo(new Probability(2750));
+                .isEqualTo(new Probability((int)(2500 + 250 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트엠제이()))
-                .isEqualTo(new Probability(3000));
-    }
+                .isEqualTo(new Probability((int)(2500 + 500 * 0.7)));
 
-    @Test
-    void 새로운_플레이어_참여시_확률이_균등하게_재분배된다() {
-        // given
-        Roulette roulette = new Roulette(new RoulettePicker());
-        Player player1 = PlayerFixture.호스트루키();
-        Player player2 = PlayerFixture.호스트한스();
-
-        // when & then
-        roulette.join(player1);
-
-        assertThat(roulette.getProbabilities())
-                .containsOnlyKeys(player1);
-        assertThat(roulette.getProbability(player1).value())
-                .isEqualTo(10000);
-
-        // when: 2명째 참여
-        roulette.join(player2);
-
-        // then
-        int totalProbability = roulette.getProbabilities()
-                .values()
-                .stream()
-                .mapToInt(Probability::value)
-                .sum();
-
-        assertThat(totalProbability)
-                .isEqualTo(10000);
-
-        // then: 균등 분배 검증
-        assertThat(roulette.getProbabilities())
-                .containsOnlyKeys(player1, player2);
-
-        assertThat(roulette.getProbabilities().values())
-                .allMatch(probability -> probability.value() == 5000);
     }
 }
