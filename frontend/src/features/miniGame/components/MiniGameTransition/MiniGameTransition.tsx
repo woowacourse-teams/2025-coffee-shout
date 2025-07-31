@@ -6,16 +6,16 @@ import { PropsWithChildren } from 'react';
 import * as S from './MiniGameTransition.styled';
 
 type Props = {
-  prevRound: RoundKey;
+  currentRound: RoundKey;
 } & PropsWithChildren;
 
-const MiniGameTransition = ({ prevRound, children }: Props) => {
+const MiniGameTransition = ({ currentRound, children }: Props) => {
   return (
     <Layout color="point-400">
       <S.Container>
         <S.Wrapper>
           <S.DescriptionWrapper>
-            <Headline1 color="white">Round {prevRound + 1}</Headline1>
+            <Headline1 color="white">Round {currentRound}</Headline1>
             <Description color="white">다음 라운드로 이동합니다!</Description>
           </S.DescriptionWrapper>
           {children}

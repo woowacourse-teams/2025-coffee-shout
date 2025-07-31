@@ -80,7 +80,7 @@ const CardGamePlayPage = () => {
   }, [currentTime, navigate, joinCode, miniGameType, currentRound, currentCardGameState]);
 
   return isTransition ? (
-    <MiniGameTransition prevRound={currentRound} />
+    <MiniGameTransition currentRound={currentRound} />
   ) : (
     <Round
       key={currentRound}

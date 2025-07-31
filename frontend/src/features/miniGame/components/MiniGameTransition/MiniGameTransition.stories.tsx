@@ -17,7 +17,7 @@ type Story = StoryObj<typeof MiniGameTransition>;
 
 export const Default: Story = {
   args: {
-    prevRound: 2,
+    currentRound: 2,
     children: <img src={CardsStackIcon} alt="cards" />,
   },
   render: (args) => (
@@ -29,7 +29,7 @@ export const Default: Story = {
 
 export const Animated: Story = {
   args: {
-    prevRound: 1,
+    currentRound: 2,
     children: <img src={CardsStackIcon} alt="cards" />,
   },
   render: (args) => (
