@@ -37,16 +37,14 @@ const LobbyPage = () => {
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleGameStart = useCallback(
-    (nextMiniGame: MiniGameType) => {
+    (data: { miniGameType: MiniGameType }) => {
+      const { miniGameType: nextMiniGame } = data;
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
     [joinCode]
   );
 
-  useWebSocketSubscription(`/room/${joinCode}/round`, (data: { miniGameType: MiniGameType }) => {
-    const { miniGameType: nextMiniGame } = data;
-    handleGameStart(nextMiniGame);
-  });
+  useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   const handleClickBackButton = () => {
     navigate('/');
