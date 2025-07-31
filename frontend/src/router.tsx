@@ -13,7 +13,7 @@ import {
   RoulettePage,
   RouletteResultPage,
 } from './pages';
-import { CardGameProvider } from './contexts/CardGame/CardGameProvider';
+import CardGameProvider from './contexts/CardGame/CardGameProvider';
 
 const router = createBrowserRouter([
   {

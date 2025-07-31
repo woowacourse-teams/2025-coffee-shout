@@ -4,3 +4,23 @@ export const MINI_GAME_NAME_MAP = {
 } as const;
 
 export type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
+
+export type CardGameState = 'READY' | 'LOADING' | 'PLAYING' | 'SCORE_BOARD' | 'DONE';
+
+export type CardGameRound = 'FIRST' | 'SECOND';
+
+export type CardType = 'ADDITION' | 'MULTIPLIER';
+
+export interface CardInfo {
+  cardType: CardType;
+  value: number;
+  selected: boolean;
+  playerName: string | null;
+}
+
+export interface CardGameStateData {
+  cardGameState: CardGameState;
+  currentRound: CardGameRound;
+  cardInfoMessages: CardInfo[];
+  allSelected: boolean;
+}

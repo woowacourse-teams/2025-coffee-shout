@@ -1,6 +1,13 @@
+import { CardGameState } from '@/types/miniGame';
+import { RoundKey } from '@/types/round';
 import { createContext, useContext } from 'react';
 
-type CardGameContextType = {};
+type CardGameContextType = {
+  startCardGame: boolean;
+  isTransition: boolean;
+  currentRound: RoundKey;
+  currentCardGameState: CardGameState;
+};
 
 export const CardGameContext = createContext<CardGameContextType | null>(null);
 
