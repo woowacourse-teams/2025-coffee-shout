@@ -9,12 +9,21 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 public class WebSocketSchedulerConfig {
 
-    @Bean
-    @Primary
+    @Bean(name = "webSocketHeartBeatScheduler")
     public TaskScheduler heartBeatMessageBrokerTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(1);
         scheduler.setThreadNamePrefix("wss-heartbeat-thread-");
+        scheduler.initialize();
+        return scheduler;
+    }
+
+    @Bean
+    @Primary
+    public TaskScheduler customMessageBrokerTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(4);
+        scheduler.setThreadNamePrefix("default-scheduler-");
         scheduler.initialize();
         return scheduler;
     }

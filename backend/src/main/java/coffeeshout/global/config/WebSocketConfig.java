@@ -1,7 +1,7 @@
 package coffeeshout.global.config;
 
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.TaskScheduler;
@@ -11,10 +11,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-@AllArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TaskScheduler taskScheduler;
+
+    public WebSocketConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
