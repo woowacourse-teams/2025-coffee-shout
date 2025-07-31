@@ -23,6 +23,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       const isFirstRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'FIRST';
       const isSecondRoundLoading = cardGameState === 'LOADING' && currentRound === 'SECOND';
       const isSecondRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'SECOND';
+      const isSecondRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'SECOND';
       const isGameDone = cardGameState === 'DONE';
 
       if (isFirstRoundPlaying) {
@@ -41,7 +42,9 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setCardInfos(cardInfoMessages);
         setCurrentCardGameState('PLAYING');
       }
-
+      if (isSecondRoundScoreBoard) {
+        setCurrentCardGameState('SCORE_BOARD');
+      }
       if (isGameDone) {
         navigate(`/room/${joinCode}/${miniGameType}/result`);
       }
