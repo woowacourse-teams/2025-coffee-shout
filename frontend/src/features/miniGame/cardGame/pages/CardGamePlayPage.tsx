@@ -22,7 +22,7 @@ const CardGamePlayPage = () => {
 
   const { miniGameType } = useParams();
   const { joinCode } = useIdentifier();
-  const { isTransition, currentRound, currentCardGameState } = useCardGame();
+  const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
@@ -44,8 +44,8 @@ const CardGamePlayPage = () => {
         ...prev,
         1: {
           index: cardIndex,
-          type: mockCardInfoMessages[cardIndex].cardType,
-          value: mockCardInfoMessages[cardIndex].value,
+          type: cardInfos[cardIndex].cardType,
+          value: cardInfos[cardIndex].value,
         },
       }));
 
@@ -57,31 +57,41 @@ const CardGamePlayPage = () => {
         ...prev,
         2: {
           index: cardIndex,
-          type: mockCardInfoMessages[cardIndex].cardType,
-          value: mockCardInfoMessages[cardIndex].value,
+          type: cardInfos[cardIndex].cardType,
+          value: cardInfos[cardIndex].value,
         },
       }));
 
-      setTimeout(() => {
-        navigate(`/room/${joinCode}/${miniGameType}/result`);
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate(`/room/${joinCode}/${miniGameType}/result`);
+      // }, 2000);
     }
   };
+
+  const shouldResetTimer =
+    currentTime === 0 &&
+    currentRound === 2 &&
+    currentCardGameState === 'PLAYING' &&
+    !hasResetTimerInRound2.current;
 
   useEffect(() => {
     if (currentTime > 0) {
       const timer = setTimeout(() => setCurrentTime(currentTime - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (
-      currentTime === 0 &&
-      currentRound === 2 &&
-      currentCardGameState === 'PLAYING' &&
-      !hasResetTimerInRound2.current
-    ) {
+    } else if (shouldResetTimer) {
       setCurrentTime(TOTAL_COUNT);
       hasResetTimerInRound2.current = true;
     }
-  }, [currentTime, navigate, joinCode, miniGameType, currentRound, currentCardGameState]);
+  }, [
+    currentTime,
+    navigate,
+    joinCode,
+    miniGameType,
+    currentRound,
+    currentCardGameState,
+    cardInfos,
+    shouldResetTimer,
+  ]);
 
   return isTransition ? (
     <MiniGameTransition currentRound={currentRound} />
@@ -92,65 +102,9 @@ const CardGamePlayPage = () => {
       onClickCard={handleCardClick}
       selectedCardInfo={selectedCardInfo}
       currentTime={currentTime}
+      cardInfos={cardInfos}
     />
   );
 };
 
 export default CardGamePlayPage;
-
-const mockCardInfoMessages = [
-  {
-    cardType: 'ADDITION',
-    value: 10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 30,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -20,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 40,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 2,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 0,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: -1,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -40,
-    selected: false,
-    playerName: null,
-  },
-];

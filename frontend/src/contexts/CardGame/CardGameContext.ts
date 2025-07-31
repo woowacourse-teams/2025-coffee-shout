@@ -1,4 +1,4 @@
-import { CardGameState } from '@/types/miniGame';
+import { CardGameState, CardInfo } from '@/types/miniGame';
 import { RoundKey } from '@/types/round';
 import { createContext, useContext } from 'react';
 
@@ -7,6 +7,7 @@ type CardGameContextType = {
   isTransition: boolean;
   currentRound: RoundKey;
   currentCardGameState: CardGameState;
+  cardInfos: CardInfo[];
 };
 
 export const CardGameContext = createContext<CardGameContextType | null>(null);
