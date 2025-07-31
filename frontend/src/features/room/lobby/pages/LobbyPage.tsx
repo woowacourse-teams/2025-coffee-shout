@@ -41,7 +41,7 @@ const LobbyPage = () => {
       const { miniGameType: nextMiniGame } = data;
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
-    [joinCode]
+    [joinCode, navigate]
   );
 
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
