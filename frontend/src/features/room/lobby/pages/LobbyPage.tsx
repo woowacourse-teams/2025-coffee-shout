@@ -9,7 +9,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { ReactElement, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
@@ -24,6 +24,7 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { openModal } = useModal();
+  const { roomId, miniGameType } = useParams();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
@@ -40,7 +41,7 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
-    navigate('/room/:roomId/:miniGameId/ready');
+    navigate(`/room/${roomId}/${miniGameType}/ready`);
   };
 
   const handleSectionChange = (option: SectionType) => {

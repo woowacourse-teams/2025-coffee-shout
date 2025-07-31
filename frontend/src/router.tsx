@@ -38,7 +38,7 @@ const router = createBrowserRouter([
           { path: 'roulette/result', element: <RouletteResultPage /> },
           { path: 'order', element: <OrderPage /> },
           {
-            path: ':miniGameId',
+            path: ':miniGameType',
             children: [
               { path: 'ready', element: <MiniGameReadyPage /> },
               { path: 'play', element: <MiniGamePlayPage /> },

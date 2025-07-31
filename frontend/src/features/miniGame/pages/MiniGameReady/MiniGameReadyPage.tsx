@@ -11,7 +11,7 @@ const COUNTDOWN_INTERVAL = 1000;
 const MiniGameReadyPage = () => {
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
   const navigate = useNavigate();
-  const { roomId, miniGameId } = useParams();
+  const { roomId, miniGameType } = useParams();
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -25,9 +25,9 @@ const MiniGameReadyPage = () => {
 
   useEffect(() => {
     if (countdown <= 0) {
-      navigate(`/room/${roomId}/${miniGameId}/play`);
+      navigate(`/room/${roomId}/${miniGameType}/play`);
     }
-  }, [countdown, navigate, roomId, miniGameId]);
+  }, [countdown, navigate, roomId, miniGameType]);
 
   return (
     <Layout color="point-400">
