@@ -16,15 +16,15 @@ type MiniGamesResponse = {
   miniGameType: MiniGameType;
 }[];
 
-export const MiniGameSection = () => {
-  const [selectedMiniGame, setSelectedMiniGame] = useState<string | null>(null);
+type Props = {
+  selectedMiniGames: string[];
+  handleMiniGameClick: (miniGameType: string) => void;
+};
+
+export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Props) => {
   const [miniGames, setMiniGames] = useState<MiniGameType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const handleMiniGameClick = (miniGameType: string) => {
-    setSelectedMiniGame(miniGameType);
-  };
 
   useEffect(() => {
     (async () => {
@@ -46,22 +46,21 @@ export const MiniGameSection = () => {
     })();
   }, []);
 
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <>
       <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
       <S.Wrapper>
-        {loading && <div>로딩 중...</div>}
-        {!loading && error && <div>{error}</div>}
-        {!loading &&
-          !error &&
-          miniGames.map((miniGame) => (
-            <GameActionButton
-              key={miniGame}
-              isSelected={selectedMiniGame === miniGame}
-              gameName={MINI_GAME_NAME_MAP[miniGame]}
-              onClick={() => handleMiniGameClick(miniGame)}
-            />
-          ))}
+        {miniGames.map((miniGame) => (
+          <GameActionButton
+            key={miniGame}
+            isSelected={selectedMiniGames.includes(miniGame)}
+            gameName={MINI_GAME_NAME_MAP[miniGame]}
+            onClick={() => handleMiniGameClick(miniGame)}
+          />
+        ))}
       </S.Wrapper>
     </>
   );
