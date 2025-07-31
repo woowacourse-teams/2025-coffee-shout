@@ -25,11 +25,11 @@ type ParticipantResponse = Player[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
+
   const { send } = useWebSocket();
+  const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
-  const { joinCode, myName } = useIdentifier();
-
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
@@ -45,8 +45,19 @@ const LobbyPage = () => {
   useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
+  const handleGameStart = useCallback(
+    (data: { miniGameType: MiniGameType }) => {
+      const { miniGameType: nextMiniGame } = data;
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+    },
+    [joinCode, navigate]
+  );
+
+  useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
+
   useEffect(() => {
     if (joinCode) {
+      console.log(`send요청 보냄!`);
       send(`/room/${joinCode}/update-players`);
     }
   }, [playerType, joinCode, send]);
@@ -56,8 +67,12 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
-    // TODO: 지금 시작할 게임 타입을 서버에서 웹소켓으로 받아서 selectedMiniGames[0]를 넣어주기
-    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'START_MINI_GAME',
+      commandRequest: {
+        hostName: myName,
+      },
+    });
   };
 
   const handleSectionChange = (option: SectionType) => {
