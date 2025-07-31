@@ -4,13 +4,16 @@ import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 import * as S from './ParticipantSection.styled';
+import { Player } from '@/types/player';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
-export const ParticipantSection = () => {
-  const { openModal, closeModal } = useModal();
+const TOTAL_PARTICIPANTS = 9;
+
+export const ParticipantSection = ({ participants }: { participants: Player[] }) => {
   const { myName } = useIdentifier();
+  const { openModal, closeModal } = useModal();
 
   const handleModifyMenu = () => {
     openModal(<MenuModifyModal onClose={closeModal} />, {
@@ -19,25 +22,32 @@ export const ParticipantSection = () => {
     });
   };
 
+  const filteredParticipants = participants.filter(
+    (participants) => participants.playerName !== myName
+  );
+
   return (
     <>
       <SectionTitle
         title="참가자"
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
-        suffix={<ProgressCounter current={7} total={9} />}
+        suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
+      {/* TODO: 아이콘 색깔 9개 정하기 */}
       <PlayerCard name={myName} iconColor="red">
         <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
       </PlayerCard>
-
       <Divider />
-
       <S.ScrollableWrapper>
-        {['다이앤', '니야', '메리', '루키', '한스', '꾹이', '엠제이', '1'].map((name) => (
-          <PlayerCard key={name} name={name} iconColor="red">
-            <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
-          </PlayerCard>
-        ))}
+        {filteredParticipants.length === 0 ? (
+          <S.Empty>현재 참여한 인원이 없습니다</S.Empty>
+        ) : (
+          filteredParticipants.map((participant) => (
+            <PlayerCard key={participant.playerName} name={participant.playerName} iconColor="red">
+              <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
+            </PlayerCard>
+          ))
+        )}
       </S.ScrollableWrapper>
       <S.BottomGap />
     </>
