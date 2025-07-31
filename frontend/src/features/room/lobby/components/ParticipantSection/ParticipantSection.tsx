@@ -11,7 +11,9 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const TOTAL_PARTICIPANTS = 9;
 
-export const ParticipantSection = ({ participants }: { participants: Player[] }) => {
+type Props = { participants: Player[] };
+
+export const ParticipantSection = ({ participants }: Props) => {
   const { myName } = useIdentifier();
   const { openModal, closeModal } = useModal();
 
