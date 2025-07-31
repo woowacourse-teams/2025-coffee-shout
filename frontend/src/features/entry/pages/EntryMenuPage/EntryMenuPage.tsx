@@ -117,7 +117,7 @@ const EntryMenuPage = () => {
         }
       );
       setJoinCode(_joinCode);
-      navigate(`/room/${_joinCode}/lobby`);
+      startSocket();
     };
 
     try {
