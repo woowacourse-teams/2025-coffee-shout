@@ -13,6 +13,7 @@ import { Probability } from '@/types/roulette';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const gameResults = [
   { id: 1, name: '다이앤', score: 20, iconColor: '#FF6B6B' as ColorList, rank: 1 },
@@ -26,6 +27,7 @@ const MiniGameResultPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const { playerType } = usePlayerType();
 
   const handlePlayerProbabilitiesData = useCallback(
     (data: Probability[]) => {
@@ -77,11 +79,13 @@ const MiniGameResultPage = () => {
           ))}
         </S.ResultList>
       </Layout.Content>
-      <Layout.ButtonBar>
-        <Button variant="primary" onClick={handleViewRouletteResult}>
-          룰렛 현황 보러가기
-        </Button>
-      </Layout.ButtonBar>
+      {playerType === 'HOST' && (
+        <Layout.ButtonBar>
+          <Button variant="primary" onClick={handleViewRouletteResult}>
+            룰렛 현황 보러가기
+          </Button>
+        </Layout.ButtonBar>
+      )}
     </Layout>
   );
 };
