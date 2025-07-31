@@ -28,6 +28,13 @@ const LobbyPage = () => {
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
+  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+
+  const handleMiniGameData = useCallback((data: MiniGameType[]) => {
+    setSelectedMiniGames(data);
+  }, []);
+
+  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleGameStart = useCallback(
     (nextMiniGame: MiniGameType) => {
@@ -40,14 +47,6 @@ const LobbyPage = () => {
     const { miniGameType: nextMiniGame } = data;
     handleGameStart(nextMiniGame);
   });
-
-  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
-
-  const handleMiniGameData = useCallback((data: MiniGameType[]) => {
-    setSelectedMiniGames(data);
-  }, []);
-
-  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
 
   const handleClickBackButton = () => {
     navigate('/');
