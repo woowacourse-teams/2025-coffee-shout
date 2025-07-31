@@ -3,6 +3,7 @@ package coffeeshout.minigame.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
@@ -24,10 +25,10 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -37,7 +38,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @Import({TestConfig.class})
@@ -101,6 +101,17 @@ class CardGameServiceTest {
 
         @Test
         void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException {
+            // given
+            CountDownLatch latch = new CountDownLatch(1); // 예상되는 메시지 수
+
+            doAnswer(invocation -> {
+                latch.countDown();
+                return null;
+            }).when(messagingTemplate).convertAndSend(
+                    eq("/topic/room/" + joinCode.getValue() + "/rank"),
+                    any(WebSocketResponse.class)
+            );
+
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             CardGame cardGameSpy = spy(cardGame);
@@ -111,9 +122,13 @@ class CardGameServiceTest {
                     players.get(2), 3, // 엠제이 3등 / 확률: 3750
                     players.get(3), 4 // 한스 4등 / 확률: 5000
             ));
+
             doReturn(result).when(cardGameSpy).getResult();
+
+            // when
             cardGameService.start(cardGameSpy, joinCode.value());
-            Thread.sleep(500);
+            assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
+
 
             Map<Player, Probability> probabilities = room.getProbabilities();
             assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
@@ -125,12 +140,24 @@ class CardGameServiceTest {
 
         @Test
         void 카드게임_종료되면_결과에_따른_점수를_응답한다() throws InterruptedException {
+            // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             Playable playable = room.startNextGame(host.getName().value());
+            CountDownLatch latch = new CountDownLatch(1); // 예상되는 메시지 수
+
+            doAnswer(invocation -> {
+                latch.countDown();
+                return null;
+            }).when(messagingTemplate).convertAndSend(
+                    eq("/topic/room/" + joinCode.getValue() + "/rank"),
+                    any(WebSocketResponse.class)
+            );
+
+            // when
             cardGameService.start(playable, joinCode.value());
+            assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
 
-            Thread.sleep(300);
-
+            // then
             verify(messagingTemplate, atLeast(1))
                     .convertAndSend(
                             eq("/topic/room/" + joinCode.getValue() + "/score"),
@@ -146,11 +173,25 @@ class CardGameServiceTest {
 
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
+            // given
+            CountDownLatch latch = new CountDownLatch(6); // 예상되는 메시지 수
+
+            doAnswer(invocation -> {
+                latch.countDown();
+                return null;
+            }).when(messagingTemplate).convertAndSend(
+                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    any(WebSocketResponse.class)
+            );
+
             Room room = roomQueryService.findByJoinCode(joinCode);
             Playable miniGame = room.startNextGame(host.getName().value());
+            // when
             cardGameService.start(miniGame, joinCode.value());
 
-            Thread.sleep(300);
+            assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+
+            // then
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
                             eq("/topic/room/" + joinCode.getValue() + "/gameState"),

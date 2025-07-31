@@ -349,4 +349,26 @@ class RoomServiceTest {
         assertThat(losePlayer).isNotNull();
         assertThat(createdRoom.getPlayers()).contains(losePlayer);
     }
+
+    @Test
+    void 룰렛을_돌려서_여러_당첨자가_나올_수_있다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트3", 4L);
+
+        // when
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+        Player firstWinner = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+        Player secondWinner = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+        Player thirdWinner = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+
+        // then
+        assertThat(List.of(firstWinner, secondWinner, thirdWinner).stream().distinct().count()).isGreaterThan(1);
+        assertThat(createdRoom.getPlayers()).contains(firstWinner, secondWinner, thirdWinner);
+    }
 }
