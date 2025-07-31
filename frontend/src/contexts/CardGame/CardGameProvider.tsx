@@ -34,11 +34,11 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setIsTransition(true);
         setCurrentRound(2);
         setCurrentCardGameState('LOADING');
-        setCardInfos(cardInfoMessages);
       }
 
       if (isSecondRoundPlaying) {
         setIsTransition(false);
+        setCardInfos(cardInfoMessages);
         setCurrentCardGameState('PLAYING');
       }
 
