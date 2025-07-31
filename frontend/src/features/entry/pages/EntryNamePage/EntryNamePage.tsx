@@ -8,20 +8,54 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const MAX_NAME_LENGTH = 10;
+
+type NickNameCheckResponse = {
+  exist: boolean;
+};
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
-  const { setMyName } = useIdentifier();
+  const { joinCode, setMyName } = useIdentifier();
+  const { playerType } = usePlayerType();
 
   const handleNavigateToHome = () => {
     navigate('/');
   };
 
-  const handleNavigateToMenu = () => {
-    // TODO: 이름 유효성 검증 먼저 진행
+  const handleNavigateToMenu = async () => {
+    if (name.length === 0) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
+
+    if (playerType === 'GUEST') {
+      try {
+        const { exist } = await api.get<NickNameCheckResponse>(
+          `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`
+        );
+
+        if (exist) {
+          alert('이미 존재하는 플레이어 닉네임입니다.');
+          setMyName('');
+          return;
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          alert(error.message);
+        } else if (error instanceof NetworkError) {
+          alert('네트워크 연결을 확인해주세요');
+        } else {
+          alert('알 수 없는 오류가 발생했습니다');
+        }
+      }
+    }
+
     setMyName(name);
     navigate('/entry/menu');
   };
