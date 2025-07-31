@@ -19,8 +19,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     if (data.cardGameState === 'PLAYING' && data.currentRound === 'FIRST') {
       setStartCardGame(true);
     }
-    // && data.currentRound === 'SECOND' 추가해야함!!
-    if (data.cardGameState === 'LOADING') {
+    if (data.cardGameState === 'LOADING' && data.currentRound === 'SECOND') {
       setIsTransition(true);
       setCurrentRound(2);
       setCurrentCardGameState('LOADING');

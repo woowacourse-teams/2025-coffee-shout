@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
 import { useNavigate, useParams } from 'react-router-dom';
 import Round from '../components/Round/Round';
@@ -24,7 +24,6 @@ const CardGamePlayPage = () => {
   const { joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
-
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
       index: -1,
@@ -37,6 +36,7 @@ const CardGamePlayPage = () => {
       value: null,
     },
   });
+  const hasResetTimerInRound2 = useRef(false);
 
   const handleCardClick = (cardIndex: number) => {
     if (currentRound === 1) {
@@ -72,10 +72,14 @@ const CardGamePlayPage = () => {
     if (currentTime > 0) {
       const timer = setTimeout(() => setCurrentTime(currentTime - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (currentCardGameState === 'LOADING' && currentRound === 2) {
-    } else if (currentTime === 0 && currentRound === 2 && currentCardGameState === 'PLAYING') {
+    } else if (
+      currentTime === 0 &&
+      currentRound === 2 &&
+      currentCardGameState === 'PLAYING' &&
+      !hasResetTimerInRound2.current
+    ) {
       setCurrentTime(TOTAL_COUNT);
-      // navigate(`/room/${joinCode}/${miniGameType}/result`);
+      hasResetTimerInRound2.current = true;
     }
   }, [currentTime, navigate, joinCode, miniGameType, currentRound, currentCardGameState]);
 
