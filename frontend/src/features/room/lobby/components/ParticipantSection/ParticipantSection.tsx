@@ -1,4 +1,3 @@
-import MenuIcon from '@/assets/juice.svg';
 import Divider from '@/components/@common/Divider/Divider';
 import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
@@ -8,7 +7,7 @@ import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/Me
 import * as S from './ParticipantSection.styled';
 import { Player } from '@/types/player';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { MenuType } from '@/types/menu';
+import { getMenuIcon } from './utils/getMenuIcon';
 
 const TOTAL_PARTICIPANTS = 9;
 
@@ -29,23 +28,6 @@ export const ParticipantSection = ({ participants }: Props) => {
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
   );
-
-  const getMenuIcon = (menuType: MenuType) => {
-    switch (menuType) {
-      case 'COFFEE':
-        return MenuIcon;
-      case 'ADE':
-        return MenuIcon;
-      case 'SMOOTHIE':
-        return MenuIcon;
-      case 'FRAPPUCCINO':
-        return MenuIcon;
-      case 'ETC':
-        return MenuIcon;
-      default:
-        return MenuIcon;
-    }
-  };
 
   return (
     <>
