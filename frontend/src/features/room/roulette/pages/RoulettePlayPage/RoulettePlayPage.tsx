@@ -57,7 +57,10 @@ const RoulettePage = () => {
   };
 
   useEffect(() => {
-    if (isSpinning && winner) {
+    // TODO: 당첨자가 나오지 않았을 때, 에러 처리 방식 정하기
+    if (!winner || !winner.trim()) console.warn('당첨자가 추첨되지 않았습니다.');
+
+    if (isSpinning) {
       const timer = setTimeout(() => {
         setIsSpinning(false);
         navigate(`/room/${roomId}/roulette/result`, { state: { winner } });
@@ -84,13 +87,11 @@ const RoulettePage = () => {
           </S.IconButtonWrapper>
         </S.Container>
       </Layout.Content>
-      {playerType === 'HOST' && (
-        <Layout.ButtonBar>
-          <Button variant={getButtonVariant()} onClick={handleSpinClick}>
-            룰렛 돌리기
-          </Button>
-        </Layout.ButtonBar>
-      )}
+      <Layout.ButtonBar>
+        <Button variant={getButtonVariant()} onClick={handleSpinClick}>
+          룰렛 돌리기
+        </Button>
+      </Layout.ButtonBar>
     </Layout>
   );
 };
