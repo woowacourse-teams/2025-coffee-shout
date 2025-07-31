@@ -23,6 +23,7 @@ import coffeeshout.room.ui.response.ProbabilityResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -138,10 +139,9 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // then
         session.send("/app/room/" + nonExistentJoinCode + "/update-players", null);
 
-        Assertions.assertThatThrownBy(() -> subscribe.get())
+        Assertions.assertThatThrownBy(() -> subscribe.get(1, TimeUnit.SECONDS))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("메시지 수신 대기 시간을 초과했습니다");
-
     }
 
     @Test
