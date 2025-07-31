@@ -10,43 +10,32 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { Player } from '@/types/player';
-import { PlayerProbability, Probability, RouletteView } from '@/types/roulette';
+import { PlayerProbability, RouletteView } from '@/types/roulette';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 
 const RoulettePlayPage = () => {
   const navigate = useNavigate();
+  const { send } = useWebSocket();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
-  const { send } = useWebSocket();
+
+  // TODO: 나중에 외부 state 로 분리할 것
+  // TODO: 이전 확률과 비교해서 룰렛 움직여야 하므로 이전 확률 또는 확률 변화값을 저장할 상태 필요
+  const location = useLocation();
+  const playerProbabilities: PlayerProbability[] = location.state?.playerProbabilitiesData ?? [];
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  // TODO: 나중에 외부 state 로 분리할 것
-  const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
-
   const handleWinnerData = useCallback((data: Player) => {
     setWinner(data.playerName);
   }, []);
 
-  const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
-    const playerProbabilitiesData = data.map((item) => ({
-      playerName: item.playerResponse.playerName,
-      probability: item.probability,
-    }));
-
-    setPlayerProbabilities(playerProbabilitiesData);
-  }, []);
-
   useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);
-  useWebSocketSubscription<Probability[]>(
-    `/room/${joinCode}/roulette`,
-    handlePlayerProbabilitiesData
-  );
 
   const isRouletteView = currentView === 'roulette';
 
@@ -78,12 +67,6 @@ const RoulettePlayPage = () => {
       return () => clearTimeout(timer);
     }
   }, [isSpinning, winner, navigate, joinCode]);
-
-  useEffect(() => {
-    if (joinCode) {
-      send(`/room/${joinCode}/get-probabilities`);
-    }
-  }, [send, joinCode]);
 
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerType) return null;

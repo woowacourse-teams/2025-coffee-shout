@@ -1,3 +1,5 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import Button from '@/components/@common/Button/Button';
 import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
@@ -7,6 +9,8 @@ import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import { ColorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
+import { Probability } from '@/types/roulette';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 
@@ -20,12 +24,32 @@ const gameResults = [
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
+  const { send } = useWebSocket();
   const { joinCode } = useIdentifier();
 
+  const handlePlayerProbabilitiesData = useCallback(
+    (data: Probability[]) => {
+      const playerProbabilitiesData = data.map((item) => ({
+        playerName: item.playerResponse.playerName,
+        probability: item.probability,
+      }));
+
+      if (joinCode) {
+        navigate(`/room/${joinCode}/roulette/play`, {
+          state: { playerProbabilitiesData },
+        });
+      }
+    },
+    [joinCode, navigate]
+  );
+
+  useWebSocketSubscription<Probability[]>(
+    `/room/${joinCode}/roulette`,
+    handlePlayerProbabilitiesData
+  );
+
   const handleViewRouletteResult = () => {
-    if (joinCode) {
-      navigate(`/room/${joinCode}/roulette/play`);
-    }
+    send(`/room/${joinCode}/get-probabilities`);
   };
 
   return (
