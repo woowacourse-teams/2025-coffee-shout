@@ -72,7 +72,10 @@ public class CardGameService implements MiniGameService {
                 ),
                 new Task<>(
                         CardGameTaskInfo.GAME_FINISH,
-                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(roomJoinCode))
+                        gameTaskFactory.done(room, cardGame, () -> {
+                            sendCardGameState(roomJoinCode);
+                            sendCardGameResult(roomJoinCode);
+                        })
                 )
         ));
     }

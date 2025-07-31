@@ -50,8 +50,12 @@ public class CardGame implements Playable {
     }
 
     public void startRound() {
-        deck.shuffle();
+        this.state = CardGameState.LOADING;
         this.round = round.next();
+    }
+
+    public void startPlay() {
+        deck.shuffle();
         this.state = CardGameState.PLAYING;
     }
 
@@ -90,10 +94,6 @@ public class CardGame implements Playable {
 
     public void changeScoreBoardState() {
         this.state = CardGameState.SCORE_BOARD;
-    }
-
-    public void changeLoadingState() {
-        this.state = CardGameState.LOADING;
     }
 
     public void changeDoneState() {

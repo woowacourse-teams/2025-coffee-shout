@@ -118,7 +118,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
             MiniGameStateMessage loadingStateResponse = responses.get().data();
             softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.LOADING.name());
-            softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.READY.name());
+            softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.FIRST.name());
         });
     }
 
