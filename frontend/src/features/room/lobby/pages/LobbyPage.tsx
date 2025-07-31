@@ -9,7 +9,8 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
-import { ReactElement, useCallback, useState } from 'react';
+import { Player } from '@/types/player';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
@@ -20,20 +21,35 @@ import * as S from './LobbyPage.styled';
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
+type ParticipantResponse = Player[];
+
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
+
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+  const [participants, setParticipants] = useState<ParticipantResponse>([]);
+
+  const handleParticipant = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
   }, []);
 
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+
+  useEffect(() => {
+    if (joinCode) {
+      send(`/room/${joinCode}/update-players`);
+    }
+  }, [playerType, joinCode, send]);
 
   const handleClickBackButton = () => {
     navigate('/');
@@ -71,7 +87,7 @@ const LobbyPage = () => {
   };
 
   const SECTIONS: SectionComponents = {
-    참가자: <ParticipantSection />,
+    참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection />,
     미니게임: (
       <MiniGameSection
