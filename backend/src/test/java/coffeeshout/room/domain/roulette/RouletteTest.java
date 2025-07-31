@@ -8,6 +8,8 @@ import coffeeshout.fixture.PlayerProbabilities;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class RouletteTest {
@@ -42,5 +44,6 @@ class RouletteTest {
                 .isEqualTo(new Probability((int)(2500 + 250 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트엠제이()))
                 .isEqualTo(new Probability((int)(2500 + 500 * 0.7)));
+
     }
 }

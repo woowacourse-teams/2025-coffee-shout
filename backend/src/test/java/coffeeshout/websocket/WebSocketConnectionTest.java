@@ -101,7 +101,7 @@ class WebSocketConnectionTest {
         assertThat(connectionLatch.await(5, TimeUnit.SECONDS)).isTrue();
         assertThat(session.isConnected()).isTrue();
 
-        Thread.sleep(1000); // 메시지 처리 대기
+        Thread.sleep(100); // 메시지 처리 대기
         session.disconnect();
     }
 
