@@ -13,7 +13,7 @@ import { Menu } from '@/types/menu';
 import { PlayerType } from '@/types/player';
 import { RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 
@@ -25,7 +25,6 @@ type RouletteResultResponse = {
 
 const RoulettePage = () => {
   const navigate = useNavigate();
-  const { roomId } = useParams();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
@@ -63,11 +62,11 @@ const RoulettePage = () => {
     if (isSpinning) {
       const timer = setTimeout(() => {
         setIsSpinning(false);
-        navigate(`/room/${roomId}/roulette/result`, { state: { winner } });
+        navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [isSpinning, winner, navigate, roomId]);
+  }, [isSpinning, winner, navigate, joinCode]);
 
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerType) return null;

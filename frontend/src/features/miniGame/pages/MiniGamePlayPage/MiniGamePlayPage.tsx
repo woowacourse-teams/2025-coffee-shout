@@ -9,7 +9,7 @@ const MINI_GAME_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
 } as const;
 
 const MiniGamePlayPage = () => {
-  const { miniGameType } = useParams<{ miniGameType: string }>();
+  const { miniGameType } = useParams();
 
   if (!miniGameType || !(miniGameType in MINI_GAME_COMPONENTS)) {
     // TODO: 에러 화면 추후 수정 필요

@@ -6,8 +6,9 @@ import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import Layout from '@/layouts/Layout';
 import { IconColor } from '@/types/player';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const gameResults = [
   { id: 1, name: '다이앤', score: 20, iconColor: 'red' as IconColor, rank: 1 },
@@ -19,11 +20,11 @@ const gameResults = [
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
-  const { roomId } = useParams<{ roomId: string }>();
+  const { joinCode } = useIdentifier();
 
   const handleViewRouletteResult = () => {
-    if (roomId) {
-      navigate(`/room/${roomId}/roulette/play`);
+    if (joinCode) {
+      navigate(`/room/${joinCode}/roulette/play`);
     }
   };
 

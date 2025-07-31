@@ -1,5 +1,6 @@
 import Description from '@/components/@common/Description/Description';
 import Headline1 from '@/components/@common/Headline1/Headline1';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,7 +12,8 @@ const COUNTDOWN_INTERVAL = 1000;
 const MiniGameReadyPage = () => {
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
   const navigate = useNavigate();
-  const { roomId, miniGameType } = useParams();
+  const { miniGameType } = useParams();
+  const { joinCode } = useIdentifier();
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -25,9 +27,9 @@ const MiniGameReadyPage = () => {
 
   useEffect(() => {
     if (countdown <= 0) {
-      navigate(`/room/${roomId}/${miniGameType}/play`);
+      navigate(`/room/${joinCode}/${miniGameType}/play`);
     }
-  }, [countdown, navigate, roomId, miniGameType]);
+  }, [countdown, navigate, joinCode, miniGameType]);
 
   return (
     <Layout color="point-400">

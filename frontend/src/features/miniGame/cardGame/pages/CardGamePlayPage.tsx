@@ -3,6 +3,7 @@ import MiniGameTransition from '@/features/miniGame/components/MiniGameTransitio
 import { RoundKey } from '@/types/round';
 import { useNavigate, useParams } from 'react-router-dom';
 import Round from '../components/Round/Round';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const TOTAL_COUNT = 10;
 
@@ -17,7 +18,8 @@ export type SelectedCardInfo = Record<
 
 const CardGamePlayPage = () => {
   const navigate = useNavigate();
-  const { roomId, miniGameType } = useParams();
+  const { miniGameType } = useParams();
+  const { joinCode } = useIdentifier();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
   const [isTransition, setIsTransition] = useState(false);
   const [currentRound, setCurrentRound] = useState<RoundKey>(1);
@@ -68,7 +70,7 @@ const CardGamePlayPage = () => {
       }));
 
       setTimeout(() => {
-        navigate(`/room/${roomId}/${miniGameType}/result`);
+        navigate(`/room/${joinCode}/${miniGameType}/result`);
       }, 2000);
     }
   };
@@ -78,9 +80,9 @@ const CardGamePlayPage = () => {
       const timer = setTimeout(() => setCurrentTime(currentTime - 1), 1000);
       return () => clearTimeout(timer);
     } else if (currentTime === 0) {
-      navigate(`/room/${roomId}/${miniGameType}/result`);
+      navigate(`/room/${joinCode}/${miniGameType}/result`);
     }
-  }, [currentTime, navigate, roomId, miniGameType]);
+  }, [currentTime, navigate, joinCode, miniGameType]);
 
   return isTransition ? (
     <MiniGameTransition prevRound={currentRound} />

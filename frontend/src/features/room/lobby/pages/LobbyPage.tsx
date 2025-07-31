@@ -10,7 +10,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
 import { ReactElement, useCallback, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
@@ -24,7 +24,6 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { openModal } = useModal();
-  const { roomId } = useParams();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
@@ -41,7 +40,8 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
-    navigate(`/room/${roomId}/${selectedMiniGames[0]}/ready`);
+    // TODO: 지금 시작할 게임 타입을 서버에서 웹소켓으로 받아서 selectedMiniGames[0]를 넣어주기
+    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
   };
 
   const handleSectionChange = (option: SectionType) => {

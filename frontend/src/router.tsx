@@ -31,7 +31,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'room/:roomId',
+        path: 'room/:joinCode',
         children: [
           { path: 'lobby', element: <LobbyPage /> },
           { path: 'roulette/play', element: <RoulettePage /> },

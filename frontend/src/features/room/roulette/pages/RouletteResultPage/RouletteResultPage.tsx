@@ -1,28 +1,29 @@
 import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline3 from '@/components/@common/Headline3/Headline3';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './RouletteResultPage.styled';
 
 const RouletteResultPage = () => {
   const navigate = useNavigate();
-  const { roomId } = useParams();
   const location = useLocation();
+  const { joinCode } = useIdentifier();
   const winner = location.state?.winner ?? '당첨자';
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (roomId) {
-        navigate(`/room/${roomId}/order`);
+      if (joinCode) {
+        navigate(`/room/${joinCode}/order`);
       } else {
         navigate('/');
       }
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [navigate, roomId]);
+  }, [navigate, joinCode]);
 
   return (
     <Layout color="point-400">
