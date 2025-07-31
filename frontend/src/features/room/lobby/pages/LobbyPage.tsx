@@ -17,7 +17,7 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 
-export type SectionType = '참가자' | '룰렛' | '미니게임';
+type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
