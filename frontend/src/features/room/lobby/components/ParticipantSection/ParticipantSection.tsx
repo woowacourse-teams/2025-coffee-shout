@@ -8,6 +8,7 @@ import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/Me
 import * as S from './ParticipantSection.styled';
 import { Player } from '@/types/player';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { MenuType } from '@/types/menu';
 
 const TOTAL_PARTICIPANTS = 9;
 
@@ -24,9 +25,27 @@ export const ParticipantSection = ({ participants }: Props) => {
     });
   };
 
+  const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
   const filteredParticipants = participants.filter(
-    (participants) => participants.playerName !== myName
+    (participant) => participant.playerName !== myName
   );
+
+  const getMenuIcon = (menuType: MenuType) => {
+    switch (menuType) {
+      case 'COFFEE':
+        return MenuIcon;
+      case 'ADE':
+        return MenuIcon;
+      case 'SMOOTHIE':
+        return MenuIcon;
+      case 'FRAPPUCCINO':
+        return MenuIcon;
+      case 'ETC':
+        return MenuIcon;
+      default:
+        return MenuIcon;
+    }
+  };
 
   return (
     <>
@@ -37,7 +56,10 @@ export const ParticipantSection = ({ participants }: Props) => {
       />
       {/* TODO: 아이콘 색깔 9개 정하기 */}
       <PlayerCard name={myName} iconColor="red">
-        <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
+        <S.Menu
+          src={getMenuIcon(mySelect && mySelect.menuResponse.menuType)}
+          onClick={handleModifyMenu}
+        />
       </PlayerCard>
       <Divider />
       <S.ScrollableWrapper>
@@ -46,7 +68,10 @@ export const ParticipantSection = ({ participants }: Props) => {
         ) : (
           filteredParticipants.map((participant) => (
             <PlayerCard key={participant.playerName} name={participant.playerName} iconColor="red">
-              <S.Menu src={MenuIcon} onClick={handleModifyMenu} />
+              <S.Menu
+                src={getMenuIcon(participant.menuResponse.menuType)}
+                onClick={handleModifyMenu}
+              />
             </PlayerCard>
           ))
         )}
