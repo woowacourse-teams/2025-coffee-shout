@@ -34,12 +34,12 @@ const RoulettePlayPage = () => {
   }, []);
 
   const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
-    const parsedData = data.map((item) => ({
+    const playerProbabilitiesData = data.map((item) => ({
       playerName: item.playerResponse.playerName,
       probability: item.probability,
     }));
 
-    setPlayerProbabilities(parsedData);
+    setPlayerProbabilities(playerProbabilitiesData);
   }, []);
 
   useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);
