@@ -63,7 +63,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
         </S.MyCardContainer>
         <S.CardContainer>
           {cardInfos.map((cardInfo, index) => {
-            return cardInfo.selected || selectedCardInfo[round].index === index ? (
+            return cardInfo.selected ? (
               <CardFront
                 card={
                   {
