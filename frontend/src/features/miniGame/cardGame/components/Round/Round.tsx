@@ -7,11 +7,9 @@ import CircularProgress from '../CircularProgress/CircularProgress';
 import CardBack from '../CardBack/CardBack';
 import { Card, CardType, CardValue } from '../../constants/cards';
 import CardFront from '../CardFront/CardFront';
-import { RoundKey } from '@/types/round';
 import { SelectedCardInfo } from '../../pages/CardGamePlayPage';
+import { RoundKey, TOTAL_COUNT } from '@/types/round';
 import { CardInfo } from '@/types/miniGame';
-
-const TOTAL_COUNT = 10;
 
 type Props = {
   round: RoundKey;

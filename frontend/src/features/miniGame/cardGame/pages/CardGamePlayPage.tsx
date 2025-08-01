@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
-import { RoundKey } from '@/types/round';
-
-const TOTAL_COUNT = 10;
+import { RoundKey, TOTAL_COUNT } from '@/types/round';
 
 export type SelectedCardInfo = Record<
   RoundKey,
