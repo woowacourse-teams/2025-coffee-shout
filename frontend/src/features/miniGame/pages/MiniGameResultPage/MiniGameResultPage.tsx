@@ -6,7 +6,6 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
-import { ColorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { Probability } from '@/types/roulette';

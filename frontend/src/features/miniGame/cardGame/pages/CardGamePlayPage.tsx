@@ -3,7 +3,6 @@ import MiniGameTransition from '@/features/miniGame/components/MiniGameTransitio
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 export type SelectedCardInfo = Record<
   RoundKey,
