@@ -41,9 +41,12 @@ export const Container = styled.button<Props>`
   padding: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px
     ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
 
+  cursor: default;
+
   ${({ $disabled }) =>
     !$disabled &&
     `
+    cursor: pointer;
     transition: transform 0.2s ease;
 
     &:active {

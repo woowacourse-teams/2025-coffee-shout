@@ -37,3 +37,10 @@ export const Selected: Story = {
     gameName: 'Coffee Shout',
   },
 };
+
+export const Disabled: Story = {
+  args: {
+    isDisabled: true,
+    gameName: 'Coffee Shout',
+  },
+};
