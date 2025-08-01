@@ -16,7 +16,6 @@ export type SelectedCardInfo = Record<
 >;
 
 const CardGamePlayPage = () => {
-
   const { myName, joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
