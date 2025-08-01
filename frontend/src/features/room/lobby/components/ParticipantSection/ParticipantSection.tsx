@@ -53,10 +53,7 @@ export const ParticipantSection = ({ participants }: Props) => {
               name={participant.playerName}
               iconColor="#FF6B6B"
             >
-              <S.Menu
-                src={getMenuIcon(participant.menuResponse.menuType)}
-                onClick={handleModifyMenu}
-              />
+              <S.Menu src={getMenuIcon(participant.menuResponse.menuType)} />
             </PlayerCard>
           ))
         )}
