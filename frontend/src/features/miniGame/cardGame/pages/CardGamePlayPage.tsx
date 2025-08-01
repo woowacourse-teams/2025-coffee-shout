@@ -35,53 +35,26 @@ const CardGamePlayPage = () => {
   });
 
   const handleCardClick = (cardIndex: number) => {
-    if (currentRound === 1) {
-      if (selectedCardInfo[1].index !== -1) {
-        return;
-      }
-
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        1: {
-          index: cardIndex,
-          type: cardInfos[cardIndex].cardType,
-          value: cardInfos[cardIndex].value,
-        },
-      }));
-
-      send(`/room/${joinCode}/minigame/command`, {
-        commandType: 'SELECT_CARD',
-        commandRequest: {
-          playerName: myName,
-          cardIndex,
-        },
-      });
-
+    if (selectedCardInfo[currentRound].index !== -1) {
       return;
     }
 
-    if (currentRound === 2) {
-      if (selectedCardInfo[2].index !== -1) {
-        return;
-      }
+    setSelectedCardInfo((prev) => ({
+      ...prev,
+      1: {
+        index: cardIndex,
+        type: cardInfos[cardIndex].cardType,
+        value: cardInfos[cardIndex].value,
+      },
+    }));
 
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        2: {
-          index: cardIndex,
-          type: cardInfos[cardIndex].cardType,
-          value: cardInfos[cardIndex].value,
-        },
-      }));
-
-      send(`/room/${joinCode}/minigame/command`, {
-        commandType: 'SELECT_CARD',
-        commandRequest: {
-          playerName: myName,
-          cardIndex,
-        },
-      });
-    }
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'SELECT_CARD',
+      commandRequest: {
+        playerName: myName,
+        cardIndex,
+      },
+    });
   };
 
   useEffect(() => {
