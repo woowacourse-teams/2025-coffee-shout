@@ -8,11 +8,10 @@ import coffeeshout.room.domain.Room;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
-public enum CardGameTaskType{
+public enum CardGameTaskType {
     FIRST_ROUND_LOADING_STATE(CardGameState.LOADING, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
@@ -59,7 +58,8 @@ public enum CardGameTaskType{
     FIRST_ROUND_SCORE_BOARD_DELAY(CardGameState.SCORE_BOARD, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
-            return new ChainedTask(() -> {}, Duration.ofMillis(CardGameState.SCORE_BOARD.getDuration()));
+            return new ChainedTask(() -> {
+            }, Duration.ofMillis(CardGameState.SCORE_BOARD.getDuration()));
         }
     },
     SECOND_ROUND_LOADING_STATE(CardGameState.LOADING, CardGameRound.FIRST) {
@@ -74,7 +74,8 @@ public enum CardGameTaskType{
     SECOND_ROUND_LOADING_DELAY(CardGameState.LOADING, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
-            return new ChainedTask(() ->{}, Duration.ofMillis(CardGameState.LOADING.getDuration()));
+            return new ChainedTask(() -> {
+            }, Duration.ofMillis(CardGameState.LOADING.getDuration()));
         }
     },
     SECOND_ROUND_PLAYING_STATE(CardGameState.PLAYING, CardGameRound.SECOND) {
@@ -89,7 +90,8 @@ public enum CardGameTaskType{
     SECOND_ROUND_PLAYING_DELAY(CardGameState.PLAYING, CardGameRound.SECOND) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
-            return new ChainedTask(() -> {}, Duration.ofMillis(CardGameState.PLAYING.getDuration()));
+            return new ChainedTask(() -> {
+            }, Duration.ofMillis(CardGameState.PLAYING.getDuration()));
         }
     },
     SECOND_ROUND_SCORE_BOARD_STATE(CardGameState.SCORE_BOARD, CardGameRound.SECOND) {
@@ -104,7 +106,8 @@ public enum CardGameTaskType{
     SECOND_ROUND_SCORE_BOARD_DELAY(CardGameState.SCORE_BOARD, CardGameRound.SECOND) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
-            return new ChainedTask(() -> {}, Duration.ofMillis(CardGameState.SCORE_BOARD.getDuration()));
+            return new ChainedTask(() -> {
+            }, Duration.ofMillis(CardGameState.SCORE_BOARD.getDuration()));
         }
     },
     GAME_FINISH_STATE(CardGameState.DONE, CardGameRound.SECOND) {
@@ -123,6 +126,10 @@ public enum CardGameTaskType{
     private final CardGameState state;
     private final CardGameRound round;
 
+    public static CardGameTaskType from(CardGame cardGame) {
+        return CardGameTaskType.of(cardGame.getState(), cardGame.getRound());
+    }
+
     public abstract ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage);
 
     CardGameTaskType(CardGameState state, CardGameRound round) {
@@ -130,8 +137,14 @@ public enum CardGameTaskType{
         this.round = round;
     }
 
-    public static List<ChainedTask> getAllTasks() {
+    public static CardGameTaskType of(CardGameState state, CardGameRound round) {
+        return Arrays.stream(values()).filter(type -> type.state == state && type.round == round)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드게임 작업입니다."));
+    }
+
+    public static List<ChainedTask> getAllTasks(CardGame cardGame, Room room, Runnable message) {
         return Arrays.stream(values()).map(type -> type.createTask(cardGame, room, message))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 }

@@ -1,15 +1,25 @@
 package coffeeshout.minigame.application;
 
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_LOADING_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_LOADING_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_PLAYING_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_PLAYING_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_SCORE_BOARD_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_SCORE_BOARD_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.GAME_FINISH_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_LOADING_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_LOADING_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_PLAYING_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_PLAYING_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_SCORE_BOARD_DELAY;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.SECOND_ROUND_SCORE_BOARD_STATE;
+
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.executor.CardGameTaskFactory;
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
-import coffeeshout.minigame.domain.executor.TaskExecutor.Task;
 import coffeeshout.minigame.domain.temp.CardGameTaskType;
+import coffeeshout.minigame.domain.temp.ChainedTask;
 import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.minigame.ui.response.MinIGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
@@ -21,10 +31,6 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
-import java.util.Arrays;
-import java.util.List;
-import javax.naming.Name;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -66,6 +72,33 @@ public class CardGameService implements MiniGameService {
         final CardGame cardGame = (CardGame) playable;
         final MiniGameTaskManager<CardGameTaskType> manager = new MiniGameTaskManager<>(scheduler);
         cardGameTaskExecutors.put(roomJoinCode, manager);
+        ChainedTask task1 = FIRST_ROUND_LOADING_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task2 = FIRST_ROUND_LOADING_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task3 = FIRST_ROUND_PLAYING_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task4 = FIRST_ROUND_PLAYING_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task5 = FIRST_ROUND_SCORE_BOARD_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task6 = FIRST_ROUND_SCORE_BOARD_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task7 = SECOND_ROUND_LOADING_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task8 = SECOND_ROUND_LOADING_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task9 = SECOND_ROUND_PLAYING_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task10 = SECOND_ROUND_PLAYING_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task11 = SECOND_ROUND_SCORE_BOARD_STATE.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task12 = SECOND_ROUND_SCORE_BOARD_DELAY.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode));
+        ChainedTask task13 = GAME_FINISH_STATE.createTask(cardGame, room, () -> sendCardGameResult(roomJoinCode));
+        manager.addTask(FIRST_ROUND_LOADING_STATE, task1);
+        manager.addTask(FIRST_ROUND_LOADING_DELAY, task2);
+        manager.addTask(FIRST_ROUND_PLAYING_STATE, task3);
+        manager.addTask(FIRST_ROUND_PLAYING_DELAY, task4);
+        manager.addTask(FIRST_ROUND_SCORE_BOARD_STATE, task5);
+        manager.addTask(FIRST_ROUND_SCORE_BOARD_DELAY, task6);
+        manager.addTask(SECOND_ROUND_LOADING_STATE, task7);
+        manager.addTask(SECOND_ROUND_LOADING_DELAY, task8);
+        manager.addTask(SECOND_ROUND_PLAYING_STATE, task9);
+        manager.addTask(SECOND_ROUND_PLAYING_DELAY, task10);
+        manager.addTask(SECOND_ROUND_SCORE_BOARD_STATE, task11);
+        manager.addTask(SECOND_ROUND_SCORE_BOARD_DELAY, task12);
+        manager.addTask(GAME_FINISH_STATE, task13);
+        manager.startWith(FIRST_ROUND_LOADING_STATE);
     }
 
 //    @Override
@@ -115,7 +148,7 @@ public class CardGameService implements MiniGameService {
         cardGame.selectCard(player, cardIndex);
         sendCardGameState(roomJoinCode);
         if (cardGame.isFinishedThisRound()) {
-            cardGameTaskExecutors.cancelPlaying(roomJoinCode, cardGame.getRound());
+            cardGameTaskExecutors.cancelPlaying(roomJoinCode, CardGameTaskType.from(cardGame));
         }
     }
 

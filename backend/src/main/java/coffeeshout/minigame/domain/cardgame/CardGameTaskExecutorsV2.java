@@ -1,7 +1,5 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
 import coffeeshout.minigame.domain.temp.CardGameTaskType;
 import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.room.domain.JoinCode;
