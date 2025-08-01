@@ -16,7 +16,7 @@ public enum CardGameTaskType {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
-                cardGame.changeLoadingState();
+                cardGame.startRound();
                 sendMessage.run();
             }, Duration.ofMillis(0));
         }
@@ -32,7 +32,7 @@ public enum CardGameTaskType {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
-                cardGame.startRound();
+                cardGame.startPlay();
                 sendMessage.run();
             }, Duration.ofMillis(0));
         }
@@ -66,7 +66,7 @@ public enum CardGameTaskType {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
-                cardGame.changeLoadingState();
+                cardGame.startRound();
                 sendMessage.run();
             }, Duration.ofMillis(0));
         }
@@ -82,7 +82,7 @@ public enum CardGameTaskType {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
-                cardGame.startRound();
+                cardGame.startPlay();
                 sendMessage.run();
             }, Duration.ofMillis(0));
         }

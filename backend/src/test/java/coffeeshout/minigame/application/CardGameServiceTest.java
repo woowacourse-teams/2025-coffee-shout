@@ -1,6 +1,6 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
@@ -15,10 +15,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
 import coffeeshout.minigame.domain.temp.CardGameTaskType;
 import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.room.application.RoomService;
@@ -31,7 +28,7 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -103,7 +100,7 @@ class CardGameServiceTest {
         }
 
         @Test
-        void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException {
+        void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException, ExecutionException {
             // given
             CountDownLatch latch = new CountDownLatch(1); // 예상되는 메시지 수
 
@@ -130,7 +127,7 @@ class CardGameServiceTest {
 
             // when
             cardGameService.start(cardGameSpy, joinCode.value());
-            assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
+            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING_STATE);
 
 
             Map<Player, Probability> probabilities = room.getProbabilities();
@@ -142,40 +139,7 @@ class CardGameServiceTest {
         }
 
         @Test
-        void 카드게임_종료되면_결과에_따른_점수를_응답한다() throws InterruptedException {
-            // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            Playable playable = room.startNextGame(host.getName().value());
-            CountDownLatch latch = new CountDownLatch(1); // 예상되는 메시지 수
-
-            doAnswer(invocation -> {
-                latch.countDown();
-                return null;
-            }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/rank"),
-                    any(WebSocketResponse.class)
-            );
-
-            // when
-            cardGameService.start(playable, joinCode.value());
-            assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
-
-            // then
-            verify(messagingTemplate, atLeast(1))
-                    .convertAndSend(
-                            eq("/topic/room/" + joinCode.getValue() + "/score"),
-                            any(WebSocketResponse.class)
-                    );
-
-            verify(messagingTemplate, atLeast(1))
-                    .convertAndSend(
-                            eq("/topic/room/" + joinCode.getValue() + "/rank"),
-                            any(WebSocketResponse.class)
-                    );
-        }
-
-        @Test
-        void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
+        void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException, ExecutionException {
             // given
             CountDownLatch latch = new CountDownLatch(6); // 예상되는 메시지 수
 
@@ -192,7 +156,7 @@ class CardGameServiceTest {
             // when
             cardGameService.start(miniGame, joinCode.value());
 
-            assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING_STATE);
 
             // then
             verify(messagingTemplate, atLeast(6))

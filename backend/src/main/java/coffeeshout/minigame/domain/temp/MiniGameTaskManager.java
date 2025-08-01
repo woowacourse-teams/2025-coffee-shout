@@ -1,7 +1,9 @@
 package coffeeshout.minigame.domain.temp;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
@@ -29,5 +31,9 @@ public class MiniGameTaskManager<T> {
     public void cancel(T type) {
         ChainedTask chainedTask = tasks.get(type);
         chainedTask.cancel();
+    }
+
+    public void join(T type) throws ExecutionException, InterruptedException {
+        tasks.get(type).join();
     }
 }
