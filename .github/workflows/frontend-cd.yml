@@ -8,6 +8,12 @@ on:
     paths:
       - "frontend/**" # frontend 변경사항만
 
+  push:
+    branches:
+      - fe/prod
+    paths:
+      - "frontend/**"
+
 env:
   FE_PROD_PATH: fe-prod
   FE_CACHE_PATH: /*
