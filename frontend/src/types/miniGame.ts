@@ -24,3 +24,13 @@ export type CardGameStateData = {
   cardInfoMessages: CardInfo[];
   allSelected: boolean;
 };
+
+export type PlayerScore = {
+  playerName: string;
+  score: number;
+};
+
+export type PlayerRank = {
+  playerName: string;
+  rank: number;
+};

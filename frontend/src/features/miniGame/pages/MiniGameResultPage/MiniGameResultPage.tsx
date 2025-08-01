@@ -14,6 +14,8 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { CardGameStateData } from '@/types/miniGame';
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 
 const gameResults = [
   { id: 1, name: '다이앤', score: 20, iconColor: '#FF6B6B' as ColorList, rank: 1 },
@@ -26,8 +28,9 @@ const gameResults = [
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
-  const { joinCode } = useIdentifier();
+  const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
+  const { ranks, scores } = useCardGame();
 
   const handlePlayerProbabilitiesData = useCallback(
     (data: Probability[]) => {
@@ -67,13 +70,18 @@ const MiniGameResultPage = () => {
       </Layout.Banner>
       <Layout.Content>
         <S.ResultList>
-          {gameResults.map((player) => (
-            <S.PlayerCardWrapper key={player.id} isHighlighted={player.rank === 4}>
+          {ranks.map((playerRank) => (
+            <S.PlayerCardWrapper
+              key={playerRank.playerName}
+              isHighlighted={playerRank.playerName === myName}
+            >
               <Headline3>
-                <S.RankNumber rank={player.rank}>{player.rank}</S.RankNumber>
+                <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
               </Headline3>
-              <PlayerCard name={player.name} iconColor={player.iconColor}>
-                <Headline4>{player.score}점</Headline4>
+              <PlayerCard name={playerRank.playerName} iconColor={'#FF6B6B'}>
+                <Headline4>
+                  {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
+                </Headline4>
               </PlayerCard>
             </S.PlayerCardWrapper>
           ))}
