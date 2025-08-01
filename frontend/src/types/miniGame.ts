@@ -11,16 +11,16 @@ export type CardGameRound = 'FIRST' | 'SECOND';
 
 export type CardType = 'ADDITION' | 'MULTIPLIER';
 
-export interface CardInfo {
+export type CardInfo = {
   cardType: CardType;
   value: number;
   selected: boolean;
   playerName: string | null;
-}
+};
 
-export interface CardGameStateData {
+export type CardGameStateData = {
   cardGameState: CardGameState;
   currentRound: CardGameRound;
   cardInfoMessages: CardInfo[];
   allSelected: boolean;
-}
+};
