@@ -6,7 +6,7 @@ import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const env = dotenv.config().parsed;
+const env = dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed || {};
 
 const envKeys = Object.keys(env).reduce((acc, key) => {
   acc[`process.env.${key}`] = JSON.stringify(env[key]);

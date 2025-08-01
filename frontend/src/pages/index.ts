@@ -7,5 +7,5 @@ export { default as MiniGameResultPage } from '../features/miniGame/pages/MiniGa
 export { default as NotFoundPage } from '../features/notFound/pages/NotFoundPage';
 export { default as LobbyPage } from '../features/room/lobby/pages/LobbyPage';
 export { default as OrderPage } from '../features/room/order/pages/OrderPage';
-export { default as RoulettePage } from '../features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage';
+export { default as RoulettePlayPage } from '../features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage';
 export { default as RouletteResultPage } from '../features/room/roulette/pages/RouletteResultPage/RouletteResultPage';

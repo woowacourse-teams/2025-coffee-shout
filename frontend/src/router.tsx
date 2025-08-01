@@ -10,7 +10,7 @@ import {
   MiniGameResultPage,
   NotFoundPage,
   OrderPage,
-  RoulettePage,
+  RoulettePlayPage,
   RouletteResultPage,
 } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
         path: 'room/:joinCode',
         children: [
           { path: 'lobby', element: <LobbyPage /> },
-          { path: 'roulette/play', element: <RoulettePage /> },
+          { path: 'roulette/play', element: <RoulettePlayPage /> },
           { path: 'roulette/result', element: <RouletteResultPage /> },
           { path: 'order', element: <OrderPage /> },
           {

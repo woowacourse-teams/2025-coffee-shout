@@ -1,4 +1,4 @@
-import { IconColor } from '@/types/player';
+import { ColorList } from '@/constants/color';
 import { Size } from '@/types/styles';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -7,7 +7,7 @@ import { cardVariants, circleVariants } from '../../constants/variants';
 
 type Props = {
   $size?: Size;
-  $playerIconColor?: IconColor;
+  $playerIconColor?: ColorList;
   $card?: Card;
 };
 
@@ -16,10 +16,6 @@ const CARD_TEXT_COLORS = {
   NEGATIVE: '#FF6C6C',
   MULTIPLIER: '#81E121',
   DEFAULT: '#000',
-} as const;
-
-const CARD_BORDER_COLORS: Record<IconColor, string> = {
-  red: '#ff4f63',
 } as const;
 
 const getCardTextColor = ($card?: Card) => {
@@ -51,7 +47,7 @@ export const Container = styled.div<Props>`
   ${({ $playerIconColor }) =>
     $playerIconColor &&
     css`
-      border: 4px solid ${CARD_BORDER_COLORS[$playerIconColor]};
+      border: 4px solid ${$playerIconColor};
     `};
   border-radius: 7px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
