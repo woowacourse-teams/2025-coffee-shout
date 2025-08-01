@@ -1,13 +1,14 @@
+import Crown from '@/assets/crown.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
-import { IconColor, PlayerType } from '@/types/player';
+import { ColorList } from '@/constants/color';
+import { PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
 import { getPlayerIcon } from './utils/getPlayerIcon';
-import Crown from '@/assets/crown.svg';
 
 type Props = {
   name: string;
-  iconColor: IconColor;
+  iconColor: ColorList;
   playerType?: PlayerType;
 } & PropsWithChildren;
 

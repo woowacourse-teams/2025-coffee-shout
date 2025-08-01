@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import CardFront from './CardFront';
-import { IconColor } from '@/types/player';
 import CardBack from '../CardBack/CardBack';
+import { ColorList } from '@/constants/color';
 
 const meta = {
   title: 'Features/MiniGame/CardGame/CardFront',
@@ -40,7 +40,7 @@ export const Large: Story = {
 export const WithPlayerSmall: Story = {
   args: {
     size: 'small',
-    playerIconColor: 'red',
+    playerIconColor: '#FF6B6B',
     card: { type: 'MULTIPLIER', value: 0 },
   },
 };
@@ -48,7 +48,7 @@ export const WithPlayerSmall: Story = {
 export const WithPlayerMedium: Story = {
   args: {
     size: 'medium',
-    playerIconColor: 'red',
+    playerIconColor: '#FF6B6B',
     card: { type: 'MULTIPLIER', value: 2 },
   },
 };
@@ -56,7 +56,7 @@ export const WithPlayerMedium: Story = {
 export const WithPlayerLarge: Story = {
   args: {
     size: 'large',
-    playerIconColor: 'red',
+    playerIconColor: '#FF6B6B',
     card: { type: 'ADDITION', value: -40 },
   },
 };
@@ -64,15 +64,15 @@ export const WithPlayerLarge: Story = {
 export const Grid: Story = {
   render: () => {
     const playerIconColorMap = [
-      'red' as IconColor,
-      'red' as IconColor,
+      '#FF6B6B' as ColorList,
+      '#FF6B6B' as ColorList,
       undefined,
       undefined,
       undefined,
-      'red' as IconColor,
+      '#FF6B6B' as ColorList,
       undefined,
-      'red' as IconColor,
-      'red' as IconColor,
+      '#FF6B6B' as ColorList,
+      '#FF6B6B' as ColorList,
     ];
 
     return (

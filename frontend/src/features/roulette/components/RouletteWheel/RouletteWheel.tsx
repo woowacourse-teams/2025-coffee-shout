@@ -1,25 +1,20 @@
-import { useTheme } from '@emotion/react';
 import RouletteWheelIcon from '@/assets/profile-red.svg';
-import * as S from './RouletteWheel.styled';
-import { describeArc } from '../../utils/describeArc';
 import { colorList } from '@/constants/color';
+import { PlayerProbability } from '@/types/roulette';
+import { useTheme } from '@emotion/react';
+import { describeArc } from '../../utils/describeArc';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
-
-type Player = {
-  playerName: string;
-  probability: number;
-};
+import * as S from './RouletteWheel.styled';
 
 type Props = {
-  players: Player[];
+  playerProbabilities: PlayerProbability[];
   isSpinning?: boolean;
 };
 
-const RouletteWheel = ({ players, isSpinning = false }: Props) => {
+const RouletteWheel = ({ playerProbabilities, isSpinning = false }: Props) => {
   const theme = useTheme();
-  const totalProbability = players.reduce((sum, player) => sum + player.probability, 0);
-
-  const playersWithAngles = getPlayersWithAngles(players, totalProbability);
+  const totalProbability = playerProbabilities.reduce((sum, player) => sum + player.probability, 0);
+  const playersWithAngles = getPlayersWithAngles(playerProbabilities, totalProbability);
 
   return (
     <S.Container>

@@ -9,33 +9,33 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { Menu } from '@/types/menu';
-import { PlayerType } from '@/types/player';
-import { RouletteView } from '@/types/roulette';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Player } from '@/types/player';
+import { PlayerProbability, RouletteView } from '@/types/roulette';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 
-type RouletteResultResponse = {
-  playerName: string;
-  menuResponse: Menu;
-  playerType: PlayerType;
-};
-
-const RoulettePage = () => {
+const RoulettePlayPage = () => {
   const navigate = useNavigate();
+  const { send } = useWebSocket();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
-  const { send } = useWebSocket();
+
+  // TODO: 나중에 외부 state 로 분리할 것
+  // TODO: 이전 확률과 비교해서 룰렛 움직여야 하므로 이전 확률 또는 확률 변화값을 저장할 상태 필요
+  const location = useLocation();
+  const playerProbabilities: PlayerProbability[] = location.state?.playerProbabilitiesData ?? [];
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  useWebSocketSubscription<RouletteResultResponse>(`/room/${joinCode}/roulette`, (data) => {
+  const handleWinnerData = useCallback((data: Player) => {
     setWinner(data.playerName);
-  });
+  }, []);
+
+  useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);
 
   const isRouletteView = currentView === 'roulette';
 
@@ -77,7 +77,14 @@ const RoulettePage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
-          {isRouletteView ? <RoulettePlaySection isSpinning={isSpinning} /> : <ProbabilityList />}
+          {isRouletteView ? (
+            <RoulettePlaySection
+              playerProbabilities={playerProbabilities}
+              isSpinning={isSpinning}
+            />
+          ) : (
+            <ProbabilityList playerProbabilities={playerProbabilities} />
+          )}
           <S.IconButtonWrapper>
             <IconButton
               iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
@@ -95,4 +102,4 @@ const RoulettePage = () => {
   );
 };
 
-export default RoulettePage;
+export default RoulettePlayPage;

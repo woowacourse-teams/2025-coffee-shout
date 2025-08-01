@@ -34,4 +34,6 @@ export const colorList = [
   '#98D8C8',
   '#F7DC6F',
   '#BB8FCE',
-];
+] as const;
+
+export type ColorList = (typeof colorList)[number];
