@@ -7,6 +7,7 @@ import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.MiniGameResponse;
+import coffeeshout.room.ui.response.MiniGameSelectedResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
@@ -64,5 +65,14 @@ public class RoomRestController {
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/minigames/selected")
+    public ResponseEntity<List<MiniGameSelectedResponse>> getSelectedMiniGames(@RequestParam String joinCode){
+        List<MiniGameSelectedResponse> result = roomService.getSelectedMiniGames(joinCode).stream()
+                .map(MiniGameSelectedResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(result);
     }
 }
