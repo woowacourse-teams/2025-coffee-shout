@@ -10,14 +10,14 @@ import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 type Props = {
+  myMenu: string;
   onClose: () => void;
 };
 
-const MenuModifyModal = ({ onClose }: Props) => {
-  // TODO: 현재 메뉴를 초깃값으로 설정 (웹소켓: 현재 본인 메뉴)
+const MenuModifyModal = ({ myMenu, onClose }: Props) => {
   const [modifiedMenu, setModifiedMenu] = useState<Option>({
     id: -1,
-    name: '',
+    name: myMenu,
   });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);

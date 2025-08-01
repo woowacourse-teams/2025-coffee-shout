@@ -18,7 +18,7 @@ export const ParticipantSection = ({ participants }: Props) => {
   const { openModal, closeModal } = useModal();
 
   const handleModifyMenu = () => {
-    openModal(<MenuModifyModal onClose={closeModal} />, {
+    openModal(<MenuModifyModal myMenu={mySelect.menuResponse.name} onClose={closeModal} />, {
       title: '음료 변경',
       showCloseButton: true,
     });
