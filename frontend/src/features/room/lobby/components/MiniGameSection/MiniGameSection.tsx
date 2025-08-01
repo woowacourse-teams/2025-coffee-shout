@@ -2,6 +2,7 @@ import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { MINI_GAME_NAME_MAP, MiniGameType } from '@/types/miniGame';
 import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
@@ -19,6 +20,7 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
   const [miniGames, setMiniGames] = useState<MiniGameType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { playerType } = usePlayerType();
 
   useEffect(() => {
     (async () => {
@@ -51,6 +53,7 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
           <GameActionButton
             key={miniGame}
             isSelected={selectedMiniGames.includes(miniGame)}
+            isDisabled={playerType === 'GUEST'}
             gameName={MINI_GAME_NAME_MAP[miniGame]}
             onClick={() => handleMiniGameClick(miniGame)}
           />
