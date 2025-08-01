@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,12 +18,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LogAspect {
 
+    public static final Marker NOTIFICATION_MARKER = MarkerFactory.getMarker("[NOTIFICATION]");
+
     @AfterReturning(
             value = "execution(* coffeeshout.room.application.RoomService.createRoom(..))",
             returning = "room"
     )
     public void logRoomCreation(Room room) {
-        log.info("JoinCode[{}] 방 생성 완료 - host: {}, createdAt: {}",
+        log.info(NOTIFICATION_MARKER, "JoinCode[{}] 방 생성 완료 - host: {}, createdAt: {}",
                 room.getJoinCode().value(),
                 room.getHost().getName().value(),
                 LocalDateTime.now());
@@ -41,7 +45,7 @@ public class LogAspect {
             argNames = "joinCode,hostName,player"
     )
     public void logSpinRoulette(String joinCode, String hostName, Player player) {
-        log.info("JoinCode[{}] 룰렛 추첨 완료 - 당첨자: {}",
+        log.info(NOTIFICATION_MARKER, "JoinCode[{}] 룰렛 추첨 완료 - 당첨자: {}",
                 joinCode,
                 player.getName().value());
     }

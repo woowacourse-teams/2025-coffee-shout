@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.MenuFixture;
+import coffeeshout.fixture.MiniGameDummy;
+import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -17,6 +21,7 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -348,5 +353,70 @@ class RoomServiceTest {
         // then
         assertThat(losePlayer).isNotNull();
         assertThat(createdRoom.getPlayers()).contains(losePlayer);
+    }
+
+    @Test
+    void 미니게임의_점수를_반환한다(){
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+
+        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
+        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
+
+        // when
+        Map<Player, MiniGameScore> miniGameScores = roomService.getMiniGameScores(
+                joinCode.value(),
+                MiniGameType.CARD_GAME
+        );
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(miniGameScores.get(PlayerFixture.호스트꾹이()).getValue()).isEqualTo(20);
+            softly.assertThat(miniGameScores.get(PlayerFixture.게스트루키()).getValue()).isEqualTo(-10);
+        });
+    }
+
+    @Test
+    void 미니게임의_순위를_반환한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+
+        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
+        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
+
+        // when
+        MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.value(), MiniGameType.CARD_GAME);
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(miniGameRanks.getPlayerRank(PlayerFixture.호스트꾹이())).isEqualTo(1);
+            softly.assertThat(miniGameRanks.getPlayerRank(PlayerFixture.게스트루키())).isEqualTo(2);
+        });
+    }
+
+    @Test
+    void 선택된_미니게임의_목록을_반환한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName, List.of(MiniGameType.CARD_GAME));
+
+        // when
+        List<MiniGameType> selectedMiniGames = roomService.getSelectedMiniGames(joinCode.value());
+
+        // then
+        assertThat(selectedMiniGames).hasSize(1);
+        assertThat(selectedMiniGames).containsExactly(MiniGameType.CARD_GAME);
     }
 }
