@@ -33,6 +33,7 @@ const RoulettePlayPage = () => {
 
   const handleWinnerData = useCallback((data: Player) => {
     setWinner(data.playerName);
+    setIsSpinning(true);
   }, []);
 
   useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);

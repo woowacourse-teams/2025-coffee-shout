@@ -9,11 +9,13 @@ import IconButton from '@/components/@common/IconButton/IconButton';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './OrderPage.styled';
 
 const OrderPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
 
   const simpleOrderItems = [
@@ -71,7 +73,7 @@ const OrderPage = () => {
       <Layout.Banner>
         <S.BannerContent>
           <S.Logo src={BreadLogoWhiteIcon} />
-          <Headline1 color="white">다이앤</Headline1>
+          <Headline1 color="white">{location.state?.winner}</Headline1>
           <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
         </S.BannerContent>
