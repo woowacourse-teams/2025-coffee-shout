@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
-import { RoundKey } from '@/types/round';
-import { useNavigate, useParams } from 'react-router-dom';
 import Round from '../components/Round/Round';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-
-const TOTAL_COUNT = 10;
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import { RoundKey, TOTAL_COUNT } from '@/types/round';
 
 export type SelectedCardInfo = Record<
   RoundKey,
@@ -17,12 +14,13 @@ export type SelectedCardInfo = Record<
 >;
 
 const CardGamePlayPage = () => {
-  const navigate = useNavigate();
-  const { miniGameType } = useParams();
-  const { joinCode } = useIdentifier();
+  // const navigate = useNavigate();
+
+  // const { miniGameType } = useParams();
+  // const { joinCode } = useIdentifier();
+  const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
-  const [isTransition, setIsTransition] = useState(false);
-  const [currentRound, setCurrentRound] = useState<RoundKey>(1);
+
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
       index: -1,
@@ -42,19 +40,10 @@ const CardGamePlayPage = () => {
         ...prev,
         1: {
           index: cardIndex,
-          type: mockCardInfoMessages[cardIndex].cardType,
-          value: mockCardInfoMessages[cardIndex].value,
+          type: cardInfos[cardIndex].cardType,
+          value: cardInfos[cardIndex].value,
         },
       }));
-
-      setTimeout(() => {
-        setIsTransition(true);
-      }, 2000);
-
-      setTimeout(() => {
-        setIsTransition(false);
-        setCurrentRound(2);
-      }, 4000);
 
       return;
     }
@@ -64,28 +53,32 @@ const CardGamePlayPage = () => {
         ...prev,
         2: {
           index: cardIndex,
-          type: mockCardInfoMessages[cardIndex].cardType,
-          value: mockCardInfoMessages[cardIndex].value,
+          type: cardInfos[cardIndex].cardType,
+          value: cardInfos[cardIndex].value,
         },
       }));
 
-      setTimeout(() => {
-        navigate(`/room/${joinCode}/${miniGameType}/result`);
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate(`/room/${joinCode}/${miniGameType}/result`);
+      // }, 2000);
     }
   };
 
   useEffect(() => {
     if (currentTime > 0) {
-      const timer = setTimeout(() => setCurrentTime(currentTime - 1), 1000);
+      const timer = setTimeout(() => setCurrentTime((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (currentTime === 0) {
-      navigate(`/room/${joinCode}/${miniGameType}/result`);
     }
-  }, [currentTime, navigate, joinCode, miniGameType]);
+  }, [currentTime]);
+
+  useEffect(() => {
+    if (currentTime === 0 && currentRound === 2 && currentCardGameState === 'PLAYING') {
+      setCurrentTime(TOTAL_COUNT);
+    }
+  }, [currentTime, currentRound, currentCardGameState]);
 
   return isTransition ? (
-    <MiniGameTransition prevRound={currentRound} />
+    <MiniGameTransition currentRound={currentRound} />
   ) : (
     <Round
       key={currentRound}
@@ -93,65 +86,9 @@ const CardGamePlayPage = () => {
       onClickCard={handleCardClick}
       selectedCardInfo={selectedCardInfo}
       currentTime={currentTime}
+      cardInfos={cardInfos}
     />
   );
 };
 
 export default CardGamePlayPage;
-
-const mockCardInfoMessages = [
-  {
-    cardType: 'ADDITION',
-    value: 10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 30,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -20,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 40,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 2,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 0,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: -1,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -40,
-    selected: false,
-    playerName: null,
-  },
-];

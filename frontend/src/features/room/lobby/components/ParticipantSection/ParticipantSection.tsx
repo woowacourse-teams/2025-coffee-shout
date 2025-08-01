@@ -3,10 +3,10 @@ import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
-import * as S from './ParticipantSection.styled';
-import { Player } from '@/types/player';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
+import { Player } from '@/types/player';
+import * as S from './ParticipantSection.styled';
 import { getMenuIcon } from './utils/getMenuIcon';
 
 const TOTAL_PARTICIPANTS = 9;
@@ -36,8 +36,7 @@ export const ParticipantSection = ({ participants }: Props) => {
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
         suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
-      {/* TODO: 아이콘 색깔 9개 정하기 */}
-      <PlayerCard name={myName} iconColor="red">
+      <PlayerCard name={myName} iconColor="#FF6B6B">
         <S.Menu
           src={getMenuIcon(mySelect && mySelect.menuResponse.menuType)}
           onClick={handleModifyMenu}
@@ -49,7 +48,11 @@ export const ParticipantSection = ({ participants }: Props) => {
           <S.Empty>현재 참여한 인원이 없습니다</S.Empty>
         ) : (
           filteredParticipants.map((participant) => (
-            <PlayerCard key={participant.playerName} name={participant.playerName} iconColor="red">
+            <PlayerCard
+              key={participant.playerName}
+              name={participant.playerName}
+              iconColor="#FF6B6B"
+            >
               <S.Menu
                 src={getMenuIcon(participant.menuResponse.menuType)}
                 onClick={handleModifyMenu}

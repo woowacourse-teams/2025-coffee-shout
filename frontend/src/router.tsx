@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
 import {
   EntryMenuPage,
@@ -10,9 +10,10 @@ import {
   MiniGameResultPage,
   NotFoundPage,
   OrderPage,
-  RoulettePage,
+  RoulettePlayPage,
   RouletteResultPage,
 } from './pages';
+import CardGameProvider from './contexts/CardGame/CardGameProvider';
 
 const router = createBrowserRouter([
   {
@@ -34,11 +35,16 @@ const router = createBrowserRouter([
         path: 'room/:joinCode',
         children: [
           { path: 'lobby', element: <LobbyPage /> },
-          { path: 'roulette/play', element: <RoulettePage /> },
+          { path: 'roulette/play', element: <RoulettePlayPage /> },
           { path: 'roulette/result', element: <RouletteResultPage /> },
           { path: 'order', element: <OrderPage /> },
           {
             path: ':miniGameType',
+            element: (
+              <CardGameProvider>
+                <Outlet />
+              </CardGameProvider>
+            ),
             children: [
               { path: 'ready', element: <MiniGameReadyPage /> },
               { path: 'play', element: <MiniGamePlayPage /> },

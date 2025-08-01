@@ -1,19 +1,16 @@
-type Player = {
-  playerName: string;
-  probability: number;
-};
+import { PlayerProbability } from '@/types/roulette';
 
 type PlayerWithAngle = {
   startAngle: number;
   endAngle: number;
-} & Player;
+} & PlayerProbability;
 
 export const getPlayersWithAngles = (
-  players: Player[],
+  playerProbabilities: PlayerProbability[],
   totalProbability: number
 ): PlayerWithAngle[] => {
   let currentAngle = 0;
-  return players.map((player) => {
+  return playerProbabilities.map((player) => {
     const angle = (player.probability / totalProbability) * 360;
     const startAngle = currentAngle;
     const endAngle = currentAngle + angle;

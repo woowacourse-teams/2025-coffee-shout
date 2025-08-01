@@ -4,11 +4,15 @@ import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
-import { RouletteView } from '@/types/roulette';
+import { PlayerProbability, RouletteView } from '@/types/roulette';
 import { useState } from 'react';
 import * as S from './RouletteSection.styled';
 
-export const RouletteSection = () => {
+type Props = {
+  playerProbabilities: PlayerProbability[];
+};
+
+export const RouletteSection = ({ playerProbabilities }: Props) => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const isRouletteView = currentView === 'roulette';
 
@@ -25,32 +29,17 @@ export const RouletteSection = () => {
           onClick={handleViewChange}
         />
       </S.IconButtonWrapper>
-      {renderContent(currentView)}
+      {renderContent(currentView, playerProbabilities)}
     </>
   );
 };
 
-const renderContent = (currentView: RouletteView) => {
+const renderContent = (currentView: RouletteView, playerProbabilities: PlayerProbability[]) => {
   switch (currentView) {
     case 'statistics':
-      return <ProbabilityList />;
+      return <ProbabilityList playerProbabilities={playerProbabilities} />;
     case 'roulette':
     default:
-      return <RouletteWheel players={mockPlayers} />;
+      return <RouletteWheel playerProbabilities={playerProbabilities} />;
   }
 };
-
-export const mockPlayers = [
-  {
-    playerName: '홍길동',
-    probability: 30.0,
-  },
-  {
-    playerName: '김철수',
-    probability: 30.0,
-  },
-  {
-    playerName: '이순신',
-    probability: 40.0,
-  },
-];
