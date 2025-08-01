@@ -10,6 +10,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
 import { PlayerProbability, Probability } from '@/types/roulette';
+import { Player } from '@/types/player';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
@@ -21,14 +22,22 @@ import * as S from './LobbyPage.styled';
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
+type ParticipantResponse = Player[];
+
 const LobbyPage = () => {
   const navigate = useNavigate();
+
   const { send } = useWebSocket();
+  const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
-  const { joinCode, myName } = useIdentifier();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+  const [participants, setParticipants] = useState<ParticipantResponse>([]);
+
+  const handleParticipant = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
   // TODO: 나중에 외부 state 로 분리할 것
   const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
@@ -46,19 +55,41 @@ const LobbyPage = () => {
     setPlayerProbabilities(parsedData);
   }, []);
 
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
   useWebSocketSubscription<Probability[]>(
     `/room/${joinCode}/roulette`,
     handlePlayerProbabilitiesData
   );
 
+  const handleGameStart = useCallback(
+    (data: { miniGameType: MiniGameType }) => {
+      const { miniGameType: nextMiniGame } = data;
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+    },
+    [joinCode, navigate]
+  );
+
+  useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
+
+  useEffect(() => {
+    if (joinCode) {
+      console.log(`send요청 보냄!`);
+      send(`/room/${joinCode}/update-players`);
+    }
+  }, [playerType, joinCode, send]);
+
   const handleClickBackButton = () => {
     navigate('/');
   };
 
   const handleClickGameStartButton = () => {
-    // TODO: 지금 시작할 게임 타입을 서버에서 웹소켓으로 받아서 selectedMiniGames[0]를 넣어주기
-    navigate(`/room/${joinCode}/${selectedMiniGames[0]}/ready`);
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'START_MINI_GAME',
+      commandRequest: {
+        hostName: myName,
+      },
+    });
   };
 
   const handleSectionChange = (option: SectionType) => {
@@ -95,6 +126,8 @@ const LobbyPage = () => {
 
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection />,
+    룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
+    참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
     미니게임: (
       <MiniGameSection
