@@ -79,13 +79,15 @@ const MiniGameResultPage = () => {
           ))}
         </S.ResultList>
       </Layout.Content>
-      {playerType === 'HOST' && (
-        <Layout.ButtonBar>
+      <Layout.ButtonBar>
+        {playerType === 'HOST' ? (
           <Button variant="primary" onClick={handleViewRouletteResult}>
             룰렛 현황 보러가기
           </Button>
-        </Layout.ButtonBar>
-      )}
+        ) : (
+          <Button variant="loading">대기 중</Button>
+        )}
+      </Layout.ButtonBar>
     </Layout>
   );
 };
