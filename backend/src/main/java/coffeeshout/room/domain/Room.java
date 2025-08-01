@@ -110,8 +110,8 @@ public class Room {
     }
 
     private void join(Player player) {
-        players.join(player);
-        roulette.join(player);
+        final Player joinedPlayer = players.join(player);
+        roulette.join(joinedPlayer);
     }
 
     public Map<Player, Probability> getProbabilities() {
