@@ -20,14 +20,14 @@ env:
 
 jobs:
   ci:
-    # PR이 실제로 merge되었을 때만 CI 실행
-    if: github.event.pull_request.merged == true
+    # Push 또는 PR이 merge되었을 때만 CI 실행
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     uses: ./.github/workflows/frontend-ci.yml
 
   cd:
     needs: ci
-    # PR이 merge되었고 CI가 성공했을 때만 실행
-    if: github.event.pull_request.merged == true && needs.ci.result == 'success'
+    # Push 또는 PR이 merge되었고 CI가 성공했을 때만 실행
+    if: (github.event_name == 'push' && needs.ci.result == 'success') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.ci.result == 'success')
     runs-on: [self-hosted, Linux, ARM64]
 
     concurrency:
