@@ -16,7 +16,9 @@ const RouletteResultPage = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (joinCode) {
-        navigate(`/room/${joinCode}/order`);
+        navigate(`/room/${joinCode}/order`, {
+          state: { winner },
+        });
       } else {
         navigate('/');
       }
