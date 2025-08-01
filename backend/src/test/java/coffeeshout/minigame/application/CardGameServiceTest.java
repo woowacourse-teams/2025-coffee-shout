@@ -9,7 +9,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilities;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
@@ -23,6 +22,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @Import({TestConfig.class})
@@ -64,15 +65,19 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
-        host = players.get(0);
+        List<Player> fixturePlayers = PlayerProbabilities.PLAYERS;
+        Players players = new Players();
+        ReflectionTestUtils.setField(players, "players", fixturePlayers);
+
+        host = fixturePlayers.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
-        for (int i = 1; i < players.size(); i++) {
-            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
-        }
+//        for (int i = 1; i < players.size(); i++) {
+//            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
+//        }
+        ReflectionTestUtils.setField(room, "players", players);
     }
 
     @Nested
@@ -128,7 +133,6 @@ class CardGameServiceTest {
             // when
             cardGameService.start(cardGameSpy, joinCode.value());
             assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
-
 
             Map<Player, Probability> probabilities = room.getProbabilities();
             assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(

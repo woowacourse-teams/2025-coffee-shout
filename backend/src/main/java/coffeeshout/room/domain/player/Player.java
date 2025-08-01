@@ -39,6 +39,10 @@ public class Player {
         this.colorIndex = colorIndex;
     }
 
+    public void updateReadyState(Boolean isReady) {
+        this.isReady = isReady;
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) {

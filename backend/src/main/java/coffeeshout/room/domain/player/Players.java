@@ -37,4 +37,9 @@ public class Players {
     public boolean hasDuplicateName(PlayerName playerNmae) {
         return players.stream().anyMatch(player -> player.sameName(playerNmae));
     }
+
+    public boolean isAllReady() {
+        return players.stream()
+                .allMatch(player -> player.getIsReady() == true);
+    }
 }
