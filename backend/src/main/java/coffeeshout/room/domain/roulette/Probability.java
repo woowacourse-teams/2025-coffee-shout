@@ -27,6 +27,10 @@ public record Probability(Integer value) {
         return new Probability(value * number);
     }
 
+    public Probability multiple(double number) {
+        return new Probability((int) (value * number));
+    }
+
     public Probability minus(Probability other) {
         return new Probability(this.value - other.value);
     }
