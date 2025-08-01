@@ -1,11 +1,16 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
-import { usePlayerRole } from '@/contexts/PlayerRole/PlayerRoleContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { ReactElement, useState } from 'react';
+import { MiniGameType } from '@/types/miniGame';
+import { Player } from '@/types/player';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
@@ -14,31 +19,60 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
-type SectionComponents = {
-  [K in SectionType]: ReactElement;
-};
+type SectionComponents = Record<SectionType, ReactElement>;
 
-const SECTIONS: SectionComponents = {
-  참가자: <ParticipantSection />,
-  룰렛: <RouletteSection />,
-  미니게임: <MiniGameSection />,
-} as const;
+type ParticipantResponse = Player[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const { openModal } = useModal();
-  const { playerRole } = usePlayerRole();
-  const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
 
-  //TODO: 다른 에러 처리방식을 찾아보기
-  if (!playerRole) return null;
+  const { send } = useWebSocket();
+  const { myName, joinCode } = useIdentifier();
+  const { openModal } = useModal();
+  const { playerType } = usePlayerType();
+  const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
+  const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+  const [participants, setParticipants] = useState<ParticipantResponse>([]);
+
+  const handleParticipant = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
+
+  const handleMiniGameData = useCallback((data: MiniGameType[]) => {
+    setSelectedMiniGames(data);
+  }, []);
+
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
+  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+
+  const handleGameStart = useCallback(
+    (data: { miniGameType: MiniGameType }) => {
+      const { miniGameType: nextMiniGame } = data;
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+    },
+    [joinCode, navigate]
+  );
+
+  useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
+
+  useEffect(() => {
+    if (joinCode) {
+      console.log(`send요청 보냄!`);
+      send(`/room/${joinCode}/update-players`);
+    }
+  }, [playerType, joinCode, send]);
 
   const handleClickBackButton = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   const handleClickGameStartButton = () => {
-    navigate('/room/:roomId/:miniGameId/ready');
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'START_MINI_GAME',
+      commandRequest: {
+        hostName: myName,
+      },
+    });
   };
 
   const handleSectionChange = (option: SectionType) => {
@@ -51,6 +85,34 @@ const LobbyPage = () => {
       showCloseButton: true,
     });
   };
+
+  const handleMiniGameClick = (miniGameType: MiniGameType) => {
+    if (playerType === 'GUEST') return;
+
+    const updatedMiniGames = selectedMiniGames.includes(miniGameType)
+      ? selectedMiniGames.filter((game) => game !== miniGameType)
+      : [...selectedMiniGames, miniGameType];
+
+    setSelectedMiniGames(updatedMiniGames);
+
+    send(`/room/${joinCode}/update-minigames`, {
+      hostName: myName,
+      miniGameTypes: updatedMiniGames,
+    });
+  };
+
+  const SECTIONS: SectionComponents = {
+    참가자: <ParticipantSection participants={participants} />,
+    룰렛: <RouletteSection />,
+    미니게임: (
+      <MiniGameSection
+        selectedMiniGames={selectedMiniGames}
+        handleMiniGameClick={handleMiniGameClick}
+      />
+    ),
+  };
+
+  if (!playerType) return null;
 
   return (
     <Layout>
@@ -67,7 +129,7 @@ const LobbyPage = () => {
           </S.Wrapper>
         </S.Container>
       </Layout.Content>
-      {playerRole === 'HOST' ? (
+      {playerType === 'HOST' ? (
         <Layout.ButtonBar flexRatios={[5.5, 1]}>
           <Button variant="primary" onClick={handleClickGameStartButton}>
             게임 시작

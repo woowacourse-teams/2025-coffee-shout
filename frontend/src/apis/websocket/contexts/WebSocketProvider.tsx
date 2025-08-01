@@ -1,5 +1,5 @@
-import { useState, PropsWithChildren } from 'react';
 import { Client } from '@stomp/stompjs';
+import { PropsWithChildren, useState } from 'react';
 import { createStompClient } from '../createStompClient';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
@@ -81,7 +81,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const send = <T,>(url: string, body: T | null = null) => {
+  const send = <T,>(url: string, body?: T) => {
     if (!client || !isConnected) {
       console.warn('❌ 메시지 전송 실패: WebSocket 연결 안됨');
       return;
@@ -89,9 +89,18 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
     const requestUrl = '/app' + url;
 
+    let payload: string;
+    if (body == null) {
+      payload = '';
+    } else if (typeof body === 'object') {
+      payload = JSON.stringify(body);
+    } else {
+      payload = String(body);
+    }
+
     client.publish({
       destination: requestUrl,
-      body: JSON.stringify(body),
+      body: payload,
     });
   };
 
