@@ -7,10 +7,6 @@ import { MINI_GAME_NAME_MAP, MiniGameType } from '@/types/miniGame';
 import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
 
-type MiniGamesResponse = {
-  miniGameType: MiniGameType;
-}[];
-
 type Props = {
   selectedMiniGames: MiniGameType[];
   handleMiniGameClick: (miniGameType: MiniGameType) => void;
@@ -26,8 +22,8 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
     (async () => {
       try {
         setLoading(true);
-        const _miniGames = await api.get<MiniGamesResponse>('/rooms/minigames');
-        setMiniGames(_miniGames.map((game) => game.miniGameType));
+        const _miniGames = await api.get<MiniGameType[]>('/rooms/minigames');
+        setMiniGames(_miniGames);
       } catch (error) {
         if (error instanceof ApiError) {
           setError(error.message);
