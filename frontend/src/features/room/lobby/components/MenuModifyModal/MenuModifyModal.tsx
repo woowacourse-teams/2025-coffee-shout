@@ -6,9 +6,8 @@ import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useEffect, useState } from 'react';
 import * as S from './MenuModifyModal.styled';
 import { Menu } from '@/types/menu';
-
-// TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
-type MenusResponse = Menu[];
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 type Props = {
   onClose: () => void;
@@ -23,13 +22,15 @@ const MenuModifyModal = ({ onClose }: Props) => {
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { send } = useWebSocket();
+  const { myName, joinCode } = useIdentifier();
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
 
-        const menus = await api.get<MenusResponse>('/menus');
+        const menus = await api.get<Menu[]>('/menus');
         const options = menus.map((menu) => ({
           id: menu.id,
           name: menu.name,
@@ -55,7 +56,11 @@ const MenuModifyModal = ({ onClose }: Props) => {
       return;
     }
 
-    // TODO 메뉴 변경 api 호출
+    send(`/room/${joinCode}/update-menus`, {
+      playerName: myName,
+      menuId: modifiedMenu.id,
+    });
+
     onClose();
   };
 
