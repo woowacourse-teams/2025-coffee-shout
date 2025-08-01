@@ -11,7 +11,9 @@ const dotenvEnv = dotenv.config({ path: path.resolve(__dirname, '.env') }).parse
 const mergedEnv = { ...process.env, ...dotenvEnv };
 
 const envKeys = Object.keys(mergedEnv).reduce((acc, key) => {
-  acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
+  if (key.startsWith('REACT_APP_')) {
+    acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
+  }
   return acc;
 }, {});
 
