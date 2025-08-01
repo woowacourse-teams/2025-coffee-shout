@@ -1,5 +1,6 @@
 package coffeeshout.room.ui;
 
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomCreateRequest;
@@ -59,19 +60,15 @@ public class RoomRestController {
     }
 
     @GetMapping("/minigames")
-    public ResponseEntity<List<MiniGameResponse>> getMiniGames() {
-        final List<MiniGameResponse> responses = roomService.getAllMiniGames().stream()
-                .map(MiniGameResponse::from)
-                .toList();
+    public ResponseEntity<List<MiniGameType>> getMiniGames() {
+        final List<MiniGameType> responses = roomService.getAllMiniGames();
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/minigames/selected")
-    public ResponseEntity<List<MiniGameSelectedResponse>> getSelectedMiniGames(@RequestParam String joinCode){
-        List<MiniGameSelectedResponse> result = roomService.getSelectedMiniGames(joinCode).stream()
-                .map(MiniGameSelectedResponse::from)
-                .toList();
+    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode){
+        List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
     }
