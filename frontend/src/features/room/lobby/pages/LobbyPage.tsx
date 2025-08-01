@@ -55,13 +55,6 @@ const LobbyPage = () => {
     setPlayerProbabilities(parsedData);
   }, []);
 
-  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
-  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
-  useWebSocketSubscription<Probability[]>(
-    `/room/${joinCode}/roulette`,
-    handlePlayerProbabilitiesData
-  );
-
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
@@ -71,6 +64,12 @@ const LobbyPage = () => {
     [joinCode, navigate]
   );
 
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
+  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+  useWebSocketSubscription<Probability[]>(
+    `/room/${joinCode}/roulette`,
+    handlePlayerProbabilitiesData
+  );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   useEffect(() => {
@@ -84,6 +83,8 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
+    if (participants.length < 2) return;
+
     send(`/room/${joinCode}/minigame/command`, {
       commandType: 'START_MINI_GAME',
       commandRequest: {
