@@ -62,13 +62,13 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
           )}
         </S.MyCardContainer>
         <S.CardContainer>
-          {cardInfos.map((_, index) => {
-            return selectedCardInfo[round].index === index ? (
+          {cardInfos.map((cardInfo, index) => {
+            return cardInfo.selected ? (
               <CardFront
                 card={
                   {
-                    type: cardInfos[index].cardType as CardType,
-                    value: cardInfos[index].value as CardValue,
+                    type: cardInfo.cardType as CardType,
+                    value: cardInfo.value as CardValue,
                   } as Card
                 }
               />

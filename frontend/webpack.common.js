@@ -6,10 +6,14 @@ import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const env = dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed || {};
 
-const envKeys = Object.keys(env).reduce((acc, key) => {
-  acc[`process.env.${key}`] = JSON.stringify(env[key]);
+const dotenvEnv = dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed || {};
+const mergedEnv = { ...process.env, ...dotenvEnv };
+
+const envKeys = Object.keys(mergedEnv).reduce((acc, key) => {
+  if (key.startsWith('REACT_APP_')) {
+    acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
+  }
   return acc;
 }, {});
 

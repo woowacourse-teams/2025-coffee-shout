@@ -3,6 +3,8 @@ import MiniGameTransition from '@/features/miniGame/components/MiniGameTransitio
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 export type SelectedCardInfo = Record<
   RoundKey,
@@ -14,11 +16,11 @@ export type SelectedCardInfo = Record<
 >;
 
 const CardGamePlayPage = () => {
-  // const navigate = useNavigate();
 
-  // const { miniGameType } = useParams();
+  const { myName, joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
+  const { send } = useWebSocket();
 
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
@@ -34,33 +36,26 @@ const CardGamePlayPage = () => {
   });
 
   const handleCardClick = (cardIndex: number) => {
-    if (currentRound === 1) {
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        1: {
-          index: cardIndex,
-          type: cardInfos[cardIndex].cardType,
-          value: cardInfos[cardIndex].value,
-        },
-      }));
-
+    if (selectedCardInfo[currentRound].index !== -1) {
       return;
     }
 
-    if (currentRound === 2) {
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        2: {
-          index: cardIndex,
-          type: cardInfos[cardIndex].cardType,
-          value: cardInfos[cardIndex].value,
-        },
-      }));
+    setSelectedCardInfo((prev) => ({
+      ...prev,
+      1: {
+        index: cardIndex,
+        type: cardInfos[cardIndex].cardType,
+        value: cardInfos[cardIndex].value,
+      },
+    }));
 
-      // setTimeout(() => {
-      //   navigate(`/room/${joinCode}/${miniGameType}/result`);
-      // }, 2000);
-    }
+    send(`/room/${joinCode}/minigame/command`, {
+      commandType: 'SELECT_CARD',
+      commandRequest: {
+        playerName: myName,
+        cardIndex,
+      },
+    });
   };
 
   useEffect(() => {
