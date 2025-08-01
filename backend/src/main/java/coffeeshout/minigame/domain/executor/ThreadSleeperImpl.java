@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.temp;
+package coffeeshout.minigame.domain.executor;
 
 import org.springframework.stereotype.Component;
 

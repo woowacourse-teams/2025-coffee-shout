@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.temp;
+package coffeeshout.minigame.domain.executor;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;

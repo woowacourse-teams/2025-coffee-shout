@@ -4,10 +4,13 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.temp.CardGameTaskFactory;
-import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
-import coffeeshout.minigame.domain.temp.TaskExecutor;
-import coffeeshout.minigame.domain.temp.TaskExecutor.Task;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.executor.CardGameTaskFactory;
+import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
+import coffeeshout.minigame.domain.executor.TaskExecutor;
+import coffeeshout.minigame.domain.executor.TaskExecutor.Task;
+import coffeeshout.minigame.domain.temp.CardGameTaskType;
+import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.minigame.ui.response.MinIGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
 import coffeeshout.minigame.ui.response.MiniGameScoresMessage;
@@ -18,13 +21,17 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.Arrays;
 import java.util.List;
+import javax.naming.Name;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class CardGameService implements MiniGameService {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
@@ -34,8 +41,22 @@ public class CardGameService implements MiniGameService {
 
     private final RoomQueryService roomQueryService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final CardGameTaskExecutors cardGameTaskExecutors;
-    private final CardGameTaskFactory gameTaskFactory;
+
+    private final CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    private final TaskScheduler scheduler;
+
+    @Autowired
+    public CardGameService(
+            RoomQueryService roomQueryService,
+            SimpMessagingTemplate messagingTemplate,
+            CardGameTaskExecutorsV2 cardGameTaskExecutors,
+            @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler
+    ) {
+        this.roomQueryService = roomQueryService;
+        this.messagingTemplate = messagingTemplate;
+        this.cardGameTaskExecutors = cardGameTaskExecutors;
+        this.scheduler = scheduler;
+    }
 
     @Override
     public void start(Playable playable, String joinCode) {
@@ -43,39 +64,49 @@ public class CardGameService implements MiniGameService {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.findByJoinCode(roomJoinCode);
         final CardGame cardGame = (CardGame) playable;
-        final TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
-        cardGameTaskExecutors.put(roomJoinCode, executor);
-        executor.submits(List.of(
-                new Task<>(
-                        CardGameTaskInfo.WAITING_FOR_START,
-                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.FIRST_ROUND_PLAYING,
-                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.FIRST_ROUND_SCORE_BOARD,
-                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.FIRST_ROUND_LOADING,
-                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.SECOND_ROUND_PLAYING,
-                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.SECOND_ROUND_SCORE_BOARD,
-                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
-                ),
-                new Task<>(
-                        CardGameTaskInfo.GAME_FINISH,
-                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(roomJoinCode))
-                )
-        ));
+        final MiniGameTaskManager<CardGameTaskType> manager = new MiniGameTaskManager<>(scheduler);
+        cardGameTaskExecutors.put(roomJoinCode, manager);
     }
+
+//    @Override
+//    public void start(Playable playable, String joinCode) {
+//        sendGameStartMessage(joinCode, playable.getMiniGameType());
+//        final JoinCode roomJoinCode = new JoinCode(joinCode);
+//        final Room room = roomQueryService.findByJoinCode(roomJoinCode);
+//        final CardGame cardGame = (CardGame) playable;
+//        final TaskExecutor<CardGameTaskInfo> executor = new TaskExecutor<>();
+//        cardGameTaskExecutors.put(roomJoinCode, executor);
+//        executor.submits(List.of(
+//                new Task<>(
+//                        CardGameTaskInfo.WAITING_FOR_START,
+//                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.FIRST_ROUND_PLAYING,
+//                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.FIRST_ROUND_SCORE_BOARD,
+//                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.FIRST_ROUND_LOADING,
+//                        gameTaskFactory.loading(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.SECOND_ROUND_PLAYING,
+//                        gameTaskFactory.play(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.SECOND_ROUND_SCORE_BOARD,
+//                        gameTaskFactory.scoreBoard(cardGame, () -> sendCardGameState(roomJoinCode))
+//                ),
+//                new Task<>(
+//                        CardGameTaskInfo.GAME_FINISH,
+//                        gameTaskFactory.done(room, cardGame, () -> sendCardGameResult(roomJoinCode))
+//                )
+//        ));
+//    }
 
     public void selectCard(String joinCode, String playerName, Integer cardIndex) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
