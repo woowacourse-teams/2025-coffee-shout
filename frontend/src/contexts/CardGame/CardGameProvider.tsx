@@ -75,7 +75,6 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
 
   const handleCardGameRank = useCallback((data: CardGameRanksData) => {
     const { ranks } = data;
-    console.log('ranks', ranks);
     ranks.sort((a, b) => a.rank - b.rank);
     setRanks(ranks);
   }, []);
