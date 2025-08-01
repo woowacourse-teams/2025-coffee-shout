@@ -25,7 +25,7 @@ const RouletteResultPage = () => {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [navigate, joinCode]);
+  }, [navigate, joinCode, winner]);
 
   return (
     <Layout color="point-400">

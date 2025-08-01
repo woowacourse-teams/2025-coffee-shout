@@ -3,7 +3,6 @@ import MiniGameTransition from '@/features/miniGame/components/MiniGameTransitio
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 export type SelectedCardInfo = Record<
@@ -19,7 +18,6 @@ const CardGamePlayPage = () => {
   // const navigate = useNavigate();
 
   // const { miniGameType } = useParams();
-  const { joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
 

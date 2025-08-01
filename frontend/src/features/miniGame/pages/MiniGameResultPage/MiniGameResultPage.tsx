@@ -14,16 +14,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { CardGameStateData } from '@/types/miniGame';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
-
-const gameResults = [
-  { id: 1, name: '다이앤', score: 20, iconColor: '#FF6B6B' as ColorList, rank: 1 },
-  { id: 2, name: '니야', score: 18, iconColor: '#FF6B6B' as ColorList, rank: 2 },
-  { id: 3, name: '메리', score: 15, iconColor: '#FF6B6B' as ColorList, rank: 3 },
-  { id: 4, name: '엠제이', score: 13, iconColor: '#FF6B6B' as ColorList, rank: 4 },
-  { id: 5, name: '루키', score: 10, iconColor: '#FF6B6B' as ColorList, rank: 5 },
-];
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
