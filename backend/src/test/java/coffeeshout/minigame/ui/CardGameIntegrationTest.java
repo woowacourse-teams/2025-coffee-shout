@@ -132,7 +132,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                new TypeReference<WebSocketResponse<MiniGameStateMessage>>() {
+                new TypeReference<>() {
                 }
         );
 

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
+import java.util.function.BooleanSupplier;
 import org.springframework.scheduling.TaskScheduler;
 
 public class ChainedTaskV2  {
@@ -14,6 +15,8 @@ public class ChainedTaskV2  {
     private ScheduledFuture<?> future;
     private ChainedTaskV2 previousChainedTask;
     private ChainedTaskV2 nextChainedTask;
+    protected BooleanSupplier earlyCompletionCondition;
+    protected ChainedTaskV2 earlyCompletionTask;
 
     private ChainedTaskV2(Builder builder) {
         this.action = builder.action;
@@ -26,8 +29,16 @@ public class ChainedTaskV2  {
 
         future = scheduler.schedule(() -> {
             action.run();
-            if (nextChainedTask != null) {
-                nextChainedTask.start(scheduler);
+
+            // 조건부 체이닝 체크
+            if (earlyCompletionCondition != null && earlyCompletionCondition.getAsBoolean()) {
+                if (earlyCompletionTask != null) {
+                    earlyCompletionTask.start(scheduler);
+                }
+            } else if (nextChainedTask != null) {
+                // 기존 체이닝 로직
+                scheduler.schedule(() -> nextChainedTask.start(scheduler),
+                        Instant.now().plus(postDelay));
             }
         }, startTime);
     }
@@ -80,6 +91,8 @@ public class ChainedTaskV2  {
         private Runnable action;
         private Duration preDelay = Duration.ZERO;
         private Duration postDelay = Duration.ZERO;
+        private BooleanSupplier earlyCompletionCondition;
+        private ChainedTaskV2 earlyCompletionTask;
 
         public Builder action(Runnable action) {
             this.action = action;
@@ -96,8 +109,17 @@ public class ChainedTaskV2  {
             return this;
         }
 
+        public Builder chainOnCondition(BooleanSupplier condition, ChainedTaskV2 task) {
+            this.earlyCompletionCondition = condition;
+            this.earlyCompletionTask = task;
+            return this;
+        }
+
         public ChainedTaskV2 build() {
-            return new ChainedTaskV2(this);
+            ChainedTaskV2 task = new ChainedTaskV2(this);
+            task.earlyCompletionCondition = this.earlyCompletionCondition;
+            task.earlyCompletionTask = this.earlyCompletionTask;
+            return task;
         }
     }
 }
