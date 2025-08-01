@@ -29,24 +29,29 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       if (isFirstRoundPlaying) {
         setStartCardGame(true);
         setCardInfos(cardInfoMessages);
+        return;
       }
 
       if (isSecondRoundLoading) {
         setIsTransition(true);
         setCurrentRound(2);
         setCurrentCardGameState('LOADING');
+        return;
       }
 
       if (isSecondRoundPlaying) {
         setIsTransition(false);
         setCardInfos(cardInfoMessages);
         setCurrentCardGameState('PLAYING');
+        return;
       }
       if (isSecondRoundScoreBoard) {
         setCurrentCardGameState('SCORE_BOARD');
+        return;
       }
       if (isGameDone) {
         navigate(`/room/${joinCode}/${miniGameType}/result`);
+        return;
       }
     },
     [navigate, joinCode, miniGameType]
