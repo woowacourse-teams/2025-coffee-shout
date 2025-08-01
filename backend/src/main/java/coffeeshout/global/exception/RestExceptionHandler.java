@@ -1,5 +1,7 @@
 package coffeeshout.global.exception;
 
+import static coffeeshout.global.log.LogAspect.NOTIFICATION_MARKER;
+
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
@@ -82,7 +84,7 @@ public class RestExceptionHandler {
             final HttpServletRequest request
     ) {
         final String logMessage = String.format(
-                "[ERROR] %s.%s | method=%s uri=%s exception=%s message=%s",
+                "%s.%s | method=%s uri=%s exception=%s message=%s",
                 handler.getBeanType().getSimpleName(),
                 handler.getMethod().getName(),
                 request.getMethod(),
@@ -90,7 +92,7 @@ public class RestExceptionHandler {
                 e.getClass().getSimpleName(),
                 e.getMessage()
         );
-        log.error(logMessage, e);
+        log.error(NOTIFICATION_MARKER, logMessage, e);
     }
 
     private void logWarning(
@@ -99,7 +101,7 @@ public class RestExceptionHandler {
             final HttpServletRequest request
     ) {
         final String logMessage = String.format(
-                "[WARN] %s.%s | method=%s uri=%s exception=%s message=%s",
+                "%s.%s | method=%s uri=%s exception=%s message=%s",
                 handler.getBeanType().getSimpleName(),
                 handler.getMethod().getName(),
                 request.getMethod(),

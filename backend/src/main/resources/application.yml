@@ -1,1 +1,8 @@
-spring.application.value=coffee-shout
+spring:
+  application:
+    name:coffee-shout
+
+logging:
+  level:
+    root: info
+
