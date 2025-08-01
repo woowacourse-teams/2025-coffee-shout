@@ -16,7 +16,7 @@ public class CardGameTaskFactory {
 
     public Runnable play(CardGame cardGame, Runnable sendMessage) {
         return () -> {
-            cardGame.startRound();
+            cardGame.startPlay();
             sendMessage.run();
             threadSleeper.sleep(cardGame.getState().getDuration());
             cardGame.assignRandomCardsToUnselectedPlayers();
@@ -33,7 +33,7 @@ public class CardGameTaskFactory {
 
     public Runnable loading(CardGame cardGame, Runnable sendMessage) {
         return () -> {
-            cardGame.changeLoadingState();
+            cardGame.startRound();
             sendMessage.run();
             threadSleeper.sleep(cardGame.getState().getDuration());
         };

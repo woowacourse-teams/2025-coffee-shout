@@ -74,13 +74,13 @@ public class Room {
     public void applyMiniGameResult(MiniGameResult miniGameResult) {
         ProbabilityCalculator probabilityCalculator = new ProbabilityCalculator(
                 players.getPlayerCount(),
-                calculateRoundCount()
+                calculateMiniGameCount()
         );
         roulette.adjustProbabilities(miniGameResult, probabilityCalculator);
     }
 
-    private int calculateRoundCount() {
-        return finishedGames.size();
+    private int calculateMiniGameCount() {
+        return miniGames.size() + finishedGames.size();
     }
 
     public boolean isPlayingState() {

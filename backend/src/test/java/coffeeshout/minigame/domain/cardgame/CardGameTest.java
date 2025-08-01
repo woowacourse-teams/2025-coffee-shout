@@ -54,7 +54,7 @@ class CardGameTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getRound()).isEqualTo(CardGameRound.FIRST);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
         }
 
@@ -85,6 +85,7 @@ class CardGameTest {
             Player player = players.getPlayer(new PlayerName("꾹이"));
 
             // when
+            cardGame.startPlay();
             cardGame.selectCard(player, 0);
 
             // then
@@ -106,6 +107,7 @@ class CardGameTest {
         @Test
         void 여러_플레이어가_카드를_선택한다() {
             // when
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -131,6 +133,7 @@ class CardGameTest {
             Player player3 = players.getPlayer(new PlayerName("엠제이"));
             Player player4 = players.getPlayer(new PlayerName("한스"));
 
+            cardGame.startPlay();
             cardGame.selectCard(player1, 0);
             cardGame.selectCard(player2, 1);
             cardGame.selectCard(player3, 2);
@@ -158,6 +161,7 @@ class CardGameTest {
             Player player4 = players.getPlayer(new PlayerName("한스"));
 
             // 첫 번째 라운드 완료
+            cardGame.startPlay();
             cardGame.selectCard(player1, 0);
             cardGame.selectCard(player2, 1);
             cardGame.selectCard(player3, 2);
@@ -183,6 +187,7 @@ class CardGameTest {
         @Test
         void 첫번째_라운드가_완료되지_않음() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -194,6 +199,7 @@ class CardGameTest {
         @Test
         void 첫번째_라운드가_완료됨() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -206,6 +212,7 @@ class CardGameTest {
         @Test
         void 현재_라운드_완료_확인() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -221,6 +228,7 @@ class CardGameTest {
         @Test
         void 라운드_진행_상태를_확인한다() {
             // given - 첫 번째 라운드 완료
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -294,6 +302,7 @@ class CardGameTest {
         @Test
         void 선택하지_않은_플레이어에게_랜덤_카드_할당() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             // players.getPlayer(new PlayerName("엠제이")), players.getPlayer(new PlayerName("한스"))은 선택하지 않음
@@ -308,6 +317,7 @@ class CardGameTest {
         @Test
         void 모든_플레이어가_선택한_경우_변화_없음() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0);
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1);
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2);
@@ -333,6 +343,7 @@ class CardGameTest {
         @Test
         void 현재_라운드의_카드_소유자를_찾는다() {
             // given
+            cardGame.startPlay();
             Player player = players.getPlayer(new PlayerName("꾹이"));
             cardGame.selectCard(player, 0);
             Card selectedCard = cardGame.getDeck().getCards().get(0);
@@ -373,9 +384,9 @@ class CardGameTest {
         }
 
         @Test
-        void 로딩_상태로_변경() {
+        void 라운드를_시작하면_로딩부터_시작된다() {
             // when
-            cardGame.changeLoadingState();
+            cardGame.startRound();
 
             // then
             assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
@@ -393,6 +404,7 @@ class CardGameTest {
         @Test
         void 게임_결과를_반환한다() {
             // given
+            cardGame.startPlay();
             cardGame.selectCard(players.getPlayer(new PlayerName("꾹이")), 0); // 40
             cardGame.selectCard(players.getPlayer(new PlayerName("루키")), 1); // 30
             cardGame.selectCard(players.getPlayer(new PlayerName("엠제이")), 2); // 20

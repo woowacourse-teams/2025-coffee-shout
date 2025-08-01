@@ -9,6 +9,8 @@ import coffeeshout.minigame.domain.MiniGameResultType;
  */
 public class ProbabilityCalculator {
 
+    private static final double ADJUSTMENT_WEIGHT = 0.7;
+
     private final Integer playerCount;
     private final Integer roundCount;
 
@@ -36,7 +38,7 @@ public class ProbabilityCalculator {
 
     private Probability computeAdjustmentStep() {
         final Probability maxAdjustment = computeInitialProbability(playerCount).divide(roundCount);
-        return maxAdjustment.divide(countAdjustableRanks());
+        return maxAdjustment.divide(countAdjustableRanks()).multiple(ADJUSTMENT_WEIGHT);
     }
 
     private int countAdjustableRanks() {

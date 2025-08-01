@@ -6,13 +6,13 @@ import java.util.Arrays;
 
 public enum CardGameTaskInfo {
 
-    WAITING_FOR_START(CardGameState.LOADING, CardGameRound.READY),
+    FIRST_ROUND_LOADING(CardGameState.LOADING, CardGameRound.FIRST),
     FIRST_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.FIRST),
     FIRST_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.FIRST),
-    FIRST_ROUND_LOADING(CardGameState.LOADING, CardGameRound.FIRST),
+    SECOND_ROUND_LOADING(CardGameState.LOADING, CardGameRound.SECOND),
     SECOND_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.SECOND),
     SECOND_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.SECOND),
-    GAME_FINISH(CardGameState.DONE, CardGameRound.SECOND),
+    GAME_FINISH(CardGameState.DONE, CardGameRound.END),
     ;
 
     private final CardGameState state;
