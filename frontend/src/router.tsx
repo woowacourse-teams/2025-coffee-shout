@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
 import {
   EntryMenuPage,
@@ -13,6 +13,7 @@ import {
   RoulettePlayPage,
   RouletteResultPage,
 } from './pages';
+import CardGameProvider from './contexts/CardGame/CardGameProvider';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,11 @@ const router = createBrowserRouter([
           { path: 'order', element: <OrderPage /> },
           {
             path: ':miniGameType',
+            element: (
+              <CardGameProvider>
+                <Outlet />
+              </CardGameProvider>
+            ),
             children: [
               { path: 'ready', element: <MiniGameReadyPage /> },
               { path: 'play', element: <MiniGamePlayPage /> },

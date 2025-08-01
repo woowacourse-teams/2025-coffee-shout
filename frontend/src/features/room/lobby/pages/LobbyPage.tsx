@@ -67,6 +67,7 @@ const LobbyPage = () => {
       const { miniGameType: nextMiniGame } = data;
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
+
     [joinCode, navigate]
   );
 
@@ -74,7 +75,6 @@ const LobbyPage = () => {
 
   useEffect(() => {
     if (joinCode) {
-      console.log(`send요청 보냄!`);
       send(`/room/${joinCode}/update-players`);
     }
   }, [playerType, joinCode, send]);

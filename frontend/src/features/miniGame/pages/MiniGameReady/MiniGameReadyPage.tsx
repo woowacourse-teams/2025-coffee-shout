@@ -5,18 +5,20 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameReadyPage.styled';
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 
 const INITIAL_COUNTDOWN_SECONDS = 3;
 const COUNTDOWN_INTERVAL = 1000;
 
 const MiniGameReadyPage = () => {
+  const { startCardGame } = useCardGame();
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
   const navigate = useNavigate();
   const { miniGameType } = useParams();
   const { joinCode } = useIdentifier();
 
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (countdown <= 1) return;
 
     const timer = setInterval(() => {
       setCountdown((prev) => prev - 1);
@@ -26,10 +28,10 @@ const MiniGameReadyPage = () => {
   }, [countdown]);
 
   useEffect(() => {
-    if (countdown <= 0) {
+    if (startCardGame) {
       navigate(`/room/${joinCode}/${miniGameType}/play`);
     }
-  }, [countdown, navigate, joinCode, miniGameType]);
+  }, [joinCode, miniGameType, startCardGame, navigate]);
 
   return (
     <Layout color="point-400">

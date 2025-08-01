@@ -7,19 +7,19 @@ import CircularProgress from '../CircularProgress/CircularProgress';
 import CardBack from '../CardBack/CardBack';
 import { Card, CardType, CardValue } from '../../constants/cards';
 import CardFront from '../CardFront/CardFront';
-import { RoundKey } from '@/types/round';
 import { SelectedCardInfo } from '../../pages/CardGamePlayPage';
-
-const TOTAL_COUNT = 10;
+import { RoundKey, TOTAL_COUNT } from '@/types/round';
+import { CardInfo } from '@/types/miniGame';
 
 type Props = {
   round: RoundKey;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
+  cardInfos: CardInfo[];
 };
 
-const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => {
+const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }: Props) => {
   return (
     <Layout>
       <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
@@ -62,13 +62,13 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => 
           )}
         </S.MyCardContainer>
         <S.CardContainer>
-          {mockCardInfoMessages.map((_, index) => {
+          {cardInfos.map((_, index) => {
             return selectedCardInfo[round].index === index ? (
               <CardFront
                 card={
                   {
-                    type: mockCardInfoMessages[index].cardType as CardType,
-                    value: mockCardInfoMessages[index].value as CardValue,
+                    type: cardInfos[index].cardType as CardType,
+                    value: cardInfos[index].value as CardValue,
                   } as Card
                 }
               />
@@ -83,60 +83,3 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime }: Props) => 
 };
 
 export default Round;
-
-const mockCardInfoMessages = [
-  {
-    cardType: 'ADDITION',
-    value: 10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 30,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -10,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -20,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: 40,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 2,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: 0,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'MULTIPLIER',
-    value: -1,
-    selected: false,
-    playerName: null,
-  },
-  {
-    cardType: 'ADDITION',
-    value: -40,
-    selected: false,
-    playerName: null,
-  },
-];
