@@ -9,8 +9,8 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
-import { PlayerProbability, Probability } from '@/types/roulette';
 import { Player } from '@/types/player';
+import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
@@ -125,8 +125,6 @@ const LobbyPage = () => {
   }, [playerType, joinCode, send]);
 
   const SECTIONS: SectionComponents = {
-    참가자: <ParticipantSection />,
-    룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
     미니게임: (
