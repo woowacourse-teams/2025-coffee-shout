@@ -3,6 +3,8 @@ import MiniGameTransition from '@/features/miniGame/components/MiniGameTransitio
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 export type SelectedCardInfo = Record<
   RoundKey,
@@ -14,12 +16,10 @@ export type SelectedCardInfo = Record<
 >;
 
 const CardGamePlayPage = () => {
-  // const navigate = useNavigate();
-
-  // const { miniGameType } = useParams();
-  // const { joinCode } = useIdentifier();
+  const { myName, joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
+  const { send } = useWebSocket();
 
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
@@ -36,6 +36,10 @@ const CardGamePlayPage = () => {
 
   const handleCardClick = (cardIndex: number) => {
     if (currentRound === 1) {
+      if (selectedCardInfo[1].index !== -1) {
+        return;
+      }
+
       setSelectedCardInfo((prev) => ({
         ...prev,
         1: {
@@ -45,10 +49,22 @@ const CardGamePlayPage = () => {
         },
       }));
 
+      send(`/room/${joinCode}/minigame/command`, {
+        commandType: 'SELECT_CARD',
+        commandRequest: {
+          playerName: myName,
+          cardIndex,
+        },
+      });
+
       return;
     }
 
     if (currentRound === 2) {
+      if (selectedCardInfo[2].index !== -1) {
+        return;
+      }
+
       setSelectedCardInfo((prev) => ({
         ...prev,
         2: {
@@ -58,9 +74,13 @@ const CardGamePlayPage = () => {
         },
       }));
 
-      // setTimeout(() => {
-      //   navigate(`/room/${joinCode}/${miniGameType}/result`);
-      // }, 2000);
+      send(`/room/${joinCode}/minigame/command`, {
+        commandType: 'SELECT_CARD',
+        commandRequest: {
+          playerName: myName,
+          cardIndex,
+        },
+      });
     }
   };
 
