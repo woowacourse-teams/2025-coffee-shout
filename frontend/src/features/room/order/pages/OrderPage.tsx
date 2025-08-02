@@ -8,65 +8,76 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './OrderPage.styled';
+import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { send } = useWebSocket();
+  const { joinCode } = useIdentifier();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
+  const [participants, setParticipants] = useState<ParticipantResponse>([]);
 
-  const simpleOrderItems = [
-    { name: '아이스 아메리카노', quantity: 3 },
-    { name: '복숭아 아이스티', quantity: 3 },
-    { name: '초코칩 프라푸치노', quantity: 1 },
-  ];
+  const handleOrder = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
-  const detailOrderItems = [
-    { person: '다이앤', drink: '복숭아 아이스티' },
-    { person: '메리', drink: '복숭아 아이스티' },
-    { person: '니야', drink: '아이스 아메리카노' },
-    { person: '엠제이', drink: '초코칩 프라푸치노' },
-    { person: '꾹이', drink: '복숭아 아이스티' },
-    { person: '한스', drink: '아이스 아메리카노' },
-    { person: '루키', drink: '아이스 아메리카노' },
-  ];
-
-  const totalQuantity = simpleOrderItems.reduce((sum, item) => sum + item.quantity, 0);
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleOrder);
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
   };
 
-  const renderSimpleView = () => (
-    <>
+  const renderSimpleView = () => {
+    const simpleViewMap = new Map();
+
+    participants.forEach((participant) => {
+      const { menuResponse } = participant;
+      const count = simpleViewMap.get(menuResponse.name) || 0;
+      simpleViewMap.set(menuResponse.name, count + 1);
+    });
+
+    return (
       <S.OrderList>
-        {simpleOrderItems.map((item, index) => (
+        <S.Divider />
+        {[...simpleViewMap].map((item, index) => (
           <S.OrderItem key={index}>
-            <Paragraph>{item.name}</Paragraph>
-            <Paragraph>{item.quantity}개</Paragraph>
+            <Paragraph>{item[0]}</Paragraph>
+            <Paragraph>{item[1]}개</Paragraph>
+          </S.OrderItem>
+        ))}
+        <S.Divider />
+        <S.TotalWrapper>
+          <Headline3>총 {participants.length}개</Headline3>
+        </S.TotalWrapper>
+      </S.OrderList>
+    );
+  };
+
+  const renderDetailView = () => {
+    return (
+      <S.OrderList>
+        {participants.map((participant, index) => (
+          <S.OrderItem key={index}>
+            <Paragraph>{participant.playerName}</Paragraph>
+            <Paragraph>{participant.menuResponse.name}</Paragraph>
           </S.OrderItem>
         ))}
       </S.OrderList>
-      <S.Divider />
-      <S.TotalWrapper>
-        <Headline3>총 {totalQuantity}개</Headline3>
-      </S.TotalWrapper>
-    </>
-  );
+    );
+  };
 
-  const renderDetailView = () => (
-    <S.DetailGrid>
-      {detailOrderItems.map((item, index) => (
-        <S.DetailItem key={index}>
-          <Paragraph>{item.person}</Paragraph>
-          <Paragraph>{item.drink}</Paragraph>
-        </S.DetailItem>
-      ))}
-    </S.DetailGrid>
-  );
+  useEffect(() => {
+    if (joinCode) {
+      send(`/room/${joinCode}/update-players`);
+    }
+  }, [joinCode, send]);
 
   return (
     <Layout>
