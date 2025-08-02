@@ -41,7 +41,7 @@ const CardGamePlayPage = () => {
 
     setSelectedCardInfo((prev) => ({
       ...prev,
-      1: {
+      [currentRound]: {
         index: cardIndex,
         type: cardInfos[cardIndex].cardType,
         value: cardInfos[cardIndex].value,

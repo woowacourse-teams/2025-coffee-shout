@@ -6,4 +6,5 @@ export type Player = {
   playerName: string;
   menuResponse: Menu;
   playerType: PlayerType;
+  isReady: boolean;
 };
