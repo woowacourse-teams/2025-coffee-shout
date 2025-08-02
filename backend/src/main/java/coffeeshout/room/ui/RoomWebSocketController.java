@@ -5,9 +5,11 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.ReadyResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -28,20 +30,38 @@ public class RoomWebSocketController {
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode,
+                WebSocketResponse.success(responses)
+        );
     }
 
     @MessageMapping("/room/{joinCode}/update-menus")
     public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(),
-                        message.menuId())
+        final List<PlayerResponse> responses = roomService.selectMenu(
+                        joinCode, message.playerName(),
+                        message.menuId()
+                )
                 .stream()
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode,
+                WebSocketResponse.success(responses)
+        );
+    }
+
+    @MessageMapping("room/{joinCode}/update-ready")
+    public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
+        ReadyResponse response = ReadyResponse.from(roomService.changePlayerState(
+                joinCode, message.playerName(),
+                message.isReady()
+        ));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode + "/ready",
+                WebSocketResponse.success(response)
+        );
     }
 
     @MessageMapping("/room/{joinCode}/get-probabilities")
@@ -51,17 +71,23 @@ public class RoomWebSocketController {
                 .map(ProbabilityResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
-                WebSocketResponse.success(responses));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode + "/roulette",
+                WebSocketResponse.success(responses)
+        );
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.updateMiniGames(joinCode, message.hostName(),
-                message.miniGameTypes());
+        final List<MiniGameType> responses = roomService.updateMiniGames(
+                joinCode, message.hostName(),
+                message.miniGameTypes()
+        );
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
-                WebSocketResponse.success(responses));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode + "/minigame",
+                WebSocketResponse.success(responses)
+        );
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
@@ -69,7 +95,9 @@ public class RoomWebSocketController {
         final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
         roomService.delayCleanUp(joinCode);
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
-                WebSocketResponse.success(losePlayer));
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + joinCode + "/roulette",
+                WebSocketResponse.success(losePlayer)
+        );
     }
 }

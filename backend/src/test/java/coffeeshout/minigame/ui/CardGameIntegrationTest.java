@@ -395,6 +395,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         joinCode = new JoinCode("ABCDE");
         Room room = new Room(joinCode, new PlayerName("플레이어1"), null);
         room.joinGuest(new PlayerName("플레이어2"), null);
+        room.findPlayer(new PlayerName("플레이어2")).updateReadyState(true);
         room.addMiniGame(new PlayerName("플레이어1"), MiniGameType.CARD_GAME.createMiniGame());
         roomRepository.save(room);
 
@@ -410,6 +411,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         );
 
         sendStartGame(session1, joinCode, room.getHost().getName().value());
+
         responses1.get();
         responses2.get();
 

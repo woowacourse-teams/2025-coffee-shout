@@ -17,15 +17,18 @@ import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.ReadyResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,6 +254,30 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
         List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
         assertThat(playerNames).contains(winner.playerName());
+    }
+
+    @Test
+    void 플레이어의_준비_상태를_변경한다() throws ExecutionException, InterruptedException, TimeoutException {
+        // given
+        TestStompSession session = createSession();
+        String joinCode = testRoom.getJoinCode().getValue();
+
+        MessageCollector<WebSocketResponse<ReadyResponse>> readySubscribe = session.subscribe(
+                "/topic/room/" + joinCode + "/ready",
+                new TypeReference<>() {
+                }
+        );
+
+        // when
+        session.send("/app/room/" + joinCode + "/update-ready", new ReadyChangeMessage(joinCode, "플레이어한스", true));
+
+        // then
+        ReadyResponse readyResponse = readySubscribe.get().data();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(readyResponse.totalPlayerCount()).isEqualTo(4);
+            softly.assertThat(readyResponse.readyPlayerCount()).isEqualTo(2);
+        });
     }
 
     private void setupTestData() {

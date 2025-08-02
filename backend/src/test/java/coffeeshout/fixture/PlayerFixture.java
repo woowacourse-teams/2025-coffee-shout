@@ -25,18 +25,26 @@ public final class PlayerFixture {
     }
 
     public static Player 게스트한스() {
-        return Player.createGuest(new PlayerName("한스"), null);
+        final Player 한스 = Player.createGuest(new PlayerName("한스"), null);
+        한스.updateReadyState(true);
+        return 한스;
     }
 
     public static Player 게스트꾹이() {
-        return Player.createGuest(new PlayerName("꾹이"), null);
+        final Player 꾹이 = Player.createGuest(new PlayerName("꾹이"), null);
+        꾹이.updateReadyState(true);
+        return 꾹이;
     }
 
     public static Player 게스트루키() {
-        return Player.createGuest(new PlayerName("루키"), null);
+        final Player 루키 = Player.createGuest(new PlayerName("루키"), null);
+        루키.updateReadyState(true);
+        return 루키;
     }
 
     public static Player 게스트엠제이() {
-        return Player.createGuest(new PlayerName("엠제이"), null);
+        final Player 엠제이 = Player.createGuest(new PlayerName("엠제이"), null);
+        엠제이.updateReadyState(true);
+        return 엠제이;
     }
 }
