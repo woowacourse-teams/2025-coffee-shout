@@ -1,5 +1,5 @@
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
+import { ParticipantResponse } from '../../../lobby/pages/LobbyPage';
 import * as S from './PlayerMenu.styled';
 
 type Props = {

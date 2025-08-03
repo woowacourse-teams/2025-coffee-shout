@@ -1,6 +1,6 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
+import { ParticipantResponse } from '../../../lobby/pages/LobbyPage';
 import * as S from './MenuCount.styled';
 
 type Props = {

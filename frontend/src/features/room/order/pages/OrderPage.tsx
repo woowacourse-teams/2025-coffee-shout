@@ -14,8 +14,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
 import * as S from './OrderPage.styled';
-import MenuCount from '../components/MenuCount';
-import PlayerMenu from '../components/PlayerMenu';
+import MenuCount from '../components/MenuCount/MenuCount';
+import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
 
 const OrderPage = () => {
   const navigate = useNavigate();
