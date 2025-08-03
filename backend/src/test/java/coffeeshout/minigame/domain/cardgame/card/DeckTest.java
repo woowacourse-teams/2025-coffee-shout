@@ -92,7 +92,7 @@ class DeckTest {
 
             // when & then
             assertThatThrownBy(() -> deck.pick(cardIndex))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalStateException.class);
         }
 
         @ParameterizedTest

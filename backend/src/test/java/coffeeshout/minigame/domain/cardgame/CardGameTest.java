@@ -128,7 +128,7 @@ class CardGameTest {
 
             // then
             assertThatThrownBy(() -> cardGame.selectCard(player2, 0))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 

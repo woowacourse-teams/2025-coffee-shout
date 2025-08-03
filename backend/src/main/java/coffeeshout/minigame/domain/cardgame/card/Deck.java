@@ -31,7 +31,7 @@ public class Deck {
 
     public Card pick(int cardIndex) {
         final Card selectedCard = cards.get(cardIndex);
-        isTrue(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
+        state(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
         pickedCards.add(selectedCard);
         return selectedCard;
     }
