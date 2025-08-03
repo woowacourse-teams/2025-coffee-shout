@@ -19,10 +19,10 @@ const MenuCount = ({ participants }: Props) => {
   return (
     <S.OrderList>
       <S.Divider />
-      {[...simpleViewMap].map((item, index) => (
+      {[...simpleViewMap].map(([menuName, count], index) => (
         <S.OrderItem key={index}>
-          <Paragraph>{item[0]}</Paragraph>
-          <Paragraph>{item[1]}개</Paragraph>
+          <Paragraph>{menuName}</Paragraph>
+          <Paragraph>{count}개</Paragraph>
         </S.OrderItem>
       ))}
       <S.Divider />
