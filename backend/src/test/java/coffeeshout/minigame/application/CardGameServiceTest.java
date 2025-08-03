@@ -127,7 +127,7 @@ class CardGameServiceTest {
 
             // when
             cardGameService.start(cardGameSpy, joinCode.value());
-            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING_STATE);
+            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
 
             Map<Player, Probability> probabilities = room.getProbabilities();
@@ -156,7 +156,7 @@ class CardGameServiceTest {
             // when
             cardGameService.start(miniGame, joinCode.value());
 
-            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING_STATE);
+            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
             // then
             verify(messagingTemplate, atLeast(6))

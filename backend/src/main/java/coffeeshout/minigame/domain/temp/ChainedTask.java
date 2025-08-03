@@ -21,8 +21,16 @@ public class ChainedTask {
         future = scheduler.schedule(chainedRunnable(scheduler), Instant.now().plus(delay));
     }
 
+    public void start(TaskScheduler scheduler, Duration delay) {
+        future = scheduler.schedule(chainedRunnable(scheduler), Instant.now().plus(delay));
+    }
+
     public void setNextTask(ChainedTask nextChainedTask) {
         this.nextChainedTask = nextChainedTask;
+    }
+
+    public void joinThis() throws ExecutionException, InterruptedException {
+        this.future.get();
     }
 
     public void join() throws ExecutionException, InterruptedException {
@@ -39,13 +47,25 @@ public class ChainedTask {
         future.cancel(false);
     }
 
+    public void cancelDelay(TaskScheduler scheduler) {
+        if (nextChainedTask == null || !nextChainedTask.isStarted() || nextChainedTask.isDone()) {
+            return;
+        }
+        nextChainedTask.cancel();
+        nextChainedTask.start(scheduler);
+    }
+
+    public boolean isDone() {
+        return isStarted() && future.isDone();
+    }
+
     private Runnable chainedRunnable(TaskScheduler scheduler) {
         if (nextChainedTask == null) {
             return runnable;
         }
         return () -> {
             runnable.run();
-            nextChainedTask.start(scheduler);
+            nextChainedTask.start(scheduler, delay);
         };
     }
 

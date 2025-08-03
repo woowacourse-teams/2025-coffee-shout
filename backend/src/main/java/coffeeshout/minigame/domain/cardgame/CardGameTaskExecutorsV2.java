@@ -25,7 +25,7 @@ public class CardGameTaskExecutorsV2 {
     }
 
     public void cancelPlaying(JoinCode joinCode, CardGameTaskType type) {
-        roomTaskExecutorMap.get(joinCode).cancel(type);
+        roomTaskExecutorMap.get(joinCode).cancelDelay(type);
     }
 
     // TODO 게임 완료 시에 해당 MiniGameTaskManager를 지워야 함

@@ -1,6 +1,6 @@
 package coffeeshout.minigame.application;
 
-import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_LOADING_STATE;
+import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_LOADING;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -64,7 +64,7 @@ public class CardGameService implements MiniGameService {
                 type,
                 type.createTask(cardGame, room, () -> sendCardGameState(roomJoinCode))
         ));
-        manager.startWith(FIRST_ROUND_LOADING_STATE);
+        manager.startWith(FIRST_ROUND_LOADING);
     }
 
     public void selectCard(String joinCode, String playerName, Integer cardIndex) {
