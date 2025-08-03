@@ -8,7 +8,7 @@ type Props = {
 };
 
 const MenuCount = ({ participants }: Props) => {
-  const simpleViewMap = new Map();
+  const simpleViewMap = new Map<string, number>();
 
   participants.forEach((participant) => {
     const { menuResponse } = participant;
