@@ -1,6 +1,6 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
@@ -10,7 +10,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -40,7 +40,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-@Import({TestConfig.class})
 class CardGameServiceTest {
 
     @MockitoBean
@@ -64,7 +63,7 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
+        List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();

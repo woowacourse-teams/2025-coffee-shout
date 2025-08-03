@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.temp.CardGameTaskType;
+import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
@@ -28,6 +28,7 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     ObjectMapper objectMapper;
 
     @Autowired
-    CardGameTaskExecutors cardGameTaskExecutors;
+    CardGameTaskExecutorsV2 cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -67,19 +68,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @AfterEach
     void tearDown() {
         // 실행 중인 모든 태스크 취소 및 스레드 정리
-        TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
-        if (executor != null) {
-            executor.cancelAll();
-            executor.getExecutor().shutdown();
-            try {
-                if (!executor.getExecutor().awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS)) {
-                    executor.getExecutor().shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                executor.getExecutor().shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
+        MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
+        Arrays.stream(CardGameTaskType.values()).forEach(executor::cancel);
     }
 
     @Test

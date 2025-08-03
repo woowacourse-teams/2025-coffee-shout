@@ -1,5 +1,6 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
+import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class Deck {
 
     public Card pick(int cardIndex) {
         final Card selectedCard = cards.get(cardIndex);
-        state(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
+        isTrue(!isPicked(selectedCard), "이미 뽑은 카드입니다.");
         pickedCards.add(selectedCard);
         return selectedCard;
     }
