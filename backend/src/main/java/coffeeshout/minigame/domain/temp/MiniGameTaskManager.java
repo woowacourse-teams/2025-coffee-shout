@@ -1,19 +1,20 @@
 package coffeeshout.minigame.domain.temp;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 
-@RequiredArgsConstructor
 public class MiniGameTaskManager<T> {
 
-    private final Map<T, ChainedTask> tasks = new ConcurrentHashMap<>();
+    private final Map<T, ChainedTask> tasks;
     private final TaskScheduler scheduler;
     private ChainedTask lastTask;
+
+    public MiniGameTaskManager(TaskScheduler scheduler) {
+        this.tasks = new ConcurrentHashMap<>();
+        this.scheduler = scheduler;
+    }
 
     public void addTask(T type, ChainedTask task) {
         if (lastTask != null) {
