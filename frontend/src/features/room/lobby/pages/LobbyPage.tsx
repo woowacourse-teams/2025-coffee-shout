@@ -22,7 +22,6 @@ import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
-
 type ParticipantResponse = Player[];
 
 const LobbyPage = () => {

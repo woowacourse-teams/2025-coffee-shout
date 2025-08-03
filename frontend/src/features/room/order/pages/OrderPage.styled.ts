@@ -26,41 +26,6 @@ export const ListHeader = styled.div`
   margin-bottom: 1rem;
 `;
 
-export const OrderList = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-export const OrderItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-`;
-
-export const Divider = styled.div`
-  border-top: 1px dashed #d1d5db;
-  margin: 1.5rem 0;
-`;
-
-export const TotalWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-export const DetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  height: calc(100% - 5rem);
-  overflow-y: scroll;
-`;
-
-export const DetailItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-`;
-
 export const Logo = styled.img`
   width: 100px;
   margin-bottom: 1rem;

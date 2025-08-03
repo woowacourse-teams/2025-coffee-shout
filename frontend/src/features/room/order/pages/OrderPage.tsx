@@ -1,3 +1,5 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
 import DetailIcon from '@/assets/detail-icon.svg';
 import DownloadIcon from '@/assets/download-icon.svg';
@@ -6,67 +8,40 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
-import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as S from './OrderPage.styled';
+import MenuCount from '../components/MenuCount/MenuCount';
+import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
+import { Player } from '@/types/player';
+
+type ParticipantResponse = Player[];
 
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { send } = useWebSocket();
+  const { joinCode } = useIdentifier();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
+  const [participants, setParticipants] = useState<ParticipantResponse>([]);
 
-  const simpleOrderItems = [
-    { name: '아이스 아메리카노', quantity: 3 },
-    { name: '복숭아 아이스티', quantity: 3 },
-    { name: '초코칩 프라푸치노', quantity: 1 },
-  ];
+  const handleOrder = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
-  const detailOrderItems = [
-    { person: '다이앤', drink: '복숭아 아이스티' },
-    { person: '메리', drink: '복숭아 아이스티' },
-    { person: '니야', drink: '아이스 아메리카노' },
-    { person: '엠제이', drink: '초코칩 프라푸치노' },
-    { person: '꾹이', drink: '복숭아 아이스티' },
-    { person: '한스', drink: '아이스 아메리카노' },
-    { person: '루키', drink: '아이스 아메리카노' },
-  ];
-
-  const totalQuantity = simpleOrderItems.reduce((sum, item) => sum + item.quantity, 0);
+  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleOrder);
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
   };
 
-  const renderSimpleView = () => (
-    <>
-      <S.OrderList>
-        {simpleOrderItems.map((item, index) => (
-          <S.OrderItem key={index}>
-            <Paragraph>{item.name}</Paragraph>
-            <Paragraph>{item.quantity}개</Paragraph>
-          </S.OrderItem>
-        ))}
-      </S.OrderList>
-      <S.Divider />
-      <S.TotalWrapper>
-        <Headline3>총 {totalQuantity}개</Headline3>
-      </S.TotalWrapper>
-    </>
-  );
-
-  const renderDetailView = () => (
-    <S.DetailGrid>
-      {detailOrderItems.map((item, index) => (
-        <S.DetailItem key={index}>
-          <Paragraph>{item.person}</Paragraph>
-          <Paragraph>{item.drink}</Paragraph>
-        </S.DetailItem>
-      ))}
-    </S.DetailGrid>
-  );
+  useEffect(() => {
+    if (joinCode) {
+      send(`/room/${joinCode}/update-players`);
+    }
+  }, [joinCode, send]);
 
   return (
     <Layout>
@@ -83,7 +58,11 @@ const OrderPage = () => {
           <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
           <IconButton iconSrc={DetailIcon} onClick={handleToggle} />
         </S.ListHeader>
-        {viewMode === 'simple' ? renderSimpleView() : renderDetailView()}
+        {viewMode === 'simple' ? (
+          <MenuCount participants={participants} />
+        ) : (
+          <PlayerMenu participants={participants} />
+        )}
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         <Button variant="primary" onClick={() => navigate('/')}>
