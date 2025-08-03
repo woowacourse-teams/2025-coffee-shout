@@ -1,9 +1,9 @@
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ParticipantResponse } from '../../../lobby/pages/LobbyPage';
 import * as S from './PlayerMenu.styled';
+import { Player } from '@/types/player';
 
 type Props = {
-  participants: ParticipantResponse;
+  participants: Player[];
 };
 
 const PlayerMenu = ({ participants }: Props) => {

@@ -12,10 +12,12 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
 import * as S from './OrderPage.styled';
 import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
+import { Player } from '@/types/player';
+
+type ParticipantResponse = Player[];
 
 const OrderPage = () => {
   const navigate = useNavigate();

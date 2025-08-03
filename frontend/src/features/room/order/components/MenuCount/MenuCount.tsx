@@ -1,10 +1,10 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import { ParticipantResponse } from '../../../lobby/pages/LobbyPage';
 import * as S from './MenuCount.styled';
+import { Player } from '@/types/player';
 
 type Props = {
-  participants: ParticipantResponse;
+  participants: Player[];
 };
 
 const MenuCount = ({ participants }: Props) => {
