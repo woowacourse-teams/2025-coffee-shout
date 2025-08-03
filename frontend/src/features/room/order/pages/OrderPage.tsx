@@ -1,3 +1,5 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
 import DetailIcon from '@/assets/detail-icon.svg';
 import DownloadIcon from '@/assets/download-icon.svg';
@@ -6,15 +8,14 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
-import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import * as S from './OrderPage.styled';
 import { ParticipantResponse } from '../../lobby/pages/LobbyPage';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import * as S from './OrderPage.styled';
+import MenuCount from '../components/MenuCount';
+import PlayerMenu from '../components/PlayerMenu';
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -32,45 +33,6 @@ const OrderPage = () => {
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
-  };
-
-  const renderSimpleView = () => {
-    const simpleViewMap = new Map();
-
-    participants.forEach((participant) => {
-      const { menuResponse } = participant;
-      const count = simpleViewMap.get(menuResponse.name) || 0;
-      simpleViewMap.set(menuResponse.name, count + 1);
-    });
-
-    return (
-      <S.OrderList>
-        <S.Divider />
-        {[...simpleViewMap].map((item, index) => (
-          <S.OrderItem key={index}>
-            <Paragraph>{item[0]}</Paragraph>
-            <Paragraph>{item[1]}개</Paragraph>
-          </S.OrderItem>
-        ))}
-        <S.Divider />
-        <S.TotalWrapper>
-          <Headline3>총 {participants.length}개</Headline3>
-        </S.TotalWrapper>
-      </S.OrderList>
-    );
-  };
-
-  const renderDetailView = () => {
-    return (
-      <S.OrderList>
-        {participants.map((participant, index) => (
-          <S.OrderItem key={index}>
-            <Paragraph>{participant.playerName}</Paragraph>
-            <Paragraph>{participant.menuResponse.name}</Paragraph>
-          </S.OrderItem>
-        ))}
-      </S.OrderList>
-    );
   };
 
   useEffect(() => {
@@ -94,7 +56,11 @@ const OrderPage = () => {
           <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
           <IconButton iconSrc={DetailIcon} onClick={handleToggle} />
         </S.ListHeader>
-        {viewMode === 'simple' ? renderSimpleView() : renderDetailView()}
+        {viewMode === 'simple' ? (
+          <MenuCount participants={participants} />
+        ) : (
+          <PlayerMenu participants={participants} />
+        )}
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         <Button variant="primary" onClick={() => navigate('/')}>
