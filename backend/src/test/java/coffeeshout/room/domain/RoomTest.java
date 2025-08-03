@@ -143,8 +143,6 @@ class RoomTest {
     @Test
     void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
         MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
