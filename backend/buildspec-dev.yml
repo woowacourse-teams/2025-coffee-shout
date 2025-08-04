@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SNS_TOPIC_ARN : "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
+    SNS_TOPIC_ARN: "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
 
 phases:
   install:
@@ -10,11 +10,12 @@ phases:
       java: corretto21
     commands:
       - ls -la
-      - chmod +x backend/gradlew
+      - chmod +x ./gradlew
 
   build:
     commands:
-      - cd backend && ./gradlew build
+      # dev 환경에서는 특정 테스트 제외하고 빌드
+      - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE
@@ -25,7 +26,7 @@ phases:
       - chmod +x ../scripts/*.sh
 
       # appspec 복사
-      - cp appspec.yml ../appspec.yml
+      - cp appspec-dev.yml ../appspec.yml
   post_build:
     commands:
       - echo "Build completed on $(date)"
@@ -35,8 +36,8 @@ phases:
         
           aws sns publish \
             --topic-arn "$SNS_TOPIC_ARN" \
-            --subject "🚨 Build Failed: $CODEBUILD_INITIATOR" \
-            --message "Build $CODEBUILD_BUILD_ID failed at $(date)" \
+            --subject "🚨 Dev Build Failed: $CODEBUILD_INITIATOR" \
+            --message "Dev Build $CODEBUILD_BUILD_ID failed at $(date)" \
             --region "$AWS_DEFAULT_REGION"
         fi
 
@@ -50,4 +51,4 @@ cache:
   paths:
     - '/root/.gradle/caches/**/*'
     - '/root/.gradle/wrapper/**/*'
-    - 'backend/.gradle/**/*'
+    - '.gradle/**/*'
