@@ -1,6 +1,6 @@
 import { ApiError, NetworkError } from './error';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || 'http://api.coffee-shout.com';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -33,7 +33,6 @@ export const apiRequest = async <T, TData>(
     retry = { count: 0, delay: 1000 },
   } = options;
 
-  // let requestUrl = `${API_URL}url`;
   let requestUrl = API_URL + url;
 
   if (params) {

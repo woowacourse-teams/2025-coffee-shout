@@ -1,3 +1,4 @@
+import { api } from '@/apis/rest/api';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
@@ -21,12 +22,10 @@ import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
-
 type ParticipantResponse = Player[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
@@ -124,6 +123,15 @@ const LobbyPage = () => {
       send(`/room/${joinCode}/get-probabilities`);
     }
   }, [playerType, joinCode, send]);
+
+  useEffect(() => {
+    (async () => {
+      const _selectedMiniGames = await api.get<MiniGameType[]>(
+        `/rooms/minigames/selected?joinCode=${joinCode}`
+      );
+      setSelectedMiniGames(_selectedMiniGames);
+    })();
+  }, [joinCode]);
 
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection participants={participants} />,
