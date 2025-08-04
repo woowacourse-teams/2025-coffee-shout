@@ -78,6 +78,30 @@ export class ButtonHelper {
   async clickEnterRoom() {
     await this.page.getByRole('button', { name: '방 참가하기' }).click();
   }
+
+  async clickGameStart() {
+    await this.page.getByRole('button', { name: '게임 시작' }).click();
+  }
+
+  async clickShare() {
+    await this.page.getByRole('button', { name: '공유' }).click();
+  }
+
+  async clickSectionTab(sectionName: '참가자' | '룰렛' | '미니게임') {
+    await this.page.getByRole('button', { name: sectionName }).click();
+  }
+
+  async clickMiniGame(gameName: string) {
+    await this.page.getByRole('button', { name: gameName }).click();
+  }
+
+  async clickCopyIcon() {
+    await this.page.locator('[src*="copy-icon"]').click();
+  }
+
+  async clickCloseModal() {
+    await this.page.getByRole('button', { name: '모달 닫기' }).click();
+  }
 }
 
 /**
@@ -105,6 +129,11 @@ export class AssertionHelper {
     // 메인 페이지에서 모달이 열린 상태
     await expect(this.page).toHaveURL('/');
     await expect(this.page.getByPlaceholder('ex) ABCDE')).toBeVisible();
+  }
+
+  async expectShareModalToBeOpen() {
+    await expect(this.page.getByRole('dialog')).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
   }
 }
 
@@ -175,6 +204,11 @@ export class TestHelper {
 
     if (!code) {
       throw new Error('방 참가 코드를 찾을 수 없습니다.');
+    }
+
+    const closeButton = this.page.getByRole('button', { name: '모달 닫기' });
+    if (await closeButton.isVisible()) {
+      await this.button.clickCloseModal();
     }
 
     return code.trim();

@@ -14,7 +14,7 @@ type Props = {
 
 const PlayerCard = ({ name, iconColor, playerType = 'GUEST', children }: Props) => {
   return (
-    <S.Container>
+    <S.Container data-testid="player-card">
       <S.Wrapper>
         <S.PlayerIcon src={getPlayerIcon(iconColor)} alt={`player-${name}-icon`} />
         <S.NameWrapper>

@@ -17,7 +17,7 @@ const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
     <S.Container>
       <Headline3 id={id}>{title}</Headline3>
       {showCloseButton && (
-        <S.CloseButton onClick={onClose}>
+        <S.CloseButton onClick={onClose} aria-label="모달 닫기">
           <CloseIcon stroke={theme.color.gray[600]} />
         </S.CloseButton>
       )}

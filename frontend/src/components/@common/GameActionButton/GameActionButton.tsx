@@ -18,7 +18,15 @@ const GameActionButton = ({ onClick, isSelected, isDisabled, gameName, ...rest }
   };
 
   return (
-    <S.Container onClick={handleClick} $isSelected={isSelected} $disabled={isDisabled} {...rest}>
+    <S.Container
+      onClick={handleClick}
+      $isSelected={isSelected}
+      $disabled={isDisabled}
+      aria-pressed={isSelected}
+      disabled={isDisabled}
+      tabIndex={isDisabled ? -1 : 0}
+      {...rest}
+    >
       <S.GameNameWrapper>
         <Headline4 color={isSelected ? 'white' : 'point-400'}>{gameName}</Headline4>
       </S.GameNameWrapper>
