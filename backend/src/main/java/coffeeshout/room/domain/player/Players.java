@@ -13,8 +13,10 @@ public class Players {
         this.players = new ArrayList<>();
     }
 
-    public void join(Player player) {
+    public Player join(Player player) {
+        player.assignColorIndex(players.size());
         this.players.add(player);
+        return getPlayer(player.getName());
     }
 
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {
@@ -34,5 +36,10 @@ public class Players {
 
     public boolean hasDuplicateName(PlayerName playerNmae) {
         return players.stream().anyMatch(player -> player.sameName(playerNmae));
+    }
+
+    public boolean isAllReady() {
+        return players.stream()
+                .allMatch(Player::getIsReady);
     }
 }

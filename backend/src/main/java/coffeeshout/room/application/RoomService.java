@@ -63,6 +63,15 @@ public class RoomService {
         return room.getPlayers();
     }
 
+    public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Player player = room.findPlayer(new PlayerName(playerName));
+
+        player.updateReadyState(isReady);
+
+        return room.getPlayers();
+    }
+
     public Map<Player, Probability> getProbabilities(String joinCode) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
