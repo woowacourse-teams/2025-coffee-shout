@@ -8,9 +8,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-@Slf4j
-@EnableScheduling
 @Configuration
+@EnableScheduling
+@Slf4j
 public class MiniGameTaskSchedulerConfig {
 
     @Bean(name = "miniGameTaskScheduler")
