@@ -294,7 +294,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        assertThatThrownBy(() -> responses.get())
+        assertThatThrownBy(responses::get)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }
@@ -323,7 +323,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        assertThatThrownBy(() -> responses.get())
+        assertThatThrownBy(responses::get)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }

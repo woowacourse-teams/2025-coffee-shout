@@ -5,7 +5,6 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.room.domain.Room;
-import java.time.Duration;
 import java.util.Arrays;
 import lombok.Getter;
 
@@ -17,7 +16,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.startRound();
                 sendMessage.run();
-            }, Duration.ofMillis(CardGameState.LOADING.getDuration()));
+            }, getState().getDurationMillis());
         }
     },
     FIRST_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.FIRST) {
@@ -26,7 +25,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.startPlay();
                 sendMessage.run();
-            }, Duration.ofMillis(CardGameState.PLAYING.getDuration()));
+            }, getState().getDurationMillis());
         }
     },
     FIRST_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.FIRST) {
@@ -36,7 +35,7 @@ public enum CardGameTaskType {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
                 sendMessage.run();
-            }, Duration.ofMillis(CardGameState.SCORE_BOARD.getDuration()));
+            }, getState().getDurationMillis());
         }
     },
     SECOND_ROUND_LOADING(CardGameState.LOADING, CardGameRound.FIRST) {
@@ -45,7 +44,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.startRound();
                 sendMessage.run();
-            }, Duration.ofMillis(CardGameState.LOADING.getDuration()));
+            }, getState().getDurationMillis());
         }
     },
     SECOND_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.SECOND) {
@@ -54,7 +53,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.startPlay();
                 sendMessage.run();
-            }, Duration.ofMillis(CardGameState.PLAYING.getDuration()));
+            }, getState().getDurationMillis());
         }
     },
     SECOND_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.SECOND) {
@@ -64,7 +63,7 @@ public enum CardGameTaskType {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
                 sendMessage.run();
-            }, Duration.ofMillis(0));
+            }, getState().getDurationMillis());
         }
     },
     GAME_FINISH_STATE(CardGameState.DONE, CardGameRound.SECOND) {
@@ -75,7 +74,7 @@ public enum CardGameTaskType {
                 MiniGameResult result = cardGame.getResult();
                 room.applyMiniGameResult(result);
                 sendMessage.run();
-            }, Duration.ofMillis(0));
+            }, getState().getDurationMillis());
         }
     },
     ;

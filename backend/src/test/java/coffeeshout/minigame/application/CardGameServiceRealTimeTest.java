@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.task.CardGameTaskType;
+import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -31,8 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest
 @Disabled
+@SpringBootTest
 class CardGameServiceRealTimeTest {
 
     @MockitoBean
@@ -48,7 +48,7 @@ class CardGameServiceRealTimeTest {
     RoomService roomService;
 
     @Autowired
-    CardGameTaskExecutors cardGameTaskExecutors;
+    CardGameTaskExecutorsV2 cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -85,10 +85,8 @@ class CardGameServiceRealTimeTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
+                MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
-
-                softly.assertThat(executor.getFutureTasks()).hasSize(7);
             });
         }
 
@@ -102,7 +100,6 @@ class CardGameServiceRealTimeTest {
                 READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
                 0~3000      3000~13000      13000~14500      14500~17500    17500~27500     27500~29000     29000~
              */
-
             Thread.sleep(1000);
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
