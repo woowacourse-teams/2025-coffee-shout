@@ -37,11 +37,11 @@ public class MiniGameTaskManager<T> {
     }
 
     public void join(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).join();
+        tasks.get(type).joinAll();
     }
 
     public void joinThis(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).joinThis();
+        tasks.get(type).join();
     }
 
     public void cancelAll() {

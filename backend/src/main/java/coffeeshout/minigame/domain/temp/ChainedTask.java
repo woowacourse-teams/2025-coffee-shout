@@ -29,14 +29,14 @@ public class ChainedTask {
         this.nextChainedTask = nextChainedTask;
     }
 
-    public void joinThis() throws ExecutionException, InterruptedException {
+    public void join() throws ExecutionException, InterruptedException {
         this.future.get();
     }
 
-    public void join() throws ExecutionException, InterruptedException {
+    public void joinAll() throws ExecutionException, InterruptedException {
         this.future.get();
         if (nextChainedTask != null) {
-            this.nextChainedTask.join();
+            this.nextChainedTask.joinAll();
         }
     }
 
