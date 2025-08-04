@@ -9,6 +9,7 @@ phases:
     runtime-versions:
       java: corretto21
     commands:
+      - cd backend
       - ls -la
       - chmod +x ./gradlew
 
@@ -26,7 +27,7 @@ phases:
       - chmod +x ../scripts/*.sh
 
       # appspec 복사
-      - cp appspec-dev.yml ../appspec.yml
+      - cp appspec.yml ../appspec.yml
   post_build:
     commands:
       - echo "Build completed on $(date)"

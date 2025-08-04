@@ -2,13 +2,14 @@ version: 0.2
 
 env:
   variables:
-    SNS_TOPIC_ARN : "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
+    SNS_TOPIC_ARN: "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
 
 phases:
   install:
     runtime-versions:
       java: corretto21
     commands:
+      - cd backend
       - ls -la
       - chmod +x ./gradlew
 
@@ -26,7 +27,7 @@ phases:
       - chmod +x ../scripts/*.sh
 
       # appspec 복사
-      - cp appspec-prod.yml ../appspec.yml
+      - cp appspec.yml ../appspec.yml
   post_build:
     commands:
       - echo "Build completed on $(date)"
