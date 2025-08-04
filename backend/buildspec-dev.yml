@@ -9,13 +9,14 @@ phases:
     runtime-versions:
       java: corretto21
     commands:
+      - cd backend
       - ls -la
       - chmod +x ./gradlew
 
   build:
     commands:
       # dev 환경에서는 특정 테스트 제외하고 빌드
-      - ./backend/gradlew build -x test
+      - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE
