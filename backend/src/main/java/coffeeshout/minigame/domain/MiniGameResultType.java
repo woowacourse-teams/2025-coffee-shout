@@ -41,5 +41,4 @@ public enum MiniGameResultType {
     private static int calculateWinnerCount(int playerCount) {
         return playerCount / 2;
     }
-
 }
