@@ -27,17 +27,17 @@ jobs:
       - name: Delete merged branch
         run: |
           BRANCH_NAME="${{ steps.branch-name.outputs.branch }}"
-          
+
           # 보호된 브랜치들은 삭제하지 않음 (main, master, develop, be/dev 등)
           PROTECTED_BRANCHES=("main" "fe/dev" "fe/prod" "be/dev" "be/prod")
-          
+
           for protected in "${PROTECTED_BRANCHES[@]}"; do
             if [[ "$BRANCH_NAME" == "$protected" ]]; then
               echo "⚠️  Protected branch '$BRANCH_NAME' will not be deleted"
               exit 0
             fi
           done
-          
+
           # 브랜치가 존재하는지 확인
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
             echo "🗑️  Deleting branch: $BRANCH_NAME"
@@ -51,10 +51,10 @@ jobs:
         with:
           script: |
             const branchName = '${{ steps.branch-name.outputs.branch }}';
-            
+
             // 보호된 브랜치 체크
             const protectedBranches = ['main', 'fe/prod', 'fe/dev', 'be/dev', 'be/prod'];
-            
+
             if (protectedBranches.includes(branchName)) {
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
