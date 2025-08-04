@@ -5,6 +5,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
+import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
@@ -24,7 +25,8 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-players")
     public void broadcastPlayers(@DestinationVariable String joinCode) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode).stream()
+        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
+                .stream()
                 .map(PlayerResponse::from)
                 .toList();
 
@@ -36,6 +38,18 @@ public class RoomWebSocketController {
     public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
         final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(),
                         message.menuId())
+                .stream()
+                .map(PlayerResponse::from)
+                .toList();
+
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
+                WebSocketResponse.success(responses));
+    }
+
+    @MessageMapping("room/{joinCode}/update-ready")
+    public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
+        final List<PlayerResponse> responses = roomService.changePlayerReadyState(joinCode, message.playerName(),
+                        message.isReady())
                 .stream()
                 .map(PlayerResponse::from)
                 .toList();

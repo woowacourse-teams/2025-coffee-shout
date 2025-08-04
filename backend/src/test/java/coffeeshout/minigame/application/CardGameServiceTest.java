@@ -72,6 +72,11 @@ class CardGameServiceTest {
         for (int i = 1; i < players.size(); i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
+
+        // 모든 플레이어가 준비 완료여야 한다.
+        for (Player player : room.getPlayers()) {
+            player.updateReadyState(true);
+        }
     }
 
     @Nested
