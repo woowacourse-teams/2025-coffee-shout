@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SNS_TOPIC_ARN : "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
+    SNS_TOPIC_ARN: "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
 
 phases:
   install:
@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       # prod 환경에서는 모든 테스트 실행
-      - ./gradlew build
+      - ./backend/gradlew build
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE

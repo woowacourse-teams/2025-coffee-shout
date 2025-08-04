@@ -1,6 +1,7 @@
 spring:
   application:
-    name:coffee-shout
+    name:
+      coffee-shout
 
 logging:
   level:
