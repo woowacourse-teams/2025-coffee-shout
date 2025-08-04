@@ -68,7 +68,7 @@ const MiniGameResultPage = () => {
               <Headline3>
                 <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
               </Headline3>
-              <PlayerCard name={playerRank.playerName} iconColor={'#FF6B6B'}>
+              <PlayerCard name={playerRank.playerName} playerColor={'#FF6B6B'}>
                 <Headline4>
                   {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
                 </Headline4>
