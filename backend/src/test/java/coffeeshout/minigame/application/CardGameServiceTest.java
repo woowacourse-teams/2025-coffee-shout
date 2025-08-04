@@ -9,8 +9,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -18,11 +17,11 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
 import coffeeshout.minigame.domain.temp.TaskExecutor;
-import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
@@ -50,10 +49,10 @@ class CardGameServiceTest {
     CardGameService cardGameService;
 
     @Autowired
-    RoomQueryService roomQueryService;
+    RoomRepository roomRepository;
 
     @Autowired
-    RoomService roomService;
+    RoomQueryService roomQueryService;
 
     @Autowired
     CardGameTaskExecutors cardGameTaskExecutors;
@@ -64,15 +63,11 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
-        host = players.get(0);
-        Room room = roomService.createRoom(host.getName().value(), 1L);
+        Room room = RoomFixture.호스트_꾹이();
+        roomRepository.save(room);
         joinCode = room.getJoinCode();
+        host = room.getHost();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
-
-        for (int i = 1; i < players.size(); i++) {
-            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
-        }
     }
 
     @Nested
@@ -113,9 +108,12 @@ class CardGameServiceTest {
             );
 
             Room room = roomQueryService.findByJoinCode(joinCode);
+
+            List<Player> players = room.getPlayers();
+
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             CardGame cardGameSpy = spy(cardGame);
-            List<Player> players = room.getPlayers();
+
             MiniGameResult result = new MiniGameResult(Map.of(
                     players.get(0), 1, // 꾹이 1등 / 가중치: -2500 * 0.7 = -1750 => 750
                     players.get(1), 2, // 루키 2등 / 가중치: -1250 * 0.7 = -875 => 1625
@@ -129,13 +127,13 @@ class CardGameServiceTest {
             cardGameService.start(cardGameSpy, joinCode.value());
             assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
 
-
             Map<Player, Probability> probabilities = room.getProbabilities();
             assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
                     players.get(0), new Probability(750),
                     players.get(1), new Probability(1625),
                     players.get(2), new Probability(3375),
-                    players.get(3), new Probability(4250)));
+                    players.get(3), new Probability(4250)
+            ));
         }
 
         @Test

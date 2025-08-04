@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class MiniGameController {
+public class MiniGameWebSocketController {
 
     private final MiniGameCommandDispatcher miniGameCommandDispatcher;
     private final ObjectMapper objectMapper;

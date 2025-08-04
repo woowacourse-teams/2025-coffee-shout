@@ -1,5 +1,6 @@
 package coffeeshout.room.domain;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -8,6 +9,7 @@ import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Player;
@@ -15,6 +17,8 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Roulette;
 import java.util.LinkedList;
 import java.util.List;
+import net.bytebuddy.build.ToStringPlugin.Enhance;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -143,8 +147,6 @@ class RoomTest {
     @Test
     void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
         MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
@@ -234,5 +236,36 @@ class RoomTest {
         // when & then
         assertThatThrownBy(() -> room.removeMiniGame(게스트_꾹이, cardGame))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 미니게임을_시작한다(){
+        // given
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        room.addMiniGame(호스트_한스, cardGame);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player host = room.getHost();
+        Player guest = room.findPlayer(게스트_꾹이);
+
+        // when
+        guest.updateReadyState(true);
+        Playable playable = room.startNextGame(host.getName().value());
+
+        // then
+        assertThat(playable.getMiniGameType()).isEqualTo(MiniGameType.CARD_GAME);
+    }
+
+    @Test
+    void 게임_시작_시_모든_플레이어가_레디_상태가_아니면_예외가_발생한다() {
+        // given
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        room.addMiniGame(호스트_한스, cardGame);
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        Player host = room.getHost();
+
+        // when & then
+        assertThatThrownBy(() -> room.startNextGame(host.getName().value()))
+            .isInstanceOf(IllegalStateException.class)
+                .hasMessage("모든 플레이어가 준비완료해야합니다.");
     }
 }

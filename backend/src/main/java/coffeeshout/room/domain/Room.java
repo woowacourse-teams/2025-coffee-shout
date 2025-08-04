@@ -6,6 +6,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -110,8 +111,8 @@ public class Room {
     }
 
     private void join(Player player) {
-        players.join(player);
-        roulette.join(player);
+        final Player joinedPlayer = players.join(player);
+        roulette.join(joinedPlayer);
     }
 
     public Map<Player, Probability> getProbabilities() {
@@ -122,7 +123,13 @@ public class Room {
         return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
-    public Playable findMiniGame(coffeeshout.minigame.domain.MiniGameType miniGameType) {
+    public List<MiniGameType> getSelectedMiniGameTypes(){
+        return getAllMiniGame().stream()
+                .map(Playable::getMiniGameType)
+                .toList();
+    }
+
+    public Playable findMiniGame(MiniGameType miniGameType) {
         return finishedGames.stream()
                 .filter(minigame -> minigame.getMiniGameType() == miniGameType)
                 .findFirst()
@@ -131,15 +138,18 @@ public class Room {
 
     public Playable startNextGame(String hostName) {
         state(host.sameName(new PlayerName(hostName)), "호스트가 게임을 시작할 수 있습니다.");
+        state(players.isAllReady(), "모든 플레이어가 준비완료해야합니다.");
+        state(players.getPlayerCount() >= 2, "게임을 시작하려면 플레이어가 2명 이상이어야 합니다.");
         state(!miniGames.isEmpty(), "시작할 게임이 없습니다.");
         state(roomState == RoomState.READY, "게임을 시작할 수 있는 상태가 아닙니다.");
 
         Playable currentGame = miniGames.poll();
-        finishedGames.add(currentGame);
 
         currentGame.startGame(players.getPlayers());
 
         roomState = RoomState.PLAYING;
+
+        finishedGames.add(currentGame);
 
         return currentGame;
     }

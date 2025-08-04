@@ -1,5 +1,7 @@
 package coffeeshout.room.application;
 
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -61,6 +63,15 @@ public class RoomService {
         return room.getPlayers();
     }
 
+    public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Player player = room.findPlayer(new PlayerName(playerName));
+
+        player.updateReadyState(isReady);
+
+        return room.getPlayers();
+    }
+
     public Map<Player, Probability> getProbabilities(String joinCode) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
@@ -107,5 +118,24 @@ public class RoomService {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         roomCommandService.delayCleanUp(room, Duration.ofHours(1));
+    }
+
+    public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Playable miniGame = room.findMiniGame(miniGameType);
+
+        return miniGame.getScores();
+    }
+
+    public MiniGameResult getMiniGameRanks(String joinCode, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Playable miniGame = room.findMiniGame(miniGameType);
+
+        return miniGame.getResult();
+    }
+
+    public List<MiniGameType> getSelectedMiniGames(String joinCode) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        return room.getSelectedMiniGameTypes();
     }
 }
