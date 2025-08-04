@@ -3,11 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
 
   // 테스트 파일 패턴
-  testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
-    '<rootDir>/src/**/*.{test,spec}.{ts,tsx}',
-    '<rootDir>/__tests__/**/*.{ts,tsx}',
-  ],
+  testMatch: ['<rootDir>/__tests__/jest/**/*.{ts,tsx}'],
 
   // 모듈 파일 확장자
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
