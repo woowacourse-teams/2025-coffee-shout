@@ -25,7 +25,8 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-players")
     public void broadcastPlayers(@DestinationVariable String joinCode) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode).stream()
+        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
+                .stream()
                 .map(PlayerResponse::from)
                 .toList();
 
