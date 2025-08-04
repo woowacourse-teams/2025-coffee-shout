@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.temp;
+package coffeeshout.minigame.domain.task;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

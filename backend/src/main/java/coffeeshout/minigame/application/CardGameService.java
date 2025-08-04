@@ -1,13 +1,13 @@
 package coffeeshout.minigame.application;
 
-import static coffeeshout.minigame.domain.temp.CardGameTaskType.FIRST_ROUND_LOADING;
+import static coffeeshout.minigame.domain.task.CardGameTaskType.FIRST_ROUND_LOADING;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.temp.CardGameTaskType;
-import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
+import coffeeshout.minigame.domain.task.CardGameTaskType;
+import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.minigame.ui.response.MiniGameRanksMessage;
 import coffeeshout.minigame.ui.response.MiniGameScoresMessage;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;

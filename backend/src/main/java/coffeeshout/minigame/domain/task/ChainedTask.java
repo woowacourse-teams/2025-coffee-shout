@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.temp;
+package coffeeshout.minigame.domain.task;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,7 +18,7 @@ public class ChainedTask {
     }
 
     public void start(TaskScheduler scheduler) {
-        future = scheduler.schedule(chainedRunnable(scheduler), Instant.now().plus(delay));
+        future = scheduler.schedule(chainedRunnable(scheduler), Instant.now());
     }
 
     public void start(TaskScheduler scheduler, Duration delay) {

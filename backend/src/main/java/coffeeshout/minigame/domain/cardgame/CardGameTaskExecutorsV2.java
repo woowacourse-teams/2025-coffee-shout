@@ -1,7 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.temp.CardGameTaskType;
-import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
+import coffeeshout.minigame.domain.task.CardGameTaskType;
+import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.room.domain.JoinCode;
 import java.util.HashMap;
 import java.util.Map;

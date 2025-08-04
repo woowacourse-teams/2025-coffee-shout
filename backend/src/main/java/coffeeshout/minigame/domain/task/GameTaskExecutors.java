@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.temp;
+package coffeeshout.minigame.domain.task;
 
 import coffeeshout.room.domain.JoinCode;
 import java.util.HashMap;
