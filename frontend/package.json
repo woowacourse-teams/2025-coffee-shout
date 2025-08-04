@@ -15,6 +15,11 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:jest": "jest --passWithNoTests --config jest.config.cjs",
+    "test:jest:watch": "jest --watch --config jest.config.cjs",
+    "test:jest:coverage": "jest --coverage --config jest.config.cjs",
+    "test:playwright": "playwright test",
+    "test:playwright:ui": "playwright test --ui",
+    "test:playwright:report": "playwright show-report",
     "test:cypress": "cypress open"
   },
   "keywords": [],
