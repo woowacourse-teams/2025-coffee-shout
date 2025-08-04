@@ -1,6 +1,7 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
@@ -10,7 +11,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -35,12 +36,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-@Import({TestConfig.class})
 class CardGameServiceTest {
 
     @MockitoBean
@@ -64,7 +63,7 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
+        List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
@@ -127,7 +126,7 @@ class CardGameServiceTest {
 
             // when
             cardGameService.start(cardGameSpy, joinCode.value());
-            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
+            cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
 
 
             Map<Player, Probability> probabilities = room.getProbabilities();
@@ -156,7 +155,7 @@ class CardGameServiceTest {
             // when
             cardGameService.start(miniGame, joinCode.value());
 
-            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
+            cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
 
             // then
             verify(messagingTemplate, atLeast(6))
@@ -164,6 +163,116 @@ class CardGameServiceTest {
                             eq("/topic/room/" + joinCode.getValue() + "/gameState"),
                             any(WebSocketResponse.class)
                     );
+        }
+    }
+
+    @Nested
+    class 카드_선택 {
+        
+        @Test
+        void 카드를_정상적으로_선택한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGame.startPlay();
+            
+            // when
+            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            
+            // then
+            assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
+        }
+        
+        @Test
+        void 카드_선택_후_게임_상태_메시지가_전송된다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGame.startPlay();
+            
+            // when
+            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            
+            // then
+            verify(messagingTemplate).convertAndSend(
+                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    any(WebSocketResponse.class)
+            );
+        }
+        
+        @Test
+        void 만약_선택된_카드를_고르면_예외를_반환한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGame.startPlay();
+            List<Player> players = room.getPlayers();
+            
+            // when & then
+            // 첫 번째 플레이어가 카드 선택
+            cardGameService.selectCard(joinCode.getValue(), players.get(0).getName().value(), 0);
+            
+            // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
+            assertThatThrownBy(() -> 
+                cardGameService.selectCard(joinCode.getValue(), players.get(1).getName().value(), 0)
+            ).isInstanceOf(IllegalStateException.class);
+        }
+        
+        @Test
+        void 게임이_플레이_상태가_아니면_예외를_반환한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            room.startNextGame(host.getName().value());
+            // PLAYING 상태로 변경하지 않음
+            
+            // when & then
+            assertThatThrownBy(() -> 
+                cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
+            ).isInstanceOf(IllegalStateException.class);
+        }
+        
+        @Test
+        void 존재하지_않는_플레이어면_예외를_반환한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGame.startPlay();
+            
+            // when & then
+            assertThatThrownBy(() -> 
+                cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
+            ).isInstanceOf(IllegalArgumentException.class);
+        }
+        
+        @Test
+        void 잘못된_카드_인덱스면_예외를_반환한다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGame.startPlay();
+            
+            // when & then
+            assertThatThrownBy(() -> 
+                cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
+            ).isInstanceOf(IndexOutOfBoundsException.class);
+        }
+        
+        @Test
+        void 라운드가_완료되면_플레이_태스크가_취소된다() {
+            // given
+            Room room = roomQueryService.findByJoinCode(joinCode);
+            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
+            cardGameService.start(cardGame, joinCode.getValue());
+            cardGame.startPlay();
+            List<Player> players = room.getPlayers();
+            
+            // when - 모든 플레이어가 카드 선택하여 라운드 완료
+            for (int i = 0; i < players.size(); i++) {
+                cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
+            }
+            
+            // then
+            assertThat(cardGame.isFinishedThisRound()).isTrue();
         }
     }
 }

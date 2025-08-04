@@ -36,7 +36,7 @@ public class CardGame implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(calculateScores());
+        return MiniGameResult.from(getScores());
     }
 
     @Override
@@ -47,6 +47,11 @@ public class CardGame implements Playable {
     @Override
     public void startGame(List<Player> players) {
         playerHands = new PlayerHands(players);
+    }
+
+    @Override
+    public Map<Player, MiniGameScore> getScores() {
+        return playerHands.scoreByPlayer();
     }
 
     public void startRound() {
@@ -62,10 +67,6 @@ public class CardGame implements Playable {
     public void selectCard(Player player, Integer cardIndex) {
         state(state == CardGameState.PLAYING, "현재 게임이 진행중인 상태가 아닙니다.");
         playerHands.put(player, deck.pick(cardIndex));
-    }
-
-    public Map<Player, MiniGameScore> calculateScores() {
-        return playerHands.scoreByPlayer();
     }
 
     public boolean isFinishedThisRound() {

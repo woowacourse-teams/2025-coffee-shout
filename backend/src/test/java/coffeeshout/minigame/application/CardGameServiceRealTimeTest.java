@@ -6,7 +6,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
@@ -56,7 +56,7 @@ class CardGameServiceRealTimeTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
+        List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();

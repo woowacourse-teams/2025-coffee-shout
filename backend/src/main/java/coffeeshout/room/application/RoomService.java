@@ -1,5 +1,7 @@
 package coffeeshout.room.application;
 
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -107,5 +109,24 @@ public class RoomService {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
         roomCommandService.delayCleanUp(room, Duration.ofHours(1));
+    }
+
+    public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Playable miniGame = room.findMiniGame(miniGameType);
+
+        return miniGame.getScores();
+    }
+
+    public MiniGameResult getMiniGameRanks(String joinCode, MiniGameType miniGameType) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Playable miniGame = room.findMiniGame(miniGameType);
+
+        return miniGame.getResult();
+    }
+
+    public List<MiniGameType> getSelectedMiniGames(String joinCode) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        return room.getSelectedMiniGameTypes();
     }
 }

@@ -4,12 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.MiniGameResultFixture;
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class RouletteTest {
@@ -23,7 +21,7 @@ class RouletteTest {
         Player result = roulette.spin();
 
         // then
-        assertThat(result).isEqualTo(PlayerProbabilities.PLAYERS.getLast());
+        assertThat(result).isEqualTo(PlayerProbabilitiesFixture.PLAYERS.getLast());
     }
 
     @Test

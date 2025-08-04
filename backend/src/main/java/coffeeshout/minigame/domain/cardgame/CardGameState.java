@@ -1,5 +1,6 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import java.time.Duration;
 import lombok.Getter;
 
 @Getter
@@ -15,5 +16,9 @@ public enum CardGameState {
 
     CardGameState(int duration) {
         this.duration = duration;
+    }
+
+    public Duration getDurationMillis() {
+        return Duration.ofMillis(duration);
     }
 }

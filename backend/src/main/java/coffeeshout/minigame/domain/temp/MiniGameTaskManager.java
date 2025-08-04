@@ -3,15 +3,18 @@ package coffeeshout.minigame.domain.temp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 
-@RequiredArgsConstructor
 public class MiniGameTaskManager<T> {
 
-    private final Map<T, ChainedTask> tasks = new ConcurrentHashMap<>();
+    private final Map<T, ChainedTask> tasks;
     private final TaskScheduler scheduler;
     private ChainedTask lastTask;
+
+    public MiniGameTaskManager(TaskScheduler scheduler) {
+        this.tasks = new ConcurrentHashMap<>();
+        this.scheduler = scheduler;
+    }
 
     public void addTask(T type, ChainedTask task) {
         if (lastTask != null) {
@@ -36,11 +39,11 @@ public class MiniGameTaskManager<T> {
         chainedTask.cancelDelay(scheduler);
     }
 
-    public void join(T type) throws ExecutionException, InterruptedException {
+    public void joinAll(T type) throws ExecutionException, InterruptedException {
         tasks.get(type).joinAll();
     }
 
-    public void joinThis(T type) throws ExecutionException, InterruptedException {
+    public void join(T type) throws ExecutionException, InterruptedException {
         tasks.get(type).join();
     }
 

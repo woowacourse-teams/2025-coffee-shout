@@ -11,10 +11,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.executor.CardGameTaskInfo;
-import coffeeshout.minigame.domain.executor.TaskExecutor;
 import coffeeshout.minigame.domain.temp.CardGameTaskType;
 import coffeeshout.minigame.domain.temp.MiniGameTaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
@@ -133,7 +130,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage loadingState = responses.get().data(); // 게임 로딩 state 응답 (LOADING)
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
-        cardGameTaskExecutors.get(joinCode).joinThis(CardGameTaskType.FIRST_ROUND_LOADING);
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
         MiniGameStateMessage playingState = responses.get().data(); // 게임 시작 state 응답 (PLAYING)
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
@@ -186,7 +183,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         // PLAYING 상태 확인
         MiniGameStateMessage playingState = responses.get().data();
 
-        cardGameTaskExecutors.get(joinCode).joinThis(CardGameTaskType.FIRST_ROUND_LOADING);
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
         assertThat(playingState.currentRound()).isEqualTo(CardGameRound.FIRST.name());

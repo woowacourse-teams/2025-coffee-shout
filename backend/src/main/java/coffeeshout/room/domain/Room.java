@@ -6,6 +6,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -122,7 +123,13 @@ public class Room {
         return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
-    public Playable findMiniGame(coffeeshout.minigame.domain.MiniGameType miniGameType) {
+    public List<MiniGameType> getSelectedMiniGameTypes(){
+        return getAllMiniGame().stream()
+                .map(Playable::getMiniGameType)
+                .toList();
+    }
+
+    public Playable findMiniGame(MiniGameType miniGameType) {
         return finishedGames.stream()
                 .filter(minigame -> minigame.getMiniGameType() == miniGameType)
                 .findFirst()
@@ -135,11 +142,12 @@ public class Room {
         state(roomState == RoomState.READY, "게임을 시작할 수 있는 상태가 아닙니다.");
 
         Playable currentGame = miniGames.poll();
-        finishedGames.add(currentGame);
 
         currentGame.startGame(players.getPlayers());
 
         roomState = RoomState.PLAYING;
+
+        finishedGames.add(currentGame);
 
         return currentGame;
     }
