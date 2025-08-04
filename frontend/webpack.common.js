@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -10,12 +11,21 @@ const __dirname = dirname(__filename);
 const dotenvEnv = dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed || {};
 const mergedEnv = { ...process.env, ...dotenvEnv };
 
-const envKeys = Object.keys(mergedEnv).reduce((acc, key) => {
-  if (key.startsWith('REACT_APP_')) {
-    acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
+const packageJson = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
+const appVersion = packageJson.version;
+
+const envKeys = Object.keys(mergedEnv).reduce(
+  (acc, key) => {
+    if (key.startsWith('REACT_APP_')) {
+      acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
+    }
+    return acc;
+  },
+  {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'process.env.REACT_APP_VERSION': JSON.stringify(appVersion),
   }
-  return acc;
-}, {});
+);
 
 export default {
   entry: './src/main.tsx',
