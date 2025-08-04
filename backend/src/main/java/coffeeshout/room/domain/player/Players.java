@@ -40,6 +40,6 @@ public class Players {
 
     public boolean isAllReady() {
         return players.stream()
-                .allMatch(player -> player.getIsReady() == true);
+                .allMatch(Player::getIsReady);
     }
 }

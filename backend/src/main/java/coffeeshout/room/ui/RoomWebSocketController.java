@@ -48,7 +48,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("room/{joinCode}/update-ready")
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.changePlayerState(joinCode, message.playerName(),
+        final List<PlayerResponse> responses = roomService.changePlayerReadyState(joinCode, message.playerName(),
                         message.isReady())
                 .stream()
                 .map(PlayerResponse::from)
