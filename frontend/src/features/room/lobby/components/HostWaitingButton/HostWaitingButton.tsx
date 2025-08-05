@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 type Props = {
   currentReadyCount?: number;
   totalParticipantCount?: number;
-} & Omit<ComponentProps<typeof Button>, 'onClick'>;
+} & ComponentProps<typeof Button>;
 
 const HostWaitingButton = ({
   currentReadyCount = 0,
