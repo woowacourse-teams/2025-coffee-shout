@@ -64,7 +64,6 @@ export const Container = styled.button<Props>`
         return `
           background: ${theme.color.point[50]};
           color: ${theme.color.point[400]};
-          /* border: 3px solid ${theme.color.point[300]}; */
         `;
 
       case 'primary':
