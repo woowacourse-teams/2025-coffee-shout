@@ -56,25 +56,46 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
 
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    {
+      name: 'Mobile Chrome Ultra Narrow',
+      use: {
+        // Galaxy Z Fold 6 Cover Screen
+        viewport: { width: 320, height: 800 },
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; SM-F956B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      },
+    },
+    {
+      name: 'Mobile Chrome Large',
+      use: {
+        ...devices['iPhone 13 Pro Max'], // 428px width
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: 'Mobile Safari Ultra Narrow',
+      use: {
+        // Galaxy Z Fold 6 Cover Screen with Safari-like browser
+        viewport: { width: 320, height: 800 },
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+        userAgent:
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      },
+    },
+    {
+      name: 'Mobile Safari Large',
+      use: {
+        ...devices['iPhone 13 Pro Max'], // Safari on large screen
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */

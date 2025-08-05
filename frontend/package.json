@@ -20,6 +20,8 @@
     "test:playwright": "playwright test",
     "test:playwright:ui": "playwright test --ui",
     "test:playwright:report": "playwright show-report",
+    "test:playwright:mobile:narrow": "playwright test --project='Mobile Chrome Ultra Narrow' --project='Mobile Safari Ultra Narrow'",
+    "test:playwright:mobile:large": "playwright test --project='Mobile Chrome Large' --project='Mobile Safari Large'",
     "test:cypress": "cypress open"
   },
   "keywords": [],
