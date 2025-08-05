@@ -3,8 +3,6 @@ import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
 
 type Props = {
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
-  canStart?: boolean;
-  participantCount?: number;
 } & Omit<ComponentProps<typeof Button>, 'onClick'>;
 
 const GameStartButton = ({ onClick, ...rest }: Props) => {
