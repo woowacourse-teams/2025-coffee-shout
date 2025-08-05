@@ -1,5 +1,6 @@
 package coffeeshout.room.application;
 
+import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -19,8 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoomService {
@@ -29,6 +32,7 @@ public class RoomService {
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
     private final JoinCodeGenerator joinCodeGenerator;
+    private final CardGameService cardGameService;
 
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuQueryService.findById(menuId);
@@ -116,8 +120,16 @@ public class RoomService {
 
     public void delayCleanUp(String joinCode) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-
+        
+        log.info("방 {} 정리 예약", joinCode);
+        
+        // 게임 관련 리소스 즉시 정리
+        cardGameService.cleanupRoom(joinCode);
+        
+        // 방 데이터는 지연 정리
         roomCommandService.delayCleanUp(room, Duration.ofHours(1));
+        
+        log.info("방 {} 정리 예약 완료", joinCode);
     }
 
     public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {

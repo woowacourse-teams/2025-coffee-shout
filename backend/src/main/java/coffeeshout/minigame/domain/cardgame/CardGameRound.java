@@ -4,13 +4,17 @@ import static org.springframework.util.Assert.state;
 
 import lombok.Getter;
 
+/**
+ * @deprecated 이 enum은 더 이상 사용되지 않습니다.
+ * 새로운 RoundState를 사용하세요.
+ */
+@Deprecated
 @Getter
 public enum CardGameRound {
     READY,
     FIRST,
     SECOND,
-    END,
-    ;
+    END;
 
     public CardGameRound next() {
         state(this.ordinal() != values().length - 1, "마지막 라운드입니다.");

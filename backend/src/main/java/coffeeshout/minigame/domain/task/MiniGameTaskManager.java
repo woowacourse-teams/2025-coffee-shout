@@ -1,53 +1,10 @@
 package coffeeshout.minigame.domain.task;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import org.springframework.scheduling.TaskScheduler;
-
+/**
+ * @deprecated 이 클래스는 더 이상 사용되지 않습니다.
+ * 새로운 RoundManagerRegistry와 RoomRoundManager를 사용하세요.
+ */
+@Deprecated
 public class MiniGameTaskManager<T> {
-
-    private final Map<T, ChainedTask> tasks;
-    private final TaskScheduler scheduler;
-    private ChainedTask lastTask;
-
-    public MiniGameTaskManager(TaskScheduler scheduler) {
-        this.tasks = new ConcurrentHashMap<>();
-        this.scheduler = scheduler;
-    }
-
-    public void addTask(T type, ChainedTask task) {
-        if (lastTask != null) {
-            lastTask.setNextTask(task);
-        }
-        lastTask = task;
-        tasks.put(type, task);
-    }
-
-    public void startWith(T type) {
-        final ChainedTask chainedTask = tasks.get(type);
-        chainedTask.start(scheduler);
-    }
-
-    public void cancel(T type) {
-        final ChainedTask chainedTask = tasks.get(type);
-        chainedTask.cancel();
-    }
-
-    public void cancelDelay(T type) {
-        final ChainedTask chainedTask = tasks.get(type);
-        chainedTask.cancelDelay(scheduler);
-    }
-
-    public void joinAll(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).joinAll();
-    }
-
-    public void join(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).join();
-    }
-
-    public void cancelAll() {
-        tasks.values().forEach(ChainedTask::cancel);
-    }
+    // 빈 클래스로 유지 (기존 참조 때문에)
 }

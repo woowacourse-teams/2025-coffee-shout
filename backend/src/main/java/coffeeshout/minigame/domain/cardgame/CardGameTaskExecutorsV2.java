@@ -1,30 +1,12 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
-import coffeeshout.room.domain.JoinCode;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.stereotype.Component;
-
-@Component
+/**
+ * @deprecated 이 클래스는 더 이상 사용되지 않습니다.
+ * 새로운 RoundManagerRegistry를 사용하세요.
+ * 
+ * 컴파일 오류 방지를 위해 임시로 유지되며, 향후 버전에서 완전히 제거될 예정입니다.
+ */
+@Deprecated
 public class CardGameTaskExecutorsV2 {
-
-    private final Map<JoinCode, MiniGameTaskManager<CardGameTaskType>> roomTaskExecutorMap;
-
-    public CardGameTaskExecutorsV2() {
-        this.roomTaskExecutorMap = new HashMap<>();
-    }
-
-    public void put(JoinCode joinCode, MiniGameTaskManager<CardGameTaskType> executor) {
-        roomTaskExecutorMap.put(joinCode, executor);
-    }
-
-    public MiniGameTaskManager<CardGameTaskType> get(JoinCode joinCode) {
-        return roomTaskExecutorMap.get(joinCode);
-    }
-
-    public void cancelPlaying(JoinCode joinCode, CardGameTaskType type) {
-        roomTaskExecutorMap.get(joinCode).cancelDelay(type);
-    }
+    // 빈 클래스로 유지 (기존 참조 때문에)
 }

@@ -4,7 +4,6 @@ import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,21 +56,38 @@ public class PlayerHands {
                 entry -> entry.getValue().calculateCardGameScore()
         ));
     }
-
-    public List<Player> getUnselectedPlayers(CardGameRound round) {
-        final List<Player> players = new ArrayList<>();
-        playerHands.forEach((player, hand) -> {
-            if (!hand.isSelected(round)) {
-                players.add(player);
-            }
-        });
-        return players;
+    
+    // === 새로운 라운드 관리를 위한 메서드들 ===
+    
+    /**
+     * 특정 라운드에서 모든 플레이어가 카드를 선택했는지 확인
+     */
+    public boolean allSelectedInCurrentRound(int roundNumber) {
+        return playerHands.values().stream()
+                .allMatch(hand -> hand.hasCardForRound(roundNumber));
     }
-
-    public Optional<Player> findCardOwner(Card card, CardGameRound round) {
+    
+    /**
+     * 특정 라운드에서 선택하지 않은 플레이어들 반환
+     */
+    public List<Player> getUnselectedPlayers(int roundNumber) {
         return playerHands.entrySet().stream()
-                .filter(entry -> entry.getValue().isAssign(card, round))
-                .findFirst()
-                .map(Entry::getKey);
+                .filter(entry -> !entry.getValue().hasCardForRound(roundNumber))
+                .map(Entry::getKey)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 특정 라운드에서 카드 소유자 찾기
+     */
+    public Optional<Player> findCardOwner(Card card, int roundNumber) {
+        return playerHands.entrySet().stream()
+                .filter(entry -> {
+                    CardHand hand = entry.getValue();
+                    return hand.hasCardForRound(roundNumber) && 
+                           card.equals(hand.getCardForRound(roundNumber));
+                })
+                .map(Entry::getKey)
+                .findFirst();
     }
 }

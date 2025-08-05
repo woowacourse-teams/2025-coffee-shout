@@ -7,3 +7,15 @@ logging:
   level:
     root: info
 
+# 카드게임 설정
+card-game:
+  max-rounds: 2
+  phases:
+    loading:
+      duration: PT3S      # 3초
+    playing:
+      duration: PT10S     # 10초
+      early-skip: true    # 모든 플레이어 선택 시 조기 종료
+    scoring:
+      duration: PT1.5S    # 1.5초
+

@@ -12,6 +12,8 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.cardgame.round.RoundPhase;
+import coffeeshout.minigame.domain.cardgame.round.RoundState;
 import coffeeshout.minigame.domain.task.CardGameTaskType;
 import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.room.application.RoomService;
@@ -47,8 +49,6 @@ class CardGameServiceRealTimeTest {
     @Autowired
     RoomService roomService;
 
-    @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -85,8 +85,6 @@ class CardGameServiceRealTimeTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
-                softly.assertThat(executor).isNotNull();
             });
         }
 
@@ -102,46 +100,46 @@ class CardGameServiceRealTimeTest {
              */
             Thread.sleep(1000);
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.LOADING);
             });
 
             Thread.sleep(4000); // 총 5초 (LOADING 3초 + PLAYING 시작 후 1초)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(0);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.PLAYING);
             });
 
             Thread.sleep(8500);
             // 총 13.5초 지남 (LOADING 3초 + PLAYING 10초 + SCORE_BOARD 시작 후 0.5초)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.SCORING);
             });
 
             Thread.sleep(2500);
             // 총 16.0초 지남 (+ 1.5초 SCORE_BOARD + 0.5초 LOADING)
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.LOADING);
             });
 
             Thread.sleep(3500);
             // 총 19초 지남 (+ 3초 LOADING + 0.5초 PLAYING)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.PLAYING);
             });
 
             Thread.sleep(9000);
             // 총 28초 지남 (+ 10초 PLAYING)
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(8);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.SCORING);
             });
 
             Thread.sleep(2000);
             // 총 31초 지남 (+ 1.5초 SCORE_BOARD 완료 후)
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DONE);
+                softly.assertThat(cardGame.getCurrentPhase()).isEqualTo(RoundPhase.DONE);
             });
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
