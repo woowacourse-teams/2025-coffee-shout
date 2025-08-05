@@ -1,6 +1,31 @@
 import { Page, expect } from '@playwright/test';
 
 /**
+ * 버튼 상호작용을 위한 베이스 헬퍼
+ */
+export class BaseButtonHelper {
+  constructor(protected page: Page) {}
+
+  // 공통 버튼 상호작용 메서드들
+  private async clickButtonByText(name: string | RegExp) {
+    await this.page.getByRole('button', { name }).click();
+  }
+
+  private getButtonByText(name: string | RegExp) {
+    return this.page.getByRole('button', { name });
+  }
+
+  // 범용 헬퍼 (급할 때 직접 사용 가능)
+  async clickButton(name: string | RegExp) {
+    await this.clickButtonByText(name);
+  }
+
+  getButton(name: string | RegExp) {
+    return this.getButtonByText(name);
+  }
+}
+
+/**
  * 페이지 네비게이션 헬퍼 함수들
  */
 export class NavigationHelper {
@@ -48,83 +73,83 @@ export class FormHelper {
 }
 
 /**
- * 버튼 클릭 헬퍼 함수들
+ * 의미있는 버튼 상호작용 헬퍼 함수들
  */
-export class ButtonHelper {
-  constructor(private page: Page) {}
-
+export class ButtonHelper extends BaseButtonHelper {
+  // === 방 생성/참가 관련 ===
   async clickCreateRoom() {
-    await this.page.getByRole('button', { name: '방 만들기' }).click();
+    await this.clickButton('방 만들기');
   }
 
   async clickJoinRoomFromHome() {
-    // 메인 페이지에서 "방 참가하러 가기" 버튼 클릭
-    await this.page.getByRole('button', { name: /방.*참가|참가.*방/ }).click();
+    await this.clickButton('방 참가하러 가기');
   }
 
   async clickJoinRoomFromModal() {
-    // 모달에서 "입장" 버튼 클릭
-    await this.page.getByRole('button', { name: '입장' }).click();
+    await this.clickButton('입장');
   }
 
   async clickGoToMenuSelection() {
-    await this.page.getByRole('button', { name: '메뉴 선택하러 가기' }).click();
+    await this.clickButton('메뉴 선택하러 가기');
   }
 
   async clickGoToCreateRoom() {
-    await this.page.getByRole('button', { name: '방 만들러 가기' }).click();
+    await this.clickButton('방 만들러 가기');
   }
 
   async clickEnterRoom() {
-    await this.page.getByRole('button', { name: '방 참가하기' }).click();
+    await this.clickButton('방 참가하기');
   }
 
+  // === 로비 ===
   async clickGameStart() {
-    await this.page.getByRole('button', { name: '게임 시작' }).click();
-  }
-
-  async clickShare() {
-    await this.page.getByRole('button', { name: '공유' }).click();
-  }
-
-  async clickSectionTab(sectionName: '참가자' | '미니게임') {
-    await this.page.getByRole('button', { name: sectionName }).click();
-  }
-
-  async clickMiniGame(gameName: '카드게임') {
-    await this.page.getByRole('button', { name: gameName }).click();
-  }
-
-  async clickCopyIcon() {
-    await this.page.getByRole('button', { name: '초대 코드 복사' }).click();
-  }
-
-  async clickCloseModal() {
-    await this.page.getByRole('button', { name: '모달 닫기' }).click();
-  }
-
-  async clickGoToRouletteStatus() {
-    await this.page.getByRole('button', { name: '룰렛 현황 보러가기' }).click();
+    await this.clickButton('게임 시작');
   }
 
   async clickGameReady() {
-    await this.page.getByRole('button', { name: '준비하기' }).click();
+    await this.clickButton('준비하기');
   }
 
   getGameWaitingButton() {
-    return this.page.getByRole('button', { name: /게임 대기중/ });
+    return this.getButton(/게임 대기중/);
   }
 
   getGameStartButton() {
-    return this.page.getByRole('button', { name: '게임 시작' });
+    return this.getButton('게임 시작');
   }
 
   getGameReadyButton() {
-    return this.page.getByRole('button', { name: '준비하기' });
+    return this.getButton('준비하기');
   }
 
   getGameReadyCompleteButton() {
-    return this.page.getByRole('button', { name: '준비 완료!' });
+    return this.getButton('준비 완료!');
+  }
+
+  async clickSectionTab(sectionName: '참가자' | '미니게임') {
+    await this.clickButton(sectionName);
+  }
+
+  async clickMiniGame(gameName: '카드게임') {
+    await this.clickButton(gameName);
+  }
+
+  // === 모달/공유 ===
+  async clickShare() {
+    await this.clickButton('공유');
+  }
+
+  async clickCopyIcon() {
+    await this.clickButton('초대 코드 복사');
+  }
+
+  async clickCloseModal() {
+    await this.clickButton('모달 닫기');
+  }
+
+  // === 룰렛 ===
+  async clickGoToRouletteStatus() {
+    await this.clickButton('룰렛 현황 보러가기');
   }
 }
 
