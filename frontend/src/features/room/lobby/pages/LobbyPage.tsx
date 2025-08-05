@@ -124,7 +124,6 @@ const LobbyPage = () => {
   };
 
   const handleGameReadyButtonClick = () => {
-    console.log('isReady', isReady);
     send(`/room/${joinCode}/update-ready`, {
       joinCode,
       playerName: myName,
@@ -139,7 +138,7 @@ const LobbyPage = () => {
       }
       return (
         <HostWaitingButton
-          isReadyCount={participants.filter((participant) => participant.isReady).length}
+          currentReadyCount={participants.filter((participant) => participant.isReady).length}
           totalParticipantCount={participants.length}
         />
       );
