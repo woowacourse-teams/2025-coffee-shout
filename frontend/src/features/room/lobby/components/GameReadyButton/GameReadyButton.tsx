@@ -2,8 +2,8 @@ import Button from '@/components/@common/Button/Button';
 import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
 
 type Props = {
+  isReady: boolean;
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
-  isReady?: boolean;
 } & Omit<ComponentProps<typeof Button>, 'onClick'>;
 
 const GameReadyButton = ({ onClick, isReady = false, ...rest }: Props) => {

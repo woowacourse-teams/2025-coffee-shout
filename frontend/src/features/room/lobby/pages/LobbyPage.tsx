@@ -37,7 +37,8 @@ const LobbyPage = () => {
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
   const isAllReady = participants.every((participant) => participant.isReady);
-  const isReady = participants.find((participant) => participant.playerName === myName)?.isReady;
+  const isReady =
+    participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
 
   const handleParticipant = useCallback((data: ParticipantResponse) => {
     setParticipants(data);
