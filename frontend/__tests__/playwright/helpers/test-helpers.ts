@@ -102,6 +102,30 @@ export class ButtonHelper {
   async clickCloseModal() {
     await this.page.getByRole('button', { name: '모달 닫기' }).click();
   }
+
+  async clickGoToRouletteStatus() {
+    await this.page.getByRole('button', { name: '룰렛 현황 보러가기' }).click();
+  }
+
+  async clickGameReady() {
+    await this.page.getByRole('button', { name: '준비하기' }).click();
+  }
+
+  getGameWaitingButton() {
+    return this.page.getByRole('button', { name: /게임 대기중/ });
+  }
+
+  getGameStartButton() {
+    return this.page.getByRole('button', { name: '게임 시작' });
+  }
+
+  getGameReadyButton() {
+    return this.page.getByRole('button', { name: '준비하기' });
+  }
+
+  getGameReadyCompleteButton() {
+    return this.page.getByRole('button', { name: '준비 완료!' });
+  }
 }
 
 /**

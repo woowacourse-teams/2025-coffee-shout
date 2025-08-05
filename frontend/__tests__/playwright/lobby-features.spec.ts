@@ -29,30 +29,44 @@ test.describe('로비 기능', () => {
     }
   });
 
-  test.describe('게임 시작 버튼 접근성', () => {
-    test('호스트는 게임 시작 버튼을 누를 수 있다.', async () => {
-      // 호스트 페이지에서 게임 시작 버튼 확인
-      const gameStartButton = hostHelper.page.getByRole('button', { name: '게임 시작' });
-      await expect(gameStartButton).toBeVisible();
+  test.describe('게임 시작 및 준비 버튼 접근성', () => {
+    test('호스트는 초기에 게임 대기중 버튼이 보이고, 게스트가 준비하면 게임 시작 버튼으로 바뀐다.', async () => {
+      // 초기에는 호스트에게 게임 대기중 버튼이 보임
+      await expect(hostHelper.button.getGameWaitingButton()).toBeVisible();
+      await expect(hostHelper.button.getGameStartButton()).not.toBeVisible();
+
+      // 게스트가 준비하기 버튼을 클릭
+      await expect(guestHelper.button.getGameReadyButton()).toBeVisible();
+      await guestHelper.button.clickGameReady();
+
+      // 게스트 화면에서 준비 완료 버튼으로 변경됨
+      await expect(guestHelper.button.getGameReadyCompleteButton()).toBeVisible();
+      await expect(guestHelper.button.getGameReadyButton()).not.toBeVisible();
+
+      // 호스트 화면에서 게임 시작 버튼이 나타남
+      await expect(hostHelper.button.getGameStartButton()).toBeVisible();
+      await expect(hostHelper.button.getGameWaitingButton()).not.toBeVisible();
 
       // 미니게임을 먼저 선택해야 게임 시작이 가능할 수 있음
       await hostHelper.button.clickSectionTab('미니게임');
       await hostHelper.button.clickMiniGame('카드게임');
 
-      // 버튼 클릭 가능 확인 (클릭 후 반응 확인만)
+      // 게임 시작 버튼 클릭 가능 확인
       await hostHelper.button.clickGameStart();
-
-      // TODO: 추후 게스트가 isReady 상태를 true로 해주어야만 게임 시작 버튼이 클릭이 되고 페이지가 이동함. 이건 여기서 처리 안하는게 맞을까?
-      // 미니게임 준비 페이지로 이동 확인 (또는 적절한 반응 확인)
-      // await expect(hostHelper.page).toHaveURL(/\/room\/.*\/(CARD_GAME)\/ready/);
-      // await expect(guestHelper.page).toHaveURL(/\/room\/.*\/(CARD_GAME)\/ready/);
     });
 
-    test('게스트는 게임 시작 버튼을 누를 수 없다.', async () => {
-      // 게스트 페이지에서는 게임 시작 버튼이 없고 대기 메시지가 표시
-      await expect(guestHelper.page.getByRole('button', { name: '게임 시작' })).not.toBeVisible();
-      await expect(guestHelper.page.getByRole('button', { name: '게임 대기중' })).toBeVisible();
-      await expect(guestHelper.page.getByRole('button', { name: '게임 대기중' })).toBeDisabled();
+    test('게스트는 게임 시작 버튼을 누를 수 없고, 준비하기/준비 완료 버튼만 사용할 수 있다.', async () => {
+      // 게스트에게는 게임 시작 버튼이 없고 준비하기 버튼이 표시됨
+      await expect(guestHelper.button.getGameStartButton()).not.toBeVisible();
+      await expect(guestHelper.button.getGameReadyButton()).toBeVisible();
+      await expect(guestHelper.button.getGameReadyButton()).toBeEnabled();
+
+      // 준비하기 버튼 클릭
+      await guestHelper.button.clickGameReady();
+
+      // 준비 완료 버튼으로 변경됨
+      await expect(guestHelper.button.getGameReadyCompleteButton()).toBeVisible();
+      await expect(guestHelper.button.getGameReadyButton()).not.toBeVisible();
     });
   });
 
