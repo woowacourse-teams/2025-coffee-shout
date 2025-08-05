@@ -1,9 +1,9 @@
-package coffeeshout.minigame.domain.cardgame.round.handler;
+package coffeeshout.minigame.domain.round.handler;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.round.RoundPhase;
-import coffeeshout.minigame.domain.cardgame.round.RoundPhaseHandler;
+import coffeeshout.minigame.domain.round.RoundPhase;
+import coffeeshout.minigame.domain.round.RoundPhaseHandler;
 import coffeeshout.room.domain.Room;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;

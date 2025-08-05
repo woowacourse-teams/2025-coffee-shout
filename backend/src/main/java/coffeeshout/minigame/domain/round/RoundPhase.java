@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.cardgame.round;
+package coffeeshout.minigame.domain.round;
 
 /**
  * 카드게임의 라운드 단계를 나타내는 열거형

@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.cardgame.round;
+package coffeeshout.minigame.domain.round;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.room.domain.Room;

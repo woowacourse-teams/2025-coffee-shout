@@ -1,9 +1,13 @@
-package coffeeshout.minigame.domain.cardgame.round;
+package coffeeshout.minigame.domain.round;
 
 import coffeeshout.room.domain.JoinCode;
+import jakarta.annotation.PreDestroy;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,20 +18,26 @@ import org.springframework.stereotype.Component;
 public class RoundManagerRegistry {
     
     private final Map<JoinCode, RoomRoundManager> roomManagers = new ConcurrentHashMap<>();
-    private final RoundManagerFactory roundManagerFactory;
+    private final List<RoundPhaseHandler> handlerList;
+    private final TaskScheduler scheduler;
     
-    public RoundManagerRegistry(RoundManagerFactory roundManagerFactory) {
-        this.roundManagerFactory = roundManagerFactory;
+    public RoundManagerRegistry(
+            List<RoundPhaseHandler> handlerList,
+            @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler) {
+        this.handlerList = handlerList;
+        this.scheduler = scheduler;
     }
     
     /**
      * 방에 대한 RoundManager를 생성하거나 반환합니다.
      */
     public RoomRoundManager getOrCreate(JoinCode joinCode) {
-        return roomManagers.computeIfAbsent(joinCode, key -> {
-            log.info("방 {}에 대한 새로운 RoundManager 생성", key.value());
-            return roundManagerFactory.create(key);
-        });
+        return roomManagers.computeIfAbsent(joinCode, this::createRoomRoundManager);
+    }
+    
+    private RoomRoundManager createRoomRoundManager(JoinCode joinCode) {
+        log.info("방 {}에 대한 새로운 RoundManager 생성", joinCode.value());
+        return new RoomRoundManager(joinCode, handlerList, scheduler);
     }
     
     /**
@@ -52,13 +62,14 @@ public class RoundManagerRegistry {
     /**
      * 모든 방의 RoundManager를 정리합니다. (애플리케이션 종료 시)
      */
+    @PreDestroy
     public void removeAll() {
-        log.info("모든 RoundManager 정리 시작 (총 {} 개)", roomManagers.size());
+        log.info("애플리케이션 종료 - 모든 RoundManager 정리 시작 (총 {} 개)", roomManagers.size());
         
         roomManagers.values().forEach(RoomRoundManager::cleanup);
         roomManagers.clear();
         
-        log.info("모든 RoundManager 정리 완료");
+        log.info("애플리케이션 종료 - 모든 RoundManager 정리 완료");
     }
     
     /**

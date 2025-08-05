@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.cardgame.round;
+package coffeeshout.minigame.domain.round;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.room.domain.JoinCode;
@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -20,11 +21,21 @@ import org.springframework.scheduling.TaskScheduler;
  */
 @Slf4j
 public class RoomRoundManager {
-    
+
+    /**
+     * -- GETTER --
+     *  관리하는 방의 JoinCode를 반환합니다.
+     */
+    @Getter
     private final JoinCode joinCode;
     private final Map<RoundPhase, RoundPhaseHandler> handlers;
     private final TaskScheduler scheduler;
     private final AtomicReference<ScheduledFuture<?>> currentTask = new AtomicReference<>();
+    /**
+     * -- GETTER --
+     *  현재 활성 상태인지 확인합니다.
+     */
+    @Getter
     private volatile boolean isActive = true;
     
     public RoomRoundManager(JoinCode joinCode, List<RoundPhaseHandler> handlerList, TaskScheduler scheduler) {
@@ -49,8 +60,9 @@ public class RoomRoundManager {
         }
         
         RoundState currentState = game.getRoundState();
+        log.info(currentState.getPhase().name());
         RoundPhaseHandler handler = handlers.get(currentState.getPhase());
-        
+
         if (handler == null) {
             log.error("핸들러를 찾을 수 없음: {} (방: {})", currentState.getPhase(), joinCode.value());
             return;
@@ -173,18 +185,5 @@ public class RoomRoundManager {
         
         log.info("방 {} RoundManager 정리 완료", joinCode.value());
     }
-    
-    /**
-     * 현재 활성 상태인지 확인합니다.
-     */
-    public boolean isActive() {
-        return isActive;
-    }
-    
-    /**
-     * 관리하는 방의 JoinCode를 반환합니다.
-     */
-    public JoinCode getJoinCode() {
-        return joinCode;
-    }
+
 }

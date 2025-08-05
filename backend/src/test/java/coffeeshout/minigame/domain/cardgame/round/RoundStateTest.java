@@ -2,6 +2,8 @@ package coffeeshout.minigame.domain.cardgame.round;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import coffeeshout.minigame.domain.round.RoundPhase;
+import coffeeshout.minigame.domain.round.RoundState;
 import org.junit.jupiter.api.Test;
 
 class RoundStateTest {

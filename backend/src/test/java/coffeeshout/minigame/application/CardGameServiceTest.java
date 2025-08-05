@@ -13,8 +13,8 @@ import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.round.RoundManagerRegistry;
-import coffeeshout.minigame.domain.cardgame.round.RoundPhase;
+import coffeeshout.minigame.domain.round.RoundManagerRegistry;
+import coffeeshout.minigame.domain.round.RoundPhase;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
@@ -23,6 +23,7 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -82,7 +83,7 @@ class CardGameServiceTest {
             
             // when
             cardGameService.start(currentGame, joinCode.value());
-            
+
             // then
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
             SoftAssertions.assertSoftly(softly -> {
@@ -146,6 +147,8 @@ class CardGameServiceTest {
             // when
             cardGameService.start(miniGame, joinCode.value());
 
+            assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
+
             // then
             verify(messagingTemplate, atLeast(1))
                     .convertAndSend(
@@ -167,7 +170,6 @@ class CardGameServiceTest {
 
             // PLAYING 상태로 수동 변경 (테스트용)
             cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds())); // LOADING
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds())); // PLAYING
 
             // when
             cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
@@ -185,7 +187,6 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
             cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
 
             // when
@@ -207,7 +208,6 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
             cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
 
             List<Player> players = room.getPlayers();
@@ -265,7 +265,6 @@ class CardGameServiceTest {
 
             // PLAYING 상태로 변경
             cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
 
             // when & then
             assertThatThrownBy(() ->
@@ -281,7 +280,6 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
             cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
 
             List<Player> players = room.getPlayers();

@@ -1,7 +1,7 @@
 package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.round.RoundPhase;
+import coffeeshout.minigame.domain.round.RoundPhase;
 
 /**
  * 카드게임 테스트를 위한 유틸리티 클래스

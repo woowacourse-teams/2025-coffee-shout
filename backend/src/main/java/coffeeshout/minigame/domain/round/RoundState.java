@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.cardgame.round;
+package coffeeshout.minigame.domain.round;
 
 import lombok.Getter;
 
