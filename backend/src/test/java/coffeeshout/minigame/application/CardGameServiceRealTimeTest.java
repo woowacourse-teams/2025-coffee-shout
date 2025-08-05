@@ -6,14 +6,14 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilities;
+import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
-import coffeeshout.minigame.domain.temp.TaskExecutor;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.task.CardGameTaskType;
+import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -31,8 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest
 @Disabled
+@SpringBootTest
 class CardGameServiceRealTimeTest {
 
     @MockitoBean
@@ -48,7 +48,7 @@ class CardGameServiceRealTimeTest {
     RoomService roomService;
 
     @Autowired
-    CardGameTaskExecutors cardGameTaskExecutors;
+    CardGameTaskExecutorsV2 cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -56,7 +56,7 @@ class CardGameServiceRealTimeTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilities.PLAYERS;
+        List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
@@ -85,10 +85,8 @@ class CardGameServiceRealTimeTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
+                MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
-
-                softly.assertThat(executor.getFutureTasks()).hasSize(7);
             });
         }
 
@@ -102,7 +100,6 @@ class CardGameServiceRealTimeTest {
                 READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
                 0~3000      3000~13000      13000~14500      14500~17500    17500~27500     27500~29000     29000~
              */
-
             Thread.sleep(1000);
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);

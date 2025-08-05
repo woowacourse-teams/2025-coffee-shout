@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class PlayerProbabilities {
+public final class PlayerProbabilitiesFixture {
 
     public static final List<Player> PLAYERS = List.of(
             PlayerFixture.호스트꾹이(),
@@ -15,7 +15,7 @@ public final class PlayerProbabilities {
             PlayerFixture.게스트한스()
     );
 
-    private PlayerProbabilities() {
+    private PlayerProbabilitiesFixture() {
     }
 
     public static Map<Player, Probability> 꾹이_루키_엠제이_한스() {

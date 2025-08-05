@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.temp.CardGameTaskInfo;
-import coffeeshout.minigame.domain.temp.TaskExecutor;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.task.CardGameTaskType;
+import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
@@ -47,7 +47,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     ObjectMapper objectMapper;
 
     @Autowired
-    CardGameTaskExecutors cardGameTaskExecutors;
+    CardGameTaskExecutorsV2 cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -67,19 +67,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @AfterEach
     void tearDown() {
         // 실행 중인 모든 태스크 취소 및 스레드 정리
-        TaskExecutor<CardGameTaskInfo> executor = cardGameTaskExecutors.get(joinCode);
-        if (executor != null) {
-            executor.cancelAll();
-            executor.getExecutor().shutdown();
-            try {
-                if (!executor.getExecutor().awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS)) {
-                    executor.getExecutor().shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                executor.getExecutor().shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
+        MiniGameTaskManager<CardGameTaskType> manager = cardGameTaskExecutors.get(joinCode);
+        manager.cancelAll();
     }
 
     @Test
@@ -132,7 +121,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
                 String.format(subscribeUrlFormat, joinCode.value()),
-                new TypeReference<>() {
+                new TypeReference<WebSocketResponse<MiniGameStateMessage>>() {
                 }
         );
 
@@ -140,6 +129,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         MiniGameStateMessage loadingState = responses.get().data(); // 게임 로딩 state 응답 (LOADING)
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
         MiniGameStateMessage playingState = responses.get().data(); // 게임 시작 state 응답 (PLAYING)
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
@@ -157,7 +148,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // then
         MiniGameStateMessage result = responses.get().data();
-
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(result.currentRound()).isEqualTo(CardGameRound.FIRST.name());
             softly.assertThat(result.cardInfoMessages()).extracting(CardInfoMessage::playerName)
@@ -189,8 +179,12 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage loadingState = responses.get().data();
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
+
         // PLAYING 상태 확인
         MiniGameStateMessage playingState = responses.get().data();
+
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
+
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
         assertThat(playingState.currentRound()).isEqualTo(CardGameRound.FIRST.name());
 
@@ -300,7 +294,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        assertThatThrownBy(() -> responses.get())
+        assertThatThrownBy(responses::get)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }
@@ -329,7 +323,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session.send(String.format(requestUrlFormat, joinCode.value()), request);
 
         // then
-        assertThatThrownBy(() -> responses.get())
+        assertThatThrownBy(responses::get)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("메시지 수신 대기 시간을 초과했습니다");
     }
