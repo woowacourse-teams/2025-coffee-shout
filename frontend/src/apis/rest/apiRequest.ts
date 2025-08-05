@@ -1,6 +1,6 @@
 import { ApiError, NetworkError } from './error';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://api.coffee-shout.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.coffee-shout.com';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
