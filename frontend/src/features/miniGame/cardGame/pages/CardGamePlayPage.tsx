@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
 import Round from '../components/Round/Round';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
@@ -20,7 +20,6 @@ const CardGamePlayPage = () => {
   const { isTransition, currentRound, currentCardGameState, cardInfos } = useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
   const { send } = useWebSocket();
-
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
     1: {
       index: -1,
@@ -33,6 +32,7 @@ const CardGamePlayPage = () => {
       value: null,
     },
   });
+  const isTimerReset = useRef(false);
 
   const handleCardClick = (cardIndex: number) => {
     if (selectedCardInfo[currentRound].index !== -1) {
@@ -65,8 +65,11 @@ const CardGamePlayPage = () => {
   }, [currentTime]);
 
   useEffect(() => {
-    if (currentTime === 0 && currentRound === 2 && currentCardGameState === 'PLAYING') {
-      setCurrentTime(TOTAL_COUNT);
+    if (currentRound === 2 && currentCardGameState === 'PLAYING') {
+      if (!isTimerReset.current) {
+        setCurrentTime(TOTAL_COUNT);
+        isTimerReset.current = true;
+      }
     }
   }, [currentTime, currentRound, currentCardGameState]);
 
