@@ -71,7 +71,7 @@ const CardGamePlayPage = () => {
         isTimerReset.current = true;
       }
     }
-  }, [currentTime, currentRound, currentCardGameState]);
+  }, [currentRound, currentCardGameState]);
 
   return isTransition ? (
     <MiniGameTransition currentRound={currentRound} />
