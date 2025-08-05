@@ -17,14 +17,14 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickCreateRoom();
 
       // 닉네임 입력 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
     });
 
     test('닉네임을 입력하고 "메뉴 선택하러 가기" 버튼 클릭 시 메뉴 선택 페이지로 이동해야 한다.', async () => {
       // 메인 페이지에서 방 만들기 클릭
       await helper.navigation.goToHomePage();
       await helper.button.clickCreateRoom();
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
 
       // 닉네임 입력
       const hostName = '호스트';
@@ -34,19 +34,19 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickGoToMenuSelection();
 
       // 메뉴 선택 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnMenuSelectionPage();
+      await helper.room.expectToBeOnMenuSelectionPage();
     });
 
     test('메뉴 셀렉트박스를 클릭해 메뉴를 선택하고 "방 만들러가기" 버튼 클릭 시 로비 페이지로 이동해야 한다.', async () => {
       // 닉네임 입력까지 진행
       await helper.navigation.goToHomePage();
       await helper.button.clickCreateRoom();
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
 
       const hostName = '호스트';
       await helper.form.fillNickname(hostName);
       await helper.button.clickGoToMenuSelection();
-      await helper.assertion.expectToBeOnMenuSelectionPage();
+      await helper.room.expectToBeOnMenuSelectionPage();
 
       // 메뉴 선택
       await helper.form.selectMenu(0); // 첫 번째 메뉴 선택
@@ -55,7 +55,7 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickGoToCreateRoom();
 
       // 로비 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnLobbyPage();
+      await helper.lobby.expectToBeOnLobbyPage();
 
       // 호스트 이름이 참가자 목록에 표시되는지 확인
       await expect(helper.page.getByText(hostName)).toBeVisible();
@@ -96,7 +96,7 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickJoinRoomFromHome();
 
       // 초대 코드 입력 페이지인지 확인
-      await helper.assertion.expectToBeOnJoinCodePage();
+      await helper.room.expectToBeOnJoinCodePage();
 
       // 실제 존재하는 초대 코드 입력
       await helper.form.fillJoinCode(joinCode);
@@ -105,18 +105,18 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickJoinRoomFromModal();
 
       // 닉네임 입력 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
     });
 
     test('닉네임을 입력하고 "메뉴 선택하러 가기" 버튼 클릭 시 메뉴 선택 페이지로 이동해야 한다.', async () => {
       // 초대 코드 입력 후 닉네임 페이지까지 진행
       await helper.navigation.goToHomePage();
       await helper.button.clickJoinRoomFromHome();
-      await helper.assertion.expectToBeOnJoinCodePage();
+      await helper.room.expectToBeOnJoinCodePage();
 
       await helper.form.fillJoinCode(joinCode);
       await helper.button.clickJoinRoomFromModal();
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
 
       // 닉네임 입력
       const guestName = '게스트';
@@ -126,23 +126,23 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickGoToMenuSelection();
 
       // 메뉴 선택 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnMenuSelectionPage();
+      await helper.room.expectToBeOnMenuSelectionPage();
     });
 
     test('메뉴를 선택한 뒤 "방 참가하기" 버튼 클릭 시 로비 페이지로 이동해야 한다.', async () => {
       // 메뉴 선택 페이지까지 진행
       await helper.navigation.goToHomePage();
       await helper.button.clickJoinRoomFromHome();
-      await helper.assertion.expectToBeOnJoinCodePage();
+      await helper.room.expectToBeOnJoinCodePage();
 
       const guestName = '게스트';
       await helper.form.fillJoinCode(joinCode);
       await helper.button.clickJoinRoomFromModal();
-      await helper.assertion.expectToBeOnNicknamePage();
+      await helper.room.expectToBeOnNicknamePage();
 
       await helper.form.fillNickname(guestName);
       await helper.button.clickGoToMenuSelection();
-      await helper.assertion.expectToBeOnMenuSelectionPage();
+      await helper.room.expectToBeOnMenuSelectionPage();
 
       // 메뉴 선택
       await helper.form.selectMenu(1); // 두 번째 메뉴 선택
@@ -151,7 +151,7 @@ test.describe('방 생성 및 참가', () => {
       await helper.button.clickEnterRoom();
 
       // 로비 페이지로 이동했는지 확인
-      await helper.assertion.expectToBeOnLobbyPage();
+      await helper.lobby.expectToBeOnLobbyPage();
 
       // 게스트 이름이 참가자 목록에 표시되는지 확인
       await expect(helper.page.getByText(guestName)).toBeVisible();

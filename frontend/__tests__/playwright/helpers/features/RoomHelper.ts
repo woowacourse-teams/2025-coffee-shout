@@ -1,11 +1,12 @@
 import { Page, expect } from '@playwright/test';
 
 /**
- * 페이지 검증 헬퍼 함수들
+ * 방 생성/참가 관련 헬퍼 함수들
  */
-export class AssertionHelper {
+export class RoomHelper {
   constructor(private page: Page) {}
 
+  // === 방 생성/참가 플로우 페이지 검증 ===
   async expectToBeOnNicknamePage() {
     await expect(this.page).toHaveURL(/\/entry\/name/);
     await expect(this.page.getByPlaceholder('닉네임을 입력해주세요')).toBeVisible();
@@ -16,19 +17,9 @@ export class AssertionHelper {
     await expect(this.page.getByRole('combobox')).toBeVisible();
   }
 
-  async expectToBeOnLobbyPage() {
-    await expect(this.page).toHaveURL(/\/room\/.*\/lobby/);
-    await expect(this.page.getByRole('heading', { name: '참가자', level: 2 })).toBeVisible();
-  }
-
   async expectToBeOnJoinCodePage() {
     // 메인 페이지에서 모달이 열린 상태
     await expect(this.page).toHaveURL('/');
     await expect(this.page.getByPlaceholder('ex) ABCDE')).toBeVisible();
-  }
-
-  async expectShareModalToBeOpen() {
-    await expect(this.page.getByRole('dialog')).toBeVisible();
-    await expect(this.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
   }
 }

@@ -1,8 +1,6 @@
 import { Page } from '@playwright/test';
-import { AssertionHelper } from './AssertionHelper';
-import { ButtonHelper } from './ButtonHelper';
-import { FormHelper } from './FormHelper';
-import { NavigationHelper } from './NavigationHelper';
+import { CardGameHelper, LobbyHelper, RoomHelper, RouletteHelper } from './features';
+import { ButtonHelper, FormHelper, NavigationHelper } from './shared';
 
 /**
  * 통합 테스트 헬퍼 클래스
@@ -11,13 +9,19 @@ export class TestHelper {
   public navigation: NavigationHelper;
   public form: FormHelper;
   public button: ButtonHelper;
-  public assertion: AssertionHelper;
+  public room: RoomHelper;
+  public lobby: LobbyHelper;
+  public cardGame: CardGameHelper;
+  public roulette: RouletteHelper;
 
   constructor(public page: Page) {
     this.navigation = new NavigationHelper(page);
     this.form = new FormHelper(page);
     this.button = new ButtonHelper(page);
-    this.assertion = new AssertionHelper(page);
+    this.room = new RoomHelper(page);
+    this.lobby = new LobbyHelper(page);
+    this.cardGame = new CardGameHelper(page);
+    this.roulette = new RouletteHelper(page);
   }
 
   /**
@@ -26,15 +30,15 @@ export class TestHelper {
   async createRoomFlow(hostName: string, menuIndex: number = 0) {
     await this.navigation.goToHomePage();
     await this.button.clickCreateRoom();
-    await this.assertion.expectToBeOnNicknamePage();
+    await this.room.expectToBeOnNicknamePage();
 
     await this.form.fillNickname(hostName);
     await this.button.clickGoToMenuSelection();
-    await this.assertion.expectToBeOnMenuSelectionPage();
+    await this.room.expectToBeOnMenuSelectionPage();
 
     await this.form.selectMenu(menuIndex);
     await this.button.clickGoToCreateRoom();
-    await this.assertion.expectToBeOnLobbyPage();
+    await this.lobby.expectToBeOnLobbyPage();
   }
 
   /**
@@ -43,19 +47,19 @@ export class TestHelper {
   async joinRoomFlow(joinCode: string, guestName: string, menuIndex: number = 0) {
     await this.navigation.goToHomePage();
     await this.button.clickJoinRoomFromHome();
-    await this.assertion.expectToBeOnJoinCodePage();
+    await this.room.expectToBeOnJoinCodePage();
 
     await this.form.fillJoinCode(joinCode);
     await this.button.clickJoinRoomFromModal();
-    await this.assertion.expectToBeOnNicknamePage();
+    await this.room.expectToBeOnNicknamePage();
 
     await this.form.fillNickname(guestName);
     await this.button.clickGoToMenuSelection();
-    await this.assertion.expectToBeOnMenuSelectionPage();
+    await this.room.expectToBeOnMenuSelectionPage();
 
     await this.form.selectMenu(menuIndex);
     await this.button.clickEnterRoom();
-    await this.assertion.expectToBeOnLobbyPage();
+    await this.lobby.expectToBeOnLobbyPage();
   }
 
   /**
