@@ -31,11 +31,7 @@ const GameActionButton = ({
         <Headline4 color={isSelected ? 'white' : 'point-400'}>{gameName}</Headline4>
         <S.DescriptionWrapper isSelected={isSelected}>
           {description &&
-            description.map((desc, index) => (
-              <S.Description key={index} color="point-300">
-                {desc}
-              </S.Description>
-            ))}
+            description.map((desc, index) => <S.Description key={index}>{desc}</S.Description>)}
         </S.DescriptionWrapper>
       </S.Wrapper>
       <S.GameIcon $isSelected={isSelected}>{icon}</S.GameIcon>

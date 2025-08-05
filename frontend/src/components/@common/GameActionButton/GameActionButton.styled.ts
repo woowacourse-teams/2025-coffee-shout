@@ -72,7 +72,7 @@ export const DescriptionWrapper = styled.div<DescriptionWrapperProps>`
   justify-content: flex-start;
   align-items: flex-start;
   margin-top: 8px;
-  color: ${({ theme, isSelected }) => (isSelected ? theme.color.white : theme.color.point[400])};
+  color: ${({ theme, isSelected }) => (isSelected ? theme.color.white : theme.color.point[300])};
 `;
 
 export const GameIcon = styled.div<Props>`
