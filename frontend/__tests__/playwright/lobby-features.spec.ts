@@ -36,16 +36,16 @@ test.describe('로비 기능', () => {
       await expect(gameStartButton).toBeVisible();
 
       // 미니게임을 먼저 선택해야 게임 시작이 가능할 수 있음
-      await hostHelper.page.getByRole('button', { name: '미니게임' }).click();
-      const cardGameButton = hostHelper.page.getByRole('button', { name: '카드게임' });
-      await cardGameButton.click();
+      await hostHelper.button.clickSectionTab('미니게임');
+      await hostHelper.button.clickMiniGame('카드게임');
 
       // 버튼 클릭 가능 확인 (클릭 후 반응 확인만)
-      await gameStartButton.click();
+      await hostHelper.button.clickGameStart();
 
       // TODO: 추후 게스트가 isReady 상태를 true로 해주어야만 게임 시작 버튼이 클릭이 되고 페이지가 이동함. 이건 여기서 처리 안하는게 맞을까?
       // 미니게임 준비 페이지로 이동 확인 (또는 적절한 반응 확인)
       // await expect(hostHelper.page).toHaveURL(/\/room\/.*\/(CARD_GAME)\/ready/);
+      // await expect(guestHelper.page).toHaveURL(/\/room\/.*\/(CARD_GAME)\/ready/);
     });
 
     test('게스트는 게임 시작 버튼을 누를 수 없다.', async () => {
@@ -59,8 +59,8 @@ test.describe('로비 기능', () => {
   test.describe('참여자 리스트 섹션', () => {
     test('모든 참가자의 이름이 표시된다.', async () => {
       // 참가자 섹션으로 이동
-      await hostHelper.page.getByRole('button', { name: '참가자' }).click();
-      await guestHelper.page.getByRole('button', { name: '참가자' }).click();
+      await hostHelper.button.clickSectionTab('참가자');
+      await guestHelper.button.clickSectionTab('참가자');
 
       // 호스트 페이지에서 참가자 확인
       await expect(hostHelper.page.getByText('호스트')).toBeVisible();
@@ -73,8 +73,8 @@ test.describe('로비 기능', () => {
 
     test('내 정보는 상단에 별도로 구분되어 표시된다.', async () => {
       // 참가자 섹션인지 확인
-      await hostHelper.page.getByRole('button', { name: '참가자' }).click();
-      await guestHelper.page.getByRole('button', { name: '참가자' }).click();
+      await hostHelper.button.clickSectionTab('참가자');
+      await guestHelper.button.clickSectionTab('참가자');
 
       // 호스트 페이지에서 자신의 정보가 상단에 표시되는지 확인
       const hostPlayerCard = hostHelper.page.locator('[data-testid="player-card"]').first();
@@ -104,7 +104,7 @@ test.describe('로비 기능', () => {
   test.describe('미니게임 선택 권한', () => {
     test('호스트는 미니게임을 선택할 수 있다.', async () => {
       // 미니게임 섹션으로 이동
-      await hostHelper.page.getByRole('button', { name: '미니게임' }).click();
+      await hostHelper.button.clickSectionTab('미니게임');
 
       // 미니게임 선택 버튼들이 활성화되어 있는지 확인
       const cardGameButton = hostHelper.page.getByRole('button', { name: '카드게임' });
@@ -112,7 +112,7 @@ test.describe('로비 기능', () => {
       await expect(cardGameButton).toBeEnabled();
 
       // 미니게임 선택
-      await cardGameButton.click();
+      await hostHelper.button.clickMiniGame('카드게임');
 
       // 선택된 상태 확인 (aria-pressed 속성)
       await expect(cardGameButton).toHaveAttribute('aria-pressed', 'true');
@@ -120,7 +120,7 @@ test.describe('로비 기능', () => {
 
     test('게스트는 미니게임을 선택할 수 없다.', async () => {
       // 미니게임 섹션으로 이동
-      await guestHelper.page.getByRole('button', { name: '미니게임' }).click();
+      await guestHelper.button.clickSectionTab('미니게임');
 
       // 미니게임 버튼들이 비활성화되어 있는지 확인
       const cardGameButton = guestHelper.page.getByRole('button', { name: '카드게임' });
@@ -130,12 +130,11 @@ test.describe('로비 기능', () => {
 
     test('호스트가 미니게임을 선택하면 게스트 화면에 실시간으로 반영된다.', async () => {
       // 호스트가 미니게임 선택
-      await hostHelper.page.getByRole('button', { name: '미니게임' }).click();
-      const cardGameButton = hostHelper.page.getByRole('button', { name: '카드게임' });
-      await cardGameButton.click();
+      await hostHelper.button.clickSectionTab('미니게임');
+      await hostHelper.button.clickMiniGame('카드게임');
 
       // 게스트 화면에서 미니게임 섹션으로 이동
-      await guestHelper.page.getByRole('button', { name: '미니게임' }).click();
+      await guestHelper.button.clickSectionTab('미니게임');
 
       // 게스트 화면에 선택된 미니게임이 반영되었는지 확인
       const guestCardGameButton = guestHelper.page.getByRole('button', { name: '카드게임' });
@@ -144,28 +143,24 @@ test.describe('로비 기능', () => {
   });
 
   test.describe('초대코드 공유 기능', () => {
-    test('호스트와 게스트 모두 초대코드 공유 버튼을 클릭하면 모달이 열린다.', async () => {
+    test('호스트와 게스트는 초대코드 공유 버튼을 클릭하면 모달이 열린다.', async () => {
       // 호스트 공유 버튼 테스트
-      await hostHelper.page.getByRole('button', { name: '공유' }).click();
+      await hostHelper.button.clickShare();
       await expect(hostHelper.page.getByRole('dialog')).toBeVisible();
       await expect(hostHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
-
-      // 모달 닫기
       await hostHelper.button.clickCloseModal();
 
       // TODO: 게스트 공유 버튼 추가 후 주석 해제
-      // // 게스트 공유 버튼 테스트
-      // const guestShareButton = guestHelper.page.getByRole('button', { name: '공유' });
-      // if (await guestShareButton.isVisible()) {
-      //   await guestShareButton.click();
-      //   await expect(guestHelper.page.getByRole('dialog')).toBeVisible();
-      //   await expect(guestHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
-      // }
+      // 게스트 공유 버튼 테스트
+      // await guestHelper.button.clickShare();
+      // await expect(guestHelper.page.getByRole('dialog')).toBeVisible();
+      // await expect(guestHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
+      // await guestHelper.button.clickCloseModal();
     });
 
     test('모달에는 제목, 내용, 초대코드 번호가 포함되어 있다.', async () => {
       // 공유 모달 열기
-      await hostHelper.page.getByRole('button', { name: '공유' }).click();
+      await hostHelper.button.clickShare();
 
       // 모달 제목 확인
       await expect(hostHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
@@ -181,19 +176,20 @@ test.describe('로비 기능', () => {
       expect(displayedCode?.trim()).toBe(joinCode);
     });
 
-    test('클립보드 복사 아이콘 클릭 시 "복사되었습니다." 토스트 메시지가 표시된다.', async () => {
+    test('클립보드 복사 아이콘 클릭 시 토스트 메시지가 표시된다.', async () => {
       // 공유 모달 열기
-      await hostHelper.page.getByRole('button', { name: '공유' }).click();
+      await hostHelper.button.clickShare();
 
-      // TODO: 클립 보드 복사 기능 PR 머지 후 수정할 것
+      // alert 이벤트 리스너를 미리 설정
+      let alertMessage = '';
+      hostHelper.page.on('dialog', async (dialog) => {
+        alertMessage = dialog.message();
+        await dialog.accept();
+      });
+
       // 복사 아이콘 클릭
-      // await hostHelper.page.locator('[src*="copy-icon"]').click();
-
-      // 토스트 메시지 확인 (alert 또는 토스트 메시지)
-      // hostHelper.page.on('dialog', async (dialog) => {
-      //   expect(dialog.message()).toBe('초대 코드가 복사되었습니다.');
-      //   await dialog.accept();
-      // });
+      await hostHelper.button.clickCopyIcon();
+      expect(alertMessage).toBe('초대 코드가 복사되었습니다.');
     });
   });
 });

@@ -87,16 +87,16 @@ export class ButtonHelper {
     await this.page.getByRole('button', { name: '공유' }).click();
   }
 
-  async clickSectionTab(sectionName: '참가자' | '룰렛' | '미니게임') {
+  async clickSectionTab(sectionName: '참가자' | '미니게임') {
     await this.page.getByRole('button', { name: sectionName }).click();
   }
 
-  async clickMiniGame(gameName: string) {
+  async clickMiniGame(gameName: '카드게임') {
     await this.page.getByRole('button', { name: gameName }).click();
   }
 
   async clickCopyIcon() {
-    await this.page.locator('[src*="copy-icon"]').click();
+    await this.page.getByRole('button', { name: '초대 코드 복사' }).click();
   }
 
   async clickCloseModal() {
@@ -196,7 +196,7 @@ export class TestHelper {
    */
   async createRoomAndGetJoinCode(hostName: string, menuIndex: number = 0): Promise<string> {
     await this.createRoomFlow(hostName, menuIndex);
-    await this.page.getByRole('button', { name: '공유' }).click();
+    await this.button.clickShare();
     await this.page.waitForSelector('h4');
 
     const joinCodeElement = this.page.getByRole('heading', { level: 4 }).last();
@@ -206,10 +206,7 @@ export class TestHelper {
       throw new Error('방 참가 코드를 찾을 수 없습니다.');
     }
 
-    const closeButton = this.page.getByRole('button', { name: '모달 닫기' });
-    if (await closeButton.isVisible()) {
-      await this.button.clickCloseModal();
-    }
+    await this.button.clickCloseModal();
 
     return code.trim();
   }

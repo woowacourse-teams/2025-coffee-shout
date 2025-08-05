@@ -20,7 +20,13 @@ const JoinCodeModal = () => {
       <S.CodeBox>
         <S.EmptyBox />
         <Headline4>{joinCode}</Headline4>
-        <S.CopyIcon src={CopyIcon} onClick={handleCopy} />
+        <S.CopyIcon
+          src={CopyIcon}
+          onClick={handleCopy}
+          aria-label="초대 코드 복사"
+          role="button"
+          tabIndex={0}
+        />
       </S.CodeBox>
     </S.Container>
   );
