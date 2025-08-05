@@ -194,15 +194,33 @@ test.describe('로비 기능', () => {
       // 공유 모달 열기
       await hostHelper.button.clickShare();
 
+      // 클립보드 API 모킹
+      await hostHelper.page.evaluate(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: {
+            writeText: async () => {
+              return Promise.resolve();
+            },
+          },
+          writable: true,
+        });
+      });
+
       // alert 이벤트 리스너를 미리 설정
       let alertMessage = '';
-      hostHelper.page.on('dialog', async (dialog) => {
-        alertMessage = dialog.message();
-        await dialog.accept();
+      const dialogPromise = new Promise<void>((resolve) => {
+        hostHelper.page.on('dialog', async (dialog) => {
+          alertMessage = dialog.message();
+          await dialog.accept();
+          resolve();
+        });
       });
 
       // 복사 아이콘 클릭
       await hostHelper.button.clickCopyIcon();
+
+      // alert 메시지가 나타날 때까지 대기
+      await dialogPromise;
       expect(alertMessage).toBe('초대 코드가 복사되었습니다.');
     });
   });
