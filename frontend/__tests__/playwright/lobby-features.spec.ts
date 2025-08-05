@@ -166,10 +166,10 @@ test.describe('로비 기능', () => {
 
       // TODO: 게스트 공유 버튼 추가 후 주석 해제
       // 게스트 공유 버튼 테스트
-      // await guestHelper.button.clickShare();
-      // await expect(guestHelper.page.getByRole('dialog')).toBeVisible();
-      // await expect(guestHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
-      // await guestHelper.button.clickCloseModal();
+      await guestHelper.button.clickShare();
+      await expect(guestHelper.page.getByRole('dialog')).toBeVisible();
+      await expect(guestHelper.page.getByRole('heading', { name: '초대 코드' })).toBeVisible();
+      await guestHelper.button.clickCloseModal();
     });
 
     test('모달에는 제목, 내용, 초대코드 번호가 포함되어 있다.', async () => {
