@@ -1,20 +1,23 @@
 import { MenuType } from '@/types/menu';
-import MenuIcon from '@/assets/juice.svg';
+import Coffee from '@/assets/coffee.svg';
+import Ade from '@/assets/ade.svg';
+import Smoothie from '@/assets/smoothie.svg';
+import Frappuccino from '@/assets/frappuccino.svg';
+import ETC from '@/assets/etc.svg';
 
-// @TODO: 아이콘 바꾸기
 export const getMenuIcon = (menuType: MenuType) => {
   switch (menuType) {
     case 'COFFEE':
-      return MenuIcon;
+      return Coffee;
     case 'ADE':
-      return MenuIcon;
+      return Ade;
     case 'SMOOTHIE':
-      return MenuIcon;
+      return Smoothie;
     case 'FRAPPUCCINO':
-      return MenuIcon;
+      return Frappuccino;
     case 'ETC':
-      return MenuIcon;
+      return ETC;
     default:
-      return MenuIcon;
+      return ETC;
   }
 };
