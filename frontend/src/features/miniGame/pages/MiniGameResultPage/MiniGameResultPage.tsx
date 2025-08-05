@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const MiniGameResultPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { ranks, scores } = useCardGame();
+  const { updateCurrentProbabilities } = useProbabilityHistory();
 
   const handlePlayerProbabilitiesData = useCallback(
     (data: Probability[]) => {
@@ -29,13 +31,13 @@ const MiniGameResultPage = () => {
         probability: item.probability,
       }));
 
+      updateCurrentProbabilities(playerProbabilitiesData);
+
       if (joinCode) {
-        navigate(`/room/${joinCode}/roulette/play`, {
-          state: { playerProbabilitiesData },
-        });
+        navigate(`/room/${joinCode}/roulette/play`);
       }
     },
-    [joinCode, navigate]
+    [joinCode, navigate, updateCurrentProbabilities]
   );
 
   useWebSocketSubscription<Probability[]>(

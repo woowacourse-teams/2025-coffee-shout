@@ -22,6 +22,7 @@ import GameStartButton from '../components/GameStartButton/GameStartButton';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import * as S from './LobbyPage.styled';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -33,6 +34,7 @@ const LobbyPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
+  const { updateCurrentProbabilities } = useProbabilityHistory();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
@@ -63,10 +65,11 @@ const LobbyPage = () => {
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
+      updateCurrentProbabilities(playerProbabilities);
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
 
-    [joinCode, navigate]
+    [joinCode, navigate, updateCurrentProbabilities, playerProbabilities]
   );
 
   useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
