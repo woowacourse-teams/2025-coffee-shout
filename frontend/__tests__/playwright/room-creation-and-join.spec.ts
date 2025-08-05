@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { TestHelper } from './helpers/test-helpers';
+import { expect, test } from '@playwright/test';
+import { TestHelper } from './helpers/TestHelper';
 
 test.describe('방 생성 및 참가', () => {
   test.describe('호스트가 방을 생성하면 로비 페이지로 이동해야 한다.', () => {

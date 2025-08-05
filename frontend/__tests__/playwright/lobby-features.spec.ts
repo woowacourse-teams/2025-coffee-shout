@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { TestHelper } from './helpers/test-helpers';
+import { expect, test } from '@playwright/test';
+import { TestHelper } from './helpers/TestHelper';
 
 test.describe('로비 기능', () => {
   let hostHelper: TestHelper;
