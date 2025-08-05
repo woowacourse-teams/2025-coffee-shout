@@ -83,7 +83,7 @@ public class RoomWebSocketController {
         final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
         roomService.delayCleanUp(joinCode);
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
                 WebSocketResponse.success(losePlayer));
     }
 }
