@@ -38,14 +38,4 @@ public class MiniGameTaskSchedulerConfig {
         scheduler.initialize();
         return scheduler;
     }
-
-    @Bean
-    @Primary
-    public TaskScheduler customMessageBrokerTaskScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(4);
-        scheduler.setThreadNamePrefix("default-scheduler-");
-        scheduler.initialize();
-        return scheduler;
-    }
 }
