@@ -91,7 +91,7 @@ class CardGameServiceTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
                 softly.assertThat(cardGame.getRoundState()).isNotNull();
-                softly.assertThat(cardGame.getRoundState().getPhase()).isNotEqualTo(RoundPhase.READY);
+                softly.assertThat(cardGame.getRoundState().phase()).isNotEqualTo(RoundPhase.READY);
                 
                 // RoundManager가 등록되었는지 확인
                 softly.assertThat(roundManagerRegistry.exists(joinCode)).isTrue();

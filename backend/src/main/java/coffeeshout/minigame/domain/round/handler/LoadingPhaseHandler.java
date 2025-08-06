@@ -24,7 +24,7 @@ public class LoadingPhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.debug("라운드 {} 로딩 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 로딩 시작", game.getRoundState().roundNumber());
         game.startRound();
     }
     

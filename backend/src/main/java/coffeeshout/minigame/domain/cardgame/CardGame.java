@@ -78,7 +78,7 @@ public class CardGame implements Playable {
 
     public void selectCard(Player player, Integer cardIndex) {
         if (!roundState.isPlayingPhase()) {
-            throw new IllegalStateException("현재 카드 선택 가능한 단계가 아닙니다. 현재 단계: " + roundState.getPhase());
+            throw new IllegalStateException("현재 카드 선택 가능한 단계가 아닙니다. 현재 단계: " + roundState.phase());
         }
         
         playerHands.put(player, deck.pick(cardIndex));
@@ -93,7 +93,7 @@ public class CardGame implements Playable {
     }
 
     public void assignRandomCardsToUnselectedPlayers() {
-        final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(roundState.getRoundNumber());
+        final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(roundState.roundNumber());
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
             playerHands.put(player, card);
@@ -101,7 +101,7 @@ public class CardGame implements Playable {
     }
 
     public Optional<Player> findCardOwnerInCurrentRound(Card card) {
-        return playerHands.findCardOwner(card, roundState.getRoundNumber());
+        return playerHands.findCardOwner(card, roundState.roundNumber());
     }
 
     public void changeScoreBoardState() {
@@ -118,7 +118,7 @@ public class CardGame implements Playable {
      * 모든 플레이어가 현재 라운드에서 카드를 선택했는지 확인
      */
     public boolean allPlayersSelected() {
-        return playerHands.allSelectedInCurrentRound(roundState.getRoundNumber());
+        return playerHands.allSelectedInCurrentRound(roundState.roundNumber());
     }
     
     /**
@@ -147,13 +147,13 @@ public class CardGame implements Playable {
      * 현재 라운드 번호 반환
      */
     public int getCurrentRoundNumber() {
-        return roundState.getRoundNumber();
+        return roundState.roundNumber();
     }
     
     /**
      * 현재 라운드 단계 반환
      */
     public RoundPhase getCurrentPhase() {
-        return roundState.getPhase();
+        return roundState.phase();
     }
 }

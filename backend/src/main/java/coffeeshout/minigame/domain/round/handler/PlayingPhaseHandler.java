@@ -17,18 +17,16 @@ import org.springframework.stereotype.Component;
 public class PlayingPhaseHandler implements RoundPhaseHandler {
     
     private final Duration duration;
-    private final boolean earlySkipEnabled;
-    
+
     public PlayingPhaseHandler(
             @Value("${card-game.phases.playing.duration:PT10S}") Duration duration,
             @Value("${card-game.phases.playing.early-skip:true}") boolean earlySkipEnabled) {
         this.duration = duration;
-        this.earlySkipEnabled = earlySkipEnabled;
     }
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.debug("라운드 {} 플레이 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 플레이 시작", game.getRoundState().roundNumber());
         game.startPlay();
     }
 

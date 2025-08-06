@@ -1,19 +1,9 @@
 package coffeeshout.minigame.domain.round;
 
-import lombok.Getter;
-
 /**
  * 카드게임의 현재 라운드와 단계 정보를 관리하는 클래스
  */
-@Getter
-public class RoundState {
-    private final int roundNumber;
-    private final RoundPhase phase;
-
-    public RoundState(int roundNumber, RoundPhase phase) {
-        this.roundNumber = roundNumber;
-        this.phase = phase;
-    }
+public record RoundState(int roundNumber, RoundPhase phase) {
 
     /**
      * 다음 단계로 전환합니다.
@@ -34,7 +24,7 @@ public class RoundState {
             case LOADING -> RoundPhase.PLAYING;
             case PLAYING -> RoundPhase.SCORING;
             case SCORING -> getRoundPhase(maxRounds);
-            case DONE -> RoundPhase.DONE;
+            default -> throw new IllegalStateException("다음 단계를 결정할 수 없습니다: " + phase);
         };
     }
 

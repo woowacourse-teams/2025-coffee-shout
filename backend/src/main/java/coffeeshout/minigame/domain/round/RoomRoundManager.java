@@ -60,11 +60,11 @@ public class RoomRoundManager {
         }
         
         RoundState currentState = game.getRoundState();
-        log.info(currentState.getPhase().name());
-        RoundPhaseHandler handler = handlers.get(currentState.getPhase());
+        log.info(currentState.phase().name());
+        RoundPhaseHandler handler = handlers.get(currentState.phase());
 
         if (handler == null) {
-            log.error("핸들러를 찾을 수 없음: {} (방: {})", currentState.getPhase(), joinCode.value());
+            log.error("핸들러를 찾을 수 없음: {} (방: {})", currentState.phase(), joinCode.value());
             return;
         }
         

@@ -17,8 +17,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(1);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.LOADING);
+        assertThat(nextState.roundNumber()).isEqualTo(1);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.LOADING);
     }
     
     @Test
@@ -30,8 +30,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(1);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.PLAYING);
+        assertThat(nextState.roundNumber()).isEqualTo(1);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.PLAYING);
     }
     
     @Test
@@ -43,8 +43,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(1);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.SCORING);
+        assertThat(nextState.roundNumber()).isEqualTo(1);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.SCORING);
     }
     
     @Test
@@ -56,8 +56,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(2);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.LOADING);
+        assertThat(nextState.roundNumber()).isEqualTo(2);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.LOADING);
     }
     
     @Test
@@ -69,8 +69,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(2);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.DONE);
+        assertThat(nextState.roundNumber()).isEqualTo(2);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.DONE);
     }
     
     @Test
@@ -82,8 +82,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(2);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(2);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.DONE);
+        assertThat(nextState.roundNumber()).isEqualTo(2);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.DONE);
     }
     
     @Test
@@ -95,8 +95,8 @@ class RoundStateTest {
         RoundState nextState = state.nextPhase(3);
         
         // then
-        assertThat(nextState.getRoundNumber()).isEqualTo(3);
-        assertThat(nextState.getPhase()).isEqualTo(RoundPhase.DONE);
+        assertThat(nextState.roundNumber()).isEqualTo(3);
+        assertThat(nextState.phase()).isEqualTo(RoundPhase.DONE);
     }
     
     @Test

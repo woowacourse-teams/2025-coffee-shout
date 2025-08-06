@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ReadyPhaseHandler implements RoundPhaseHandler {
     @Override
     public void execute(CardGame game, Room room) {
-        log.debug("라운드 {} 로딩 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 로딩 시작", game.getRoundState().roundNumber());
     }
 
     @Override

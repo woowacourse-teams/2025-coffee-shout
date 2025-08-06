@@ -24,7 +24,7 @@ public class ScoringPhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.debug("라운드 {} 점수 계산 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 점수 계산 시작", game.getRoundState().roundNumber());
         
         // 선택하지 않은 플레이어들에게 랜덤 카드 할당
         game.assignRandomCardsToUnselectedPlayers();
