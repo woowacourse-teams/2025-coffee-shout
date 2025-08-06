@@ -105,7 +105,12 @@ export class CardGameHelper {
 
   // === 게임 진행 검증 ===
   async expectCurrentRound(roundNumber: number) {
-    await expect(this.page.getByText(`라운드 ${roundNumber}`)).toBeVisible();
+    await expect(this.page.getByText(`Round ${roundNumber}`)).toBeVisible({ timeout: 15000 });
+  }
+
+  async waitForRoundTimer() {
+    // 10초 타이머 + 여유시간 2초
+    await this.page.waitForTimeout(12000);
   }
 
   // === 카드게임 액션 ===
@@ -158,11 +163,6 @@ export class CardGameHelper {
     await expect(cardElement).toBeVisible();
     await expect(cardElement).toHaveAttribute('data-selected', 'true');
     await expect(cardElement).toHaveAttribute('data-flipped', 'true');
-  }
-
-  async waitForRoundTimer() {
-    // 10초 타이머 대기 (약간의 여유시간 포함)
-    await this.page.waitForTimeout(11000);
   }
 
   async playAllRounds() {

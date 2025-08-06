@@ -81,64 +81,31 @@ test.describe('카드게임', () => {
     });
   });
 
-  // test.describe('라운드 진행 조건', () => {
-  //   test('모든 사용자가 카드를 선택하면 자동으로 다음 라운드로 진행된다.', async () => {
-  //     // 현재 라운드 확인
-  //     await hostHelper.cardGame.expectCurrentRound(1);
+  test.describe('라운드 진행 조건', () => {
+    test('모든 사용자가 카드를 선택하면 자동으로 다음 라운드로 진행된다.', async () => {
+      // 현재 라운드 확인
+      await hostHelper.cardGame.expectCurrentRound(1);
+      await guestHelper.cardGame.expectCurrentRound(1);
 
-  //     // 호스트와 게스트가 모두 카드 선택
-  //     await hostHelper.cardGame.selectCard(0);
-  //     await guestHelper.cardGame.selectCard(1);
+      // 호스트와 게스트가 모두 카드 선택
+      await hostHelper.cardGame.selectCard(0);
+      await guestHelper.cardGame.selectCard(1);
 
-  //     // 다음 라운드로 자동 진행되는지 확인
-  //     await hostHelper.cardGame.expectCurrentRound(2);
-  //     await guestHelper.cardGame.expectCurrentRound(2);
-  //   });
+      // 다음 라운드로 자동 진행되는지 확인
+      await hostHelper.cardGame.expectCurrentRound(2);
+      await guestHelper.cardGame.expectCurrentRound(2);
+    });
 
-  //   test('카드를 선택하지 않아도 10초 후 자동으로 다음 라운드로 넘어간다.', async () => {
-  //     // 현재 라운드 확인
-  //     await hostHelper.cardGame.expectCurrentRound(1);
+    test('카드를 선택하지 않아도 10초 후 자동으로 다음 라운드로 넘어간다.', async () => {
+      // 현재 라운드 확인
+      await hostHelper.cardGame.expectCurrentRound(1);
 
-  //     // 10초 대기 (타이머 확인)
-  //     await hostHelper.cardGame.waitForRoundTimer();
+      // 10초 대기 (타이머 확인)
+      await hostHelper.cardGame.waitForRoundTimer();
 
-  //     // 다음 라운드로 자동 진행되었는지 확인
-  //     await hostHelper.cardGame.expectCurrentRound(2);
-  //     await guestHelper.cardGame.expectCurrentRound(2);
-  //   });
-  // });
-
-  // test.describe('게임 종료 이후', () => {
-  //   test('모든 라운드가 끝나면 카드게임 결과 화면이 표시된다.', async () => {
-  //     // 모든 라운드 진행 (예: 3라운드)
-  //     await hostHelper.cardGame.playAllRounds();
-
-  //     // 결과 화면 표시 확인
-  //     await hostHelper.cardGame.expectToBeOnCardGameResultPage();
-  //     await guestHelper.cardGame.expectToBeOnCardGameResultPage();
-  //   });
-
-  //   test('호스트는 "룰렛 현황 보러가기" 버튼을 눌러 다음 화면으로 이동할 수 있다.', async () => {
-  //     // 모든 라운드 완료
-  //     await hostHelper.cardGame.playAllRounds();
-
-  //     // 호스트가 룰렛 현황 보러가기 버튼 클릭
-  //     await hostHelper.button.clickGoToRouletteStatus();
-
-  //     // 룰렛 페이지로 이동 확인
-  //     await hostHelper.roulette.expectToBeOnRoulettePage();
-  //   });
-
-  //   test('게스트는 호스트가 이동할 때까지 대기 상태가 된다.', async () => {
-  //     // 모든 라운드 완료
-  //     await hostHelper.cardGame.playAllRounds();
-
-  //     // 게스트에게는 대기 메시지가 표시되는지 확인
-  //     // await guestHelper.roulette.expectWaitingForHostMessage();
-
-  //     // 호스트가 이동하면 게스트도 함께 이동
-  //     await hostHelper.button.clickGoToRouletteStatus();
-  //     await guestHelper.roulette.expectToBeOnRoulettePage();
-  //   });
-  // });
+      // 다음 라운드로 자동 진행되었는지 확인
+      await hostHelper.cardGame.expectCurrentRound(2);
+      await guestHelper.cardGame.expectCurrentRound(2);
+    });
+  });
 });
