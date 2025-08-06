@@ -19,8 +19,7 @@ public class PlayingPhaseHandler implements RoundPhaseHandler {
     private final Duration duration;
 
     public PlayingPhaseHandler(
-            @Value("${card-game.phases.playing.duration:PT10S}") Duration duration,
-            @Value("${card-game.phases.playing.early-skip:true}") boolean earlySkipEnabled) {
+            @Value("${card-game.phases.playing.duration:PT10S}") Duration duration) {
         this.duration = duration;
     }
     
