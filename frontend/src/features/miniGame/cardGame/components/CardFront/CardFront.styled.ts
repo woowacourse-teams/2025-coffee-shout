@@ -7,7 +7,7 @@ import { cardVariants, circleVariants } from '../../constants/variants';
 
 type Props = {
   $size?: Size;
-  $playerIconColor?: ColorList;
+  $playerColor?: ColorList;
   $card?: Card;
 };
 
@@ -44,10 +44,10 @@ const cardTextFontSize = {
 export const Container = styled.div<Props>`
   ${({ $size }) => cardVariants[$size || 'large']}
   background-color: ${({ theme }) => theme.color.point[200]};
-  ${({ $playerIconColor }) =>
-    $playerIconColor &&
+  ${({ $playerColor }) =>
+    $playerColor &&
     css`
-      border: 4px solid ${$playerIconColor};
+      border: 4px solid ${$playerColor};
     `};
   border-radius: 7px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);

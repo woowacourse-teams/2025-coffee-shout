@@ -6,15 +6,15 @@ import * as S from './CardFront.styled';
 
 type Props = {
   size?: Size;
-  playerIconColor?: ColorList;
+  playerColor?: ColorList;
   card: Card;
 };
 
-const CardFront = ({ size, playerIconColor, card }: Props) => {
+const CardFront = ({ size, playerColor, card }: Props) => {
   const isSignInversionCard = card.type === 'MULTIPLIER' && card.value === -1;
 
   return (
-    <S.Container $size={size} $playerIconColor={playerIconColor}>
+    <S.Container $size={size} $playerColor={playerColor}>
       <S.Circle $size={size}>
         {isSignInversionCard ? (
           <S.CardIcon src={CardIcon} alt="부호 반전" />

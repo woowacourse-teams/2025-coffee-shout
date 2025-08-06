@@ -11,10 +11,11 @@ import Layout from '@/layouts/Layout';
 import { Probability } from '@/types/roulette';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './MiniGameResultPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import { colorList } from '@/constants/color';
+import * as S from './MiniGameResultPage.styled';
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const MiniGameResultPage = () => {
       const playerProbabilitiesData = data.map((item) => ({
         playerName: item.playerResponse.playerName,
         probability: item.probability,
+        playerColor: colorList[item.playerResponse.colorIndex],
       }));
 
       updateCurrentProbabilities(playerProbabilitiesData);
@@ -70,7 +72,7 @@ const MiniGameResultPage = () => {
               <Headline3>
                 <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
               </Headline3>
-              <PlayerCard name={playerRank.playerName} iconColor={'#FF6B6B'}>
+              <PlayerCard name={playerRank.playerName} playerColor={'#FF6B6B'}>
                 <Headline4>
                   {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
                 </Headline4>

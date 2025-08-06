@@ -1,3 +1,4 @@
+import { ColorList } from '@/constants/color';
 import { Player } from './player';
 
 export type RouletteView = 'roulette' | 'statistics';
@@ -10,6 +11,7 @@ export type Probability = {
 export type PlayerProbability = {
   playerName: string;
   probability: number;
+  playerColor: ColorList;
 };
 
 export type ProbabilityHistory = {

@@ -21,8 +21,9 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
-import * as S from './LobbyPage.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import { colorList } from '@/constants/color';
+import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -57,6 +58,7 @@ const LobbyPage = () => {
     const parsedData = data.map((item) => ({
       playerName: item.playerResponse.playerName,
       probability: item.probability,
+      playerColor: colorList[item.playerResponse.colorIndex],
     }));
 
     setPlayerProbabilities(parsedData);

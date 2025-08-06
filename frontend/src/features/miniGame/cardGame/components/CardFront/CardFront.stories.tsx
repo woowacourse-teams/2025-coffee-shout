@@ -40,7 +40,7 @@ export const Large: Story = {
 export const WithPlayerSmall: Story = {
   args: {
     size: 'small',
-    playerIconColor: '#FF6B6B',
+    playerColor: '#FF6B6B',
     card: { type: 'MULTIPLIER', value: 0 },
   },
 };
@@ -48,7 +48,7 @@ export const WithPlayerSmall: Story = {
 export const WithPlayerMedium: Story = {
   args: {
     size: 'medium',
-    playerIconColor: '#FF6B6B',
+    playerColor: '#FF6B6B',
     card: { type: 'MULTIPLIER', value: 2 },
   },
 };
@@ -56,14 +56,14 @@ export const WithPlayerMedium: Story = {
 export const WithPlayerLarge: Story = {
   args: {
     size: 'large',
-    playerIconColor: '#FF6B6B',
+    playerColor: '#FF6B6B',
     card: { type: 'ADDITION', value: -40 },
   },
 };
 
 export const Grid: Story = {
   render: () => {
-    const playerIconColorMap = [
+    const playerColorMap = [
       '#FF6B6B' as ColorList,
       '#FF6B6B' as ColorList,
       undefined,
@@ -85,10 +85,10 @@ export const Grid: Story = {
         }}
       >
         {Array.from({ length: 9 }, (_, index) =>
-          playerIconColorMap[index] ? (
+          playerColorMap[index] ? (
             <CardFront
               key={index}
-              playerIconColor={playerIconColorMap[index]}
+              playerColor={playerColorMap[index]}
               card={{ type: 'MULTIPLIER', value: -1 }}
             />
           ) : (

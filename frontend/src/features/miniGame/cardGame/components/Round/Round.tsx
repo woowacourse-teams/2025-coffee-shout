@@ -10,6 +10,7 @@ import CardFront from '../CardFront/CardFront';
 import { SelectedCardInfo } from '../../pages/CardGamePlayPage';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
 import { CardInfo } from '@/types/miniGame';
+import { colorList } from '@/constants/color';
 
 type Props = {
   round: RoundKey;
@@ -71,6 +72,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
                     value: cardInfo.value as CardValue,
                   } as Card
                 }
+                playerColor={colorList[cardInfo.colorIndex]}
               />
             ) : (
               <CardBack key={index} onClick={() => onClickCard(index)} />

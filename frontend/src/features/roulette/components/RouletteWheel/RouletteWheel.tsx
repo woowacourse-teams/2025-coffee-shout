@@ -1,10 +1,9 @@
-import RouletteWheelIcon from '@/assets/profile-red.svg';
-import { colorList } from '@/constants/color';
 import { useTheme } from '@emotion/react';
 import { describeArc } from '../../utils/describeArc';
-import * as S from './RouletteWheel.styled';
-import { PlayerProbability } from '@/types/roulette';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
+import { PlayerProbability } from '@/types/roulette';
+import { colorList } from '@/constants/color';
+import * as S from './RouletteWheel.styled';
 
 type Angle = { playerName: string; startAngle: number; endAngle: number };
 
@@ -36,7 +35,6 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
               />
             ))}
           </svg>
-       
         </S.Wrapper>
       </S.Container>
     );
@@ -68,7 +66,6 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
               />
             ))}
           </svg>
-         
         </S.Wrapper>
       </S.Container>
     );
