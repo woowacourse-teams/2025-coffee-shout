@@ -6,3 +6,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   gap: 1rem;
 `;
+
+export const Icon = styled.img`
+  width: 50px;
+`;

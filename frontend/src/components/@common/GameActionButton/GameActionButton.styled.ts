@@ -55,15 +55,32 @@ export const Container = styled.button<Props>`
   `}
 `;
 
-export const GameNameWrapper = styled.div``;
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+`;
 
-export const InfoIcon = styled.img`
-  width: ${SPACING.ICON_SIZE}px;
-  height: ${SPACING.ICON_SIZE}px;
+export const DescriptionWrapper = styled.div<Props>`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 8px;
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.color.white : theme.color.point[300])};
 `;
 
 export const GameIcon = styled.div<Props>`
   position: absolute;
   bottom: ${({ $isSelected }) => getAdjustedPadding($isSelected).vertical}px;
   right: ${({ $isSelected }) => getAdjustedPadding($isSelected).horizontal}px;
+`;
+
+export const Description = styled.p`
+  ${({ theme }) => theme.typography.small}
+`;
+
+export const Icon = styled.img`
+  width: 20px;
 `;
