@@ -56,4 +56,17 @@ public class LogAspect {
     public void logDelayCleanUp(JoinCode joinCode) {
         log.info("JoinCode[{}] 방 삭제 완료", joinCode.value());
     }
+
+    @AfterReturning(
+            value = "execution(* coffeeshout.room.application.RoomService.enterRoom(..)) && args(joinCode, guestName, menuId)",
+            returning = "room",
+            argNames = "joinCode,guestName,menuId,room"
+    )
+    public void logEnterRoom(String joinCode, String guestName, Long menuId, Room room) {
+        final List<String> playerNames = room.getPlayers().stream()
+                .map(player -> player.getName().value())
+                .toList();
+        log.info("JoinCode[{}] 게스트 입장 - 게스트 이름: {}, 메뉴 ID: {}, 현재 참여자 목록: {}", joinCode, guestName, menuId,
+                playerNames);
+    }
 }
