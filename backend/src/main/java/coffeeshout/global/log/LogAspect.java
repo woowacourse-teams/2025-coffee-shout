@@ -1,11 +1,14 @@
 package coffeeshout.global.log;
 
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -32,6 +35,14 @@ public class LogAspect {
     }
 
     @After(
+            value = "execution(* coffeeshout.room.application.RoomService.changePlayerReadyState(..)) && args(joinCode, playerName, isReady)",
+            argNames = "joinCode,playerName,isReady"
+    )
+    public void logPlayerReadyState(String joinCode, String playerName, Boolean isReady) {
+        log.info("JoinCode[{}] 플레이어 Ready 상태 변경 - 플레이어: {}, 상태: {}", joinCode, playerName, isReady);
+    }
+
+    @After(
             value = "execution(* coffeeshout.minigame.application.MiniGameService.start(..)) && args(playable, joinCode)",
             argNames = "playable,joinCode"
     )
@@ -55,5 +66,35 @@ public class LogAspect {
     )
     public void logDelayCleanUp(JoinCode joinCode) {
         log.info("JoinCode[{}] 방 삭제 완료", joinCode.value());
+    }
+
+    @AfterReturning(
+            value = "execution(* coffeeshout.room.application.RoomService.enterRoom(..)) && args(joinCode, guestName, menuId)",
+            returning = "room",
+            argNames = "joinCode,guestName,menuId,room"
+    )
+    public void logEnterRoom(String joinCode, String guestName, Long menuId, Room room) {
+        final List<String> playerNames = room.getPlayers().stream()
+                .map(player -> player.getName().value())
+                .toList();
+        log.info("JoinCode[{}] 게스트 입장 - 게스트 이름: {}, 메뉴 ID: {}, 현재 참여자 목록: {}", joinCode, guestName, menuId,
+                playerNames);
+    }
+
+    @After(
+            value = "execution(* coffeeshout.room.application.RoomService.selectMenu(..)) && args(joinCode, guestName, menuId)",
+            argNames = "joinCode,guestName,menuId"
+    )
+    public void logSelectMenu(String joinCode, String guestName, Long menuId) {
+        log.info("JoinCode[{}] 메뉴 변경 - 게스트 이름: {}, 메뉴 ID: {}", joinCode, guestName, menuId);
+    }
+
+    @After("execution(* coffeeshout.global.websocket.LoggingSimpMessagingTemplate.convertAndSend(..))")
+    public void logWebSocketMessage(JoinPoint joinPoint) {
+        final Object[] args = joinPoint.getArgs();
+        final String destination = (String) args[0];
+        final var payload = (WebSocketResponse) args[1];
+
+        log.info("WebSocket 메시지 전송 - destination: {}, success: {}", destination, payload.success());
     }
 }
