@@ -65,11 +65,9 @@ const CardGamePlayPage = () => {
   }, [currentTime]);
 
   useEffect(() => {
-    if (currentRound === 2 && currentCardGameState === 'PLAYING') {
-      if (!isTimerReset.current) {
-        setCurrentTime(TOTAL_COUNT);
-        isTimerReset.current = true;
-      }
+    if (currentRound === 2 && currentCardGameState === 'PLAYING' && !isTimerReset.current) {
+      setCurrentTime(TOTAL_COUNT);
+      isTimerReset.current = true;
     }
   }, [currentRound, currentCardGameState]);
 
