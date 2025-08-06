@@ -46,8 +46,8 @@ public record MiniGameStateMessage(
 
     public static MiniGameStateMessage from(@NonNull CardGame cardGame) {
         return new MiniGameStateMessage(
-                cardGame.getState().name(),
-                cardGame.getRound().name(),
+                cardGame.getCurrentPhase().name(),
+                String.valueOf(cardGame.getCurrentRoundNumber()),
                 CardInfoMessage.from(cardGame),
                 cardGame.getPlayerHands().isRoundFinished()
         );

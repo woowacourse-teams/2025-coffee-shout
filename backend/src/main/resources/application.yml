@@ -7,3 +7,14 @@ logging:
   level:
     root: info
 
+# 카드게임 설정
+card-game:
+  max-rounds: 2
+  phases:
+    loading:
+      duration: PT3S      # 3초
+    playing:
+      duration: PT10S     # 10초
+    scoring:
+      duration: PT1.5S    # 1.5초
+
