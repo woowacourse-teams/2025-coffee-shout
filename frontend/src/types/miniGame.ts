@@ -16,6 +16,7 @@ export type CardInfo = {
   value: number;
   selected: boolean;
   playerName: string | null;
+  colorIndex: number;
 };
 
 export type CardGameStateData = {
