@@ -27,10 +27,13 @@ const OrderPage = () => {
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
 
-  const handleOrder = useCallback((data: ParticipantResponse) => {
-    setParticipants(data);
-    stopSocket();
-  }, []);
+  const handleOrder = useCallback(
+    (data: ParticipantResponse) => {
+      setParticipants(data);
+      stopSocket();
+    },
+    [stopSocket]
+  );
 
   useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleOrder);
 
@@ -46,7 +49,7 @@ const OrderPage = () => {
     if (joinCode && isConnected) {
       send(`/room/${joinCode}/update-players`);
     }
-  }, [joinCode, send]);
+  }, [joinCode, send, isConnected]);
 
   return (
     <Layout>
