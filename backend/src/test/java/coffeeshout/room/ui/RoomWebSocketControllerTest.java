@@ -233,7 +233,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
         // when - 룰렛 결과 구독
         MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/roulette",
+                "/topic/room/" + joinCode + "/winner",
                 new TypeReference<WebSocketResponse<PlayerResponse>>() {
                 }
         );

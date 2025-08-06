@@ -1,10 +1,10 @@
+
 name: Backend CI
 on:
   pull_request:
     branches:
       - be/dev
       - be/prod
-      - be/feat/**
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
@@ -17,7 +17,7 @@ on:
       - "backend/**"
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,8 +34,26 @@ jobs:
           distribution: 'corretto'
           cache: gradle
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Compile Check
         run: ./gradlew compileJava compileTestJava
 
-      - name: Check Application Properties
-        run: ./gradlew bootJar --dry-run
+      - name: Run Tests
+        run: ./gradlew test
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            backend/build/test-results/test/*.xml
+          check_name: "Backend Test Results"
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports
+          path: backend/build/reports/tests/test/
