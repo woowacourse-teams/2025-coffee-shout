@@ -1,5 +1,6 @@
 package coffeeshout.global.log;
 
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -7,6 +8,7 @@ import coffeeshout.room.domain.player.Player;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -85,5 +87,14 @@ public class LogAspect {
     )
     public void logSelectMenu(String joinCode, String guestName, Long menuId) {
         log.info("JoinCode[{}] 메뉴 변경 - 게스트 이름: {}, 메뉴 ID: {}", joinCode, guestName, menuId);
+    }
+
+    @After("execution(* coffeeshout.global.websocket.LoggingSimpMessagingTemplate.convertAndSend(..))")
+    public void logWebSocketMessage(JoinPoint joinPoint) {
+        final Object[] args = joinPoint.getArgs();
+        final String destination = (String) args[0];
+        final var payload = (WebSocketResponse) args[1];
+
+        log.info("WebSocket 메시지 전송 - destination: {}, success: {}", destination, payload.success());
     }
 }
