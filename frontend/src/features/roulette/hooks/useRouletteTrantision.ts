@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { PlayerProbability } from '@/types/roulette';
 import { interpolateAngles } from '../utils/interpolateAngles';
 
-const ANIMATION_DURATION = 2000; // ms
+const ANIMATION_DURATION = 1600; // ms
 
-// Easing function - 부드러운 시작과 끝
-const easeInOutCubic = (t: number): number => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+// Easing function - 빠른 시작, 부드러운 끝
+const easeOutCubic = (t: number): number => {
+  return 1 - Math.pow(1 - t, 3);
 };
 
 export const useRouletteTransition = (
@@ -32,7 +32,7 @@ export const useRouletteTransition = (
       const rawT = Math.min(elapsed / ANIMATION_DURATION, 1);
 
       // Easing 적용
-      const t = easeInOutCubic(rawT);
+      const t = easeOutCubic(rawT);
 
       const next = interpolateAngles({ from: prev, to: current, t });
       setAngles(next);
