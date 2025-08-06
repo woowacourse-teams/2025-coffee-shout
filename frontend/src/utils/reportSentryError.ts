@@ -8,7 +8,11 @@ export const reportApiError = (error: ApiError | NetworkError) => {
       tags: {
         errorType: 'api',
         statusCode: error.status.toString(),
-        errorCategory: error.status >= 500 ? 'server_error' : 'client_error',
+        errorCategory: error.status >= 500 ? 'serverError' : 'clientError',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+        errorData: error.data,
       },
     });
   } else if (error instanceof NetworkError) {
@@ -16,7 +20,10 @@ export const reportApiError = (error: ApiError | NetworkError) => {
       level: 'error',
       tags: {
         errorType: 'network',
-        errorCategory: 'connection_error',
+        errorCategory: 'connectionError',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
       },
     });
   }
@@ -38,7 +45,7 @@ export const reportWebsocketError = (
     tags: {
       errorType: 'websocket',
       websocketType: type,
-      errorCategory: 'realtime_error',
+      errorCategory: 'realtimeError',
     },
     extra: {
       timestamp: new Date().toISOString(),
