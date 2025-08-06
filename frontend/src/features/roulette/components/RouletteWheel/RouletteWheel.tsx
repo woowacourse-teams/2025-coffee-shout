@@ -19,7 +19,7 @@ const RouletteWheel = ({ playerProbabilities, isSpinning = false }: Props) => {
     <S.Container>
       <S.Wrapper $isSpinning={isSpinning}>
         <svg width={300} height={300} viewBox="0 0 300 300">
-          {playersWithAngles.map((player, index) => (
+          {playersWithAngles.map((player) => (
             <path
               key={player.playerName}
               d={describeArc({
