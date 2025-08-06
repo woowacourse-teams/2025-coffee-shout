@@ -6,18 +6,15 @@ export type ContainerProps = {
 };
 
 export type TriggerProps = {
-  $disabled?: boolean;
   $isOpen: boolean;
 };
 
 export type SelectTextProps = {
   $hasValue: boolean;
-  $disabled?: boolean;
 };
 
 export type ArrowIconProps = {
   $isOpen: boolean;
-  $disabled?: boolean;
 };
 
 export type ContentProps = {
@@ -25,7 +22,6 @@ export type ContentProps = {
 };
 
 export type ItemProps = {
-  $disabled?: boolean;
   $selected?: boolean;
 };
 
@@ -40,7 +36,7 @@ export const Trigger = styled.div<TriggerProps>`
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  background-color: ${({ $disabled, theme }) => ($disabled ? theme.color.gray[50] : 'white')};
+  background-color: 'white';
 
   border-bottom: 2px solid
     ${({ theme, $isOpen }) => {
@@ -48,23 +44,17 @@ export const Trigger = styled.div<TriggerProps>`
       return theme.color.gray[200];
     }};
 
-  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
+  cursor: pointer;
   user-select: none;
 
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:disabled) {
-      border-bottom-color: ${({ theme, $disabled }) => {
-        if ($disabled) return theme.color.gray[200];
-        return theme.color.gray[400];
-      }};
+      border-bottom-color: ${({ theme }) => theme.color.gray[400]};
     }
   }
   @media (hover: none) {
     &:active:not(:disabled) {
-      border-bottom-color: ${({ theme, $disabled }) => {
-        if ($disabled) return theme.color.gray[200];
-        return theme.color.gray[400];
-      }};
+      border-bottom-color: ${({ theme }) => theme.color.gray[400]};
     }
   }
 
@@ -75,8 +65,7 @@ export const Trigger = styled.div<TriggerProps>`
 `;
 
 export const SelectText = styled.span<SelectTextProps>`
-  color: ${({ theme, $hasValue, $disabled }) => {
-    if ($disabled) return theme.color.gray[400];
+  color: ${({ theme, $hasValue }) => {
     if ($hasValue) return theme.color.gray[700];
     return theme.color.gray[300];
   }};
@@ -93,8 +82,7 @@ export const ArrowIcon = styled.div<ArrowIconProps>`
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 6px solid
-    ${({ theme, $disabled }) => ($disabled ? theme.color.gray[300] : theme.color.gray[400])};
+  border-top: 6px solid ${({ theme }) => theme.color.gray[400]};
 
   transform: ${({ $isOpen }) => ($isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
   transition: transform 0.2s ease;
@@ -128,13 +116,12 @@ export const Content = styled.ul<ContentProps>`
 
 export const Item = styled.li<ItemProps>`
   padding: 8px 12px;
-  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
+  cursor: pointer;
 
   background-color: ${({ $selected, theme }) =>
     $selected ? theme.color.gray[100] : 'transparent'};
 
-  color: ${({ theme, $disabled, $selected }) => {
-    if ($disabled) return theme.color.gray[300];
+  color: ${({ theme, $selected }) => {
     if ($selected) return theme.color.gray[900];
     return theme.color.gray[700];
   }};
