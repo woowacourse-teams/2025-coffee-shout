@@ -1,4 +1,4 @@
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -64,7 +64,7 @@ export default {
       template: './public/index.html',
     }),
     new webpack.DefinePlugin(envKeys),
-    new SentryWebpackPlugin({
+    sentryWebpackPlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: 'woowacourse-7th-fe',
       project: '2025-coffee-shout',
