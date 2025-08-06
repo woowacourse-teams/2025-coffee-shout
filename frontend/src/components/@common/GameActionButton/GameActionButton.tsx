@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from 'react';
+import { ComponentProps, ReactElement } from 'react';
 import Headline4 from '../Headline4/Headline4';
 import * as S from './GameActionButton.styled';
 
@@ -8,7 +8,7 @@ type Props = {
   isDisabled: boolean;
   gameName: string;
   description: string[];
-  icon: ReactNode;
+  icon: ReactElement;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const GameActionButton = ({
