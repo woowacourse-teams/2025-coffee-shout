@@ -1,6 +1,7 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { ColorList } from '@/constants/color';
 import { Size } from '@/types/styles';
+import { ComponentProps } from 'react';
 import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
 
@@ -8,13 +9,13 @@ type Props = {
   size?: Size;
   playerIconColor?: ColorList;
   card: Card;
-};
+} & ComponentProps<'div'>;
 
-const CardFront = ({ size, playerIconColor, card }: Props) => {
+const CardFront = ({ size, playerIconColor, card, ...rest }: Props) => {
   const isSignInversionCard = card.type === 'MULTIPLIER' && card.value === -1;
 
   return (
-    <S.Container $size={size} $playerIconColor={playerIconColor}>
+    <S.Container $size={size} $playerIconColor={playerIconColor} {...rest}>
       <S.Circle $size={size}>
         {isSignInversionCard ? (
           <S.CardIcon src={CardIcon} alt="부호 반전" />
