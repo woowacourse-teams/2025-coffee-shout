@@ -78,4 +78,12 @@ public class LogAspect {
         log.info("JoinCode[{}] 게스트 입장 - 게스트 이름: {}, 메뉴 ID: {}, 현재 참여자 목록: {}", joinCode, guestName, menuId,
                 playerNames);
     }
+
+    @After(
+            value = "execution(* coffeeshout.room.application.RoomService.selectMenu(..)) && args(joinCode, guestName, menuId)",
+            argNames = "joinCode,guestName,menuId"
+    )
+    public void logSelectMenu(String joinCode, String guestName, Long menuId) {
+        log.info("JoinCode[{}] 메뉴 변경 - 게스트 이름: {}, 메뉴 ID: {}", joinCode, guestName, menuId);
+    }
 }
