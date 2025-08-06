@@ -19,6 +19,7 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
+import { colorList } from '@/constants/color';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -49,6 +50,7 @@ const LobbyPage = () => {
     const parsedData = data.map((item) => ({
       playerName: item.playerResponse.playerName,
       probability: item.probability,
+      playerColor: colorList[item.playerResponse.colorIndex],
     }));
 
     setPlayerProbabilities(parsedData);

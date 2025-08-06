@@ -1,5 +1,4 @@
 import RouletteWheelIcon from '@/assets/profile-red.svg';
-import { colorList } from '@/constants/color';
 import { PlayerProbability } from '@/types/roulette';
 import { useTheme } from '@emotion/react';
 import { describeArc } from '../../utils/describeArc';
@@ -30,7 +29,7 @@ const RouletteWheel = ({ playerProbabilities, isSpinning = false }: Props) => {
                 startAngle: player.startAngle,
                 endAngle: player.endAngle,
               })}
-              fill={colorList[index % colorList.length]}
+              fill={player.playerColor}
               stroke={theme.color.point[100]}
               strokeWidth="1"
             />
