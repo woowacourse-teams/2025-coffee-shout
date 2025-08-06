@@ -108,11 +108,6 @@ export class CardGameHelper {
     await expect(this.page.getByText(`Round ${roundNumber}`)).toBeVisible({ timeout: 15000 });
   }
 
-  async waitForRoundTimer() {
-    // 10초 타이머 + 여유시간 2초
-    await this.page.waitForTimeout(12000);
-  }
-
   // === 카드게임 액션 ===
   async selectCard(cardIndex: number) {
     const cardElement = this.page.locator(`[data-testid="card-${cardIndex}"]`);

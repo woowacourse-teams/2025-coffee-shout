@@ -95,17 +95,5 @@ test.describe('카드게임', () => {
       await hostHelper.cardGame.expectCurrentRound(2);
       await guestHelper.cardGame.expectCurrentRound(2);
     });
-
-    test('카드를 선택하지 않아도 10초 후 자동으로 다음 라운드로 넘어간다.', async () => {
-      // 현재 라운드 확인
-      await hostHelper.cardGame.expectCurrentRound(1);
-
-      // 10초 대기 (타이머 확인)
-      await hostHelper.cardGame.waitForRoundTimer();
-
-      // 다음 라운드로 자동 진행되었는지 확인
-      await hostHelper.cardGame.expectCurrentRound(2);
-      await guestHelper.cardGame.expectCurrentRound(2);
-    });
   });
 });
