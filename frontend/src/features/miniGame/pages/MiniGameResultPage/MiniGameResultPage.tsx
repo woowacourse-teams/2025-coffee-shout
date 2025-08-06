@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import { colorList } from '@/constants/color';
 
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const MiniGameResultPage = () => {
       const playerProbabilitiesData = data.map((item) => ({
         playerName: item.playerResponse.playerName,
         probability: item.probability,
+        playerColor: colorList[item.playerResponse.colorIndex],
       }));
 
       if (joinCode) {
@@ -68,7 +70,7 @@ const MiniGameResultPage = () => {
               <Headline3>
                 <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
               </Headline3>
-              <PlayerCard name={playerRank.playerName} iconColor={'#FF6B6B'}>
+              <PlayerCard name={playerRank.playerName} playerColor={'#FF6B6B'}>
                 <Headline4>
                   {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
                 </Headline4>
