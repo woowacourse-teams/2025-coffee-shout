@@ -29,7 +29,7 @@ const GameActionButton = ({
     <S.Container onClick={handleClick} $isSelected={isSelected} $disabled={isDisabled} {...rest}>
       <S.Wrapper>
         <Headline4 color={isSelected ? 'white' : 'point-400'}>{gameName}</Headline4>
-        <S.DescriptionWrapper isSelected={isSelected}>
+        <S.DescriptionWrapper $isSelected={isSelected}>
           {description &&
             description.map((desc, index) => <S.Description key={index}>{desc}</S.Description>)}
         </S.DescriptionWrapper>

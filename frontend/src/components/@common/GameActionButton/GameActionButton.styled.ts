@@ -25,10 +25,6 @@ type Props = {
   $disabled?: boolean;
 };
 
-type DescriptionWrapperProps = {
-  isSelected: boolean;
-};
-
 export const Container = styled.button<Props>`
   position: relative;
   display: flex;
@@ -66,13 +62,13 @@ export const Wrapper = styled.div`
   align-items: flex-start;
 `;
 
-export const DescriptionWrapper = styled.div<DescriptionWrapperProps>`
+export const DescriptionWrapper = styled.div<Props>`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   margin-top: 8px;
-  color: ${({ theme, isSelected }) => (isSelected ? theme.color.white : theme.color.point[300])};
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.color.white : theme.color.point[300])};
 `;
 
 export const GameIcon = styled.div<Props>`
