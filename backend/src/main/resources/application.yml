@@ -7,3 +7,11 @@ logging:
   level:
     root: info
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    metrics:
+      enabled: true
