@@ -44,3 +44,16 @@ export const Disabled: Story = {
     gameName: 'Coffee Shout',
   },
 };
+
+export const Test: Story = {
+  render: () => (
+    <GameActionButton
+      isSelected={false}
+      isDisabled={false}
+      gameName="Coffee Shout"
+      description={['설명 1', '설명 2']}
+      icon={<span>Icon</span>}
+      onClick={() => console.log('Button clicked')}
+    />
+  ),
+};
