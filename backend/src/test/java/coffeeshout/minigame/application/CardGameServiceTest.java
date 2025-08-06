@@ -1,7 +1,6 @@
 package coffeeshout.minigame.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
@@ -10,6 +9,8 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import coffeeshout.config.TaskSchedulerConfig;
+import coffeeshout.config.TestTaskScheduler;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
@@ -35,11 +36,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
+@Import(TaskSchedulerConfig.class)
+@TestPropertySource(properties = {
+        "spring.main.allow-bean-definition-overriding=true"
+})
 class CardGameServiceTest {
 
     @MockitoBean
@@ -63,6 +72,7 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
+        System.out.println("=== TEST SETUP ===");
         List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
@@ -77,6 +87,15 @@ class CardGameServiceTest {
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);
         }
+    }
+    @Autowired
+    @Qualifier("miniGameTaskScheduler")
+    TaskScheduler scheduler;
+
+    @Test
+    void 스케줄러_주입_확인() {
+        System.out.println("📌 주입된 스케줄러 클래스: " + scheduler.getClass());
+        assertThat(scheduler).isInstanceOf(TestTaskScheduler.class);
     }
 
     @Nested
