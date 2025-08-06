@@ -1,6 +1,7 @@
 package coffeeshout.room.domain.player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ public class Players {
     private final List<Player> players;
 
     public Players() {
-        this.players = new ArrayList<>();
+        this.players = Collections.synchronizedList(new ArrayList<>());
     }
 
     public Player join(Player player) {
