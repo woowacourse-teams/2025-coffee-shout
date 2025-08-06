@@ -18,6 +18,9 @@ import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
+import GameStartButton from '../components/GameStartButton/GameStartButton';
+import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
+import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import * as S from './LobbyPage.styled';
 import { colorList } from '@/constants/color';
 
@@ -34,6 +37,9 @@ const LobbyPage = () => {
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
+  const isAllReady = participants.every((participant) => participant.isReady);
+  const isReady =
+    participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
 
   const handleParticipant = useCallback((data: ParticipantResponse) => {
     setParticipants(data);
@@ -120,6 +126,30 @@ const LobbyPage = () => {
     });
   };
 
+  const handleGameReadyButtonClick = () => {
+    send(`/room/${joinCode}/update-ready`, {
+      joinCode,
+      playerName: myName,
+      isReady: !isReady,
+    });
+  };
+
+  const renderGameButton = () => {
+    if (playerType === 'HOST') {
+      if (isAllReady) {
+        return <GameStartButton onClick={handleClickGameStartButton} />;
+      }
+      return (
+        <HostWaitingButton
+          currentReadyCount={participants.filter((participant) => participant.isReady).length}
+          totalParticipantCount={participants.length}
+        />
+      );
+    }
+
+    return <GameReadyButton isReady={isReady} onClick={handleGameReadyButtonClick} />;
+  };
+
   useEffect(() => {
     if (playerType === 'GUEST' && joinCode) {
       send(`/room/${joinCode}/get-probabilities`);
@@ -163,20 +193,13 @@ const LobbyPage = () => {
           </S.Wrapper>
         </S.Container>
       </Layout.Content>
-      {playerType === 'HOST' ? (
-        <Layout.ButtonBar flexRatios={[5.5, 1]}>
-          <Button variant="primary" onClick={handleClickGameStartButton}>
-            게임 시작
-          </Button>
-          <Button variant="primary" onClick={handleShare}>
-            <img src={ShareIcon} alt="공유" />
-          </Button>
-        </Layout.ButtonBar>
-      ) : (
-        <Layout.ButtonBar flexRatios={[5.5, 1]}>
-          <Button variant="loading">게임 대기중</Button>
-        </Layout.ButtonBar>
-      )}
+
+      <Layout.ButtonBar flexRatios={[5.5, 1]}>
+        {renderGameButton()}
+        <Button variant="primary" onClick={handleShare}>
+          <img src={ShareIcon} alt="공유" />
+        </Button>
+      </Layout.ButtonBar>
     </Layout>
   );
 };

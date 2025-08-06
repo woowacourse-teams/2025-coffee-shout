@@ -1,7 +1,7 @@
 import { Size } from '@/types/styles';
 import styled from '@emotion/styled';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading';
+export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading' | 'ready';
 
 type Props = {
   $height: Size;
@@ -58,6 +58,12 @@ export const Container = styled.button<Props>`
           color: ${theme.color.white};
           cursor: default;
           opacity: 0.7;
+        `;
+
+      case 'ready':
+        return `
+          background: ${theme.color.point[50]};
+          color: ${theme.color.point[400]};
         `;
 
       case 'primary':
