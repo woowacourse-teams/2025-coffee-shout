@@ -96,4 +96,65 @@ test.describe('카드게임', () => {
       await guestHelper.cardGame.expectCurrentRound(2);
     });
   });
+
+  test.describe('게임 종료 이후', () => {
+    test('모든 라운드가 끝나면 카드게임 결과 화면이 표시된다.', async () => {
+      // 2라운드 진행 - 호스트와 게스트 모두 카드 선택
+      for (let round = 1; round <= 2; round++) {
+        // 현재 라운드 확인
+        await hostHelper.cardGame.expectCurrentRound(round);
+        await guestHelper.cardGame.expectCurrentRound(round);
+
+        // 호스트와 게스트가 각각 카드 선택
+        await hostHelper.cardGame.selectCard(0);
+        await guestHelper.cardGame.selectCard(1);
+      }
+
+      // 결과 화면 표시 확인
+      await hostHelper.cardGame.expectToBeOnCardGameResultPage();
+      await guestHelper.cardGame.expectToBeOnCardGameResultPage();
+    });
+
+    test('호스트는 "룰렛 현황 보러가기" 버튼을 눌러 다음 화면으로 이동할 수 있다.', async () => {
+      // 2라운드 진행 - 호스트와 게스트 모두 카드 선택
+      for (let round = 1; round <= 2; round++) {
+        // 현재 라운드 확인
+        await hostHelper.cardGame.expectCurrentRound(round);
+        await guestHelper.cardGame.expectCurrentRound(round);
+
+        // 호스트와 게스트가 각각 카드 선택
+        await hostHelper.cardGame.selectCard(0);
+        await guestHelper.cardGame.selectCard(1);
+      }
+
+      // 결과 화면 표시 확인
+      await hostHelper.cardGame.expectToBeOnCardGameResultPage();
+
+      // 호스트가 룰렛 현황 보러가기 버튼 클릭
+      await hostHelper.button.clickGoToRouletteStatus();
+
+      // 룰렛 페이지로 이동 확인
+      await hostHelper.roulette.expectToBeOnRoulettePage();
+    });
+
+    test('게스트는 호스트가 이동할 때까지 대기 상태가 된다.', async () => {
+      // 2라운드 진행 - 호스트와 게스트 모두 카드 선택
+      for (let round = 1; round <= 2; round++) {
+        // 현재 라운드 확인
+        await hostHelper.cardGame.expectCurrentRound(round);
+        await guestHelper.cardGame.expectCurrentRound(round);
+
+        // 호스트와 게스트가 각각 카드 선택
+        await hostHelper.cardGame.selectCard(0);
+        await guestHelper.cardGame.selectCard(1);
+      }
+
+      // 게스트에게는 대기 메시지가 표시되는지 확인
+      await guestHelper.roulette.expectWaitingMessage();
+
+      // 호스트가 이동하면 게스트도 함께 이동
+      await hostHelper.button.clickGoToRouletteStatus();
+      await guestHelper.roulette.expectToBeOnRoulettePage();
+    });
+  });
 });

@@ -19,8 +19,8 @@ export class CardGameHelper {
   }
 
   async expectToBeOnCardGameResultPage() {
-    await expect(this.page).toHaveURL(/\/room\/.*\/CARD_GAME\/result/);
-    await expect(this.page.getByText('카드게임 결과')).toBeVisible();
+    await this.page.waitForURL(/\/room\/.*\/CARD_GAME\/result/, { timeout: 30000 });
+    await expect(this.page.getByRole('heading', { name: '게임 결과' })).toBeVisible();
   }
 
   // === 카드 상태 검증 ===
@@ -158,28 +158,5 @@ export class CardGameHelper {
     await expect(cardElement).toBeVisible();
     await expect(cardElement).toHaveAttribute('data-selected', 'true');
     await expect(cardElement).toHaveAttribute('data-flipped', 'true');
-  }
-
-  async playAllRounds() {
-    // 3라운드 진행 (라운드 수는 실제 게임 규칙에 따라 조정)
-    for (let round = 1; round <= 3; round++) {
-      // 현재 라운드에서 카드 선택
-      const availableCards = this.page.locator(
-        '[data-testid^="card-"]:not([data-selected="true"])'
-      );
-      const cardCount = await availableCards.count();
-
-      if (cardCount > 0) {
-        await availableCards.first().click();
-      }
-
-      // 다음 라운드로 진행될 때까지 대기
-      if (round < 3) {
-        await this.page.waitForTimeout(2000);
-      }
-    }
-
-    // 게임 결과 화면으로 이동 대기
-    await this.page.waitForURL(/\/room\/.*\/mini-game\/result/);
   }
 }
