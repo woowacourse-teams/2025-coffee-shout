@@ -1,7 +1,5 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import static org.springframework.util.Assert.state;
-
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -31,20 +29,16 @@ public class CardGame implements Playable {
     private PlayerHands playerHands;
     
     // 새로운 라운드 관리 방식만 사용
-    @Setter
     private RoundState roundState;
-    private final int maxRounds;
 
     public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
         this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
-        this.roundState = new RoundState(1, RoundPhase.READY);
-        this.maxRounds = DEFAULT_MAX_ROUNDS;
+        this.roundState = new RoundState(1, RoundPhase.READY, DEFAULT_MAX_ROUNDS);
     }
     
     public CardGame(@NonNull CardGameDeckGenerator deckGenerator, int maxRounds) {
         this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
-        this.roundState = new RoundState(1, RoundPhase.READY);
-        this.maxRounds = maxRounds;
+        this.roundState = new RoundState(1, RoundPhase.READY, maxRounds);
     }
 
     @Override
@@ -65,11 +59,6 @@ public class CardGame implements Playable {
     @Override
     public Map<Player, MiniGameScore> getScores() {
         return playerHands.scoreByPlayer();
-    }
-
-    public void startRound() {
-        // 라운드 시작 로직
-        prepareForNewRound();
     }
 
     public void startPlay() {
@@ -120,14 +109,7 @@ public class CardGame implements Playable {
     public boolean allPlayersSelected() {
         return playerHands.allSelectedInCurrentRound(roundState.roundNumber());
     }
-    
-    /**
-     * 새 라운드 준비 (덱 셔플 등)
-     */
-    public void prepareForNewRound() {
-        deck.shuffle();
-    }
-    
+
     /**
      * 라운드 점수 계산
      */
@@ -151,9 +133,23 @@ public class CardGame implements Playable {
     }
     
     /**
+     * 최대 라운드 수 반환
+     */
+    public int getMaxRounds() {
+        return roundState.maxRounds();
+    }
+    
+    /**
      * 현재 라운드 단계 반환
      */
     public RoundPhase getCurrentPhase() {
         return roundState.phase();
+    }
+
+    /**
+     * 다음 단계로 이동합니다. CardGame이 자체적으로 RoundState를 관리합니다.
+     */
+    public void moveToNextPhase() {
+        this.roundState = roundState.nextPhase();
     }
 }

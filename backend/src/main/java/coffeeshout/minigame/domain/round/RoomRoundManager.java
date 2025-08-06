@@ -124,10 +124,9 @@ public class RoomRoundManager {
             return;
         }
         
-        RoundState nextState = game.getRoundState().nextPhase(game.getMaxRounds());
-        game.setRoundState(nextState);
+        game.moveToNextPhase();
         
-        log.info("방 {} - 다음 단계로 이동: {}", joinCode.value(), nextState);
+        log.info("방 {} - 다음 단계로 이동: {}", joinCode.value(), game.getRoundState());
         
         // 다음 단계 실행
         executePhase(game, room, onStateChange);

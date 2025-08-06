@@ -169,7 +169,7 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 수동 변경 (테스트용)
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds())); // LOADING
+            cardGame.moveToNextPhase(); // LOADING
 
             // when
             cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
@@ -187,7 +187,7 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
 
             // when
             cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
@@ -208,7 +208,7 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
 
             List<Player> players = room.getPlayers();
 
@@ -246,8 +246,8 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
+            cardGame.moveToNextPhase();
 
             // when & then
             assertThatThrownBy(() ->
@@ -264,7 +264,7 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
 
             // when & then
             assertThatThrownBy(() ->
@@ -280,7 +280,7 @@ class CardGameServiceTest {
             cardGameService.start(cardGame, joinCode.value());
 
             // PLAYING 상태로 변경
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
 
             List<Player> players = room.getPlayers();
 

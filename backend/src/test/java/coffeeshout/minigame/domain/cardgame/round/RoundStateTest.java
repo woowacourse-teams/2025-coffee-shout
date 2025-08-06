@@ -11,10 +11,10 @@ class RoundStateTest {
     @Test
     void 라운드_1에서_READY_다음_단계는_LOADING이다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.READY);
+        RoundState state = new RoundState(1, RoundPhase.READY, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(1);
@@ -24,10 +24,10 @@ class RoundStateTest {
     @Test
     void LOADING_다음_단계는_PLAYING이다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.LOADING);
+        RoundState state = new RoundState(1, RoundPhase.LOADING, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(1);
@@ -37,10 +37,10 @@ class RoundStateTest {
     @Test
     void PLAYING_다음_단계는_SCORING이다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.PLAYING);
+        RoundState state = new RoundState(1, RoundPhase.PLAYING, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(1);
@@ -50,10 +50,10 @@ class RoundStateTest {
     @Test
     void 라운드_1_SCORING_다음_단계는_라운드_2_LOADING이다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.SCORING);
+        RoundState state = new RoundState(1, RoundPhase.SCORING, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(2);
@@ -63,10 +63,10 @@ class RoundStateTest {
     @Test
     void 최대_라운드에서_SCORING_다음_단계는_DONE이다() {
         // given
-        RoundState state = new RoundState(2, RoundPhase.SCORING);
+        RoundState state = new RoundState(2, RoundPhase.SCORING, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(2);
@@ -76,10 +76,10 @@ class RoundStateTest {
     @Test
     void DONE_다음_단계는_계속_DONE이다() {
         // given
-        RoundState state = new RoundState(2, RoundPhase.DONE);
+        RoundState state = new RoundState(2, RoundPhase.DONE, 2);
         
         // when
-        RoundState nextState = state.nextPhase(2);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(2);
@@ -89,10 +89,10 @@ class RoundStateTest {
     @Test
     void _3라운드_게임에서_라운드_3_SCORING_다음_단계는_DONE이다() {
         // given
-        RoundState state = new RoundState(3, RoundPhase.SCORING);
+        RoundState state = new RoundState(3, RoundPhase.SCORING, 3);
         
         // when
-        RoundState nextState = state.nextPhase(3);
+        RoundState nextState = state.nextPhase();
         
         // then
         assertThat(nextState.roundNumber()).isEqualTo(3);
@@ -102,7 +102,7 @@ class RoundStateTest {
     @Test
     void PLAYING_단계에서_isPlayingPhase는_true를_반환한다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.PLAYING);
+        RoundState state = new RoundState(1, RoundPhase.PLAYING, 2);
         
         // when & then
         assertThat(state.isPlayingPhase()).isTrue();
@@ -111,7 +111,7 @@ class RoundStateTest {
     @Test
     void LOADING_단계에서_isPlayingPhase는_false를_반환한다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.LOADING);
+        RoundState state = new RoundState(1, RoundPhase.LOADING, 2);
         
         // when & then
         assertThat(state.isPlayingPhase()).isFalse();
@@ -120,7 +120,7 @@ class RoundStateTest {
     @Test
     void DONE_단계에서_isGameFinished는_true를_반환한다() {
         // given
-        RoundState state = new RoundState(2, RoundPhase.DONE);
+        RoundState state = new RoundState(2, RoundPhase.DONE, 2);
         
         // when & then
         assertThat(state.isGameFinished()).isTrue();
@@ -129,7 +129,7 @@ class RoundStateTest {
     @Test
     void PLAYING_단계에서_isGameFinished는_false를_반환한다() {
         // given
-        RoundState state = new RoundState(1, RoundPhase.PLAYING);
+        RoundState state = new RoundState(1, RoundPhase.PLAYING, 2);
         
         // when & then
         assertThat(state.isGameFinished()).isFalse();

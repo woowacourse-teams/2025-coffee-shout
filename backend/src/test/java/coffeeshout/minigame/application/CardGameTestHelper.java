@@ -15,10 +15,10 @@ public class CardGameTestHelper {
     public static void setPlayingState(CardGame cardGame) {
         // READY → LOADING → PLAYING 순서로 변경
         if (cardGame.getCurrentPhase() == RoundPhase.READY) {
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds())); // LOADING
+            cardGame.moveToNextPhase(); // LOADING
         }
         if (cardGame.getCurrentPhase() == RoundPhase.LOADING) {
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds())); // PLAYING
+            cardGame.moveToNextPhase(); // PLAYING
         }
     }
     
@@ -27,7 +27,7 @@ public class CardGameTestHelper {
      */
     public static void setPhase(CardGame cardGame, RoundPhase targetPhase) {
         while (cardGame.getCurrentPhase() != targetPhase && cardGame.getCurrentPhase() != RoundPhase.DONE) {
-            cardGame.setRoundState(cardGame.getRoundState().nextPhase(cardGame.getMaxRounds()));
+            cardGame.moveToNextPhase();
         }
     }
     
