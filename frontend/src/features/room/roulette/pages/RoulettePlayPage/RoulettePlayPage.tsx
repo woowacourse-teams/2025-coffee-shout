@@ -36,7 +36,7 @@ const RoulettePlayPage = () => {
     setIsSpinning(true);
   }, []);
 
-  useWebSocketSubscription<Player>(`/room/${joinCode}/roulette`, handleWinnerData);
+  useWebSocketSubscription<Player>(`/room/${joinCode}/winner`, handleWinnerData);
 
   const isRouletteView = currentView === 'roulette';
 
