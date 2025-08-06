@@ -5,6 +5,7 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -29,6 +30,14 @@ public class LogAspect {
                 room.getJoinCode().value(),
                 room.getHost().getName().value(),
                 LocalDateTime.now());
+    }
+
+    @After(
+            value = "execution(* coffeeshout.room.application.RoomService.changePlayerReadyState(..)) && args(joinCode, playerName, isReady)",
+            argNames = "joinCode,playerName,isReady"
+    )
+    public void logPlayerReadyState(String joinCode, String playerName, Boolean isReady) {
+        log.info("JoinCode[{}] 플레이어 Ready 상태 변경 - 플레이어: {}, 상태: {}", joinCode, playerName, isReady);
     }
 
     @After(
