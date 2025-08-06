@@ -5,7 +5,6 @@ import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/Probability
 import { useRouletteTransition } from '@/features/roulette/hooks/useRouletteTrantision';
 
 type Props = {
-
   isSpinning: boolean;
 };
 
