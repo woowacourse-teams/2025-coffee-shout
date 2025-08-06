@@ -28,16 +28,10 @@ public class PlayingPhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.info("라운드 {} 플레이 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 플레이 시작", game.getRoundState().getRoundNumber());
         game.startPlay();
     }
-    
-    @Override
-    public boolean canSkipToNext(CardGame game) {
-        // 설정에서 조기 종료가 활성화되어 있고, 모든 플레이어가 카드를 선택했다면 조기 종료
-        return earlySkipEnabled && game.isFinishedThisRound();
-    }
-    
+
     @Override
     public Duration getDuration() {
         return duration;

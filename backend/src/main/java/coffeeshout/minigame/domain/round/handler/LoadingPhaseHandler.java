@@ -24,14 +24,8 @@ public class LoadingPhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.info("라운드 {} 로딩 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 로딩 시작", game.getRoundState().getRoundNumber());
         game.startRound();
-    }
-    
-    @Override
-    public boolean canSkipToNext(CardGame game) {
-        // 로딩 단계는 항상 지정된 시간만큼 대기
-        return false;
     }
     
     @Override

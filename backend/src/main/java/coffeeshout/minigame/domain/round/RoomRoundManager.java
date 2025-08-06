@@ -96,33 +96,26 @@ public class RoomRoundManager {
         if (!isActive) {
             return;
         }
-        
-        // 조기 종료 가능한지 확인
-        if (handler.canSkipToNext(game)) {
-            log.info("방 {} - 조기 종료 조건 만족, 즉시 다음 단계로 이동", joinCode.value());
-            moveToNextPhase(game, room, onStateChange);
-        } else {
-            // 지정된 시간 후 다음 단계로
-            Duration duration = handler.getDuration();
-            if (!duration.isZero()) {
-                log.info("방 {} - 다음 단계까지 {}초 대기", joinCode.value(), duration.toSeconds());
-                
-                ScheduledFuture<?> future = scheduler.schedule(
+
+        Duration duration = handler.getDuration();
+        if (!duration.isZero()) {
+            log.info("방 {} - 다음 단계까지 {}초 대기", joinCode.value(), duration.toSeconds());
+
+            ScheduledFuture<?> future = scheduler.schedule(
                     () -> {
                         if (isActive) {
                             moveToNextPhase(game, room, onStateChange);
                         }
                     },
                     Instant.now().plus(duration)
-                );
-                
-                // 기존 스케줄된 작업이 있다면 취소
-                cancelCurrentTask();
-                currentTask.set(future);
-            } else {
-                // 지속 시간이 0이면 즉시 다음 단계로
-                moveToNextPhase(game, room, onStateChange);
-            }
+            );
+
+            // 기존 스케줄된 작업이 있다면 취소
+            cancelCurrentTask();
+            currentTask.set(future);
+        } else {
+            // 지속 시간이 0이면 즉시 다음 단계로
+            moveToNextPhase(game, room, onStateChange);
         }
     }
     
@@ -138,29 +131,6 @@ public class RoomRoundManager {
         
         // 다음 단계 실행
         executePhase(game, room, onStateChange);
-    }
-    
-    /**
-     * 조기 종료를 트리거합니다. (예: 모든 플레이어가 카드 선택 완료)
-     */
-    public void triggerEarlyTransition(CardGame game, Room room, Runnable onStateChange) {
-        if (!isActive) {
-            log.warn("비활성화된 RoundManager에서 조기 전환 시도: {}", joinCode.value());
-            return;
-        }
-        
-        RoundState currentState = game.getRoundState();
-        RoundPhaseHandler handler = handlers.get(currentState.getPhase());
-        
-        if (handler != null && handler.canSkipToNext(game)) {
-            log.info("방 {} - 조기 전환 트리거: {}", joinCode.value(), currentState);
-            
-            // 기존 스케줄된 작업 취소
-            cancelCurrentTask();
-            
-            // 즉시 다음 단계로 이동
-            moveToNextPhase(game, room, onStateChange);
-        }
     }
     
     /**

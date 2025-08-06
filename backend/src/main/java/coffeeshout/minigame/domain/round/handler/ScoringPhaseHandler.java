@@ -24,7 +24,7 @@ public class ScoringPhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.info("라운드 {} 점수 계산 시작", game.getRoundState().getRoundNumber());
+        log.debug("라운드 {} 점수 계산 시작", game.getRoundState().getRoundNumber());
         
         // 선택하지 않은 플레이어들에게 랜덤 카드 할당
         game.assignRandomCardsToUnselectedPlayers();
@@ -32,13 +32,7 @@ public class ScoringPhaseHandler implements RoundPhaseHandler {
         // 점수판 상태로 변경
         game.changeScoreBoardState();
     }
-    
-    @Override
-    public boolean canSkipToNext(CardGame game) {
-        // 점수 표시는 항상 지정된 시간만큼 보여줌
-        return false;
-    }
-    
+
     @Override
     public Duration getDuration() {
         return duration;

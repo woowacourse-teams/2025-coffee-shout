@@ -64,20 +64,6 @@ public class CardGameService implements MiniGameService {
 
         cardGame.selectCard(player, cardIndex);
         sendCardGameState(roomJoinCode);
-
-        if (cardGame.allPlayersSelected()) {
-            log.info("방 {} - 모든 플레이어 카드 선택 완료, 조기 전환 트리거", joinCode);
-            
-            // 해당 방의 RoundManager 가져오기
-            RoomRoundManager roomRoundManager = roundManagerRegistry.get(roomJoinCode);
-            if (roomRoundManager != null && roomRoundManager.isActive()) {
-                Room room = roomQueryService.findByJoinCode(roomJoinCode);
-                roomRoundManager.triggerEarlyTransition(cardGame, room,
-                        () -> sendCardGameState(roomJoinCode));
-            } else {
-                log.warn("방 {} - RoundManager를 찾을 수 없거나 비활성 상태", joinCode);
-            }
-        }
     }
 
     private void sendCardGameState(JoinCode joinCode) {

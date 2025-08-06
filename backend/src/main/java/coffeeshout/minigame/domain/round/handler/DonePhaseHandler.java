@@ -18,7 +18,7 @@ public class DonePhaseHandler implements RoundPhaseHandler {
     
     @Override
     public void execute(CardGame game, Room room) {
-        log.info("카드게임 완료");
+        log.debug("카드게임 완료");
         
         // 게임 완료 상태로 변경
         game.changeDoneState();
@@ -26,12 +26,6 @@ public class DonePhaseHandler implements RoundPhaseHandler {
         // 최종 결과를 룸에 적용
         MiniGameResult result = game.getResult();
         room.applyMiniGameResult(result);
-    }
-    
-    @Override
-    public boolean canSkipToNext(CardGame game) {
-        // 게임이 완료되면 더 이상 진행할 단계가 없음
-        return false;
     }
     
     @Override
