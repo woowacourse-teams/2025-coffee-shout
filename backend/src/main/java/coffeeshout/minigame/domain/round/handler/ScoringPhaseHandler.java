@@ -29,8 +29,6 @@ public class ScoringPhaseHandler implements RoundPhaseHandler {
         // 선택하지 않은 플레이어들에게 랜덤 카드 할당
         game.assignRandomCardsToUnselectedPlayers();
         
-        // 점수판 상태로 변경
-        game.changeScoreBoardState();
     }
 
     @Override

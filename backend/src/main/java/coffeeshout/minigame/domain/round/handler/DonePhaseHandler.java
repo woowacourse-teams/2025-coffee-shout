@@ -20,9 +20,6 @@ public class DonePhaseHandler implements RoundPhaseHandler {
     public void execute(CardGame game, Room room) {
         log.debug("카드게임 완료");
         
-        // 게임 완료 상태로 변경
-        game.changeDoneState();
-        
         // 최종 결과를 룸에 적용
         MiniGameResult result = game.getResult();
         room.applyMiniGameResult(result);

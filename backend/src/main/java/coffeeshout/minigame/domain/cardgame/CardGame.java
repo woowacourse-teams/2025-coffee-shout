@@ -92,14 +92,6 @@ public class CardGame implements Playable {
     public Optional<Player> findCardOwnerInCurrentRound(Card card) {
         return playerHands.findCardOwner(card, roundState.roundNumber());
     }
-
-    public void changeScoreBoardState() {
-        // 점수판 상태 변경 로직 (필요시 추가)
-    }
-
-    public void changeDoneState() {
-        // 게임 완료 상태 변경 로직 (필요시 추가)
-    }
     
     // === 새로운 라운드 관리 메서드들 ===
     
