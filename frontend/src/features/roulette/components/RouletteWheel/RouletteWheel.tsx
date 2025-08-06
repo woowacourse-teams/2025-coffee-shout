@@ -36,7 +36,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
               />
             ))}
           </svg>
-          <S.CenterImage src={RouletteWheelIcon} alt="roulette-center" />
+       
         </S.Wrapper>
       </S.Container>
     );
@@ -68,6 +68,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
               />
             ))}
           </svg>
+         
         </S.Wrapper>
       </S.Container>
     );

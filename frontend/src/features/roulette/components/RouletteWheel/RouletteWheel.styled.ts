@@ -1,4 +1,3 @@
-import { Z_INDEX } from '@/constants/zIndex';
 import styled from '@emotion/styled';
 
 type WrapperProps = {
@@ -38,14 +37,4 @@ export const Wrapper = styled.div<WrapperProps>`
       transform: rotate(1080deg);
     }
   }
-`;
-
-export const CenterImage = styled.img`
-  width: 64px;
-  height: 64px;
-  z-index: ${Z_INDEX.ROULETTE_WHEEL_CENTER_IMAGE};
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 `;
