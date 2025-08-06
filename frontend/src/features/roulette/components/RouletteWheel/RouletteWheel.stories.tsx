@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
 import RouletteWheel from './RouletteWheel';
+import { colorList } from '@/constants/color';
 
 const meta: Meta<typeof RouletteWheel> = {
   title: 'Composition/RouletteWheel',
@@ -32,13 +33,16 @@ const mockPlayerProbabilities = [
   {
     playerName: '홍길동',
     probability: 30.0,
+    playerColor: colorList[0],
   },
   {
     playerName: '김철수',
     probability: 30.0,
+    playerColor: colorList[1],
   },
   {
     playerName: '이순신',
     probability: 40.0,
+    playerColor: colorList[2],
   },
 ];

@@ -35,8 +35,3 @@ export const CrownIcon = styled.img`
   height: 30px;
   margin-bottom: 8px;
 `;
-
-export const PlayerIcon = styled.img`
-  width: 50px;
-  height: 50px;
-`;

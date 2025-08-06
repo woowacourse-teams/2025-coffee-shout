@@ -8,6 +8,7 @@ import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/Me
 import { Player } from '@/types/player';
 import * as S from './ParticipantSection.styled';
 import { getMenuIcon } from './utils/getMenuIcon';
+import { colorList } from '@/constants/color';
 
 const TOTAL_PARTICIPANTS = 9;
 
@@ -28,6 +29,9 @@ export const ParticipantSection = ({ participants }: Props) => {
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
   );
+  const myColorIndex =
+    participants.find((participant) => participant.playerName === myName)?.colorIndex ?? 0;
+  const myColor = colorList[myColorIndex];
 
   return (
     <>
@@ -36,7 +40,7 @@ export const ParticipantSection = ({ participants }: Props) => {
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
         suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
-      <PlayerCard name={myName} iconColor="#FF6B6B">
+      <PlayerCard name={myName} playerColor={myColor}>
         <S.Menu
           src={getMenuIcon(mySelect && mySelect.menuResponse.menuType)}
           onClick={handleModifyMenu}
@@ -51,7 +55,7 @@ export const ParticipantSection = ({ participants }: Props) => {
             <PlayerCard
               key={participant.playerName}
               name={participant.playerName}
-              iconColor="#FF6B6B"
+              playerColor={colorList[participant.colorIndex]}
             >
               <S.Menu src={getMenuIcon(participant.menuResponse.menuType)} />
             </PlayerCard>

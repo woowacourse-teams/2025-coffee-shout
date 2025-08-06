@@ -3,6 +3,10 @@ export const MINI_GAME_NAME_MAP = {
   // '31_GAME': '랜덤 31222',
 } as const;
 
+export const MINI_GAME_DESCRIPTION: Record<MiniGameType, string[]> = {
+  CARD_GAME: ['2라운드 동안 매번 카드 1장씩 뒤집어', '가장 높은 점수를 내보세요!'],
+};
+
 export type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
 export type CardGameState = 'READY' | 'LOADING' | 'PLAYING' | 'SCORE_BOARD' | 'DONE';
@@ -16,6 +20,7 @@ export type CardInfo = {
   value: number;
   selected: boolean;
   playerName: string | null;
+  colorIndex: number;
 };
 
 export type CardGameStateData = {
