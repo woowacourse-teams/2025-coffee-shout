@@ -75,10 +75,8 @@ public class RoomRoundManager {
             handler.execute(game, room);
             onStateChange.run(); // 상태 변경 알림
             
-            // 게임이 완료되었으면 더 이상 스케줄링하지 않음
             if (currentState.isGameFinished()) {
                 log.info("방 {} - 게임 완료", joinCode.value());
-                cleanup();
                 return;
             }
             
@@ -110,8 +108,6 @@ public class RoomRoundManager {
                     Instant.now().plus(duration)
             );
 
-            // 기존 스케줄된 작업이 있다면 취소
-            cancelCurrentTask();
             currentTask.set(future);
         } else {
             // 지속 시간이 0이면 즉시 다음 단계로
@@ -131,28 +127,4 @@ public class RoomRoundManager {
         // 다음 단계 실행
         executePhase(game, room, onStateChange);
     }
-    
-    /**
-     * 현재 스케줄된 작업을 취소합니다.
-     */
-    public void cancelCurrentTask() {
-        ScheduledFuture<?> future = currentTask.getAndSet(null);
-        if (future != null && !future.isDone()) {
-            future.cancel(false);
-            log.info("방 {} - 스케줄된 작업 취소", joinCode.value());
-        }
-    }
-    
-    /**
-     * 이 RoundManager를 정리합니다. (방 종료 시 호출)
-     */
-    public void cleanup() {
-        log.info("방 {} RoundManager 정리 시작", joinCode.value());
-        
-        isActive = false;
-        cancelCurrentTask();
-        
-        log.info("방 {} RoundManager 정리 완료", joinCode.value());
-    }
-
 }

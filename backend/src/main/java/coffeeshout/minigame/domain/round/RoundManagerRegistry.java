@@ -50,13 +50,13 @@ public class RoundManagerRegistry {
     /**
      * 방이 종료될 때 해당 RoundManager를 정리합니다.
      */
+    /**
+     * 참조되는 인스턴스가 존재한다면, 해당 인스턴스의 스케줄링 작업이 제거되지 않을 수 있다.
+     * 우선은 문제가 없으니 스케줄링 제거는 없애지 않는다.
+     */
+
     public void remove(JoinCode joinCode) {
-        RoomRoundManager manager = roomManagers.remove(joinCode);
-        if (manager != null) {
-            log.info("방 {} RoundManager 정리 시작", joinCode.value());
-            manager.cleanup();
-            log.info("방 {} RoundManager 정리 완료", joinCode.value());
-        }
+        roomManagers.remove(joinCode);
     }
     
     /**
@@ -66,7 +66,6 @@ public class RoundManagerRegistry {
     public void removeAll() {
         log.info("애플리케이션 종료 - 모든 RoundManager 정리 시작 (총 {} 개)", roomManagers.size());
         
-        roomManagers.values().forEach(RoomRoundManager::cleanup);
         roomManagers.clear();
         
         log.info("애플리케이션 종료 - 모든 RoundManager 정리 완료");

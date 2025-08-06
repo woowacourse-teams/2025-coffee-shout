@@ -28,7 +28,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@Disabled
 @SpringBootTest
 class CardGameServiceRealTimeTest {
 
@@ -61,6 +60,11 @@ class CardGameServiceRealTimeTest {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
         MockitoAnnotations.openMocks(this);
+
+        // 모든 플레이어가 준비 완료여야 한다.
+        for (Player player : room.getPlayers()) {
+            player.updateReadyState(true);
+        }
     }
 
 //    @Disabled
