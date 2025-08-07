@@ -158,10 +158,12 @@ const LobbyPage = () => {
 
   useEffect(() => {
     (async () => {
-      const _selectedMiniGames = await api.get<MiniGameType[]>(
-        `/rooms/minigames/selected?joinCode=${joinCode}`
-      );
-      setSelectedMiniGames(_selectedMiniGames);
+      if (joinCode) {
+        const _selectedMiniGames = await api.get<MiniGameType[]>(
+          `/rooms/minigames/selected?joinCode=${joinCode}`
+        );
+        setSelectedMiniGames(_selectedMiniGames);
+      }
     })();
   }, [joinCode]);
 
