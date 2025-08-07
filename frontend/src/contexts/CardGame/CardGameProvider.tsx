@@ -50,6 +50,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
 
       if (isFirstRoundPlaying) {
         setStartCardGame(true);
+        setCurrentCardGameState('PLAYING');
         setCardInfos(cardInfoMessages);
         return;
       }
