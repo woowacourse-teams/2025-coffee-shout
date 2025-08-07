@@ -22,10 +22,6 @@ const meta = {
       control: 'text',
       description: '선택되지 않았을 때 표시되는 텍스트',
     },
-    disabled: {
-      control: 'boolean',
-      description: '비활성화 상태',
-    },
     onChange: {
       action: 'changed',
       description: '옵션 선택 시 실행되는 함수',
@@ -67,14 +63,6 @@ export const WithValue: Story = {
   },
 };
 
-export const Disabled: Story = {
-  args: {
-    options: basicOptions,
-    disabled: true,
-    placeholder: '비활성화된 SelectBox',
-  },
-};
-
 export const Interactive = () => {
   const [selectedValue, setSelectedValue] = useState<Option>({
     id: -1,
@@ -87,7 +75,7 @@ export const Interactive = () => {
     { id: 3, name: '카푸치노' },
     { id: 4, name: '마끼아또' },
     { id: 5, name: '카페 모카' },
-    { id: 6, name: '에스프레소', disabled: true },
+    { id: 6, name: '에스프레소' },
   ];
 
   return (

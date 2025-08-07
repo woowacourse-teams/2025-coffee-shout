@@ -4,19 +4,19 @@ import { ColorList } from '@/constants/color';
 import { PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
-import { getPlayerIcon } from './utils/getPlayerIcon';
+import PlayerIcon from '@/components/@common/PlayerIcon/PlayerIcon';
 
 type Props = {
   name: string;
-  iconColor: ColorList;
+  playerColor: ColorList;
   playerType?: PlayerType;
 } & PropsWithChildren;
 
-const PlayerCard = ({ name, iconColor, playerType = 'GUEST', children }: Props) => {
+const PlayerCard = ({ name, playerColor, playerType = 'GUEST', children }: Props) => {
   return (
     <S.Container data-testid="player-card">
       <S.Wrapper>
-        <S.PlayerIcon src={getPlayerIcon(iconColor)} alt={`player-${name}-icon`} />
+        <PlayerIcon color={playerColor} />
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
           {playerType === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}

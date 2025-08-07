@@ -1,6 +1,7 @@
 import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
+import { colorList } from '@/constants/color';
 import Layout from '@/layouts/Layout';
 import { CardInfo } from '@/types/miniGame';
 import { RoundKey, TOTAL_COUNT } from '@/types/round';
@@ -82,6 +83,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
                     value: cardInfo.value as CardValue,
                   } as Card
                 }
+                playerColor={colorList[cardInfo.colorIndex]}
               />
             ) : (
               <CardBack

@@ -1,6 +1,4 @@
-import InfoGrayIcon from '@/assets/gray-info.svg';
-import InfoWhiteIcon from '@/assets/white-info.svg';
-import { ComponentProps } from 'react';
+import { ComponentProps, ReactElement } from 'react';
 import Headline4 from '../Headline4/Headline4';
 import * as S from './GameActionButton.styled';
 
@@ -9,9 +7,19 @@ type Props = {
   isSelected: boolean;
   isDisabled: boolean;
   gameName: string;
+  description: string[];
+  icon: ReactElement;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const GameActionButton = ({ onClick, isSelected, isDisabled, gameName, ...rest }: Props) => {
+const GameActionButton = ({
+  onClick,
+  isSelected,
+  isDisabled,
+  gameName,
+  description,
+  icon,
+  ...rest
+}: Props) => {
   const handleClick = () => {
     if (isDisabled) return;
     onClick();
@@ -27,11 +35,14 @@ const GameActionButton = ({ onClick, isSelected, isDisabled, gameName, ...rest }
       tabIndex={isDisabled ? -1 : 0}
       {...rest}
     >
-      <S.GameNameWrapper>
+      <S.Wrapper>
         <Headline4 color={isSelected ? 'white' : 'point-400'}>{gameName}</Headline4>
-      </S.GameNameWrapper>
-      <S.InfoIcon src={isSelected ? InfoWhiteIcon : InfoGrayIcon} alt="info" />
-      <S.GameIcon $isSelected={isSelected}>🎮</S.GameIcon>
+        <S.DescriptionWrapper $isSelected={isSelected}>
+          {description &&
+            description.map((desc, index) => <S.Description key={index}>{desc}</S.Description>)}
+        </S.DescriptionWrapper>
+      </S.Wrapper>
+      <S.GameIcon $isSelected={isSelected}>{icon}</S.GameIcon>
     </S.Container>
   );
 };

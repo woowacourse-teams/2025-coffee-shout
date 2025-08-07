@@ -7,4 +7,5 @@ export type Player = {
   menuResponse: Menu;
   playerType: PlayerType;
   isReady: boolean;
+  colorIndex: number;
 };
