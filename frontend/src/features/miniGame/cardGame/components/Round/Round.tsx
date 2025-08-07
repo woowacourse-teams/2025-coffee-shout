@@ -7,13 +7,14 @@ import CircularProgress from '../CircularProgress/CircularProgress';
 import CardBack from '../CardBack/CardBack';
 import { Card, CardType, CardValue } from '../../constants/cards';
 import CardFront from '../CardFront/CardFront';
-import { SelectedCardInfo } from '../../pages/CardGamePlayPage';
-import { RoundKey, TOTAL_COUNT } from '@/types/round';
-import { CardInfo } from '@/types/miniGame';
+import { TOTAL_COUNT } from '@/types/round';
+import { CardGameRound, CardInfo } from '@/types/miniGame';
 import { colorList } from '@/constants/color';
+import { SelectedCardInfo } from '@/contexts/CardGame/CardGameProvider';
+import { ROUND_NUMBER_MAP } from '@/constants/miniGame';
 
 type Props = {
-  round: RoundKey;
+  round: CardGameRound;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
@@ -27,7 +28,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
       <Layout.Content>
         <S.TitleContainer>
           <S.TitleWrapper>
-            <Headline2>Round {round}</Headline2>
+            <Headline2>Round {ROUND_NUMBER_MAP[round]}</Headline2>
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>
@@ -35,26 +36,26 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
           </S.CircularProgressWrapper>
         </S.TitleContainer>
         <S.MyCardContainer>
-          {selectedCardInfo[1].index !== -1 ? (
+          {selectedCardInfo['FIRST'].isSelected ? (
             <CardFront
               size="medium"
               card={
                 {
-                  type: selectedCardInfo[1].type as CardType,
-                  value: selectedCardInfo[1].value as CardValue,
+                  type: selectedCardInfo['FIRST'].type as CardType,
+                  value: selectedCardInfo['FIRST'].value as CardValue,
                 } as Card
               }
             />
           ) : (
             <CardBack size="medium" disabled={true} />
           )}
-          {selectedCardInfo[2].index !== -1 ? (
+          {selectedCardInfo['SECOND'].isSelected ? (
             <CardFront
               size="medium"
               card={
                 {
-                  type: selectedCardInfo[2].type as CardType,
-                  value: selectedCardInfo[2].value as CardValue,
+                  type: selectedCardInfo['SECOND'].type as CardType,
+                  value: selectedCardInfo['SECOND'].value as CardValue,
                 } as Card
               }
             />

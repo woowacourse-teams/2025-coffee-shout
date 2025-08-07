@@ -2,25 +2,47 @@ import { PropsWithChildren, useCallback, useState } from 'react';
 import { CardGameContext } from './CardGameContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '../Identifier/IdentifierContext';
-import { CardGameState, CardGameStateData, CardInfo } from '@/types/miniGame';
-import { RoundKey } from '@/types/round';
+import { CardGameRound, CardGameState, CardGameStateData, CardInfo } from '@/types/miniGame';
+
 import { useNavigate, useParams } from 'react-router-dom';
+
+export type SelectedCardInfo = Record<
+  CardGameRound,
+  {
+    isSelected: boolean;
+    type: string | null;
+    value: number | null;
+  }
+>;
 
 const CardGameProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
-  const { joinCode } = useIdentifier();
+  const { joinCode, myName } = useIdentifier();
   const { miniGameType } = useParams();
   const [startCardGame, setStartCardGame] = useState<boolean>(false);
   const [isTransition, setIsTransition] = useState(false);
-  const [currentRound, setCurrentRound] = useState<RoundKey>(1);
+  const [currentRound, setCurrentRound] = useState<CardGameRound>('FIRST');
   const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
   const [cardInfos, setCardInfos] = useState<CardInfo[]>([]);
+  const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({
+    FIRST: {
+      isSelected: false,
+      type: null,
+      value: null,
+    },
+    SECOND: {
+      isSelected: false,
+      type: null,
+      value: null,
+    },
+  });
 
   const handleCardGameState = useCallback(
     (data: CardGameStateData) => {
       const { cardGameState, currentRound, cardInfoMessages } = data;
 
       const isFirstRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'FIRST';
+      const isFirstRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'FIRST';
       const isSecondRoundLoading = cardGameState === 'LOADING' && currentRound === 'SECOND';
       const isSecondRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'SECOND';
       const isSecondRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'SECOND';
@@ -32,9 +54,31 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
+      if (isFirstRoundScoreBoard) {
+        setCurrentCardGameState('SCORE_BOARD');
+        setCardInfos(cardInfoMessages);
+
+        const myRandomSelectedCard = cardInfoMessages.find((card) => card.playerName === myName);
+
+        if (!myRandomSelectedCard) {
+          return;
+        }
+
+        setSelectedCardInfo((prev) => ({
+          ...prev,
+          [currentRound]: {
+            isSelected: true,
+            type: myRandomSelectedCard.cardType,
+            value: myRandomSelectedCard.value,
+          },
+        }));
+
+        return;
+      }
+
       if (isSecondRoundLoading) {
         setIsTransition(true);
-        setCurrentRound(2);
+        setCurrentRound('SECOND');
         setCurrentCardGameState('LOADING');
         return;
       }
@@ -47,6 +91,22 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       }
       if (isSecondRoundScoreBoard) {
         setCurrentCardGameState('SCORE_BOARD');
+        setCardInfos(cardInfoMessages);
+
+        const myRandomSelectedCard = cardInfoMessages.find((card) => card.playerName === myName);
+
+        if (!myRandomSelectedCard) {
+          return;
+        }
+
+        setSelectedCardInfo((prev) => ({
+          ...prev,
+          [currentRound]: {
+            isSelected: true,
+            type: myRandomSelectedCard.cardType,
+            value: myRandomSelectedCard.value,
+          },
+        }));
         return;
       }
       if (isGameDone) {
@@ -54,7 +114,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         return;
       }
     },
-    [navigate, joinCode, miniGameType]
+    [navigate, joinCode, miniGameType, myName, cardInfos, setSelectedCardInfo]
   );
 
   useWebSocketSubscription(`/room/${joinCode}/gameState`, handleCardGameState);
@@ -67,6 +127,8 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         currentRound,
         currentCardGameState,
         cardInfos,
+        selectedCardInfo,
+        setSelectedCardInfo,
       }}
     >
       {children}
