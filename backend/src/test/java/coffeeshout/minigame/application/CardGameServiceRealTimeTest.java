@@ -22,7 +22,6 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -31,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@Disabled
 @SpringBootTest
 class CardGameServiceRealTimeTest {
 
@@ -65,10 +63,14 @@ class CardGameServiceRealTimeTest {
         for (int i = 1; i < players.size(); i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
+
+        for (Player player : room.getPlayers()) {
+            player.updateReadyState(true);
+        }
+
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Disabled
     @Nested
     class 카드게임_시작 {
 

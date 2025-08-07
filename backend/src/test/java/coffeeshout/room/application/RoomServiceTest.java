@@ -8,7 +8,6 @@ import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
@@ -130,7 +129,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
-                .isInstanceOf(InvalidStateException.class);
+                .isInstanceOf(InvalidArgumentException.class);
     }
 
     @Test
@@ -166,7 +165,7 @@ class RoomServiceTest {
 
         // when & then
         assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
-                .isInstanceOf(InvalidStateException.class);
+                .isInstanceOf(InvalidArgumentException.class);
     }
 
     @Test

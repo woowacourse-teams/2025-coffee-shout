@@ -172,7 +172,7 @@ public class Room {
 
     private void validateRoomReady() {
         if (roomState != RoomState.READY) {
-            throw new InvalidStateException(
+            throw new InvalidArgumentException(
                     RoomErrorCode.ROOM_NOT_READY_TO_JOIN,
                     "READY 상태에서만 참여 가능합니다. 현재 상태: " + roomState
             );
@@ -181,7 +181,7 @@ public class Room {
 
     private void validateCanJoin() {
         if (!canJoin()) {
-            throw new InvalidStateException(
+            throw new InvalidArgumentException(
                     RoomErrorCode.ROOM_FULL,
                     "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount()
             );
