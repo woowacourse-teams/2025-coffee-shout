@@ -6,7 +6,6 @@ import coffeeshout.minigame.domain.MiniGameResultType;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import lombok.extern.slf4j.Slf4j;
 
 /*
     등수별 확률 조정 정도를 계산하는 클래스
