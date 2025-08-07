@@ -20,8 +20,8 @@ public class ProbabilityCalculator {
         this.roundCount = roundCount;
     }
 
-    public static Probability computeInitialProbability(int playerCount) {
-        return Probability.TOTAL.divide(playerCount);
+    public Probability calculateAdjustProbability(int rank) {
+        return calculateAdjustProbability(playerCount, rank);
     }
 
     public Probability calculateAdjustProbability(int playerCount, int rank) {
@@ -37,8 +37,12 @@ public class ProbabilityCalculator {
     }
 
     private Probability computeAdjustmentStep() {
-        final Probability maxAdjustment = computeInitialProbability(playerCount).divide(roundCount);
+        final Probability maxAdjustment = computeInitialProbability().divide(roundCount);
         return maxAdjustment.divide(countAdjustableRanks()).multiple(ADJUSTMENT_WEIGHT);
+    }
+
+    private Probability computeInitialProbability() {
+        return Probability.TOTAL.divide(playerCount);
     }
 
     private int countAdjustableRanks() {

@@ -33,7 +33,7 @@ public class Roulette {
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
         for (Player player : playerProbabilities.keySet()) {
             final int rank = miniGameResult.getPlayerRank(player);
-            final Probability probability = probabilityCalculator.calculateAdjustProbability(getPlayerCount(), rank);
+            final Probability probability = probabilityCalculator.calculateAdjustProbability(rank);
             final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
             final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
             playerProbabilities.put(player, adjustedProbability);
