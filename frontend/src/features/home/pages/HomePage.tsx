@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
 import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
-import { ApiError } from '@/apis/rest/error';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -54,8 +53,6 @@ const HomePage = () => {
   const handleClickHostButton = () => {
     setHost();
     navigate('/entry/name');
-
-    throw new ApiError(400, 'Sentry 테스트');
   };
 
   return (
