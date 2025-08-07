@@ -1,4 +1,5 @@
 import { ApiError, NetworkError } from './error';
+import { reportApiError } from '@/apis/utils/reportSentryError';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://api.coffee-shout.com';
 
@@ -88,7 +89,9 @@ export const apiRequest = async <T, TData>(
           console.warn('응답 메시지 파싱 실패', parseError);
         }
 
-        throw new ApiError(response.status, errorMessage, errorData);
+        const apiError = new ApiError(response.status, errorMessage, errorData);
+        reportApiError(apiError);
+        throw apiError;
       }
 
       return await response.json();
@@ -106,7 +109,9 @@ export const apiRequest = async <T, TData>(
 
       if (error instanceof TypeError) {
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-          throw new NetworkError('네트워크 연결에 실패했습니다');
+          const networkError = new NetworkError('네트워크 연결에 실패했습니다');
+          reportApiError(networkError);
+          throw networkError;
         }
       }
 
