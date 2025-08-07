@@ -8,6 +8,10 @@ logging:
     root: info
 
 management:
+  metrics:
+    export:
+      cloudwatch:
+        enabled: false
   endpoint:
     health:
       show-details: always
