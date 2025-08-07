@@ -88,13 +88,4 @@ public class LogAspect {
     public void logSelectMenu(String joinCode, String guestName, Long menuId) {
         log.info("JoinCode[{}] 메뉴 변경 - 게스트 이름: {}, 메뉴 ID: {}", joinCode, guestName, menuId);
     }
-
-    @After("execution(* coffeeshout.global.websocket.LoggingSimpMessagingTemplate.convertAndSend(..))")
-    public void logWebSocketMessage(JoinPoint joinPoint) {
-        final Object[] args = joinPoint.getArgs();
-        final String destination = (String) args[0];
-        final var payload = (WebSocketResponse) args[1];
-
-        log.info("WebSocket 메시지 전송 - destination: {}, success: {}", destination, payload.success());
-    }
 }

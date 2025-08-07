@@ -1,6 +1,7 @@
 package coffeeshout.global.metric;
 
 import io.micrometer.core.instrument.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -8,13 +9,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
+@Slf4j
 public class WebSocketMetricService {
 
     private final MeterRegistry meterRegistry;
     private final AtomicLong currentConnections = new AtomicLong(0);
-    private final AtomicLong totalConnections = new AtomicLong(0);
     private final Timer connectionEstablishmentTimer;
     private final Map<String, Timer.Sample> connectionSamples = new ConcurrentHashMap<>();
+
+    // Counter 캐싱용
+    private final Map<String, Counter> failedCounters = new ConcurrentHashMap<>();
+    private final Map<String, Counter> disconnectedCounters = new ConcurrentHashMap<>();
 
     public WebSocketMetricService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -23,44 +28,63 @@ public class WebSocketMetricService {
                 .description("현재 웹소켓 연결 개수")
                 .register(meterRegistry);
 
-        Gauge.builder("websocket.connections.total", totalConnections, AtomicLong::get)
-                .description("총 웹소켓 연결 시도 개수")
-                .register(meterRegistry);
-
         this.connectionEstablishmentTimer = Timer.builder("websocket.connection.establishment.time")
                 .description("웹소켓 연결 수립 시간")
                 .register(meterRegistry);
     }
 
     public void startConnection(String sessionId) {
-        connectionSamples.put(sessionId, Timer.start(meterRegistry));
+        Timer.Sample sample = Timer.start(meterRegistry);
+        connectionSamples.put(sessionId, sample);
     }
 
     public void completeConnection(String sessionId) {
         currentConnections.incrementAndGet();
-        totalConnections.incrementAndGet();
-
         Timer.Sample sample = connectionSamples.remove(sessionId);
         if (sample != null) {
-            sample.stop(connectionEstablishmentTimer);
+            long durationNanos = sample.stop(connectionEstablishmentTimer);
+            double durationMs = durationNanos / 1_000_000.0;
+            log.info("WebSocket 연결 수립 완료: sessionId={}, duration={}ms", sessionId, durationMs);
         }
     }
 
     public void failConnection(String sessionId, String reason) {
-        connectionSamples.remove(sessionId); // 필요 없으니 제거
-        Counter.builder("websocket.connections.failed")
-                .tags("reason", reason)
-                .register(meterRegistry)
-                .increment();
+        connectionSamples.remove(sessionId);
+
+        String key = "failed." + reason;
+        Counter counter = failedCounters.computeIfAbsent(key, k ->
+                Counter.builder("websocket.connections.failed")
+                        .description("웹소켓 연결 실패 건수")
+                        .tag("reason", reason)
+                        .register(meterRegistry)
+        );
+        counter.increment();
     }
 
     public void recordDisconnection(String sessionId, String reason, boolean isNormal) {
-        currentConnections.decrementAndGet();
-        connectionSamples.remove(sessionId); // 혹시 안 지워졌으면 정리
+        connectionSamples.remove(sessionId);
 
-        Counter.builder("websocket.connections.disconnected")
-                .tags("reason", reason, "type", isNormal ? "normal" : "abnormal")
-                .register(meterRegistry)
-                .increment();
+        String type = isNormal ? "normal" : "abnormal";
+        String key = "disconnected." + reason + "." + type;
+
+        Counter counter = disconnectedCounters.computeIfAbsent(key, k ->
+                Counter.builder("websocket.connections.disconnected")
+                        .description("웹소켓 연결 해제 건수")
+                        .tag("reason", reason)
+                        .tag("type", type)
+                        .register(meterRegistry)
+        );
+        counter.increment();
+    }
+
+    // 평균 연결 수립 시간 조회
+    public double getAverageConnectionTime() {
+        long count = connectionEstablishmentTimer.count();
+        return count > 0 ? connectionEstablishmentTimer.totalTime(java.util.concurrent.TimeUnit.MILLISECONDS) / count : 0;
+    }
+
+    // 현재 연결 수 조회
+    public long getCurrentConnections() {
+        return currentConnections.get();
     }
 }

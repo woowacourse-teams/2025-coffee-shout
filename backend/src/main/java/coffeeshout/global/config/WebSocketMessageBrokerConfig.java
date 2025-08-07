@@ -1,7 +1,6 @@
 package coffeeshout.global.config;
 
 
-import coffeeshout.global.handler.WebSocketMetricInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -17,14 +16,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TaskScheduler taskScheduler;
-    private final WebSocketMetricInterceptor webSocketMetricInterceptor;
     private final ChannelInterceptor channelInterceptor;
 
     public WebSocketMessageBrokerConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
-                                        WebSocketMetricInterceptor webSocketMetricInterceptor,
                                         ChannelInterceptor channelInterceptor) {
         this.taskScheduler = taskScheduler;
-        this.webSocketMetricInterceptor = webSocketMetricInterceptor;
         this.channelInterceptor = channelInterceptor;
     }
 
@@ -41,7 +37,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(webSocketMetricInterceptor)
                 .withSockJS();
     }
 

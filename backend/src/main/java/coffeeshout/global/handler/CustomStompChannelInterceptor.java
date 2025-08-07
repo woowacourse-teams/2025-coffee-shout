@@ -1,6 +1,9 @@
 package coffeeshout.global.handler;
 
+import java.util.Set;
+
 import coffeeshout.global.metric.WebSocketMetricService;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -18,69 +21,106 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
     private final WebSocketMetricService webSocketMetricService;
 
+    // 중복 처리 방지용
+    private final Set<String> processedDisconnections = ConcurrentHashMap.newKeySet();
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor == null) return message;
 
-        StompCommand command = accessor.getCommand();
+        Object commandObj = accessor.getCommand();
         String sessionId = accessor.getSessionId();
 
-        // command null 체크 추가
-        if (command == null) {
-            // 내부 메시지거나 하트비트 같은 애들
+        // STOMP 명령이 아닌 내부 메시지는 무시
+        if (!(commandObj instanceof StompCommand)) {
             return message;
         }
+
+        StompCommand command = (StompCommand) commandObj;
 
         try {
             switch (command) {
                 case CONNECT:
-                    handleConnect(accessor);
-                    break;
-
-                case CONNECTED:
-                    handleConnected(sessionId);
+                    log.info("WebSocket 연결 시작: sessionId={}", sessionId);
+                    webSocketMetricService.startConnection(sessionId);
                     break;
 
                 case SUBSCRIBE:
-                    log.info("구독 요청: sessionId={}, destination={}", sessionId, accessor.getDestination());
+                    log.debug("구독 요청: sessionId={}, destination={}", sessionId, accessor.getDestination());
                     break;
 
                 case UNSUBSCRIBE:
-                    log.info("구독 해제: sessionId={}", sessionId);
+                    log.debug("구독 해제: sessionId={}", sessionId);
                     break;
 
                 case SEND:
-                    log.info("메시지 전송: sessionId={}, destination={}", sessionId, accessor.getDestination());
+                    log.debug("클라이언트 메시지: sessionId={}, destination={}", sessionId, accessor.getDestination());
                     break;
 
                 case DISCONNECT:
-                    handleDisconnect(sessionId, accessor);
+                    log.info("WebSocket 연결 해제 요청: sessionId={}", sessionId);
+                    // DISCONNECT는 postSend에서만 처리하도록 변경
                     break;
 
                 case ERROR:
-                    handleError(sessionId, accessor);
+                    String errorMessage = accessor.getMessage();
+                    log.error("STOMP 에러: sessionId={}, message={}", sessionId, errorMessage);
+                    webSocketMetricService.recordDisconnection(sessionId, "stomp_error", false);
                     break;
 
                 default:
+                    log.trace("기타 STOMP 명령: sessionId={}, command={}", sessionId, command);
                     break;
             }
         } catch (Exception e) {
-            log.error("인터셉터 처리 중 에러: sessionId={}, command={}", sessionId, command, e);
+            log.error("STOMP 인터셉터 처리 중 에러: sessionId={}, command={}", sessionId, command, e);
         }
+
         return message;
     }
 
     @Override
     public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-        if (!sent) {
-            // 메시지 전송 실패했을 때 처리
-            StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-            if (accessor != null) {
-                log.warn("메시지 전송 실패: sessionId={}, command={}",
-                        accessor.getSessionId(), accessor.getCommand());
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+        if (accessor == null) return;
+
+        Object commandObj = accessor.getCommand();
+        String sessionId = accessor.getSessionId();
+
+        // STOMP 명령이 아닌 내부 메시지는 무시
+        if (!(commandObj instanceof StompCommand)) {
+            return;
+        }
+
+        StompCommand command = (StompCommand) commandObj;
+
+        try {
+            if (command == StompCommand.CONNECT && sent) {
+                // 서버에서 CONNECTED 응답을 성공적으로 보냈을 때 연결 완료 처리
+                log.info("WebSocket 연결 완료: sessionId={}", sessionId);
+                webSocketMetricService.completeConnection(sessionId);
+            } else if (command == StompCommand.DISCONNECT && sent) {
+                // DISCONNECT 메시지 전송 완료 시 연결 해제 처리 (중복 방지)
+                if (processedDisconnections.add(sessionId)) {
+                    log.info("WebSocket 연결 해제 완료: sessionId={}", sessionId);
+                    webSocketMetricService.recordDisconnection(sessionId, "client_disconnect", true);
+                } else {
+                    log.debug("중복 DISCONNECT 무시: sessionId={}", sessionId);
+                }
+            } else if (!sent) {
+                // 메시지 전송 실패
+                log.warn("STOMP 메시지 전송 실패: sessionId={}, command={}", sessionId, command);
+
+                if (command == StompCommand.CONNECTED) {
+                    // 연결 응답 실패
+                    webSocketMetricService.failConnection(sessionId, "connection_response_failed");
+                }
             }
+        } catch (Exception e) {
+            log.error("STOMP postSend 처리 중 에러: sessionId={}, command={}", sessionId, command, e);
         }
     }
 
@@ -92,40 +132,5 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     @Override
     public boolean preReceive(MessageChannel channel) {
         return true;
-    }
-
-    private void handleConnect(StompHeaderAccessor accessor) {
-        String sessionId = accessor.getSessionId();
-        log.info("STOMP 연결 시도: sessionId={}", sessionId);
-
-        // 연결 ID를 세션 속성에서 가져오기 (HandshakeInterceptor에서 설정했다고 가정)
-        String connectionId = (String) accessor.getSessionAttributes().get("connectionId");
-        if (connectionId != null) {
-            // 연결 시작 시간 기록은 HandshakeInterceptor에서 이미 했다고 가정
-            log.debug("연결 ID 확인: connectionId={}", connectionId);
-        }
-    }
-
-    private void handleConnected(String sessionId) {
-        log.info("STOMP 연결 완료: sessionId={}", sessionId);
-
-        // 여기서는 sessionAttributes에서 connectionId 가져올 수 없어서
-        // sessionId를 connectionId로 사용하거나 다른 방법 필요
-        webSocketMetricService.completeConnection(sessionId);
-    }
-
-    private void handleDisconnect(String sessionId, StompHeaderAccessor accessor) {
-        log.info("STOMP 연결 해제: sessionId={}", sessionId);
-
-        // 정상 종료로 간주 (STOMP의 경우 클라이언트가 명시적으로 DISCONNECT 보냄)
-        webSocketMetricService.recordDisconnection(sessionId, "Normal disconnect", true);
-    }
-
-    private void handleError(String sessionId, StompHeaderAccessor accessor) {
-        String errorMessage = accessor.getMessage();
-        log.error("STOMP 에러 발생: sessionId={}, message={}", sessionId, errorMessage);
-
-        // 에러로 인한 비정상 종료
-        webSocketMetricService.recordDisconnection(sessionId, errorMessage, false);
     }
 }
