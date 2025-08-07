@@ -263,18 +263,8 @@ class CardGameServiceTest {
         }
 
         @Test
-        void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException {
+        void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException, ExecutionException {
             // given
-            CountDownLatch latch = new CountDownLatch(1);
-
-            doAnswer(invocation -> {
-                latch.countDown(); // 라운드 완료 시그널
-                return null;
-            }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
-                    any(WebSocketResponse.class)
-            );
-
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGameService.start(cardGame, joinCode.getValue());
@@ -285,9 +275,7 @@ class CardGameServiceTest {
             for (int i = 0; i < players.size(); i++) {
                 cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
             }
-
-            // 완료될 때까지 대기
-            latch.await(5, TimeUnit.SECONDS);
+            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_PLAYING);
 
             // then
             assertThat(cardGame.isFinishedThisRound()).isTrue();
