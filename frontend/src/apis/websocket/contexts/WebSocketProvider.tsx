@@ -1,4 +1,4 @@
-import { reportWebsocketError } from '@/utils/reportSentryError';
+import { reportWebsocketError } from '@/apis/utils/reportSentryError';
 import { Client, IFrame } from '@stomp/stompjs';
 import { PropsWithChildren, useState } from 'react';
 import { createStompClient } from '../createStompClient';
