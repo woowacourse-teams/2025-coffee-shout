@@ -8,10 +8,11 @@ logging:
     root: info
 
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
-        include: "*"
-  endpoint:
-    metrics:
-      enabled: true
+        include: "health,info,metrics"
+
