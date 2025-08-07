@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
 import { useRouletteTransition } from './useRouletteTrantision';
 import { PlayerProbability } from '@/types/roulette';
+import { colorList } from '@/constants/color';
 
 // 테스트용 컴포넌트
 const RouletteTransitionDemo = ({
@@ -134,7 +135,7 @@ const RouletteTransitionDemo = ({
           >
             {angles ? (
               <div>
-                {angles.map((angle, index) => (
+                {angles.map((angle) => (
                   <div key={angle.playerName} style={{ marginBottom: '10px' }}>
                     <strong>{angle.playerName}</strong>
                     <br />
@@ -227,16 +228,16 @@ type Story = StoryObj<typeof RouletteTransitionDemo>;
 export const EqualToUnequal: Story = {
   args: {
     initialData: [
-      { playerName: 'Alice', probability: 25 },
-      { playerName: 'Bob', probability: 25 },
-      { playerName: 'Charlie', probability: 25 },
-      { playerName: 'Diana', probability: 25 },
+      { playerName: 'Alice', probability: 25, playerColor: colorList[0] },
+      { playerName: 'Bob', probability: 25, playerColor: colorList[1] },
+      { playerName: 'Charlie', probability: 25, playerColor: colorList[2] },
+      { playerName: 'Diana', probability: 25, playerColor: colorList[3] },
     ],
     targetData: [
-      { playerName: 'Alice', probability: 40 },
-      { playerName: 'Bob', probability: 30 },
-      { playerName: 'Charlie', probability: 20 },
-      { playerName: 'Diana', probability: 10 },
+      { playerName: 'Alice', probability: 40, playerColor: colorList[0] },
+      { playerName: 'Bob', probability: 30, playerColor: colorList[1] },
+      { playerName: 'Charlie', probability: 20, playerColor: colorList[2] },
+      { playerName: 'Diana', probability: 10, playerColor: colorList[3] },
     ],
   },
 };
@@ -245,16 +246,16 @@ export const EqualToUnequal: Story = {
 export const DramaticChange: Story = {
   args: {
     initialData: [
-      { playerName: 'Player1', probability: 10 },
-      { playerName: 'Player2', probability: 20 },
-      { playerName: 'Player3', probability: 30 },
-      { playerName: 'Player4', probability: 40 },
+      { playerName: 'Player1', probability: 10, playerColor: colorList[0] },
+      { playerName: 'Player2', probability: 20, playerColor: colorList[1] },
+      { playerName: 'Player3', probability: 30, playerColor: colorList[2] },
+      { playerName: 'Player4', probability: 40, playerColor: colorList[3] },
     ],
     targetData: [
-      { playerName: 'Player1', probability: 50 },
-      { playerName: 'Player2', probability: 25 },
-      { playerName: 'Player3', probability: 15 },
-      { playerName: 'Player4', probability: 10 },
+      { playerName: 'Player1', probability: 50, playerColor: colorList[0] },
+      { playerName: 'Player2', probability: 25, playerColor: colorList[1] },
+      { playerName: 'Player3', probability: 15, playerColor: colorList[2] },
+      { playerName: 'Player4', probability: 10, playerColor: colorList[3] },
     ],
   },
 };
@@ -263,14 +264,14 @@ export const DramaticChange: Story = {
 export const DifferentPlayerCount: Story = {
   args: {
     initialData: [
-      { playerName: 'Alice', probability: 50 },
-      { playerName: 'Bob', probability: 50 },
+      { playerName: 'Alice', probability: 50, playerColor: colorList[0] },
+      { playerName: 'Bob', probability: 50, playerColor: colorList[1] },
     ],
     targetData: [
-      { playerName: 'Alice', probability: 30 },
-      { playerName: 'Bob', probability: 30 },
-      { playerName: 'Charlie', probability: 25 },
-      { playerName: 'Diana', probability: 15 },
+      { playerName: 'Alice', probability: 30, playerColor: colorList[0] },
+      { playerName: 'Bob', probability: 30, playerColor: colorList[1] },
+      { playerName: 'Charlie', probability: 25, playerColor: colorList[2] },
+      { playerName: 'Diana', probability: 15, playerColor: colorList[3] },
     ],
   },
 };
@@ -279,16 +280,16 @@ export const DifferentPlayerCount: Story = {
 export const ExtremeChange: Story = {
   args: {
     initialData: [
-      { playerName: 'Winner', probability: 5 },
-      { playerName: 'Runner1', probability: 15 },
-      { playerName: 'Runner2', probability: 30 },
-      { playerName: 'Others', probability: 50 },
+      { playerName: 'Winner', probability: 5, playerColor: colorList[0] },
+      { playerName: 'Runner1', probability: 15, playerColor: colorList[1] },
+      { playerName: 'Runner2', probability: 30, playerColor: colorList[2] },
+      { playerName: 'Others', probability: 50, playerColor: colorList[3] },
     ],
     targetData: [
-      { playerName: 'Winner', probability: 80 },
-      { playerName: 'Runner1', probability: 10 },
-      { playerName: 'Runner2', probability: 7 },
-      { playerName: 'Others', probability: 3 },
+      { playerName: 'Winner', probability: 80, playerColor: colorList[0] },
+      { playerName: 'Runner1', probability: 10, playerColor: colorList[1] },
+      { playerName: 'Runner2', probability: 7, playerColor: colorList[2] },
+      { playerName: 'Others', probability: 3, playerColor: colorList[3] },
     ],
   },
 };
@@ -297,28 +298,28 @@ export const ExtremeChange: Story = {
 export const ManyPlayers: Story = {
   args: {
     initialData: [
-      { playerName: 'Player1', probability: 10 },
-      { playerName: 'Player2', probability: 10 },
-      { playerName: 'Player3', probability: 10 },
-      { playerName: 'Player4', probability: 10 },
-      { playerName: 'Player5', probability: 10 },
-      { playerName: 'Player6', probability: 10 },
-      { playerName: 'Player7', probability: 10 },
-      { playerName: 'Player8', probability: 10 },
-      { playerName: 'Player9', probability: 10 },
-      { playerName: 'Player10', probability: 10 },
+      { playerName: 'Player1', probability: 10, playerColor: colorList[0] },
+      { playerName: 'Player2', probability: 10, playerColor: colorList[1] },
+      { playerName: 'Player3', probability: 10, playerColor: colorList[2] },
+      { playerName: 'Player4', probability: 10, playerColor: colorList[3] },
+      { playerName: 'Player5', probability: 10, playerColor: colorList[4] },
+      { playerName: 'Player6', probability: 10, playerColor: colorList[5] },
+      { playerName: 'Player7', probability: 10, playerColor: colorList[6] },
+      { playerName: 'Player8', probability: 10, playerColor: colorList[7] },
+      { playerName: 'Player9', probability: 10, playerColor: colorList[8] },
+      { playerName: 'Player10', probability: 10, playerColor: colorList[0] },
     ],
     targetData: [
-      { playerName: 'Player1', probability: 25 },
-      { playerName: 'Player2', probability: 20 },
-      { playerName: 'Player3', probability: 15 },
-      { playerName: 'Player4', probability: 12 },
-      { playerName: 'Player5', probability: 10 },
-      { playerName: 'Player6', probability: 8 },
-      { playerName: 'Player7', probability: 5 },
-      { playerName: 'Player8', probability: 3 },
-      { playerName: 'Player9', probability: 1.5 },
-      { playerName: 'Player10', probability: 0.5 },
+      { playerName: 'Player1', probability: 25, playerColor: colorList[0] },
+      { playerName: 'Player2', probability: 20, playerColor: colorList[1] },
+      { playerName: 'Player3', probability: 15, playerColor: colorList[2] },
+      { playerName: 'Player4', probability: 12, playerColor: colorList[3] },
+      { playerName: 'Player5', probability: 10, playerColor: colorList[4] },
+      { playerName: 'Player6', probability: 8, playerColor: colorList[5] },
+      { playerName: 'Player7', probability: 5, playerColor: colorList[6] },
+      { playerName: 'Player8', probability: 3, playerColor: colorList[7] },
+      { playerName: 'Player9', probability: 1.5, playerColor: colorList[8] },
+      { playerName: 'Player10', probability: 0.5, playerColor: colorList[0] },
     ],
   },
 };

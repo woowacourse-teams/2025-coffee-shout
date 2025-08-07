@@ -54,24 +54,27 @@ const LobbyPage = () => {
     setSelectedMiniGames(data);
   }, []);
 
-  const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
-    const parsedData = data.map((item) => ({
-      playerName: item.playerResponse.playerName,
-      probability: item.probability,
-      playerColor: colorList[item.playerResponse.colorIndex],
-    }));
+  const handlePlayerProbabilitiesData = useCallback(
+    (data: Probability[]) => {
+      const parsedData = data.map((item) => ({
+        playerName: item.playerResponse.playerName,
+        probability: item.probability,
+        playerColor: colorList[item.playerResponse.colorIndex],
+      }));
 
-    setPlayerProbabilities(parsedData);
-  }, []);
+      setPlayerProbabilities(parsedData);
+      updateCurrentProbabilities(parsedData);
+    },
+    [updateCurrentProbabilities]
+  );
 
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
-      updateCurrentProbabilities(playerProbabilities);
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
 
-    [joinCode, navigate, updateCurrentProbabilities, playerProbabilities]
+    [joinCode, navigate]
   );
 
   useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
