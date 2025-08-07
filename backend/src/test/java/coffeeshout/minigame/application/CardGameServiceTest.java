@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -133,7 +134,6 @@ class CardGameServiceTest {
             cardGameService.start(cardGameSpy, joinCode.value());
             cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
 
-
             Map<Player, Probability> probabilities = room.getProbabilities();
             assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
                     players.get(0), new Probability(750),
@@ -173,38 +173,38 @@ class CardGameServiceTest {
 
     @Nested
     class 카드_선택 {
-        
+
         @Test
         void 카드를_정상적으로_선택한다() {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
-            
+
             // when
             cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
-            
+
             // then
             assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
         }
-        
+
         @Test
         void 카드_선택_후_게임_상태_메시지가_전송된다() {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
-            
+
             // when
             cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
-            
+
             // then
             verify(messagingTemplate).convertAndSend(
                     eq("/topic/room/" + joinCode.getValue() + "/gameState"),
                     any(WebSocketResponse.class)
             );
         }
-        
+
         @Test
         void 만약_선택된_카드를_고르면_예외를_반환한다() {
             // given
@@ -212,70 +212,83 @@ class CardGameServiceTest {
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
-            
+
             // when & then
             // 첫 번째 플레이어가 카드 선택
             cardGameService.selectCard(joinCode.getValue(), players.get(0).getName().value(), 0);
-            
+
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
-            assertThatThrownBy(() -> 
-                cardGameService.selectCard(joinCode.getValue(), players.get(1).getName().value(), 0)
+            assertThatThrownBy(() ->
+                    cardGameService.selectCard(joinCode.getValue(), players.get(1).getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
-        
+
         @Test
         void 게임이_플레이_상태가_아니면_예외를_반환한다() {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             room.startNextGame(host.getName().value());
             // PLAYING 상태로 변경하지 않음
-            
+
             // when & then
-            assertThatThrownBy(() -> 
-                cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
+            assertThatThrownBy(() ->
+                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
-        
+
         @Test
         void 존재하지_않는_플레이어면_예외를_반환한다() {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
-            
+
             // when & then
-            assertThatThrownBy(() -> 
-                cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
+            assertThatThrownBy(() ->
+                    cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
-        
+
         @Test
         void 잘못된_카드_인덱스면_예외를_반환한다() {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
-            
+
             // when & then
-            assertThatThrownBy(() -> 
-                cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
+            assertThatThrownBy(() ->
+                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
-        
+
         @Test
-        void 라운드가_완료되면_플레이_태스크가_취소된다() {
+        void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException {
             // given
+            CountDownLatch latch = new CountDownLatch(1);
+
+            doAnswer(invocation -> {
+                latch.countDown(); // 라운드 완료 시그널
+                return null;
+            }).when(messagingTemplate).convertAndSend(
+                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    any(WebSocketResponse.class)
+            );
+
             Room room = roomQueryService.findByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGameService.start(cardGame, joinCode.getValue());
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
-            
-            // when - 모든 플레이어가 카드 선택하여 라운드 완료
+
+            // when
             for (int i = 0; i < players.size(); i++) {
                 cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
             }
-            
+
+            // 완료될 때까지 대기
+            latch.await(5, TimeUnit.SECONDS);
+
             // then
             assertThat(cardGame.isFinishedThisRound()).isTrue();
         }
