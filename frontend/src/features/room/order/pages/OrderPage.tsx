@@ -22,14 +22,18 @@ type ParticipantResponse = Player[];
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { send } = useWebSocket();
+  const { send, stopSocket, isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
 
-  const handleOrder = useCallback((data: ParticipantResponse) => {
-    setParticipants(data);
-  }, []);
+  const handleOrder = useCallback(
+    (data: ParticipantResponse) => {
+      setParticipants(data);
+      stopSocket();
+    },
+    [stopSocket]
+  );
 
   useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleOrder);
 
@@ -37,11 +41,15 @@ const OrderPage = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
   };
 
+  const handleClickGoMain = () => {
+    navigate('/');
+  };
+
   useEffect(() => {
-    if (joinCode) {
+    if (joinCode && isConnected) {
       send(`/room/${joinCode}/update-players`);
     }
-  }, [joinCode, send]);
+  }, [joinCode, send, isConnected]);
 
   return (
     <Layout>
@@ -65,7 +73,7 @@ const OrderPage = () => {
         )}
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
-        <Button variant="primary" onClick={() => navigate('/')}>
+        <Button variant="primary" onClick={handleClickGoMain}>
           메인 화면으로 가기
         </Button>
         <Button variant="primary" onClick={() => {}}>
