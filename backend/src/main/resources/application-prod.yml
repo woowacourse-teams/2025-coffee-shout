@@ -1,0 +1,7 @@
+metrics:
+  cloudwatch:
+    namespace: coffee-shout-prod
+    step: PT1M
+    enabled: true
+    batch-size: 20
+

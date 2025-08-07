@@ -16,3 +16,7 @@ management:
       exposure:
         include: "health,info,metrics"
 
+metrics:
+  cloudwatch:
+    enabled: false
+
