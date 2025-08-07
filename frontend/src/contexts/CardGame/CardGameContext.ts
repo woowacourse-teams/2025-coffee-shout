@@ -1,5 +1,5 @@
 import { CardGameRound, CardGameState, CardInfo } from '@/types/miniGame';
-import React, { createContext, useContext } from 'react';
+import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { SelectedCardInfo } from './CardGameProvider';
 
 type CardGameContextType = {
@@ -9,7 +9,7 @@ type CardGameContextType = {
   currentCardGameState: CardGameState;
   cardInfos: CardInfo[];
   selectedCardInfo: SelectedCardInfo;
-  setSelectedCardInfo: React.Dispatch<React.SetStateAction<SelectedCardInfo>>;
+  setSelectedCardInfo: Dispatch<SetStateAction<SelectedCardInfo>>;
 };
 
 export const CardGameContext = createContext<CardGameContextType | null>(null);
