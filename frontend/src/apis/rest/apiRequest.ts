@@ -1,7 +1,7 @@
 import { ApiError, NetworkError } from './error';
 import { reportApiError } from '@/apis/utils/reportSentryError';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://api.coffee-shout.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.dev.coffee-shout.com';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
