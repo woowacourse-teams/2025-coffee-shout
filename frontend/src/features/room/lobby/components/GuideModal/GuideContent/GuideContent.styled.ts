@@ -10,8 +10,8 @@ export const ContentContainer = styled.div`
 
 export const ImageContainer = styled.div`
   width: 200px;
-  height: 350px;
-  margin: 32px 0px;
+  height: 380px;
+  margin: 16px 0px;
 `;
 
 export const PlaceholderImage = styled.div`
