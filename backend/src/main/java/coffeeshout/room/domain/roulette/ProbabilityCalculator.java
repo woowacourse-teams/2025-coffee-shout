@@ -43,11 +43,11 @@ public class ProbabilityCalculator {
     }
 
     private Probability computeAdjustmentStep() {
-        final Probability maxAdjustment = computeInitialProbability(playerCount).divide(roundCount);
+        final Probability maxAdjustment = computeInitialProbability().divide(roundCount);
         return maxAdjustment.divide(countAdjustableRanks()).multiple(ADJUSTMENT_WEIGHT);
     }
 
-    private Probability computeInitialProbability(int playerCount) {
+    private Probability computeInitialProbability() {
         return Probability.TOTAL.divide(playerCount);
     }
 
