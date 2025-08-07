@@ -1,7 +1,11 @@
 package coffeeshout.global.metric;
 
+import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import io.micrometer.core.instrument.*;
+import io.micrometer.core.instrument.Timer.Sample;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,13 +19,13 @@ public class WebSocketMetricService {
     private final MeterRegistry meterRegistry;
     private final AtomicLong currentConnections = new AtomicLong(0);
     private final Timer connectionEstablishmentTimer;
-    private final Map<String, Timer.Sample> connectionSamples = new ConcurrentHashMap<>();
+    private final Map<String, Sample> connectionSamples = new ConcurrentHashMap<>();
 
     // Counter 캐싱용
     private final Map<String, Counter> failedCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> disconnectedCounters = new ConcurrentHashMap<>();
 
-    public WebSocketMetricService(MeterRegistry meterRegistry) {
+    public WebSocketMetricService(CloudWatchMeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
 
         Gauge.builder("websocket.connections.current", currentConnections, AtomicLong::get)
@@ -34,13 +38,13 @@ public class WebSocketMetricService {
     }
 
     public void startConnection(String sessionId) {
-        Timer.Sample sample = Timer.start(meterRegistry);
+        Sample sample = Timer.start(meterRegistry);
         connectionSamples.put(sessionId, sample);
     }
 
     public void completeConnection(String sessionId) {
         currentConnections.incrementAndGet();
-        Timer.Sample sample = connectionSamples.remove(sessionId);
+        Sample sample = connectionSamples.remove(sessionId);
         if (sample != null) {
             long durationNanos = sample.stop(connectionEstablishmentTimer);
             double durationMs = durationNanos / 1_000_000.0;
@@ -80,7 +84,7 @@ public class WebSocketMetricService {
     // 평균 연결 수립 시간 조회
     public double getAverageConnectionTime() {
         long count = connectionEstablishmentTimer.count();
-        return count > 0 ? connectionEstablishmentTimer.totalTime(java.util.concurrent.TimeUnit.MILLISECONDS) / count : 0;
+        return count > 0 ? connectionEstablishmentTimer.totalTime(TimeUnit.MILLISECONDS) / count : 0;
     }
 
     // 현재 연결 수 조회
