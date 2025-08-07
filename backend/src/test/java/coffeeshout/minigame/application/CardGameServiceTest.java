@@ -275,7 +275,8 @@ class CardGameServiceTest {
             for (int i = 0; i < players.size(); i++) {
                 cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
             }
-            cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_PLAYING);
+
+            Thread.sleep(5000);
 
             // then
             assertThat(cardGame.isFinishedThisRound()).isTrue();
