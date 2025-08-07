@@ -4,7 +4,11 @@ import java.util.Random;
 
 public class RoulettePicker implements RandomPicker {
 
-    private final Random random = new Random();
+    private final Random random;
+
+    public RoulettePicker() {
+        this.random = new Random();
+    }
 
     @Override
     public int nextInt(int origin, int bound) {

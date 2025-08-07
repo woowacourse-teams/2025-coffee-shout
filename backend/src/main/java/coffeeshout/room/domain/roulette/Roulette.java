@@ -1,11 +1,14 @@
 package coffeeshout.room.domain.roulette;
 
+import static org.springframework.util.Assert.isTrue;
+
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameResultType;
 import coffeeshout.room.domain.player.Player;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Roulette {
 
     private final RandomPicker randomPicker;
@@ -31,16 +34,20 @@ public class Roulette {
     }
 
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
-        for (Player player : playerProbabilities.keySet()) {
-            final int rank = miniGameResult.getPlayerRank(player);
-            final Probability probability = probabilityCalculator.calculateAdjustProbability(rank);
-            final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
-            final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
-            playerProbabilities.put(player, adjustedProbability);
+        final RankNormalization rankNormalization = RankNormalization.from(miniGameResult);
+
+        for (Player player : miniGameResult.getRank().keySet()) {
+            final int normalizedRank = rankNormalization.getNormalizedRank(player);
+            final Probability probability = probabilityCalculator.calculateAdjustProbability(
+                    rankNormalization,
+                    normalizedRank, getProbability(player));
+
+            playerProbabilities.put(player, probability);
         }
     }
 
     public Probability getProbability(Player player) {
+        isTrue(playerProbabilities.containsKey(player), "해당 플레이어가 존재하지 않습니다. Player:" + player);
         return playerProbabilities.get(player);
     }
 
