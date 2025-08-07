@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 /*
     등수별 확률 조정 정도를 계산하는 클래스
  */
-@Slf4j
 public class ProbabilityCalculator {
 
     protected static final double ADJUSTMENT_WEIGHT = 0.7;
