@@ -1,3 +1,4 @@
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -63,6 +64,15 @@ export default {
       template: './public/index.html',
     }),
     new webpack.DefinePlugin(envKeys),
+    sentryWebpackPlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: 'woowacourse-7th-fe',
+      project: '2025-coffee-shout',
+      release: appVersion,
+      sourcemaps: {
+        disable: process.env.NODE_ENV !== 'production',
+      },
+    }),
   ],
   devServer: {
     compress: true,
