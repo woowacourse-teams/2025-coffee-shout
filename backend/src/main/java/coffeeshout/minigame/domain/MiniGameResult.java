@@ -14,14 +14,14 @@ import lombok.NonNull;
 @Getter
 public class MiniGameResult {
 
-    private final Map<Player, Integer> ranks;
+    private final Map<Player, Integer> rank;
 
-    public MiniGameResult(Map<Player, Integer> ranks) {
-        this.ranks = ranks;
+    public MiniGameResult(Map<Player, Integer> rank) {
+        this.rank = rank;
     }
 
     public Integer getPlayerRank(Player player) {
-        return ranks.get(player);
+        return rank.get(player);
     }
 
     public static MiniGameResult from(@NonNull Map<Player, MiniGameScore> playerScores) {
@@ -56,7 +56,7 @@ public class MiniGameResult {
     }
 
     public int getTieCountByRank(int rank) {
-        return (int) ranks.values()
+        return (int) this.rank.values()
                 .stream()
                 .filter(value -> value.equals(rank))
                 .count();

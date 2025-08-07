@@ -32,8 +32,8 @@ class MiniGameResultTest {
         // then
         SoftAssertions.assertSoftly(
                 softly -> {
-                    softly.assertThat(miniGameResult.getRanks().size()).isEqualTo(4);
-                    softly.assertThat(miniGameResult.getRanks()).containsExactlyInAnyOrderEntriesOf(
+                    softly.assertThat(miniGameResult.getRank().size()).isEqualTo(4);
+                    softly.assertThat(miniGameResult.getRank()).containsExactlyInAnyOrderEntriesOf(
                             Map.of(
                                     게스트_엠제이, 1,
                                     호스트_한스, 2,

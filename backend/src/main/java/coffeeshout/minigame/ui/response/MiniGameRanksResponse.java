@@ -19,7 +19,7 @@ public record MiniGameRanksResponse(List<MiniGameRankResponse> ranks) {
     }
 
     public static MiniGameRanksResponse from(@NonNull MiniGameResult miniGameResult) {
-        final List<MiniGameRankResponse> ranks = miniGameResult.getRanks().entrySet()
+        final List<MiniGameRankResponse> ranks = miniGameResult.getRank().entrySet()
                 .stream()
                 .map(MiniGameRankResponse::from)
                 .toList();
