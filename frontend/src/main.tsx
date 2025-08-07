@@ -16,7 +16,7 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
   tracesSampleRate: 0.2,
-  tracePropagationTargets: ['localhost:8080', 'https://api.coffee-shout.com', /^\/api\//],
+  tracePropagationTargets: ['localhost:8080', 'https://api.dev.coffee-shout.com', /^\/api\//],
 });
 // }
 
