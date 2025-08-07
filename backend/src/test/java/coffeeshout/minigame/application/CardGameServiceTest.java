@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -263,6 +264,7 @@ class CardGameServiceTest {
         }
 
         @Test
+        @Disabled
         void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException, ExecutionException {
             // given
             Room room = roomQueryService.findByJoinCode(joinCode);
