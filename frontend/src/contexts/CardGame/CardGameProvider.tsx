@@ -114,7 +114,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         return;
       }
     },
-    [navigate, joinCode, miniGameType, myName, cardInfos, setSelectedCardInfo]
+    [navigate, joinCode, miniGameType, myName, setSelectedCardInfo]
   );
 
   useWebSocketSubscription(`/room/${joinCode}/gameState`, handleCardGameState);
