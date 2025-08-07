@@ -22,10 +22,10 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
     setOptions(options);
   }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setContent(null);
     setOptions({});
-  };
+  }, []);
 
   return (
     <ModalContext.Provider value={{ openModal, closeModal }}>
