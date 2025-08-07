@@ -190,7 +190,7 @@ class RouletteTest {
         }
 
         @Test
-        void _5명_중_1등_동접자_2명_3등_동접자_2명() {
+        void _5명_중_1등_동점자_2명_3등_동점자_2명() {
             // given
             Player 한스 = PlayerFixture.호스트한스();
             Player 루키 = PlayerFixture.게스트루키();
