@@ -1,7 +1,6 @@
 package coffeeshout.room.domain.roulette;
 
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameResultType;
 import coffeeshout.room.domain.player.Player;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,9 +32,9 @@ public class Roulette {
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
         for (Player player : playerProbabilities.keySet()) {
             final int rank = miniGameResult.getPlayerRank(player);
-            final Probability probability = probabilityCalculator.calculateAdjustProbability(getPlayerCount(), rank);
-            final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
-            final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
+            final int probabilityChange = probabilityCalculator.calculateProbabilityChange(rank,
+                    miniGameResult.getTieCountByRank(rank));
+            final Probability adjustedProbability = getProbability(player).plus(probabilityChange);
             playerProbabilities.put(player, adjustedProbability);
         }
     }

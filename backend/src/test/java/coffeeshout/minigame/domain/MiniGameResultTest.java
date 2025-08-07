@@ -1,5 +1,7 @@
 package coffeeshout.minigame.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.minigame.domain.cardgame.CardGameScore;
 import coffeeshout.room.domain.player.Player;
@@ -30,8 +32,8 @@ class MiniGameResultTest {
         // then
         SoftAssertions.assertSoftly(
                 softly -> {
-                    softly.assertThat(miniGameResult.getRank().size()).isEqualTo(4);
-                    softly.assertThat(miniGameResult.getRank()).containsExactlyInAnyOrderEntriesOf(
+                    softly.assertThat(miniGameResult.getRanks().size()).isEqualTo(4);
+                    softly.assertThat(miniGameResult.getRanks()).containsExactlyInAnyOrderEntriesOf(
                             Map.of(
                                     게스트_엠제이, 1,
                                     호스트_한스, 2,
@@ -65,5 +67,20 @@ class MiniGameResultTest {
                     softly.assertThat(miniGameResult.getPlayerRank(게스트_꾹이)).isEqualTo(4);
                 }
         );
+    }
+
+    @Test
+    void 동점자가_몇_명인지_확인한다() {
+        // given
+        MiniGameResult miniGameResult = new MiniGameResult(Map.of(호스트_한스, 1,
+                게스트_루키, 1,
+                게스트_엠제이, 3,
+                게스트_꾹이, 4));
+
+        // when
+        int count = miniGameResult.getTieCountByRank(1);
+
+        // then
+        assertThat(count).isEqualTo(2);
     }
 }
