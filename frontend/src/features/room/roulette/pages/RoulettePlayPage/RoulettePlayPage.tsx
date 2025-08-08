@@ -81,7 +81,7 @@ const RoulettePlayPage = () => {
           {isRouletteView ? (
             <RoulettePlaySection isSpinning={isSpinning} />
           ) : (
-            <ProbabilityList playerProbabilities={probabilityHistory.prev} />
+            <ProbabilityList playerProbabilities={probabilityHistory.current} />
           )}
           <S.IconButtonWrapper>
             <IconButton
