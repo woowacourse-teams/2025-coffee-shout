@@ -13,3 +13,8 @@ export type PlayerProbability = {
   probability: number;
   playerColor: ColorList;
 };
+
+export type ProbabilityHistory = {
+  prev: PlayerProbability[];
+  current: PlayerProbability[];
+};
