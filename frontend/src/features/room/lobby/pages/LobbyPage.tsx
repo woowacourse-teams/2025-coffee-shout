@@ -21,8 +21,9 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
-import * as S from './LobbyPage.styled';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { colorList } from '@/constants/color';
+import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -34,6 +35,7 @@ const LobbyPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { openModal } = useModal();
   const { playerType } = usePlayerType();
+  const { updateCurrentProbabilities } = useProbabilityHistory();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
@@ -52,15 +54,19 @@ const LobbyPage = () => {
     setSelectedMiniGames(data);
   }, []);
 
-  const handlePlayerProbabilitiesData = useCallback((data: Probability[]) => {
-    const parsedData = data.map((item) => ({
-      playerName: item.playerResponse.playerName,
-      probability: item.probability,
-      playerColor: colorList[item.playerResponse.colorIndex],
-    }));
+  const handlePlayerProbabilitiesData = useCallback(
+    (data: Probability[]) => {
+      const parsedData = data.map((item) => ({
+        playerName: item.playerResponse.playerName,
+        probability: item.probability,
+        playerColor: colorList[item.playerResponse.colorIndex],
+      }));
 
-    setPlayerProbabilities(parsedData);
-  }, []);
+      setPlayerProbabilities(parsedData);
+      updateCurrentProbabilities(parsedData);
+    },
+    [updateCurrentProbabilities]
+  );
 
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {

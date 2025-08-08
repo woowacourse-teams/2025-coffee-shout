@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import Button from '@/components/@common/Button/Button';
@@ -8,15 +10,14 @@ import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
-import { Probability } from '@/types/roulette';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import * as S from './MiniGameResultPage.styled';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { colorList } from '@/constants/color';
-import { MiniGameType, PlayerRank, PlayerScore } from '@/types/miniGame';
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
+import { colorList } from '@/constants/color';
+import { MiniGameType, PlayerRank, PlayerScore } from '@/types/miniGame';
+import { Probability } from '@/types/roulette';
+import * as S from './MiniGameResultPage.styled';
 
 type RankResponse = {
   ranks: PlayerRank[];
@@ -31,6 +32,8 @@ const MiniGameResultPage = () => {
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
+
+  const { updateCurrentProbabilities } = useProbabilityHistory();
   const [ranks, setRanks] = useState<PlayerRank[] | null>(null);
   const [scores, setScores] = useState<PlayerScore[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,13 +47,13 @@ const MiniGameResultPage = () => {
         playerColor: colorList[item.playerResponse.colorIndex],
       }));
 
+      updateCurrentProbabilities(playerProbabilitiesData);
+
       if (joinCode) {
-        navigate(`/room/${joinCode}/roulette/play`, {
-          state: { playerProbabilitiesData },
-        });
+        navigate(`/room/${joinCode}/roulette/play`);
       }
     },
-    [joinCode, navigate]
+    [joinCode, navigate, updateCurrentProbabilities]
   );
 
   useWebSocketSubscription<Probability[]>(
