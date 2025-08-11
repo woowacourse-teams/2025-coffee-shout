@@ -1,20 +1,18 @@
 package coffeeshout.global.handler;
 
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.ui.response.PlayerResponse;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -31,7 +29,8 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     private final WebSocketMetricService webSocketMetricService;
     private final RoomService roomService;
     private final RoomQueryService roomQueryService;
-    private final LoggingSimpMessagingTemplate messagingTemplate; // 순환 의존성 해결을 위해 제거
+    private final ApplicationEventPublisher eventPublisher;
+//    private final LoggingSimpMessagingTemplate messagingTemplate; // 순환 의존성 해결을 위해 제거
 
     // 중복 처리 방지용
     private final Set<String> processedDisconnections = ConcurrentHashMap.newKeySet();
@@ -52,11 +51,9 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
         final String sessionId = accessor.getSessionId();
 
         // STOMP 명령이 아닌 내부 메시지는 무시
-        if (!(commandObj instanceof StompCommand)) {
+        if (!(commandObj instanceof final StompCommand command)) {
             return message;
         }
-
-        final StompCommand command = (StompCommand) commandObj;
 
         try {
             switch (command) {
@@ -241,18 +238,8 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
     private void sendCurrentRoomState(String joinCode, String newSessionId) {
         try {
-            // TODO: 순환 의존성 해결을 위해 임시로 주석 처리
-            // 실제로는 ApplicationEventPublisher 등을 사용해서 이벤트 발행하는 방식으로 해결
-            log.info("방 상태 전송 필요: joinCode={}, sessionId={} (구현 예정)", joinCode, newSessionId);
-
-            final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                    .stream()
-                    .map(PlayerResponse::from)
-                    .toList();
-
-            // 방 전체에 현재 상태 브로드캐스트 (재연결된 사용자도 받음)
-            messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                    WebSocketResponse.success(responses));
+            log.info("방 상태 전송 이벤트 발행: joinCode={}, sessionId={}", joinCode, newSessionId);
+            eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_RECONNECTED"));
         } catch (Exception e) {
             log.error("방 상태 전송 실패: joinCode={}, sessionId={}", joinCode, newSessionId, e);
         }
@@ -296,15 +283,8 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
             if (removed) {
                 log.info("플레이어 방에서 제거 완료: joinCode={}, playerName={}", joinCode, playerName);
 
-                // TODO: 순환 의존성 해결을 위해 임시로 주석 처리
-                // 실제로는 ApplicationEventPublisher로 이벤트 발행해서 브로드캐스트
-                final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                        .stream()
-                        .map(PlayerResponse::from)
-                        .toList();
-
-                messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                        WebSocketResponse.success(responses));
+                // 이벤트 발행으로 브로드캐스트
+                eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
             } else {
                 log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
             }
