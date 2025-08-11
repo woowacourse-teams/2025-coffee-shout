@@ -76,7 +76,6 @@ class CardGameServiceTest {
 
     @BeforeEach
     void setUp() {
-        System.out.println("=== TEST SETUP ===");
         List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
         Room room = roomService.createRoom(host.getName().value(), 1L);
