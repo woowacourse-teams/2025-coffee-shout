@@ -14,13 +14,6 @@ export const ImageContainer = styled.div`
   margin: 16px 0px;
 `;
 
-export const PlaceholderImage = styled.div`
-  width: 100%;
-  height: 100%;
-  background: gray;
-  border-radius: 8px;
-`;
-
 export const TextContainer = styled.div`
   margin-bottom: 20px;
 `;

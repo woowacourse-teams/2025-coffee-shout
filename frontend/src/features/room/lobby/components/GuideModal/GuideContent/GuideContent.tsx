@@ -9,9 +9,7 @@ type Props = {
 const GuideContent = ({ pageData }: Props) => {
   return (
     <S.ContentContainer>
-      <S.ImageContainer>
-        <S.PlaceholderImage>{pageData.image}</S.PlaceholderImage>
-      </S.ImageContainer>
+      <S.ImageContainer>{pageData.image}</S.ImageContainer>
       <S.TextContainer>
         <Headline4>{pageData.title}</Headline4>
         <S.DescriptionWrapper>
