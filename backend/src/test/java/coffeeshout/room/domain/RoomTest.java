@@ -65,7 +65,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, MenuFixture.아메리카노()))
-                .isInstanceOf(InvalidStateException.class)
+                .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY_TO_JOIN);
     }
 
@@ -89,7 +89,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), MenuFixture.아메리카노()))
-                .isInstanceOf(InvalidStateException.class)
+                .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
     }
 

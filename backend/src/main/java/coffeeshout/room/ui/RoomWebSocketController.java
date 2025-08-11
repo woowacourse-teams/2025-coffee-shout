@@ -1,6 +1,7 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
@@ -13,14 +14,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final LoggingSimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
 
     @MessageMapping("/room/{joinCode}/update-players")
@@ -46,7 +46,7 @@ public class RoomWebSocketController {
                 WebSocketResponse.success(responses));
     }
 
-    @MessageMapping("room/{joinCode}/update-ready")
+    @MessageMapping("/room/{joinCode}/update-ready")
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
         final List<PlayerResponse> responses = roomService.changePlayerReadyState(joinCode, message.playerName(),
                         message.isReady())

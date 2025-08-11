@@ -3,6 +3,7 @@ package coffeeshout.minigame.application;
 import static coffeeshout.minigame.domain.task.CardGameTaskType.FIRST_ROUND_LOADING;
 
 import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
@@ -19,7 +20,6 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class CardGameService implements MiniGameService {
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final RoomQueryService roomQueryService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final LoggingSimpMessagingTemplate messagingTemplate;
 
     private final CardGameTaskExecutorsV2 cardGameTaskExecutors;
     private final TaskScheduler scheduler;
@@ -38,7 +38,7 @@ public class CardGameService implements MiniGameService {
     @Autowired
     public CardGameService(
             RoomQueryService roomQueryService,
-            SimpMessagingTemplate messagingTemplate,
+            LoggingSimpMessagingTemplate messagingTemplate,
             CardGameTaskExecutorsV2 cardGameTaskExecutors,
             @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler
     ) {

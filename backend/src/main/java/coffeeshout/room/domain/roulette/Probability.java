@@ -39,13 +39,14 @@ public record Probability(Integer value) {
         return new Probability(this.value + other.value);
     }
 
-    public Probability adjust(MiniGameResultType resultType, Probability adjustProbability) {
-        if (resultType == MiniGameResultType.LOSER) {
-            return this.plus(adjustProbability);
+    public Probability plus(int value) {
+        return new Probability(this.value + value);
+    }
+
+    public int getProbabilityChange(MiniGameResultType resultType) {
+        if (resultType == MiniGameResultType.WINNER) {
+            return -value;
         }
-        if (resultType == MiniGameResultType.UNDECIDED) {
-            return this;
-        }
-        return this.minus(adjustProbability);
+        return value;
     }
 }
