@@ -179,7 +179,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage loadingState = responses.get().data();
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
-
         // PLAYING 상태 확인
         MiniGameStateMessage playingState = responses.get().data();
 

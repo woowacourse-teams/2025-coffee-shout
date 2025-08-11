@@ -43,4 +43,8 @@ public class Players {
         return players.stream()
                 .allMatch(Player::getIsReady);
     }
+
+    public boolean removePlayer(PlayerName playerName) {
+        return players.removeIf(player -> player.sameName(playerName));
+    }
 }

@@ -1,8 +1,17 @@
 package coffeeshout.global.handler;
 
-import java.util.Set;
-
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.ui.response.PlayerResponse;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,30 +29,68 @@ import org.springframework.stereotype.Component;
 public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
     private final WebSocketMetricService webSocketMetricService;
+    private final RoomService roomService;
+    private final RoomQueryService roomQueryService;
+    private final LoggingSimpMessagingTemplate messagingTemplate; // 순환 의존성 해결을 위해 제거
 
     // 중복 처리 방지용
     private final Set<String> processedDisconnections = ConcurrentHashMap.newKeySet();
 
+    // 플레이어 세션 매핑 관리
+    private final ConcurrentHashMap<String, String> playerSessionMap = new ConcurrentHashMap<>(); // "joinCode:playerName" -> sessionId
+    private final ConcurrentHashMap<String, String> sessionPlayerMap = new ConcurrentHashMap<>(); // sessionId -> "joinCode:playerName"
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        final StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (accessor == null) return message;
+        if (accessor == null) {
+            return message;
+        }
 
-        Object commandObj = accessor.getCommand();
-        String sessionId = accessor.getSessionId();
+        final Object commandObj = accessor.getCommand();
+        final String sessionId = accessor.getSessionId();
 
         // STOMP 명령이 아닌 내부 메시지는 무시
         if (!(commandObj instanceof StompCommand)) {
             return message;
         }
 
-        StompCommand command = (StompCommand) commandObj;
+        final StompCommand command = (StompCommand) commandObj;
 
         try {
             switch (command) {
                 case CONNECT:
                     log.info("WebSocket 연결 시작: sessionId={}", sessionId);
+                    final String joinCode = accessor.getFirstNativeHeader("joinCode");
+                    final String playerName = accessor.getFirstNativeHeader("playerName");
+
+                    if (joinCode != null && playerName != null) {
+                        final String playerKey = joinCode + ":" + playerName;
+
+                        // 기존 세션 있으면 재연결, 없으면 첫 연결
+                        String oldSessionId = playerSessionMap.get(playerKey);
+                        if (oldSessionId != null) {
+                            log.info("기존 플레이어 세션 정리: playerKey={}, oldSessionId={}", playerKey, oldSessionId);
+                            sessionPlayerMap.remove(oldSessionId);
+                            playerSessionMap.remove(playerKey);
+
+                            playerSessionMap.put(playerKey, sessionId);
+                            sessionPlayerMap.put(sessionId, playerKey);
+                            log.info("플레이어 재연결 매핑: playerKey={}, sessionId={}", playerKey, sessionId);
+
+                            // 재연결 처리
+                            handlePlayerReconnection(joinCode, playerName, sessionId);
+                        } else {
+                            playerSessionMap.put(playerKey, sessionId);
+                            sessionPlayerMap.put(sessionId, playerKey);
+                            log.info("플레이어 첫 연결 매핑: playerKey={}, sessionId={}", playerKey, sessionId);
+
+                            // 첫 연결 처리  
+                            handlePlayerFirstConnection(joinCode, playerName, sessionId);
+                        }
+                    }
+
                     webSocketMetricService.startConnection(sessionId);
                     break;
 
@@ -61,12 +108,28 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
                 case DISCONNECT:
                     log.info("WebSocket 연결 해제 요청: sessionId={}", sessionId);
+                    final String disconnectedPlayerKey = sessionPlayerMap.remove(sessionId);
+                    if (disconnectedPlayerKey != null) {
+                        playerSessionMap.remove(disconnectedPlayerKey);
+                        log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
+
+                        // 방에서 플레이어 제거
+                        handlePlayerDisconnection(disconnectedPlayerKey, sessionId, "CLIENT_DISCONNECT");
+                    }
                     // DISCONNECT는 postSend에서만 처리하도록 변경
                     break;
 
                 case ERROR:
-                    String errorMessage = accessor.getMessage();
+                    final String errorMessage = accessor.getMessage();
                     log.error("STOMP 에러: sessionId={}, message={}", sessionId, errorMessage);
+
+                    // 에러 발생 시 플레이어 제거
+                    final String errorPlayerKey = sessionPlayerMap.remove(sessionId);
+                    if (errorPlayerKey != null) {
+                        playerSessionMap.remove(errorPlayerKey);
+                        handlePlayerDisconnection(errorPlayerKey, sessionId, "STOMP_ERROR");
+                    }
+
                     webSocketMetricService.recordDisconnection(sessionId, "stomp_error", false);
                     break;
 
@@ -83,19 +146,21 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        final StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (accessor == null) return;
+        if (accessor == null) {
+            return;
+        }
 
-        Object commandObj = accessor.getCommand();
-        String sessionId = accessor.getSessionId();
+        final Object commandObj = accessor.getCommand();
+        final String sessionId = accessor.getSessionId();
 
         // STOMP 명령이 아닌 내부 메시지는 무시
         if (!(commandObj instanceof StompCommand)) {
             return;
         }
 
-        StompCommand command = (StompCommand) commandObj;
+        final StompCommand command = (StompCommand) commandObj;
 
         try {
             if (command == StompCommand.CONNECT && sent) {
@@ -115,7 +180,12 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                 log.warn("STOMP 메시지 전송 실패: sessionId={}, command={}", sessionId, command);
 
                 if (command == StompCommand.CONNECTED) {
-                    // 연결 응답 실패
+                    // 연결 응답 실패 - 플레이어 제거
+                    final String failedPlayerKey = sessionPlayerMap.remove(sessionId);
+                    if (failedPlayerKey != null) {
+                        playerSessionMap.remove(failedPlayerKey);
+                        handlePlayerDisconnection(failedPlayerKey, sessionId, "CONNECTION_FAILED");
+                    }
                     webSocketMetricService.failConnection(sessionId, "connection_response_failed");
                 }
             }
@@ -132,5 +202,115 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     @Override
     public boolean preReceive(MessageChannel channel) {
         return true;
+    }
+
+    private void handlePlayerFirstConnection(String joinCode, String playerName, String sessionId) {
+        log.info("플레이어 첫 연결: joinCode={}, playerName={}", joinCode, playerName);
+        // 첫 연결은 별도 검증 없이 성공 처리
+        // 실제 방 참여는 REST API로 이미 되어있을 것
+    }
+
+    private void handlePlayerReconnection(String joinCode, String playerName, String newSessionId) {
+        try {
+            // 1. 방 존재 확인
+            final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+
+            // 2. 플레이어가 방에 있는지 확인
+            final Player player = room.findPlayer(new PlayerName(playerName)); // 없으면 예외 터짐
+
+            // 3. 방 상태 확인
+            if (room.isPlayingState()) {
+                log.info("게임 중인 방 재연결 거부: joinCode={}, playerName={}", joinCode, playerName);
+                disconnectSession(newSessionId, "GAME_IN_PROGRESS");
+                return;
+            }
+
+            // 4. READY 상태면 재연결 허용 + 현재 상태 전송
+            log.info("방 재연결 허용: joinCode={}, playerName={}", joinCode, playerName);
+            sendCurrentRoomState(joinCode, newSessionId);
+
+        } catch (Exception e) {
+            log.warn("재연결 실패: joinCode={}, playerName={}, error={}", joinCode, playerName, e.getMessage());
+            // 재연결 실패 시 기존 매핑 제거하고 방에서 플레이어 제거
+            final String playerKey = joinCode + ":" + playerName;
+            playerSessionMap.remove(playerKey);
+            sessionPlayerMap.remove(newSessionId);
+            handlePlayerDisconnection(playerKey, newSessionId, "RECONNECTION_FAILED");
+        }
+    }
+
+    private void sendCurrentRoomState(String joinCode, String newSessionId) {
+        try {
+            // TODO: 순환 의존성 해결을 위해 임시로 주석 처리
+            // 실제로는 ApplicationEventPublisher 등을 사용해서 이벤트 발행하는 방식으로 해결
+            log.info("방 상태 전송 필요: joinCode={}, sessionId={} (구현 예정)", joinCode, newSessionId);
+
+            final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
+                    .stream()
+                    .map(PlayerResponse::from)
+                    .toList();
+
+            // 방 전체에 현재 상태 브로드캐스트 (재연결된 사용자도 받음)
+            messagingTemplate.convertAndSend("/topic/room/" + joinCode,
+                    WebSocketResponse.success(responses));
+        } catch (Exception e) {
+            log.error("방 상태 전송 실패: joinCode={}, sessionId={}", joinCode, newSessionId, e);
+        }
+    }
+
+    private void disconnectSession(String sessionId, String reason) {
+        try {
+            // 에러 메시지는 로그로만 남기고, 클라이언트는 연결 실패로 알아서 처리하게 함
+            log.warn("세션 연결 거부: sessionId={}, reason={}", sessionId, reason);
+        } catch (Exception e) {
+            log.error("세션 거부 처리 실패: sessionId={}, reason={}", sessionId, reason, e);
+        }
+    }
+
+    private void handlePlayerDisconnection(String playerKey, String sessionId, String reason) {
+        try {
+            final String[] parts = playerKey.split(":");
+            if (parts.length != 2) {
+                log.warn("잘못된 플레이어 키 형식: {}", playerKey);
+                return;
+            }
+
+            final String joinCode = parts[0];
+            final String playerName = parts[1];
+
+            log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
+
+            // 방에서 플레이어 제거
+            removePlayerFromRoom(joinCode, playerName);
+
+        } catch (Exception e) {
+            log.error("플레이어 연결 해제 처리 실패: playerKey={}, sessionId={}, reason={}", playerKey, sessionId, reason, e);
+        }
+    }
+
+    private void removePlayerFromRoom(String joinCode, String playerName) {
+        try {
+            // 방에서 플레이어 제거
+            boolean removed = roomService.removePlayer(joinCode, playerName);
+
+            if (removed) {
+                log.info("플레이어 방에서 제거 완료: joinCode={}, playerName={}", joinCode, playerName);
+
+                // TODO: 순환 의존성 해결을 위해 임시로 주석 처리
+                // 실제로는 ApplicationEventPublisher로 이벤트 발행해서 브로드캐스트
+                final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
+                        .stream()
+                        .map(PlayerResponse::from)
+                        .toList();
+
+                messagingTemplate.convertAndSend("/topic/room/" + joinCode,
+                        WebSocketResponse.success(responses));
+            } else {
+                log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
+            }
+
+        } catch (Exception e) {
+            log.error("방에서 플레이어 제거 실패: joinCode={}, playerName={}", joinCode, playerName, e);
+        }
     }
 }

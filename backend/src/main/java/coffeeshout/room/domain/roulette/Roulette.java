@@ -50,4 +50,18 @@ public class Roulette {
     public Map<Player, Probability> getProbabilities() {
         return Map.copyOf(playerProbabilities);
     }
+
+    public boolean removePlayer(Player player) {
+        if (playerProbabilities.remove(player) != null) {
+            // 남은 플레이어들의 확률 재조정
+            if (!playerProbabilities.isEmpty()) {
+                final Probability probability = Probability.TOTAL.divide(getPlayerCount());
+                for (Map.Entry<Player, Probability> entry : playerProbabilities.entrySet()) {
+                    entry.setValue(probability);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
