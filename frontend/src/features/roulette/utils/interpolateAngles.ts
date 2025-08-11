@@ -21,6 +21,7 @@ export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
       playerName: fromPlayer.playerName,
       startAngle: fromPlayer.startAngle + (toPlayer.startAngle - fromPlayer.startAngle) * t,
       endAngle: fromPlayer.endAngle + (toPlayer.endAngle - fromPlayer.endAngle) * t,
+      playerColor: fromPlayer.playerColor,
     };
   });
 };

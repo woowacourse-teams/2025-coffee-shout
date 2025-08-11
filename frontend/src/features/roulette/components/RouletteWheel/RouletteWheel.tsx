@@ -6,8 +6,16 @@ import { Angle, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
 
 type Props =
-  | { angles: Angle[]; playerProbabilities?: never; isSpinning?: boolean }
-  | { playerProbabilities: PlayerProbability[]; angles?: never; isSpinning?: boolean };
+  | {
+      angles: Angle[];
+      playerProbabilities?: never;
+      isSpinning?: boolean;
+    }
+  | {
+      angles?: never;
+      playerProbabilities: PlayerProbability[];
+      isSpinning?: boolean;
+    };
 
 const getCenterAngle = (startAngle: number, endAngle: number) => {
   return (startAngle + endAngle) / 2;
@@ -25,7 +33,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
       <S.Container>
         <S.Wrapper $isSpinning={isSpinning}>
           <svg width={300} height={300} viewBox="0 0 300 300">
-            {angles.map((player, index) => {
+            {angles.map((player) => {
               const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
               const textPosition = getTextPosition(centerAngle);
 
@@ -39,7 +47,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
                       startAngle: player.startAngle,
                       endAngle: player.endAngle,
                     })}
-                    fill={playerProbabilities[index].playerColor}
+                    fill={player.playerColor}
                     stroke={theme.color.point[100]}
                     strokeWidth="1"
                   />
