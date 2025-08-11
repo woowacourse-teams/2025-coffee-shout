@@ -25,7 +25,11 @@ const RoulettePlaySection = ({ isSpinning }: Props) => {
 
   return (
     <S.Container>
-      <RouletteWheel isSpinning={isSpinning} angles={angles} />
+      <RouletteWheel
+        isSpinning={isSpinning}
+        angles={angles}
+        playerProbabilities={probabilityHistory.current}
+      />
       <S.ProbabilityText>
         <Headline4>
           당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}

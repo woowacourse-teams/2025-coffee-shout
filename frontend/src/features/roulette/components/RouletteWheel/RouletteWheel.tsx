@@ -3,7 +3,6 @@ import { describeArc } from '../../utils/describeArc';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
 import { polarToCartesian } from '../../utils/polarToCartesian';
 import { Angle, PlayerProbability } from '@/types/roulette';
-import { colorList } from '@/constants/color';
 import * as S from './RouletteWheel.styled';
 
 type Props =
@@ -40,7 +39,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
                       startAngle: player.startAngle,
                       endAngle: player.endAngle,
                     })}
-                    fill={colorList[index % colorList.length]}
+                    fill={playerProbabilities[index].playerColor}
                     stroke={theme.color.point[100]}
                     strokeWidth="1"
                   />
@@ -72,7 +71,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
       <S.Container>
         <S.Wrapper $isSpinning={isSpinning}>
           <svg width={300} height={300} viewBox="0 0 300 300">
-            {playersWithAngles.map((player, index) => {
+            {playersWithAngles.map((player) => {
               const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
               const textPosition = getTextPosition(centerAngle);
 
@@ -86,7 +85,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
                       startAngle: player.startAngle,
                       endAngle: player.endAngle,
                     })}
-                    fill={colorList[index % colorList.length]}
+                    fill={player.playerColor}
                     stroke={theme.color.point[100]}
                   />
                   <S.PlayerNameText
