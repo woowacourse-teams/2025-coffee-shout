@@ -9,20 +9,15 @@ export const PaginationContainer = styled.div`
 export const PaginationButton = styled.button`
   background: none;
   border: none;
-  color: #333;
-  font-size: 16px;
-  font-weight: 500;
+  color: ${({ theme }) => theme.color.gray[800]};
+  ${({ theme }) => theme.typography.paragraph}
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 8px;
   min-width: 60px;
 
-  &:hover:not(:disabled) {
-    background: #f5f5f5;
-  }
-
   &:disabled {
-    color: #ccc;
+    color: ${({ theme }) => theme.color.gray[300]};
     cursor: not-allowed;
   }
 `;
@@ -36,6 +31,6 @@ export const Dot = styled.div<{ active: boolean }>`
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: ${(props) => (props.active ? '#ff6b6b' : '#ddd')};
+  background: ${({ theme, active }) => (active ? theme.color.point[500] : theme.color.gray[200])};
   transition: all 0.2s ease;
 `;
