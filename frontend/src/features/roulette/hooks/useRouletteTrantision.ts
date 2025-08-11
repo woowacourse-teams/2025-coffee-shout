@@ -24,6 +24,7 @@ export const useRouletteTransition = (
       return;
     }
 
+    //requestAnimationFrame이 호출할 프레임 처리 함수
     const step = (timestamp: number) => {
       if (startTimeRef.current === null) startTimeRef.current = timestamp;
       const elapsed = timestamp - startTimeRef.current;
