@@ -1,9 +1,10 @@
 import { useTheme } from '@emotion/react';
 import { describeArc } from '../../utils/describeArc';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
-import { polarToCartesian } from '../../utils/polarToCartesian';
 import { Angle, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
+import { getCenterAngle } from '../../utils/getCenterAngle';
+import { getTextPosition } from '../../utils/getTextPosition';
 
 type Props =
   | {
@@ -16,14 +17,6 @@ type Props =
       playerProbabilities: PlayerProbability[];
       isSpinning?: boolean;
     };
-
-const getCenterAngle = (startAngle: number, endAngle: number) => {
-  return (startAngle + endAngle) / 2;
-};
-
-const getTextPosition = (centerAngle: number, radius: number = 80) => {
-  return polarToCartesian({ cx: 150, cy: 150, r: radius, angle: centerAngle });
-};
 
 const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Props) => {
   const theme = useTheme();

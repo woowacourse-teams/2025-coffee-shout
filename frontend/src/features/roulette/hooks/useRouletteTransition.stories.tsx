@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
-import { useRouletteTransition } from './useRouletteTrantision';
+import { useRouletteTransition } from './useRouletteTransition';
 import { PlayerProbability } from '@/types/roulette';
 import { colorList } from '@/constants/color';
 

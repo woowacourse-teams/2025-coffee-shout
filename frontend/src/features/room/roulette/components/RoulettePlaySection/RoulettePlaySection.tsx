@@ -2,7 +2,7 @@ import Headline4 from '@/components/@common/Headline4/Headline4';
 import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import * as S from './RoulettePlaySection.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { useRouletteTransition } from '@/features/roulette/hooks/useRouletteTrantision';
+import { useRouletteTransition } from '@/features/roulette/hooks/useRouletteTransition';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 type Props = {
