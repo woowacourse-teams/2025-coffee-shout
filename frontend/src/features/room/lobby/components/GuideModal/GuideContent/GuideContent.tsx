@@ -2,11 +2,11 @@ import * as S from './GuideContent.styled';
 import { GuideInfo } from '../GuideModal';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 
-type GuideContentProps = {
+type Props = {
   pageData: GuideInfo;
 };
 
-const GuideContent = ({ pageData }: GuideContentProps) => {
+const GuideContent = ({ pageData }: Props) => {
   return (
     <S.ContentContainer>
       <S.ImageContainer>
