@@ -8,11 +8,11 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CardGameTaskExecutorsV2 {
+public class CardGameTaskExecutors {
 
     private final Map<JoinCode, MiniGameTaskManager<CardGameTaskType>> roomTaskExecutorMap;
 
-    public CardGameTaskExecutorsV2() {
+    public CardGameTaskExecutors() {
         this.roomTaskExecutorMap = new HashMap<>();
     }
 

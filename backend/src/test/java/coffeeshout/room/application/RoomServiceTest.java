@@ -3,7 +3,7 @@ package coffeeshout.room.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.config.TaskSchedulerConfig;
+import coffeeshout.config.TestTaskSchedulerConfig;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
@@ -31,7 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TaskSchedulerConfig.class)
+@Import(TestTaskSchedulerConfig.class)
 class RoomServiceTest {
 
     @Autowired

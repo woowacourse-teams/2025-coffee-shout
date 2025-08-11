@@ -9,15 +9,14 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.config.TaskSchedulerConfig;
-import coffeeshout.config.TestTaskScheduler;
+import coffeeshout.common.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.task.CardGameTaskType;
 import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.room.application.RoomService;
@@ -31,32 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-@Import(TaskSchedulerConfig.class)
-@ActiveProfiles("test")
-class CardGameServiceTest {
-
-    @MockitoBean
-    SimpMessagingTemplate messagingTemplate;
+class CardGameServiceTest extends ServiceTest {
 
     @Autowired
     CardGameService cardGameService;
@@ -68,28 +49,31 @@ class CardGameServiceTest {
     RoomService roomService;
 
     @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    CardGameTaskExecutors cardGameTaskExecutors;
 
     JoinCode joinCode;
 
     Player host;
 
+    Room room;
+
+    CardGame cardGame;
+
     @BeforeEach
     void setUp() {
         List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
-        Room room = roomService.createRoom(host.getName().value(), 1L);
+        room = roomService.createRoom(host.getName().value(), 1L);
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
         for (int i = 1; i < players.size(); i++) {
             room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
         }
-
-        // 모든 플레이어가 준비 완료여야 한다.
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);
         }
+        cardGame = (CardGame) room.startNextGame(host.getName().value());
     }
 
     @Nested
@@ -98,9 +82,7 @@ class CardGameServiceTest {
         @Test
         void 카드게임을_시작한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            Playable currentGame = room.startNextGame(host.getName().value());
-            cardGameService.start(currentGame, joinCode.value());
+            cardGameService.start(cardGame, joinCode.value());
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
 
             // when & then
@@ -111,26 +93,12 @@ class CardGameServiceTest {
 
                 MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
-
-//                softly.assertThat(executor.getFutureTasks()).hasSize(7);
             });
         }
 
         @Test
         void 카드게임이_종료되면_결과에_따라_룰렛의_가중치가_반영된다() throws InterruptedException, ExecutionException {
             // given
-            CountDownLatch latch = new CountDownLatch(1); // 예상되는 메시지 수
-
-            doAnswer(invocation -> {
-                latch.countDown();
-                return null;
-            }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/rank"),
-                    any(WebSocketResponse.class)
-            );
-
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             CardGame cardGameSpy = spy(cardGame);
             List<Player> players = room.getPlayers();
             MiniGameResult result = new MiniGameResult(Map.of(
@@ -156,21 +124,8 @@ class CardGameServiceTest {
 
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException, ExecutionException {
-            // given
-            CountDownLatch latch = new CountDownLatch(6); // 예상되는 메시지 수
-
-            doAnswer(invocation -> {
-                latch.countDown();
-                return null;
-            }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
-                    any(WebSocketResponse.class)
-            );
-
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            Playable miniGame = room.startNextGame(host.getName().value());
             // when
-            cardGameService.start(miniGame, joinCode.value());
+            cardGameService.start(cardGame, joinCode.value());
 
             cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
 
@@ -189,8 +144,6 @@ class CardGameServiceTest {
         @Test
         void 카드를_정상적으로_선택한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
             // when
@@ -203,8 +156,6 @@ class CardGameServiceTest {
         @Test
         void 카드_선택_후_게임_상태_메시지가_전송된다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
             // when
@@ -220,8 +171,6 @@ class CardGameServiceTest {
         @Test
         void 만약_선택된_카드를_고르면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
 
@@ -237,11 +186,6 @@ class CardGameServiceTest {
 
         @Test
         void 게임이_플레이_상태가_아니면_예외를_반환한다() {
-            // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            room.startNextGame(host.getName().value());
-            // PLAYING 상태로 변경하지 않음
-
             // when & then
             assertThatThrownBy(() ->
                     cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
@@ -251,8 +195,6 @@ class CardGameServiceTest {
         @Test
         void 존재하지_않는_플레이어면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
             // when & then
@@ -264,35 +206,12 @@ class CardGameServiceTest {
         @Test
         void 잘못된_카드_인덱스면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
             // when & then
             assertThatThrownBy(() ->
                     cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
-        }
-
-        @Test
-        @Disabled
-        void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException, ExecutionException {
-            // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
-            CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
-            cardGameService.start(cardGame, joinCode.getValue());
-            cardGame.startPlay();
-            List<Player> players = room.getPlayers();
-
-            // when
-            for (int i = 0; i < players.size(); i++) {
-                cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
-            }
-
-            Thread.sleep(5000);
-
-            // then
-            assertThat(cardGame.isFinishedThisRound()).isTrue();
         }
     }
 }

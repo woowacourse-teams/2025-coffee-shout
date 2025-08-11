@@ -6,7 +6,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.task.CardGameTaskType;
 import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
@@ -32,14 +32,14 @@ public class CardGameService implements MiniGameService {
     private final RoomQueryService roomQueryService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
-    private final CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    private final CardGameTaskExecutors cardGameTaskExecutors;
     private final TaskScheduler scheduler;
 
     @Autowired
     public CardGameService(
             RoomQueryService roomQueryService,
             LoggingSimpMessagingTemplate messagingTemplate,
-            CardGameTaskExecutorsV2 cardGameTaskExecutors,
+            CardGameTaskExecutors cardGameTaskExecutors,
             @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler
     ) {
         this.roomQueryService = roomQueryService;

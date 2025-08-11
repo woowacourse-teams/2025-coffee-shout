@@ -11,7 +11,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.task.CardGameTaskType;
 import coffeeshout.minigame.domain.task.MiniGameTaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
@@ -47,7 +47,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     ObjectMapper objectMapper;
 
     @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    CardGameTaskExecutors cardGameTaskExecutors;
 
     JoinCode joinCode;
 

@@ -1,6 +1,6 @@
 package coffeeshout.fixture;
 
-import coffeeshout.config.TaskSchedulerConfig;
+import coffeeshout.config.TestTaskSchedulerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,7 +23,7 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({TaskSchedulerConfig.class})
+@Import({TestTaskSchedulerConfig.class})
 public abstract class WebSocketIntegrationTestSupport {
 
     static final int CONNECT_TIMEOUT_SECONDS = 1;
