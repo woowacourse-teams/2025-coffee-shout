@@ -22,9 +22,6 @@ public class ChainedTask {
     }
 
     public void start(TaskScheduler scheduler, Duration delay) {
-        System.out.println("delay");
-        System.out.println(scheduler);
-
         future = scheduler.schedule(chainedRunnable(scheduler), Instant.now().plus(delay));
     }
 
