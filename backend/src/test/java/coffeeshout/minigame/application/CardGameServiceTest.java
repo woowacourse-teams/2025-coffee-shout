@@ -43,14 +43,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 @Import(TaskSchedulerConfig.class)
-@TestPropertySource(properties = {
-        "spring.main.allow-bean-definition-overriding=true"
-})
+@ActiveProfiles("test")
 class CardGameServiceTest {
 
     @MockitoBean
@@ -89,15 +91,6 @@ class CardGameServiceTest {
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);
         }
-    }
-    @Autowired
-    @Qualifier("miniGameTaskScheduler")
-    TaskScheduler scheduler;
-
-    @Test
-    void 스케줄러_주입_확인() {
-        System.out.println("📌 주입된 스케줄러 클래스: " + scheduler.getClass());
-        assertThat(scheduler).isInstanceOf(TestTaskScheduler.class);
     }
 
     @Nested

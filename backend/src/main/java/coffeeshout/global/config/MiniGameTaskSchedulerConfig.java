@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -14,9 +15,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class MiniGameTaskSchedulerConfig {
 
     @Bean(name = "miniGameTaskScheduler")
+    @Profile("!test")
     public TaskScheduler miniGameTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        System.out.println("prod: "+ scheduler);
 
         // 스레드 풀 크기 (동시 실행되는 스케줄 작업 수에 따라 조정)
         scheduler.setPoolSize(3);
