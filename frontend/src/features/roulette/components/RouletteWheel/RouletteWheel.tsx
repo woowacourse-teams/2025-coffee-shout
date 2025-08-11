@@ -24,8 +24,6 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
 
   const playersWithAngles = angles || convertProbabilitiesToAngles(playerProbabilities);
 
-  if (playersWithAngles.length === 0) return null;
-
   return (
     <S.Container>
       <S.Wrapper $isSpinning={isSpinning}>
