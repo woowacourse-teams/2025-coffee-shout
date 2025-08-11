@@ -100,53 +100,49 @@ class CardGameServiceRealTimeTest {
 
             /*
                 READY       DESCRIPTION       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
-                0~2000      2000 ~ 3500      3500~13500      13500~15000      15000~17000    17000~27000     27000~28500     28500~
+                0~3000      3000 ~ 4500      4500~14500      14500~16000      16000~18000    18000~28000     28000~29500     29500~
              */
-            Thread.sleep(1000);
+            Thread.sleep(1000); // 1000
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
 
-            Thread.sleep(2000);
+
+            Thread.sleep(3000); // 4000
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DESCRIPTION);
             });
 
-            Thread.sleep(4500); // 총 8초
+            Thread.sleep(4500); // 8500
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(0);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(6500);
-            // 총 14초 지남
+            Thread.sleep(6500); // 15000
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
             });
 
-            Thread.sleep(2500);
-            // 총 16.5
+            Thread.sleep(2500); // 17500
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
 
-            Thread.sleep(3500);
-            // 총 20
+            Thread.sleep(3500); // 21000
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(8000);
-            // 총 28초 지남
+            Thread.sleep(9500); // 29500
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(8);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
             });
 
-            Thread.sleep(2000);
-            // 총 30초 지남
+            Thread.sleep(2000); // 31000
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DONE);
             });
