@@ -15,7 +15,7 @@ export const WebSocketContext = createContext<WebSocketContextType | null>(null)
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
+    throw new Error('useWebSocket는 WebSocketProvider 안에서 사용해야 합니다.');
   }
   return context;
 };
