@@ -1,4 +1,3 @@
-import { Z_INDEX } from '@/constants/zIndex';
 import styled from '@emotion/styled';
 
 type WrapperProps = {
@@ -10,8 +9,6 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex: 1;
-  margin-bottom: 5rem;
 `;
 
 export const Wrapper = styled.div<WrapperProps>`
@@ -42,12 +39,8 @@ export const Wrapper = styled.div<WrapperProps>`
   }
 `;
 
-export const CenterImage = styled.img`
-  width: 64px;
-  height: 64px;
-  z-index: ${Z_INDEX.ROULETTE_WHEEL_CENTER_IMAGE};
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+export const PlayerNameText = styled.text`
+  fill: ${({ theme }) => theme.color.point[100]};
+  font-size: 12px;
+  font-weight: bold;
 `;

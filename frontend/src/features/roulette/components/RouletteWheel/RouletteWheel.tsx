@@ -1,44 +1,111 @@
-import RouletteWheelIcon from '@/assets/profile-red.svg';
-import { PlayerProbability } from '@/types/roulette';
 import { useTheme } from '@emotion/react';
 import { describeArc } from '../../utils/describeArc';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
+import { polarToCartesian } from '../../utils/polarToCartesian';
+import { PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
 
-type Props = {
-  playerProbabilities: PlayerProbability[];
-  isSpinning?: boolean;
+type Angle = { playerName: string; startAngle: number; endAngle: number };
+
+type Props = { angles?: Angle[]; playerProbabilities: PlayerProbability[]; isSpinning?: boolean };
+
+const getCenterAngle = (startAngle: number, endAngle: number) => {
+  return (startAngle + endAngle) / 2;
 };
 
-const RouletteWheel = ({ playerProbabilities, isSpinning = false }: Props) => {
-  const theme = useTheme();
-  const totalProbability = playerProbabilities.reduce((sum, player) => sum + player.probability, 0);
-  const playersWithAngles = getPlayersWithAngles(playerProbabilities, totalProbability);
+const getTextPosition = (centerAngle: number, radius: number = 80) => {
+  return polarToCartesian({ cx: 150, cy: 150, r: radius, angle: centerAngle });
+};
 
-  return (
-    <S.Container>
-      <S.Wrapper $isSpinning={isSpinning}>
-        <svg width={300} height={300} viewBox="0 0 300 300">
-          {playersWithAngles.map((player) => (
-            <path
-              key={player.playerName}
-              d={describeArc({
-                cx: 150,
-                cy: 150,
-                r: 140,
-                startAngle: player.startAngle,
-                endAngle: player.endAngle,
-              })}
-              fill={player.playerColor}
-              stroke={theme.color.point[100]}
-              strokeWidth="1"
-            />
-          ))}
-        </svg>
-        <S.CenterImage src={RouletteWheelIcon} alt="roulette-center" />
-      </S.Wrapper>
-    </S.Container>
-  );
+const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Props) => {
+  const theme = useTheme();
+
+  if (angles) {
+    return (
+      <S.Container>
+        <S.Wrapper $isSpinning={isSpinning}>
+          <svg width={300} height={300} viewBox="0 0 300 300">
+            {angles.map((player, index) => {
+              const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
+              const textPosition = getTextPosition(centerAngle);
+
+              return (
+                <g key={player.playerName}>
+                  <path
+                    d={describeArc({
+                      cx: 150,
+                      cy: 150,
+                      r: 140,
+                      startAngle: player.startAngle,
+                      endAngle: player.endAngle,
+                    })}
+                    fill={playerProbabilities[index].playerColor}
+                    stroke={theme.color.point[100]}
+                    strokeWidth="1"
+                  />
+                  <S.PlayerNameText
+                    x={textPosition.x}
+                    y={textPosition.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    {player.playerName}
+                  </S.PlayerNameText>
+                </g>
+              );
+            })}
+          </svg>
+        </S.Wrapper>
+      </S.Container>
+    );
+  }
+
+  if (playerProbabilities) {
+    const totalProbability = playerProbabilities.reduce(
+      (sum, player) => sum + player.probability,
+      0
+    );
+    const playersWithAngles = getPlayersWithAngles(playerProbabilities, totalProbability);
+
+    return (
+      <S.Container>
+        <S.Wrapper $isSpinning={isSpinning}>
+          <svg width={300} height={300} viewBox="0 0 300 300">
+            {playersWithAngles.map((player) => {
+              const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
+              const textPosition = getTextPosition(centerAngle);
+
+              return (
+                <g key={player.playerName}>
+                  <path
+                    d={describeArc({
+                      cx: 150,
+                      cy: 150,
+                      r: 140,
+                      startAngle: player.startAngle,
+                      endAngle: player.endAngle,
+                    })}
+                    fill={player.playerColor}
+                    stroke={theme.color.point[100]}
+                  />
+                  <S.PlayerNameText
+                    x={textPosition.x}
+                    y={textPosition.y}
+                    style={{
+                      textAnchor: 'middle',
+                      dominantBaseline: 'middle',
+                    }}
+                  >
+                    {player.playerName}
+                  </S.PlayerNameText>
+                </g>
+              );
+            })}
+          </svg>
+        </S.Wrapper>
+      </S.Container>
+    );
+  }
 };
 
 export default RouletteWheel;

@@ -9,7 +9,6 @@ export const Container = styled.div`
 `;
 
 export const ProbabilityText = styled.div`
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
   text-align: center;
+  padding-bottom: 2rem;
 `;
