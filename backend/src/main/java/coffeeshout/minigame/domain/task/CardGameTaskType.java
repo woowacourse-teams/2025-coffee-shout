@@ -19,6 +19,15 @@ public enum CardGameTaskType {
             }, getState().getDurationMillis());
         }
     },
+    FIRST_ROUND_DESCRIPTION(CardGameState.DESCRIPTION, CardGameRound.FIRST) {
+        @Override
+        public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
+            return new ChainedTask(() -> {
+                cardGame.updateDescription();
+                sendMessage.run();
+            }, getState().getDurationMillis());
+        }
+    },
     FIRST_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {

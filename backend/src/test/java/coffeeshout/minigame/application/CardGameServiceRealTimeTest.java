@@ -99,49 +99,54 @@ class CardGameServiceRealTimeTest {
             cardGameService.start(cardGame, joinCode.value());
 
             /*
-                READY       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
-                0~3000      3000~13000      13000~14500      14500~17500    17500~27500     27500~29000     29000~
+                READY       DESCRIPTION       PLAYING         SCORE_BOARD      LOADING        PLAYING         SCORE_BOARD     DONE
+                0~2000      2000 ~ 3500      3500~13500      13500~15000      15000~17000    17000~27000     27000~28500     28500~
              */
             Thread.sleep(1000);
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
 
-            Thread.sleep(4000); // 총 5초 (LOADING 3초 + PLAYING 시작 후 1초)
+            Thread.sleep(2000);
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DESCRIPTION);
+            });
+
+            Thread.sleep(4500); // 총 8초
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(0);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(8500);
-            // 총 13.5초 지남 (LOADING 3초 + PLAYING 10초 + SCORE_BOARD 시작 후 0.5초)
+            Thread.sleep(6500);
+            // 총 14초 지남
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
             });
 
             Thread.sleep(2500);
-            // 총 16.0초 지남 (+ 1.5초 SCORE_BOARD + 0.5초 LOADING)
+            // 총 16.5
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
             });
 
             Thread.sleep(3500);
-            // 총 19초 지남 (+ 3초 LOADING + 0.5초 PLAYING)
+            // 총 20
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(4);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.PLAYING);
             });
 
-            Thread.sleep(9000);
-            // 총 28초 지남 (+ 10초 PLAYING)
+            Thread.sleep(8000);
+            // 총 28초 지남
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getPlayerHands().totalHandSize()).isEqualTo(8);
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.SCORE_BOARD);
             });
 
             Thread.sleep(2000);
-            // 총 31초 지남 (+ 1.5초 SCORE_BOARD 완료 후)
+            // 총 30초 지남
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.DONE);
             });
