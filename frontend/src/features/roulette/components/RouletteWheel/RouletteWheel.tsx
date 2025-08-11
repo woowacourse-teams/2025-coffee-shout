@@ -2,11 +2,9 @@ import { useTheme } from '@emotion/react';
 import { describeArc } from '../../utils/describeArc';
 import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
 import { polarToCartesian } from '../../utils/polarToCartesian';
-import { PlayerProbability } from '@/types/roulette';
+import { Angle, PlayerProbability } from '@/types/roulette';
 import { colorList } from '@/constants/color';
 import * as S from './RouletteWheel.styled';
-
-type Angle = { playerName: string; startAngle: number; endAngle: number };
 
 type Props =
   | { angles: Angle[]; playerProbabilities?: never; isSpinning?: boolean }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { PlayerProbability } from '@/types/roulette';
+import { Angle, PlayerProbability } from '@/types/roulette';
 import { interpolateAngles } from '../utils/interpolateAngles';
 
 const ANIMATION_DURATION = 1600; // ms
@@ -13,9 +13,7 @@ export const useRouletteTransition = (
   prev: PlayerProbability[] | null,
   current: PlayerProbability[] | null
 ) => {
-  const [angles, setAngles] = useState<
-    { playerName: string; startAngle: number; endAngle: number }[] | null
-  >(null);
+  const [angles, setAngles] = useState<Angle[] | null>(null);
 
   const requestRef = useRef<number>(null);
   const startTimeRef = useRef<number | null>(null);
