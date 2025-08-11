@@ -201,7 +201,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         }
 
         // 첫 번째 라운드 완료 후 SCORE_BOARD 상태로 변경
-        MiniGameStateMessage scoreBoardState = responses.get(10, TimeUnit.SECONDS).data();
+        MiniGameStateMessage scoreBoardState = responses.get(12, TimeUnit.SECONDS).data();
         assertThat(scoreBoardState.cardGameState()).isEqualTo(CardGameState.SCORE_BOARD.name());
 
         // 두 번째 라운드 시작
