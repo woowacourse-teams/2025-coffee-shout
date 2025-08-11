@@ -19,4 +19,9 @@ export type ProbabilityHistory = {
   current: PlayerProbability[];
 };
 
-export type Angle = { playerName: string; startAngle: number; endAngle: number };
+export type Angle = {
+  playerName: string;
+  startAngle: number;
+  endAngle: number;
+  playerColor: ColorList;
+};
