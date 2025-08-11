@@ -153,11 +153,9 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
         final String sessionId = accessor.getSessionId();
 
         // STOMP 명령이 아닌 내부 메시지는 무시
-        if (!(commandObj instanceof StompCommand)) {
+        if (!(commandObj instanceof final StompCommand command)) {
             return;
         }
-
-        final StompCommand command = (StompCommand) commandObj;
 
         try {
             if (command == StompCommand.CONNECT && sent) {
