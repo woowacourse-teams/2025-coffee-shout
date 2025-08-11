@@ -13,7 +13,7 @@ const GuideContent = ({ pageData }: Props) => {
       <S.TextContainer>
         <Headline4>{pageData.title}</Headline4>
         <S.DescriptionWrapper>
-          {pageData.description.split('\n').map((line, index) => (
+          {pageData.description.map((line, index) => (
             <S.Description key={index}>{line}</S.Description>
           ))}
         </S.DescriptionWrapper>
