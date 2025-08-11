@@ -30,14 +30,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
-    implementation("io.micrometer:micrometer-registry-cloudwatch2")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 tasks.withType<Test> {
