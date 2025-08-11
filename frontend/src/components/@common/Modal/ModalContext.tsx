@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, ReactNode, useState } from 'react';
+import { createContext, PropsWithChildren, ReactNode, useCallback, useState } from 'react';
 import Modal from './Modal';
 
 type Options = {
@@ -17,15 +17,15 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
   const [content, setContent] = useState<ReactNode | null>(null);
   const [options, setOptions] = useState<Options>({});
 
-  const openModal = (content: ReactNode, options: Options = {}) => {
+  const openModal = useCallback((content: ReactNode, options: Options = {}) => {
     setContent(content);
     setOptions(options);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setContent(null);
     setOptions({});
-  };
+  }, []);
 
   return (
     <ModalContext.Provider value={{ openModal, closeModal }}>

@@ -23,6 +23,7 @@ import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { colorList } from '@/constants/color';
+import GuideModal from '../components/GuideModal/GuideModal';
 import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
@@ -33,7 +34,7 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
@@ -172,6 +173,24 @@ const LobbyPage = () => {
       }
     })();
   }, [joinCode]);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('coffee-shout-first-time-user');
+
+    if (!hasSeenGuide) {
+      openModal(
+        <GuideModal
+          onClose={() => {
+            localStorage.setItem('coffee-shout-first-time-user', 'true');
+            closeModal();
+          }}
+        />,
+        {
+          showCloseButton: false,
+        }
+      );
+    }
+  }, [openModal, closeModal]);
 
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection participants={participants} />,
