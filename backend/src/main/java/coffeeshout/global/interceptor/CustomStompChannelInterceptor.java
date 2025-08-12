@@ -65,7 +65,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                     final String menuId = accessor.getFirstNativeHeader("menuId");
 
                     if (joinCode != null && playerName != null && menuId != null) {
-                        final String playerKey = joinCode + ":" + playerName + ":" + menuId;
+                        final String playerKey = joinCode + ":" + playerName;
 
                         // 기존 세션 있으면 재연결, 없으면 첫 연결
                         String oldSessionId = playerSessionMap.get(playerKey);
@@ -257,14 +257,13 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     private void handlePlayerDisconnection(String playerKey, String sessionId, String reason) {
         try {
             final String[] parts = playerKey.split(":");
-            if (parts.length != 3) {
+            if (parts.length != 2) {
                 log.warn("잘못된 플레이어 키 형식: {}", playerKey);
                 return;
             }
 
             final String joinCode = parts[0];
             final String playerName = parts[1];
-            final String menuId = parts[2];
 
             log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
 
