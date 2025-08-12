@@ -1,3 +1,5 @@
+import { CardGameRound } from '@/constants/miniGame';
+
 export const MINI_GAME_NAME_MAP = {
   CARD_GAME: '카드게임',
   // '31_GAME': '랜덤 31222',
@@ -10,8 +12,6 @@ export const MINI_GAME_DESCRIPTION: Record<MiniGameType, string[]> = {
 export type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
 export type CardGameState = 'READY' | 'LOADING' | 'PLAYING' | 'SCORE_BOARD' | 'DONE';
-
-export type CardGameRound = 'FIRST' | 'SECOND';
 
 export type CardType = 'ADDITION' | 'MULTIPLIER';
 

@@ -2,9 +2,10 @@ import { PropsWithChildren, useCallback, useState } from 'react';
 import { CardGameContext } from './CardGameContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '../Identifier/IdentifierContext';
-import { CardGameRound, CardGameState, CardGameStateData, CardInfo } from '@/types/miniGame';
+import { CardGameState, CardGameStateData, CardInfo } from '@/types/miniGame';
 
 import { useNavigate, useParams } from 'react-router-dom';
+import { CardGameRound } from '@/constants/miniGame';
 
 export type SelectedCardInfo = Record<
   CardGameRound,
