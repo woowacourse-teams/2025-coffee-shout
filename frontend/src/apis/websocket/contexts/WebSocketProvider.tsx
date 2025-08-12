@@ -20,6 +20,8 @@ type WebSocketError = {
 
 type WebSocketMessage<T> = WebSocketSuccess<T> | WebSocketError;
 
+const MAX_RECONNECT_ATTEMPTS = 3;
+
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -27,7 +29,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const wasConnectedBeforeBackground = useRef(true);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 3;
 
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
   const { joinCode, myName, menuId } = useIdentifier();
@@ -38,7 +39,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
-      // joinCode와 myName이 유효한 값인지 확인
       if (!joinCode || !myName || !menuId) {
         console.log('⚠️ WebSocket 연결 시도 건너뜀: joinCode, myName, menuId 가 없음');
         return;
@@ -196,14 +196,14 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       // 앱이 포그라운드로 전환됨
       if (wasConnectedBeforeBackground.current) {
         // 최대 재연결 시도 횟수 체크
-        if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          console.log(`❌ 최대 재연결 시도 횟수 초과 (${maxReconnectAttempts}회) - 재연결 중단`);
+        if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
+          console.log(`❌ 최대 재연결 시도 횟수 초과 (${MAX_RECONNECT_ATTEMPTS}회) - 재연결 중단`);
           wasConnectedBeforeBackground.current = false;
           return;
         }
 
         console.log(
-          `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`
+          `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${reconnectAttemptsRef.current + 1}/${MAX_RECONNECT_ATTEMPTS})`
         );
 
         // 기존 재연결 타이머가 있다면 제거
