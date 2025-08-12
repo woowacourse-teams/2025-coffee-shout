@@ -6,6 +6,7 @@ import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,10 +20,11 @@ public class Roulette {
         this.playerProbabilities = new LinkedHashMap<>();
     }
 
-    public Player spin() {
+    public Winner spin() {
         final RouletteRanges rouletteRanges = new RouletteRanges(playerProbabilities);
         final int randomNumber = randomPicker.nextInt(1, rouletteRanges.endValue());
-        return rouletteRanges.pickPlayer(randomNumber);
+        final Player pickedPlayer = rouletteRanges.pickPlayer(randomNumber);
+        return Winner.from(pickedPlayer);
     }
 
     public void join(Player player) {
