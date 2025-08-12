@@ -30,7 +30,6 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     private final RoomService roomService;
     private final RoomQueryService roomQueryService;
     private final ApplicationEventPublisher eventPublisher;
-//    private final LoggingSimpMessagingTemplate messagingTemplate; // 순환 의존성 해결을 위해 제거
 
     // 중복 처리 방지용
     private final Set<String> processedDisconnections = ConcurrentHashMap.newKeySet();
