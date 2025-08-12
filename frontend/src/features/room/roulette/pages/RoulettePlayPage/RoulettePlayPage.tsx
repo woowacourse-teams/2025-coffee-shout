@@ -64,7 +64,7 @@ const RoulettePlayPage = () => {
       const timer = setTimeout(() => {
         setIsSpinning(false);
         navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
-      }, 7000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [isSpinning, winner, navigate, joinCode]);
