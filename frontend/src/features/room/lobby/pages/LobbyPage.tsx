@@ -46,9 +46,17 @@ const LobbyPage = () => {
   const handleParticipant = useCallback(
     (data: ParticipantResponse) => {
       setParticipants(data);
-      setMenuId(data[0].menuResponse.id);
+
+      const menuId = data.find((participant) => participant.playerName === myName)?.menuResponse.id;
+
+      if (!menuId) {
+        alert('메뉴 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      setMenuId(menuId);
     },
-    [setMenuId]
+    [setMenuId, myName]
   );
 
   // TODO: 나중에 외부 state 로 분리할 것
