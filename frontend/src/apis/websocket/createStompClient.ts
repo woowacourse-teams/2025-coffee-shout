@@ -2,7 +2,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { getWebSocketUrl } from './utils/getWebSocketUrl';
 
-export const createStompClient = () => {
+export const createStompClient = (joinCode: string, playerName: string, menuId: number) => {
   const wsUrl = getWebSocketUrl();
 
   const client = new Client({
@@ -11,6 +11,7 @@ export const createStompClient = () => {
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
+    connectHeaders: { joinCode, playerName, menuId: menuId.toString() },
   });
 
   return client;

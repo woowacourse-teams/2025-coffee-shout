@@ -40,10 +40,8 @@ type EnterRoomResponse = {
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
-
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
-
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
@@ -104,7 +102,7 @@ const EntryMenuPage = () => {
         menuId,
       });
       setJoinCode(joinCode);
-      startSocket();
+      startSocket(joinCode, myName, menuId);
     };
 
     const handleGuest = async () => {
@@ -117,7 +115,7 @@ const EntryMenuPage = () => {
         }
       );
       setJoinCode(_joinCode);
-      startSocket();
+      startSocket(_joinCode, myName, menuId);
     };
 
     try {

@@ -3,12 +3,12 @@ import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 import { Player } from '@/types/player';
 import * as S from './ParticipantSection.styled';
 import { getMenuIcon } from './utils/getMenuIcon';
-import { colorList } from '@/constants/color';
 
 const TOTAL_PARTICIPANTS = 9;
 
@@ -18,14 +18,23 @@ export const ParticipantSection = ({ participants }: Props) => {
   const { myName } = useIdentifier();
   const { openModal, closeModal } = useModal();
 
+  console.log('participants: ', participants);
+  console.log('myName: ', myName);
+
+  const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
+
   const handleModifyMenu = () => {
+    if (!mySelect) {
+      alert('⚠️ 내 정보가 존재하지 않아 메뉴 변경 모달을 열 수 없습니다.');
+      return;
+    }
+
     openModal(<MenuModifyModal myMenu={mySelect.menuResponse.name} onClose={closeModal} />, {
       title: '음료 변경',
       showCloseButton: true,
     });
   };
 
-  const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
   );
