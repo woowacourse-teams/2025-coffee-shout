@@ -79,7 +79,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                             log.info("플레이어 재연결 매핑: playerKey={}, sessionId={}", playerKey, sessionId);
 
                             // 재연결 처리
-                            handlePlayerReconnection(joinCode, playerName, Long.getLong(menuId), sessionId);
+                            handlePlayerReconnection(joinCode, playerName, Long.parseLong(menuId), sessionId);
                         } else {
                             playerSessionMap.put(playerKey, sessionId);
                             sessionPlayerMap.put(sessionId, playerKey);
