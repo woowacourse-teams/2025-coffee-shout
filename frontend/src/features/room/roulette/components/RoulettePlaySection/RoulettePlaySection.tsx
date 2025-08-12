@@ -24,22 +24,16 @@ const RoulettePlaySection = ({ isSpinning, winner }: Props) => {
 
   const myProbabilityChange = myCurrentProbability - myPrevProbability;
 
+  const shouldComputeFinalRotation = isSpinning && winner;
+  const finalRotation = shouldComputeFinalRotation
+    ? calculateFinalRotation(convertProbabilitiesToAngles(probabilityHistory.current), winner)
+    : 0;
+
   if (!angles) return null;
 
   return (
     <S.Container>
-      <RouletteWheel
-        isSpinning={isSpinning}
-        angles={angles}
-        finalRotation={
-          isSpinning
-            ? calculateFinalRotation(
-                convertProbabilitiesToAngles(probabilityHistory.current),
-                winner
-              )
-            : 0
-        }
-      />
+      <RouletteWheel isSpinning={isSpinning} angles={angles} finalRotation={finalRotation} />
       <S.ProbabilityText>
         <Headline4>
           당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}
