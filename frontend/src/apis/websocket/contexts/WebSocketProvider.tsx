@@ -44,18 +44,18 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
-      const stompClient = createStompClient(joinCode, myName, menuId);
+      const stompClient = createStompClient({ joinCode, playerName: myName, menuId });
 
       stompClient.onConnect = () => {
         setIsConnected(true);
         reconnectAttemptsRef.current = 0;
         wasConnectedBeforeBackground.current = false;
-        console.log('✅WebSocket 연결');
+        console.log('✅ WebSocket 연결');
       };
 
       stompClient.onDisconnect = () => {
         setIsConnected(false);
-        console.log('❌WebSocket 연결 해제');
+        console.log('❌ WebSocket 연결 해제');
       };
 
       stompClient.onStompError = (frame: IFrame) => {
@@ -220,7 +220,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       }
     }
 
-    // cleanup
     return () => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);

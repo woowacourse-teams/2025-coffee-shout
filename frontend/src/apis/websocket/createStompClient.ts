@@ -2,7 +2,13 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { getWebSocketUrl } from './utils/getWebSocketUrl';
 
-export const createStompClient = (joinCode: string, playerName: string, menuId: number) => {
+type Props = {
+  joinCode: string;
+  playerName: string;
+  menuId: number;
+};
+
+export const createStompClient = ({ joinCode, playerName, menuId }: Props) => {
   const wsUrl = getWebSocketUrl();
 
   const client = new Client({
