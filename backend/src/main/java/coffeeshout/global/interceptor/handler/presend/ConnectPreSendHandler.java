@@ -3,7 +3,6 @@ package coffeeshout.global.interceptor.handler.presend;
 import coffeeshout.global.interceptor.handler.PreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
@@ -12,7 +11,6 @@ import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -26,7 +24,6 @@ public class ConnectPreSendHandler implements PreSendHandler {
     private final WebSocketMetricService webSocketMetricService;
     private final RoomQueryService roomQueryService;
     private final MenuQueryService menuQueryService;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public StompCommand getCommand() {
@@ -42,34 +39,43 @@ public class ConnectPreSendHandler implements PreSendHandler {
         final String menuId = accessor.getFirstNativeHeader("menuId");
 
         if (joinCode != null && playerName != null && menuId != null) {
-            // 기존 세션 있으면 재연결, 없으면 첫 연결
-            String oldSessionId = sessionManager.getExistingSessionId(joinCode, playerName);
-            if (oldSessionId != null) {
-                log.info("플레이어 재연결 감지: joinCode={}, playerName={}, oldSessionId={}", 
-                        joinCode, playerName, oldSessionId);
-                
-                // 새 세션으로 등록
-                sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
-                
-                // 재연결 처리
-                Long parsedMenuId = parseMenuId(menuId);
-                if (parsedMenuId != null) {
-                    handlePlayerReconnection(joinCode, playerName, parsedMenuId, sessionId);
-                } else {
-                    log.warn("잘못된 menuId 형식으로 재연결 실패: joinCode={}, playerName={}, menuId={}", 
-                            joinCode, playerName, menuId);
-                    sessionManager.removeSession(sessionId);
-                }
-            } else {
-                // 첫 연결 등록
-                sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
-                
-                // 첫 연결 처리  
-                handlePlayerFirstConnection(joinCode, playerName);
-            }
+            processPlayerConnection(sessionId, joinCode, playerName, menuId);
         }
 
         webSocketMetricService.startConnection(sessionId);
+    }
+
+    private void processPlayerConnection(String sessionId, String joinCode, String playerName, String menuId) {
+        // 기존 세션 있으면 재연결, 없으면 첫 연결
+        String oldSessionId = sessionManager.getExistingSessionId(joinCode, playerName);
+        if (oldSessionId != null) {
+            processPlayerReconnect(sessionId, joinCode, playerName, menuId, oldSessionId);
+            return;
+        }
+        // 첫 연결 등록 & 처리
+        sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
+
+        handlePlayerFirstConnection(joinCode, playerName);
+    }
+
+    private void processPlayerReconnect(String sessionId, String joinCode, String playerName, String menuId,
+                                        String oldSessionId) {
+        log.info("플레이어 재연결 감지: joinCode={}, playerName={}, oldSessionId={}",
+                joinCode, playerName, oldSessionId);
+
+        // 새 세션으로 등록
+        sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
+
+        // 재연결 처리
+        Long parsedMenuId = parseMenuId(menuId);
+        if (parsedMenuId != null) {
+            handlePlayerReconnection(joinCode, playerName, parsedMenuId, sessionId);
+            return;
+        }
+
+        log.warn("잘못된 menuId 형식으로 재연결 실패: joinCode={}, playerName={}, menuId={}",
+                joinCode, playerName, menuId);
+        sessionManager.removeSession(sessionId);
     }
 
     private void handlePlayerFirstConnection(String joinCode, String playerName) {
@@ -85,7 +91,7 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
             // 2. 플레이어가 방에 있는지 확인
             final Menu menu = menuQueryService.findById(menuId);
-            room.joinGuest(new PlayerName(playerName), menu);
+            room.reJoin(new PlayerName(playerName), menu);
 
             // 3. 방 상태 확인
             if (room.isPlayingState()) {
@@ -96,7 +102,6 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
             // 4. READY 상태면 재연결 허용 + 현재 상태 전송
             log.info("방 재연결 허용: joinCode={}, playerName={}", joinCode, playerName);
-            sendCurrentRoomState(joinCode, newSessionId);
 
         } catch (Exception e) {
             log.warn("재연결 실패: joinCode={}, playerName={}, error={}", joinCode, playerName, e.getMessage());
@@ -104,15 +109,6 @@ public class ConnectPreSendHandler implements PreSendHandler {
             sessionManager.removeSession(newSessionId);
             final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
             // TODO: 플레이어 disconnect 처리 로직 필요 (다른 핸들러에서 처리)
-        }
-    }
-
-    private void sendCurrentRoomState(String joinCode, String newSessionId) {
-        try {
-            log.info("방 상태 전송 이벤트 발행: joinCode={}, sessionId={}", joinCode, newSessionId);
-            eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_RECONNECTED"));
-        } catch (Exception e) {
-            log.error("방 상태 전송 실패: joinCode={}, sessionId={}", joinCode, newSessionId, e);
         }
     }
 
