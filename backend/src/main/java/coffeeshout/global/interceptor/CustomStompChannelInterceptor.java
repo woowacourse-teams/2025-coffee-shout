@@ -65,7 +65,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                     final String menuId = accessor.getFirstNativeHeader("menuId");
 
                     if (joinCode != null && playerName != null && menuId != null) {
-                        final String playerKey = joinCode + ":" + playerName + ':' + menuId;
+                        final String playerKey = joinCode + ":" + playerName + ":" + menuId;
 
                         // 기존 세션 있으면 재연결, 없으면 첫 연결
                         String oldSessionId = playerSessionMap.get(playerKey);
@@ -107,9 +107,8 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
                 case DISCONNECT:
                     log.info("WebSocket 연결 해제 요청: sessionId={}", sessionId);
-                    final String disconnectedPlayerKey = sessionPlayerMap.remove(sessionId);
+                    final String disconnectedPlayerKey = sessionPlayerMap.get(sessionId);
                     if (disconnectedPlayerKey != null) {
-                        playerSessionMap.remove(disconnectedPlayerKey);
                         log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
 
                         // 방에서 플레이어 제거
