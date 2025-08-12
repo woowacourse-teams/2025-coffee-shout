@@ -48,6 +48,24 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       const isSecondRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'SECOND';
       const isGameDone = cardGameState === 'DONE';
 
+      const handleScoreBoard = () => {
+        setCurrentCardGameState('SCORE_BOARD');
+        setCardInfos(cardInfoMessages);
+
+        const mySelectedCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+        if (!mySelectedCardInfo) return;
+        if (selectedCardInfo[currentRound].isSelected) return;
+
+        setSelectedCardInfo((prev) => ({
+          ...prev,
+          [currentRound]: {
+            isSelected: true,
+            type: mySelectedCardInfo.cardType,
+            value: mySelectedCardInfo.value,
+          },
+        }));
+      };
+
       if (isFirstRoundPlaying) {
         setStartCardGame(true);
         setCurrentCardGameState('PLAYING');
@@ -56,24 +74,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       }
 
       if (isFirstRoundScoreBoard) {
-        setCurrentCardGameState('SCORE_BOARD');
-        setCardInfos(cardInfoMessages);
-
-        const myRandomSelectedCard = cardInfoMessages.find((card) => card.playerName === myName);
-
-        if (!myRandomSelectedCard) {
-          return;
-        }
-
-        setSelectedCardInfo((prev) => ({
-          ...prev,
-          [currentRound]: {
-            isSelected: true,
-            type: myRandomSelectedCard.cardType,
-            value: myRandomSelectedCard.value,
-          },
-        }));
-
+        handleScoreBoard();
         return;
       }
 
@@ -90,32 +91,18 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setCurrentCardGameState('PLAYING');
         return;
       }
+
       if (isSecondRoundScoreBoard) {
-        setCurrentCardGameState('SCORE_BOARD');
-        setCardInfos(cardInfoMessages);
-
-        const myRandomSelectedCard = cardInfoMessages.find((card) => card.playerName === myName);
-
-        if (!myRandomSelectedCard) {
-          return;
-        }
-
-        setSelectedCardInfo((prev) => ({
-          ...prev,
-          [currentRound]: {
-            isSelected: true,
-            type: myRandomSelectedCard.cardType,
-            value: myRandomSelectedCard.value,
-          },
-        }));
+        handleScoreBoard();
         return;
       }
+
       if (isGameDone) {
         navigate(`/room/${joinCode}/${miniGameType}/result`);
         return;
       }
     },
-    [navigate, joinCode, miniGameType, myName, setSelectedCardInfo]
+    [navigate, joinCode, miniGameType, myName, setSelectedCardInfo, selectedCardInfo]
   );
 
   useWebSocketSubscription(`/room/${joinCode}/gameState`, handleCardGameState);
