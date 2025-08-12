@@ -55,4 +55,9 @@ public class Players {
             return false;
         });
     }
+
+    public boolean existsByName(PlayerName playerName) {
+        return players.stream()
+                .anyMatch(player -> player.sameName(playerName));
+    }
 }

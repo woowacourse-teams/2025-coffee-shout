@@ -211,9 +211,9 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
             // 1. 방 존재 확인
             final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
-            // 2. 플레이어가 방에 있는지 확인
+            // 2. 방에 플레이어 재생성
             final Menu menu = menuQueryService.findById(menuId);
-            room.joinGuest(new PlayerName(playerName), menu);
+            room.reJoin(new PlayerName(playerName), menu);
 
             // 3. 방 상태 확인
             if (room.isPlayingState()) {
