@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.HandlerMethod;
 
 @RestControllerAdvice
 @Slf4j
@@ -21,10 +20,9 @@ public class RestExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(
             Exception exception,
-            HandlerMethod handler,
             HttpServletRequest request
     ) {
-        logError(exception, handler, request);
+        logError(exception, request);
         return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, new ErrorCode() {
             @Override
             public String getCode() {
@@ -41,30 +39,27 @@ public class RestExceptionHandler {
     @ExceptionHandler(InvalidArgumentException.class)
     public ProblemDetail handleInvalidArgumentException(
             InvalidArgumentException exception,
-            HandlerMethod handler,
             HttpServletRequest request
     ) {
-        logWarning(exception, handler, request);
+        logWarning(exception, request);
         return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(InvalidStateException.class)
     public ProblemDetail handleInvalidStateException(
             InvalidStateException exception,
-            HandlerMethod handler,
             HttpServletRequest request
     ) {
-        logError(exception, handler, request);
+        logError(exception, request);
         return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(NotExistElementException.class)
     public ProblemDetail handleNotExistElementException(
             NotExistElementException exception,
-            HandlerMethod handler,
             HttpServletRequest request
     ) {
-        logWarning(exception, handler, request);
+        logWarning(exception, request);
         return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
     }
 
@@ -80,13 +75,10 @@ public class RestExceptionHandler {
 
     private void logError(
             final Exception e,
-            final HandlerMethod handler,
             final HttpServletRequest request
     ) {
         final String logMessage = String.format(
-                "%s.%s | method=%s uri=%s exception=%s message=%s",
-                handler.getBeanType().getSimpleName(),
-                handler.getMethod().getName(),
+                "method=%s uri=%s exception=%s message=%s",
                 request.getMethod(),
                 request.getRequestURI(),
                 e.getClass().getSimpleName(),
@@ -97,13 +89,10 @@ public class RestExceptionHandler {
 
     private void logWarning(
             final Exception e,
-            final HandlerMethod handler,
             final HttpServletRequest request
     ) {
         final String logMessage = String.format(
-                "%s.%s | method=%s uri=%s exception=%s message=%s",
-                handler.getBeanType().getSimpleName(),
-                handler.getMethod().getName(),
+                "method=%s uri=%s exception=%s message=%s",
                 request.getMethod(),
                 request.getRequestURI(),
                 e.getClass().getSimpleName(),
