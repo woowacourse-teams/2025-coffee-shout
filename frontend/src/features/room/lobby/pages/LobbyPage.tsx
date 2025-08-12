@@ -18,6 +18,7 @@ import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
+import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
@@ -33,7 +34,7 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { myName, joinCode, setMenuId } = useIdentifier();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
@@ -108,7 +109,15 @@ const LobbyPage = () => {
   };
 
   const handleClickGameStartButton = () => {
-    if (participants.length < 2) return;
+    if (participants.length < 2) {
+      alert('참여자가 없어 게임을 진행할 수 없습니다.');
+      return;
+    }
+
+    if (selectedMiniGames.length === 0) {
+      alert('선택된 미니게임이 없어 게임을 진행할 수 없습니다.');
+      return;
+    }
 
     send(`/room/${joinCode}/minigame/command`, {
       commandType: 'START_MINI_GAME',
@@ -184,6 +193,24 @@ const LobbyPage = () => {
       }
     })();
   }, [joinCode]);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('coffee-shout-first-time-user');
+
+    if (!hasSeenGuide) {
+      openModal(
+        <GuideModal
+          onClose={() => {
+            localStorage.setItem('coffee-shout-first-time-user', 'true');
+            closeModal();
+          }}
+        />,
+        {
+          showCloseButton: false,
+        }
+      );
+    }
+  }, [openModal, closeModal]);
 
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection participants={participants} />,
