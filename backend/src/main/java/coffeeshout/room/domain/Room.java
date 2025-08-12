@@ -161,6 +161,31 @@ public class Room {
         return players.hasDuplicateName(guestName);
     }
 
+    public boolean removePlayer(PlayerName playerName) {
+        Player playerToRemove = null;
+        try {
+            playerToRemove = findPlayer(playerName);
+        } catch (Exception e) {
+            // 플레이어가 이미 없으면 false 반환
+            return false;
+        }
+
+        boolean removed = players.removePlayer(playerName);
+        if (removed && playerToRemove != null) {
+            roulette.removePlayer(playerToRemove);
+        }
+        return removed;
+    }
+
+    public void reJoin(PlayerName playerName, Menu menu) {
+        validateRoomReady();
+        validateCanJoin();
+        validatePlayerNameNotDuplicate(playerName);
+
+        final Player player = createPlayerByRole(playerName, menu);
+        join(player);
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -196,19 +221,10 @@ public class Room {
         }
     }
 
-    public boolean removePlayer(PlayerName playerName) {
-        Player playerToRemove = null;
-        try {
-            playerToRemove = findPlayer(playerName);
-        } catch (Exception e) {
-            // 플레이어가 이미 없으면 false 반환
-            return false;
+    private Player createPlayerByRole(PlayerName playerName, Menu menu) {
+        if (host.sameName(playerName)) {
+            return Player.createHost(playerName, menu);
         }
-
-        boolean removed = players.removePlayer(playerName);
-        if (removed && playerToRemove != null) {
-            roulette.removePlayer(playerToRemove);
-        }
-        return removed;
+        return Player.createGuest(playerName, menu);
     }
 }
