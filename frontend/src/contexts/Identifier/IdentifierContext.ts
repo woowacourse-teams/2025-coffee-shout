@@ -9,6 +9,7 @@ type IdentifierContextType = {
   setMyName: (myName: string) => void;
   clearMyName: () => void;
 
+  // TODO: player 정보와 함께 사용하는 것이 좋을듯
   menuId: number;
   setMenuId: (menuId: number) => void;
   clearMenuId: () => void;
