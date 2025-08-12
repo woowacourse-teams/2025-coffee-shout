@@ -18,9 +18,6 @@ export const ParticipantSection = ({ participants }: Props) => {
   const { myName } = useIdentifier();
   const { openModal, closeModal } = useModal();
 
-  console.log('participants: ', participants);
-  console.log('myName: ', myName);
-
   const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
 
   const handleModifyMenu = () => {
