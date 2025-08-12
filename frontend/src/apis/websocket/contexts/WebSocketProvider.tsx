@@ -23,7 +23,7 @@ type WebSocketMessage<T> = WebSocketSuccess<T> | WebSocketError;
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const isVisible = usePageVisibility();
+  const { isVisible } = usePageVisibility();
   const wasConnectedBeforeBackground = useRef(true);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export const usePageVisibility = () => {
-  const [isVisible, setIsVisible] = useState(!document.hidden);
+  const [isVisible, setIsVisible] = useState<boolean>(!document.hidden);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -24,5 +24,5 @@ export const usePageVisibility = () => {
     };
   }, []);
 
-  return isVisible;
+  return { isVisible };
 };
