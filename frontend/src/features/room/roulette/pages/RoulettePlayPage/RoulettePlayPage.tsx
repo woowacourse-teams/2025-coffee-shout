@@ -64,7 +64,7 @@ const RoulettePlayPage = () => {
       const timer = setTimeout(() => {
         setIsSpinning(false);
         navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
-      }, 3000);
+      }, 7000);
       return () => clearTimeout(timer);
     }
   }, [isSpinning, winner, navigate, joinCode]);
@@ -79,7 +79,7 @@ const RoulettePlayPage = () => {
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
           {isRouletteView ? (
-            <RoulettePlaySection isSpinning={isSpinning} />
+            <RoulettePlaySection isSpinning={isSpinning} winner={winner} />
           ) : (
             <ProbabilityList playerProbabilities={probabilityHistory.current} />
           )}

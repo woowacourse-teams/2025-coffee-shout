@@ -4,12 +4,15 @@ import * as S from './RoulettePlaySection.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { useRouletteTransition } from '@/features/roulette/hooks/useRouletteTransition';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
+import { Angle } from '@/types/roulette';
 
 type Props = {
   isSpinning: boolean;
+  winner: string | null;
 };
 
-const RoulettePlaySection = ({ isSpinning }: Props) => {
+const RoulettePlaySection = ({ isSpinning, winner }: Props) => {
   const { myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
   const angles = useRouletteTransition(probabilityHistory.prev, probabilityHistory.current);
@@ -25,7 +28,18 @@ const RoulettePlaySection = ({ isSpinning }: Props) => {
 
   return (
     <S.Container>
-      <RouletteWheel isSpinning={isSpinning} angles={angles} />
+      <RouletteWheel
+        isSpinning={isSpinning}
+        angles={angles}
+        finalRotation={
+          isSpinning
+            ? calculateFinalRotation(
+                convertProbabilitiesToAngles(probabilityHistory.current),
+                winner
+              )
+            : 0
+        }
+      />
       <S.ProbabilityText>
         <Headline4>
           당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}
@@ -37,3 +51,25 @@ const RoulettePlaySection = ({ isSpinning }: Props) => {
 };
 
 export default RoulettePlaySection;
+
+const calculateFinalRotation = (finalAngles: Angle[], winner: string | null) => {
+  if (!winner) return 0;
+  const winnerData = finalAngles.find((player) => player.playerName === winner);
+  if (!winnerData) return 0;
+
+  // 당첨자 영역의 중앙 각도
+  const winnerCenterAngle = (winnerData.startAngle + winnerData.endAngle) / 2;
+
+  // 12시 방향에 맞추기 위한 회전 각도
+  let finalRotation = 360 - winnerCenterAngle;
+
+  // 회전 각도를 0 ~ 360 범위로 정규화
+  while (finalRotation < 0) {
+    finalRotation += 360;
+  }
+  while (finalRotation >= 360) {
+    finalRotation -= 360;
+  }
+
+  return finalRotation;
+};

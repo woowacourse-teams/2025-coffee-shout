@@ -1,5 +1,5 @@
 import { Angle, PlayerProbability } from '@/types/roulette';
-import { getPlayersWithAngles } from './getPlayerWithAngles.ts';
+import { convertProbabilitiesToAngles } from './convertProbabilitiesToAngles';
 
 type Props = {
   from: PlayerProbability[];
@@ -8,11 +8,8 @@ type Props = {
 };
 
 export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
-  const totalFrom = from.reduce((sum, p) => sum + p.probability, 0);
-  const totalTo = to.reduce((sum, p) => sum + p.probability, 0);
-
-  const fromAngles = getPlayersWithAngles(from, totalFrom);
-  const toAngles = getPlayersWithAngles(to, totalTo);
+  const fromAngles = convertProbabilitiesToAngles(from);
+  const toAngles = convertProbabilitiesToAngles(to);
 
   return fromAngles.map((fromPlayer, i) => {
     const toPlayer = toAngles[i];

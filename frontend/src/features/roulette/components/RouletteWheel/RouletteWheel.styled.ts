@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 
 type WrapperProps = {
   $isSpinning?: boolean;
+  $finalRotation?: number;
 };
 
 export const Container = styled.div`
@@ -21,13 +22,16 @@ export const Wrapper = styled.div<WrapperProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   position: relative;
+
+  --final-rotation: ${({ $finalRotation }) => $finalRotation ?? 0}deg;
+
   ${({ $isSpinning }) =>
     $isSpinning &&
     `
       animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
+      animation-fill-mode: forwards;
     `}
 
   @keyframes spin {
@@ -35,7 +39,7 @@ export const Wrapper = styled.div<WrapperProps>`
       transform: rotate(0deg);
     }
     100% {
-      transform: rotate(1080deg);
+      transform: rotate(calc(1080deg + var(--final-rotation)));
     }
   }
 `;
