@@ -221,7 +221,7 @@ public class Room {
         }
     }
 
-    private Player createPlayerByRole(PlayerName playerName, Menu menu) {
+    private Player createPlayer(PlayerName playerName, Menu menu) {
         if (host.sameName(playerName)) {
             return Player.createHost(playerName, menu);
         }
