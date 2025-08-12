@@ -1,4 +1,4 @@
-package coffeeshout.global.handler;
+package coffeeshout.global.interceptor;
 
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
