@@ -8,10 +8,9 @@ import CardBack from '../CardBack/CardBack';
 import { Card, CardType, CardValue } from '../../constants/cards';
 import CardFront from '../CardFront/CardFront';
 import { TOTAL_COUNT } from '@/types/round';
-import { CardGameRound, CardInfo } from '@/types/miniGame';
+import { CardInfo, SelectedCardInfo } from '@/types/miniGame';
 import { colorList } from '@/constants/color';
-import { SelectedCardInfo } from '@/contexts/CardGame/CardGameProvider';
-import { ROUND_NUMBER_MAP } from '@/constants/miniGame';
+import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
 
 type Props = {
   round: CardGameRound;
@@ -41,8 +40,8 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
               size="medium"
               card={
                 {
-                  type: selectedCardInfo['FIRST'].type as CardType,
-                  value: selectedCardInfo['FIRST'].value as CardValue,
+                  type: selectedCardInfo['FIRST'].type,
+                  value: selectedCardInfo['FIRST'].value,
                 } as Card
               }
             />
