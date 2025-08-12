@@ -61,6 +61,18 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setStartCardGame(true);
         setCurrentCardGameState('PLAYING');
         setCardInfos(cardInfoMessages);
+
+        const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+        if (!myCardInfo) return;
+
+        setSelectedCardInfo((prev) => ({
+          ...prev,
+          [currentRound]: {
+            isSelected: true,
+            type: myCardInfo.cardType,
+            value: myCardInfo.value,
+          },
+        }));
         return;
       }
 
@@ -80,6 +92,17 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setIsTransition(false);
         setCardInfos(cardInfoMessages);
         setCurrentCardGameState('PLAYING');
+        const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+        if (!myCardInfo) return;
+
+        setSelectedCardInfo((prev) => ({
+          ...prev,
+          [currentRound]: {
+            isSelected: true,
+            type: myCardInfo.cardType,
+            value: myCardInfo.value,
+          },
+        }));
         return;
       }
 
