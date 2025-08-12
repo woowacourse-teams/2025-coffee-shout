@@ -9,6 +9,7 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
 export const Wrapper = styled.div<WrapperProps>`
@@ -43,4 +44,18 @@ export const PlayerNameText = styled.text`
   fill: ${({ theme }) => theme.color.point[100]};
   font-size: 12px;
   font-weight: bold;
+`;
+
+export const Pin = styled.div`
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 30px solid ${({ theme }) => theme.color.gray[500]};
+  border-radius: 4px;
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 `;

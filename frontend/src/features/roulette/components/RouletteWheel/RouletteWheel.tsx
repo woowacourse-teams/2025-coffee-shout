@@ -26,6 +26,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
 
   return (
     <S.Container>
+      <RoulettePin />
       <S.Wrapper $isSpinning={isSpinning}>
         <svg
           width={WHEEL_CONFIG.SIZE}
@@ -80,4 +81,8 @@ const RouletteSlice = ({ player, strokeColor }: RouletteSliceProps) => {
       </S.PlayerNameText>
     </g>
   );
+};
+
+const RoulettePin = () => {
+  return <S.Pin />;
 };
