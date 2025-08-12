@@ -39,3 +39,12 @@ export type PlayerRank = {
   playerName: string;
   rank: number;
 };
+
+export type SelectedCardInfo = Record<
+  CardGameRound,
+  {
+    isSelected: boolean;
+    type: string | null;
+    value: number | null;
+  }
+>;

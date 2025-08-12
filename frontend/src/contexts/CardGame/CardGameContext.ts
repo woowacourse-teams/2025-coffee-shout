@@ -1,6 +1,5 @@
-import { CardGameState, CardInfo } from '@/types/miniGame';
+import { CardGameState, CardInfo, SelectedCardInfo } from '@/types/miniGame';
 import { createContext, Dispatch, SetStateAction, useContext } from 'react';
-import { SelectedCardInfo } from './CardGameProvider';
 import { CardGameRound } from '@/constants/miniGame';
 
 type CardGameContextType = {
