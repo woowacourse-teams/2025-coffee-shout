@@ -9,6 +9,11 @@ type Props = {
   isSpinning: boolean;
 };
 
+const formatPercent = new Intl.NumberFormat('ko-KR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 const RoulettePlaySection = ({ isSpinning }: Props) => {
   const { myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
@@ -33,7 +38,7 @@ const RoulettePlaySection = ({ isSpinning }: Props) => {
       <S.ProbabilityText>
         <Headline4>
           당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}
-          {myProbabilityChange}%
+          {formatPercent.format(myProbabilityChange)}%
         </Headline4>
       </S.ProbabilityText>
     </S.Container>
