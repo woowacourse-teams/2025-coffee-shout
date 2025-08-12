@@ -1,11 +1,6 @@
 spring:
   application:
-    name:
-      coffee-shout
-
-logging:
-  level:
-    root: info
+    name: coffee-shout
 
 management:
   endpoint:

@@ -41,9 +41,14 @@ JVM_OPTS="$JVM_OPTS -XX:+PrintGCDetails"
 JVM_OPTS="$JVM_OPTS -Xloggc:logs/gc.log"
 JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 
+# 환경 변수 설정 (기본값: prod)
+SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+echo "   🎯 활성 프로파일: $SPRING_PROFILES_ACTIVE"
+
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
 nohup java $JVM_OPTS \
+    -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE \
     -jar app/coffee-shout-backend.jar \
     > logs/application.log 2>&1 &
 

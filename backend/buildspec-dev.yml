@@ -3,6 +3,7 @@ version: 0.2
 env:
   variables:
     SNS_TOPIC_ARN: "arn:aws:sns:ap-northeast-2:843255971531:coffee-shout"
+    SPRING_PROFILES_ACTIVE: "dev"
 
 phases:
   install:
