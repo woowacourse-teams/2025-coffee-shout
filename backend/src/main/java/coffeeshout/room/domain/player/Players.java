@@ -37,8 +37,8 @@ public class Players {
         return players.size();
     }
 
-    public boolean hasDuplicateName(PlayerName playerNmae) {
-        return players.stream().anyMatch(player -> player.sameName(playerNmae));
+    public boolean hasDuplicateName(PlayerName playerName) {
+        return players.stream().anyMatch(player -> player.sameName(playerName));
     }
 
     public boolean isAllReady() {
