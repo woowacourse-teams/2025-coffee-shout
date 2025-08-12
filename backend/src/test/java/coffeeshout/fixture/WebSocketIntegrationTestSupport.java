@@ -1,11 +1,16 @@
 package coffeeshout.fixture;
 
+import coffeeshout.common.MessageResponse;
 import coffeeshout.config.TestTaskSchedulerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.test.json.JsonAssert;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -71,5 +77,27 @@ public abstract class WebSocketIntegrationTestSupport {
                 )
                 .get(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         return new TestStompSession(session, objectMapper);
+    }
+
+    protected void assertMessage(MessageResponse response, String payload) throws JSONException {
+        JSONAssert.assertEquals(response.payload(), payload, false);
+    }
+
+    protected void assertMessageContains(MessageResponse response, long duration, String expected) {
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.payload()).contains(expected);
+            softly.assertThat(response.duration()).isBetween(duration - 100, duration + 100);
+        });
+    }
+
+    protected void assertMessageContains(MessageResponse response, String expected) {
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.payload()).contains(expected);
+        });
+    }
+
+    protected void assertMessage(MessageResponse response, long duration, String payload) throws JSONException {
+        JSONAssert.assertEquals(response.payload(), payload, false);
+        Assertions.assertThat(response.duration()).isBetween(duration - 100, duration + 100);
     }
 }

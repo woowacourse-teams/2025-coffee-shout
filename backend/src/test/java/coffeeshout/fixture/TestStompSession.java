@@ -1,8 +1,7 @@
 package coffeeshout.fixture;
 
+import coffeeshout.common.MessageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -25,27 +24,14 @@ public class TestStompSession {
         this.objectMapper = objectMapper;
     }
 
-    public MessageCollector<String> subscribe(String subscribeEndPoint) {
-        MessageCollector<String> messageCollector = new MessageCollector<>();
-        session.subscribe(
-                subscribeEndPoint,
-                new MessageCollectorStompFrameHandler<>(messageCollector, String.class)
-        );
-        return messageCollector;
-    }
-
-    public <T> MessageCollector<T> subscribe(String subscribeEndpoint, TypeReference<T> typeRef) {
-        MessageCollector<T> messageCollector = new MessageCollector<>();
-        session.subscribe(
-                subscribeEndpoint,
-null
-//                new MessageCollectorStompFrameHandler<>(messageCollector, typeRef, objectMapper)
-        );
+    public MessageCollector subscribe(String subscribeEndPoint) {
+        MessageCollector messageCollector = new MessageCollector();
+        session.subscribe(subscribeEndPoint, new MessageCollectorStompFrameHandler(messageCollector));
         return messageCollector;
     }
 
     public void send(String sendEndpoint, Object bodyMessage) {
-        session.send(java.lang.String.format(sendEndpoint), bodyMessage);
+        session.send(String.format(sendEndpoint), bodyMessage);
     }
 
     public void send(String sendEndpoint, String jsonString) {
@@ -57,24 +43,26 @@ null
         }
     }
 
-    public static class MessageCollector<T> {
-        private final BlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    public static class MessageCollector {
+        private final BlockingQueue<String> queue = new LinkedBlockingQueue<>();
 
-        private void add(T message) {
+        private void add(String message) {
             queue.add(message);
         }
 
-        public T get() {
+        public MessageResponse get() {
             return get(DEFAULT_RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
 
-        public T get(long timeout, TimeUnit unit) {
+        public MessageResponse get(long timeout, TimeUnit unit) {
             try {
-                T message = queue.poll(timeout, unit);
+                long start = System.currentTimeMillis();
+                String message = queue.poll(timeout, unit);
                 if (message == null) {
                     throw new RuntimeException("메시지 수신 대기 시간을 초과했습니다");
                 }
-                return message;
+                long end = System.currentTimeMillis();
+                return new MessageResponse(end - start, message);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -89,17 +77,11 @@ null
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static class MessageCollectorStompFrameHandler<T> implements StompFrameHandler {
-        private final MessageCollector<T> messageCollector;
-        private final Class<T> payloadClass;
+    private static class MessageCollectorStompFrameHandler implements StompFrameHandler {
+        private final MessageCollector messageCollector;
 
-        public MessageCollectorStompFrameHandler(
-                MessageCollector<T> messageCollector,
-                Class<T> payloadClass
-        ) {
+        public MessageCollectorStompFrameHandler(MessageCollector messageCollector) {
             this.messageCollector = messageCollector;
-            this.payloadClass = payloadClass;
         }
 
         @Override
@@ -111,12 +93,8 @@ null
         public void handleFrame(StompHeaders headers, Object payload) {
             synchronized (messageCollector) {
                 try {
-                    if (payloadClass == String.class && payload != null) {
-                        String jsonString = new String((byte[]) payload, StandardCharsets.UTF_8);
-                        messageCollector.add((T) jsonString);
-                    } else {
-                        messageCollector.add((T) payload);
-                    }
+                    String jsonString = new String((byte[]) payload, StandardCharsets.UTF_8);
+                    messageCollector.add(jsonString);
                 } catch (Exception e) {
                     throw new RuntimeException("메시지 변환 실패: " + payload, e);
                 }
