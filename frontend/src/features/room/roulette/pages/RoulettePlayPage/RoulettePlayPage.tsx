@@ -24,7 +24,7 @@ const RoulettePlayPage = () => {
   const { joinCode, myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
 
-  // TODO: 나중에 외부 state 로 분리할 것
+  // TODO: 나중에 외부 state로 분리할 것
   // TODO: 이전 확률과 비교해서 룰렛 움직여야 하므로 이전 확률 또는 확률 변화값을 저장할 상태 필요
 
   const [isSpinning, setIsSpinning] = useState(false);
