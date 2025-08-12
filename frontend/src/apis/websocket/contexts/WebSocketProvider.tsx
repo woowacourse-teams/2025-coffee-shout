@@ -4,7 +4,6 @@ import { Client, IFrame } from '@stomp/stompjs';
 import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { createStompClient } from '../createStompClient';
 import { usePageVisibility } from '../hooks/usePageVisibility';
-import { useReconnectionPolicy } from '../hooks/useReconnectionPolicy';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
 type WebSocketSuccess<T> = {
@@ -29,7 +28,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 3;
-  const { shouldReconnect, getReconnectionDelay, currentPolicy } = useReconnectionPolicy();
   const { joinCode, myName, menuId } = useIdentifier();
 
   const startSocket = useCallback(
@@ -48,7 +46,8 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
       stompClient.onConnect = () => {
         setIsConnected(true);
-        reconnectAttemptsRef.current = 0; // 연결 성공시 재연결 시도 횟수 리셋
+        reconnectAttemptsRef.current = 0;
+        wasConnectedBeforeBackground.current = false;
         console.log('✅WebSocket 연결');
       };
 
@@ -186,23 +185,14 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   // 앱 전환 감지 및 재연결 로직
   useEffect(() => {
     if (!isVisible) {
-      // 앱이 백그라운드로 전환됨
       if (isConnected) {
         wasConnectedBeforeBackground.current = true;
-        console.log(`📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제 (정책: ${currentPolicy})`);
+        console.log(`📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제`);
         stopSocket();
       }
     } else {
       // 앱이 포그라운드로 전환됨
-      console.log(`🔍 재연결 조건 확인:`, {
-        wasConnectedBeforeBackground: wasConnectedBeforeBackground.current,
-        shouldReconnect: shouldReconnect(wasConnectedBeforeBackground.current),
-        currentPolicy,
-        reconnectAttempts: reconnectAttemptsRef.current,
-        maxReconnectAttempts,
-      });
-
-      if (shouldReconnect(wasConnectedBeforeBackground.current)) {
+      if (wasConnectedBeforeBackground.current) {
         // 최대 재연결 시도 횟수 체크
         if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
           console.log(`❌ 최대 재연결 시도 횟수 초과 (${maxReconnectAttempts}회) - 재연결 중단`);
@@ -211,7 +201,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         }
 
         console.log(
-          `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (정책: ${currentPolicy}, 시도: ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`
+          `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`
         );
 
         // 기존 재연결 타이머가 있다면 제거
@@ -219,26 +209,12 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
           clearTimeout(reconnectTimeoutRef.current);
         }
 
-        const delay = getReconnectionDelay();
-        if (delay > 0) {
-          // 지연 후 재연결 시도
-          reconnectTimeoutRef.current = window.setTimeout(() => {
-            // TODO: 화면에 Toast로 재연결 되고 있음을 알리기
-            console.log(`🔄 웹소켓 재연결 시작 (정책: ${currentPolicy})`);
-            reconnectAttemptsRef.current += 1;
-            startSocket(joinCode, myName, menuId);
-            wasConnectedBeforeBackground.current = false;
-          }, delay);
-        } else {
-          // 즉시 재연결 시도
-          console.log(`🔄 웹소켓 즉시 재연결 시도 (정책: ${currentPolicy})`);
+        // 1초 지연 후 재연결 시도
+        reconnectTimeoutRef.current = window.setTimeout(() => {
+          console.log(`🔄 웹소켓 재연결 시작`);
           reconnectAttemptsRef.current += 1;
           startSocket(joinCode, myName, menuId);
-          wasConnectedBeforeBackground.current = false;
-        }
-      } else {
-        console.log(`📱 앱이 포그라운드로 전환됨 - 재연결 건너뜀 (정책: ${currentPolicy})`);
-        wasConnectedBeforeBackground.current = false;
+        }, 1000);
       }
     }
 
@@ -248,18 +224,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [
-    isVisible,
-    isConnected,
-    startSocket,
-    stopSocket,
-    shouldReconnect,
-    getReconnectionDelay,
-    currentPolicy,
-    joinCode,
-    myName,
-    menuId,
-  ]);
+  }, [isVisible, isConnected, startSocket, stopSocket, joinCode, myName, menuId]);
 
   const contextValue: WebSocketContextType = {
     startSocket,
