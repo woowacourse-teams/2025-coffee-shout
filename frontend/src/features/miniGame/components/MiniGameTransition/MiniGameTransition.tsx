@@ -3,8 +3,7 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Layout from '@/layouts/Layout';
 import { PropsWithChildren } from 'react';
 import * as S from './MiniGameTransition.styled';
-import { CardGameRound } from '@/types/miniGame';
-import { ROUND_NUMBER_MAP } from '@/constants/miniGame';
+import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
 
 type Props = {
   currentRound: CardGameRound;
