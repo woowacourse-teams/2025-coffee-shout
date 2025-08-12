@@ -258,13 +258,14 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     private void handlePlayerDisconnection(String playerKey, String sessionId, String reason) {
         try {
             final String[] parts = playerKey.split(":");
-            if (parts.length != 2) {
+            if (parts.length != 3) {
                 log.warn("잘못된 플레이어 키 형식: {}", playerKey);
                 return;
             }
 
             final String joinCode = parts[0];
             final String playerName = parts[1];
+            final String menuId = parts[2];
 
             log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
 
