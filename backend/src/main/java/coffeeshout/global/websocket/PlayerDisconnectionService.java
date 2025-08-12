@@ -1,0 +1,66 @@
+package coffeeshout.global.websocket;
+
+import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
+import coffeeshout.room.application.RoomService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+/**
+ * 플레이어 연결 해제 관련 로직을 담당하는 서비스
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PlayerDisconnectionService {
+
+    private final StompSessionManager sessionManager;
+    private final RoomService roomService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    /**
+     * 플레이어 연결 해제 처리
+     */
+    public void handlePlayerDisconnection(String playerKey, String sessionId, String reason) {
+        try {
+            if (!sessionManager.isValidPlayerKey(playerKey)) {
+                log.warn("잘못된 플레이어 키 형식: {}", playerKey);
+                return;
+            }
+
+            final String joinCode = sessionManager.extractJoinCode(playerKey);
+            final String playerName = sessionManager.extractPlayerName(playerKey);
+
+            log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
+
+            // 방에서 플레이어 제거
+            removePlayerFromRoom(joinCode, playerName);
+
+        } catch (Exception e) {
+            log.error("플레이어 연결 해제 처리 실패: playerKey={}, sessionId={}, reason={}", playerKey, sessionId, reason, e);
+        }
+    }
+
+    /**
+     * 방에서 플레이어 제거
+     */
+    private void removePlayerFromRoom(String joinCode, String playerName) {
+        try {
+            // 방에서 플레이어 제거
+            boolean removed = roomService.removePlayer(joinCode, playerName);
+
+            if (removed) {
+                log.info("플레이어 방에서 제거 완료: joinCode={}, playerName={}", joinCode, playerName);
+
+                // 이벤트 발행으로 브로드캐스트
+                eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
+            } else {
+                log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
+            }
+
+        } catch (Exception e) {
+            log.error("방에서 플레이어 제거 실패: joinCode={}, playerName={}", joinCode, playerName, e);
+        }
+    }
+}

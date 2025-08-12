@@ -1,0 +1,47 @@
+package coffeeshout.global.interceptor.handler.postsend;
+
+import coffeeshout.global.interceptor.handler.PostSendHandler;
+import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.StompSessionManager;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class ConnectPostSendHandler implements PostSendHandler {
+
+    private final StompSessionManager sessionManager;
+    private final WebSocketMetricService webSocketMetricService;
+    private final PlayerDisconnectionService playerDisconnectionService;
+
+    @Override
+    public StompCommand getCommand() {
+        return StompCommand.CONNECT;
+    }
+
+    @Override
+    public void handle(StompHeaderAccessor accessor, String sessionId, boolean sent) {
+        if (sent) {
+            // 서버에서 CONNECTED 응답을 성공적으로 보냈을 때 연결 완료 처리
+            log.info("WebSocket 연결 완료: sessionId={}", sessionId);
+            webSocketMetricService.completeConnection(sessionId);
+            return;
+        }
+
+        // 연결 응답 실패 - 플레이어 제거
+        log.warn("STOMP 메시지 전송 실패: sessionId={}, command={}", sessionId, StompCommand.CONNECTED);
+
+        final String failedPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
+        if (failedPlayerKey != null) {
+            sessionManager.removeSession(sessionId);
+            playerDisconnectionService.handlePlayerDisconnection(failedPlayerKey, sessionId, "CONNECTION_FAILED");
+        }
+
+        webSocketMetricService.failConnection(sessionId, "connection_response_failed");
+    }
+}
