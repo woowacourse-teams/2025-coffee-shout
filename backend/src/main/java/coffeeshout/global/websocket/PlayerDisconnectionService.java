@@ -17,7 +17,6 @@ public class PlayerDisconnectionService {
 
     private final StompSessionManager sessionManager;
     private final RoomService roomService;
-    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 플레이어 연결 해제 처리
@@ -52,13 +51,10 @@ public class PlayerDisconnectionService {
 
             if (removed) {
                 log.info("플레이어 방에서 제거 완료: joinCode={}, playerName={}", joinCode, playerName);
-
-                // 이벤트 발행으로 브로드캐스트
-                eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
-            } else {
-                log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
+                return;
             }
 
+            log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
         } catch (Exception e) {
             log.error("방에서 플레이어 제거 실패: joinCode={}, playerName={}", joinCode, playerName, e);
         }

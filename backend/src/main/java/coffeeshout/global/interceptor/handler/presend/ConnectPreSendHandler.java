@@ -102,12 +102,11 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
             // 4. READY 상태면 재연결 허용 + 현재 상태 전송
             log.info("방 재연결 허용: joinCode={}, playerName={}", joinCode, playerName);
-
         } catch (Exception e) {
             log.warn("재연결 실패: joinCode={}, playerName={}, error={}", joinCode, playerName, e.getMessage());
             // 재연결 실패 시 기존 매핑 제거하고 방에서 플레이어 제거
             sessionManager.removeSession(newSessionId);
-            final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
+//            final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
             // TODO: 플레이어 disconnect 처리 로직 필요 (다른 핸들러에서 처리)
         }
     }
@@ -119,9 +118,6 @@ public class ConnectPreSendHandler implements PreSendHandler {
         sessionManager.removeSession(sessionId);
     }
 
-    /**
-     * 안전한 menuId 파싱
-     */
     private Long parseMenuId(String menuId) {
         if (menuId == null || menuId.trim().isEmpty()) {
             return null;
