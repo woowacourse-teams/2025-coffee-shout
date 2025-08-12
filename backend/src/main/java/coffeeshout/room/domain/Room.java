@@ -4,7 +4,6 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
@@ -123,7 +122,7 @@ public class Room {
         return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
-    public List<MiniGameType> getSelectedMiniGameTypes(){
+    public List<MiniGameType> getSelectedMiniGameTypes() {
         return getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
@@ -195,5 +194,21 @@ public class Room {
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );
         }
+    }
+
+    public boolean removePlayer(PlayerName playerName) {
+        Player playerToRemove = null;
+        try {
+            playerToRemove = findPlayer(playerName);
+        } catch (Exception e) {
+            // 플레이어가 이미 없으면 false 반환
+            return false;
+        }
+
+        boolean removed = players.removePlayer(playerName);
+        if (removed && playerToRemove != null) {
+            roulette.removePlayer(playerToRemove);
+        }
+        return removed;
     }
 }

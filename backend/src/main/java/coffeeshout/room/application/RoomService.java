@@ -138,4 +138,9 @@ public class RoomService {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         return room.getSelectedMiniGameTypes();
     }
+
+    public boolean removePlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        return room.removePlayer(new PlayerName(playerName));
+    }
 }
