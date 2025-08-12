@@ -8,14 +8,8 @@ import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 const CardGamePlayPage = () => {
   const { myName, joinCode } = useIdentifier();
-  const {
-    isTransition,
-    currentRound,
-    currentCardGameState,
-    cardInfos,
-    selectedCardInfo,
-    setSelectedCardInfo,
-  } = useCardGame();
+  const { isTransition, currentRound, currentCardGameState, cardInfos, selectedCardInfo } =
+    useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
   const { send } = useWebSocket();
 
@@ -25,15 +19,6 @@ const CardGamePlayPage = () => {
     if (selectedCardInfo[currentRound].isSelected) {
       return;
     }
-
-    setSelectedCardInfo((prev) => ({
-      ...prev,
-      [currentRound]: {
-        isSelected: true,
-        type: cardInfos[cardIndex].cardType,
-        value: cardInfos[cardIndex].value,
-      },
-    }));
 
     send(`/room/${joinCode}/minigame/command`, {
       commandType: 'SELECT_CARD',
