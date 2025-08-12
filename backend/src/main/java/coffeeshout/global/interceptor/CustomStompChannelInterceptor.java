@@ -5,8 +5,9 @@ import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +30,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
     private final WebSocketMetricService webSocketMetricService;
     private final RoomService roomService;
     private final RoomQueryService roomQueryService;
+    private final MenuQueryService menuQueryService;
     private final ApplicationEventPublisher eventPublisher;
 
     // 중복 처리 방지용
@@ -60,9 +62,10 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                     log.info("WebSocket 연결 시작: sessionId={}", sessionId);
                     final String joinCode = accessor.getFirstNativeHeader("joinCode");
                     final String playerName = accessor.getFirstNativeHeader("playerName");
+                    final String menuId = accessor.getFirstNativeHeader("menuId");
 
-                    if (joinCode != null && playerName != null) {
-                        final String playerKey = joinCode + ":" + playerName;
+                    if (joinCode != null && playerName != null && menuId != null) {
+                        final String playerKey = joinCode + ":" + playerName + ':' + menuId;
 
                         // 기존 세션 있으면 재연결, 없으면 첫 연결
                         String oldSessionId = playerSessionMap.get(playerKey);
@@ -76,7 +79,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
                             log.info("플레이어 재연결 매핑: playerKey={}, sessionId={}", playerKey, sessionId);
 
                             // 재연결 처리
-                            handlePlayerReconnection(joinCode, playerName, sessionId);
+                            handlePlayerReconnection(joinCode, playerName, Long.getLong(menuId), sessionId);
                         } else {
                             playerSessionMap.put(playerKey, sessionId);
                             sessionPlayerMap.put(sessionId, playerKey);
@@ -204,13 +207,14 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
         // 실제 방 참여는 REST API로 이미 되어있을 것
     }
 
-    private void handlePlayerReconnection(String joinCode, String playerName, String newSessionId) {
+    private void handlePlayerReconnection(String joinCode, String playerName, Long menuId, String newSessionId) {
         try {
             // 1. 방 존재 확인
             final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
 
             // 2. 플레이어가 방에 있는지 확인
-            final Player player = room.findPlayer(new PlayerName(playerName)); // 없으면 예외 터짐
+            final Menu menu = menuQueryService.findById(menuId);
+            room.joinGuest(new PlayerName(playerName), menu);
 
             // 3. 방 상태 확인
             if (room.isPlayingState()) {
