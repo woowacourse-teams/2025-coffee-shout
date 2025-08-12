@@ -21,7 +21,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
   const { joinCode, myName } = useIdentifier();
   const { miniGameType } = useParams();
   const [startCardGame, setStartCardGame] = useState<boolean>(false);
-  const [isTransition, setIsTransition] = useState(false);
+  const [isTransition, setIsTransition] = useState<boolean>(false);
   const [currentRound, setCurrentRound] = useState<CardGameRound>('FIRST');
   const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
   const [cardInfos, setCardInfos] = useState<CardInfo[]>([]);
