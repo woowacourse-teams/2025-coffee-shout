@@ -1,11 +1,16 @@
 package coffeeshout.fixture;
 
+import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.minigame.ui.response.MiniGameStateMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -22,15 +27,6 @@ public class TestStompSession {
         this.objectMapper = objectMapper;
     }
 
-    public <T> MessageCollector<T> subscribe(String subscribeEndpoint, Class<T> payloadClazz) {
-        MessageCollector<T> messageCollector = new MessageCollector<>();
-        session.subscribe(
-                subscribeEndpoint,
-                new MessageCollectorStompFrameHandler<>(messageCollector, payloadClazz, objectMapper)
-        );
-        return messageCollector;
-    }
-
     public <T> MessageCollector<T> subscribe(String subscribeEndpoint, TypeReference<T> typeRef) {
         MessageCollector<T> messageCollector = new MessageCollector<>();
         session.subscribe(
@@ -42,6 +38,15 @@ public class TestStompSession {
 
     public void send(String sendEndpoint, Object bodyMessage) {
         session.send(String.format(sendEndpoint), bodyMessage);
+    }
+
+    public void send(String sendEndpoint, String jsonString) {
+        try {
+            Object jsonObject = objectMapper.readValue(jsonString, Object.class);
+            session.send(sendEndpoint, jsonObject);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 파싱 실패: " + jsonString, e);
+        }
     }
 
     public static class MessageCollector<T> {
@@ -102,12 +107,24 @@ public class TestStompSession {
             this.objectMapper = objectMapper;
         }
 
+        public MessageCollectorStompFrameHandler(
+                MessageCollector<T> messageCollector,
+                JavaType javaType,
+                ObjectMapper objectMapper
+        ) {
+            this.messageCollector = messageCollector;
+            this.typeInfo = javaType;
+            this.objectMapper = objectMapper;
+        }
+
         @Override
         public Type getPayloadType(StompHeaders headers) {
             if (typeInfo instanceof Class) {
                 return (Class<?>) typeInfo;
             } else if (typeInfo instanceof TypeReference) {
                 return ((TypeReference<?>) typeInfo).getType();
+            } else if (typeInfo instanceof JavaType) {
+                return ((JavaType) typeInfo);
             }
             throw new IllegalStateException("Unsupported type info: " + typeInfo);
         }
@@ -115,16 +132,21 @@ public class TestStompSession {
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
             synchronized (messageCollector) {
-                // Always convert using ObjectMapper to ensure proper deserialization of nested objects
-                T convertedPayload;
-                if (typeInfo instanceof Class) {
-                    convertedPayload = objectMapper.convertValue(payload, (Class<T>) typeInfo);
-                } else if (typeInfo instanceof TypeReference) {
-                    convertedPayload = objectMapper.convertValue(payload, (TypeReference<T>) typeInfo);
-                } else {
-                    throw new IllegalStateException("Unsupported type info: " + typeInfo);
+                try {
+                    T convertedPayload;
+                    if (typeInfo instanceof Class) {
+                        convertedPayload = objectMapper.convertValue(payload, (Class<T>) typeInfo);
+                    } else if (typeInfo instanceof TypeReference) {
+                        convertedPayload = objectMapper.convertValue(payload, (TypeReference<T>) typeInfo);
+                    } else if (typeInfo instanceof JavaType) {
+                        convertedPayload = objectMapper.convertValue(payload, (JavaType) typeInfo);
+                    } else {
+                        throw new IllegalStateException("Unsupported type info: " + typeInfo);
+                    }
+                    messageCollector.add(convertedPayload);
+                } catch (Exception e) {
+                    throw new RuntimeException("메시지 변환 실패: " + payload, e);
                 }
-                messageCollector.add(convertedPayload);
             }
         }
     }

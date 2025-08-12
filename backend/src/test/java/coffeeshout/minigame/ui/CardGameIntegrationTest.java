@@ -179,7 +179,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MiniGameStateMessage loadingState = responses.get().data();
         assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
 
-
         // PLAYING 상태 확인
         MiniGameStateMessage playingState = responses.get().data();
 
@@ -333,32 +332,40 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         // given
         TestStompSession session = createSession();
 
-        String subscribeUrlFormat = "/topic/room/%s/gameState";
-        String requestUrlFormat = "/app/room/%s/minigame/command";
+        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.value());
+        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.value());
 
-        MessageCollector<WebSocketResponse<MiniGameStateMessage>> responses = session.subscribe(
-                String.format(subscribeUrlFormat, joinCode.value()),
-                new TypeReference<>() {
-                }
+        var responses = session.subscribe(
+                subscribeUrlFormat,
+                new TypeReference<WebSocketResponse<MiniGameStateMessage>>() {}
         );
 
-        sendStartGame(session, joinCode, host.getName().value());
+        session.send(requestUrlFormat, String.format("""
+                {
+                  "commandType": "START_MINI_GAME",
+                  "commandRequest": {
+                    "hostName": "%s"
+                  }
+                }
+                """, host.getName().value()));
+
+
         responses.get(); // LOADING
         responses.get(); // PLAYING
 
-        String playerName = "꾹이";
-        int cardIndex = 0;
-
-        MiniGameMessage request = new MiniGameMessage(
-                CommandType.SELECT_CARD,
-                objectMapper.valueToTree(new SelectCardCommand(playerName, cardIndex))
-        );
-
         // when
-        session.send(String.format(requestUrlFormat, joinCode.value()), request);
+        session.send(requestUrlFormat, """
+                {
+                   "commandType": "SELECT_CARD",
+                   "commandRequest": {
+                     "playerName": "꾹이",
+                     "cardIndex": 0
+                   }
+                }
+                """);
+        MiniGameStateMessage result = responses.get().data();
 
         // then
-        MiniGameStateMessage result = responses.get().data();
 
         SoftAssertions.assertSoftly(softly -> {
             // 선택된 카드가 있는지 확인
@@ -373,7 +380,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                     .findFirst()
                     .orElse(null);
             softly.assertThat(selectedCard).isNotNull();
-            softly.assertThat(selectedCard.playerName()).isEqualTo(playerName);
+            softly.assertThat(selectedCard.playerName()).isEqualTo("꾹이");
         });
     }
 

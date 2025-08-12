@@ -69,9 +69,6 @@ public class CardGameService implements MiniGameService {
         final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
         cardGame.selectCard(player, cardIndex);
         sendCardGameState(roomJoinCode);
-        if (cardGame.isFinishedThisRound()) {
-            cardGameTaskExecutors.cancelPlaying(roomJoinCode, CardGameTaskType.from(cardGame));
-        }
     }
 
     private void sendCardGameState(JoinCode joinCode) {
