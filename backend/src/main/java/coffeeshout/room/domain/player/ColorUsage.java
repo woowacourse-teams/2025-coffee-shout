@@ -36,7 +36,7 @@ public class ColorUsage {
     }
 
     public void release(int colorIndex) {
-        if (colorIndex < 0 || colorIndex >= 9) {
+        if (colorIndex < 0 || colorIndex >= COLOR_MAX_COUNT) {
             throw new InvalidArgumentException(ColorErrorCode.INVALID_COLOR_INDEX, "유효하지 않은 색깔 index입니다.");
         }
         colors.put(colorIndex, false);
