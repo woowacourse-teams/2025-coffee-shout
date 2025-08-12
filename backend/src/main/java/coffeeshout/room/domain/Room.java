@@ -162,19 +162,13 @@ public class Room {
     }
 
     public boolean removePlayer(PlayerName playerName) {
-        Player playerToRemove = null;
-        try {
-            playerToRemove = findPlayer(playerName);
-        } catch (Exception e) {
-            // 플레이어가 이미 없으면 false 반환
-            return false;
+        if (players.existsByName(playerName)) {
+            roulette.removePlayer(playerName);
+            players.removePlayer(playerName);
+            return true;
         }
 
-        boolean removed = players.removePlayer(playerName);
-        if (removed && playerToRemove != null) {
-            roulette.removePlayer(playerToRemove);
-        }
-        return removed;
+        return false;
     }
 
     public void reJoin(PlayerName playerName, Menu menu) {
@@ -182,7 +176,7 @@ public class Room {
         validateCanJoin();
         validatePlayerNameNotDuplicate(playerName);
 
-        final Player player = createPlayerByRole(playerName, menu);
+        final Player player = createPlayer(playerName, menu);
         join(player);
     }
 
