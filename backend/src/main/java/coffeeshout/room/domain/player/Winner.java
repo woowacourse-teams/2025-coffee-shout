@@ -9,7 +9,7 @@ public record Winner(
 ) {
 
     private static final Random RANDOM = new Random();
-    private static final int PIE_SEGMENT = 100;
+    private static final int PIE_SEGMENT = 101;
 
     public static Winner from(Player player) {
         return new Winner(
