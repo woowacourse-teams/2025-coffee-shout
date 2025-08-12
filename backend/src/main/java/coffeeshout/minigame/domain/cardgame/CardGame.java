@@ -59,6 +59,10 @@ public class CardGame implements Playable {
         this.round = round.next();
     }
 
+    public void updateDescription() {
+        this.state = CardGameState.DESCRIPTION;
+    }
+
     public void startPlay() {
         deck.shuffle();
         this.state = CardGameState.PLAYING;
