@@ -4,7 +4,6 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
@@ -123,7 +122,7 @@ public class Room {
         return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
-    public List<MiniGameType> getSelectedMiniGameTypes(){
+    public List<MiniGameType> getSelectedMiniGameTypes() {
         return getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
@@ -162,6 +161,25 @@ public class Room {
         return players.hasDuplicateName(guestName);
     }
 
+    public boolean removePlayer(PlayerName playerName) {
+        if (players.existsByName(playerName)) {
+            roulette.removePlayer(playerName);
+            players.removePlayer(playerName);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void reJoin(PlayerName playerName, Menu menu) {
+        validateRoomReady();
+        validateCanJoin();
+        validatePlayerNameNotDuplicate(playerName);
+
+        final Player player = createPlayer(playerName, menu);
+        join(player);
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -195,5 +213,12 @@ public class Room {
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );
         }
+    }
+
+    private Player createPlayer(PlayerName playerName, Menu menu) {
+        if (host.sameName(playerName)) {
+            return Player.createHost(playerName, menu);
+        }
+        return Player.createGuest(playerName, menu);
     }
 }
