@@ -2,13 +2,41 @@ import { reportWebsocketError } from '@/apis/utils/reportSentryError';
 import { Client, IFrame } from '@stomp/stompjs';
 import { WebSocketErrorType } from '../constants/constants';
 
-export interface WebSocketErrorContext {
+type WebSocketErrorContext = {
   type: WebSocketErrorType;
   url?: string;
   extra?: Record<string, unknown>;
-}
+};
 
-// TODO: 각각의 타입을 객체로 바꾸기
+type SubscriptionErrorParams = {
+  url: string;
+  errorMessage: string;
+  messageBody?: string;
+  onError?: (error: Error) => void;
+};
+
+type ConnectionRequiredErrorParams = {
+  type: 'subscription' | 'send';
+  url: string;
+  isConnected: boolean;
+  hasClient: boolean;
+  onError?: (error: Error) => void;
+};
+
+type ParsingErrorParams = {
+  url: string;
+  originalError: unknown;
+  messageBody: string;
+  onError?: (error: Error) => void;
+};
+
+type SendErrorParams = {
+  url: string;
+  originalError: unknown;
+  body: unknown;
+  onError?: (error: Error) => void;
+};
+
 export class WebSocketErrorHandler {
   static handleError(
     message: string,
@@ -51,12 +79,12 @@ export class WebSocketErrorHandler {
     });
   }
 
-  static handleSubscriptionError(
-    url: string,
-    errorMessage: string,
-    messageBody?: string,
-    onError?: (error: Error) => void
-  ): Error {
+  static handleSubscriptionError({
+    url,
+    errorMessage,
+    messageBody,
+    onError,
+  }: SubscriptionErrorParams): Error {
     const fullMessage = `구독 메시지 오류 (${url}): ${errorMessage}`;
 
     return this.handleError(
@@ -70,19 +98,24 @@ export class WebSocketErrorHandler {
     );
   }
 
-  static handleConnectionRequiredError(
-    action: string,
-    url: string,
-    isConnected: boolean,
-    hasClient: boolean,
-    onError?: (error: Error) => void
-  ): Error {
-    const errorMessage = `${action} 실패 (${url}): WebSocket 연결 안됨`;
+  static handleConnectionRequiredError({
+    type,
+    url,
+    isConnected,
+    hasClient,
+    onError,
+  }: ConnectionRequiredErrorParams): Error {
+    const TYPE_MESSAGE = {
+      subscription: '구독',
+      send: '메시지 전송',
+    } as const;
+
+    const errorMessage = `${TYPE_MESSAGE[type]} 실패 (${url}): WebSocket 연결 안됨`;
 
     return this.handleError(
       errorMessage,
       {
-        type: action === '구독' ? 'subscription' : 'send',
+        type,
         url,
         extra: { isConnected, hasClient },
       },
@@ -90,12 +123,12 @@ export class WebSocketErrorHandler {
     );
   }
 
-  static handleParsingError(
-    url: string,
-    originalError: unknown,
-    messageBody: string,
-    onError?: (error: Error) => void
-  ): Error {
+  static handleParsingError({
+    url,
+    originalError,
+    messageBody,
+    onError,
+  }: ParsingErrorParams): Error {
     const errorMessage = `JSON 파싱 실패 (${url}): ${originalError instanceof Error ? originalError.message : String(originalError)}`;
 
     return this.handleError(
@@ -109,12 +142,7 @@ export class WebSocketErrorHandler {
     );
   }
 
-  static handleSendError(
-    url: string,
-    originalError: unknown,
-    body: unknown,
-    onError?: (error: Error) => void
-  ): Error {
+  static handleSendError({ url, originalError, body, onError }: SendErrorParams): Error {
     const errorMessage = `메시지 전송 중 오류 (${url}): ${originalError instanceof Error ? originalError.message : String(originalError)}`;
 
     return this.handleError(

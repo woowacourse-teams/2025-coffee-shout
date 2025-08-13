@@ -3,22 +3,22 @@ import { Client } from '@stomp/stompjs';
 import { WebSocketErrorHandler } from '../utils/WebSocketErrorHandler';
 import { WEBSOCKET_CONFIG, WebSocketMessage } from '../constants/constants';
 
-interface Props {
+type Props = {
   client: Client | null;
   isConnected: boolean;
-}
+};
 
 export const useWebSocketMessaging = ({ client, isConnected }: Props) => {
   const subscribe = useCallback(
     <T>(url: string, onData: (data: T) => void, onError?: (error: Error) => void) => {
       if (!client || !isConnected) {
-        const error = WebSocketErrorHandler.handleConnectionRequiredError(
-          '구독',
+        const error = WebSocketErrorHandler.handleConnectionRequiredError({
+          type: 'subscription',
           url,
           isConnected,
-          !!client,
-          onError
-        );
+          hasClient: !!client,
+          onError,
+        });
         throw error;
       }
 
@@ -29,18 +29,23 @@ export const useWebSocketMessaging = ({ client, isConnected }: Props) => {
           const parsedMessage = JSON.parse(message.body) as WebSocketMessage<T>;
 
           if (!parsedMessage.success) {
-            WebSocketErrorHandler.handleSubscriptionError(
+            WebSocketErrorHandler.handleSubscriptionError({
               url,
-              parsedMessage.errorMessage,
-              message.body,
-              onError
-            );
+              errorMessage: parsedMessage.errorMessage,
+              messageBody: message.body,
+              onError,
+            });
             return;
           }
 
           onData(parsedMessage.data);
         } catch (error) {
-          WebSocketErrorHandler.handleParsingError(url, error, message.body, onError);
+          WebSocketErrorHandler.handleParsingError({
+            url,
+            originalError: error,
+            messageBody: message.body,
+            onError,
+          });
         }
       });
     },
@@ -50,13 +55,13 @@ export const useWebSocketMessaging = ({ client, isConnected }: Props) => {
   const send = useCallback(
     <T>(url: string, body?: T, onError?: (error: Error) => void) => {
       if (!client || !isConnected) {
-        WebSocketErrorHandler.handleConnectionRequiredError(
-          '메시지 전송',
+        WebSocketErrorHandler.handleConnectionRequiredError({
+          type: 'send',
           url,
           isConnected,
-          !!client,
-          onError
-        );
+          hasClient: !!client,
+          onError,
+        });
         return;
       }
 
@@ -71,7 +76,12 @@ export const useWebSocketMessaging = ({ client, isConnected }: Props) => {
           body: payload,
         });
       } catch (error) {
-        WebSocketErrorHandler.handleSendError(url, error, body, onError);
+        WebSocketErrorHandler.handleSendError({
+          url,
+          originalError: error,
+          body,
+          onError,
+        });
       }
     },
     [client, isConnected]
