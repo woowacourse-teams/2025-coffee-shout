@@ -16,7 +16,7 @@ import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePl
 import * as S from './RoulettePlayPage.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
-type RouletteWinnerData = {
+type RouletteWinnerResponse = {
   playerName: string;
   colorIndex: number;
   randomAngle: number;
@@ -31,19 +31,18 @@ const RoulettePlayPage = () => {
   const { probabilityHistory } = useProbabilityHistory();
 
   // TODO: 나중에 외부 state 로 분리할 것
-  // TODO: 이전 확률과 비교해서 룰렛 움직여야 하므로 이전 확률 또는 확률 변화값을 저장할 상태 필요
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  const handleWinnerData = useCallback((data: RouletteWinnerData) => {
+  const handleWinnerData = useCallback((data: RouletteWinnerResponse) => {
     setWinner(data.playerName);
     setRandomAngle(data.randomAngle);
     setIsSpinning(true);
   }, []);
 
-  useWebSocketSubscription<RouletteWinnerData>(`/room/${joinCode}/winner`, handleWinnerData);
+  useWebSocketSubscription<RouletteWinnerResponse>(`/room/${joinCode}/winner`, handleWinnerData);
 
   const isRouletteView = currentView === 'roulette';
 
