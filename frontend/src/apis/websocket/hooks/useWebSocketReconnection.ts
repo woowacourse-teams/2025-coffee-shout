@@ -67,13 +67,11 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
    * 앱 전환 감지 및 재연결 로직
    */
   useEffect(() => {
-    if (!isVisible) {
-      if (isConnected) {
-        wasConnectedBeforeBackground.current = true;
-        console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
-        stopSocket();
-      }
-    } else if (wasConnectedBeforeBackground.current) {
+    if (!isVisible && isConnected) {
+      wasConnectedBeforeBackground.current = true;
+      console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
+      stopSocket();
+    } else if (isVisible && wasConnectedBeforeBackground.current && !isConnected) {
       attemptReconnect();
     }
 
