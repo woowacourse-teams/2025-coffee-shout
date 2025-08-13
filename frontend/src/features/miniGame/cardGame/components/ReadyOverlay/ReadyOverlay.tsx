@@ -10,7 +10,7 @@ const ReadyOverlay = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDisplayText('START!');
-    }, 800);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
