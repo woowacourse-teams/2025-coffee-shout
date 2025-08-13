@@ -110,7 +110,7 @@ const EntryMenuPage = () => {
       const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
         '/rooms/enter',
         {
-          joinCode: joinCode,
+          joinCode,
           guestName: myName,
           menuId,
         }
