@@ -7,20 +7,20 @@ import RouletteSlice from '../RouletteSlice/RouletteSlice';
 
 type Props =
   | {
-      angles: RouletteSector[];
+      sectors: RouletteSector[];
       playerProbabilities?: never;
       isSpinning?: boolean;
     }
   | {
-      angles?: never;
+      sectors?: never;
       playerProbabilities: PlayerProbability[];
       isSpinning?: boolean;
     };
 
-const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Props) => {
+const RouletteWheel = ({ sectors, playerProbabilities, isSpinning = false }: Props) => {
   const theme = useTheme();
 
-  const playersWithAngles = angles || convertProbabilitiesToAngles(playerProbabilities);
+  const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
   return (
     <S.Container>

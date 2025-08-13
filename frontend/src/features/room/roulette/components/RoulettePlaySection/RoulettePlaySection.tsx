@@ -12,7 +12,10 @@ type Props = {
 const RoulettePlaySection = ({ isSpinning }: Props) => {
   const { myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
-  const angles = useRouletteTransition(probabilityHistory.prev, probabilityHistory.current);
+  const animatedSectors = useRouletteTransition(
+    probabilityHistory.prev,
+    probabilityHistory.current
+  );
 
   const myPrevProbability =
     probabilityHistory.prev.find((player) => player.playerName === myName)?.probability ?? 0;
@@ -21,11 +24,11 @@ const RoulettePlaySection = ({ isSpinning }: Props) => {
 
   const myProbabilityChange = myCurrentProbability - myPrevProbability;
 
-  if (!angles) return null;
+  if (!animatedSectors) return null;
 
   return (
     <S.Container>
-      <RouletteWheel isSpinning={isSpinning} angles={angles} />
+      <RouletteWheel isSpinning={isSpinning} sectors={animatedSectors} />
       <S.ProbabilityText>
         <Headline4>
           당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}
