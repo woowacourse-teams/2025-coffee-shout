@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
-import { WebSocketErrorHandler } from '../utils/WebSocketErrorHandler';
+import { useCallback } from 'react';
 import { WEBSOCKET_CONFIG, WebSocketMessage } from '../constants/constants';
+import WebSocketErrorHandler from '../utils/WebSocketErrorHandler';
 
 type Props = {
   client: Client | null;

@@ -2,7 +2,7 @@ import { Client, IFrame } from '@stomp/stompjs';
 import { useCallback, useState } from 'react';
 import { ConnectionParams } from '../constants/constants';
 import { createStompClient } from '../utils/createStompClient';
-import { WebSocketErrorHandler } from '../utils/WebSocketErrorHandler';
+import WebSocketErrorHandler from '../utils/WebSocketErrorHandler';
 
 export const useWebSocketConnection = () => {
   const [client, setClient] = useState<Client | null>(null);

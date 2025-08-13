@@ -1,12 +1,6 @@
 import { reportWebsocketError } from '@/apis/utils/reportSentryError';
 import { Client, IFrame } from '@stomp/stompjs';
-import { WebSocketErrorType } from '../constants/constants';
-
-type WebSocketErrorContext = {
-  type: WebSocketErrorType;
-  url?: string;
-  extra?: Record<string, unknown>;
-};
+import { WebSocketErrorOptions } from '../constants/constants';
 
 type SubscriptionErrorParams = {
   url: string;
@@ -37,14 +31,14 @@ type SendErrorParams = {
   onError?: (error: Error) => void;
 };
 
-export class WebSocketErrorHandler {
+class WebSocketErrorHandler {
   static handleError(
     message: string,
-    context: WebSocketErrorContext,
+    options?: WebSocketErrorOptions,
     onError?: (error: Error) => void
   ): Error {
     console.error(message);
-    reportWebsocketError(message, context);
+    reportWebsocketError(message, options);
 
     const error = new Error(message);
     onError?.(error);
@@ -152,3 +146,5 @@ export class WebSocketErrorHandler {
     );
   }
 }
+
+export default WebSocketErrorHandler;

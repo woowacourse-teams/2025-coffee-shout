@@ -23,6 +23,11 @@ export type WebSocketError = {
   errorMessage: string;
 };
 
+export type WebSocketErrorOptions = {
+  type?: WebSocketErrorType;
+  extra?: Record<string, unknown>;
+};
+
 export type WebSocketMessage<T> = WebSocketSuccess<T> | WebSocketError;
 
 export type WebSocketErrorType = 'stomp' | 'connection' | 'subscription' | 'send' | 'parsing';
