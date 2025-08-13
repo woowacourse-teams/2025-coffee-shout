@@ -1,7 +1,7 @@
-import { Angle } from '@/types/roulette';
+import { RouletteSector } from '@/types/roulette';
 
 type Props = {
-  finalAngles: Angle[];
+  finalAngles: RouletteSector[];
   winner: string | null;
   randomAngle: number;
 };
