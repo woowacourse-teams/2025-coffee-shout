@@ -4,8 +4,12 @@ import { createContext, useContext } from 'react';
 export type WebSocketContextType = {
   startSocket: (joinCode: string, myName: string, menuId: number) => void;
   stopSocket: () => void;
-  send: <T>(destination: string, body?: T) => void;
-  subscribe: <T>(destination: string, onData: (data: T) => void) => StompSubscription;
+  send: <T>(destination: string, body?: T, onError?: (error: Error) => void) => void;
+  subscribe: <T>(
+    destination: string,
+    onData: (data: T) => void,
+    onError?: (error: Error) => void
+  ) => StompSubscription;
   isConnected: boolean;
   isVisible: boolean;
   client: Client | null;

@@ -1,6 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getWebSocketUrl } from './utils/getWebSocketUrl';
+import { getWebSocketUrl } from './getWebSocketUrl';
 
 type Props = {
   joinCode: string;

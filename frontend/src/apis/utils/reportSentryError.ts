@@ -1,5 +1,6 @@
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import * as Sentry from '@sentry/react';
+import { WebSocketErrorType } from '../websocket/constants/constants';
 
 export const reportApiError = (error: ApiError | NetworkError) => {
   if (error instanceof ApiError) {
@@ -28,8 +29,6 @@ export const reportApiError = (error: ApiError | NetworkError) => {
     });
   }
 };
-
-type WebSocketErrorType = 'connection' | 'stomp' | 'subscription' | 'send' | 'parsing';
 
 export const reportWebsocketError = (
   errorMessage: string,
