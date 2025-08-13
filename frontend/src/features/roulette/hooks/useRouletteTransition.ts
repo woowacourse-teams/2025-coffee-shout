@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { RouletteSector, PlayerProbability } from '@/types/roulette';
-import { interpolateAngles } from '../utils/interpolateAngles';
+import { interpolateAngles } from '../utils';
 
 const ANIMATION_DURATION = 1600; // ms
 

@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
 import { WHEEL_CONFIG } from '../../constants/config';
-import { convertProbabilitiesToAngles } from '../../utils/convertProbabilitiesToAngles';
+import { convertProbabilitiesToAngles } from '../../utils';
 import RouletteSlice from '../RouletteSlice/RouletteSlice';
 
 type Props =

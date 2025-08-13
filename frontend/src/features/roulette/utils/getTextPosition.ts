@@ -1,5 +1,5 @@
 import { WHEEL_CONFIG } from '../constants/config';
-import { polarToCartesian } from './polarToCartesian';
+import { polarToCartesian } from './index';
 
 export const getTextPosition = (centerAngle: number, radius: number = WHEEL_CONFIG.TEXT_RADIUS) => {
   return polarToCartesian({

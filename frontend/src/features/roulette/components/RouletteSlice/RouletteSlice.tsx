@@ -1,9 +1,7 @@
 import { RouletteSector } from '@/types/roulette';
 import * as S from './RouletteSlice.styled';
 import { WHEEL_CONFIG } from '../../constants/config';
-import { getCenterAngle } from '../../utils/getCenterAngle';
-import { getTextPosition } from '../../utils/getTextPosition';
-import { describeArc } from '../../utils/describeArc';
+import { getCenterAngle, getTextPosition, describeArc } from '../../utils';
 
 type Props = {
   player: RouletteSector;

@@ -1,5 +1,5 @@
 import { RouletteSector, PlayerProbability } from '@/types/roulette';
-import { getPlayersWithAngles } from './getPlayerWithAngles.ts';
+import { getPlayersWithAngles } from './index';
 
 type Props = {
   from: PlayerProbability[];
