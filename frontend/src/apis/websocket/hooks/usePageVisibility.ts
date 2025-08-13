@@ -15,8 +15,6 @@ export const usePageVisibility = () => {
       }
     };
 
-    setIsVisible(!document.hidden);
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
