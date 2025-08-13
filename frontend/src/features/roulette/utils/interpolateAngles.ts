@@ -1,13 +1,13 @@
-import { Angle, PlayerProbability } from '@/types/roulette';
 import { convertProbabilitiesToAngles } from './convertProbabilitiesToAngles';
+import { PlayerProbability, RouletteSector } from '@/types/roulette';
 
 type Props = {
   from: PlayerProbability[];
   to: PlayerProbability[];
-  t: number;
+  progress: number;
 };
 
-export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
+export const interpolateAngles = ({ from, to, progress }: Props): RouletteSector[] => {
   const fromAngles = convertProbabilitiesToAngles(from);
   const toAngles = convertProbabilitiesToAngles(to);
 
@@ -16,8 +16,8 @@ export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
 
     return {
       playerName: fromPlayer.playerName,
-      startAngle: fromPlayer.startAngle + (toPlayer.startAngle - fromPlayer.startAngle) * t,
-      endAngle: fromPlayer.endAngle + (toPlayer.endAngle - fromPlayer.endAngle) * t,
+      startAngle: fromPlayer.startAngle + (toPlayer.startAngle - fromPlayer.startAngle) * progress,
+      endAngle: fromPlayer.endAngle + (toPlayer.endAngle - fromPlayer.endAngle) * progress,
       playerColor: fromPlayer.playerColor,
     };
   });

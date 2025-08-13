@@ -1,35 +1,33 @@
 import { useTheme } from '@emotion/react';
-import { describeArc } from '../../utils/describeArc';
-import { Angle, PlayerProbability } from '@/types/roulette';
+import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
-import { getCenterAngle } from '../../utils/getCenterAngle';
-import { getTextPosition } from '../../utils/getTextPosition';
-import { WHEEL_CONFIG } from '../constants/config';
-import { convertProbabilitiesToAngles } from '../../utils/convertProbabilitiesToAngles';
+import { WHEEL_CONFIG } from '../../constants/config';
+import { convertProbabilitiesToAngles } from '../../utils';
+import RouletteSlice from '../RouletteSlice/RouletteSlice';
 
 type Props =
   | {
-      angles: Angle[];
+      sectors: RouletteSector[];
       playerProbabilities?: never;
       isSpinning?: boolean;
       finalRotation?: number;
     }
   | {
-      angles?: never;
+      sectors?: never;
       playerProbabilities: PlayerProbability[];
       isSpinning?: boolean;
       finalRotation?: number;
     };
 
 const RouletteWheel = ({
-  angles,
+  sectors,
   playerProbabilities,
   isSpinning = false,
   finalRotation = 0,
 }: Props) => {
   const theme = useTheme();
 
-  const playersWithAngles = angles || convertProbabilitiesToAngles(playerProbabilities);
+  const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
   return (
     <S.Container>
@@ -54,41 +52,6 @@ const RouletteWheel = ({
 };
 
 export default RouletteWheel;
-
-type RouletteSliceProps = {
-  player: { playerName: string; playerColor: string; startAngle: number; endAngle: number };
-  strokeColor: string;
-};
-
-const RouletteSlice = ({ player, strokeColor }: RouletteSliceProps) => {
-  const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
-  const textPosition = getTextPosition(centerAngle);
-
-  return (
-    <g key={player.playerName}>
-      <path
-        d={describeArc({
-          cx: WHEEL_CONFIG.CENTER,
-          cy: WHEEL_CONFIG.CENTER,
-          r: WHEEL_CONFIG.RADIUS,
-          startAngle: player.startAngle,
-          endAngle: player.endAngle,
-        })}
-        fill={player.playerColor}
-        stroke={strokeColor}
-        strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
-      />
-      <S.PlayerNameText
-        x={textPosition.x}
-        y={textPosition.y}
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {player.playerName}
-      </S.PlayerNameText>
-    </g>
-  );
-};
 
 const RoulettePin = () => {
   return <S.Pin />;

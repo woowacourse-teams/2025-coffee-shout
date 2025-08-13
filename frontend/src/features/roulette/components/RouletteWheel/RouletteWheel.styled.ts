@@ -44,22 +44,12 @@ export const Wrapper = styled.div<WrapperProps>`
   }
 `;
 
-export const PlayerNameText = styled.text`
-  fill: ${({ theme }) => theme.color.point[100]};
-  font-size: 12px;
-  font-weight: bold;
-`;
-
 export const Pin = styled.div`
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 30px solid ${({ theme }) => theme.color.gray[500]};
-  border-radius: 4px;
   position: absolute;
-  top: 30px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 20px;
+  background-color: ${({ theme }) => theme.color.point[100]};
 `;

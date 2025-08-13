@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Angle, PlayerProbability } from '@/types/roulette';
-import { interpolateAngles } from '../utils/interpolateAngles';
+import { RouletteSector, PlayerProbability } from '@/types/roulette';
+import { interpolateAngles } from '../utils';
 
 const ANIMATION_DURATION = 1600; // ms
 
@@ -14,14 +14,14 @@ export const useRouletteTransition = (
   current: PlayerProbability[] | null
 ) => {
   // 현재 애니메이션 중인 각도 상태
-  const [angles, setAngles] = useState<Angle[] | null>(null);
+  const [animatedSectors, setAnimatedSectors] = useState<RouletteSector[] | null>(null);
 
   const requestRef = useRef<number>(null);
   const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!prev || !current || prev.length === 0 || current.length === 0) {
-      setAngles(null);
+      setAnimatedSectors(null);
       return;
     }
 
@@ -35,11 +35,11 @@ export const useRouletteTransition = (
       const rawT = Math.min(elapsed / ANIMATION_DURATION, 1);
 
       // Easing 적용, t는 애니메이션 진행률을 나타냄
-      const t = easeOutCubic(rawT);
+      const progress = easeOutCubic(rawT);
 
       // 현재 진행률에 따른 중간 각도 계산
-      const next = interpolateAngles({ from: prev, to: current, t });
-      setAngles(next);
+      const next = interpolateAngles({ from: prev, to: current, progress });
+      setAnimatedSectors(next);
 
       // 애니메이션이 완료되지 않았다면 다음 프레임 요청
       if (rawT < 1) {
@@ -59,5 +59,5 @@ export const useRouletteTransition = (
     };
   }, [prev, current]);
 
-  return angles;
+  return animatedSectors;
 };
