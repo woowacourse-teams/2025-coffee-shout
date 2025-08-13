@@ -5,12 +5,14 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './CardGameReadyPage.styled';
 import CardGameDescription1 from '@/assets/card_game_desc1.svg';
 import CardGameDescription2 from '@/assets/card_game_desc2.svg';
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import Layout from '@/layouts/Layout';
 
 const CardGameReadyPage = () => {
   const navigate = useNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
-  const TOTAL_DURATION = 3000;
+  const { isPreparing } = useCardGame();
 
   const slideData = [
     {
@@ -26,26 +28,24 @@ const CardGameReadyPage = () => {
   ];
 
   useEffect(() => {
-    const gameStartTimer = setTimeout(() => {
+    if (isPreparing) {
       navigate(`/room/${joinCode}/${miniGameType}/play`);
-    }, TOTAL_DURATION);
-
-    return () => {
-      clearTimeout(gameStartTimer);
-    };
-  }, []);
+    }
+  }, [isPreparing, joinCode, miniGameType, navigate]);
 
   return (
-    <S.Container>
-      {slideData.map((slide, index) => (
-        <Slide
-          key={index}
-          textLines={slide.textLines}
-          image={slide.image}
-          className={slide.className}
-        />
-      ))}
-    </S.Container>
+    <Layout color="point-400">
+      <Layout.Content>
+        {slideData.map((slide, index) => (
+          <Slide
+            key={index}
+            textLines={slide.textLines}
+            image={slide.image}
+            className={slide.className}
+          />
+        ))}
+      </Layout.Content>
+    </Layout>
   );
 };
 

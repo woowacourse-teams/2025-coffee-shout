@@ -3,7 +3,7 @@ import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { CardGameRound } from '@/constants/miniGame';
 
 type CardGameContextType = {
-  startCardGame: boolean;
+  isPreparing: boolean;
   isTransition: boolean;
   currentRound: CardGameRound;
   currentCardGameState: CardGameState;
