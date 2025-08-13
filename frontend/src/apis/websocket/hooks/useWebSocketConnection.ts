@@ -11,37 +11,31 @@ export const useWebSocketConnection = () => {
   const validateConnectionParams = useCallback((params: ConnectionParams): boolean => {
     const { joinCode, myName, menuId } = params;
     if (!joinCode || !myName || !menuId) {
-      console.log('⚠️ WebSocket 연결 시도 건너뜀');
       return false;
     }
     return true;
   }, []);
 
-  // 연결 성공 핸들러
   const handleConnect = useCallback(() => {
     setIsConnected(true);
     console.log('✅ WebSocket 연결');
   }, []);
 
-  // 연결 해제 핸들러
   const handleDisconnect = useCallback(() => {
     setIsConnected(false);
     console.log('❌ WebSocket 연결 해제');
   }, []);
 
-  // STOMP 에러 핸들러
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
   }, []);
 
-  // WebSocket 에러 핸들러
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
   }, []);
 
-  // WebSocket 클라이언트 설정
   const setupStompClient = useCallback(
     (params: ConnectionParams): Client => {
       const stompClient = createStompClient({
@@ -60,7 +54,6 @@ export const useWebSocketConnection = () => {
     [handleConnect, handleDisconnect, handleStompError, handleWebSocketError]
   );
 
-  // WebSocket 시작
   const startSocket = useCallback(
     (joinCode: string, myName: string, menuId: number) => {
       if (client && isConnected) return;
@@ -75,7 +68,6 @@ export const useWebSocketConnection = () => {
     [client, isConnected, validateConnectionParams, setupStompClient]
   );
 
-  // WebSocket 중지
   const stopSocket = useCallback(() => {
     if (!client || !isConnected) return;
 

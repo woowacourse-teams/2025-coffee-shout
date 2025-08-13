@@ -5,13 +5,10 @@ import { useWebSocketReconnection } from '../hooks/useWebSocketReconnection';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
-  // WebSocket 연결 관리
   const { client, isConnected, startSocket, stopSocket } = useWebSocketConnection();
 
-  // WebSocket 메시징 관리
   const { subscribe, send } = useWebSocketMessaging({ client, isConnected });
 
-  // WebSocket 재연결 관리
   const { isVisible } = useWebSocketReconnection({
     isConnected,
     startSocket,
