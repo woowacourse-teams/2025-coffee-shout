@@ -4,10 +4,10 @@ import { getPlayersWithAngles } from './getPlayerWithAngles.ts';
 type Props = {
   from: PlayerProbability[];
   to: PlayerProbability[];
-  t: number;
+  progress: number;
 };
 
-export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
+export const interpolateAngles = ({ from, to, progress }: Props): Angle[] => {
   const totalFrom = from.reduce((sum, p) => sum + p.probability, 0);
   const totalTo = to.reduce((sum, p) => sum + p.probability, 0);
 
@@ -19,8 +19,8 @@ export const interpolateAngles = ({ from, to, t }: Props): Angle[] => {
 
     return {
       playerName: fromPlayer.playerName,
-      startAngle: fromPlayer.startAngle + (toPlayer.startAngle - fromPlayer.startAngle) * t,
-      endAngle: fromPlayer.endAngle + (toPlayer.endAngle - fromPlayer.endAngle) * t,
+      startAngle: fromPlayer.startAngle + (toPlayer.startAngle - fromPlayer.startAngle) * progress,
+      endAngle: fromPlayer.endAngle + (toPlayer.endAngle - fromPlayer.endAngle) * progress,
       playerColor: fromPlayer.playerColor,
     };
   });

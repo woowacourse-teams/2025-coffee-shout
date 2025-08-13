@@ -35,10 +35,10 @@ export const useRouletteTransition = (
       const rawT = Math.min(elapsed / ANIMATION_DURATION, 1);
 
       // Easing 적용, t는 애니메이션 진행률을 나타냄
-      const t = easeOutCubic(rawT);
+      const progress = easeOutCubic(rawT);
 
       // 현재 진행률에 따른 중간 각도 계산
-      const next = interpolateAngles({ from: prev, to: current, t });
+      const next = interpolateAngles({ from: prev, to: current, progress });
       setAngles(next);
 
       // 애니메이션이 완료되지 않았다면 다음 프레임 요청
