@@ -22,6 +22,13 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
     wasConnectedBeforeBackground.current = false;
   }, []);
 
+  const clearReconnectTimeout = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+  }, []);
+
   const attemptReconnect = useCallback(() => {
     if (reconnectAttemptsRef.current >= WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS) {
       console.log(
@@ -37,17 +44,14 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
       }/${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS})`
     );
 
-    // 이전 재연결 시도가 있는 경우 취소 (메모리 누수 방지)
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
+    clearReconnectTimeout();
 
     reconnectTimeoutRef.current = window.setTimeout(() => {
       console.log('🔄 웹소켓 재연결 시작');
       reconnectAttemptsRef.current += 1;
       startSocket(joinCode, myName, menuId);
     }, WEBSOCKET_CONFIG.RECONNECT_DELAY_MS);
-  }, [startSocket, joinCode, myName, menuId]);
+  }, [startSocket, joinCode, myName, menuId, clearReconnectTimeout]);
 
   // 앱 전환 감지 및 재연결 로직
   useEffect(() => {
@@ -65,11 +69,9 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
     }
 
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
+      clearReconnectTimeout();
     };
-  }, [isVisible, isConnected, stopSocket, attemptReconnect]);
+  }, [isVisible, isConnected, stopSocket, attemptReconnect, clearReconnectTimeout]);
 
   // 연결 성공 시 재연결 시도 횟수 리셋
   useEffect(() => {
