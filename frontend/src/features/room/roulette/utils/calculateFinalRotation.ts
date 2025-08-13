@@ -14,9 +14,6 @@ export const calculateFinalRotation = ({ finalAngles, winner, randomAngle }: Pro
   if (!winnerData) return 0;
 
   const { startAngle, endAngle } = winnerData;
-  console.log('startAngle', startAngle);
-  console.log('endAngle', endAngle);
-  console.log('randomAngle', randomAngle);
 
   if (endAngle - startAngle <= MARGIN_ANGLE * 2) {
     const centerAngle = (startAngle + endAngle) / 2;
