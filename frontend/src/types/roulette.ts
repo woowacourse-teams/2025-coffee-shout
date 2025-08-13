@@ -19,7 +19,7 @@ export type ProbabilityHistory = {
   current: PlayerProbability[];
 };
 
-export type Angle = {
+export type RouletteSector = {
   playerName: string;
   startAngle: number;
   endAngle: number;

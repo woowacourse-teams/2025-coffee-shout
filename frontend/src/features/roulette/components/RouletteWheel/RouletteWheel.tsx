@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { Angle, PlayerProbability } from '@/types/roulette';
+import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
 import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils/convertProbabilitiesToAngles';
@@ -7,7 +7,7 @@ import RouletteSlice from '../RouletteSlice/RouletteSlice';
 
 type Props =
   | {
-      angles: Angle[];
+      angles: RouletteSector[];
       playerProbabilities?: never;
       isSpinning?: boolean;
     }

@@ -1,4 +1,4 @@
-import { Angle, PlayerProbability } from '@/types/roulette';
+import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import { getPlayersWithAngles } from './getPlayerWithAngles.ts';
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   progress: number;
 };
 
-export const interpolateAngles = ({ from, to, progress }: Props): Angle[] => {
+export const interpolateAngles = ({ from, to, progress }: Props): RouletteSector[] => {
   const totalFrom = from.reduce((sum, p) => sum + p.probability, 0);
   const totalTo = to.reduce((sum, p) => sum + p.probability, 0);
 
