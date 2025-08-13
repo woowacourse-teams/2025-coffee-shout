@@ -17,10 +17,18 @@ type Props = {
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
+  isTimerActive: boolean;
   cardInfos: CardInfo[];
 };
 
-const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }: Props) => {
+const Round = ({
+  round,
+  onClickCard,
+  selectedCardInfo,
+  currentTime,
+  isTimerActive,
+  cardInfos,
+}: Props) => {
   return (
     <Layout>
       <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
@@ -31,7 +39,7 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>
-            <CircularProgress current={currentTime} total={TOTAL_COUNT} />
+            <CircularProgress current={currentTime} total={TOTAL_COUNT} isActive={isTimerActive} />
           </S.CircularProgressWrapper>
         </S.TitleContainer>
         <S.MyCardContainer>
