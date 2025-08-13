@@ -16,7 +16,11 @@ type Story = StoryObj<typeof CardGameReadyPage>;
 
 export const Default: Story = {
   render: () => {
-    return <CardGameReadyPage />;
+    return (
+      <div style={{ width: '100vw', height: '100vh' }}>
+        <CardGameReadyPage />
+      </div>
+    );
   },
   parameters: {
     layout: 'centered',
