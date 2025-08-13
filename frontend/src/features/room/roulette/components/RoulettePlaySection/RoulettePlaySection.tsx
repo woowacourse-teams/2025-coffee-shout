@@ -10,9 +10,10 @@ import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
 type Props = {
   isSpinning: boolean;
   winner: string | null;
+  randomAngle: number;
 };
 
-const RoulettePlaySection = ({ isSpinning, winner }: Props) => {
+const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
   const { myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
   const angles = useRouletteTransition(probabilityHistory.prev, probabilityHistory.current);
@@ -26,7 +27,11 @@ const RoulettePlaySection = ({ isSpinning, winner }: Props) => {
 
   const shouldComputeFinalRotation = isSpinning && winner;
   const finalRotation = shouldComputeFinalRotation
-    ? calculateFinalRotation(convertProbabilitiesToAngles(probabilityHistory.current), winner)
+    ? calculateFinalRotation({
+        finalAngles: convertProbabilitiesToAngles(probabilityHistory.current),
+        winner,
+        randomAngle,
+      })
     : 0;
 
   if (!angles) return null;

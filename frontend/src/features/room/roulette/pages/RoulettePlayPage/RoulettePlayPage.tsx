@@ -9,7 +9,6 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { Player } from '@/types/player';
 import { RouletteView } from '@/types/roulette';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +16,14 @@ import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePl
 import * as S from './RoulettePlayPage.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
+type RouletteWinnerData = {
+  playerName: string;
+  colorIndex: number;
+  randomAngle: number;
+};
+
 const RoulettePlayPage = () => {
+  const [randomAngle, setRandomAngle] = useState(0);
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { playerType } = usePlayerType();
@@ -31,12 +37,13 @@ const RoulettePlayPage = () => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [winner, setWinner] = useState<string | null>(null);
 
-  const handleWinnerData = useCallback((data: Player) => {
+  const handleWinnerData = useCallback((data: RouletteWinnerData) => {
     setWinner(data.playerName);
+    setRandomAngle(data.randomAngle);
     setIsSpinning(true);
   }, []);
 
-  useWebSocketSubscription<Player>(`/room/${joinCode}/winner`, handleWinnerData);
+  useWebSocketSubscription<RouletteWinnerData>(`/room/${joinCode}/winner`, handleWinnerData);
 
   const isRouletteView = currentView === 'roulette';
 
@@ -52,7 +59,6 @@ const RoulettePlayPage = () => {
 
   const handleSpinClick = () => {
     if (currentView === 'statistics') handleViewChange();
-    setIsSpinning(true);
     send(`/room/${joinCode}/spin-roulette`, { hostName: myName });
   };
 
@@ -79,7 +85,11 @@ const RoulettePlayPage = () => {
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
           {isRouletteView ? (
-            <RoulettePlaySection isSpinning={isSpinning} winner={winner} />
+            <RoulettePlaySection
+              isSpinning={isSpinning}
+              winner={winner}
+              randomAngle={randomAngle}
+            />
           ) : (
             <ProbabilityList playerProbabilities={probabilityHistory.current} />
           )}

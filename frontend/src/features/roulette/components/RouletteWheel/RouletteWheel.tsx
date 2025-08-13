@@ -27,7 +27,6 @@ const RouletteWheel = ({
   isSpinning = false,
   finalRotation = 0,
 }: Props) => {
-  console.log(finalRotation);
   const theme = useTheme();
 
   const playersWithAngles = angles || convertProbabilitiesToAngles(playerProbabilities);
