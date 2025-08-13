@@ -29,42 +29,51 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
     }
   }, []);
 
-  const attemptReconnect = useCallback(() => {
+  const checkAndHandleMaxAttempts = useCallback(() => {
     if (reconnectAttemptsRef.current >= WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS) {
       console.log(
         `❌ 최대 재연결 시도 횟수 초과 (${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS}회) - 재연결 중단`
       );
       wasConnectedBeforeBackground.current = false;
-      return;
+      return true;
     }
+    return false;
+  }, []);
 
+  const logReconnectAttempt = useCallback(() => {
     console.log(
       `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${
         reconnectAttemptsRef.current + 1
       }/${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS})`
     );
+  }, []);
 
-    clearReconnectTimeout();
-
+  const scheduleReconnect = useCallback(() => {
     reconnectTimeoutRef.current = window.setTimeout(() => {
       console.log('🔄 웹소켓 재연결 시작');
       reconnectAttemptsRef.current += 1;
       startSocket(joinCode, myName, menuId);
     }, WEBSOCKET_CONFIG.RECONNECT_DELAY_MS);
-  }, [startSocket, joinCode, myName, menuId, clearReconnectTimeout]);
+  }, [startSocket, joinCode, myName, menuId]);
 
-  // 앱 전환 감지 및 재연결 로직
+  const attemptReconnect = useCallback(() => {
+    if (checkAndHandleMaxAttempts()) return;
+    logReconnectAttempt();
+    clearReconnectTimeout();
+    scheduleReconnect();
+  }, [checkAndHandleMaxAttempts, logReconnectAttempt, clearReconnectTimeout, scheduleReconnect]);
+
+  /**
+   * 앱 전환 감지 및 재연결 로직
+   */
   useEffect(() => {
     if (!isVisible) {
-      // 백그라운드이고, 웹소켓이 끊기지 않은 경우
-      if (!isConnected) return;
-
-      // 백그라운드이고, 웹소켓이 끊긴 경우
-      wasConnectedBeforeBackground.current = true;
-      console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
-      stopSocket();
+      if (isConnected) {
+        wasConnectedBeforeBackground.current = true;
+        console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
+        stopSocket();
+      }
     } else if (wasConnectedBeforeBackground.current) {
-      // 현재 포그라운드이고, 이전에 한 번 웹소켓이 연결된 경우, 재연결 시도
       attemptReconnect();
     }
 
@@ -73,7 +82,9 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
     };
   }, [isVisible, isConnected, stopSocket, attemptReconnect, clearReconnectTimeout]);
 
-  // 연결 성공 시 재연결 시도 횟수 리셋
+  /**
+   * 연결 성공 시 재연결 시도 횟수 리셋
+   */
   useEffect(() => {
     if (isConnected) {
       resetReconnectAttempts();
