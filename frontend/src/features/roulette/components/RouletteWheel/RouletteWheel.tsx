@@ -31,7 +31,7 @@ const RouletteWheel = ({
 
   return (
     <S.Container>
-      <RoulettePin />
+      <S.Pin />
       <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
         <svg
           width={WHEEL_CONFIG.SIZE}
@@ -52,7 +52,3 @@ const RouletteWheel = ({
 };
 
 export default RouletteWheel;
-
-const RoulettePin = () => {
-  return <S.Pin />;
-};
