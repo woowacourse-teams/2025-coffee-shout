@@ -25,13 +25,4 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
       console.error('❌ 웹소켓 구독 실패:', error);
     }
   }, [isConnected, isVisible, subscribe, destination, onData]);
-
-  // 재연결시 구독 상태 복구를 위한 디버깅 로그
-  useEffect(() => {
-    console.log(`🔍 구독 상태 변경 - ${destination}:`, {
-      isConnected,
-      isVisible,
-      hasSubscription: !!subscriptionRef.current,
-    });
-  }, [isConnected, isVisible, destination]);
 };
