@@ -91,8 +91,7 @@ export class WebSocketErrorHandler {
       fullMessage,
       {
         type: 'subscription',
-        url,
-        extra: { messageBody },
+        extra: { url, messageBody },
       },
       onError
     );
@@ -116,8 +115,7 @@ export class WebSocketErrorHandler {
       errorMessage,
       {
         type,
-        url,
-        extra: { isConnected, hasClient },
+        extra: { url, isConnected, hasClient },
       },
       onError
     );
@@ -135,8 +133,7 @@ export class WebSocketErrorHandler {
       errorMessage,
       {
         type: 'parsing',
-        url,
-        extra: { messageBody, originalError: String(originalError) },
+        extra: { url, messageBody, originalError: String(originalError) },
       },
       onError
     );
@@ -149,8 +146,7 @@ export class WebSocketErrorHandler {
       errorMessage,
       {
         type: 'send',
-        url,
-        extra: { body: String(body), originalError: String(originalError) },
+        extra: { url, body: String(body), originalError: String(originalError) },
       },
       onError
     );
