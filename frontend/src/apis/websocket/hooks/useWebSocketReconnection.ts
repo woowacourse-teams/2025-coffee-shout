@@ -12,7 +12,6 @@ type Props = {
 export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket }: Props) => {
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
   const { joinCode, myName, menuId } = useIdentifier();
-
   const { isVisible } = usePageVisibility();
   const wasConnectedBeforeBackground = useRef(true);
   const reconnectTimeoutRef = useRef<number | null>(null);
@@ -38,6 +37,7 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
       }/${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS})`
     );
 
+    // 이전 재연결 시도가 있는 경우 취소 (메모리 누수 방지)
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
@@ -52,11 +52,15 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   // 앱 전환 감지 및 재연결 로직
   useEffect(() => {
     if (!isVisible) {
+      // 백그라운드이고, 웹소켓이 끊기지 않은 경우
       if (!isConnected) return;
+
+      // 백그라운드이고, 웹소켓이 끊긴 경우
       wasConnectedBeforeBackground.current = true;
       console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
       stopSocket();
     } else if (wasConnectedBeforeBackground.current) {
+      // 현재 포그라운드이고, 이전에 한 번 웹소켓이 연결된 경우, 재연결 시도
       attemptReconnect();
     }
 
