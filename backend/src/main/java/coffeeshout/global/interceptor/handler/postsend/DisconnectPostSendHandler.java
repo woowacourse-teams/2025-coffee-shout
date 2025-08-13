@@ -2,6 +2,7 @@ package coffeeshout.global.interceptor.handler.postsend;
 
 import coffeeshout.global.interceptor.handler.PostSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.PlayerDisconnectionService;
 import coffeeshout.global.websocket.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DisconnectPostSendHandler implements PostSendHandler {
 
+    private static final String CLIENT_DISCONNECT = "CLIENT_DISCONNECT";
+
     private final StompSessionManager sessionManager;
     private final WebSocketMetricService webSocketMetricService;
+    private final PlayerDisconnectionService playerDisconnectionService;
 
     @Override
     public StompCommand getCommand() {
@@ -33,7 +37,17 @@ public class DisconnectPostSendHandler implements PostSendHandler {
             return;
         }
 
+        final String disconnectedPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
+        if (disconnectedPlayerKey != null) {
+            log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
+
+            // 방에서 플레이어 제거
+            playerDisconnectionService.handlePlayerDisconnection(disconnectedPlayerKey, sessionId, CLIENT_DISCONNECT);
+        }
+
+        sessionManager.removeSession(sessionId);
         log.info("WebSocket 연결 해제 완료: sessionId={}", sessionId);
-        webSocketMetricService.recordDisconnection(sessionId, "client_disconnect", true);
+
+        webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT, true);
     }
 }

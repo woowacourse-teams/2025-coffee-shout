@@ -88,36 +88,10 @@ public class StompSessionManager {
     }
 
     /**
-     * 플레이어 세션 제거
-     */
-    public void removePlayerSession(String joinCode, String playerName) {
-        String playerKey = createPlayerKey(joinCode, playerName);
-        String sessionId = playerSessionMap.remove(playerKey);
-        if (sessionId != null) {
-            sessionPlayerMap.remove(sessionId);
-            log.info("플레이어 세션 제거: playerKey={}, sessionId={}", playerKey, sessionId);
-        }
-    }
-
-    /**
      * 중복 disconnection 처리 방지를 위한 체크 및 등록
      */
     public boolean isDisconnectionProcessed(String sessionId) {
         return !processedDisconnections.add(sessionId);
-    }
-
-    /**
-     * 중복 disconnection 처리 상태 제거
-     */
-    public void removeDisconnectionProcessed(String sessionId) {
-        processedDisconnections.remove(sessionId);
-    }
-
-    /**
-     * 현재 연결된 세션 수 조회
-     */
-    public int getConnectedSessionCount() {
-        return sessionPlayerMap.size();
     }
 
     /**

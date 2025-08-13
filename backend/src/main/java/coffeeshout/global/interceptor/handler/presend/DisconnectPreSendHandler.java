@@ -14,9 +14,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DisconnectPreSendHandler implements PreSendHandler {
 
-    private final StompSessionManager sessionManager;
-    private final PlayerDisconnectionService playerDisconnectionService;
-
     @Override
     public StompCommand getCommand() {
         return StompCommand.DISCONNECT;
@@ -25,13 +22,5 @@ public class DisconnectPreSendHandler implements PreSendHandler {
     @Override
     public void handle(StompHeaderAccessor accessor, String sessionId) {
         log.info("WebSocket 연결 해제 요청: sessionId={}", sessionId);
-        
-        final String disconnectedPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
-        if (disconnectedPlayerKey != null) {
-            log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
-            
-            // 방에서 플레이어 제거
-            playerDisconnectionService.handlePlayerDisconnection(disconnectedPlayerKey, sessionId, "CLIENT_DISCONNECT");
-        }
     }
 }
