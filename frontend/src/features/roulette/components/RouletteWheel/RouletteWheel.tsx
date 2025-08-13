@@ -48,7 +48,7 @@ const RouletteWheel = ({ angles, playerProbabilities, isSpinning = false }: Prop
 export default RouletteWheel;
 
 type RouletteSliceProps = {
-  player: { playerName: string; playerColor: string; startAngle: number; endAngle: number };
+  player: Angle;
   strokeColor: string;
 };
 
