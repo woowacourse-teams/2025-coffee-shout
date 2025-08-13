@@ -13,7 +13,7 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
   const { joinCode, myName, menuId } = useIdentifier();
   const { isVisible } = usePageVisibility();
-  const wasConnectedBeforeBackground = useRef(true);
+  const wasConnectedBeforeBackground = useRef(false);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
 
