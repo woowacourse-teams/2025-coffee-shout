@@ -3,7 +3,6 @@ package coffeeshout.global.interceptor;
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -36,11 +35,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
         }
 
         try {
-            handlerRegistry.getPreSendHandler(command)
-                    .ifPresentOrElse(
-                            handler -> handler.handle(accessor, sessionId),
-                            () -> log.trace("처리할 PreSend 핸들러가 없습니다: command={}", command)
-                    );
+            handlerRegistry.handlePreSend(command, accessor, sessionId);
         } catch (Exception e) {
             log.error("STOMP 인터셉터 처리 중 에러: sessionId={}, command={}", sessionId, command, e);
         }
@@ -65,11 +60,7 @@ public class CustomStompChannelInterceptor implements ChannelInterceptor {
         }
 
         try {
-            handlerRegistry.getPostSendHandler(command)
-                    .ifPresentOrElse(
-                            handler -> handler.handle(accessor, sessionId, sent),
-                            () -> log.trace("처리할 PostSend 핸들러가 없습니다: command={}", command)
-                    );
+            handlerRegistry.handlePostSend(command, accessor, sessionId, sent);
         } catch (Exception e) {
             log.error("STOMP postSend 처리 중 에러: sessionId={}, command={}", sessionId, command, e);
         }

@@ -2,11 +2,11 @@ package coffeeshout.global.interceptor.handler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,16 +33,26 @@ public class StompHandlerRegistry {
     }
 
     /**
-     * PreSend 핸들러 조회
+     * PreSend 핸들러 사용
      */
-    public Optional<PreSendHandler> getPreSendHandler(StompCommand command) {
-        return Optional.ofNullable(preSendHandlers.get(command));
+    public void handlePreSend(StompCommand command, StompHeaderAccessor accessor, String sessionId) {
+        if (preSendHandlers.containsKey(command)) {
+            preSendHandlers.get(command).handle(accessor, sessionId);
+            return;
+        }
+
+        log.trace("처리할 PreSend 핸들러가 없습니다: command={}", command);
     }
 
     /**
-     * PostSend 핸들러 조회
+     * PostSend 핸들러 사용
      */
-    public Optional<PostSendHandler> getPostSendHandler(StompCommand command) {
-        return Optional.ofNullable(postSendHandlers.get(command));
+    public void handlePostSend(StompCommand command, StompHeaderAccessor accessor, String sessionId, boolean sent) {
+        if (postSendHandlers.containsKey(command)) {
+            postSendHandlers.get(command).handle(accessor, sessionId, sent);
+            return;
+        }
+
+        log.trace("처리할 PostSend 핸들러가 없습니다: command={}", command);
     }
 }
