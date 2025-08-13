@@ -4,7 +4,7 @@ import { Angle, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
 import { getCenterAngle } from '../../utils/getCenterAngle';
 import { getTextPosition } from '../../utils/getTextPosition';
-import { WHEEL_CONFIG } from '../constants/config';
+import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils/convertProbabilitiesToAngles';
 
 type Props =
