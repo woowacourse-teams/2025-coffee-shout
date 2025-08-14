@@ -32,17 +32,47 @@ export const Interactive: StoryObj<typeof RouletteWheel> = {
 const mockPlayerProbabilities = [
   {
     playerName: '홍길동',
-    probability: 30.0,
+    probability: 15.0,
     playerColor: colorList[0],
   },
   {
     playerName: '김철수',
-    probability: 30.0,
+    probability: 12.0,
     playerColor: colorList[1],
   },
   {
     playerName: '이순신',
-    probability: 40.0,
+    probability: 18.0,
     playerColor: colorList[2],
+  },
+  {
+    playerName: '박영희',
+    probability: 10.0,
+    playerColor: colorList[3],
+  },
+  {
+    playerName: '정민수',
+    probability: 14.0,
+    playerColor: colorList[4],
+  },
+  {
+    playerName: '최지영',
+    probability: 11.0,
+    playerColor: colorList[5],
+  },
+  {
+    playerName: '강동원',
+    probability: 8.0,
+    playerColor: colorList[6],
+  },
+  {
+    playerName: '윤서연',
+    probability: 7.0,
+    playerColor: colorList[7],
+  },
+  {
+    playerName: '임태현',
+    probability: 5.0,
+    playerColor: colorList[8],
   },
 ];

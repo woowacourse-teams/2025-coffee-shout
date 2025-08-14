@@ -27,13 +27,13 @@ export type ColorKey = keyof typeof COLOR_MAP;
 export const colorList = [
   '#FF6B6B',
   '#80d6d0',
-  '#45B7D1',
-  '#96CEB4',
-  '#FFEAA7',
-  '#DDA0DD',
-  '#98D8C8',
-  '#F7DC6F',
-  '#BB8FCE',
+  '#a7e142',
+  '#bf77f6',
+  '#ffa102',
+  '#5a88c8',
+  '#ff8ad8',
+  '#c6c8d0',
+  '#2ba727',
 ] as const;
 
 export type ColorList = (typeof colorList)[number];
