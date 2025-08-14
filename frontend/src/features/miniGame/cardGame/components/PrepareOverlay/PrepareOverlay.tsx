@@ -4,12 +4,17 @@ import chatBubble from '@/assets/chat_bubble.svg';
 import coffee from '@/assets/coffee-white.svg';
 import { useEffect, useState } from 'react';
 
+const PREPARE_TEXT = {
+  READY: 'READY',
+  START: 'START!',
+};
+
 const PrepareOverlay = () => {
-  const [displayText, setDisplayText] = useState<string>('READY');
+  const [displayText, setDisplayText] = useState<string>(PREPARE_TEXT.READY);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDisplayText('START!');
+      setDisplayText(PREPARE_TEXT.START);
     }, 1000);
 
     return () => clearTimeout(timer);
