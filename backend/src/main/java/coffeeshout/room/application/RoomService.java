@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
@@ -101,7 +102,7 @@ public class RoomService {
         return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
     }
 
-    public Player spinRoulette(String joinCode, String hostName) {
+    public Winner spinRoulette(String joinCode, String hostName) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
@@ -137,5 +138,10 @@ public class RoomService {
     public List<MiniGameType> getSelectedMiniGames(String joinCode) {
         final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
         return room.getSelectedMiniGameTypes();
+    }
+
+    public boolean removePlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        return room.removePlayer(new PlayerName(playerName));
     }
 }

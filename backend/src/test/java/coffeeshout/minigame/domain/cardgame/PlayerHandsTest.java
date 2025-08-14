@@ -127,7 +127,7 @@ class PlayerHandsTest {
             // when - 두 번째 라운드
             playerHands.put(players.getPlayer(new PlayerName("꾹이")), MultiplierCard.DOUBLE);
             playerHands.put(players.getPlayer(new PlayerName("루키")), MultiplierCard.QUADRUPLE);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), MultiplierCard.NULLIFY);
+            playerHands.put(players.getPlayer(new PlayerName("한스")), MultiplierCard.INVERT);
             assertThat(playerHands.isRoundFinished()).isFalse();
             playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.ZERO);
 
@@ -174,7 +174,7 @@ class PlayerHandsTest {
             playerHands.put(player1, AdditionCard.PLUS_40);
             playerHands.put(player1, MultiplierCard.DOUBLE);
             playerHands.put(player2, AdditionCard.PLUS_30);
-            playerHands.put(player2, MultiplierCard.NULLIFY);
+            playerHands.put(player2, MultiplierCard.INVERT);
 
             // when
             Map<Player, MiniGameScore> scores = playerHands.scoreByPlayer();
@@ -182,7 +182,7 @@ class PlayerHandsTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(scores.get(player1).getValue()).isEqualTo(80);
-                softly.assertThat(scores.get(player2).getValue()).isEqualTo(0);
+                softly.assertThat(scores.get(player2).getValue()).isEqualTo(-30);
                 softly.assertThat(scores).hasSize(4);
             });
         }

@@ -2,7 +2,6 @@ package coffeeshout.minigame.domain.cardgame.card;
 
 import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.DOUBLE;
 import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.INVERT;
-import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.NULLIFY;
 import static coffeeshout.minigame.domain.cardgame.card.MultiplierCard.QUADRUPLE;
 import static org.springframework.util.Assert.isTrue;
 
@@ -18,7 +17,6 @@ public class MultiplierCards {
         this.cards = new ArrayList<>();
         this.cards.add(QUADRUPLE);
         this.cards.add(DOUBLE);
-        this.cards.add(NULLIFY);
         this.cards.add(INVERT);
     }
 
