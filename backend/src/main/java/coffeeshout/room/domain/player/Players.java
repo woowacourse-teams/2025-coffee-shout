@@ -1,6 +1,7 @@
 package coffeeshout.room.domain.player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 
@@ -8,17 +9,17 @@ import lombok.Getter;
 public class Players {
 
     private final List<Player> players;
+    private final ColorUsage colorUsage;
 
     public Players() {
-        this.players = new ArrayList<>();
+        this.players = Collections.synchronizedList(new ArrayList<>());
+        this.colorUsage = new ColorUsage();
     }
 
-    public void join(Player player) {
+    public Player join(Player player) {
+        player.assignColorIndex(colorUsage.pickRandomOne());
         this.players.add(player);
-    }
-
-    public boolean notExistPlayerName(PlayerName playerName) {
-        return players.stream().noneMatch(player -> player.getName().equals(playerName));
+        return getPlayer(player.getName());
     }
 
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {
@@ -34,5 +35,29 @@ public class Players {
 
     public int getPlayerCount() {
         return players.size();
+    }
+
+    public boolean hasDuplicateName(PlayerName playerName) {
+        return players.stream().anyMatch(player -> player.sameName(playerName));
+    }
+
+    public boolean isAllReady() {
+        return players.stream()
+                .allMatch(Player::getIsReady);
+    }
+
+    public boolean removePlayer(PlayerName playerName) {
+        return players.removeIf(player -> {
+            if (player.sameName(playerName)) {
+                colorUsage.release(player.getColorIndex());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public boolean existsByName(PlayerName playerName) {
+        return players.stream()
+                .anyMatch(player -> player.sameName(playerName));
     }
 }

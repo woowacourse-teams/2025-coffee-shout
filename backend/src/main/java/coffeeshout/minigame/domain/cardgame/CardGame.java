@@ -11,7 +11,6 @@ import coffeeshout.minigame.domain.cardgame.card.Deck;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.player.Players;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class CardGame implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(calculateScores());
+        return MiniGameResult.from(getScores());
     }
 
     @Override
@@ -46,23 +45,32 @@ public class CardGame implements Playable {
     }
 
     @Override
-    public void startGame(Players players) {
+    public void startGame(List<Player> players) {
         playerHands = new PlayerHands(players);
     }
 
+    @Override
+    public Map<Player, MiniGameScore> getScores() {
+        return playerHands.scoreByPlayer();
+    }
+
     public void startRound() {
-        deck.shuffle();
+        this.state = CardGameState.LOADING;
         this.round = round.next();
+    }
+
+    public void updateDescription() {
+        this.state = CardGameState.DESCRIPTION;
+    }
+
+    public void startPlay() {
+        deck.shuffle();
         this.state = CardGameState.PLAYING;
     }
 
     public void selectCard(Player player, Integer cardIndex) {
         state(state == CardGameState.PLAYING, "현재 게임이 진행중인 상태가 아닙니다.");
         playerHands.put(player, deck.pick(cardIndex));
-    }
-
-    public Map<Player, MiniGameScore> calculateScores() {
-        return playerHands.scoreByPlayer();
     }
 
     public boolean isFinishedThisRound() {
@@ -78,7 +86,7 @@ public class CardGame implements Playable {
     }
 
     public void assignRandomCardsToUnselectedPlayers() {
-        List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
+        final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
             playerHands.put(player, card);
@@ -91,10 +99,6 @@ public class CardGame implements Playable {
 
     public void changeScoreBoardState() {
         this.state = CardGameState.SCORE_BOARD;
-    }
-
-    public void changeLoadingState() {
-        this.state = CardGameState.LOADING;
     }
 
     public void changeDoneState() {

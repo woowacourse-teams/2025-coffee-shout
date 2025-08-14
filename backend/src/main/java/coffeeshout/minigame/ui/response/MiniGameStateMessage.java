@@ -14,27 +14,32 @@ public record MiniGameStateMessage(
         List<CardInfoMessage> cardInfoMessages,
         Boolean allSelected
 ) {
+
     public record CardInfoMessage(
             String cardType,
             int value,
             boolean selected,
-            String playerName
+            String playerName,
+            Integer colorIndex
     ) {
+
         public static List<CardInfoMessage> from(@NonNull CardGame cardGame) {
             return cardGame.getDeck().getCards().stream()
                     .map(card -> {
                         Optional<Player> player = cardGame.findCardOwnerInCurrentRound(card);
                         PlayerName name = player.map(Player::getName).orElse(null);
-                        return CardInfoMessage.of(card, player.isPresent(), name);
+                        Integer colorIndex = player.map(Player::getColorIndex).orElse(null);
+                        return CardInfoMessage.of(card, player.isPresent(), name, colorIndex);
                     }).toList();
         }
 
-        public static CardInfoMessage of(@NonNull Card card, boolean isSelected, PlayerName name) {
+        public static CardInfoMessage of(@NonNull Card card, boolean isSelected, PlayerName name, Integer colorIndex) {
             return new CardInfoMessage(
                     card.getType().name(),
                     card.getValue(),
                     isSelected,
-                    name == null ? null : name.value()
+                    name == null ? null : name.value(),
+                    colorIndex
             );
         }
     }

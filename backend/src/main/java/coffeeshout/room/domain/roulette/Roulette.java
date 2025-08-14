@@ -1,8 +1,12 @@
 package coffeeshout.room.domain.roulette;
 
+import static coffeeshout.room.domain.RoomErrorCode.NO_EXIST_PLAYER;
+
+import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameResultType;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,10 +20,11 @@ public class Roulette {
         this.playerProbabilities = new LinkedHashMap<>();
     }
 
-    public Player spin() {
+    public Winner spin() {
         final RouletteRanges rouletteRanges = new RouletteRanges(playerProbabilities);
         final int randomNumber = randomPicker.nextInt(1, rouletteRanges.endValue());
-        return rouletteRanges.pickPlayer(randomNumber);
+        final Player pickedPlayer = rouletteRanges.pickPlayer(randomNumber);
+        return Winner.from(pickedPlayer);
     }
 
     public void join(Player player) {
@@ -33,9 +38,9 @@ public class Roulette {
     public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
         for (Player player : playerProbabilities.keySet()) {
             final int rank = miniGameResult.getPlayerRank(player);
-            final Probability probability = probabilityCalculator.calculateAdjustProbability(getPlayerCount(), rank);
-            final MiniGameResultType resultType = MiniGameResultType.of(getPlayerCount(), rank);
-            final Probability adjustedProbability = getProbability(player).adjust(resultType, probability);
+            final int probabilityChange = probabilityCalculator.calculateProbabilityChange(rank,
+                    miniGameResult.getTieCountByRank(rank));
+            final Probability adjustedProbability = getProbability(player).plus(probabilityChange);
             playerProbabilities.put(player, adjustedProbability);
         }
     }
@@ -50,5 +55,29 @@ public class Roulette {
 
     public Map<Player, Probability> getProbabilities() {
         return Map.copyOf(playerProbabilities);
+    }
+
+    public boolean removePlayer(PlayerName playerName) {
+        final Player player = getPlayer(playerName);
+
+        if (playerProbabilities.remove(player) == null) {
+            return false;
+        }
+
+        // 남은 플레이어들의 확률 재조정
+        if (!playerProbabilities.isEmpty()) {
+            final Probability probability = Probability.TOTAL.divide(getPlayerCount());
+            for (Map.Entry<Player, Probability> entry : playerProbabilities.entrySet()) {
+                entry.setValue(probability);
+            }
+        }
+        return true;
+    }
+
+    private Player getPlayer(PlayerName playerName) {
+        return playerProbabilities.keySet().stream()
+                .filter(p -> p.sameName(playerName))
+                .findFirst()
+                .orElseThrow(() -> new InvalidArgumentException(NO_EXIST_PLAYER, "플레이어가 존재하지 않습니다."));
     }
 }
