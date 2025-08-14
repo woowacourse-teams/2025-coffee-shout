@@ -1,10 +1,10 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import * as S from './Slide.styled';
-import { ImgHTMLAttributes, ReactElement } from 'react';
+import { ComponentProps, ReactElement } from 'react';
 
 type Props = {
   textLines: string[];
-  image: ReactElement<ImgHTMLAttributes<HTMLImageElement>, 'img'>;
+  image: ReactElement<ComponentProps<'img'>>;
   className: string;
 };
 
