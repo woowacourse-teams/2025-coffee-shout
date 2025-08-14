@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useState } from 'react';
-import { useRouletteTransition } from './useRouletteTrantision';
+import { useRouletteTransition } from './useRouletteTransition';
 import { PlayerProbability } from '@/types/roulette';
 import { colorList } from '@/constants/color';
 
@@ -15,7 +15,7 @@ const RouletteTransitionDemo = ({
   const [current, setCurrent] = useState<PlayerProbability[] | null>(targetData);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const angles = useRouletteTransition(prev, current);
+  const animatedSectors = useRouletteTransition(prev, current);
 
   const handleStartAnimation = () => {
     setPrev(current);
@@ -78,7 +78,7 @@ const RouletteTransitionDemo = ({
             <svg width="300" height="300" viewBox="0 0 300 300">
               <circle cx="150" cy="150" r="140" fill="none" stroke="#ddd" strokeWidth="2" />
 
-              {angles?.map((angle, index) => {
+              {animatedSectors?.map((angle, index) => {
                 const startAngleRad = (angle.startAngle * Math.PI) / 180;
                 const endAngleRad = (angle.endAngle * Math.PI) / 180;
 
@@ -132,9 +132,9 @@ const RouletteTransitionDemo = ({
               overflowY: 'auto',
             }}
           >
-            {angles ? (
+            {animatedSectors ? (
               <div>
-                {angles.map((angle) => (
+                {animatedSectors.map((angle) => (
                   <div key={angle.playerName} style={{ marginBottom: '10px' }}>
                     <strong>{angle.playerName}</strong>
                     <br />
