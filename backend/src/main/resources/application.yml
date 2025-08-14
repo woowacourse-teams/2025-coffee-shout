@@ -15,4 +15,14 @@ management:
     web:
       exposure:
         include: "health,info,metrics,prometheus"
-
+  metrics:
+    enable:
+      tomcat: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true

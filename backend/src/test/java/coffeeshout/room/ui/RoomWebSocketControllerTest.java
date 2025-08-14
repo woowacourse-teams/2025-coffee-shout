@@ -21,6 +21,7 @@ import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.WinnerResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -232,23 +233,22 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
 
         // when - 룰렛 결과 구독
-        MessageCollector<WebSocketResponse<PlayerResponse>> rouletteSubscribe = session.subscribe(
+        MessageCollector<WebSocketResponse<WinnerResponse>> rouletteSubscribe = session.subscribe(
                 "/topic/room/" + joinCode + "/winner",
-                new TypeReference<WebSocketResponse<PlayerResponse>>() {
+                new TypeReference<WebSocketResponse<WinnerResponse>>() {
                 }
         );
 
         session.send("/app/room/" + joinCode + "/spin-roulette", new RouletteSpinMessage(hostName));
 
-        WebSocketResponse<PlayerResponse> response = rouletteSubscribe.get();
+        WebSocketResponse<WinnerResponse> response = rouletteSubscribe.get();
 
         // then
         assertThat(response.success()).isTrue();
         assertThat(response.data()).isNotNull();
 
-        PlayerResponse winner = response.data();
+        WinnerResponse winner = response.data();
         assertThat(winner.playerName()).isNotBlank();
-        assertThat(winner.menuResponse()).isNotNull();
 
         // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
         List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
@@ -278,7 +278,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                 softly -> {
                     softly.assertThat(readyResponses).filteredOn(player -> player.playerName().equals(playerName))
                             .extracting(PlayerResponse::isReady).containsExactly(true);
-                    softly.assertThat(readyResponses).extracting(PlayerResponse::isReady).containsExactlyInAnyOrder(true, true, false, false);
+                    softly.assertThat(readyResponses).extracting(PlayerResponse::isReady)
+                            .containsExactlyInAnyOrder(true, true, false, false);
                 }
         );
     }
