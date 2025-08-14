@@ -40,15 +40,15 @@ const CardGamePlayPage = () => {
 
   useEffect(() => {
     if (currentCardGameState === 'DESCRIPTION') {
-      setCurrentTime(10);
+      setCurrentTime(TOTAL_COUNT);
       setIsTimerActive(false);
     } else if (currentCardGameState === 'PLAYING') {
       if (currentRound === 'FIRST') {
-        setCurrentTime(10);
+        setCurrentTime(TOTAL_COUNT);
         setIsTimerActive(true);
         isTimerReset.current = false;
       } else if (currentRound === 'SECOND' && !isTimerReset.current) {
-        setCurrentTime(10);
+        setCurrentTime(TOTAL_COUNT);
         setIsTimerActive(true);
         isTimerReset.current = true;
       }
