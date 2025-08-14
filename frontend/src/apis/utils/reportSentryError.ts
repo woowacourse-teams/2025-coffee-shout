@@ -30,7 +30,7 @@ export const reportApiError = (error: ApiError | NetworkError) => {
   }
 };
 
-export const reportWebsocketError = (errorMessage: string, options?: WebSocketErrorOptions) => {
+export const reportWebSocketError = (errorMessage: string, options?: WebSocketErrorOptions) => {
   const { type = 'connection', extra } = options || {};
 
   Sentry.captureException(new Error(errorMessage), {

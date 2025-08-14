@@ -1,4 +1,4 @@
-import { reportWebsocketError } from '@/apis/utils/reportSentryError';
+import { reportWebSocketError } from '@/apis/utils/reportSentryError';
 import { Client, IFrame } from '@stomp/stompjs';
 import { WebSocketErrorOptions } from '../constants/constants';
 
@@ -51,7 +51,7 @@ class WebSocketErrorHandler {
     onError?: (error: WebSocketError) => void
   ): WebSocketError {
     console.error(message);
-    reportWebsocketError(message, options);
+    reportWebSocketError(message, options);
 
     const error = new WebSocketError(message, options?.type || 'unknown', options?.extra);
     onError?.(error);
