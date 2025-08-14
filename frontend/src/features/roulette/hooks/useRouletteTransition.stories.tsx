@@ -4,7 +4,6 @@ import { useRouletteTransition } from './useRouletteTransition';
 import { PlayerProbability } from '@/types/roulette';
 import { colorList } from '@/constants/color';
 
-// 테스트용 컴포넌트
 const RouletteTransitionDemo = ({
   initialData,
   targetData,
