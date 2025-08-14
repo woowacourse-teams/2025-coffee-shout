@@ -40,7 +40,7 @@ export const Wrapper = styled.div<WrapperProps>`
 `;
 
 export const PlayerNameText = styled.text`
-  fill: ${({ theme }) => theme.color.point[100]};
+  fill: ${({ theme }) => theme.color.white};
   font-size: 12px;
   font-weight: bold;
 `;
