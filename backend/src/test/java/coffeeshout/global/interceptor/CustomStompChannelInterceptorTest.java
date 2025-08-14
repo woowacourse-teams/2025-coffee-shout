@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -53,6 +54,9 @@ class CustomStompChannelInterceptorTest {
     @Mock
     private MessageChannel channel;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private StompSessionManager sessionManager;
     private CustomStompChannelInterceptor interceptor;
 
@@ -72,6 +76,11 @@ class CustomStompChannelInterceptorTest {
         final RoomService roomService = mock(RoomService.class);
         final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
                 roomService);
+        eventPublisher = new ApplicationEventPublisher() {
+            @Override
+            public void publishEvent(Object event) {
+            }
+        };
 
         // 핸들러들 생성
         connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
@@ -79,7 +88,7 @@ class CustomStompChannelInterceptorTest {
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
                 playerDisconnectionService);
         disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                playerDisconnectionService, eventPublisher);
         errorPreSendHandler = new ErrorPreSendHandler(sessionManager, webSocketMetricService,
                 playerDisconnectionService);
 
@@ -131,8 +140,8 @@ class CustomStompChannelInterceptorTest {
             // when
             interceptor.postSend(message, channel, true);
 
-            // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
+            // then - 세션이 남아있는지 확인
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 
@@ -169,9 +178,8 @@ class CustomStompChannelInterceptorTest {
         }
 
         /**
-         * 현재 로직은 disconnect 후 연결을 하는 것이므로
-         * disconnect 없이 연결 시도하면 예외가 발생한다.
-         * 재연결 실패: joinCode=TEV23, playerName=testPlayer, error=중복된 닉네임은 들어올 수 없습니다. 닉네임: testPlayer
+         * 현재 로직은 disconnect 후 연결을 하는 것이므로 disconnect 없이 연결 시도하면 예외가 발생한다. 재연결 실패: joinCode=TEV23,
+         * playerName=testPlayer, error=중복된 닉네임은 들어올 수 없습니다. 닉네임: testPlayer
          */
         @Disabled
         @Test
@@ -276,8 +284,8 @@ class CustomStompChannelInterceptorTest {
             // when
             disconnectPostSendHandler.handle(accessor, sessionId, true);
 
-            // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
+            // then - 세션이 남아있는지 확인
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 

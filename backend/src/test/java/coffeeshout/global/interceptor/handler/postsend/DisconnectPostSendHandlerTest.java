@@ -1,5 +1,9 @@
 package coffeeshout.global.interceptor.handler.postsend;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verifyNoInteractions;
+
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.PlayerDisconnectionService;
 import coffeeshout.global.websocket.StompSessionManager;
@@ -10,12 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DisconnectPostSendHandlerTest {
@@ -25,6 +26,9 @@ class DisconnectPostSendHandlerTest {
 
     @Mock
     private RoomService roomService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private StompSessionManager sessionManager;
     private DisconnectPostSendHandler handler;
@@ -36,9 +40,16 @@ class DisconnectPostSendHandlerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
+        eventPublisher = new ApplicationEventPublisher() {
+            @Override
+            public void publishEvent(Object event) {
+
+            }
+        };
         final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
                 roomService);
-        handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, playerDisconnectionService);
+        handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, playerDisconnectionService,
+                eventPublisher);
     }
 
     @Test
@@ -70,7 +81,7 @@ class DisconnectPostSendHandlerTest {
             sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
             StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
             accessor.setSessionId(sessionId);
-            
+
             // 이미 처리된 상태로 설정
             sessionManager.isDisconnectionProcessed(sessionId);
 
@@ -118,17 +129,17 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 
         @Test
-        void 세션_매핑이_완전히_제거된다() {
+        void 세션_매핑이_남아있는다() {
             // given
             sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
             StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
             accessor.setSessionId(sessionId);
-            
+
             // 초기 상태 확인
             assertThat(sessionManager.getPlayerKey(sessionId)).isNotNull();
             assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
@@ -137,8 +148,8 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            assertThat(sessionManager.hasSessionId(joinCode, playerName)).isFalse();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
+            assertThat(sessionManager.hasSessionId(joinCode, playerName)).isTrue();
         }
 
         @Test
@@ -184,30 +195,6 @@ class DisconnectPostSendHandlerTest {
 
             // then
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
-        }
-    }
-
-    @Nested
-    class 세션_카운트_검증 {
-
-        @Test
-        void 연결_해제_후_세션_카운트가_감소한다() {
-            // given
-            sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
-            String anotherSessionId = "another-session";
-            sessionManager.registerPlayerSession("ROOM456", "anotherPlayer", anotherSessionId);
-            
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
-            accessor.setSessionId(sessionId);
-            
-            // 초기 상태 확인
-            assertThat(sessionManager.getConnectedPlayerCountByJoinCode(joinCode)).isEqualTo(1);
-
-            // when
-            handler.handle(accessor, sessionId, true);
-
-            // then
-            assertThat(sessionManager.getConnectedPlayerCountByJoinCode(joinCode)).isZero();
         }
     }
 }
