@@ -25,12 +25,12 @@ class DeckTest {
                 AdditionCard.PLUS_20,
                 AdditionCard.PLUS_10,
                 AdditionCard.ZERO,
-                AdditionCard.MINUS_10
+                AdditionCard.MINUS_10,
+                AdditionCard.MINUS_20
         );
         multiplierCards = List.of(
                 MultiplierCard.QUADRUPLE,
-                MultiplierCard.DOUBLE,
-                MultiplierCard.INVERT
+                MultiplierCard.DOUBLE
         );
         deck = new Deck(additionCards, multiplierCards);
     }
