@@ -15,13 +15,13 @@ const CircularProgress = ({ current, total, size = '2rem', isActive }: Props) =>
   const [strokeDashoffset, setStrokeDashoffset] = useState(0);
 
   useEffect(() => {
-    if (total <= 0) {
-      setStrokeDashoffset(circumference);
+    if (!isActive) {
+      setStrokeDashoffset(0);
       return;
     }
 
-    if (!isActive) {
-      setStrokeDashoffset(0);
+    if (total <= 0) {
+      setStrokeDashoffset(circumference);
       return;
     }
 
