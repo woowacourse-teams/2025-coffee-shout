@@ -29,11 +29,13 @@ export const useWebSocketConnection = () => {
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
+    setClient(null);
   }, []);
 
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
+    setClient(null);
   }, []);
 
   const setupStompClient = useCallback(
