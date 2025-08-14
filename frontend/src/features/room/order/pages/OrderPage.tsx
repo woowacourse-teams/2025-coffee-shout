@@ -25,6 +25,8 @@ const OrderPage = () => {
   const { send, stopSocket, isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
+
+  // TODO: 전역으로 분리
   const [participants, setParticipants] = useState<ParticipantResponse>([]);
 
   const handleOrder = useCallback(

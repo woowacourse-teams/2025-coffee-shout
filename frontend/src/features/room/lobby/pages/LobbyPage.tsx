@@ -6,24 +6,24 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
+import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
+import GameStartButton from '../components/GameStartButton/GameStartButton';
+import GuideModal from '../components/GuideModal/GuideModal';
+import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
 import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
-import GameStartButton from '../components/GameStartButton/GameStartButton';
-import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
-import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { colorList } from '@/constants/color';
-import GuideModal from '../components/GuideModal/GuideModal';
 import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
@@ -33,7 +33,7 @@ type ParticipantResponse = Player[];
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
-  const { myName, joinCode } = useIdentifier();
+  const { myName, joinCode, setMenuId } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
@@ -44,9 +44,21 @@ const LobbyPage = () => {
   const isReady =
     participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
 
-  const handleParticipant = useCallback((data: ParticipantResponse) => {
-    setParticipants(data);
-  }, []);
+  const handleParticipant = useCallback(
+    (data: ParticipantResponse) => {
+      setParticipants(data);
+
+      const menuId = data.find((participant) => participant.playerName === myName)?.menuResponse.id;
+
+      if (!menuId) {
+        console.log('메뉴 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      setMenuId(menuId);
+    },
+    [setMenuId, myName]
+  );
 
   // TODO: 나중에 외부 state 로 분리할 것
   const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
@@ -166,7 +178,7 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (playerType === 'GUEST' && joinCode) {
+    if (joinCode) {
       send(`/room/${joinCode}/get-probabilities`);
     }
   }, [playerType, joinCode, send]);

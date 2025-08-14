@@ -5,12 +5,14 @@ import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { TOTAL_COUNT } from '@/types/round';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import PrepareOverlay from '../components/PrepareOverlay/PrepareOverlay';
 
 const CardGamePlayPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos, selectedCardInfo } =
     useCardGame();
   const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
+  const [isTimerActive, setIsTimerActive] = useState(false);
   const { send } = useWebSocket();
 
   const isTimerReset = useRef(false);
@@ -30,30 +32,51 @@ const CardGamePlayPage = () => {
   };
 
   useEffect(() => {
-    if (currentTime > 0) {
+    if (isTimerActive && currentTime > 0) {
       const timer = setTimeout(() => setCurrentTime((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     }
-  }, [currentTime]);
+  }, [currentTime, isTimerActive]);
 
   useEffect(() => {
-    if (currentRound === 'SECOND' && currentCardGameState === 'PLAYING' && !isTimerReset.current) {
+    if (currentCardGameState === 'DESCRIPTION') {
       setCurrentTime(TOTAL_COUNT);
-      isTimerReset.current = true;
+      return;
+    }
+
+    if (currentCardGameState === 'PLAYING') {
+      if (currentRound === 'FIRST') {
+        setCurrentTime(TOTAL_COUNT);
+        setIsTimerActive(true);
+        isTimerReset.current = false;
+        return;
+      }
+
+      if (currentRound === 'SECOND' && !isTimerReset.current) {
+        setCurrentTime(TOTAL_COUNT);
+        setIsTimerActive(true);
+        isTimerReset.current = true;
+      }
     }
   }, [currentRound, currentCardGameState]);
 
-  return isTransition ? (
-    <MiniGameTransition currentRound={currentRound} />
-  ) : (
-    <Round
-      key={currentRound}
-      round={currentRound}
-      onClickCard={handleCardClick}
-      selectedCardInfo={selectedCardInfo}
-      currentTime={currentTime}
-      cardInfos={cardInfos}
-    />
+  if (isTransition) {
+    return <MiniGameTransition currentRound={currentRound} />;
+  }
+
+  return (
+    <>
+      {currentCardGameState === 'DESCRIPTION' && <PrepareOverlay />}
+      <Round
+        key={currentRound}
+        round={currentRound}
+        onClickCard={handleCardClick}
+        selectedCardInfo={selectedCardInfo}
+        currentTime={currentTime}
+        isTimerActive={isTimerActive}
+        cardInfos={cardInfos}
+      />
+    </>
   );
 };
 

@@ -1,17 +1,15 @@
-import { PropsWithChildren, useCallback, useState } from 'react';
-import { CardGameContext } from './CardGameContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { useIdentifier } from '../Identifier/IdentifierContext';
-import { CardGameState, CardGameStateData, CardInfo, SelectedCardInfo } from '@/types/miniGame';
-
-import { useNavigate, useParams } from 'react-router-dom';
 import { CardGameRound } from '@/constants/miniGame';
+import { CardGameState, CardGameStateData, CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import { PropsWithChildren, useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useIdentifier } from '../Identifier/IdentifierContext';
+import { CardGameContext } from './CardGameContext';
 
 const CardGameProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const { joinCode, myName } = useIdentifier();
   const { miniGameType } = useParams();
-  const [startCardGame, setStartCardGame] = useState<boolean>(false);
   const [isTransition, setIsTransition] = useState<boolean>(false);
   const [currentRound, setCurrentRound] = useState<CardGameRound>('FIRST');
   const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
@@ -33,6 +31,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     (data: CardGameStateData) => {
       const { cardGameState, currentRound, cardInfoMessages } = data;
 
+      const isPreparing = cardGameState === 'DESCRIPTION';
       const isFirstRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'FIRST';
       const isFirstRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'FIRST';
       const isSecondRoundLoading = cardGameState === 'LOADING' && currentRound === 'SECOND';
@@ -58,8 +57,13 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         }));
       };
 
+      if (isPreparing) {
+        setCurrentCardGameState('DESCRIPTION');
+        setCardInfos(cardInfoMessages);
+        return;
+      }
+
       if (isFirstRoundPlaying) {
-        setStartCardGame(true);
         setCurrentCardGameState('PLAYING');
         setCardInfos(cardInfoMessages);
 
@@ -125,7 +129,6 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
   return (
     <CardGameContext.Provider
       value={{
-        startCardGame,
         isTransition,
         currentRound,
         currentCardGameState,
