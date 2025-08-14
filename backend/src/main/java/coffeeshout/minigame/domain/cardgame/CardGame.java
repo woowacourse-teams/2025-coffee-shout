@@ -55,12 +55,12 @@ public class CardGame implements Playable {
     }
 
     public void startRound() {
-        this.state = CardGameState.LOADING;
         this.round = round.next();
+        this.state = round == CardGameRound.FIRST ? CardGameState.FIRST_LOADING : CardGameState.LOADING;
     }
 
     public void updateDescription() {
-        this.state = CardGameState.DESCRIPTION;
+        this.state = CardGameState.PREPARE;
     }
 
     public void startPlay() {
