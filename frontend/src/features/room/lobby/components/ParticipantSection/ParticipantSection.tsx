@@ -33,6 +33,10 @@ export const ParticipantSection = ({ participants }: Props) => {
     participants.find((participant) => participant.playerName === myName)?.colorIndex ?? 0;
   const myColor = colorList[myColorIndex];
 
+  if (!mySelect) {
+    return null;
+  }
+
   return (
     <>
       <SectionTitle
@@ -40,11 +44,13 @@ export const ParticipantSection = ({ participants }: Props) => {
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
         suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
-      <PlayerCard name={myName} playerColor={myColor}>
-        <S.Menu
-          src={getMenuIcon(mySelect && mySelect.menuResponse.menuType)}
-          onClick={handleModifyMenu}
-        />
+      <PlayerCard
+        name={myName}
+        playerColor={myColor}
+        isReady={mySelect.isReady}
+        playerType={mySelect.playerType}
+      >
+        <S.Menu src={getMenuIcon(mySelect.menuResponse.menuType)} onClick={handleModifyMenu} />
       </PlayerCard>
       <Divider />
       <S.ScrollableWrapper>
@@ -56,6 +62,8 @@ export const ParticipantSection = ({ participants }: Props) => {
               key={participant.playerName}
               name={participant.playerName}
               playerColor={colorList[participant.colorIndex]}
+              isReady={participant.isReady}
+              playerType={participant.playerType}
             >
               <S.Menu src={getMenuIcon(participant.menuResponse.menuType)} />
             </PlayerCard>

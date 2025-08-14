@@ -83,3 +83,12 @@ export const DifferentProfileIcons: Story = {
     </>
   ),
 };
+
+export const Ready: Story = {
+  args: {
+    name: '홍길동',
+    playerColor: '#45B7D1',
+    isReady: true,
+    children: <img src={JuiceIcon} alt="juice" />,
+  },
+};
