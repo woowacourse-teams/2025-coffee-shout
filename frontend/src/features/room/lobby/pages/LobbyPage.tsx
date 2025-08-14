@@ -178,7 +178,7 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (playerType === 'GUEST' && joinCode) {
+    if (joinCode) {
       send(`/room/${joinCode}/get-probabilities`);
     }
   }, [playerType, joinCode, send]);
