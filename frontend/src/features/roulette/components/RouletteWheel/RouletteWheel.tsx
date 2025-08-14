@@ -10,21 +10,29 @@ type Props =
       sectors: RouletteSector[];
       playerProbabilities?: never;
       isSpinning?: boolean;
+      finalRotation?: number;
     }
   | {
       sectors?: never;
       playerProbabilities: PlayerProbability[];
       isSpinning?: boolean;
+      finalRotation?: number;
     };
 
-const RouletteWheel = ({ sectors, playerProbabilities, isSpinning = false }: Props) => {
+const RouletteWheel = ({
+  sectors,
+  playerProbabilities,
+  isSpinning = false,
+  finalRotation = 0,
+}: Props) => {
   const theme = useTheme();
 
   const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
   return (
     <S.Container>
-      <S.Wrapper $isSpinning={isSpinning}>
+      <S.Pin />
+      <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
         <svg
           width={WHEEL_CONFIG.SIZE}
           height={WHEEL_CONFIG.SIZE}
