@@ -11,7 +11,7 @@ type Props = {
 const RADIUS = 45;
 const circumference = 2 * Math.PI * RADIUS;
 
-const CircularProgress = ({ current, total, size = '2rem', isActive }: Props) => {
+const CircularProgress = ({ current, total, size = '2rem', isActive = true }: Props) => {
   const [strokeDashoffset, setStrokeDashoffset] = useState(0);
 
   useEffect(() => {
