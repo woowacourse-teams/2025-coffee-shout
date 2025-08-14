@@ -12,7 +12,7 @@ const CardGameReadyPage = () => {
   const navigate = useNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
-  const { isPreparing } = useCardGame();
+  const { currentCardGameState } = useCardGame();
 
   const slideData = [
     {
@@ -28,10 +28,10 @@ const CardGameReadyPage = () => {
   ];
 
   useEffect(() => {
-    if (isPreparing) {
+    if (currentCardGameState === 'DESCRIPTION') {
       navigate(`/room/${joinCode}/${miniGameType}/play`);
     }
-  }, [isPreparing, joinCode, miniGameType, navigate]);
+  }, [currentCardGameState, joinCode, miniGameType, navigate]);
 
   return (
     <Layout color="point-400">

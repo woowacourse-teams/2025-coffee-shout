@@ -11,7 +11,6 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const { joinCode, myName } = useIdentifier();
   const { miniGameType } = useParams();
-  const [isPreparing, setIsPreparing] = useState<boolean>(false);
   const [isTransition, setIsTransition] = useState<boolean>(false);
   const [currentRound, setCurrentRound] = useState<CardGameRound>('FIRST');
   const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
@@ -60,14 +59,12 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       };
 
       if (isPreparing) {
-        setIsPreparing(true);
         setCurrentCardGameState('DESCRIPTION');
         setCardInfos(cardInfoMessages);
         return;
       }
 
       if (isFirstRoundPlaying) {
-        setIsPreparing(false);
         setCurrentCardGameState('PLAYING');
         setCardInfos(cardInfoMessages);
 
@@ -133,7 +130,6 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
   return (
     <CardGameContext.Provider
       value={{
-        isPreparing,
         isTransition,
         currentRound,
         currentCardGameState,
