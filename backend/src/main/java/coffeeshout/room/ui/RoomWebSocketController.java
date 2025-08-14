@@ -4,6 +4,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;

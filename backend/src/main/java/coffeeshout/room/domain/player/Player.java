@@ -27,6 +27,14 @@ public class Player {
         return new Player(name, menu, false, PlayerType.GUEST);
     }
 
+    public static Player createHost(PlayerName name, Menu menu, Integer colorIndex) {
+        return new Player(name, menu, true, PlayerType.HOST);
+    }
+
+    public static Player createGuest(PlayerName name, Menu menu, Integer colorIndex) {
+        return new Player(name, menu, false, PlayerType.GUEST);
+    }
+
     public void selectMenu(Menu menu) {
         this.menu = menu;
     }

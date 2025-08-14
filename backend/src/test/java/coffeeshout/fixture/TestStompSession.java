@@ -43,6 +43,10 @@ public class TestStompSession {
         }
     }
 
+    public void send(String sendEndpoint) {
+        session.send(sendEndpoint, null);
+    }
+
     public static class MessageCollector {
         private final BlockingQueue<String> queue = new LinkedBlockingQueue<>();
 

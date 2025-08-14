@@ -15,6 +15,14 @@ public final class PlayerProbabilitiesFixture {
             PlayerFixture.게스트한스()
     );
 
+    public static List<Player> 루키_엠제이_한스_리스트() {
+        return List.of(
+                PlayerFixture.게스트루키(),
+                PlayerFixture.게스트엠제이(),
+                PlayerFixture.게스트한스()
+        );
+    }
+
     private PlayerProbabilitiesFixture() {
     }
 
