@@ -5,7 +5,7 @@ import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { TOTAL_COUNT } from '@/types/round';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import ReadyOverlay from '../components/ReadyOverlay/ReadyOverlay';
+import PrepareOverlay from '../components/PrepareOverlay/PrepareOverlay';
 
 const CardGamePlayPage = () => {
   const { myName, joinCode } = useIdentifier();
@@ -61,7 +61,7 @@ const CardGamePlayPage = () => {
 
   return (
     <>
-      {currentCardGameState === 'DESCRIPTION' && <ReadyOverlay />}
+      {currentCardGameState === 'DESCRIPTION' && <PrepareOverlay />}
       <Round
         key={currentRound}
         round={currentRound}

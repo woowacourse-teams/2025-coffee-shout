@@ -1,10 +1,10 @@
 import Headline1 from '@/components/@common/Headline1/Headline1';
-import * as S from './ReadyOverlay.styled';
+import * as S from './PrepareOverlay.styled';
 import chatBubble from '@/assets/chat_bubble.svg';
 import coffee from '@/assets/coffee-white.svg';
 import { useEffect, useState } from 'react';
 
-const ReadyOverlay = () => {
+const PrepareOverlay = () => {
   const [displayText, setDisplayText] = useState('READY');
 
   useEffect(() => {
@@ -28,4 +28,4 @@ const ReadyOverlay = () => {
   );
 };
 
-export default ReadyOverlay;
+export default PrepareOverlay;
