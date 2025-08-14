@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import { interpolateAngles } from '../utils';
 
-const ANIMATION_DURATION = 1600; // ms
+const ANIMATION_DURATION = 1600;
 
 // Easing function - 빠른 시작, 부드러운 끝
 const easeOutCubic = (t: number): number => {
