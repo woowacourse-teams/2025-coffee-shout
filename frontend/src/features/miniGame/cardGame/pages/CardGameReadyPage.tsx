@@ -28,6 +28,7 @@ const CardGameReadyPage = () => {
   ];
 
   useEffect(() => {
+    if (!joinCode || !miniGameType) return;
     if (currentCardGameState === 'DESCRIPTION') {
       navigate(`/room/${joinCode}/${miniGameType}/play`);
     }
