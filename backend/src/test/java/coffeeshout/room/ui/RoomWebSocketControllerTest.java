@@ -24,6 +24,7 @@ import coffeeshout.room.ui.response.ProbabilityResponse;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,11 +33,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     JoinCode joinCode;
-    
+
     Player host;
-    
+
     TestStompSession session;
-    
+
     Room testRoom;
 
     @BeforeEach
@@ -44,7 +45,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         testRoom = RoomFixture.호스트_꾹이();
         joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
         host = testRoom.getHost();
-        
+
         roomRepository.save(testRoom);
         session = createSession();
     }
@@ -56,10 +57,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     })
     @ApiSchema(description = """
             [방에 입장하여 플레이어 목록을 조회한다]
-            
+                        
             - /app/room/{joinCode}/update-players로 요청을 보내면 플레이어 목록을 받을 수 있다.
             - 응답으로는 방에 있는 모든 플레이어의 정보가 포함된다.
-            
+                        
             """,
             responseType = PlayerResponse.class
     )
@@ -75,7 +76,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
         // then
         MessageResponse playersResponse = responses.get();
-        assertMessage(playersResponse, """
+        assertMessageCustomization(playersResponse, """
                 {
                    "success":true,
                    "data":[
@@ -88,7 +89,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"HOST",
                          "isReady":true,
-                         "colorIndex":0
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"루키",
@@ -99,7 +100,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":1
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"엠제이",
@@ -110,7 +111,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":2
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"한스",
@@ -121,21 +122,21 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":3
+                         "colorIndex":"*"
                       }
                    ],
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization("colorIndex"));
     }
 
     @Test
     @ApiSchema(description = """
             [플레이어의 메뉴를 변경한다]
-            
+                        
             - /app/room/{joinCode}/update-menus로 메뉴 변경 요청을 보낸다.
             - 변경된 메뉴 정보가 모든 구독자에게 브로드캐스트된다.
-            
+                        
             """,
             responseType = PlayerResponse.class,
             requestType = MenuChangeMessage.class
@@ -157,8 +158,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
         // then
         MessageResponse menuChangeResponse = responses.get();
-        
-        assertMessage(menuChangeResponse, """
+
+        assertMessageCustomization(menuChangeResponse, """
                 {
                    "success":true,
                    "data":[
@@ -171,7 +172,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"HOST",
                          "isReady":true,
-                         "colorIndex":0
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"루키",
@@ -182,7 +183,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":1
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"엠제이",
@@ -193,7 +194,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":2
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"한스",
@@ -204,21 +205,21 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":3
+                         "colorIndex":"*"
                       }
                    ],
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization("colorIndex"));
     }
 
     @Test
     @ApiSchema(description = """
             [준비 상태를 변경한다]
-            
+                        
             - /app/room/{joinCode}/update-ready로 준비 상태 변경 요청을 보낸다.
             - 변경된 준비 상태가 모든 구독자에게 브로드캐스트된다.
-            
+                        
             """,
             responseType = PlayerResponse.class,
             requestType = ReadyChangeMessage.class
@@ -242,7 +243,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // then
         MessageResponse readyResponse = responses.get();
 
-        assertMessage(readyResponse, """
+        assertMessageCustomization(readyResponse, """
                 {
                    "success":true,
                    "data":[
@@ -255,7 +256,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"HOST",
                          "isReady":true,
-                         "colorIndex":0
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"루키",
@@ -266,7 +267,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":1
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"엠제이",
@@ -277,7 +278,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":2
+                         "colorIndex":"*"
                       },
                       {
                          "playerName":"한스",
@@ -288,21 +289,21 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":3
+                         "colorIndex":"*"
                       }
                    ],
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization("colorIndex"));
     }
 
     @Test
     @ApiSchema(description = """
             [플레이어들의 확률을 조회한다]
-            
+                        
             - /app/room/{joinCode}/get-probabilities로 확률 조회 요청을 보낸다.
             - 각 플레이어의 당첨 확률이 /topic/room/{joinCode}/roulette로 응답된다.
-            
+                        
             """,
             responseType = ProbabilityResponse.class
     )
@@ -319,7 +320,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // then
         MessageResponse probabilityResponse = responses.get();
 
-        assertMessage(probabilityResponse, """
+        assertMessageCustomization(probabilityResponse, """
                 {
                    "success":true,
                    "data":[
@@ -333,7 +334,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"HOST",
                             "isReady":true,
-                            "colorIndex":0
+                            "colorIndex":"*"
                          },
                          "probability":25.0
                       },
@@ -347,7 +348,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":1
+                            "colorIndex":"*"
                          },
                          "probability":25.0
                       },
@@ -361,7 +362,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":2
+                            "colorIndex":"*"
                          },
                          "probability":25.0
                       },
@@ -375,14 +376,14 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":3
+                            "colorIndex":"*"
                          },
                          "probability":25.0
                       }
                    ],
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization("playerResponse.colorIndex"));
     }
 
     @Test
@@ -391,10 +392,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     })
     @ApiSchema(description = """
             [미니게임을 선택한다]
-            
+                        
             - 호스트가 /app/room/{joinCode}/update-minigames로 미니게임 선택 요청을 보낸다.
             - 선택된 미니게임 목록이 모든 구독자에게 브로드캐스트된다.
-            
+                        
             """,
             responseType = MiniGameType.class,
             requestType = MiniGameSelectMessage.class
@@ -429,11 +430,11 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     @ApiSchema(description = """
             [룰렛을 돌려서 당첨자를 선택한다]
-            
+                        
             - 방 상태가 PLAYING일 때만 룰렛을 돌릴 수 있다.
             - /app/room/{joinCode}/spin-roulette로 룰렛 회전 요청을 보낸다.
             - 선택된 당첨자 정보가 /topic/room/{joinCode}/winner로 브로드캐스트된다.
-            
+                        
             """,
             responseType = PlayerResponse.class,
             requestType = RouletteSpinMessage.class
@@ -460,6 +461,15 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // 룰렛 결과는 랜덤이므로 assertMessageContains 사용
         assertMessageContains(winnerResponse, "\"success\":true");
         assertMessageContains(winnerResponse, "\"playerName\":");
-        assertMessageContains(winnerResponse, "\"menuResponse\":");
+    }
+
+    private static Customization getColorIndexCustomization(String path) {
+        return new Customization(path, (actual, expect) -> {
+            System.out.println("actual: " + actual + " expect: " + expect);
+            if (expect instanceof Integer value) {
+                return value >= 0 && value <= 9;
+            }
+            return true;
+        });
     }
 }

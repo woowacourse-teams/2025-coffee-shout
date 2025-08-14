@@ -15,7 +15,6 @@ import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.card.CardType;
 import coffeeshout.minigame.ui.request.command.StartMiniGameCommand;
-import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
@@ -43,6 +43,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     void setUp(@Autowired RoomRepository roomRepository) throws Exception {
         joinCode = new JoinCode("A4B2C");
         Room room = RoomFixture.호스트_꾹이();
+        room.getPlayers().forEach(player -> player.updateReadyState(true));
         host = room.getHost();
         cardGame = new CardGameFake(new CardGameDeckStub());
         room.addMiniGame(host.getName(), cardGame);
@@ -89,7 +90,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                 """, host.getName().value()));
 
         MessageResponse firstRoundLoading = responses.get();
-        MessageResponse firstRoundDescription = responses.get();
+        MessageResponse prepare = responses.get();
         MessageResponse firstRoundPlaying = responses.get();
         MessageResponse firstRoundScoreBoard = responses.get(11, TimeUnit.SECONDS);
         MessageResponse secondRoundLoading = responses.get();
@@ -97,11 +98,11 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MessageResponse secondRoundScoreBoard = responses.get(11, TimeUnit.SECONDS);
         MessageResponse done = responses.get();
 
-        assertMessage(firstRoundLoading, """
+        assertMessageCustomization(firstRoundLoading, """
                 {
                    "success":true,
                    "data":{
-                      "cardGameState":"LOADING",
+                      "cardGameState":"FIRST_LOADING",
                       "currentRound":"FIRST",
                       "cardInfoMessages":[
                          {
@@ -172,10 +173,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                    },
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization());
 
-        assertMessageContains(firstRoundDescription, 3000L, "\"cardGameState\":\"DESCRIPTION\"");
-        assertMessageContains(firstRoundPlaying, 1500L, "\"cardGameState\":\"PLAYING\"");
+        assertMessageContains(prepare, 4000L, "\"cardGameState\":\"PREPARE\"");
+        assertMessageContains(firstRoundPlaying, 2000L, "\"cardGameState\":\"PLAYING\"");
         assertMessageContains(firstRoundScoreBoard, 10250L, "\"cardGameState\":\"SCORE_BOARD\"");
         assertMessageContains(secondRoundLoading, 1500L, "\"cardGameState\":\"LOADING\"");
         assertMessageContains(secondRoundPlaying, 3000L, "\"cardGameState\":\"PLAYING\"");
@@ -203,7 +204,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                 }
                 """, host.getName().value()));
 
-        responses.get(); // LOADING
+        responses.get(); // FIRST_LOADING
         responses.get(); // PREPARE
         responses.get(); // PLAYING
 
@@ -220,7 +221,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         MessageResponse firstRoundPlaying = responses.get();
 
         // then
-        assertMessage(firstRoundPlaying, """
+        assertMessageCustomization(firstRoundPlaying, """
                 {
                    "success":true,
                    "data":{
@@ -232,69 +233,78 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                             "value":40,
                             "selected":true,
                             "playerName":"꾹이",
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"ADDITION",
                             "value":30,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"ADDITION",
                             "value":20,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"ADDITION",
                             "value":10,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"ADDITION",
                             "value":0,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"ADDITION",
                             "value":-10,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"MULTIPLIER",
                             "value":4,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"MULTIPLIER",
                             "value":2,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          },
                          {
                             "cardType":"MULTIPLIER",
                             "value":0,
                             "selected":false,
                             "playerName":null,
-                            "colorIndex":null
+                            "colorIndex":"*"
                          }
                       ],
                       "allSelected":false
                    },
                    "errorMessage":null
                 }
-                """);
+                """, getColorIndexCustomization());
+    }
+
+    private static Customization getColorIndexCustomization() {
+        return new Customization("colorIndex", (actual, expect) -> {
+            if (expect instanceof Integer value) {
+                return value >= 0 && value <= 9;
+            }
+            return true;
+        });
     }
 }
