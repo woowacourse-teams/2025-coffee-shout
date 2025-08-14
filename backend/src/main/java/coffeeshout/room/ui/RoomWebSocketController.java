@@ -11,6 +11,7 @@ import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.WinnerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -81,10 +82,10 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
-        final PlayerResponse losePlayer = PlayerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
+        final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
         roomService.delayCleanUp(joinCode);
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
-                WebSocketResponse.success(losePlayer));
+                WebSocketResponse.success(winner));
     }
 }

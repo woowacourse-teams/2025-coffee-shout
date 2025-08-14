@@ -9,6 +9,7 @@ import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Nested;
@@ -22,10 +23,10 @@ class RouletteTest {
         Roulette roulette = RouletteFixture.고정_끝값_반환();
 
         // when
-        Player result = roulette.spin();
+        Winner winner = roulette.spin();
 
         // then
-        assertThat(result).isEqualTo(PlayerProbabilitiesFixture.PLAYERS.getLast());
+        assertThat(winner.name()).isEqualTo(PlayerProbabilitiesFixture.PLAYERS.getLast().getName());
     }
 
     @Test
@@ -39,13 +40,13 @@ class RouletteTest {
 
         // then
         assertThat(roulette.getProbability(PlayerFixture.호스트한스()))
-                .isEqualTo(new Probability((int)(2500 - 500 * 0.7)));
+                .isEqualTo(new Probability((int) (2500 - 500 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트루키()))
-                .isEqualTo(new Probability((int)(2500 - 250 * 0.7)));
+                .isEqualTo(new Probability((int) (2500 - 250 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트꾹이()))
-                .isEqualTo(new Probability((int)(2500 + 250 * 0.7)));
+                .isEqualTo(new Probability((int) (2500 + 250 * 0.7)));
         assertThat(roulette.getProbability(PlayerFixture.호스트엠제이()))
-                .isEqualTo(new Probability((int)(2500 + 500 * 0.7)));
+                .isEqualTo(new Probability((int) (2500 + 500 * 0.7)));
     }
 
     @Nested
@@ -218,11 +219,11 @@ class RouletteTest {
                         softly.assertThat(roulette.getProbability(루키))
                                 .isEqualTo(new Probability(2000 - (2100 / 2)));
                         softly.assertThat(roulette.getProbability(꾹이))
-                                .isEqualTo(new Probability(2000 + 700  / 2));
+                                .isEqualTo(new Probability(2000 + 700 / 2));
                         softly.assertThat(roulette.getProbability(엠제이))
                                 .isEqualTo(new Probability(2000 + 700 / 2));
                         softly.assertThat(roulette.getProbability(호스트))
-                                .isEqualTo(new Probability(2000 +  1400));
+                                .isEqualTo(new Probability(2000 + 1400));
                     }
             );
         }

@@ -9,13 +9,15 @@ import lombok.Getter;
 public class Players {
 
     private final List<Player> players;
+    private final ColorUsage colorUsage;
 
     public Players() {
         this.players = Collections.synchronizedList(new ArrayList<>());
+        this.colorUsage = new ColorUsage();
     }
 
     public Player join(Player player) {
-        player.assignColorIndex(players.size());
+        player.assignColorIndex(colorUsage.pickRandomOne());
         this.players.add(player);
         return getPlayer(player.getName());
     }
@@ -35,12 +37,27 @@ public class Players {
         return players.size();
     }
 
-    public boolean hasDuplicateName(PlayerName playerNmae) {
-        return players.stream().anyMatch(player -> player.sameName(playerNmae));
+    public boolean hasDuplicateName(PlayerName playerName) {
+        return players.stream().anyMatch(player -> player.sameName(playerName));
     }
 
     public boolean isAllReady() {
         return players.stream()
                 .allMatch(Player::getIsReady);
+    }
+
+    public boolean removePlayer(PlayerName playerName) {
+        return players.removeIf(player -> {
+            if (player.sameName(playerName)) {
+                colorUsage.release(player.getColorIndex());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public boolean existsByName(PlayerName playerName) {
+        return players.stream()
+                .anyMatch(player -> player.sameName(playerName));
     }
 }

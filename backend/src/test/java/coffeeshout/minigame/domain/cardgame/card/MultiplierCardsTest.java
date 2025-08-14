@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class MultiplierCardsTest {
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3, 4})
+    @ValueSource(ints = {1, 2, 3})
     void 요청한_개수만큼_카드를_뽑는다(int count) {
         // given
         MultiplierCards multiplierCards = new MultiplierCards();

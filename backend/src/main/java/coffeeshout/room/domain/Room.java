@@ -4,13 +4,13 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
+import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
@@ -88,12 +88,12 @@ public class Room {
         return roomState == RoomState.PLAYING;
     }
 
-    public Player spinRoulette(Player host) {
+    public Winner spinRoulette(Player host) {
         isTrue(isHost(host), "호스트만 룰렛을 돌릴 수 있습니다.");
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
         // TODO 룰렛을 돌리기 전에 모든 게임들을 플레이해야 한다.
-        final Player winner = roulette.spin();
+        final Winner winner = roulette.spin();
         roomState = RoomState.DONE;
         return winner;
     }
@@ -123,7 +123,7 @@ public class Room {
         return Collections.unmodifiableList(new ArrayList<>(miniGames));
     }
 
-    public List<MiniGameType> getSelectedMiniGameTypes(){
+    public List<MiniGameType> getSelectedMiniGameTypes() {
         return getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
@@ -162,6 +162,25 @@ public class Room {
         return players.hasDuplicateName(guestName);
     }
 
+    public boolean removePlayer(PlayerName playerName) {
+        if (players.existsByName(playerName)) {
+            roulette.removePlayer(playerName);
+            players.removePlayer(playerName);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void reJoin(PlayerName playerName, Menu menu) {
+        validateRoomReady();
+        validateCanJoin();
+        validatePlayerNameNotDuplicate(playerName);
+
+        final Player player = createPlayer(playerName, menu);
+        join(player);
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -195,5 +214,12 @@ public class Room {
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );
         }
+    }
+
+    private Player createPlayer(PlayerName playerName, Menu menu) {
+        if (host.sameName(playerName)) {
+            return Player.createHost(playerName, menu);
+        }
+        return Player.createGuest(playerName, menu);
     }
 }

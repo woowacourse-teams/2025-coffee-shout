@@ -1,6 +1,5 @@
 package coffeeshout.room.domain;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -8,17 +7,15 @@ import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Roulette;
 import java.util.LinkedList;
 import java.util.List;
-import net.bytebuddy.build.ToStringPlugin.Enhance;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -165,11 +162,11 @@ class RoomTest {
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         Player host = room.findPlayer(호스트_한스);
 
-        Player winner = room.spinRoulette(host);
+        Winner winner = room.spinRoulette(host);
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-        assertThat(winner).isEqualTo(Player.createHost(new PlayerName("한스"), MenuFixture.아메리카노()));
+        assertThat(winner.name()).isEqualTo(new PlayerName("한스"));
     }
 
     @Test
@@ -239,7 +236,7 @@ class RoomTest {
     }
 
     @Test
-    void 미니게임을_시작한다(){
+    void 미니게임을_시작한다() {
         // given
         CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
@@ -265,7 +262,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.startNextGame(host.getName().value()))
-            .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessage("모든 플레이어가 준비완료해야합니다.");
     }
 }
