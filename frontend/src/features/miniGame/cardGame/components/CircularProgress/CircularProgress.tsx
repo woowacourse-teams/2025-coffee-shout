@@ -42,9 +42,7 @@ const CircularProgress = ({ current, total, size = '2rem', isActive = true }: Pr
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           transform="rotate(90 50 50) scale(-1,1) translate(-100, 0)"
-          style={{
-            transition: isActive ? 'stroke-dashoffset 0.3s ease' : 'none',
-          }}
+          $isActive={isActive}
         />
       </S.ProgressRing>
       <S.CountText>{current}</S.CountText>
