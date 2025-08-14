@@ -36,7 +36,7 @@ export const CrownIcon = styled.img`
   margin-bottom: 4px;
 `;
 
-export const ReadyIcon = styled.div`
-  font-size: 18px;
-  margin-bottom: 2px;
+export const ReadyIcon = styled.img`
+  width: 22px;
+  height: 22px;
 `;
