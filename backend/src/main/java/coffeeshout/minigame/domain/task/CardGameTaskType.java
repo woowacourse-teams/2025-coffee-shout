@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardGameTaskType {
-    FIRST_ROUND_LOADING(CardGameState.LOADING, CardGameRound.FIRST) {
+    FIRST_ROUND_LOADING(CardGameState.FIRST_LOADING, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
@@ -19,7 +19,7 @@ public enum CardGameTaskType {
             }, getState().getDurationMillis());
         }
     },
-    FIRST_ROUND_DESCRIPTION(CardGameState.DESCRIPTION, CardGameRound.FIRST) {
+    FIRST_ROUND_DESCRIPTION(CardGameState.PREPARE, CardGameRound.FIRST) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
@@ -47,7 +47,7 @@ public enum CardGameTaskType {
             }, getState().getDurationMillis());
         }
     },
-    SECOND_ROUND_LOADING(CardGameState.LOADING, CardGameRound.FIRST) {
+    SECOND_ROUND_LOADING(CardGameState.LOADING, CardGameRound.SECOND) {
         @Override
         public ChainedTask createTask(CardGame cardGame, Room room, Runnable sendMessage) {
             return new ChainedTask(() -> {
