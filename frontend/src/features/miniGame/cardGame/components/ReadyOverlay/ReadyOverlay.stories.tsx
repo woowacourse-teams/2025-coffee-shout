@@ -18,7 +18,4 @@ export const Default: Story = {
   render: () => {
     return <ReadyOverlay />;
   },
-  parameters: {
-    layout: 'centered',
-  },
 };
