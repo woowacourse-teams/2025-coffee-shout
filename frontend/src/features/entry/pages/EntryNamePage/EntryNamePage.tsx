@@ -8,19 +8,37 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { api } from '@/apis/rest/api';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const MAX_NAME_LENGTH = 10;
+
+type PlayerNameCheckResponse = {
+  exist: boolean;
+};
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
-  const { setMyName } = useIdentifier();
+  const { setMyName, joinCode } = useIdentifier();
+  const { playerType } = usePlayerType();
 
   const handleNavigateToHome = () => {
     navigate('/');
   };
 
-  const handleNavigateToMenu = () => {
+  const handleNavigateToMenu = async () => {
+    if (playerType === 'GUEST') {
+      const { exist } = await api.get<PlayerNameCheckResponse>(
+        `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`
+      );
+
+      if (exist) {
+        alert('중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.');
+        return;
+      }
+    }
+
     setMyName(name);
     navigate('/entry/menu');
   };
