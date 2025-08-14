@@ -42,7 +42,7 @@ export const Container = styled.div`
 
   &.slide-second {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(30%);
     animation: ${slideInFromRight} 0.4s ease-out 2s forwards;
   }
 `;
@@ -57,6 +57,7 @@ export const TextWrapper = styled.div`
 
 export const ImageWrapper = styled.div`
   width: 50%;
+  max-width: 250px;
   height: 300px;
   display: flex;
   align-items: center;
