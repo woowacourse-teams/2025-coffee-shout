@@ -9,6 +9,7 @@ import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -47,11 +48,12 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
     private void processPlayerConnection(String sessionId, String joinCode, String playerName, String menuId) {
         // 기존 세션 있으면 재연결, 없으면 첫 연결
-        String oldSessionId = sessionManager.getExistingSessionId(joinCode, playerName);
-        if (oldSessionId != null) {
+        if (sessionManager.hasSessionId(joinCode, playerName)) {
+            String oldSessionId = sessionManager.getSessionId(joinCode, playerName);
             processPlayerReconnect(sessionId, joinCode, playerName, menuId, oldSessionId);
             return;
         }
+
         // 첫 연결 등록 & 처리
         sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
 
@@ -67,15 +69,14 @@ public class ConnectPreSendHandler implements PreSendHandler {
         sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
 
         // 재연결 처리
-        Long parsedMenuId = parseMenuId(menuId);
-        if (parsedMenuId != null) {
-            handlePlayerReconnection(joinCode, playerName, parsedMenuId, sessionId);
-            return;
-        }
-
-        log.warn("잘못된 menuId 형식으로 재연결 실패: joinCode={}, playerName={}, menuId={}",
-                joinCode, playerName, menuId);
-        sessionManager.removeSession(sessionId);
+        parseMenuId(menuId).ifPresentOrElse(
+                parsedMenuId -> handlePlayerReconnection(joinCode, playerName, parsedMenuId, sessionId),
+                () -> {
+                    log.warn("잘못된 menuId 형식으로 재연결 실패: joinCode={}, playerName={}, menuId={}",
+                            joinCode, playerName, menuId);
+                    sessionManager.removeSession(sessionId);
+                }
+        );
     }
 
     private void handlePlayerFirstConnection(String joinCode, String playerName) {
@@ -118,15 +119,15 @@ public class ConnectPreSendHandler implements PreSendHandler {
         sessionManager.removeSession(sessionId);
     }
 
-    private Long parseMenuId(String menuId) {
+    private Optional<Long> parseMenuId(String menuId) {
         if (menuId == null || menuId.trim().isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return Long.parseLong(menuId.trim());
+            return Optional.of(Long.parseLong(menuId.trim()));
         } catch (NumberFormatException e) {
-            log.warn("menuId 파싱 실패: {}", menuId, e);
-            return null;
+            log.warn("menuId 파싱 실패: {}", menuId);
+            return Optional.empty();
         }
     }
 }

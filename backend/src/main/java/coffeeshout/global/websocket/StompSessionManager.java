@@ -1,10 +1,11 @@
 package coffeeshout.global.websocket;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import static org.springframework.util.Assert.isTrue;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -46,15 +47,31 @@ public class StompSessionManager {
     /**
      * 플레이어의 기존 세션 ID 조회
      */
-    public String getExistingSessionId(String joinCode, String playerName) {
+    public boolean hasSessionId(String joinCode, String playerName) {
         String playerKey = createPlayerKey(joinCode, playerName);
+        return playerSessionMap.containsKey(playerKey);
+    }
+
+    public String getSessionId(String joinCode, String playerName) {
+        String playerKey = createPlayerKey(joinCode, playerName);
+
+        isTrue(playerSessionMap.containsKey(playerKey),
+                "플레이어 세션이 존재하지 않습니다: joinCode=%s, playerName=%s".formatted(joinCode, playerName));
+
         return playerSessionMap.get(playerKey);
     }
 
     /**
      * 세션 ID로 플레이어 키 조회
      */
-    public String getPlayerKeyBySessionId(String sessionId) {
+    public boolean hasPlayerKey(String sessionId) {
+        return sessionPlayerMap.containsKey(sessionId);
+    }
+
+    public String getPlayerKey(String sessionId) {
+        isTrue(sessionPlayerMap.containsKey(sessionId),
+                "세션 ID가 존재하지 않습니다: sessionId=%s".formatted(sessionId));
+
         return sessionPlayerMap.get(sessionId);
     }
 

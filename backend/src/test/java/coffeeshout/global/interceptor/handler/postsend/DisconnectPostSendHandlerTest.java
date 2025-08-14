@@ -79,7 +79,7 @@ class DisconnectPostSendHandlerTest {
 
             // then
             // 세션이 여전히 존재하는지 확인 (중복 처리로 무시됨)
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo(joinCode + ":" + playerName);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             verifyNoInteractions(webSocketMetricService);
             verifyNoInteractions(roomService);
         }
@@ -99,7 +99,7 @@ class DisconnectPostSendHandlerTest {
 
             // then
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             verifyNoInteractions(roomService);
         }
     }
@@ -118,7 +118,7 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 
@@ -130,15 +130,15 @@ class DisconnectPostSendHandlerTest {
             accessor.setSessionId(sessionId);
             
             // 초기 상태 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNotNull();
-            assertThat(sessionManager.getExistingSessionId(joinCode, playerName)).isEqualTo(sessionId);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isNotNull();
+            assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
 
             // when
             handler.handle(accessor, sessionId, true);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
-            assertThat(sessionManager.getExistingSessionId(joinCode, playerName)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
+            assertThat(sessionManager.hasSessionId(joinCode, playerName)).isFalse();
         }
 
         @Test

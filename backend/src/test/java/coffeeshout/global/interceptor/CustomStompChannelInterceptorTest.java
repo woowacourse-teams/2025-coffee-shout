@@ -110,7 +110,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - preSend 후 세션이 등록되었는지 확인
             assertThat(preSendResult).isEqualTo(message);
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo(joinCode + ":" + playerName);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
 
             // when - postSend (연결 성공)
             interceptor.postSend(message, channel, true);
@@ -132,7 +132,7 @@ class CustomStompChannelInterceptorTest {
             interceptor.postSend(message, channel, true);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 
@@ -147,7 +147,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - 메시지가 그대로 반환되고 세션 상태 변경 없음
             assertThat(result).isEqualTo(message);
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
         }
     }
 
@@ -163,8 +163,8 @@ class CustomStompChannelInterceptorTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then - 실제 세션 매니저 상태 검증
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo(joinCode + ":" + playerName);
-            assertThat(sessionManager.getExistingSessionId(joinCode, playerName)).isEqualTo(sessionId);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
+            assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -194,11 +194,11 @@ class CustomStompChannelInterceptorTest {
 
             // then - 새 세션으로 교체되었는지 확인
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(sessionManager.getPlayerKeyBySessionId(sessionId))
+                softly.assertThat(sessionManager.getPlayerKey(sessionId))
                         .isEqualTo(joinCode + ":" + playerName);
-                softly.assertThat(sessionManager.getExistingSessionId(joinCode, playerName))
+                softly.assertThat(sessionManager.getSessionId(joinCode, playerName))
                         .isEqualTo(sessionId);
-                softly.assertThat(sessionManager.getPlayerKeyBySessionId(oldSessionId)).isNull();
+                softly.assertThat(sessionManager.getPlayerKey(oldSessionId)).isNull();
             });
             then(webSocketMetricService).should().startConnection(sessionId);
         }
@@ -214,7 +214,7 @@ class CustomStompChannelInterceptorTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션 등록되지 않았는지 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -257,7 +257,7 @@ class CustomStompChannelInterceptorTest {
             connectPostSendHandler.handle(accessor, sessionId, false);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().failConnection(sessionId, "connection_response_failed");
         }
     }
@@ -277,7 +277,7 @@ class CustomStompChannelInterceptorTest {
             disconnectPostSendHandler.handle(accessor, sessionId, true);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
         }
 
@@ -293,7 +293,7 @@ class CustomStompChannelInterceptorTest {
             disconnectPostSendHandler.handle(accessor, sessionId, false);
 
             // then - 세션이 여전히 존재하는지 확인 (처리되지 않음)
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo(joinCode + ":" + playerName);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
         }
 
@@ -310,7 +310,7 @@ class CustomStompChannelInterceptorTest {
             disconnectPostSendHandler.handle(accessor, sessionId, true);
 
             // then - 세션이 여전히 존재하는지 확인 (중복 처리로 무시됨)
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo(joinCode + ":" + playerName);
+            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
         }
     }
@@ -331,7 +331,7 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
         }
 
@@ -345,7 +345,7 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션 상태는 변경되지 않음
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
         }
     }

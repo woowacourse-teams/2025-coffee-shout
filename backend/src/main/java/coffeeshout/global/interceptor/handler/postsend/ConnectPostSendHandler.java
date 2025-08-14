@@ -36,8 +36,8 @@ public class ConnectPostSendHandler implements PostSendHandler {
         // 연결 응답 실패 - 플레이어 제거
         log.warn("STOMP 메시지 전송 실패: sessionId={}, command={}", sessionId, StompCommand.CONNECTED);
 
-        final String failedPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
-        if (failedPlayerKey != null) {
+        if (sessionManager.hasPlayerKey(sessionId)) {
+            final String failedPlayerKey = sessionManager.getPlayerKey(sessionId);
             sessionManager.removeSession(sessionId);
             playerDisconnectionService.handlePlayerDisconnection(failedPlayerKey, sessionId, "CONNECTION_FAILED");
         }

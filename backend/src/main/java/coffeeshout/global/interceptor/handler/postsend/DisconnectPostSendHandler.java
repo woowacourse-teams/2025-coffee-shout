@@ -37,8 +37,8 @@ public class DisconnectPostSendHandler implements PostSendHandler {
             return;
         }
 
-        final String disconnectedPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
-        if (disconnectedPlayerKey != null) {
+        if (sessionManager.hasPlayerKey(sessionId)) {
+            final String disconnectedPlayerKey = sessionManager.getPlayerKey(sessionId);
             log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
 
             // 방에서 플레이어 제거

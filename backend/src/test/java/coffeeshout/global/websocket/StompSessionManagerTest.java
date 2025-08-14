@@ -170,8 +170,8 @@ class StompSessionManagerTest {
         sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
 
         // then
-        assertThat(sessionManager.getExistingSessionId(joinCode, playerName)).isEqualTo(sessionId);
-        assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isEqualTo("ABC123:player1");
+        assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
+        assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo("ABC123:player1");
     }
 
     @Test

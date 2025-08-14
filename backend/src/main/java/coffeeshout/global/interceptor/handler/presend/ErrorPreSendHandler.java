@@ -30,8 +30,9 @@ public class ErrorPreSendHandler implements PreSendHandler {
         log.error("STOMP 에러: sessionId={}, message={}", sessionId, errorMessage);
 
         // 에러 발생 시 플레이어 제거
-        final String errorPlayerKey = sessionManager.getPlayerKeyBySessionId(sessionId);
-        if (errorPlayerKey != null) {
+        if (sessionManager.hasPlayerKey(sessionId)) {
+            final String errorPlayerKey = sessionManager.getPlayerKey(sessionId);
+
             sessionManager.removeSession(sessionId);
             playerDisconnectionService.handlePlayerDisconnection(errorPlayerKey, sessionId, "STOMP_ERROR");
         }

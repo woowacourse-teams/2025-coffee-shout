@@ -74,9 +74,9 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId))
+            assertThat(sessionManager.getPlayerKey(sessionId))
                     .isEqualTo(joinCode + ":" + playerName);
-            assertThat(sessionManager.getExistingSessionId(joinCode, playerName))
+            assertThat(sessionManager.getSessionId(joinCode, playerName))
                     .isEqualTo(sessionId);
             then(webSocketMetricService).should().startConnection(sessionId);
         }
@@ -92,7 +92,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -109,7 +109,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -126,7 +126,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -143,7 +143,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
     }
@@ -169,7 +169,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -188,7 +188,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
@@ -208,7 +208,7 @@ class ConnectPreSendHandlerTest {
             connectPreSendHandler.handle(accessor, sessionId);
 
             // then
-            assertThat(sessionManager.getPlayerKeyBySessionId(sessionId)).isNull();
+            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
     }
