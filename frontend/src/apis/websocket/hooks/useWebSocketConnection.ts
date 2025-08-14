@@ -58,6 +58,11 @@ export const useWebSocketConnection = () => {
     (joinCode: string, myName: string, menuId: number) => {
       if (client && isConnected) return;
 
+      if (client && !isConnected) {
+        client.deactivate();
+        setClient(null);
+      }
+
       const params = { joinCode, myName, menuId };
       if (!validateConnectionParams(params)) return;
 
@@ -73,6 +78,7 @@ export const useWebSocketConnection = () => {
 
     client.deactivate();
     setIsConnected(false);
+    setClient(null);
   }, [client, isConnected]);
 
   return {
