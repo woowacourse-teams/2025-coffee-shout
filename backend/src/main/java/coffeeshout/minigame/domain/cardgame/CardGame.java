@@ -20,8 +20,8 @@ import lombok.NonNull;
 @Getter
 public class CardGame implements Playable {
 
-    private static final int ADDITION_CARD_COUNT = 6;
-    private static final int MULTIPLIER_CARD_COUNT = 3;
+    private static final int ADDITION_CARD_COUNT = 7;
+    private static final int MULTIPLIER_CARD_COUNT = 2;
 
     private final Deck deck;
     private PlayerHands playerHands;
@@ -55,12 +55,12 @@ public class CardGame implements Playable {
     }
 
     public void startRound() {
-        this.state = CardGameState.LOADING;
         this.round = round.next();
+        this.state = round == CardGameRound.FIRST ? CardGameState.FIRST_LOADING : CardGameState.LOADING;
     }
 
     public void updateDescription() {
-        this.state = CardGameState.DESCRIPTION;
+        this.state = CardGameState.PREPARE;
     }
 
     public void startPlay() {

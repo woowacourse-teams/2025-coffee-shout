@@ -54,7 +54,7 @@ class CardGameTest {
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame.getRound()).isEqualTo(CardGameRound.FIRST);
-                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+                softly.assertThat(cardGame.getState()).isEqualTo(CardGameState.FIRST_LOADING);
             });
         }
 
@@ -404,7 +404,7 @@ class CardGameTest {
             cardGame.startRound();
 
             // then
-            assertThat(cardGame.getState()).isEqualTo(CardGameState.LOADING);
+            assertThat(cardGame.getState()).isEqualTo(CardGameState.FIRST_LOADING);
         }
     }
 

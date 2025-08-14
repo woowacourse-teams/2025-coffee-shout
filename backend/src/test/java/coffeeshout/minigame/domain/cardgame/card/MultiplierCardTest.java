@@ -64,7 +64,6 @@ class MultiplierCardTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(MultiplierCard.QUADRUPLE.getType()).isEqualTo(CardType.MULTIPLIER);
             softly.assertThat(MultiplierCard.DOUBLE.getType()).isEqualTo(CardType.MULTIPLIER);
-            softly.assertThat(MultiplierCard.NULLIFY.getType()).isEqualTo(CardType.MULTIPLIER);
             softly.assertThat(MultiplierCard.INVERT.getType()).isEqualTo(CardType.MULTIPLIER);
         });
     }

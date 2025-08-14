@@ -34,7 +34,7 @@ public class ConnectPreSendHandler implements PreSendHandler {
     @Override
     public void handle(StompHeaderAccessor accessor, String sessionId) {
         log.info("WebSocket 연결 시작: sessionId={}", sessionId);
-        
+
         final String joinCode = accessor.getFirstNativeHeader("joinCode");
         final String playerName = accessor.getFirstNativeHeader("playerName");
         final String menuId = accessor.getFirstNativeHeader("menuId");
