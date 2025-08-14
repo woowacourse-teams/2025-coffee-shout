@@ -106,7 +106,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
             softly.assertThat(startResponse.miniGameType()).isEqualTo(MiniGameType.CARD_GAME);
 
             MiniGameStateMessage loadingStateResponse = responses.get().data();
-            softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+            softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
             softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.FIRST.name());
         });
     }
@@ -128,9 +128,11 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         sendStartGame(session, joinCode, host.getName().value());
 
         MiniGameStateMessage loadingState = responses.get().data(); // 게임 로딩 state 응답 (LOADING)
-        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
 
         cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
+
+        responses.get(); // PREPARE
 
         MiniGameStateMessage playingState = responses.get().data(); // 게임 시작 state 응답 (PLAYING)
         assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
@@ -177,8 +179,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // LOADING 상태 확인
         MiniGameStateMessage loadingState = responses.get().data();
-        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
 
+        responses.get(); // PREPARE
 
         // PLAYING 상태 확인
         MiniGameStateMessage playingState = responses.get().data();
@@ -228,6 +231,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         // when
@@ -284,6 +288,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         // when
@@ -344,6 +349,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         String playerName = "꾹이";
@@ -405,6 +411,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         );
 
         sendStartGame(session1, joinCode, room.getHost().getName().value());
+
+        responses1.get();
+        responses2.get();
 
         responses1.get();
         responses2.get();
