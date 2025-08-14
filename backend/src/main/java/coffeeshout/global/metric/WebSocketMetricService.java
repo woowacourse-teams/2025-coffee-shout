@@ -1,16 +1,16 @@
 package coffeeshout.global.metric;
 
-import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
-import io.micrometer.core.instrument.*;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.Timer.Sample;
-import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -25,7 +25,7 @@ public class WebSocketMetricService {
     private final Map<String, Counter> failedCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> disconnectedCounters = new ConcurrentHashMap<>();
 
-    public WebSocketMetricService(CloudWatchMeterRegistry meterRegistry) {
+    public WebSocketMetricService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
 
         Gauge.builder("websocket.connections.current", currentConnections, AtomicLong::get)
@@ -56,11 +56,12 @@ public class WebSocketMetricService {
         connectionSamples.remove(sessionId);
 
         String key = "failed." + reason;
-        Counter counter = failedCounters.computeIfAbsent(key, k ->
-                Counter.builder("websocket.connections.failed")
-                        .description("웹소켓 연결 실패 건수")
-                        .tag("reason", reason)
-                        .register(meterRegistry)
+        Counter counter = failedCounters.computeIfAbsent(
+                key, k ->
+                        Counter.builder("websocket.connections.failed")
+                                .description("웹소켓 연결 실패 건수")
+                                .tag("reason", reason)
+                                .register(meterRegistry)
         );
         counter.increment();
     }
@@ -71,12 +72,13 @@ public class WebSocketMetricService {
         String type = isNormal ? "normal" : "abnormal";
         String key = "disconnected." + reason + "." + type;
 
-        Counter counter = disconnectedCounters.computeIfAbsent(key, k ->
-                Counter.builder("websocket.connections.disconnected")
-                        .description("웹소켓 연결 해제 건수")
-                        .tag("reason", reason)
-                        .tag("type", type)
-                        .register(meterRegistry)
+        Counter counter = disconnectedCounters.computeIfAbsent(
+                key, k ->
+                        Counter.builder("websocket.connections.disconnected")
+                                .description("웹소켓 연결 해제 건수")
+                                .tag("reason", reason)
+                                .tag("type", type)
+                                .register(meterRegistry)
         );
         counter.increment();
     }

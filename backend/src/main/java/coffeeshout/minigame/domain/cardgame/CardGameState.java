@@ -7,6 +7,7 @@ import lombok.Getter;
 public enum CardGameState {
     READY(0),
     LOADING(3000),
+    DESCRIPTION(1500),
     PLAYING(10250),
     SCORE_BOARD(1500),
     DONE(0),

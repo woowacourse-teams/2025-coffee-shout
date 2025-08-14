@@ -17,6 +17,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.List;
 import java.util.Map;
@@ -347,15 +348,15 @@ class RoomServiceTest {
         ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
 
         // when
-        Player losePlayer = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+        Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
 
         // then
-        assertThat(losePlayer).isNotNull();
-        assertThat(createdRoom.getPlayers()).contains(losePlayer);
+        assertThat(winner).isNotNull();
+        assertThat(createdRoom.getPlayers().stream().map(Player::getName)).contains(winner.name());
     }
 
     @Test
-    void 미니게임의_점수를_반환한다(){
+    void 미니게임의_점수를_반환한다() {
         // given
         String hostName = "호스트";
         Room createdRoom = roomService.createRoom(hostName, 1L);

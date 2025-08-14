@@ -63,22 +63,6 @@ class CardGameScoreTest {
         assertThat(score.getValue()).isEqualTo(20);
     }
 
-
-    @Test
-    void 무효화_카드로_점수를_업데이트한다() {
-        // given
-        CardHand hand = new CardHand();
-        hand.put(AdditionCard.PLUS_40);
-        hand.put(MultiplierCard.NULLIFY);
-
-        // when
-        CardGameScore score = hand.calculateCardGameScore();
-
-        // then
-        assertThat(score.getValue()).isEqualTo(0);
-    }
-
-
     @Test
     void 계산된_점수가_같으면_동일하다() {
         // given

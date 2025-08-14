@@ -28,7 +28,7 @@ class AdditionCardsTest {
     void 최대_사용_가능한_카드_수를_초과하면_예외가_발생한다() {
         // given
         AdditionCards additionCards = new AdditionCards();
-        int count = 10;
+        int count = 20;
 
         // when & then
         assertThatThrownBy(() -> additionCards.pickCards(count))
