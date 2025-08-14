@@ -9,7 +9,7 @@ export type WebSocketContextType = {
     destination: string,
     onData: (data: T) => void,
     onError?: (error: Error) => void
-  ) => StompSubscription;
+  ) => StompSubscription | null;
   isConnected: boolean;
   isVisible: boolean;
   client: Client | null;

@@ -12,14 +12,14 @@ export const useWebSocketMessaging = ({ client, isConnected }: Props) => {
   const subscribe = useCallback(
     <T>(url: string, onData: (data: T) => void, onError?: (error: Error) => void) => {
       if (!client || !isConnected) {
-        const error = WebSocketErrorHandler.handleConnectionRequiredError({
+        WebSocketErrorHandler.handleConnectionRequiredError({
           type: 'subscription',
           url,
           isConnected,
           hasClient: !!client,
           onError,
         });
-        throw error;
+        return null;
       }
 
       const requestUrl = WEBSOCKET_CONFIG.TOPIC_PREFIX + url;
