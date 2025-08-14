@@ -47,7 +47,7 @@ public class DisconnectPostSendHandler implements PostSendHandler {
             // 방에서 플레이어 제거
             playerDisconnectionService.handlePlayerDisconnection(disconnectedPlayerKey, sessionId, CLIENT_DISCONNECT);
 
-            final String joinCode = sessionManager.extractJoinCode(sessionId);
+            final String joinCode = sessionManager.extractJoinCode(disconnectedPlayerKey);
             eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
         }
 
