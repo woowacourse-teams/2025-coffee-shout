@@ -39,7 +39,7 @@ const CardGamePlayPage = () => {
   }, [currentTime, isTimerActive]);
 
   useEffect(() => {
-    if (currentCardGameState === 'DESCRIPTION') {
+    if (currentCardGameState === 'PREPARE') {
       setCurrentTime(TOTAL_COUNT);
       return;
     }
@@ -66,7 +66,7 @@ const CardGamePlayPage = () => {
 
   return (
     <>
-      {currentCardGameState === 'DESCRIPTION' && <PrepareOverlay />}
+      {currentCardGameState === 'PREPARE' && <PrepareOverlay />}
       <Round
         key={currentRound}
         round={currentRound}
