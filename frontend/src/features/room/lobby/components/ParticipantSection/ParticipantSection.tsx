@@ -39,6 +39,10 @@ export const ParticipantSection = ({ participants }: Props) => {
     participants.find((participant) => participant.playerName === myName)?.colorIndex ?? 0;
   const myColor = colorList[myColorIndex];
 
+  if (!mySelect) {
+    return null;
+  }
+
   return (
     <>
       <SectionTitle
