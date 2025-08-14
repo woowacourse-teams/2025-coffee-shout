@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import RouletteWheel from './RouletteWheel';
 import { colorList } from '@/constants/color';
 
@@ -13,17 +13,88 @@ export default meta;
 export const Interactive: StoryObj<typeof RouletteWheel> = {
   render: () => {
     const [isSpinning, setIsSpinning] = useState(false);
+    const [finalRotation, setFinalRotation] = useState(0);
+
     const handleSpin = () => {
       if (isSpinning) return;
       setIsSpinning(true);
-      setTimeout(() => setIsSpinning(false), 3000);
+
+      // 3초 후 스피닝 완료
+      setTimeout(() => {
+        setIsSpinning(false);
+        // 테스트용: 랜덤한 finalRotation 설정
+        setFinalRotation(Math.floor(Math.random() * 360));
+      }, 3000);
     };
+
+    const handleReset = () => {
+      setFinalRotation(0);
+      setIsSpinning(false);
+    };
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-        <RouletteWheel playerProbabilities={mockPlayerProbabilities} isSpinning={isSpinning} />
-        <button onClick={handleSpin} disabled={isSpinning} style={{ marginTop: 16 }}>
-          {isSpinning ? '돌아가는 중...' : '돌리기'}
-        </button>
+        <RouletteWheel
+          playerProbabilities={mockPlayerProbabilities}
+          isSpinning={isSpinning}
+          finalRotation={finalRotation}
+        />
+        <div style={{ display: 'flex', gap: 16 }}>
+          <button onClick={handleSpin} disabled={isSpinning}>
+            {isSpinning ? '돌아가는 중...' : '돌리기'}
+          </button>
+          <button onClick={handleReset} disabled={isSpinning}>
+            리셋
+          </button>
+        </div>
+        <div style={{ fontSize: 14, color: '#666' }}>Final Rotation: {finalRotation}°</div>
+      </div>
+    );
+  },
+};
+
+export const WithFixedRotation: StoryObj<typeof RouletteWheel> = {
+  render: () => {
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [finalRotation, setFinalRotation] = useState(90);
+
+    const handleSpin = () => {
+      if (isSpinning) return;
+      setIsSpinning(true);
+
+      setTimeout(() => {
+        setIsSpinning(false);
+      }, 3000);
+    };
+
+    const handleRotationChange = (e: ChangeEvent<HTMLInputElement>) => {
+      setFinalRotation(Number(e.target.value));
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+        <RouletteWheel
+          playerProbabilities={mockPlayerProbabilities}
+          isSpinning={isSpinning}
+          finalRotation={finalRotation}
+        />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <button onClick={handleSpin} disabled={isSpinning}>
+            {isSpinning ? '돌아가는 중...' : '돌리기'}
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label>Final Rotation:</label>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              value={finalRotation}
+              onChange={handleRotationChange}
+              disabled={isSpinning}
+            />
+            <span>{finalRotation}°</span>
+          </div>
+        </div>
       </div>
     );
   },

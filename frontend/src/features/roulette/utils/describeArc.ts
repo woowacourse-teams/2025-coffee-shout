@@ -1,4 +1,4 @@
-import { polarToCartesian } from './polarToCartesian';
+import { polarToCartesian } from './index';
 
 type Props = {
   cx: number;
