@@ -5,14 +5,22 @@ import { PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
 import PlayerIcon from '@/components/@common/PlayerIcon/PlayerIcon';
+import CheckIcon from '@/assets/check-icon.svg';
 
 type Props = {
   name: string;
   playerColor: ColorList;
   playerType?: PlayerType;
+  isReady?: boolean;
 } & PropsWithChildren;
 
-const PlayerCard = ({ name, playerColor, playerType = 'GUEST', children }: Props) => {
+const PlayerCard = ({
+  name,
+  playerColor,
+  playerType = 'GUEST',
+  isReady = false,
+  children,
+}: Props) => {
   return (
     <S.Container>
       <S.Wrapper>
@@ -20,6 +28,7 @@ const PlayerCard = ({ name, playerColor, playerType = 'GUEST', children }: Props
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
           {playerType === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}
+          {playerType === 'GUEST' && isReady && <S.ReadyIcon src={CheckIcon} alt="ready" />}
         </S.NameWrapper>
       </S.Wrapper>
       {children}

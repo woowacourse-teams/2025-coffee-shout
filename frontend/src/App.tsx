@@ -10,8 +10,8 @@ import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/Probabilit
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <WebSocketProvider>
-        <IdentifierProvider>
+      <IdentifierProvider>
+        <WebSocketProvider>
           <PlayerTypeProvider>
             <ProbabilityHistoryProvider>
               <ModalProvider>
@@ -19,8 +19,8 @@ const App = () => {
               </ModalProvider>
             </ProbabilityHistoryProvider>
           </PlayerTypeProvider>
-        </IdentifierProvider>
-      </WebSocketProvider>
+        </WebSocketProvider>
+      </IdentifierProvider>
     </ThemeProvider>
   );
 };
