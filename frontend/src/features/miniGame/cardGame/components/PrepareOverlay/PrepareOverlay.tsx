@@ -5,7 +5,7 @@ import coffee from '@/assets/coffee-white.svg';
 import { useEffect, useState } from 'react';
 
 const PrepareOverlay = () => {
-  const [displayText, setDisplayText] = useState('READY');
+  const [displayText, setDisplayText] = useState<string>('READY');
 
   useEffect(() => {
     const timer = setTimeout(() => {
