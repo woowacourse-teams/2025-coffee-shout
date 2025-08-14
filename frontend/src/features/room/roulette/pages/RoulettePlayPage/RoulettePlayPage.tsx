@@ -37,6 +37,7 @@ const RoulettePlayPage = () => {
   const [winner, setWinner] = useState<string | null>(null);
 
   const handleWinnerData = useCallback((data: RouletteWinnerResponse) => {
+    setCurrentView('roulette');
     setWinner(data.playerName);
     setRandomAngle(data.randomAngle);
     setIsSpinning(true);
@@ -53,11 +54,10 @@ const RoulettePlayPage = () => {
   };
 
   const handleViewChange = () => {
-    setCurrentView((prev) => (prev === 'roulette' ? 'statistics' : 'roulette'));
+    setCurrentView((prev) => (prev === 'statistics' ? 'roulette' : 'statistics'));
   };
 
   const handleSpinClick = () => {
-    if (currentView === 'statistics') handleViewChange();
     send(`/room/${joinCode}/spin-roulette`, { hostName: myName });
   };
 
