@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
+import coffeeshout.commom.task.TaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
@@ -47,7 +47,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     ObjectMapper objectMapper;
 
     @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    CardGameTaskExecutors cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -67,7 +67,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @AfterEach
     void tearDown() {
         // 실행 중인 모든 태스크 취소 및 스레드 정리
-        MiniGameTaskManager<CardGameTaskType> manager = cardGameTaskExecutors.get(joinCode);
+        TaskManager<CardGameTaskType> manager = cardGameTaskExecutors.get(joinCode);
         manager.cancelAll();
     }
 
