@@ -30,7 +30,7 @@ class DeckTest {
         multiplierCards = List.of(
                 MultiplierCard.QUADRUPLE,
                 MultiplierCard.DOUBLE,
-                MultiplierCard.NULLIFY
+                MultiplierCard.INVERT
         );
         deck = new Deck(additionCards, multiplierCards);
     }
