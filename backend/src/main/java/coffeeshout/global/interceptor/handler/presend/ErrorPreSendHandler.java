@@ -2,7 +2,7 @@ package coffeeshout.global.interceptor.handler.presend;
 
 import coffeeshout.global.interceptor.handler.PreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class ErrorPreSendHandler implements PreSendHandler {
 
     private final StompSessionManager sessionManager;
     private final WebSocketMetricService webSocketMetricService;
-    private final PlayerDisconnectionService playerDisconnectionService;
+    private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     @Override
     public StompCommand getCommand() {
@@ -34,7 +34,7 @@ public class ErrorPreSendHandler implements PreSendHandler {
             final String errorPlayerKey = sessionManager.getPlayerKey(sessionId);
 
             sessionManager.removeSession(sessionId);
-            playerDisconnectionService.handlePlayerDisconnection(errorPlayerKey, sessionId, "STOMP_ERROR");
+            delayedPlayerRemovalService.schedulePlayerRemoval(errorPlayerKey, sessionId, "STOMP_ERROR");
         }
 
         webSocketMetricService.recordDisconnection(sessionId, "stomp_error", false);
