@@ -1,6 +1,6 @@
 import { CardGameState, CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import { CardGameRound } from '@/types/round';
 import { createContext, Dispatch, SetStateAction, useContext } from 'react';
-import { CardGameRound } from '@/constants/miniGame';
 
 type CardGameContextType = {
   isTransition: boolean;

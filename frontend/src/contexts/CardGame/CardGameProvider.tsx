@@ -1,6 +1,6 @@
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { CardGameRound } from '@/constants/miniGame';
 import { CardGameState, CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import { CardGameRound } from '@/types/round';
 import { PropsWithChildren, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIdentifier } from '../Identifier/IdentifierContext';

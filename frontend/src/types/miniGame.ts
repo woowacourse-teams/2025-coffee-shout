@@ -1,4 +1,4 @@
-import { CardGameRound } from '@/constants/miniGame';
+import { CardGameRound } from './round';
 
 export const MINI_GAME_NAME_MAP = {
   CARD_GAME: '카드게임',

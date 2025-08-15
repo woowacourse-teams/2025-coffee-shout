@@ -2,10 +2,9 @@ import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import { colorList } from '@/constants/color';
-import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
 import Layout from '@/layouts/Layout';
 import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame';
-import { TOTAL_COUNT } from '@/types/round';
+import { CardGameRound, ROUND_NUMBER_MAP } from '@/types/round';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import CircularProgress from '../CircularProgress/CircularProgress';
@@ -13,6 +12,7 @@ import * as S from './Round.styled';
 
 type Props = {
   round: CardGameRound;
+  roundTotalTime: number;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
@@ -22,6 +22,7 @@ type Props = {
 
 const Round = ({
   round,
+  roundTotalTime,
   onClickCard,
   selectedCardInfo,
   currentTime,
@@ -38,7 +39,11 @@ const Round = ({
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>
-            <CircularProgress current={currentTime} total={TOTAL_COUNT} isActive={isTimerActive} />
+            <CircularProgress
+              current={currentTime}
+              total={roundTotalTime}
+              isActive={isTimerActive}
+            />
           </S.CircularProgressWrapper>
         </S.TitleContainer>
         <S.MyCardContainer>

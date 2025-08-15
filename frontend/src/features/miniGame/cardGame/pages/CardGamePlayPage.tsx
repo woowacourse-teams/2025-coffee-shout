@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
-import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
-import Round from '../components/Round/Round';
-import { useCardGame } from '@/contexts/CardGame/CardGameContext';
-import { TOTAL_COUNT } from '@/types/round';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
+import { useEffect, useRef, useState } from 'react';
 import PrepareOverlay from '../components/PrepareOverlay/PrepareOverlay';
+import Round from '../components/Round/Round';
+
+const ROUND_TOTAL_TIME = 10;
 
 const CardGamePlayPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { isTransition, currentRound, currentCardGameState, cardInfos, selectedCardInfo } =
     useCardGame();
-  const [currentTime, setCurrentTime] = useState(TOTAL_COUNT);
+  const [currentTime, setCurrentTime] = useState(ROUND_TOTAL_TIME);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const { send } = useWebSocket();
 
@@ -40,20 +41,20 @@ const CardGamePlayPage = () => {
 
   useEffect(() => {
     if (currentCardGameState === 'PREPARE') {
-      setCurrentTime(TOTAL_COUNT);
+      setCurrentTime(ROUND_TOTAL_TIME);
       return;
     }
 
     if (currentCardGameState === 'PLAYING') {
       if (currentRound === 'FIRST') {
-        setCurrentTime(TOTAL_COUNT);
+        setCurrentTime(ROUND_TOTAL_TIME);
         setIsTimerActive(true);
         isTimerReset.current = false;
         return;
       }
 
       if (currentRound === 'SECOND' && !isTimerReset.current) {
-        setCurrentTime(TOTAL_COUNT);
+        setCurrentTime(ROUND_TOTAL_TIME);
         setIsTimerActive(true);
         isTimerReset.current = true;
       }
@@ -70,6 +71,7 @@ const CardGamePlayPage = () => {
       <Round
         key={currentRound}
         round={currentRound}
+        roundTotalTime={ROUND_TOTAL_TIME}
         onClickCard={handleCardClick}
         selectedCardInfo={selectedCardInfo}
         currentTime={currentTime}
