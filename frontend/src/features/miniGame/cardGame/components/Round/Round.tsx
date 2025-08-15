@@ -1,16 +1,15 @@
-import Layout from '@/layouts/Layout';
-import * as S from './Round.styled';
-import Headline4 from '@/components/@common/Headline4/Headline4';
-import Headline2 from '@/components/@common/Headline2/Headline2';
 import Description from '@/components/@common/Description/Description';
-import CircularProgress from '../CircularProgress/CircularProgress';
-import CardBack from '../CardBack/CardBack';
-import { Card, CardType, CardValue } from '../../constants/cards';
-import CardFront from '../CardFront/CardFront';
-import { TOTAL_COUNT } from '@/types/round';
-import { CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import Headline2 from '@/components/@common/Headline2/Headline2';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 import { colorList } from '@/constants/color';
 import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
+import Layout from '@/layouts/Layout';
+import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import { TOTAL_COUNT } from '@/types/round';
+import CardBack from '../CardBack/CardBack';
+import CardFront from '../CardFront/CardFront';
+import CircularProgress from '../CircularProgress/CircularProgress';
+import * as S from './Round.styled';
 
 type Props = {
   round: CardGameRound;
@@ -61,8 +60,8 @@ const Round = ({
               size="medium"
               card={
                 {
-                  type: selectedCardInfo['SECOND'].type as CardType,
-                  value: selectedCardInfo['SECOND'].value as CardValue,
+                  type: selectedCardInfo['SECOND'].type,
+                  value: selectedCardInfo['SECOND'].value,
                 } as Card
               }
             />
@@ -76,8 +75,8 @@ const Round = ({
               <CardFront
                 card={
                   {
-                    type: cardInfo.cardType as CardType,
-                    value: cardInfo.value as CardValue,
+                    type: cardInfo.cardType,
+                    value: cardInfo.value,
                   } as Card
                 }
                 playerColor={colorList[cardInfo.colorIndex]}

@@ -1,7 +1,7 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { ColorList } from '@/constants/color';
+import { Card } from '@/types/miniGame';
 import { Size } from '@/types/styles';
-import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
 
 type Props = {
