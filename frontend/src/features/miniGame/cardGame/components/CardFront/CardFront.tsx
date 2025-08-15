@@ -1,6 +1,6 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { ColorList } from '@/constants/color';
-import { Card } from '@/types/miniGame';
+import { Card } from '@/types/miniGame/cardGame';
 import { Size } from '@/types/styles';
 import * as S from './CardFront.styled';
 

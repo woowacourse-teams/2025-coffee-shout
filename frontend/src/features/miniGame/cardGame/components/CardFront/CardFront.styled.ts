@@ -1,5 +1,5 @@
 import { ColorList } from '@/constants/color';
-import { Card } from '@/types/miniGame';
+import { Card } from '@/types/miniGame/cardGame';
 import { Size } from '@/types/styles';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';

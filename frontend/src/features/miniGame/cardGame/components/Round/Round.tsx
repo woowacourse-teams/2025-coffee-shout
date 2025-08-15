@@ -3,15 +3,15 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import { colorList } from '@/constants/color';
 import Layout from '@/layouts/Layout';
-import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame';
-import { CardGameRound, ROUND_NUMBER_MAP } from '@/types/round';
+import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import CircularProgress from '../CircularProgress/CircularProgress';
 import * as S from './Round.styled';
+import { ROUND_MAP, RoundType } from '@/types/miniGame/round';
 
 type Props = {
-  round: CardGameRound;
+  round: RoundType;
   roundTotalTime: number;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
@@ -35,7 +35,7 @@ const Round = ({
       <Layout.Content>
         <S.TitleContainer>
           <S.TitleWrapper>
-            <Headline2>Round {ROUND_NUMBER_MAP[round]}</Headline2>
+            <Headline2>Round {ROUND_MAP[round]}</Headline2>
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>

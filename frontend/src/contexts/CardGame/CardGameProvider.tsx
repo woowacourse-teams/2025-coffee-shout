@@ -1,6 +1,6 @@
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { CardGameState, CardInfo, SelectedCardInfo } from '@/types/miniGame';
-import { CardGameRound } from '@/types/round';
+import { CardGameState, CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
+import { RoundType } from '@/types/miniGame/round';
 import { PropsWithChildren, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIdentifier } from '../Identifier/IdentifierContext';
@@ -8,7 +8,7 @@ import { CardGameContext } from './CardGameContext';
 
 type CardGameStateResponse = {
   cardGameState: CardGameState;
-  currentRound: CardGameRound;
+  currentRound: RoundType;
   cardInfoMessages: CardInfo[];
   allSelected: boolean;
 };
@@ -18,7 +18,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
   const { joinCode, myName } = useIdentifier();
   const { miniGameType } = useParams();
   const [isTransition, setIsTransition] = useState<boolean>(false);
-  const [currentRound, setCurrentRound] = useState<CardGameRound>('FIRST');
+  const [currentRound, setCurrentRound] = useState<RoundType>('FIRST');
   const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
   const [cardInfos, setCardInfos] = useState<CardInfo[]>([]);
   const [selectedCardInfo, setSelectedCardInfo] = useState<SelectedCardInfo>({

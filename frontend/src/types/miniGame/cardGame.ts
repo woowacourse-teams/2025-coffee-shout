@@ -1,15 +1,8 @@
-import { CardGameRound } from './round';
+import { RoundType } from './round';
 
-export const MINI_GAME_NAME_MAP = {
-  CARD_GAME: '카드게임',
-  // '31_GAME': '랜덤 31222',
-} as const;
-
-export type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
-
-export const MINI_GAME_DESCRIPTION: Record<MiniGameType, string[]> = {
-  CARD_GAME: ['2라운드 동안 매번 카드 1장씩 뒤집어', '가장 높은 점수를 내보세요!'],
-};
+/**
+ * 카드 게임 타입
+ */
 
 export type CardGameState = 'READY' | 'LOADING' | 'PREPARE' | 'PLAYING' | 'SCORE_BOARD' | 'DONE';
 
@@ -42,7 +35,7 @@ export type CardInfo = {
 };
 
 export type SelectedCardInfo = Record<
-  CardGameRound,
+  RoundType,
   {
     isSelected: boolean;
     type: CardType | null;
