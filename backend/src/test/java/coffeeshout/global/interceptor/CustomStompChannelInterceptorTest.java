@@ -13,9 +13,8 @@ import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler
 import coffeeshout.global.interceptor.handler.presend.ConnectPreSendHandler;
 import coffeeshout.global.interceptor.handler.presend.ErrorPreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
@@ -32,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -53,9 +51,9 @@ class CustomStompChannelInterceptorTest {
 
     @Mock
     private MessageChannel channel;
-
+    
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     private StompSessionManager sessionManager;
     private CustomStompChannelInterceptor interceptor;
@@ -73,24 +71,16 @@ class CustomStompChannelInterceptorTest {
     void setUp() {
         // 실제 구현체 생성
         sessionManager = new StompSessionManager();
-        final RoomService roomService = mock(RoomService.class);
-        final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
-                roomService);
-        eventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(Object event) {
-            }
-        };
 
         // 핸들러들 생성
         connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
-                menuQueryService);
+                menuQueryService, delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                delayedPlayerRemovalService);
         disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService, eventPublisher);
+                delayedPlayerRemovalService);
         errorPreSendHandler = new ErrorPreSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                delayedPlayerRemovalService);
 
         // 핸들러 레지스트리 생성
         final StompHandlerRegistry handlerRegistry = new StompHandlerRegistry(
