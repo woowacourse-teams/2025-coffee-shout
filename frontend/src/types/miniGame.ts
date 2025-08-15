@@ -49,13 +49,3 @@ export type SelectedCardInfo = Record<
     value: CardValue | null;
   }
 >;
-
-export type PlayerScore = {
-  playerName: string;
-  score: number;
-};
-
-export type PlayerRank = {
-  playerName: string;
-  rank: number;
-};
