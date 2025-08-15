@@ -13,3 +13,15 @@ export type PlayerProbability = {
   probability: number;
   playerColor: ColorList;
 };
+
+export type ProbabilityHistory = {
+  prev: PlayerProbability[];
+  current: PlayerProbability[];
+};
+
+export type RouletteSector = {
+  playerName: string;
+  startAngle: number;
+  endAngle: number;
+  playerColor: ColorList;
+};

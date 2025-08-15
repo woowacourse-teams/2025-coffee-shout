@@ -1,41 +1,51 @@
-import RouletteWheelIcon from '@/assets/profile-red.svg';
-import { PlayerProbability } from '@/types/roulette';
 import { useTheme } from '@emotion/react';
-import { describeArc } from '../../utils/describeArc';
-import { getPlayersWithAngles } from '../../utils/getPlayerWithAngles.ts';
+import { RouletteSector, PlayerProbability } from '@/types/roulette';
 import * as S from './RouletteWheel.styled';
+import { WHEEL_CONFIG } from '../../constants/config';
+import { convertProbabilitiesToAngles } from '../../utils';
+import RouletteSlice from '../RouletteSlice/RouletteSlice';
 
-type Props = {
-  playerProbabilities: PlayerProbability[];
-  isSpinning?: boolean;
-};
+type Props =
+  | {
+      sectors: RouletteSector[];
+      playerProbabilities?: never;
+      isSpinning?: boolean;
+      finalRotation?: number;
+    }
+  | {
+      sectors?: never;
+      playerProbabilities: PlayerProbability[];
+      isSpinning?: boolean;
+      finalRotation?: number;
+    };
 
-const RouletteWheel = ({ playerProbabilities, isSpinning = false }: Props) => {
+const RouletteWheel = ({
+  sectors,
+  playerProbabilities,
+  isSpinning = false,
+  finalRotation = 0,
+}: Props) => {
   const theme = useTheme();
-  const totalProbability = playerProbabilities.reduce((sum, player) => sum + player.probability, 0);
-  const playersWithAngles = getPlayersWithAngles(playerProbabilities, totalProbability);
+
+  const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
   return (
     <S.Container>
-      <S.Wrapper $isSpinning={isSpinning}>
-        <svg width={300} height={300} viewBox="0 0 300 300">
+      <S.Pin />
+      <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
+        <svg
+          width={WHEEL_CONFIG.SIZE}
+          height={WHEEL_CONFIG.SIZE}
+          viewBox={`0 0 ${WHEEL_CONFIG.SIZE} ${WHEEL_CONFIG.SIZE}`}
+        >
           {playersWithAngles.map((player) => (
-            <path
+            <RouletteSlice
               key={player.playerName}
-              d={describeArc({
-                cx: 150,
-                cy: 150,
-                r: 140,
-                startAngle: player.startAngle,
-                endAngle: player.endAngle,
-              })}
-              fill={player.playerColor}
-              stroke={theme.color.point[100]}
-              strokeWidth="1"
+              player={player}
+              strokeColor={theme.color.point[100]}
             />
           ))}
         </svg>
-        <S.CenterImage src={RouletteWheelIcon} alt="roulette-center" />
       </S.Wrapper>
     </S.Container>
   );

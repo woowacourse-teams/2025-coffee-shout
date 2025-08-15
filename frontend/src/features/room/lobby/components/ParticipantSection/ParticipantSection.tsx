@@ -3,12 +3,12 @@ import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 import { Player } from '@/types/player';
 import * as S from './ParticipantSection.styled';
 import { getMenuIcon } from './utils/getMenuIcon';
-import { colorList } from '@/constants/color';
 
 const TOTAL_PARTICIPANTS = 9;
 
@@ -18,20 +18,30 @@ export const ParticipantSection = ({ participants }: Props) => {
   const { myName } = useIdentifier();
   const { openModal, closeModal } = useModal();
 
+  const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
+
   const handleModifyMenu = () => {
+    if (!mySelect) {
+      alert('⚠️ 내 정보가 존재하지 않아 메뉴 변경 모달을 열 수 없습니다.');
+      return;
+    }
+
     openModal(<MenuModifyModal myMenu={mySelect.menuResponse.name} onClose={closeModal} />, {
       title: '음료 변경',
       showCloseButton: true,
     });
   };
 
-  const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
   );
   const myColorIndex =
     participants.find((participant) => participant.playerName === myName)?.colorIndex ?? 0;
   const myColor = colorList[myColorIndex];
+
+  if (!mySelect) {
+    return null;
+  }
 
   return (
     <>
@@ -40,11 +50,13 @@ export const ParticipantSection = ({ participants }: Props) => {
         description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
         suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
-      <PlayerCard name={myName} playerColor={myColor}>
-        <S.Menu
-          src={getMenuIcon(mySelect && mySelect.menuResponse.menuType)}
-          onClick={handleModifyMenu}
-        />
+      <PlayerCard
+        name={myName}
+        playerColor={myColor}
+        isReady={mySelect.isReady}
+        playerType={mySelect.playerType}
+      >
+        <S.Menu src={getMenuIcon(mySelect.menuResponse.menuType)} onClick={handleModifyMenu} />
       </PlayerCard>
       <Divider />
       <S.ScrollableWrapper>
@@ -56,6 +68,8 @@ export const ParticipantSection = ({ participants }: Props) => {
               key={participant.playerName}
               name={participant.playerName}
               playerColor={colorList[participant.colorIndex]}
+              isReady={participant.isReady}
+              playerType={participant.playerType}
             >
               <S.Menu src={getMenuIcon(participant.menuResponse.menuType)} />
             </PlayerCard>

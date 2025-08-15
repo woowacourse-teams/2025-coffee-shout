@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 
 type Props = {
   $size?: string;
+  $isActive?: boolean;
 };
 
 export const Container = styled.div<Props>`
@@ -26,11 +27,11 @@ export const BackgroundCircle = styled.circle`
   stroke-width: 10;
 `;
 
-export const ProgressCircle = styled.circle`
+export const ProgressCircle = styled.circle<Props>`
   stroke: ${({ theme }) => theme.color.point[400]};
   stroke-width: 10;
   stroke-linecap: round;
-  transition: stroke-dashoffset 1.1s linear;
+  transition: ${({ $isActive }) => ($isActive ? 'stroke-dashoffset 1.1s linear' : 'none')};
 `;
 
 export const CountText = styled.span`

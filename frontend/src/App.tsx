@@ -5,19 +5,22 @@ import { ModalProvider } from './components/@common/Modal/ModalContext';
 import { IdentifierProvider } from './contexts/Identifier/IdentifierProvider';
 import { theme } from './styles/theme';
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
+import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <WebSocketProvider>
-        <IdentifierProvider>
+      <IdentifierProvider>
+        <WebSocketProvider>
           <PlayerTypeProvider>
-            <ModalProvider>
-              <Outlet />
-            </ModalProvider>
+            <ProbabilityHistoryProvider>
+              <ModalProvider>
+                <Outlet />
+              </ModalProvider>
+            </ProbabilityHistoryProvider>
           </PlayerTypeProvider>
-        </IdentifierProvider>
-      </WebSocketProvider>
+        </WebSocketProvider>
+      </IdentifierProvider>
     </ThemeProvider>
   );
 };

@@ -2,26 +2,34 @@ import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import { colorList } from '@/constants/color';
+import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
 import Layout from '@/layouts/Layout';
-import { CardInfo } from '@/types/miniGame';
-import { RoundKey, TOTAL_COUNT } from '@/types/round';
+import { CardInfo, SelectedCardInfo } from '@/types/miniGame';
+import { TOTAL_COUNT } from '@/types/round';
 import { Card, CardType, CardValue } from '../../constants/cards';
-import { SelectedCardInfo } from '../../pages/CardGamePlayPage';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import CircularProgress from '../CircularProgress/CircularProgress';
 import * as S from './Round.styled';
 
 type Props = {
-  round: RoundKey;
+  round: CardGameRound;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
+  isTimerActive: boolean;
   cardInfos: CardInfo[];
 };
 
-const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }: Props) => {
-  const isCardSelectedInCurrentRound = selectedCardInfo[round].index !== -1;
+const Round = ({
+  round,
+  onClickCard,
+  selectedCardInfo,
+  currentTime,
+  isTimerActive,
+  cardInfos,
+}: Props) => {
+  const isCardSelectedInCurrentRound = selectedCardInfo[round].isSelected;
 
   return (
     <Layout>
@@ -29,36 +37,37 @@ const Round = ({ round, onClickCard, selectedCardInfo, currentTime, cardInfos }:
       <Layout.Content>
         <S.TitleContainer>
           <S.TitleWrapper>
-            <Headline2>Round {round}</Headline2>
+            <Headline2>Round {ROUND_NUMBER_MAP[round]}</Headline2>
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>
-            <CircularProgress current={currentTime} total={TOTAL_COUNT} />
+            <CircularProgress current={currentTime} total={TOTAL_COUNT} isActive={isTimerActive} />
           </S.CircularProgressWrapper>
         </S.TitleContainer>
+
         <S.MyCardContainer data-testid="selected-card-area">
-          {selectedCardInfo[1].index !== -1 ? (
+          {selectedCardInfo['FIRST'].isSelected ? (
             <CardFront
               size="medium"
               data-testid="card-selected-round-1"
               card={
                 {
-                  type: selectedCardInfo[1].type as CardType,
-                  value: selectedCardInfo[1].value as CardValue,
+                  type: selectedCardInfo['FIRST'].type,
+                  value: selectedCardInfo['FIRST'].value,
                 } as Card
               }
             />
           ) : (
             <CardBack size="medium" disabled={true} data-testid="card-empty-round-1" />
           )}
-          {selectedCardInfo[2].index !== -1 ? (
+          {selectedCardInfo['SECOND'].isSelected ? (
             <CardFront
               size="medium"
               data-testid="card-selected-round-2"
               card={
                 {
-                  type: selectedCardInfo[2].type as CardType,
-                  value: selectedCardInfo[2].value as CardValue,
+                  type: selectedCardInfo['SECOND'].type as CardType,
+                  value: selectedCardInfo['SECOND'].value as CardValue,
                 } as Card
               }
             />

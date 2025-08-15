@@ -31,7 +31,12 @@ export const NameWrapper = styled.div`
   }
 `;
 export const CrownIcon = styled.img`
-  width: 30px;
-  height: 30px;
-  margin-bottom: 8px;
+  width: 22px;
+  height: 22px;
+  margin-bottom: 4px;
+`;
+
+export const ReadyIcon = styled.img`
+  width: 22px;
+  height: 22px;
 `;

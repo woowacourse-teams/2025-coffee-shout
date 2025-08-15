@@ -22,7 +22,7 @@ type Story = StoryObj<typeof PlayerIcon>;
 
 export const Default: Story = {
   args: {
-    color: '#FF6B6B',
+    color: colorList[0], // Use first color from colorList
   },
 };
 
@@ -39,56 +39,57 @@ export const AllColors: Story = {
   ),
 };
 
+// Generate individual stories for each color dynamically
 export const Red: Story = {
   args: {
-    color: '#FF6B6B',
+    color: colorList[0], // #FF6B6B
   },
 };
 
 export const Teal: Story = {
   args: {
-    color: '#80d6d0',
+    color: colorList[1], // #80d6d0
   },
 };
 
 export const Blue: Story = {
   args: {
-    color: '#45B7D1',
+    color: colorList[2], // #45B7D1
   },
 };
 
 export const Green: Story = {
   args: {
-    color: '#96CEB4',
+    color: colorList[3], // #96CEB4
   },
 };
 
 export const Yellow: Story = {
   args: {
-    color: '#FFEAA7',
+    color: colorList[4], // #FFEAA7
   },
 };
 
 export const Purple: Story = {
   args: {
-    color: '#DDA0DD',
+    color: colorList[5], // #DDA0DD
   },
 };
 
 export const Mint: Story = {
   args: {
-    color: '#98D8C8',
+    color: colorList[6], // #98D8C8
   },
 };
 
 export const Gold: Story = {
   args: {
-    color: '#F7DC6F',
+    color: colorList[7], // #F7DC6F
   },
 };
 
 export const Lavender: Story = {
   args: {
-    color: '#BB8FCE',
+    color: colorList[8], // #BB8FCE
   },
 };
