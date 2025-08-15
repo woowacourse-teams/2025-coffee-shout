@@ -31,7 +31,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     (data: CardGameStateData) => {
       const { cardGameState, currentRound, cardInfoMessages } = data;
 
-      const isPreparing = cardGameState === 'DESCRIPTION';
+      const isPreparing = cardGameState === 'PREPARE';
       const isFirstRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'FIRST';
       const isFirstRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'FIRST';
       const isSecondRoundLoading = cardGameState === 'LOADING' && currentRound === 'SECOND';
@@ -58,7 +58,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       };
 
       if (isPreparing) {
-        setCurrentCardGameState('DESCRIPTION');
+        setCurrentCardGameState('PREPARE');
         setCardInfos(cardInfoMessages);
         return;
       }
