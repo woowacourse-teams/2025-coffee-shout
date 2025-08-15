@@ -12,13 +12,7 @@ export const MINI_GAME_DESCRIPTION: Record<MiniGameType, string[]> = {
 export type MiniGameType = keyof typeof MINI_GAME_NAME_MAP;
 
 // @todo: prepare로 수정
-export type CardGameState =
-  | 'READY'
-  | 'LOADING'
-  | 'DESCRIPTION'
-  | 'PLAYING'
-  | 'SCORE_BOARD'
-  | 'DONE';
+export type CardGameState = 'READY' | 'LOADING' | 'PREPARE' | 'PLAYING' | 'SCORE_BOARD' | 'DONE';
 
 export type CardType = 'ADDITION' | 'MULTIPLIER';
 
