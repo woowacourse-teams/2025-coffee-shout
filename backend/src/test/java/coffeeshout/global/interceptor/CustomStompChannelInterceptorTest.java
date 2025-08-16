@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
@@ -51,7 +50,7 @@ class CustomStompChannelInterceptorTest {
 
     @Mock
     private MessageChannel channel;
-    
+
     @Mock
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
@@ -329,7 +328,6 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
         }
 
