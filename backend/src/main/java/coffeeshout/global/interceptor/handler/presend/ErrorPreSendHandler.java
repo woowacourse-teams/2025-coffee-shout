@@ -33,7 +33,6 @@ public class ErrorPreSendHandler implements PreSendHandler {
         if (sessionManager.hasPlayerKey(sessionId)) {
             final String errorPlayerKey = sessionManager.getPlayerKey(sessionId);
 
-            sessionManager.removeSession(sessionId);
             delayedPlayerRemovalService.schedulePlayerRemoval(errorPlayerKey, sessionId, "STOMP_ERROR");
         }
 
