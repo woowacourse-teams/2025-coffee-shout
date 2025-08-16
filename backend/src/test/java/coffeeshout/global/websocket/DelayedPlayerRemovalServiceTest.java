@@ -33,7 +33,7 @@ class DelayedPlayerRemovalServiceTest {
 
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
-    private final String playerKey = "ABC123:김철수";
+    private final String playerKey = "ABC23:김철수";
     private final String sessionId = "session-123";
     private final String reason = "CLIENT_DISCONNECT";
 

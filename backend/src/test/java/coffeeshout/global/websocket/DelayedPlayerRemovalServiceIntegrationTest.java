@@ -16,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * DelayedPlayerRemovalService의 실제 타이밍 기반 통합 테스트
- * 실제 TaskScheduler를 사용하여 지연 실행을 테스트한다.
+ * DelayedPlayerRemovalService의 실제 타이밍 기반 통합 테스트 실제 TaskScheduler를 사용하여 지연 실행을 테스트한다.
  */
 @ExtendWith(MockitoExtension.class)
 class DelayedPlayerRemovalServiceIntegrationTest {
@@ -28,7 +27,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
-    private final String playerKey = "ABC123:김철수";
+    private final String playerKey = "ABC23:김철수";
     private final String sessionId = "session-123";
     private final String reason = "CLIENT_DISCONNECT";
 
@@ -91,7 +90,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, firstSessionId, reason);
-            
+
             // 잠시 후 재스케줄링
             await().pollDelay(100, TimeUnit.MILLISECONDS).until(() -> true);
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, secondSessionId, reason);
@@ -114,9 +113,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         @Test
         void 여러_플레이어가_동시에_스케줄링되어도_안전하게_처리된다() {
             // given
-            String player1 = "ABC123:김철수";
-            String player2 = "DEF456:박영희";
-            String player3 = "GHI789:이민수";
+            String player1 = "ABC23:김철수";
+            String player2 = "DEF56:박영희";
+            String player3 = "GHI89:이민수";
 
             // when - 동시에 여러 플레이어 스케줄링
             delayedPlayerRemovalService.schedulePlayerRemoval(player1, "session-1", reason);
@@ -201,14 +200,13 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     }
 
     /**
-     * 테스트용 DelayedPlayerRemovalService
-     * 실제 15초 대신 짧은 시간으로 테스트할 수 있도록 오버라이드
+     * 테스트용 DelayedPlayerRemovalService 실제 15초 대신 짧은 시간으로 테스트할 수 있도록 오버라이드
      */
     private static class TestDelayedPlayerRemovalService extends DelayedPlayerRemovalService {
         private static final Duration TEST_REMOVAL_DELAY = Duration.ofMillis(500); // 500ms로 단축
 
-        public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler, 
-                                             PlayerDisconnectionService playerDisconnectionService) {
+        public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
+                                               PlayerDisconnectionService playerDisconnectionService) {
             super(taskScheduler, playerDisconnectionService);
         }
 
@@ -221,7 +219,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     class 빠른_테스트_시나리오 {
         // 실제 15초 기다리기 어려우면 이런 식으로 더 짧은 지연시간으로 테스트
         // 단, DelayedPlayerRemovalService 구조 변경 필요
-        
+
         @Test
         void 설정으로_지연시간을_조정할_수_있다면_더_빠른_테스트가_가능하다() {
             // 현재는 하드코딩되어 있어서 불가능
