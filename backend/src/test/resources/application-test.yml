@@ -7,3 +7,4 @@ logging:
 room:
   cleanup:
     interval: 500 # 500 milliseconds for testing
+    enabled: false # 테스트에서는 스케줄러 비활성화

@@ -84,7 +84,6 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/spin-roulette")
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
         final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
-        roomCleanupService.delayCleanUp(joinCode);
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
                 WebSocketResponse.success(winner));

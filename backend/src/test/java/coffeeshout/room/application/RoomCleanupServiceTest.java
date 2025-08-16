@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * 테스트 시에는 1시간 간격이 아닌 500ms 간격으로 실행되도록 설정되어 있다.
@@ -27,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@TestPropertySource(properties = "room.cleanup.enabled=true") // 이 테스트에서만 스케줄러 활성화
 class RoomCleanupServiceTest {
 
     @Value("${room.cleanup.interval}")
@@ -60,56 +62,6 @@ class RoomCleanupServiceTest {
         PlayerName hostName = new PlayerName("테스트호스트");
         testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
         testRoom = roomRepository.save(testRoom);
-    }
-
-    @Test
-    void 지연시간_이전에_삭제가_되지_않는다() {
-        // given - 플레이어를 연결해놔서 스케줄러에 의해 삭제되지 않도록함
-        String playerName = "테스트플레이어";
-        String sessionId = "test-session-" + System.currentTimeMillis();
-
-        stompSessionManager.registerPlayerSession(joinCode.getValue(), playerName, sessionId);
-
-        // when
-        roomCleanupService.delayCleanUp(joinCode.getValue());
-
-        // then
-        await().atMost(delayMs - 100, TimeUnit.MILLISECONDS) // 500ms - 100ms 여유시간
-                .untilAsserted(() -> assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode()))
-                        .isNotEmpty());
-
-        // cleanup
-        stompSessionManager.removeSession(sessionId);
-    }
-
-    @Test
-    void 지연시간_이후에_삭제된다() {
-        // given - 플레이어를 연결해놔서 스케줄러에 의해 삭제되지 않도록함
-        String playerName = "테스트플레이어";
-        String sessionId = "test-session-" + System.currentTimeMillis();
-
-        stompSessionManager.registerPlayerSession(joinCode.getValue(), playerName, sessionId);
-        // when
-        roomCleanupService.delayCleanUp(joinCode.getValue());
-
-        // then - 500ms 후에는 삭제되어야 함
-        await().atLeast(delayMs - 100, TimeUnit.MILLISECONDS) // 500ms - 100ms 여유시간 when을 처리하면서 지연될 수 있음
-                .atMost(delayMs + 100, TimeUnit.MILLISECONDS) // 500ms + 여유시간
-                .untilAsserted(() -> assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode()))
-                        .isEmpty());
-    }
-
-    @Test
-    @DisplayName("delayCleanUp 메서드로 지연 삭제가 정상 동작한다")
-    void delayCleanUp_메서드로_지연_삭제가_정상_동작한다() {
-        // when
-        roomCleanupService.delayCleanUp(joinCode.getValue());
-
-        // then - cleanup interval 후에 룸이 삭제되는지 확인
-        await().atMost(delayMs + 200, TimeUnit.MILLISECONDS)
-                .untilAsserted(() ->
-                        assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isEmpty()
-                );
     }
 
     @Test

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class RoomCleanupService {
 
     private final long roomCleanupDelayMs;
+    private final boolean cleanupEnabled;
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
     private final StompSessionManager stompSessionManager;
@@ -25,28 +26,29 @@ public class RoomCleanupService {
 
     public RoomCleanupService(
             @Value("${room.cleanup.interval}") long roomCleanupDelayMs,
+            @Value("${room.cleanup.enabled:true}") boolean cleanupEnabled,
             RoomQueryService roomQueryService,
             RoomCommandService roomCommandService,
             StompSessionManager stompSessionManager,
             TaskScheduler taskScheduler) {
         this.roomCleanupDelayMs = roomCleanupDelayMs;
+        this.cleanupEnabled = cleanupEnabled;
         this.roomQueryService = roomQueryService;
         this.roomCommandService = roomCommandService;
         this.stompSessionManager = stompSessionManager;
         this.taskScheduler = taskScheduler;
     }
 
-    public void delayCleanUp(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        taskScheduler.schedule(() -> roomCommandService.delete(room),
-                Instant.now().plus(Duration.ofMillis(roomCleanupDelayMs)));
-    }
-
     @PostConstruct
     public void startScheduledCleanup() {
-        taskScheduler.scheduleWithFixedDelay(this::cleanupEmptyRooms,
-                Duration.ofMillis(roomCleanupDelayMs));
+        if (cleanupEnabled) {
+            log.info("방 정리 스케줄러 시작 - 간격: {}ms", roomCleanupDelayMs);
+            taskScheduler.scheduleWithFixedDelay(this::cleanupEmptyRooms,
+                    Duration.ofMillis(roomCleanupDelayMs));
+            return;
+        }
+
+        log.info("방 정리 스케줄러 비활성화됨 (room.cleanup.enabled=false)");
     }
 
     private void cleanupEmptyRooms() {

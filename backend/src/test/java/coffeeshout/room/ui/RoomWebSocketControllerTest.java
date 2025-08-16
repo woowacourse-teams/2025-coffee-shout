@@ -6,7 +6,6 @@ import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.TestStompSession.MessageCollector;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -31,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,33 +46,13 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     private MenuRepository menuRepository;
 
     @Autowired
-    private StompSessionManager stompSessionManager;
-
-    @Autowired
     private JoinCodeGenerator joinCodeGenerator;
 
     private Room testRoom;
-    private String testSessionId;
 
     @BeforeEach
     void setUp() {
         setupTestData();
-
-        // 스케줄러에 의한 방 삭제 방지를 위해 플레이어 세션 등록
-        testSessionId = "test-ws-session-" + System.currentTimeMillis();
-        stompSessionManager.registerPlayerSession(
-                testRoom.getJoinCode().getValue(),
-                "호스트꾹이",
-                testSessionId
-        );
-    }
-
-    @AfterEach
-    void tearDown() {
-        // 테스트 후 세션 정리
-        if (testSessionId != null) {
-            stompSessionManager.removeSession(testSessionId);
-        }
     }
 
     @Test
