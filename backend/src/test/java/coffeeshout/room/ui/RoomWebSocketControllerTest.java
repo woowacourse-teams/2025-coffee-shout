@@ -6,6 +6,7 @@ import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.TestStompSession.MessageCollector;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -15,6 +16,7 @@ import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
@@ -29,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +47,34 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Autowired
     private MenuRepository menuRepository;
 
+    @Autowired
+    private StompSessionManager stompSessionManager;
+
+    @Autowired
+    private JoinCodeGenerator joinCodeGenerator;
+
     private Room testRoom;
-    private Menu testMenu;
+    private String testSessionId;
 
     @BeforeEach
     void setUp() {
         setupTestData();
+
+        // 스케줄러에 의한 방 삭제 방지를 위해 플레이어 세션 등록
+        testSessionId = "test-ws-session-" + System.currentTimeMillis();
+        stompSessionManager.registerPlayerSession(
+                testRoom.getJoinCode().getValue(),
+                "호스트꾹이",
+                testSessionId
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        // 테스트 후 세션 정리
+        if (testSessionId != null) {
+            stompSessionManager.removeSession(testSessionId);
+        }
     }
 
     @Test
@@ -286,10 +311,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     private void setupTestData() {
         // 메뉴 생성
-        testMenu = menuRepository.findAll().get(0);
+        final Menu testMenu = menuRepository.findAll().get(0);
 
-        // 방 생성 - 호스트와 함께
-        JoinCode joinCode = new JoinCode("TEST2"); // 5자리로 수정
+        // 고유한 JoinCode 생성으로 테스트 격리
+        JoinCode joinCode = joinCodeGenerator.generate();
         PlayerName hostName = new PlayerName("호스트꾹이");
         testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
 
