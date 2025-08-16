@@ -5,16 +5,14 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.room.application.RoomService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 
@@ -25,10 +23,7 @@ class DisconnectPostSendHandlerTest {
     private WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private RoomService roomService;
-
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     private StompSessionManager sessionManager;
     private DisconnectPostSendHandler handler;
@@ -40,16 +35,7 @@ class DisconnectPostSendHandlerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        eventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(Object event) {
-
-            }
-        };
-        final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
-                roomService);
-        handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, playerDisconnectionService,
-                eventPublisher);
+        handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, delayedPlayerRemovalService);
     }
 
     @Test
@@ -72,7 +58,7 @@ class DisconnectPostSendHandlerTest {
 
             // then
             verifyNoInteractions(webSocketMetricService);
-            verifyNoInteractions(roomService);
+            verifyNoInteractions(delayedPlayerRemovalService);
         }
 
         @Test
@@ -92,7 +78,7 @@ class DisconnectPostSendHandlerTest {
             // 세션이 여전히 존재하는지 확인 (중복 처리로 무시됨)
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             verifyNoInteractions(webSocketMetricService);
-            verifyNoInteractions(roomService);
+            verifyNoInteractions(delayedPlayerRemovalService);
         }
     }
 
@@ -111,7 +97,7 @@ class DisconnectPostSendHandlerTest {
             // then
             then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            verifyNoInteractions(roomService);
+            verifyNoInteractions(delayedPlayerRemovalService);
         }
     }
 
@@ -153,7 +139,7 @@ class DisconnectPostSendHandlerTest {
         }
 
         @Test
-        void 플레이어_연결_해제_서비스가_호출된다() {
+        void 플레이어_지연_삭제_서비스가_호출된다() {
             // given
             sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
             StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
@@ -163,7 +149,7 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            then(roomService).should().removePlayer(joinCode, playerName);
+            then(delayedPlayerRemovalService).should().schedulePlayerRemoval(joinCode + ":" + playerName, sessionId, "CLIENT_DISCONNECT");
         }
     }
 
