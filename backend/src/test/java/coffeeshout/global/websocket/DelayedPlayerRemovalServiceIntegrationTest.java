@@ -1,6 +1,5 @@
 package coffeeshout.global.websocket;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -51,8 +50,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
             // then - 15초 후 실행을 기다림 (테스트에서는 짧게 조정할 수 없어서 긴 시간이 필요)
             // 실제 운영에서는 15초지만, 테스트에서는 적절한 시간으로 조정 필요
-            await()
-                    .atMost(20, TimeUnit.SECONDS)
+            await().atMost(20, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         then(playerDisconnectionService).should()
                                 .handlePlayerDisconnection(playerKey, sessionId, reason);
@@ -68,8 +66,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
 
             // then - 15초 기다려도 실행되지 않음
-            await()
-                    .during(Duration.ofSeconds(2)) // 2초 동안 호출되지 않음을 확인
+            await().during(Duration.ofSeconds(2)) // 2초 동안 호출되지 않음을 확인
                     .atMost(Duration.ofSeconds(3))
                     .untilAsserted(() -> {
                         then(playerDisconnectionService).should(never())
@@ -94,8 +91,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             delayedPlayerRemovalService.schedulePlayerRemoval(player3, "session-3", reason);
 
             // then - 모든 플레이어가 독립적으로 처리됨
-            await()
-                    .atMost(20, TimeUnit.SECONDS)
+            await().atMost(20, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         then(playerDisconnectionService).should()
                                 .handlePlayerDisconnection(player1, "session-1", reason);
@@ -116,8 +112,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
             // then - 실행 완료 후 PlayerDisconnectionService 호출됨을 확인
-            await()
-                    .atMost(20, TimeUnit.SECONDS)
+            await().atMost(20, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         then(playerDisconnectionService).should()
                                 .handlePlayerDisconnection(playerKey, sessionId, reason);
@@ -133,8 +128,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
 
             // then - 취소 후 일정 시간이 지나도 호출되지 않음
-            await()
-                    .during(Duration.ofSeconds(2))
+            await().during(Duration.ofSeconds(2))
                     .atMost(Duration.ofSeconds(3))
                     .untilAsserted(() -> {
                         then(playerDisconnectionService).should(never())
@@ -157,18 +151,5 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능
         // 하지만 현재 구조상 REMOVAL_DELAY가 private static final이라 어렵다
         // 실제로는 설정으로 빼거나 생성자 주입으로 받는 게 좋을 듯
-    }
-
-    @Nested
-    class 빠른_테스트_시나리오 {
-        // 실제 15초 기다리기 어려우면 이런 식으로 더 짧은 지연시간으로 테스트
-        // 단, DelayedPlayerRemovalService 구조 변경 필요
-
-        @Test
-        void 설정으로_지연시간을_조정할_수_있다면_더_빠른_테스트가_가능하다() {
-            // 현재는 하드코딩되어 있어서 불가능
-            // Duration REMOVAL_DELAY를 생성자나 설정으로 주입받도록 리팩토링하면
-            // 테스트에서는 짧은 시간으로 설정 가능
-        }
     }
 }
