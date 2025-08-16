@@ -1,3 +1,4 @@
+import storybook from 'eslint-plugin-storybook';
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
@@ -6,6 +7,8 @@ import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import jest from 'eslint-plugin-jest';
+import cypress from 'eslint-plugin-cypress';
 
 export default [
   js.configs.recommended,
@@ -39,6 +42,8 @@ export default [
       react,
       'react-hooks': reactHooks,
       prettier,
+      jest,
+      cypress,
     },
     rules: {
       ...typescript.configs.recommended.rules,
@@ -65,6 +70,58 @@ export default [
     settings: {
       react: {
         version: 'detect',
+      },
+    },
+  },
+  // Jest override
+  {
+    files: [
+      '**/__tests__/**/*.[jt]s?(x)',
+      '**/*.test.[jt]s?(x)',
+      '**/*.spec.[jt]s?(x)',
+      'src/setupTests.ts',
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      jest,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
+    },
+  },
+  // Cypress override
+  {
+    files: ['**/*.cy.{js,ts,jsx,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.cypress,
+        ...globals.node,
+        ...globals.browser,
+        describe: 'readonly',
+        it: 'readonly',
+        cy: 'readonly',
+      },
+    },
+    plugins: {
+      cypress,
+    },
+    rules: {
+      ...cypress.configs.recommended.rules,
+    },
+  },
+
+  ...storybook.configs['flat/recommended'],
+  {
+    files: ['jest.config.js', 'cypress.config.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
       },
     },
   },
