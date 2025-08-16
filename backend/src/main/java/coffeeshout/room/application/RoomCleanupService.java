@@ -7,7 +7,6 @@ import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
@@ -51,13 +50,14 @@ public class RoomCleanupService {
         log.info("방 정리 스케줄러 비활성화됨 (room.cleanup.enabled=false)");
     }
 
+    // TODO 제거되는 방 개수 메트릭화하면 좋을 거 같음
     private void cleanupEmptyRooms() {
         log.info("빈 방 정리 작업 시작");
         for (Room room : roomQueryService.getAll()) {
             final JoinCode joinCode = room.getJoinCode();
 
             if (!stompSessionManager.hasActiveConnections(joinCode)) {
-                log.debug("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode.value());
+                log.info("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode.value());
                 roomCommandService.delete(room);
             }
         }
