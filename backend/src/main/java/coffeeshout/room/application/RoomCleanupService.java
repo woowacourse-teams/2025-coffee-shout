@@ -39,13 +39,6 @@ public class RoomCleanupService {
         this.taskScheduler = taskScheduler;
     }
 
-    public void delayCleanUp(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        taskScheduler.schedule(() -> roomCommandService.delete(room),
-                Instant.now().plus(roomCleanupInterval));
-    }
-
     @PostConstruct
     public void startScheduledCleanup() {
         log.debug("RoomCleanupService 설정 - enabled: {}, interval: {}", cleanupEnabled, roomCleanupInterval);
