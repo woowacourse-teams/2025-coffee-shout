@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.service;
 
-import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.repository.RoomRepository;
@@ -18,7 +18,8 @@ public class RoomCommandService {
     }
 
     public void delete(Room room) {
-        isTrue(room.getJoinCode() != null, "JoinCode가 존재하지 않습니다.");
+        notNull(room, "Room이 존재하지 않습니다.");
+        notNull(room.getJoinCode(), "JoinCode가 존재하지 않습니다.");
 
         roomRepository.deleteByJoinCode(room.getJoinCode());
     }

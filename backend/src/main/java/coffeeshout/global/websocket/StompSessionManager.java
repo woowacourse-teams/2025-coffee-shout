@@ -1,6 +1,7 @@
 package coffeeshout.global.websocket;
 
 import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import java.util.Set;
@@ -166,7 +167,7 @@ public class StompSessionManager {
     }
 
     public boolean hasActiveConnections(JoinCode joinCode) {
-        isTrue(joinCode != null, "JoinCode는 null일 수 없습니다");
+        notNull(joinCode, "JoinCode는 null일 수 없습니다");
 
         return getConnectedPlayerCountByJoinCode(joinCode.getValue()) > 0;
     }

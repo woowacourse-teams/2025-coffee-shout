@@ -3,7 +3,6 @@ package coffeeshout.room.ui;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.application.RoomCleanupService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
@@ -24,7 +23,6 @@ public class RoomWebSocketController {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
-    private final RoomCleanupService roomCleanupService;
 
     @MessageMapping("/room/{joinCode}/update-players")
     public void broadcastPlayers(@DestinationVariable String joinCode) {
