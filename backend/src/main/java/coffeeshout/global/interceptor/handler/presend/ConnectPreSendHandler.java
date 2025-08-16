@@ -91,7 +91,7 @@ public class ConnectPreSendHandler implements PreSendHandler {
             final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
             // 2. 플레이어가 방에 있는지 확인
-            final Menu menu = menuQueryService.findById(menuId);
+            final Menu menu = menuQueryService.getById(menuId);
             room.reJoin(new PlayerName(playerName), menu);
 
             // 3. 방 상태 확인

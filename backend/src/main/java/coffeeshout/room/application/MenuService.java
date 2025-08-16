@@ -13,6 +13,6 @@ public class MenuService {
     private final MenuQueryService menuQueryService;
 
     public List<Menu> getAll() {
-        return menuQueryService.findAll();
+        return menuQueryService.getAll();
     }
 }

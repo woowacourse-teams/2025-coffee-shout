@@ -163,7 +163,7 @@ class ConnectPreSendHandlerTest {
             Room testRoom = createPlayingRoom(testMenu);
 
             given(roomQueryService.getByJoinCode(any(JoinCode.class))).willReturn(testRoom);
-            given(menuQueryService.findById(1L)).willReturn(testMenu);
+            given(menuQueryService.getById(1L)).willReturn(testMenu);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);

@@ -192,7 +192,7 @@ class CustomStompChannelInterceptorTest {
             Room testRoom = createTestRoom(testMenu);
 
             given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
-            given(menuQueryService.findById(1L)).willReturn(testMenu);
+            given(menuQueryService.getById(1L)).willReturn(testMenu);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);

@@ -31,7 +31,7 @@ public class RoomService {
     private final JoinCodeGenerator joinCodeGenerator;
 
     public Room createRoom(String hostName, Long menuId) {
-        final Menu menu = menuQueryService.findById(menuId);
+        final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
 
@@ -39,7 +39,7 @@ public class RoomService {
     }
 
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
-        final Menu menu = menuQueryService.findById(menuId);
+        final Menu menu = menuQueryService.getById(menuId);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         room.joinGuest(new PlayerName(guestName), menu);
@@ -55,7 +55,7 @@ public class RoomService {
 
     public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Menu menu = menuQueryService.findById(menuId);
+        final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
         player.selectMenu(menu);
