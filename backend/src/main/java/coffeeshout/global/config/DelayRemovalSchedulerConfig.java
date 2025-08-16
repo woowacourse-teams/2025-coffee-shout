@@ -17,7 +17,7 @@ public class DelayRemovalSchedulerConfig {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         // 스레드 풀 크기 (동시 실행되는 스케줄 작업 수에 따라 조정)
-        scheduler.setPoolSize(2);
+        scheduler.setPoolSize(1);
 
         // 스레드 이름 접두사
         scheduler.setThreadNamePrefix("delay-removal-task");
