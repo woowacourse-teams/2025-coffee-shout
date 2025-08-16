@@ -20,15 +20,19 @@ public class DelayedPlayerRemovalService {
     @Qualifier("delayRemovalScheduler")
     private final TaskScheduler taskScheduler;
     private final PlayerDisconnectionService playerDisconnectionService;
+    private final StompSessionManager stompSessionManager;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
         log.info("플레이어 지연 삭제 스케줄링: playerKey={}, sessionId={}, delay={}초",
                 playerKey, sessionId, REMOVAL_DELAY.getSeconds());
-        
+
         // 새로운 스케줄 등록
         final ScheduledFuture<?> future = taskScheduler.schedule(
-                () -> executePlayerRemoval(playerKey, sessionId, reason),
+                () -> {
+                    executePlayerRemoval(playerKey, sessionId, reason);
+                    stompSessionManager.removeSession(sessionId);
+                },
                 Instant.now().plus(REMOVAL_DELAY)
         );
 

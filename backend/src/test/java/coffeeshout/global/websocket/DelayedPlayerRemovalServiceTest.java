@@ -1,6 +1,5 @@
 package coffeeshout.global.websocket;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -28,6 +27,9 @@ class DelayedPlayerRemovalServiceTest {
     private PlayerDisconnectionService playerDisconnectionService;
 
     @Mock
+    private StompSessionManager sessionManager;
+
+    @Mock
     @SuppressWarnings("rawtypes")
     private ScheduledFuture scheduledFuture;
 
@@ -39,7 +41,8 @@ class DelayedPlayerRemovalServiceTest {
 
     @BeforeEach
     void setUp() {
-        delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService);
+        delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
+                sessionManager);
     }
 
     @Nested
@@ -122,7 +125,6 @@ class DelayedPlayerRemovalServiceTest {
             then(scheduledFuture).should(never()).cancel(false);
         }
     }
-
 
 
     @Nested

@@ -25,6 +25,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
+    private StompSessionManager stompSessionManager;
 
     private final String playerKey = "ABC23:김철수";
     private final String sessionId = "session-123";
@@ -36,8 +37,10 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         taskScheduler.setPoolSize(5);
         taskScheduler.setThreadNamePrefix("test-scheduler-");
         taskScheduler.initialize();
+        stompSessionManager = new StompSessionManager();
 
-        delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService);
+        delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
+                stompSessionManager);
     }
 
     @Nested
@@ -144,8 +147,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         private static final Duration TEST_REMOVAL_DELAY = Duration.ofMillis(500); // 500ms로 단축
 
         public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
-                                               PlayerDisconnectionService playerDisconnectionService) {
-            super(taskScheduler, playerDisconnectionService);
+                                               PlayerDisconnectionService playerDisconnectionService,
+                                               StompSessionManager stompSessionManager) {
+            super(taskScheduler, playerDisconnectionService, stompSessionManager);
         }
 
         // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능
