@@ -148,7 +148,7 @@ class CardGameServiceRealTimeTest {
             });
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
-                            eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                            eq("/topic/room/" + joinCode.value() + "/gameState"),
                             any(WebSocketResponse.class)
                     );
         }

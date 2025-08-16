@@ -334,8 +334,8 @@ class RoomServiceTest {
         createdRoom.joinGuest(guestName, MenuFixture.아메리카노());
 
         // when & then
-        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "게스트1")).isTrue();
-        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), "게스트1")).isTrue();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), "uniqueName")).isFalse();
     }
 
     @Test

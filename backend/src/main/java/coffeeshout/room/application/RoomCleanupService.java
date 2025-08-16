@@ -48,6 +48,8 @@ public class RoomCleanupService {
 
     @PostConstruct
     public void startScheduledCleanup() {
+        log.debug("RoomCleanupService 설정 - enabled: {}, interval: {}", cleanupEnabled, roomCleanupInterval);
+        
         if (cleanupEnabled) {
             log.info("방 정리 스케줄러 시작 - 간격: {}", roomCleanupInterval);
             taskScheduler.scheduleWithFixedDelay(this::cleanupEmptyRooms, roomCleanupInterval);

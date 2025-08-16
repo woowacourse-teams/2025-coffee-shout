@@ -169,6 +169,6 @@ public class StompSessionManager {
     public boolean hasActiveConnections(JoinCode joinCode) {
         notNull(joinCode, "JoinCode는 null일 수 없습니다");
 
-        return getConnectedPlayerCountByJoinCode(joinCode.getValue()) > 0;
+        return getConnectedPlayerCountByJoinCode(joinCode.value()) > 0;
     }
 }

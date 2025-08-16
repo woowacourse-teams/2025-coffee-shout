@@ -113,7 +113,7 @@ class CardGameServiceTest {
                 latch.countDown();
                 return null;
             }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/rank"),
+                    eq("/topic/room/" + joinCode.value() + "/rank"),
                     any(WebSocketResponse.class)
             );
 
@@ -151,7 +151,7 @@ class CardGameServiceTest {
                 latch.countDown();
                 return null;
             }).when(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    eq("/topic/room/" + joinCode.value() + "/gameState"),
                     any(WebSocketResponse.class)
             );
 
@@ -165,7 +165,7 @@ class CardGameServiceTest {
             // then
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
-                            eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                            eq("/topic/room/" + joinCode.value() + "/gameState"),
                             any(WebSocketResponse.class)
                     );
         }
@@ -182,7 +182,7 @@ class CardGameServiceTest {
             cardGame.startPlay();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), host.getName().value(), 0);
 
             // then
             assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
@@ -196,11 +196,11 @@ class CardGameServiceTest {
             cardGame.startPlay();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), host.getName().value(), 0);
 
             // then
             verify(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    eq("/topic/room/" + joinCode.value() + "/gameState"),
                     any(WebSocketResponse.class)
             );
         }
@@ -215,11 +215,11 @@ class CardGameServiceTest {
 
             // when & then
             // 첫 번째 플레이어가 카드 선택
-            cardGameService.selectCard(joinCode.getValue(), players.get(0).getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), players.get(0).getName().value(), 0);
 
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), players.get(1).getName().value(), 0)
+                    cardGameService.selectCard(joinCode.value(), players.get(1).getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -232,7 +232,7 @@ class CardGameServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
+                    cardGameService.selectCard(joinCode.value(), host.getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -245,7 +245,7 @@ class CardGameServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
+                    cardGameService.selectCard(joinCode.value(), "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -258,7 +258,7 @@ class CardGameServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
+                    cardGameService.selectCard(joinCode.value(), host.getName().value(), 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
 
@@ -268,13 +268,13 @@ class CardGameServiceTest {
             // given
             Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
-            cardGameService.start(cardGame, joinCode.getValue());
+            cardGameService.start(cardGame, joinCode.value());
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
 
             // when
             for (int i = 0; i < players.size(); i++) {
-                cardGameService.selectCard(joinCode.getValue(), players.get(i).getName().value(), i);
+                cardGameService.selectCard(joinCode.value(), players.get(i).getName().value(), i);
             }
 
             Thread.sleep(5000);
