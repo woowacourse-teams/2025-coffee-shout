@@ -11,6 +11,7 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * 테스트 시에는 1시간 간격이 아닌 500ms 간격으로 실행되도록 설정되어 있다.
@@ -28,14 +30,15 @@ import org.springframework.test.context.TestPropertySource;
 
 @ActiveProfiles("test")
 @SpringBootTest
-@TestPropertySource(properties = "room.cleanup.enabled=true") // 이 테스트에서만 스케줄러 활성화
 class RoomCleanupServiceTest {
 
-    @Value("${room.cleanup.interval}")
-    long delayMs;
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("room.cleanup.enabled", () -> "true");
+    }
 
-    @Autowired
-    RoomCleanupService roomCleanupService;
+    @Value("${room.cleanup.interval}")
+    Duration delayMs;
 
     @Autowired
     RoomRepository roomRepository;
@@ -71,12 +74,12 @@ class RoomCleanupServiceTest {
         String playerName = "테스트플레이어";
         String sessionId = "test-session-" + System.currentTimeMillis();
 
-        stompSessionManager.registerPlayerSession(joinCode.getValue(), playerName, sessionId);
+        stompSessionManager.registerPlayerSession(joinCode.value(), playerName, sessionId);
 
         // when & then - 스케줄러가 실행되는 동안 정
         await().pollInterval(100, TimeUnit.MILLISECONDS)
-                .atMost(delayMs * 2, TimeUnit.MILLISECONDS)
-                .during(delayMs, TimeUnit.MILLISECONDS)
+                .atMost(delayMs.multipliedBy(2))
+                .during(delayMs)
                 .untilAsserted(() ->
                         assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isNotEmpty()
                 );
@@ -94,7 +97,7 @@ class RoomCleanupServiceTest {
         // when & then - 스케줄러가 실행되어 룸이 삭제될 때까지 대기
         // cleanupIntervalMs는 스케줄러의 실행 간격이므로, 최소 한 번의 실행을 위해 여유시간 추가
         await().pollInterval(50, TimeUnit.MILLISECONDS)
-                .atMost(delayMs + 300, TimeUnit.MILLISECONDS)
+                .atMost(delayMs.plus(Duration.ofMillis(300)))
                 .untilAsserted(() ->
                         assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isEmpty()
                 );
@@ -104,16 +107,16 @@ class RoomCleanupServiceTest {
     @DisplayName("스케줄러는 연결 상태에 따라 룸을 선택적으로 정리한다")
     void 스케줄러는_연결_상태에_따라_룸을_선택적으로_정리한다() {
         // given - 여러 룸 생성 (고유한 joinCode 사용)
-        String connectedRoomCode = joinCodeGenerator.generate().getValue();
+        String connectedRoomCode = joinCodeGenerator.generate().value();
         Room connectedRoom = Room.createNewRoom(new JoinCode(connectedRoomCode), new PlayerName("연결된호스트"), testMenu);
         connectedRoom = roomRepository.save(connectedRoom);
 
-        String disconnectedRoomCode1 = joinCodeGenerator.generate().getValue();
+        String disconnectedRoomCode1 = joinCodeGenerator.generate().value();
         Room disconnectedRoom1 = Room.createNewRoom(new JoinCode(disconnectedRoomCode1), new PlayerName("연결안된호스트1"),
                 testMenu);
         disconnectedRoom1 = roomRepository.save(disconnectedRoom1);
 
-        String disconnectedRoomCode2 = joinCodeGenerator.generate().getValue();
+        String disconnectedRoomCode2 = joinCodeGenerator.generate().value();
         Room disconnectedRoom2 = Room.createNewRoom(new JoinCode(disconnectedRoomCode2), new PlayerName("연결안된호스트2"),
                 testMenu);
         disconnectedRoom2 = roomRepository.save(disconnectedRoom2);
@@ -127,7 +130,7 @@ class RoomCleanupServiceTest {
         final Room finalDisconnectedRoom = disconnectedRoom1;
         final Room finalDisconnectedRoom1 = disconnectedRoom2;
         await().pollInterval(100, TimeUnit.MILLISECONDS)
-                .atMost(delayMs + 500, TimeUnit.MILLISECONDS)
+                .atMost(delayMs.plus(Duration.ofMillis(500)))
                 .untilAsserted(() -> {
                     SoftAssertions.assertSoftly(softly -> {
                         // 연결된 룸은 삭제되지 않아야 함
@@ -152,7 +155,7 @@ class RoomCleanupServiceTest {
     @DisplayName("스케줄러는 지속적으로 실행되어 새로 생성된 빈 룸도 정리한다")
     void 스케줄러는_지속적으로_실행되어_새로_생성된_빈_룸도_정리한다() {
         // given - 초기 룸은 먼저 삭제되도록 대기
-        await().atMost(delayMs + 200, TimeUnit.MILLISECONDS)
+        await().atMost(delayMs.plus(Duration.ofMillis(300)))
                 .untilAsserted(() ->
                         assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isEmpty()
                 );
@@ -165,7 +168,7 @@ class RoomCleanupServiceTest {
         // then - 새로 생성된 룸도 다음 스케줄러 실행에서 삭제되는지 확인
         final Room finalNewRoom = newRoom;
         await().pollInterval(50, TimeUnit.MILLISECONDS)
-                .atMost(delayMs + 300, TimeUnit.MILLISECONDS)
+                .atMost(delayMs.plus(Duration.ofMillis(300)))
                 .untilAsserted(() ->
                         assertThat(roomRepository.findByJoinCode(finalNewRoom.getJoinCode())).isEmpty()
                 );
