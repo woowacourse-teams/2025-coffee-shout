@@ -3,10 +3,13 @@ package coffeeshout.room.domain.player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import lombok.Getter;
 
 @Getter
 public class Players {
+
+    private static final Random RANDOM = new Random();
 
     private final List<Player> players;
     private final ColorUsage colorUsage;
@@ -59,5 +62,9 @@ public class Players {
     public boolean existsByName(PlayerName playerName) {
         return players.stream()
                 .anyMatch(player -> player.sameName(playerName));
+    }
+
+    public Player getRandomPlayer() {
+        return players.get(RANDOM.nextInt(players.size()));
     }
 }
