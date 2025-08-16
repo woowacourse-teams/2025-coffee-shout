@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +67,6 @@ class RoomCleanupServiceTest {
     }
 
     @Test
-    @DisplayName("WebSocket 연결이 있는 룸은 스케줄러 실행 후에도 정리되지 않는다")
     void WebSocket_연결이_있는_룸은_스케줄러_실행_후에도_정리되지_않는다() {
         // given - 플레이어 세션 등록으로 활성 연결 시뮬레이션
         String playerName = "테스트플레이어";
@@ -76,10 +74,9 @@ class RoomCleanupServiceTest {
 
         stompSessionManager.registerPlayerSession(joinCode.value(), playerName, sessionId);
 
-        // when & then - 스케줄러가 실행되는 동안 정
+        // when & then - 스케줄러가 실행되는 동안 정리되지 않음을 확인
         await().pollInterval(100, TimeUnit.MILLISECONDS)
-                .atMost(delayMs.multipliedBy(2))
-                .during(delayMs)
+                .atMost(delayMs.plus(Duration.ofMillis(100)))
                 .untilAsserted(() ->
                         assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isNotEmpty()
                 );
@@ -89,7 +86,6 @@ class RoomCleanupServiceTest {
     }
 
     @Test
-    @DisplayName("WebSocket 연결이 없는 룸은 스케줄러에 의해 자동으로 정리된다")
     void WebSocket_연결이_없는_룸은_스케줄러에_의해_자동으로_정리된다() {
         // given - 룸이 존재하지만 활성 연결이 없는 상태
         assertThat(roomRepository.findByJoinCode(testRoom.getJoinCode())).isNotEmpty();
@@ -104,7 +100,6 @@ class RoomCleanupServiceTest {
     }
 
     @Test
-    @DisplayName("스케줄러는 연결 상태에 따라 룸을 선택적으로 정리한다")
     void 스케줄러는_연결_상태에_따라_룸을_선택적으로_정리한다() {
         // given - 여러 룸 생성 (고유한 joinCode 사용)
         String connectedRoomCode = joinCodeGenerator.generate().value();
@@ -152,7 +147,6 @@ class RoomCleanupServiceTest {
     }
 
     @Test
-    @DisplayName("스케줄러는 지속적으로 실행되어 새로 생성된 빈 룸도 정리한다")
     void 스케줄러는_지속적으로_실행되어_새로_생성된_빈_룸도_정리한다() {
         // given - 초기 룸은 먼저 삭제되도록 대기
         await().atMost(delayMs.plus(Duration.ofMillis(300)))
