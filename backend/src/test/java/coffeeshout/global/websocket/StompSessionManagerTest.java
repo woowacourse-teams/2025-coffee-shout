@@ -17,8 +17,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("정상적인 플레이어 키 생성")
-    void createPlayerKey_Success() {
+    void 정상적인_플레이어_키_생성() {
         // given
         String joinCode = "ABC23";
         String playerName = "player1";
@@ -31,8 +30,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("joinCode가 null인 경우 예외 발생")
-    void createPlayerKey_NullJoinCode_ThrowsException() {
+    void joinCode가_null인_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey(null, "player1"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -40,8 +38,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("playerName이 null인 경우 예외 발생")
-    void createPlayerKey_NullPlayerName_ThrowsException() {
+    void playerName이_null인_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey("ABC23", null))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -49,8 +46,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("joinCode에 구분자가 포함된 경우 예외 발생")
-    void createPlayerKey_JoinCodeContainsDelimiter_ThrowsException() {
+    void joinCode에_구분자가_포함된_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey("ABC:23", "player1"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -58,8 +54,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("playerName에 구분자가 포함된 경우 예외 발생")
-    void createPlayerKey_PlayerNameContainsDelimiter_ThrowsException() {
+    void playerName에_구분자가_포함된_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey("ABC23", "play:er1"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -67,8 +62,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("정상적인 joinCode 추출")
-    void extractJoinCode_Success() {
+    void 정상적인_joinCode_추출() {
         // given
         String playerKey = "ABC23:player1";
 
@@ -80,8 +74,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("정상적인 playerName 추출")
-    void extractPlayerName_Success() {
+    void 정상적인_playerName_추출() {
         // given
         String playerKey = "ABC23:player1";
 
@@ -93,8 +86,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("null 플레이어 키로 joinCode 추출 시 예외 발생")
-    void extractJoinCode_NullPlayerKey_ThrowsException() {
+    void null_플레이어_키로_joinCode_추출_시_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.extractJoinCode(null))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -102,8 +94,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("구분자가 없는 플레이어 키로 joinCode 추출 시 예외 발생")
-    void extractJoinCode_NoDelimiter_ThrowsException() {
+    void 구분자가_없는_플레이어_키로_joinCode_추출_시_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.extractJoinCode("ABC23player1"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -111,8 +102,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("잘못된 형식의 플레이어 키로 playerName 추출 시 예외 발생")
-    void extractPlayerName_InvalidFormat_ThrowsException() {
+    void 잘못된_형식의_플레이어_키로_playerName_추출_시_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.extractPlayerName("ABC23:player1:extra"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -120,8 +110,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("빈 joinCode가 있는 플레이어 키 검증 시 예외 발생")
-    void extractJoinCode_EmptyJoinCode_ThrowsException() {
+    void 빈_joinCode가_있는_플레이어_키_검증_시_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.extractJoinCode(":player1"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -129,8 +118,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("플레이어 키 유효성 검증 - 정상")
-    void isValidPlayerKey_ValidKey_ReturnsTrue() {
+    void 플레이어_키_유효성_검증_정상() {
         // given
         String validPlayerKey = "ABC23:player1";
 
@@ -139,29 +127,25 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("플레이어 키 유효성 검증 - null")
-    void isValidPlayerKey_NullKey_ReturnsFalse() {
+    void 플레이어_키_유효성_검증_null() {
         // when & then
         assertThat(sessionManager.isValidPlayerKey(null)).isFalse();
     }
 
     @Test
-    @DisplayName("플레이어 키 유효성 검증 - 구분자 없음")
-    void isValidPlayerKey_NoDelimiter_ReturnsFalse() {
+    void 플레이어_키_유효성_검증_구분자_없음() {
         // when & then
         assertThat(sessionManager.isValidPlayerKey("ABC23player1")).isFalse();
     }
 
     @Test
-    @DisplayName("플레이어 키 유효성 검증 - 빈 joinCode")
-    void isValidPlayerKey_EmptyJoinCode_ReturnsFalse() {
+    void 플레이어_키_유효성_검증_빈_joinCode() {
         // when & then
         assertThat(sessionManager.isValidPlayerKey(":player1")).isFalse();
     }
 
     @Test
-    @DisplayName("플레이어 세션 등록 및 조회")
-    void registerAndGetPlayerSession() {
+    void 플레이어_세션_등록_및_조회() {
         // given
         String joinCode = "ABC23";
         String playerName = "player1";
@@ -176,8 +160,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    @DisplayName("특정 방의 연결된 플레이어 수 조회")
-    void getConnectedPlayerCountByJoinCode() {
+    void 특정_방의_연결된_플레이어_수_조회() {
         // given
         String joinCode = "ABC23";
         sessionManager.registerPlayerSession(joinCode, "player1", "session1");
