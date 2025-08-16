@@ -265,4 +265,78 @@ class RoomTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("모든 플레이어가 준비완료해야합니다.");
     }
+
+    @Test
+    void 호스트가_나가면_남은_플레이어_중_랜덤으로_새_호스트가_된다() {
+        // given
+        room.joinGuest(게스트_루키, MenuFixture.아메리카노());
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        room.joinGuest(게스트_엠제이, MenuFixture.아메리카노());
+        
+        Player originalHost = room.getHost();
+        assertThat(originalHost.getName()).isEqualTo(호스트_한스);
+        assertThat(room.getPlayers()).hasSize(4);
+
+        // when
+        boolean removed = room.removePlayer(호스트_한스);
+
+        // then
+        assertThat(removed).isTrue();
+        assertThat(room.getPlayers()).hasSize(3);
+        
+        Player newHost = room.getHost();
+        assertThat(newHost.getName()).isNotEqualTo(호스트_한스);
+        assertThat(newHost.getName()).isIn(게스트_루키, 게스트_꾹이, 게스트_엠제이);
+    }
+
+    @Test
+    void 호스트가_나가고_남은_플레이어가_없으면_호스트_승격이_일어나지_않는다() {
+        // given
+        assertThat(room.getPlayers()).hasSize(1);
+        Player originalHost = room.getHost();
+        assertThat(originalHost.getName()).isEqualTo(호스트_한스);
+
+        // when
+        boolean removed = room.removePlayer(호스트_한스);
+
+        // then
+        assertThat(removed).isTrue();
+        assertThat(room.getPlayers()).hasSize(0);
+        // 원래 호스트 객체는 그대로 유지됨 (빈 방이므로)
+        assertThat(room.getHost()).isEqualTo(originalHost);
+    }
+
+    @Test
+    void 게스트가_나가면_호스트는_그대로다() {
+        // given
+        room.joinGuest(게스트_루키, MenuFixture.아메리카노());
+        room.joinGuest(게스트_꾹이, MenuFixture.아메리카노());
+        
+        Player originalHost = room.getHost();
+        assertThat(originalHost.getName()).isEqualTo(호스트_한스);
+        assertThat(room.getPlayers()).hasSize(3);
+
+        // when
+        boolean removed = room.removePlayer(게스트_루키);
+
+        // then
+        assertThat(removed).isTrue();
+        assertThat(room.getPlayers()).hasSize(2);
+        assertThat(room.getHost()).isEqualTo(originalHost);
+        assertThat(room.getHost().getName()).isEqualTo(호스트_한스);
+    }
+
+    @Test
+    void 존재하지_않는_플레이어_제거시_false_반환() {
+        // given
+        PlayerName 존재하지않는플레이어 = new PlayerName("없는놈");
+
+        // when
+        boolean removed = room.removePlayer(존재하지않는플레이어);
+
+        // then
+        assertThat(removed).isFalse();
+        assertThat(room.getPlayers()).hasSize(1);
+        assertThat(room.getHost().getName()).isEqualTo(호스트_한스);
+    }
 }
