@@ -40,8 +40,6 @@ class DisconnectPostSendHandlerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        eventPublisher = event -> {
-        };
         final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
                 roomService);
         handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, playerDisconnectionService,
