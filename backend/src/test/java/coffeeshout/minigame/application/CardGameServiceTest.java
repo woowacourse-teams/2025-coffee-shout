@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -87,7 +86,7 @@ class CardGameServiceTest {
         @Test
         void 카드게임을_시작한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             Playable currentGame = room.startNextGame(host.getName().value());
             cardGameService.start(currentGame, joinCode.value());
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
@@ -118,7 +117,7 @@ class CardGameServiceTest {
                     any(WebSocketResponse.class)
             );
 
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             CardGame cardGameSpy = spy(cardGame);
             List<Player> players = room.getPlayers();
@@ -156,7 +155,7 @@ class CardGameServiceTest {
                     any(WebSocketResponse.class)
             );
 
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             Playable miniGame = room.startNextGame(host.getName().value());
             // when
             cardGameService.start(miniGame, joinCode.value());
@@ -178,7 +177,7 @@ class CardGameServiceTest {
         @Test
         void 카드를_정상적으로_선택한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
@@ -192,7 +191,7 @@ class CardGameServiceTest {
         @Test
         void 카드_선택_후_게임_상태_메시지가_전송된다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
@@ -209,7 +208,7 @@ class CardGameServiceTest {
         @Test
         void 만약_선택된_카드를_고르면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
@@ -227,7 +226,7 @@ class CardGameServiceTest {
         @Test
         void 게임이_플레이_상태가_아니면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             room.startNextGame(host.getName().value());
             // PLAYING 상태로 변경하지 않음
 
@@ -240,7 +239,7 @@ class CardGameServiceTest {
         @Test
         void 존재하지_않는_플레이어면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
@@ -253,7 +252,7 @@ class CardGameServiceTest {
         @Test
         void 잘못된_카드_인덱스면_예외를_반환한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGame.startPlay();
 
@@ -267,7 +266,7 @@ class CardGameServiceTest {
         @Disabled
         void 라운드가_완료되면_플레이_태스크가_취소된다() throws InterruptedException, ExecutionException {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGameService.start(cardGame, joinCode.getValue());
             cardGame.startPlay();

@@ -1,14 +1,18 @@
 package coffeeshout.global.websocket;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
-
+@ExtendWith(MockitoExtension.class)
 class StompSessionManagerTest {
 
-    private StompSessionManager sessionManager;
+    StompSessionManager sessionManager;
 
     @BeforeEach
     void setUp() {

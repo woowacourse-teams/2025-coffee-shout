@@ -22,29 +22,25 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 class DisconnectPostSendHandlerTest {
 
     @Mock
-    private WebSocketMetricService webSocketMetricService;
+    WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private RoomService roomService;
+    RoomService roomService;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    ApplicationEventPublisher eventPublisher;
 
-    private StompSessionManager sessionManager;
-    private DisconnectPostSendHandler handler;
+    StompSessionManager sessionManager;
+    DisconnectPostSendHandler handler;
 
-    private final String sessionId = "test-session-id";
-    private final String joinCode = "TEST123";
-    private final String playerName = "testPlayer";
+    final String sessionId = "test-session-id";
+    final String joinCode = "TEST123";
+    final String playerName = "testPlayer";
 
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        eventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(Object event) {
-
-            }
+        eventPublisher = event -> {
         };
         final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
                 roomService);

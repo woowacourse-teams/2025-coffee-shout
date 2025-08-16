@@ -32,7 +32,7 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
 
     @Override
     public void handle(String joinCode, StartMiniGameCommand command) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Playable currentGame = room.startNextGame(command.hostName());
         final MiniGameType miniGameType = currentGame.getMiniGameType();
         services.get(miniGameType).start(currentGame, joinCode);

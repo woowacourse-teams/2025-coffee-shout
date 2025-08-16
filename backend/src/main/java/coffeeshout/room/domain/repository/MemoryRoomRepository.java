@@ -2,6 +2,7 @@ package coffeeshout.room.domain.repository;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,13 @@ public class MemoryRoomRepository implements RoomRepository {
 
     public MemoryRoomRepository() {
         this.rooms = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public List<Room> findAll() {
+        return rooms.values()
+                .stream()
+                .toList();
     }
 
     @Override

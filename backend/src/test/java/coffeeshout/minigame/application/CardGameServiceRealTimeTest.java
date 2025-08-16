@@ -77,7 +77,7 @@ class CardGameServiceRealTimeTest {
         @Test
         void 카드게임을_시작한다() {
             // given
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGameService.start(cardGame, joinCode.value());
 
@@ -94,7 +94,7 @@ class CardGameServiceRealTimeTest {
 
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() throws InterruptedException {
-            Room room = roomQueryService.findByJoinCode(joinCode);
+            Room room = roomQueryService.getByJoinCode(joinCode);
             CardGame cardGame = (CardGame) room.startNextGame(host.getName().value());
             cardGameService.start(cardGame, joinCode.value());
 

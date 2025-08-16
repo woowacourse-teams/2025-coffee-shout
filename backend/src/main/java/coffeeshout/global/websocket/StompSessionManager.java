@@ -2,6 +2,7 @@ package coffeeshout.global.websocket;
 
 import static org.springframework.util.Assert.isTrue;
 
+import coffeeshout.room.domain.JoinCode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,8 @@ public class StompSessionManager {
     private final ConcurrentHashMap<String, String> sessionPlayerMap; // sessionId -> "joinCode:playerName"
 
     public StompSessionManager() {
-        playerSessionMap = new ConcurrentHashMap<>();
-        sessionPlayerMap = new ConcurrentHashMap<>();
+        this.playerSessionMap = new ConcurrentHashMap<>();
+        this.sessionPlayerMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -162,5 +163,11 @@ public class StompSessionManager {
         if (parts[0].isEmpty() || parts[1].isEmpty()) {
             throw new IllegalArgumentException("joinCode 또는 playerName이 비어있습니다: " + playerKey);
         }
+    }
+
+    public boolean hasActiveConnections(JoinCode joinCode) {
+        isTrue(joinCode != null, "JoinCode는 null일 수 없습니다");
+
+        return getConnectedPlayerCountByJoinCode(joinCode.getValue()) > 0;
     }
 }

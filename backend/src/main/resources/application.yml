@@ -26,3 +26,7 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
+
+room:
+  cleanup:
+    interval: 3600000 # 1 hour in milliseconds

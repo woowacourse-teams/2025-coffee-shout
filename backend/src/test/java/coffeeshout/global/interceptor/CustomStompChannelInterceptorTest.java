@@ -43,31 +43,31 @@ import org.springframework.messaging.support.MessageBuilder;
 class CustomStompChannelInterceptorTest {
 
     @Mock
-    private WebSocketMetricService webSocketMetricService;
+    WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private RoomQueryService roomQueryService;
+    RoomQueryService roomQueryService;
 
     @Mock
-    private MenuQueryService menuQueryService;
+    MenuQueryService menuQueryService;
 
     @Mock
-    private MessageChannel channel;
+    MessageChannel channel;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    ApplicationEventPublisher eventPublisher;
 
-    private StompSessionManager sessionManager;
-    private CustomStompChannelInterceptor interceptor;
+    StompSessionManager sessionManager;
+    CustomStompChannelInterceptor interceptor;
 
-    private ConnectPreSendHandler connectPreSendHandler;
-    private ConnectPostSendHandler connectPostSendHandler;
-    private DisconnectPostSendHandler disconnectPostSendHandler;
-    private ErrorPreSendHandler errorPreSendHandler;
+    ConnectPreSendHandler connectPreSendHandler;
+    ConnectPostSendHandler connectPostSendHandler;
+    DisconnectPostSendHandler disconnectPostSendHandler;
+    ErrorPreSendHandler errorPreSendHandler;
 
-    private final String sessionId = "test-session-id";
-    private final String joinCode = "TEV23";
-    private final String playerName = "testPlayer";
+    final String sessionId = "test-session-id";
+    final String joinCode = "TEV23";
+    final String playerName = "testPlayer";
 
     @BeforeEach
     void setUp() {
@@ -76,10 +76,7 @@ class CustomStompChannelInterceptorTest {
         final RoomService roomService = mock(RoomService.class);
         final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
                 roomService);
-        eventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(Object event) {
-            }
+        eventPublisher = event -> {
         };
 
         // 핸들러들 생성
@@ -194,7 +191,7 @@ class CustomStompChannelInterceptorTest {
             Menu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
-            given(roomQueryService.findByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
+            given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
             given(menuQueryService.findById(1L)).willReturn(testMenu);
 
             // when
@@ -226,11 +223,11 @@ class CustomStompChannelInterceptorTest {
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
-        private Room createTestRoom(Menu menu) {
+        Room createTestRoom(Menu menu) {
             return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
         }
 
-        private Menu createTestMenu() {
+        Menu createTestMenu() {
             Menu menu = new Menu("Test Menu", MenuType.COFFEE);
             menu.setId(1L);
             return menu;
@@ -358,7 +355,7 @@ class CustomStompChannelInterceptorTest {
         }
     }
 
-    private StompHeaderAccessor createAccessor(StompCommand stompCommand) {
+    StompHeaderAccessor createAccessor(StompCommand stompCommand) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(stompCommand);
         accessor.setSessionId(sessionId);
         accessor.setNativeHeader("joinCode", joinCode);

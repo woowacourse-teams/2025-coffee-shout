@@ -3,6 +3,7 @@ package coffeeshout.room.ui;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.application.RoomCleanupService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
@@ -23,6 +24,7 @@ public class RoomWebSocketController {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
+    private final RoomCleanupService roomCleanupService;
 
     @MessageMapping("/room/{joinCode}/update-players")
     public void broadcastPlayers(@DestinationVariable String joinCode) {
@@ -82,7 +84,7 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/spin-roulette")
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
         final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
-        roomService.delayCleanUp(joinCode);
+        roomCleanupService.delayCleanUp(joinCode);
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
                 WebSocketResponse.success(winner));
