@@ -22,15 +22,15 @@ public class RoomStateUpdateEventListener {
     @EventListener
     public void handleRoomStateUpdate(RoomStateUpdateEvent event) {
         try {
-            log.info("방 상태 업데이트 이벤트 처리: joinCode={}, reason={}", event.getJoinCode(), event.getReason());
+            log.info("방 상태 업데이트 이벤트 처리: joinCode={}, reason={}", event.joinCode(), event.reason());
 
-            sendPlayerStatus(event.getJoinCode());
-            sendProbabilitiesStatus(event.getJoinCode());
+            sendPlayerStatus(event.joinCode());
+            sendProbabilitiesStatus(event.joinCode());
 
-            log.info("방 상태 브로드캐스트 완료: joinCode={}", event.getJoinCode());
+            log.info("방 상태 브로드캐스트 완료: joinCode={}", event.joinCode());
 
         } catch (Exception e) {
-            log.error("방 상태 업데이트 이벤트 처리 실패: joinCode={}, reason={}", event.getJoinCode(), event.getReason(), e);
+            log.error("방 상태 업데이트 이벤트 처리 실패: joinCode={}, reason={}", event.joinCode(), event.reason(), e);
         }
     }
 
