@@ -7,6 +7,7 @@ import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomCleanupService {
 
-    private final long roomCleanupDelayMs;
+    private final Duration roomCleanupInterval;
     private final boolean cleanupEnabled;
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
@@ -24,13 +25,13 @@ public class RoomCleanupService {
     private final TaskScheduler taskScheduler;
 
     public RoomCleanupService(
-            @Value("${room.cleanup.interval}") long roomCleanupDelayMs,
+            @Value("${room.cleanup.interval}") Duration roomCleanupInterval,
             @Value("${room.cleanup.enabled:true}") boolean cleanupEnabled,
             RoomQueryService roomQueryService,
             RoomCommandService roomCommandService,
             StompSessionManager stompSessionManager,
             TaskScheduler taskScheduler) {
-        this.roomCleanupDelayMs = roomCleanupDelayMs;
+        this.roomCleanupInterval = roomCleanupInterval;
         this.cleanupEnabled = cleanupEnabled;
         this.roomQueryService = roomQueryService;
         this.roomCommandService = roomCommandService;
@@ -38,12 +39,18 @@ public class RoomCleanupService {
         this.taskScheduler = taskScheduler;
     }
 
+    public void delayCleanUp(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+
+        taskScheduler.schedule(() -> roomCommandService.delete(room),
+                Instant.now().plus(roomCleanupInterval));
+    }
+
     @PostConstruct
     public void startScheduledCleanup() {
         if (cleanupEnabled) {
-            log.info("방 정리 스케줄러 시작 - 간격: {}ms", roomCleanupDelayMs);
-            taskScheduler.scheduleWithFixedDelay(this::cleanupEmptyRooms,
-                    Duration.ofMillis(roomCleanupDelayMs));
+            log.info("방 정리 스케줄러 시작 - 간격: {}", roomCleanupInterval);
+            taskScheduler.scheduleWithFixedDelay(this::cleanupEmptyRooms, roomCleanupInterval);
             return;
         }
 

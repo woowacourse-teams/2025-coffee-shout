@@ -29,5 +29,5 @@ server:
 
 room:
   cleanup:
-    interval: 3600000 # 1 hour in milliseconds
+    interval: 1h # 1시간 간격
     enabled: true # 운영 환경에서는 스케줄러 활성화
