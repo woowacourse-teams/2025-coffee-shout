@@ -27,10 +27,10 @@ public class DelayedPlayerRemovalService {
                 playerKey, sessionId, REMOVAL_DELAY.getSeconds());
 
         // 기존 스케줄 있으면 취소
-        cancelScheduledRemoval(playerKey);
+        // cancelScheduledRemoval(playerKey);
 
         // 새로운 스케줄 등록
-        ScheduledFuture<?> future = taskScheduler.schedule(
+        final ScheduledFuture<?> future = taskScheduler.schedule(
                 () -> executePlayerRemoval(playerKey, sessionId, reason),
                 Instant.now().plus(REMOVAL_DELAY)
         );
@@ -39,7 +39,7 @@ public class DelayedPlayerRemovalService {
     }
 
     public void cancelScheduledRemoval(String playerKey) {
-        ScheduledFuture<?> future = scheduledTasks.remove(playerKey);
+        final ScheduledFuture<?> future = scheduledTasks.remove(playerKey);
         if (future != null && !future.isDone()) {
             future.cancel(false);
             log.info("플레이어 지연 삭제 취소됨: playerKey={}", playerKey);

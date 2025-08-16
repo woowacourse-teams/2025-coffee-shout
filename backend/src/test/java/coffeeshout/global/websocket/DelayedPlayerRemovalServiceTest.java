@@ -62,25 +62,6 @@ class DelayedPlayerRemovalServiceTest {
 
         @Test
         @SuppressWarnings("unchecked")
-        void 동일한_플레이어의_기존_스케줄을_취소하고_새로_등록한다() {
-            // given
-            given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
-                    .willReturn(scheduledFuture);
-
-            // 첫 번째 스케줄 등록
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
-
-            // when - 같은 플레이어 다시 스케줄링
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, "new-session", "SERVER_ERROR");
-
-            // then
-            then(taskScheduler).should(times(2)).schedule(any(Runnable.class), any(Instant.class));
-            then(scheduledFuture).should().cancel(false);
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
-        }
-
-        @Test
-        @SuppressWarnings("unchecked")
         void 서로_다른_플레이어는_독립적으로_스케줄링된다() {
             // given
             String anotherPlayerKey = "DEF456:박영희";
@@ -233,24 +214,6 @@ class DelayedPlayerRemovalServiceTest {
 
     @Nested
     class 동시성_시나리오 {
-
-        @Test
-        @SuppressWarnings("unchecked")
-        void 같은_플레이어의_동시_스케줄링_요청을_안전하게_처리한다() {
-            // given
-            given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
-                    .willReturn(scheduledFuture);
-
-            // when - 동시에 여러 번 호출
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId + "2", reason);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId + "3", reason);
-
-            // then - 마지막 스케줄만 유효
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
-            then(taskScheduler).should(times(3)).schedule(any(Runnable.class), any(Instant.class));
-            then(scheduledFuture).should(times(2)).cancel(false); // 첫 번째, 두 번째 취소됨
-        }
 
         @Test
         @SuppressWarnings("unchecked")

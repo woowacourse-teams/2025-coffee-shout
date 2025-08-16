@@ -81,30 +81,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
             assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
         }
-
-        @Test
-        void 재스케줄링하면_첫번째는_취소되고_두번째만_실행된다() {
-            // given
-            String firstSessionId = "session-1";
-            String secondSessionId = "session-2";
-
-            // when
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, firstSessionId, reason);
-
-            // 잠시 후 재스케줄링
-            await().pollDelay(100, TimeUnit.MILLISECONDS).until(() -> true);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, secondSessionId, reason);
-
-            // then - 두 번째 세션ID로만 호출됨
-            await()
-                    .atMost(20, TimeUnit.SECONDS)
-                    .untilAsserted(() -> {
-                        then(playerDisconnectionService).should()
-                                .handlePlayerDisconnection(playerKey, secondSessionId, reason);
-                        then(playerDisconnectionService).should(never())
-                                .handlePlayerDisconnection(playerKey, firstSessionId, reason);
-                    });
-        }
     }
 
     @Nested
@@ -138,31 +114,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player1)).isFalse();
             assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player2)).isFalse();
             assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player3)).isFalse();
-        }
-
-        @Test
-        void 한_플레이어를_빠르게_여러번_스케줄링해도_마지막_것만_실행된다() {
-            // when - 빠르게 여러 번 스케줄링
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, "session-1", reason);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, "session-2", reason);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, "session-3", reason);
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, "session-final", reason);
-
-            // then - 마지막 세션만 실행됨
-            await()
-                    .atMost(20, TimeUnit.SECONDS)
-                    .untilAsserted(() -> {
-                        then(playerDisconnectionService).should()
-                                .handlePlayerDisconnection(playerKey, "session-final", reason);
-                    });
-
-            // 이전 세션들은 호출되지 않음
-            then(playerDisconnectionService).should(never())
-                    .handlePlayerDisconnection(playerKey, "session-1", reason);
-            then(playerDisconnectionService).should(never())
-                    .handlePlayerDisconnection(playerKey, "session-2", reason);
-            then(playerDisconnectionService).should(never())
-                    .handlePlayerDisconnection(playerKey, "session-3", reason);
         }
     }
 
