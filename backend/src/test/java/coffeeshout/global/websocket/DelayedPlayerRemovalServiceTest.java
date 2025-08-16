@@ -57,7 +57,6 @@ class DelayedPlayerRemovalServiceTest {
 
             // then
             then(taskScheduler).should().schedule(any(Runnable.class), any(Instant.class));
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
         }
 
         @Test
@@ -74,8 +73,6 @@ class DelayedPlayerRemovalServiceTest {
 
             // then
             then(taskScheduler).should(times(2)).schedule(any(Runnable.class), any(Instant.class));
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(anotherPlayerKey)).isTrue();
         }
     }
 
@@ -97,7 +94,6 @@ class DelayedPlayerRemovalServiceTest {
 
             // then
             then(scheduledFuture).should().cancel(false);
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
         }
 
         @Test
@@ -127,43 +123,7 @@ class DelayedPlayerRemovalServiceTest {
         }
     }
 
-    @Nested
-    class 스케줄_상태_확인 {
 
-        @Test
-        void 스케줄이_없으면_false를_반환한다() {
-            // when & then
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
-        }
-
-        @Test
-        @SuppressWarnings("unchecked")
-        void 스케줄이_있고_완료되지_않았으면_true를_반환한다() {
-            // given
-            given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
-                    .willReturn(scheduledFuture);
-            given(scheduledFuture.isDone()).willReturn(false);
-
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
-
-            // when & then
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
-        }
-
-        @Test
-        @SuppressWarnings("unchecked")
-        void 스케줄이_완료되었으면_false를_반환한다() {
-            // given
-            given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
-                    .willReturn(scheduledFuture);
-            given(scheduledFuture.isDone()).willReturn(true);
-
-            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
-
-            // when & then
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
-        }
-    }
 
     @Nested
     class 실제_삭제_실행_시뮬레이션 {
@@ -228,7 +188,6 @@ class DelayedPlayerRemovalServiceTest {
             delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
 
             // then
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
             then(scheduledFuture).should().cancel(false);
         }
     }

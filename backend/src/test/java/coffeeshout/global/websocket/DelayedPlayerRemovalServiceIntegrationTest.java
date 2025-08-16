@@ -57,9 +57,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
                         then(playerDisconnectionService).should()
                                 .handlePlayerDisconnection(playerKey, sessionId, reason);
                     });
-
-            // 실행 후에는 스케줄이 제거됨
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
         }
 
         @Test
@@ -78,8 +75,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
                         then(playerDisconnectionService).should(never())
                                 .handlePlayerDisconnection(playerKey, sessionId, reason);
                     });
-
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
         }
     }
 
@@ -109,11 +104,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
                         then(playerDisconnectionService).should()
                                 .handlePlayerDisconnection(player3, "session-3", reason);
                     });
-
-            // 모든 스케줄이 완료됨
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player1)).isFalse();
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player2)).isFalse();
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(player3)).isFalse();
         }
     }
 
@@ -125,28 +115,31 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
-            // 실행 전에는 존재
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
-
-            // then - 실행 후에는 제거됨
+            // then - 실행 완료 후 PlayerDisconnectionService 호출됨을 확인
             await()
                     .atMost(20, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
-                        assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
+                        then(playerDisconnectionService).should()
+                                .handlePlayerDisconnection(playerKey, sessionId, reason);
                     });
         }
 
         @Test
-        void 취소된_태스크도_맵에서_즉시_제거된다() {
+        void 취소된_태스크는_PlayerDisconnectionService를_호출하지_않는다() {
             // given
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isTrue();
 
             // when
             delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
 
-            // then - 즉시 제거됨
-            assertThat(delayedPlayerRemovalService.hasScheduledRemoval(playerKey)).isFalse();
+            // then - 취소 후 일정 시간이 지나도 호출되지 않음
+            await()
+                    .during(Duration.ofSeconds(2))
+                    .atMost(Duration.ofSeconds(3))
+                    .untilAsserted(() -> {
+                        then(playerDisconnectionService).should(never())
+                                .handlePlayerDisconnection(playerKey, sessionId, reason);
+                    });
         }
     }
 

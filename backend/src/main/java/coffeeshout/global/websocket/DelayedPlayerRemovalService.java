@@ -25,10 +25,7 @@ public class DelayedPlayerRemovalService {
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
         log.info("플레이어 지연 삭제 스케줄링: playerKey={}, sessionId={}, delay={}초",
                 playerKey, sessionId, REMOVAL_DELAY.getSeconds());
-
-        // 기존 스케줄 있으면 취소
-        // cancelScheduledRemoval(playerKey);
-
+        
         // 새로운 스케줄 등록
         final ScheduledFuture<?> future = taskScheduler.schedule(
                 () -> executePlayerRemoval(playerKey, sessionId, reason),
@@ -60,8 +57,5 @@ public class DelayedPlayerRemovalService {
         }
     }
 
-    public boolean hasScheduledRemoval(String playerKey) {
-        ScheduledFuture<?> future = scheduledTasks.get(playerKey);
-        return future != null && !future.isDone();
-    }
+
 }
