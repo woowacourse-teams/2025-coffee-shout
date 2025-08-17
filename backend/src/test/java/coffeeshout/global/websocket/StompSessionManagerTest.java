@@ -32,16 +32,14 @@ class StompSessionManagerTest {
     void joinCode가_null인_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey(null, "player1"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("joinCode와 playerName은 null일 수 없습니다");
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void playerName이_null인_경우_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.createPlayerKey("ABC23", null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("joinCode와 playerName은 null일 수 없습니다");
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -88,8 +86,7 @@ class StompSessionManagerTest {
     void null_플레이어_키로_joinCode_추출_시_예외_발생() {
         // when & then
         assertThatThrownBy(() -> sessionManager.extractJoinCode(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("플레이어 키가 null입니다");
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test

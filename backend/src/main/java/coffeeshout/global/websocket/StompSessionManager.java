@@ -66,11 +66,11 @@ public class StompSessionManager {
     /**
      * 세션 ID로 플레이어 키 조회
      */
-    public boolean hasPlayerKey(String sessionId) {
+    public boolean hasPlayerKey(@NonNull String sessionId) {
         return sessionPlayerMap.containsKey(sessionId);
     }
 
-    public String getPlayerKey(String sessionId) {
+    public String getPlayerKey(@NonNull String sessionId) {
         isTrue(sessionPlayerMap.containsKey(sessionId),
                 "세션 ID가 존재하지 않습니다: sessionId=%s".formatted(sessionId));
 
@@ -80,7 +80,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키에서 조인 코드 추출
      */
-    public String extractJoinCode(String playerKey) {
+    public String extractJoinCode(@NonNull String playerKey) {
         validatePlayerKey(playerKey);
         String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts[0];
@@ -89,7 +89,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키에서 플레이어 이름 추출
      */
-    public String extractPlayerName(String playerKey) {
+    public String extractPlayerName(@NonNull String playerKey) {
         validatePlayerKey(playerKey);
         String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts[1];
@@ -135,7 +135,10 @@ public class StompSessionManager {
     /**
      * 플레이어 키 유효성 검증
      */
-    public boolean isValidPlayerKey(@NonNull String playerKey) {
+    public boolean isValidPlayerKey(String playerKey) {
+        if (playerKey == null || !playerKey.contains(PLAYER_KEY_DELIMITER)) {
+            return false;
+        }
         String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts.length == EXPECTED_PLAYER_KEY_PARTS &&
                !parts[0].isEmpty() && !parts[1].isEmpty();
