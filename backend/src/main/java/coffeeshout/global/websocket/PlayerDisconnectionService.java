@@ -19,6 +19,13 @@ public class PlayerDisconnectionService {
     private final RoomService roomService;
     private final ApplicationEventPublisher eventPublisher;
 
+    public void cancelReady(String playerKey) {
+        final String joinCode = sessionManager.extractJoinCode(playerKey);
+        final String playerName = sessionManager.extractPlayerName(playerKey);
+
+        roomService.changePlayerReadyState(joinCode, playerName, false);
+    }
+
     /**
      * 플레이어 연결 해제 처리
      */

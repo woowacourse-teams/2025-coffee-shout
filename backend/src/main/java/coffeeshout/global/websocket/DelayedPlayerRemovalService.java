@@ -27,6 +27,9 @@ public class DelayedPlayerRemovalService {
         log.info("플레이어 지연 삭제 스케줄링: playerKey={}, sessionId={}, delay={}초",
                 playerKey, sessionId, REMOVAL_DELAY.getSeconds());
 
+        // disconnect 된 플레이어는 ready 상태 false로 변경
+        playerDisconnectionService.cancelReady(playerKey);
+
         // 새로운 스케줄 등록
         final ScheduledFuture<?> future = taskScheduler.schedule(
                 () -> {
