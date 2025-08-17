@@ -24,6 +24,9 @@ public class PlayerDisconnectionService {
         final String playerName = sessionManager.extractPlayerName(playerKey);
 
         roomService.changePlayerReadyState(joinCode, playerName, false);
+
+        eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_SET_READY_FALSE"));
+        log.info("삭제 대기된 플레이어 ready 상태 변경 완료: joinCode={}, playerName={}", joinCode, playerName);
     }
 
     /**
