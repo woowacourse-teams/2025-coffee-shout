@@ -1,18 +1,19 @@
 import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
 import * as S from './Button.styled';
 import { isTouchDevice } from '@/utils/isTouchDevice';
+import { Size } from '@/types/styles';
 
 type Props = {
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
   variant?: S.ButtonVariant;
   width?: string;
-  height?: string;
+  height?: Size;
 } & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({
   variant = 'primary',
   width = '100%',
-  height = '45px',
+  height = 'medium',
   children,
   onClick,
   ...rest

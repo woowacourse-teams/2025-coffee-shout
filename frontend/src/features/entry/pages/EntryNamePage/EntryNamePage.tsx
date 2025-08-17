@@ -69,7 +69,7 @@ const EntryNamePage = () => {
         <Button
           variant={isButtonDisabled ? 'disabled' : 'primary'}
           onClick={handleNavigateToMenu}
-          height="50px"
+          height="large"
         >
           메뉴 선택하러 가기
         </Button>

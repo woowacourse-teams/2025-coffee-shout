@@ -164,7 +164,7 @@ const EntryMenuPage = () => {
         <Button
           variant={isButtonDisabled ? 'disabled' : 'primary'}
           onClick={handleNavigateToLobby}
-          height="50px"
+          height="large"
         >
           {isHost ? '방 만들러 가기' : '방 참가하기'}
         </Button>
