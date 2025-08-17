@@ -7,11 +7,11 @@ import WarningIcon from './Icons/WarningIcon';
 import * as S from './Toast.styled';
 import { ToastOptions } from './types';
 
-interface ToastProps extends Omit<ToastOptions, 'duration'> {
+type Props = {
   isExiting?: boolean;
-}
+} & Omit<ToastOptions, 'duration'>;
 
-const Toast = ({ message, type, isExiting = false }: ToastProps) => {
+const Toast = ({ message, type, isExiting = false }: Props) => {
   const renderIcon = () => {
     switch (type) {
       case 'success':
