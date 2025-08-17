@@ -1,11 +1,11 @@
 package coffeeshout.global.websocket;
 
 import static org.springframework.util.Assert.isTrue;
-import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -125,10 +125,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키 생성 (public 메서드)
      */
-    public String createPlayerKey(String joinCode, String playerName) {
-        if (joinCode == null || playerName == null) {
-            throw new IllegalArgumentException("joinCode와 playerName은 null일 수 없습니다");
-        }
+    public String createPlayerKey(@NonNull String joinCode, @NonNull String playerName) {
         if (joinCode.contains(PLAYER_KEY_DELIMITER) || playerName.contains(PLAYER_KEY_DELIMITER)) {
             throw new IllegalArgumentException("joinCode와 playerName에 구분자('" + PLAYER_KEY_DELIMITER + "')가 포함될 수 없습니다");
         }
@@ -138,10 +135,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키 유효성 검증
      */
-    public boolean isValidPlayerKey(String playerKey) {
-        if (playerKey == null || !playerKey.contains(PLAYER_KEY_DELIMITER)) {
-            return false;
-        }
+    public boolean isValidPlayerKey(@NonNull String playerKey) {
         String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts.length == EXPECTED_PLAYER_KEY_PARTS &&
                !parts[0].isEmpty() && !parts[1].isEmpty();
@@ -150,10 +144,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키 유효성 검증 및 예외 발생
      */
-    private void validatePlayerKey(String playerKey) {
-        if (playerKey == null) {
-            throw new IllegalArgumentException("플레이어 키가 null입니다");
-        }
+    private void validatePlayerKey(@NonNull String playerKey) {
         if (!playerKey.contains(PLAYER_KEY_DELIMITER)) {
             throw new IllegalArgumentException("플레이어 키에 구분자('" + PLAYER_KEY_DELIMITER + "')가 없습니다: " + playerKey);
         }
@@ -166,9 +157,7 @@ public class StompSessionManager {
         }
     }
 
-    public boolean hasActiveConnections(JoinCode joinCode) {
-        notNull(joinCode, "JoinCode는 null일 수 없습니다");
-
+    public boolean hasActiveConnections(@NonNull JoinCode joinCode) {
         return getConnectedPlayerCountByJoinCode(joinCode.value()) > 0;
     }
 }
