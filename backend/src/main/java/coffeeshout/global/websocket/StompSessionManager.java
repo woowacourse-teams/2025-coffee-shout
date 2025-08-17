@@ -31,7 +31,7 @@ public class StompSessionManager {
     /**
      * 플레이어 세션 매핑 등록
      */
-    public void registerPlayerSession(String joinCode, String playerName, String sessionId) {
+    public void registerPlayerSession(@NonNull String joinCode, @NonNull String playerName, @NonNull String sessionId) {
         String playerKey = createPlayerKey(joinCode, playerName);
 
         // 기존 세션이 있으면 정리
@@ -49,12 +49,12 @@ public class StompSessionManager {
     /**
      * 플레이어의 기존 세션 ID 조회
      */
-    public boolean hasSessionId(String joinCode, String playerName) {
+    public boolean hasSessionId(@NonNull String joinCode, @NonNull String playerName) {
         String playerKey = createPlayerKey(joinCode, playerName);
         return playerSessionMap.containsKey(playerKey);
     }
 
-    public String getSessionId(String joinCode, String playerName) {
+    public String getSessionId(@NonNull String joinCode, @NonNull String playerName) {
         String playerKey = createPlayerKey(joinCode, playerName);
 
         isTrue(playerSessionMap.containsKey(playerKey),
@@ -98,7 +98,7 @@ public class StompSessionManager {
     /**
      * 세션 매핑 제거
      */
-    public void removeSession(String sessionId) {
+    public void removeSession(@NonNull String sessionId) {
         String playerKey = sessionPlayerMap.remove(sessionId);
         if (playerKey != null) {
             playerSessionMap.remove(playerKey);
@@ -109,14 +109,14 @@ public class StompSessionManager {
     /**
      * 중복 disconnection 처리 방지를 위한 체크 및 등록
      */
-    public boolean isDisconnectionProcessed(String sessionId) {
+    public boolean isDisconnectionProcessed(@NonNull String sessionId) {
         return !processedDisconnections.add(sessionId);
     }
 
     /**
      * 특정 방의 연결된 플레이어 수 조회
      */
-    public long getConnectedPlayerCountByJoinCode(String joinCode) {
+    public long getConnectedPlayerCountByJoinCode(@NonNull String joinCode) {
         return playerSessionMap.keySet().stream()
                 .filter(playerKey -> playerKey.startsWith(joinCode + PLAYER_KEY_DELIMITER))
                 .count();
