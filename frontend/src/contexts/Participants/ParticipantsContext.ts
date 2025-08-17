@@ -5,6 +5,7 @@ type ParticipantsContextType = {
   participants: Player[];
   setParticipants: (participants: Player[]) => void;
   isAllReady: boolean;
+  getParticipantColorIndex: (playerName: string) => number;
 };
 
 export const ParticipantsContext = createContext<ParticipantsContextType | null>(null);

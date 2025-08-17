@@ -6,12 +6,18 @@ export const ParticipantsProvider = ({ children }: PropsWithChildren) => {
   const [participants, setParticipants] = useState<Player[]>([]);
   const isAllReady = participants.every((participant) => participant.isReady);
 
+  const getParticipantColorIndex = (playerName: string): number => {
+    const participant = participants.find((p) => p.playerName === playerName);
+    return participant?.colorIndex ?? 0;
+  };
+
   return (
     <ParticipantsContext.Provider
       value={{
         participants,
-        setParticipants,
         isAllReady,
+        setParticipants,
+        getParticipantColorIndex,
       }}
     >
       {children}
