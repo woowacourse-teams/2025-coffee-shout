@@ -13,7 +13,7 @@ type Props = {
 const Button = ({
   variant = 'primary',
   width = '100%',
-  height = 'medium',
+  height = 'large',
   children,
   onClick,
   ...rest
