@@ -31,11 +31,12 @@ public class Room {
     private static final int MINIMUM_GUEST_COUNT = 2;
 
     private final JoinCode joinCode;
-    private final Player host;
     private final Players players;
     private final Roulette roulette;
     private final Queue<Playable> miniGames;
     private final List<Playable> finishedGames;
+
+    private Player host;
     private RoomState roomState;
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
@@ -167,6 +168,12 @@ public class Room {
         if (players.existsByName(playerName)) {
             roulette.removePlayer(playerName);
             players.removePlayer(playerName);
+
+            // 호스트가 나간 경우 새로운 호스트 지정
+            if (host.sameName(playerName) && players.getPlayerCount() > 0) {
+                promoteNewHost();
+            }
+
             return true;
         }
 
@@ -222,5 +229,11 @@ public class Room {
             return Player.createHost(playerName, menu);
         }
         return Player.createGuest(playerName, menu);
+    }
+
+    private void promoteNewHost() {
+        final Player newHost = players.getRandomPlayer();
+        newHost.updateReadyState(true);
+        this.host = newHost;
     }
 }

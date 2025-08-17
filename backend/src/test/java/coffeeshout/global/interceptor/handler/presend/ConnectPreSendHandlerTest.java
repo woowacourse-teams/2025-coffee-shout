@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -36,6 +37,9 @@ class ConnectPreSendHandlerTest {
 
     @Mock
     private MenuQueryService menuQueryService;
+    
+    @Mock
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     private StompSessionManager sessionManager;
     private ConnectPreSendHandler connectPreSendHandler;
@@ -52,7 +56,8 @@ class ConnectPreSendHandlerTest {
                 sessionManager,
                 webSocketMetricService,
                 roomQueryService,
-                menuQueryService
+                menuQueryService,
+                delayedPlayerRemovalService
         );
     }
 

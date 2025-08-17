@@ -2,12 +2,10 @@ package coffeeshout.global.interceptor.handler.postsend;
 
 import coffeeshout.global.interceptor.handler.PostSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -21,8 +19,7 @@ public class DisconnectPostSendHandler implements PostSendHandler {
 
     private final StompSessionManager sessionManager;
     private final WebSocketMetricService webSocketMetricService;
-    private final PlayerDisconnectionService playerDisconnectionService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     @Override
     public StompCommand getCommand() {
@@ -44,11 +41,8 @@ public class DisconnectPostSendHandler implements PostSendHandler {
             final String disconnectedPlayerKey = sessionManager.getPlayerKey(sessionId);
             log.info("플레이어 세션 해제: playerKey={}, sessionId={}", disconnectedPlayerKey, sessionId);
 
-            // 방에서 플레이어 제거
-            playerDisconnectionService.handlePlayerDisconnection(disconnectedPlayerKey, sessionId, CLIENT_DISCONNECT);
-
-            final String joinCode = sessionManager.extractJoinCode(disconnectedPlayerKey);
-            eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
+            // 지연 삭제 스케줄링
+            delayedPlayerRemovalService.schedulePlayerRemoval(disconnectedPlayerKey, sessionId, CLIENT_DISCONNECT);
         }
 
         // 세션 정리 로직 추가
