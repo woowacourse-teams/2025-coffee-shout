@@ -1,28 +1,16 @@
-import { Size } from '@/types/styles';
 import styled from '@emotion/styled';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading' | 'ready';
 
 type Props = {
-  $height: Size;
   $variant: ButtonVariant;
   $width: string;
+  $height: string;
 };
 
 export const Container = styled.button<Props>`
   width: ${({ $width }) => $width};
-  height: ${({ $height }) => {
-    switch ($height) {
-      case 'small':
-        return '40px';
-      case 'medium':
-        return '45px';
-      case 'large':
-        return '50px';
-      default:
-        return '50px';
-    }
-  }};
+  height: ${({ $height }) => $height};
   ${({ theme }) => theme.typography.h4}
   display: flex;
   align-items: center;

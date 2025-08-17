@@ -161,7 +161,11 @@ const EntryMenuPage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToLobby}>
+        <Button
+          variant={isButtonDisabled ? 'disabled' : 'primary'}
+          onClick={handleNavigateToLobby}
+          height="50px"
+        >
           {isHost ? '방 만들러 가기' : '방 참가하기'}
         </Button>
       </Layout.ButtonBar>
