@@ -11,6 +11,7 @@ import { TOTAL_COUNT } from '@/types/round';
 import { CardInfo, SelectedCardInfo } from '@/types/miniGame';
 import { colorList } from '@/constants/color';
 import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
 type Props = {
   round: CardGameRound;
@@ -29,6 +30,8 @@ const Round = ({
   isTimerActive,
   cardInfos,
 }: Props) => {
+  const { getParticipantColorIndex } = useParticipants();
+
   return (
     <Layout>
       <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
@@ -72,6 +75,12 @@ const Round = ({
         </S.MyCardContainer>
         <S.CardContainer>
           {cardInfos.map((cardInfo, index) => {
+            if (cardInfo.playerName === null) {
+              return null;
+            }
+
+            const playerColor = colorList[getParticipantColorIndex(cardInfo.playerName)];
+
             return cardInfo.selected ? (
               <CardFront
                 card={
@@ -80,7 +89,7 @@ const Round = ({
                     value: cardInfo.value as CardValue,
                   } as Card
                 }
-                playerColor={colorList[cardInfo.colorIndex]}
+                playerColor={playerColor}
               />
             ) : (
               <CardBack key={index} onClick={() => onClickCard(index)} />

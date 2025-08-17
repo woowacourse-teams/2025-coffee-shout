@@ -18,6 +18,7 @@ import { colorList } from '@/constants/color';
 import { MiniGameType, PlayerRank, PlayerScore } from '@/types/miniGame';
 import { Probability } from '@/types/roulette';
 import * as S from './MiniGameResultPage.styled';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
 type RankResponse = {
   ranks: PlayerRank[];
@@ -32,7 +33,7 @@ const MiniGameResultPage = () => {
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
-
+  const { getParticipantColorIndex } = useParticipants();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const [ranks, setRanks] = useState<PlayerRank[] | null>(null);
   const [scores, setScores] = useState<PlayerScore[] | null>(null);
@@ -119,7 +120,10 @@ const MiniGameResultPage = () => {
                 <Headline3>
                   <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
                 </Headline3>
-                <PlayerCard name={playerRank.playerName} playerColor={'#FF6B6B'}>
+                <PlayerCard
+                  name={playerRank.playerName}
+                  playerColor={colorList[getParticipantColorIndex(playerRank.playerName)]}
+                >
                   <Headline4>
                     {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
                   </Headline4>
