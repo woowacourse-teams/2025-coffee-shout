@@ -42,7 +42,7 @@ const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode, setMenuId } = useIdentifier();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,8 +102,7 @@ const EntryMenuPage = () => {
         menuId,
       });
       setJoinCode(joinCode);
-      setMenuId(menuId);
-      startSocket(joinCode, myName, menuId);
+      startSocket(joinCode, myName);
     };
 
     const handleGuest = async () => {
@@ -116,8 +115,7 @@ const EntryMenuPage = () => {
         }
       );
       setJoinCode(_joinCode);
-      setMenuId(menuId);
-      startSocket(_joinCode, myName, menuId);
+      startSocket(_joinCode, myName);
     };
 
     try {
