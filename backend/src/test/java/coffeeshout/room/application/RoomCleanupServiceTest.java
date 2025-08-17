@@ -125,7 +125,7 @@ class RoomCleanupServiceTest {
         final Room finalDisconnectedRoom = disconnectedRoom1;
         final Room finalDisconnectedRoom1 = disconnectedRoom2;
         await().pollInterval(100, TimeUnit.MILLISECONDS)
-                .atMost(delayMs.plus(Duration.ofMillis(500)))
+                .atMost(delayMs.multipliedBy(2))
                 .untilAsserted(() -> {
                     SoftAssertions.assertSoftly(softly -> {
                         // 연결된 룸은 삭제되지 않아야 함

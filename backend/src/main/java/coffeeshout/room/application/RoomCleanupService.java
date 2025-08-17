@@ -53,11 +53,15 @@ public class RoomCleanupService {
     // TODO 제거되는 방 개수 메트릭화하면 좋을 거 같음
     private void cleanupEmptyRooms() {
         log.info("빈 방 정리 작업 시작");
-        for (JoinCode joinCode : roomQueryService.getAllJoinCodes()) {
-            if (!stompSessionManager.hasActiveConnections(joinCode)) {
-                log.info("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode.value());
-                roomCommandService.delete(joinCode);
+        try {
+            for (JoinCode joinCode : roomQueryService.getAllJoinCodes()) {
+                if (!stompSessionManager.hasActiveConnections(joinCode)) {
+                    log.info("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode.value());
+                    roomCommandService.delete(joinCode);
+                }
             }
+        } catch (Exception e) {
+            log.error("빈 방 정리 작업 중 예외 발생: {}", e.getMessage(), e);
         }
     }
 }
