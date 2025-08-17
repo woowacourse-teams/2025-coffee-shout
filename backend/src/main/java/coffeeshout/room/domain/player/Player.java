@@ -7,7 +7,7 @@ import lombok.Getter;
 public class Player {
 
     private final PlayerName name;
-    private final PlayerType playerType;
+    private PlayerType playerType;
     private Menu menu;
     private Boolean isReady;
     private Integer colorIndex;
@@ -41,6 +41,11 @@ public class Player {
 
     public void updateReadyState(Boolean isReady) {
         this.isReady = isReady;
+    }
+
+    public void promote() {
+        this.playerType = PlayerType.HOST;
+        this.isReady = true;
     }
 
     @Override
