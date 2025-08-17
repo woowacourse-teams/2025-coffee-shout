@@ -60,10 +60,8 @@ class RoomCleanupServiceTest {
         testMenu = menuRepository.findAll().getFirst();
 
         // 각 테스트마다 고유한 joinCode 생성하여 테스트 격리
-        joinCode = joinCodeGenerator.generate();
-        PlayerName hostName = new PlayerName("테스트호스트");
-        testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
-        testRoom = roomRepository.save(testRoom);
+        testRoom = createAndSaveRoom("테스트호스트");
+        joinCode = testRoom.getJoinCode();
     }
 
     @Test
@@ -102,23 +100,13 @@ class RoomCleanupServiceTest {
     @Test
     void 스케줄러는_연결_상태에_따라_룸을_선택적으로_정리한다() {
         // given - 여러 룸 생성 (고유한 joinCode 사용)
-        String connectedRoomCode = joinCodeGenerator.generate().value();
-        Room connectedRoom = Room.createNewRoom(new JoinCode(connectedRoomCode), new PlayerName("연결된호스트"), testMenu);
-        connectedRoom = roomRepository.save(connectedRoom);
-
-        String disconnectedRoomCode1 = joinCodeGenerator.generate().value();
-        Room disconnectedRoom1 = Room.createNewRoom(new JoinCode(disconnectedRoomCode1), new PlayerName("연결안된호스트1"),
-                testMenu);
-        disconnectedRoom1 = roomRepository.save(disconnectedRoom1);
-
-        String disconnectedRoomCode2 = joinCodeGenerator.generate().value();
-        Room disconnectedRoom2 = Room.createNewRoom(new JoinCode(disconnectedRoomCode2), new PlayerName("연결안된호스트2"),
-                testMenu);
-        disconnectedRoom2 = roomRepository.save(disconnectedRoom2);
+        Room connectedRoom = createAndSaveRoom("연결된호스트");
+        Room disconnectedRoom1 = createAndSaveRoom("연결안된호스트1");
+        Room disconnectedRoom2 = createAndSaveRoom("연결안된호스트2");
 
         // 하나의 룸에만 플레이어 세션 등록
         String sessionId = "connected-session-" + System.currentTimeMillis();
-        stompSessionManager.registerPlayerSession(connectedRoomCode, "연결된플레이어", sessionId);
+        stompSessionManager.registerPlayerSession(connectedRoom.getJoinCode().value(), "연결된플레이어", sessionId);
 
         // when & then - 스케줄러 실행을 기다리며 선택적 삭제 확인
         final Room finalConnectedRoom = connectedRoom;
@@ -155,16 +143,19 @@ class RoomCleanupServiceTest {
                 );
 
         // when - 새로운 룸 생성 (연결 없음, 고유한 joinCode 사용)
-        JoinCode newJoincode = joinCodeGenerator.generate();
-        Room newRoom = Room.createNewRoom(newJoincode, new PlayerName("새로운호스트"), testMenu);
-        newRoom = roomRepository.save(newRoom);
+        final Room newRoom = createAndSaveRoom("새로운호스트");
 
         // then - 새로 생성된 룸도 다음 스케줄러 실행에서 삭제되는지 확인
-        final Room finalNewRoom = newRoom;
         await().pollInterval(50, TimeUnit.MILLISECONDS)
                 .atMost(delayMs.plus(Duration.ofMillis(300)))
                 .untilAsserted(() ->
-                        assertThat(roomRepository.findByJoinCode(finalNewRoom.getJoinCode())).isEmpty()
+                        assertThat(roomRepository.findByJoinCode(newRoom.getJoinCode())).isEmpty()
                 );
+    }
+
+    private Room createAndSaveRoom(String hostName) {
+        String roomCode = joinCodeGenerator.generate().value();
+        Room room = Room.createNewRoom(new JoinCode(roomCode), new PlayerName(hostName), testMenu);
+        return roomRepository.save(room);
     }
 }
