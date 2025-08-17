@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
@@ -12,16 +11,24 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DelayedPlayerRemovalService {
 
     private static final Duration REMOVAL_DELAY = Duration.ofSeconds(15);
 
-    @Qualifier("delayRemovalScheduler")
     private final TaskScheduler taskScheduler;
     private final PlayerDisconnectionService playerDisconnectionService;
     private final StompSessionManager stompSessionManager;
-    private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks;
+
+    public DelayedPlayerRemovalService(
+            @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
+            PlayerDisconnectionService playerDisconnectionService,
+            StompSessionManager stompSessionManager) {
+        this.taskScheduler = taskScheduler;
+        this.playerDisconnectionService = playerDisconnectionService;
+        this.stompSessionManager = stompSessionManager;
+        this.scheduledTasks = new ConcurrentHashMap<>();
+    }
 
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
         log.info("플레이어 지연 삭제 스케줄링: playerKey={}, sessionId={}, delay={}초",
