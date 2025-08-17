@@ -2,6 +2,7 @@ import { Z_INDEX } from '@/constants/zIndex';
 import styled from '@emotion/styled';
 
 export const Backdrop = styled.div`
+  position: fixed;
   display: flex;
   width: 100%;
   height: 100%;
@@ -9,13 +10,10 @@ export const Backdrop = styled.div`
   align-items: center;
   background-color: rgba(0, 0, 0, 0.3);
   inset: 0;
-  position: fixed;
-  z-index: ${Z_INDEX.MODAL};
-
   max-width: 430px;
-  width: 100%;
   height: 100dvh;
   margin: 0 auto;
+  z-index: ${Z_INDEX.MODAL};
 `;
 
 export const Container = styled.div`
