@@ -7,7 +7,7 @@ type ButtonBarProps = {
   children: ReactElement | ReactElement[];
 };
 
-const ButtonBar = ({ height = '4rem', flexRatios, children }: ButtonBarProps) => {
+const ButtonBar = ({ height = '3rem', flexRatios, children }: ButtonBarProps) => {
   if (flexRatios?.some((ratio) => ratio <= 0)) {
     throw new Error('flexRatio는 0보다 큰 양수여야 합니다');
   }
