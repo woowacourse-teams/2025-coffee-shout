@@ -23,7 +23,7 @@ class DisconnectPostSendHandlerTest {
     WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private DelayedPlayerRemovalService delayedPlayerRemovalService;
+    DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     StompSessionManager sessionManager;
     DisconnectPostSendHandler handler;
@@ -35,10 +35,7 @@ class DisconnectPostSendHandlerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
-                roomService);
-        handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, playerDisconnectionService,
-                eventPublisher);
+
         handler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService, delayedPlayerRemovalService);
     }
 
