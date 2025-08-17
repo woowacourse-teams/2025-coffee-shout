@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.then;
 import coffeeshout.global.exception.GlobalErrorCode;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -31,21 +32,24 @@ import org.springframework.test.util.ReflectionTestUtils;
 class ConnectPreSendHandlerTest {
 
     @Mock
-    WebSocketMetricService webSocketMetricService;
+    private WebSocketMetricService webSocketMetricService;
 
     @Mock
-    RoomQueryService roomQueryService;
+    private RoomQueryService roomQueryService;
 
     @Mock
-    MenuQueryService menuQueryService;
+    private MenuQueryService menuQueryService;
 
-    StompSessionManager sessionManager;
-    ConnectPreSendHandler connectPreSendHandler;
+    @Mock
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
-    final String sessionId = "test-session-id";
-    final String joinCode = "TES23";
-    final String playerName = "testPlayer";
-    final String menuId = "1";
+    private StompSessionManager sessionManager;
+    private ConnectPreSendHandler connectPreSendHandler;
+
+    private final String sessionId = "test-session-id";
+    private final String joinCode = "TES23";
+    private final String playerName = "testPlayer";
+    private final String menuId = "1";
 
     @BeforeEach
     void setUp() {
@@ -54,7 +58,8 @@ class ConnectPreSendHandlerTest {
                 sessionManager,
                 webSocketMetricService,
                 roomQueryService,
-                menuQueryService
+                menuQueryService,
+                delayedPlayerRemovalService
         );
     }
 
@@ -260,11 +265,11 @@ class ConnectPreSendHandlerTest {
         }
     }
 
-    StompHeaderAccessor createConnectAccessor() {
+    private StompHeaderAccessor createConnectAccessor() {
         return createConnectAccessorWithSessionId(sessionId);
     }
 
-    StompHeaderAccessor createConnectAccessorWithSessionId(String sessionId) {
+    private StompHeaderAccessor createConnectAccessorWithSessionId(String sessionId) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
         accessor.setSessionId(sessionId);
         accessor.setNativeHeader("joinCode", joinCode);
@@ -273,13 +278,13 @@ class ConnectPreSendHandlerTest {
         return accessor;
     }
 
-    Menu createTestMenu() {
+    private Menu createTestMenu() {
         Menu menu = new Menu("Test Menu", MenuType.COFFEE);
         menu.setId(1L);
         return menu;
     }
 
-    Room createPlayingRoom(Menu menu) {
+    private Room createPlayingRoom(Menu menu) {
         Room room = Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 

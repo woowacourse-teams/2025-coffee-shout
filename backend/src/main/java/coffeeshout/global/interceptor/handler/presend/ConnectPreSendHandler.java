@@ -2,6 +2,7 @@ package coffeeshout.global.interceptor.handler.presend;
 
 import coffeeshout.global.interceptor.handler.PreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -25,6 +26,7 @@ public class ConnectPreSendHandler implements PreSendHandler {
     private final WebSocketMetricService webSocketMetricService;
     private final RoomQueryService roomQueryService;
     private final MenuQueryService menuQueryService;
+    private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     @Override
     public StompCommand getCommand() {
@@ -67,6 +69,10 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
         // 새 세션으로 등록
         sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
+        
+        // 기존 지연 삭제 취소
+        final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
+        delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
 
         // 재연결 처리
         parseMenuId(menuId).ifPresentOrElse(

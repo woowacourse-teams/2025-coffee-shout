@@ -27,7 +27,6 @@ class WebSocketConnectionTest {
     private int port;
 
     @Test
-    @DisplayName("순수 WebSocket STOMP 연결 테스트")
     void 순수_WebSocket_STOMP_연결_테스트() throws Exception {
         // given
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(List.of(
@@ -50,7 +49,6 @@ class WebSocketConnectionTest {
     }
 
     @Test
-    @DisplayName("토픽 구독 테스트")
     void 토픽_구독_테스트() throws Exception {
         // given
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(List.of(
@@ -76,7 +74,6 @@ class WebSocketConnectionTest {
     }
 
     @Test
-    @DisplayName("메시지 전송 테스트")
     void 메시지_전송_테스트() throws Exception {
         // given
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(List.of(

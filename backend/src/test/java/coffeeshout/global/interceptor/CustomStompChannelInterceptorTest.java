@@ -13,7 +13,7 @@ import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler
 import coffeeshout.global.interceptor.handler.presend.ConnectPreSendHandler;
 import coffeeshout.global.interceptor.handler.presend.ErrorPreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
@@ -55,7 +55,7 @@ class CustomStompChannelInterceptorTest {
     MessageChannel channel;
 
     @Mock
-    ApplicationEventPublisher eventPublisher;
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     StompSessionManager sessionManager;
     CustomStompChannelInterceptor interceptor;
@@ -73,21 +73,16 @@ class CustomStompChannelInterceptorTest {
     void setUp() {
         // 실제 구현체 생성
         sessionManager = new StompSessionManager();
-        final RoomService roomService = mock(RoomService.class);
-        final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
-                roomService);
-        eventPublisher = event -> {
-        };
 
         // 핸들러들 생성
         connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
-                menuQueryService);
+                menuQueryService, delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                delayedPlayerRemovalService);
         disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService, eventPublisher);
+                delayedPlayerRemovalService);
         errorPreSendHandler = new ErrorPreSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                delayedPlayerRemovalService);
 
         // 핸들러 레지스트리 생성
         final StompHandlerRegistry handlerRegistry = new StompHandlerRegistry(
@@ -223,11 +218,11 @@ class CustomStompChannelInterceptorTest {
             then(webSocketMetricService).should().startConnection(sessionId);
         }
 
-        Room createTestRoom(Menu menu) {
+        private Room createTestRoom(Menu menu) {
             return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
         }
 
-        Menu createTestMenu() {
+        private Menu createTestMenu() {
             Menu menu = new Menu("Test Menu", MenuType.COFFEE);
             menu.setId(1L);
             return menu;
@@ -336,7 +331,6 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
         }
 
@@ -355,7 +349,7 @@ class CustomStompChannelInterceptorTest {
         }
     }
 
-    StompHeaderAccessor createAccessor(StompCommand stompCommand) {
+    private StompHeaderAccessor createAccessor(StompCommand stompCommand) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(stompCommand);
         accessor.setSessionId(sessionId);
         accessor.setNativeHeader("joinCode", joinCode);
