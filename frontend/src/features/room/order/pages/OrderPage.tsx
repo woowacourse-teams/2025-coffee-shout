@@ -9,6 +9,7 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,27 +18,23 @@ import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
 import { Player } from '@/types/player';
 
-type ParticipantResponse = Player[];
-
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { send, stopSocket, isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const { participants, setParticipants } = useParticipants();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
 
-  // TODO: 전역으로 분리
-  const [participants, setParticipants] = useState<ParticipantResponse>([]);
-
   const handleOrder = useCallback(
-    (data: ParticipantResponse) => {
+    (data: Player[]) => {
       setParticipants(data);
       stopSocket();
     },
-    [stopSocket]
+    [stopSocket, setParticipants]
   );
 
-  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleOrder);
+  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleOrder);
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
