@@ -132,7 +132,7 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<JoinCodeModal />, {
+    openModal(<JoinCodeModal onClose={closeModal} />, {
       title: '초대 코드',
       showCloseButton: true,
     });
@@ -223,7 +223,15 @@ const LobbyPage = () => {
     ),
   };
 
-  if (!playerType) return null;
+  useEffect(() => {
+    if (!playerType) {
+      navigate('/', { replace: true });
+    }
+  }, [playerType, navigate]);
+
+  if (!playerType) {
+    return null;
+  }
 
   return (
     <Layout>
