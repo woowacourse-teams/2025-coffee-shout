@@ -11,15 +11,14 @@ import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import * as S from './OrderPage.styled';
 import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
+import * as S from './OrderPage.styled';
 
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { stopSocket, isConnected } = useWebSocket();
-
   const { participants } = useParticipants();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
 

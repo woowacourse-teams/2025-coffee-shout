@@ -13,6 +13,10 @@ export const Logo = styled.img`
   right: 20px;
   -webkit-user-drag: none;
   user-select: none;
+
+  @media (max-height: 675px) {
+    display: none;
+  }
 `;
 
 export const ButtonContainer = styled.div`
