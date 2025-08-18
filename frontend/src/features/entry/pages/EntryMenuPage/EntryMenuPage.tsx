@@ -1,5 +1,6 @@
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
@@ -10,7 +11,6 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -42,7 +42,7 @@ const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode, setMenuId } = useIdentifier();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,8 +102,7 @@ const EntryMenuPage = () => {
         menuId,
       });
       setJoinCode(joinCode);
-      setMenuId(menuId);
-      startSocket(joinCode, myName, menuId);
+      startSocket(joinCode, myName);
     };
 
     const handleGuest = async () => {
@@ -116,8 +115,7 @@ const EntryMenuPage = () => {
         }
       );
       setJoinCode(_joinCode);
-      setMenuId(menuId);
-      startSocket(_joinCode, myName, menuId);
+      startSocket(_joinCode, myName);
     };
 
     try {

@@ -5,10 +5,9 @@ import { getWebSocketUrl } from './getWebSocketUrl';
 type Props = {
   joinCode: string;
   playerName: string;
-  menuId: number;
 };
 
-export const createStompClient = ({ joinCode, playerName, menuId }: Props) => {
+export const createStompClient = ({ joinCode, playerName }: Props) => {
   const wsUrl = getWebSocketUrl();
 
   const client = new Client({
@@ -17,7 +16,7 @@ export const createStompClient = ({ joinCode, playerName, menuId }: Props) => {
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
-    connectHeaders: { joinCode, playerName, menuId: menuId.toString() },
+    connectHeaders: { joinCode, playerName },
   });
 
   return client;

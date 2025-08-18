@@ -1,10 +1,28 @@
+import Headline2 from '@/components/@common/Headline2/Headline2';
+import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import Layout from '@/layouts/Layout';
+import { useNavigate } from 'react-router-dom';
+import * as S from './NotFoundPage.styled';
+
 const NotFoundPage = () => {
+  const navigate = useNavigate();
+
+  const handleClickHomeButton = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
-      <h1>404 - 페이지를 찾을 수 없습니다</h1>
-      <p>요청하신 페이지를 찾을 수 없습니다.</p>
-      <button>홈으로 돌아가기</button>
-    </div>
+    <Layout color="point-400">
+      <Layout.Content>
+        <S.Container>
+          <S.NotFoundText>404</S.NotFoundText>
+          <Headline2 color="white">페이지를 찾을 수 없습니다</Headline2>
+          <S.ButtonContainer onClick={handleClickHomeButton}>
+            <Paragraph color="white">홈으로 돌아가기 &gt;</Paragraph>
+          </S.ButtonContainer>
+        </S.Container>
+      </Layout.Content>
+    </Layout>
   );
 };
 

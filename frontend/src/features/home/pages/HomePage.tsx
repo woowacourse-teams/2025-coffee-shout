@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
 import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -17,10 +18,14 @@ const HomePage = () => {
   const { openModal, closeModal } = useModal();
   const { setHost, setGuest } = usePlayerType();
   const { clearIdentifier } = useIdentifier();
+  const { isConnected, stopSocket } = useWebSocket();
 
   useEffect(() => {
+    if (isConnected) {
+      stopSocket();
+    }
     clearIdentifier();
-  }, [clearIdentifier]);
+  }, [clearIdentifier, isConnected, stopSocket]);
 
   useEffect(() => {
     const checkFirstVisit = () => {

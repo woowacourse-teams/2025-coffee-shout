@@ -11,7 +11,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import Layout from '@/layouts/Layout';
-import { MiniGameType } from '@/types/miniGame';
+import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ type ParticipantResponse = Player[];
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
-  const { myName, joinCode, setMenuId } = useIdentifier();
+  const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
@@ -44,21 +44,9 @@ const LobbyPage = () => {
   const isReady =
     participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
 
-  const handleParticipant = useCallback(
-    (data: ParticipantResponse) => {
-      setParticipants(data);
-
-      const menuId = data.find((participant) => participant.playerName === myName)?.menuResponse.id;
-
-      if (!menuId) {
-        console.log('메뉴 정보를 찾을 수 없습니다.');
-        return;
-      }
-
-      setMenuId(menuId);
-    },
-    [setMenuId, myName]
-  );
+  const handleParticipant = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
   // TODO: 나중에 외부 state 로 분리할 것
   const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
@@ -104,7 +92,7 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send]);
 
-  const handleClickBackButton = () => {
+  const handleNavigateToHome = () => {
     navigate('/');
   };
 
@@ -235,7 +223,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleClickBackButton} />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}

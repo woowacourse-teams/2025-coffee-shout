@@ -1,8 +1,8 @@
 import { ColorList } from '@/constants/color';
+import { Card } from '@/types/miniGame/cardGame';
 import { Size } from '@/types/styles';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Card } from '../../constants/cards';
 import { cardVariants, circleVariants } from '../../constants/variants';
 import { DESIGN_TOKENS } from '@/constants/design';
 
