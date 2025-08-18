@@ -2,7 +2,6 @@ package coffeeshout.global.websocket;
 
 import static org.springframework.util.Assert.isTrue;
 
-import coffeeshout.room.domain.JoinCode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
@@ -159,9 +158,5 @@ public class StompSessionManager {
         if (parts[0].isEmpty() || parts[1].isEmpty()) {
             throw new IllegalArgumentException("joinCode 또는 playerName이 비어있습니다: " + playerKey);
         }
-    }
-
-    public boolean hasActiveConnections(@NonNull JoinCode joinCode) {
-        return getConnectedPlayerCountByJoinCode(joinCode.value()) > 0;
     }
 }
