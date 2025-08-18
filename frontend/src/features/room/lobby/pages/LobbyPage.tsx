@@ -10,6 +10,7 @@ import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
@@ -28,7 +29,6 @@ import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
-type ParticipantResponse = Player[];
 
 const LobbyPage = () => {
   const navigate = useNavigate();
@@ -37,16 +37,17 @@ const LobbyPage = () => {
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
+  const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
-  const [participants, setParticipants] = useState<ParticipantResponse>([]);
-  const isAllReady = participants.every((participant) => participant.isReady);
-  const isReady =
-    participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
+  const isReady = checkPlayerReady(myName) ?? false;
 
-  const handleParticipant = useCallback((data: ParticipantResponse) => {
-    setParticipants(data);
-  }, []);
+  const handleParticipant = useCallback(
+    (data: Player[]) => {
+      setParticipants(data);
+    },
+    [setParticipants]
+  );
 
   // TODO: 나중에 외부 state 로 분리할 것
   const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
@@ -78,7 +79,7 @@ const LobbyPage = () => {
     [joinCode, navigate]
   );
 
-  useWebSocketSubscription<ParticipantResponse>(`/room/${joinCode}`, handleParticipant);
+  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
   useWebSocketSubscription<Probability[]>(
     `/room/${joinCode}/roulette`,

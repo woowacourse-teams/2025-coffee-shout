@@ -8,7 +8,7 @@ import { DESIGN_TOKENS } from '@/constants/design';
 
 type Props = {
   $size?: Size;
-  $playerColor?: ColorList;
+  $playerColor?: ColorList | null;
   $card?: Card;
 };
 
