@@ -1,15 +1,15 @@
+import { api } from '@/apis/rest/api';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Input from '@/components/@common/Input/Input';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { api } from '@/apis/rest/api';
-import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const MAX_NAME_LENGTH = 10;
 
@@ -66,7 +66,11 @@ const EntryNamePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToMenu}>
+        <Button
+          variant={isButtonDisabled ? 'disabled' : 'primary'}
+          onClick={handleNavigateToMenu}
+          height="large"
+        >
           메뉴 선택하러 가기
         </Button>
       </Layout.ButtonBar>

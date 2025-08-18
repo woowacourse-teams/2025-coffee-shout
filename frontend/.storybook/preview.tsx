@@ -14,17 +14,17 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <ThemeProvider theme={theme}>
-        <WebSocketProvider>
-          <MemoryRouter>
-            <IdentifierProvider>
+        <IdentifierProvider>
+          <WebSocketProvider>
+            <MemoryRouter>
               <CardGameProvider>
                 <ModalProvider>
                   <Story />
                 </ModalProvider>
               </CardGameProvider>
-            </IdentifierProvider>
-          </MemoryRouter>
-        </WebSocketProvider>
+            </MemoryRouter>
+          </WebSocketProvider>
+        </IdentifierProvider>
       </ThemeProvider>
     ),
   ],

@@ -34,6 +34,5 @@ export const CardContainer = styled.div`
   grid-template-columns: repeat(3, 1fr);
   place-items: center;
   margin: 0 auto;
-  width: 20.25rem;
   gap: 0.625rem;
 `;

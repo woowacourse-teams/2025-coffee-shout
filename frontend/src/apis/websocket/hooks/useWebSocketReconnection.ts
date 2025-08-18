@@ -5,13 +5,13 @@ import { usePageVisibility } from './usePageVisibility';
 
 type Props = {
   isConnected: boolean;
-  startSocket: (joinCode: string, myName: string, menuId: number) => void;
+  startSocket: (joinCode: string, myName: string) => void;
   stopSocket: () => void;
 };
 
 export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket }: Props) => {
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
-  const { joinCode, myName, menuId } = useIdentifier();
+  const { joinCode, myName } = useIdentifier();
   const { isVisible } = usePageVisibility();
   const wasConnectedBeforeBackground = useRef(false);
   const reconnectTimeoutRef = useRef<number | null>(null);
@@ -52,9 +52,9 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
     reconnectTimeoutRef.current = window.setTimeout(() => {
       console.log('🔄 웹소켓 재연결 시작');
       reconnectAttemptsRef.current += 1;
-      startSocket(joinCode, myName, menuId);
+      startSocket(joinCode, myName);
     }, WEBSOCKET_CONFIG.RECONNECT_DELAY_MS);
-  }, [startSocket, joinCode, myName, menuId]);
+  }, [startSocket, joinCode, myName]);
 
   const attemptReconnect = useCallback(() => {
     if (checkAndHandleMaxAttempts()) return;
