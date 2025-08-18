@@ -1,3 +1,5 @@
+import { DESIGN_TOKENS } from '@/constants/design';
+
 const color = {
   point: {
     50: '#FEF2F2',
@@ -28,39 +30,39 @@ const color = {
 
 const typography = {
   h1: {
-    fontSize: '30px',
+    fontSize: DESIGN_TOKENS.typography.h1,
     fontWeight: 700,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h2: {
-    fontSize: '24px',
+    fontSize: DESIGN_TOKENS.typography.h2,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h3: {
-    fontSize: '20px',
+    fontSize: DESIGN_TOKENS.typography.h3,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
   h4: {
-    fontSize: '16px',
+    fontSize: DESIGN_TOKENS.typography.h4,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
 
   paragraph: {
-    fontSize: '16px',
+    fontSize: DESIGN_TOKENS.typography.paragraph,
     fontWeight: 500,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
   },
 
   small: {
-    fontSize: '14px',
+    fontSize: DESIGN_TOKENS.typography.small,
     fontWeight: 400,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",

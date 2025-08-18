@@ -1,21 +1,22 @@
+import { DESIGN_TOKENS } from '@/constants/design';
+
 export const cardVariants = {
-  // 1.28 비율
   small: {
-    width: '3rem', // ~48px
-    height: '3.84rem', // ~61.4px
+    width: DESIGN_TOKENS.card.small.width,
+    height: DESIGN_TOKENS.card.small.height,
   },
   medium: {
-    width: '4rem', // ~64px
-    height: '5.12rem', // ~81.9px
+    width: DESIGN_TOKENS.card.medium.width,
+    height: DESIGN_TOKENS.card.medium.height,
   },
   large: {
-    width: '6rem', // ~96px
-    height: '7.68rem', // ~122.9px
+    width: DESIGN_TOKENS.card.large.width,
+    height: DESIGN_TOKENS.card.large.height,
   },
 };
 
 export const circleVariants = {
-  small: '2.15rem', // ~34.4px
-  medium: '2.875rem', // ~46px
-  large: '4.325rem', // ~69.2px
+  small: DESIGN_TOKENS.circle.small,
+  medium: DESIGN_TOKENS.circle.medium,
+  large: DESIGN_TOKENS.circle.large,
 };

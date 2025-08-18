@@ -8,8 +8,7 @@ export const Container = styled.button`
   gap: 20px;
 
   width: 100%;
-  min-width: 310px;
-  height: 135px;
+  height: 130px;
   background-color: ${({ theme }) => theme.color.gray[50]};
   border-radius: 12px;
   padding: 28px 20px;

@@ -1,7 +1,7 @@
-import { Size } from '@/types/styles';
 import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
 import * as S from './Button.styled';
 import { isTouchDevice } from '@/utils/isTouchDevice';
+import { Size } from '@/types/styles';
 
 type Props = {
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
