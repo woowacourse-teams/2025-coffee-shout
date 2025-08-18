@@ -9,10 +9,6 @@ type IdentifierContextType = {
   setMyName: (myName: string) => void;
   clearMyName: () => void;
 
-  menuId: number;
-  setMenuId: (menuId: number) => void;
-  clearMenuId: () => void;
-
   clearIdentifier: () => void;
 };
 

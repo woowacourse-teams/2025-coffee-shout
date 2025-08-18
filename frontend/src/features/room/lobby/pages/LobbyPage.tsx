@@ -33,7 +33,7 @@ type ParticipantResponse = Player[];
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
-  const { myName, joinCode, setMenuId } = useIdentifier();
+  const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
@@ -44,21 +44,9 @@ const LobbyPage = () => {
   const isReady =
     participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
 
-  const handleParticipant = useCallback(
-    (data: ParticipantResponse) => {
-      setParticipants(data);
-
-      const menuId = data.find((participant) => participant.playerName === myName)?.menuResponse.id;
-
-      if (!menuId) {
-        console.log('메뉴 정보를 찾을 수 없습니다.');
-        return;
-      }
-
-      setMenuId(menuId);
-    },
-    [setMenuId, myName]
-  );
+  const handleParticipant = useCallback((data: ParticipantResponse) => {
+    setParticipants(data);
+  }, []);
 
   // TODO: 나중에 외부 state 로 분리할 것
   const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
