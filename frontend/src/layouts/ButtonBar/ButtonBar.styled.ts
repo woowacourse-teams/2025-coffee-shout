@@ -13,6 +13,7 @@ export const Container = styled.div<ContainerProps>`
   height: ${({ $height }) => $height};
   display: flex;
   gap: 1.5rem;
+  padding-top: 8px;
 `;
 
 export const Wrapper = styled.div<WrapperProps>`

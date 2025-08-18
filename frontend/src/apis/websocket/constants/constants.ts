@@ -5,12 +5,6 @@ export const WEBSOCKET_CONFIG = {
   APP_PREFIX: '/app',
 } as const;
 
-export type ConnectionParams = {
-  joinCode: string;
-  myName: string;
-  menuId: number;
-};
-
 export type WebSocketSuccess<T> = {
   success: true;
   data: T;

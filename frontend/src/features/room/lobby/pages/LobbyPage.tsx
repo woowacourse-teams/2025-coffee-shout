@@ -12,7 +12,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
-import { MiniGameType } from '@/types/miniGame';
+import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ type SectionComponents = Record<SectionType, ReactElement>;
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { send } = useWebSocket();
-  const { myName, joinCode, setMenuId } = useIdentifier();
+  const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
@@ -46,17 +46,8 @@ const LobbyPage = () => {
   const handleParticipant = useCallback(
     (data: Player[]) => {
       setParticipants(data);
-
-      const menuId = data.find((participant) => participant.playerName === myName)?.menuResponse.id;
-
-      if (!menuId) {
-        console.log('메뉴 정보를 찾을 수 없습니다.');
-        return;
-      }
-
-      setMenuId(menuId);
     },
-    [setMenuId, myName, setParticipants]
+    [setParticipants]
   );
 
   // TODO: 나중에 외부 state 로 분리할 것
@@ -103,7 +94,7 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send]);
 
-  const handleClickBackButton = () => {
+  const handleNavigateToHome = () => {
     navigate('/');
   };
 
@@ -131,7 +122,7 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<JoinCodeModal />, {
+    openModal(<JoinCodeModal onClose={closeModal} />, {
       title: '초대 코드',
       showCloseButton: true,
     });
@@ -222,11 +213,19 @@ const LobbyPage = () => {
     ),
   };
 
-  if (!playerType) return null;
+  useEffect(() => {
+    if (!playerType) {
+      navigate('/', { replace: true });
+    }
+  }, [playerType, navigate]);
+
+  if (!playerType) {
+    return null;
+  }
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleClickBackButton} />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}

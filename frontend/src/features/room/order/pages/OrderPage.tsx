@@ -1,5 +1,4 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
 import DetailIcon from '@/assets/detail-icon.svg';
 import DownloadIcon from '@/assets/download-icon.svg';
@@ -8,33 +7,20 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import * as S from './OrderPage.styled';
 import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
-import { Player } from '@/types/player';
+import * as S from './OrderPage.styled';
 
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { send, stopSocket, isConnected } = useWebSocket();
-  const { joinCode } = useIdentifier();
-  const { participants, setParticipants } = useParticipants();
+  const { stopSocket, isConnected } = useWebSocket();
+  const { participants } = useParticipants();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
-
-  const handleOrder = useCallback(
-    (data: Player[]) => {
-      setParticipants(data);
-      stopSocket();
-    },
-    [stopSocket, setParticipants]
-  );
-
-  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleOrder);
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
@@ -45,10 +31,10 @@ const OrderPage = () => {
   };
 
   useEffect(() => {
-    if (joinCode && isConnected) {
-      send(`/room/${joinCode}/update-players`);
+    if (isConnected) {
+      stopSocket();
     }
-  }, [joinCode, send, isConnected]);
+  }, [stopSocket, isConnected]);
 
   return (
     <Layout>
