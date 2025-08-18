@@ -104,7 +104,7 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send]);
 
-  const handleClickBackButton = () => {
+  const handleNavigateToHome = () => {
     navigate('/');
   };
 
@@ -227,7 +227,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleClickBackButton} />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}
