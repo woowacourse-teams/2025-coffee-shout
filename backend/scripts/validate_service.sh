@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [VALIDATE_SERVICE] 서비스 상태 검증 ==="
 

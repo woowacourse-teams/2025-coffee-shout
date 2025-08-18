@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [AFTER_INSTALL] 애플리케이션 설정 ==="
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [APPLICATION_STOP] 커피빵 게임 서버 종료 ==="
 
