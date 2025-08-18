@@ -1,3 +1,4 @@
+import { DESIGN_TOKENS } from '@/constants/design';
 import styled from '@emotion/styled';
 
 type ContainerProps = { $height: string; $hasValue: boolean };
@@ -44,7 +45,7 @@ export const Input = styled.input`
 
 export const ClearButton = styled.button<ClearButtonProps>`
   background-color: white;
-  font-size: 20px;
+  font-size: ${DESIGN_TOKENS.typography.h2};
   display: flex;
   justify-content: center;
   align-items: center;

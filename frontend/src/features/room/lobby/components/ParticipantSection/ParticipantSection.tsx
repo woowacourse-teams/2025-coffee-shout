@@ -35,6 +35,7 @@ export const ParticipantSection = ({ participants }: Props) => {
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
   );
+
   const myColorIndex =
     participants.find((participant) => participant.playerName === myName)?.colorIndex ?? 0;
   const myColor = colorList[myColorIndex];

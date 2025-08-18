@@ -9,7 +9,7 @@ export const Container = styled.div`
 
 export const Wrapper = styled.div`
   position: absolute;
-  bottom: 2rem;
+  bottom: 1rem;
   left: 2rem;
   right: 2rem;
 `;

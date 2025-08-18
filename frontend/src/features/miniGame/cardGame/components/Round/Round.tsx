@@ -2,18 +2,18 @@ import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import { colorList } from '@/constants/color';
-import { CardGameRound, ROUND_NUMBER_MAP } from '@/constants/miniGame';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
-import { CardInfo, SelectedCardInfo } from '@/types/miniGame';
-import { TOTAL_COUNT } from '@/types/round';
-import { Card, CardType, CardValue } from '../../constants/cards';
+import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
+import { ROUND_MAP, RoundType } from '@/types/miniGame/round';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import CircularProgress from '../CircularProgress/CircularProgress';
 import * as S from './Round.styled';
 
 type Props = {
-  round: CardGameRound;
+  round: RoundType;
+  roundTotalTime: number;
   onClickCard: (cardIndex: number) => void;
   selectedCardInfo: SelectedCardInfo;
   currentTime: number;
@@ -23,6 +23,7 @@ type Props = {
 
 const Round = ({
   round,
+  roundTotalTime,
   onClickCard,
   selectedCardInfo,
   currentTime,
@@ -30,6 +31,7 @@ const Round = ({
   cardInfos,
 }: Props) => {
   const isCardSelectedInCurrentRound = selectedCardInfo[round].isSelected;
+  const { getParticipantColorIndex } = useParticipants();
 
   return (
     <Layout>
@@ -37,11 +39,15 @@ const Round = ({
       <Layout.Content>
         <S.TitleContainer>
           <S.TitleWrapper>
-            <Headline2>Round {ROUND_NUMBER_MAP[round]}</Headline2>
+            <Headline2>Round {ROUND_MAP[round]}</Headline2>
             <Description>카드를 골라주세요!</Description>
           </S.TitleWrapper>
           <S.CircularProgressWrapper>
-            <CircularProgress current={currentTime} total={TOTAL_COUNT} isActive={isTimerActive} />
+            <CircularProgress
+              current={currentTime}
+              total={roundTotalTime}
+              isActive={isTimerActive}
+            />
           </S.CircularProgressWrapper>
         </S.TitleContainer>
 
@@ -66,8 +72,8 @@ const Round = ({
               data-testid="card-selected-round-2"
               card={
                 {
-                  type: selectedCardInfo['SECOND'].type as CardType,
-                  value: selectedCardInfo['SECOND'].value as CardValue,
+                  type: selectedCardInfo['SECOND'].type,
+                  value: selectedCardInfo['SECOND'].value,
                 } as Card
               }
             />
@@ -80,6 +86,11 @@ const Round = ({
             const isThisCardSelected = cardInfo.selected;
             const shouldDisableCard = isCardSelectedInCurrentRound && !isThisCardSelected;
 
+            let playerColor = null;
+            if (cardInfo.playerName !== null) {
+              playerColor = colorList[getParticipantColorIndex(cardInfo.playerName)];
+            }
+
             return isThisCardSelected ? (
               <CardFront
                 key={index}
@@ -88,11 +99,11 @@ const Round = ({
                 data-selected="true"
                 card={
                   {
-                    type: cardInfo.cardType as CardType,
-                    value: cardInfo.value as CardValue,
+                    type: cardInfo.cardType,
+                    value: cardInfo.value,
                   } as Card
                 }
-                playerColor={colorList[cardInfo.colorIndex]}
+                playerColor={playerColor}
               />
             ) : (
               <CardBack
