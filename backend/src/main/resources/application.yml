@@ -26,8 +26,3 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
-
-room:
-  cleanup:
-    interval: 1h # 1시간 간격
-    enabled: true # 운영 환경에서는 스케줄러 활성화
