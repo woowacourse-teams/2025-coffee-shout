@@ -37,11 +37,10 @@ const LobbyPage = () => {
   const { openModal, closeModal } = useModal();
   const { playerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
-  const { participants, setParticipants, isAllReady } = useParticipants();
+  const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
-  const isReady =
-    participants.find((participant) => participant.playerName === myName)?.isReady ?? false;
+  const isReady = checkPlayerReady(myName) ?? false;
 
   const handleParticipant = useCallback(
     (data: Player[]) => {

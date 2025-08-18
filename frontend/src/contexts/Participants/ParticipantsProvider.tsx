@@ -4,6 +4,14 @@ import { Player } from '@/types/player';
 
 export const ParticipantsProvider = ({ children }: PropsWithChildren) => {
   const [participants, setParticipants] = useState<Player[]>([]);
+
+  const checkPlayerReady = useCallback(
+    (playerName: string): boolean => {
+      const participant = participants.find((participant) => participant.playerName === playerName);
+      return participant?.isReady ?? false;
+    },
+    [participants]
+  );
   const isAllReady = participants.every((participant) => participant.isReady);
 
   const getParticipantColorIndex = useCallback(
@@ -21,6 +29,7 @@ export const ParticipantsProvider = ({ children }: PropsWithChildren) => {
         isAllReady,
         setParticipants,
         getParticipantColorIndex,
+        checkPlayerReady,
       }}
     >
       {children}

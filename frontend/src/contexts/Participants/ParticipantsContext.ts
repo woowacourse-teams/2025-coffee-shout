@@ -3,8 +3,9 @@ import { Player } from '@/types/player';
 
 type ParticipantsContextType = {
   participants: Player[];
-  setParticipants: (participants: Player[]) => void;
+  checkPlayerReady: (playerName: string) => boolean;
   isAllReady: boolean;
+  setParticipants: (participants: Player[]) => void;
   getParticipantColorIndex: (playerName: string) => number;
 };
 
