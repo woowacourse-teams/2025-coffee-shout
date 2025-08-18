@@ -6,7 +6,7 @@ import * as S from './CardFront.styled';
 
 type Props = {
   size?: Size;
-  playerColor?: ColorList;
+  playerColor?: ColorList | null;
   card: Card;
 };
 

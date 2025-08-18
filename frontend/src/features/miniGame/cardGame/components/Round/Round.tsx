@@ -79,11 +79,10 @@ const Round = ({
         </S.MyCardContainer>
         <S.CardContainer>
           {cardInfos.map((cardInfo, index) => {
-            if (cardInfo.playerName === null) {
-              return null;
+            let playerColor = null;
+            if (cardInfo.playerName !== null) {
+              playerColor = colorList[getParticipantColorIndex(cardInfo.playerName)];
             }
-
-            const playerColor = colorList[getParticipantColorIndex(cardInfo.playerName)];
 
             return cardInfo.selected ? (
               <CardFront
