@@ -18,7 +18,7 @@ import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { stopSocket } = useWebSocket();
+  const { stopSocket, isConnected } = useWebSocket();
 
   const { participants } = useParticipants();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
@@ -32,8 +32,10 @@ const OrderPage = () => {
   };
 
   useEffect(() => {
-    stopSocket();
-  }, [stopSocket]);
+    if (isConnected) {
+      stopSocket();
+    }
+  }, [stopSocket, isConnected]);
 
   return (
     <Layout>
