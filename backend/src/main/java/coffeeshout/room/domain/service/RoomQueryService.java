@@ -16,11 +16,8 @@ public class RoomQueryService {
 
     private final RoomRepository roomRepository;
 
-    public List<JoinCode> getAllJoinCodes() {
-        return roomRepository.findAll()
-                .stream()
-                .map(Room::getJoinCode)
-                .toList();
+    public List<Room> getAllRooms() {
+        return roomRepository.findAll();
     }
 
     public Room getByJoinCode(@NonNull JoinCode joinCode) {

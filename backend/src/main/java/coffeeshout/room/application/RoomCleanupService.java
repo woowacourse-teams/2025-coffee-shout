@@ -2,6 +2,7 @@ package coffeeshout.room.application;
 
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import jakarta.annotation.PostConstruct;
@@ -19,7 +20,6 @@ public class RoomCleanupService {
     private final boolean cleanupEnabled;
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
-    private final StompSessionManager stompSessionManager;
     private final TaskScheduler taskScheduler;
 
     public RoomCleanupService(
@@ -27,13 +27,11 @@ public class RoomCleanupService {
             @Value("${room.cleanup.enabled:true}") boolean cleanupEnabled,
             RoomQueryService roomQueryService,
             RoomCommandService roomCommandService,
-            StompSessionManager stompSessionManager,
             TaskScheduler taskScheduler) {
         this.roomCleanupInterval = roomCleanupInterval;
         this.cleanupEnabled = cleanupEnabled;
         this.roomQueryService = roomQueryService;
         this.roomCommandService = roomCommandService;
-        this.stompSessionManager = stompSessionManager;
         this.taskScheduler = taskScheduler;
     }
 
@@ -54,9 +52,10 @@ public class RoomCleanupService {
     private void cleanupEmptyRooms() {
         log.info("빈 방 정리 작업 시작");
         try {
-            for (JoinCode joinCode : roomQueryService.getAllJoinCodes()) {
-                if (!stompSessionManager.hasActiveConnections(joinCode)) {
-                    log.info("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode.value());
+            for (final Room room : roomQueryService.getAllRooms()) {
+                final JoinCode joinCode = room.getJoinCode();
+                if (room.isEmpty()) {
+                    log.info("JoinCode[{}] 방에 연결된 사용자가 없어 정리합니다.", joinCode);
                     roomCommandService.delete(joinCode);
                 }
             }
