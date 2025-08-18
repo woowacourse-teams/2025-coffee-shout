@@ -35,7 +35,7 @@ const LobbyPage = () => {
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
-  const { playerType } = usePlayerType();
+  const { playerType, setPlayerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
@@ -45,8 +45,13 @@ const LobbyPage = () => {
   const handleParticipant = useCallback(
     (data: Player[]) => {
       setParticipants(data);
+
+      const currentPlayer = data.find((player) => player.playerName === myName);
+      if (currentPlayer) {
+        setPlayerType(currentPlayer.playerType);
+      }
     },
-    [setParticipants]
+    [setParticipants, myName, setPlayerType]
   );
 
   // TODO: 나중에 외부 state 로 분리할 것

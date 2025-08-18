@@ -3,6 +3,7 @@ import { PlayerType } from '@/types/player';
 
 type PlayerTypeContextType = {
   playerType: PlayerType | null;
+  setPlayerType: (type: PlayerType | null) => void;
   setGuest: () => void;
   setHost: () => void;
 };
