@@ -1,5 +1,6 @@
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
@@ -10,7 +11,6 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
