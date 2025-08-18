@@ -334,8 +334,8 @@ class RoomServiceTest {
         createdRoom.joinGuest(guestName, MenuFixture.아메리카노());
 
         // when & then
-        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "게스트1")).isTrue();
-        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), guestName.value())).isTrue();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), "uniqueName")).isFalse();
     }
 
     @Test
@@ -416,7 +416,37 @@ class RoomServiceTest {
         List<MiniGameType> selectedMiniGames = roomService.getSelectedMiniGames(joinCode.value());
 
         // then
-        assertThat(selectedMiniGames).hasSize(1);
-        assertThat(selectedMiniGames).containsExactly(MiniGameType.CARD_GAME);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(selectedMiniGames).hasSize(1);
+            softly.assertThat(selectedMiniGames).containsExactly(MiniGameType.CARD_GAME);
+        });
+    }
+
+    @Test
+    void 플레이어를_제거할_때_플레이어가_없다면_방을_제거한다() {
+        // given
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        // when
+        roomService.removePlayer(joinCode.value(), hostName);
+
+        // then
+        assertThat(roomService.roomExists(joinCode.value())).isFalse();
+    }
+
+    @Test
+    void 플레이어를_제거할_때_플레이어가_있다면_방을_제거하지_않는다() {
+        String hostName = "호스트";
+        Room createdRoom = roomService.createRoom(hostName, 1L);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+
+        // when
+        roomService.removePlayer(joinCode.value(), hostName);
+
+        // then
+        assertThat(roomService.roomExists(joinCode.value())).isTrue();
     }
 }

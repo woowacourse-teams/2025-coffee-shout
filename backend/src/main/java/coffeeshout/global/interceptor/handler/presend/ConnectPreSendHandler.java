@@ -80,7 +80,7 @@ public class ConnectPreSendHandler implements PreSendHandler {
     private void handlePlayerReconnection(String joinCode, String playerName, String newSessionId) {
         try {
             // 1. 방 존재 확인
-            final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+            final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
             // 2. 방 상태 확인
             if (room.isPlayingState()) {

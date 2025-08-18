@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import coffeeshout.global.exception.GlobalErrorCode;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
@@ -145,7 +147,7 @@ class ConnectPreSendHandlerTest {
             Menu testMenu = createTestMenu();
             Room testRoom = createPlayingRoom(testMenu);
 
-            given(roomQueryService.findByJoinCode(any(JoinCode.class))).willReturn(testRoom);
+            given(roomQueryService.getByJoinCode(any(JoinCode.class))).willReturn(testRoom);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);
@@ -163,8 +165,8 @@ class ConnectPreSendHandlerTest {
 
             StompHeaderAccessor accessor = createConnectAccessor();
 
-            given(roomQueryService.findByJoinCode(any(JoinCode.class)))
-                    .willThrow(new RuntimeException("Room not found"));
+            given(roomQueryService.getByJoinCode(any(JoinCode.class)))
+                    .willThrow(new NotExistElementException(GlobalErrorCode.NOT_EXIST, "방이 존재하지 않습니다."));
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);

@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -22,14 +23,14 @@ public class StompSessionManager {
     private final ConcurrentHashMap<String, String> sessionPlayerMap; // sessionId -> "joinCode:playerName"
 
     public StompSessionManager() {
-        playerSessionMap = new ConcurrentHashMap<>();
-        sessionPlayerMap = new ConcurrentHashMap<>();
+        this.playerSessionMap = new ConcurrentHashMap<>();
+        this.sessionPlayerMap = new ConcurrentHashMap<>();
     }
 
     /**
      * 플레이어 세션 매핑 등록
      */
-    public void registerPlayerSession(String joinCode, String playerName, String sessionId) {
+    public void registerPlayerSession(@NonNull String joinCode, @NonNull String playerName, @NonNull String sessionId) {
         final String playerKey = createPlayerKey(joinCode, playerName);
 
         // 기존 세션이 있으면 정리
@@ -47,12 +48,12 @@ public class StompSessionManager {
     /**
      * 플레이어의 기존 세션 ID 조회
      */
-    public boolean hasSessionId(String joinCode, String playerName) {
+    public boolean hasSessionId(@NonNull String joinCode, @NonNull String playerName) {
         final String playerKey = createPlayerKey(joinCode, playerName);
         return playerSessionMap.containsKey(playerKey);
     }
 
-    public String getSessionId(String joinCode, String playerName) {
+    public String getSessionId(@NonNull String joinCode, @NonNull String playerName) {
         final String playerKey = createPlayerKey(joinCode, playerName);
 
         isTrue(playerSessionMap.containsKey(playerKey),
@@ -64,11 +65,11 @@ public class StompSessionManager {
     /**
      * 세션 ID로 플레이어 키 조회
      */
-    public boolean hasPlayerKey(String sessionId) {
+    public boolean hasPlayerKey(@NonNull String sessionId) {
         return sessionPlayerMap.containsKey(sessionId);
     }
 
-    public String getPlayerKey(String sessionId) {
+    public String getPlayerKey(@NonNull String sessionId) {
         isTrue(sessionPlayerMap.containsKey(sessionId),
                 "세션 ID가 존재하지 않습니다: sessionId=%s".formatted(sessionId));
 
@@ -78,7 +79,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키에서 조인 코드 추출
      */
-    public String extractJoinCode(String playerKey) {
+    public String extractJoinCode(@NonNull String playerKey) {
         validatePlayerKey(playerKey);
         final String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts[0];
@@ -87,7 +88,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키에서 플레이어 이름 추출
      */
-    public String extractPlayerName(String playerKey) {
+    public String extractPlayerName(@NonNull String playerKey) {
         validatePlayerKey(playerKey);
         String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts[1];
@@ -96,25 +97,28 @@ public class StompSessionManager {
     /**
      * 세션 매핑 제거
      */
-    public void removeSession(String sessionId) {
+    public void removeSession(@NonNull String sessionId) {
         final String playerKey = sessionPlayerMap.remove(sessionId);
         if (playerKey != null) {
             playerSessionMap.remove(playerKey);
             log.info("세션 매핑 제거: playerKey={}, sessionId={}", playerKey, sessionId);
         }
+
+        // 중복 disconnect 방지 세트 정리(메모리 누수 방지 목적)
+        processedDisconnections.remove(sessionId);
     }
 
     /**
      * 중복 disconnection 처리 방지를 위한 체크 및 등록
      */
-    public boolean isDisconnectionProcessed(String sessionId) {
+    public boolean isDisconnectionProcessed(@NonNull String sessionId) {
         return !processedDisconnections.add(sessionId);
     }
 
     /**
      * 특정 방의 연결된 플레이어 수 조회
      */
-    public long getConnectedPlayerCountByJoinCode(String joinCode) {
+    public long getConnectedPlayerCountByJoinCode(@NonNull String joinCode) {
         return playerSessionMap.keySet().stream()
                 .filter(playerKey -> playerKey.startsWith(joinCode + PLAYER_KEY_DELIMITER))
                 .count();
@@ -123,10 +127,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키 생성 (public 메서드)
      */
-    public String createPlayerKey(String joinCode, String playerName) {
-        if (joinCode == null || playerName == null) {
-            throw new IllegalArgumentException("joinCode와 playerName은 null일 수 없습니다");
-        }
+    public String createPlayerKey(@NonNull String joinCode, @NonNull String playerName) {
         if (joinCode.contains(PLAYER_KEY_DELIMITER) || playerName.contains(PLAYER_KEY_DELIMITER)) {
             throw new IllegalArgumentException("joinCode와 playerName에 구분자('" + PLAYER_KEY_DELIMITER + "')가 포함될 수 없습니다");
         }
@@ -148,10 +149,7 @@ public class StompSessionManager {
     /**
      * 플레이어 키 유효성 검증 및 예외 발생
      */
-    private void validatePlayerKey(String playerKey) {
-        if (playerKey == null) {
-            throw new IllegalArgumentException("플레이어 키가 null입니다");
-        }
+    private void validatePlayerKey(@NonNull String playerKey) {
         if (!playerKey.contains(PLAYER_KEY_DELIMITER)) {
             throw new IllegalArgumentException("플레이어 키에 구분자('" + PLAYER_KEY_DELIMITER + "')가 없습니다: " + playerKey);
         }

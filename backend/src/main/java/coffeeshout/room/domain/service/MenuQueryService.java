@@ -16,12 +16,12 @@ public class MenuQueryService {
         this.menuRepository = menuRepository;
     }
 
-    public Menu findById(Long menuId) {
+    public Menu getById(Long menuId) {
         return menuRepository.findById(menuId)
                 .orElseThrow(() -> new NotExistElementException(GlobalErrorCode.NOT_EXIST, "메뉴가 존재하지 않습니다."));
     }
 
-    public List<Menu> findAll() {
+    public List<Menu> getAll() {
         return menuRepository.findAll();
     }
 }

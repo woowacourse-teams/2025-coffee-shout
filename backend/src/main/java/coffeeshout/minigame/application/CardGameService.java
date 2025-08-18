@@ -52,7 +52,7 @@ public class CardGameService implements MiniGameService {
     public void start(Playable playable, String joinCode) {
         sendGameStartMessage(joinCode, playable.getMiniGameType());
         final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final Room room = roomQueryService.findByJoinCode(roomJoinCode);
+        final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         final CardGame cardGame = (CardGame) playable;
         final MiniGameTaskManager<CardGameTaskType> manager = new MiniGameTaskManager<>(scheduler);
         cardGameTaskExecutors.put(roomJoinCode, manager);
@@ -87,7 +87,7 @@ public class CardGameService implements MiniGameService {
     }
 
     private CardGame getCardGame(JoinCode joinCode) {
-        final Room room = roomQueryService.findByJoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(joinCode);
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 }

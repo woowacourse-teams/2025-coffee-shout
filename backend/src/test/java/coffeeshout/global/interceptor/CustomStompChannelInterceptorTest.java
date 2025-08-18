@@ -40,31 +40,31 @@ import org.springframework.messaging.support.MessageBuilder;
 class CustomStompChannelInterceptorTest {
 
     @Mock
-    private WebSocketMetricService webSocketMetricService;
+    WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private RoomQueryService roomQueryService;
+    RoomQueryService roomQueryService;
 
     @Mock
-    private MenuQueryService menuQueryService;
+    MenuQueryService menuQueryService;
 
     @Mock
-    private MessageChannel channel;
+    MessageChannel channel;
 
     @Mock
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
-    private StompSessionManager sessionManager;
-    private CustomStompChannelInterceptor interceptor;
+    StompSessionManager sessionManager;
+    CustomStompChannelInterceptor interceptor;
 
-    private ConnectPreSendHandler connectPreSendHandler;
-    private ConnectPostSendHandler connectPostSendHandler;
-    private DisconnectPostSendHandler disconnectPostSendHandler;
-    private ErrorPreSendHandler errorPreSendHandler;
+    ConnectPreSendHandler connectPreSendHandler;
+    ConnectPostSendHandler connectPostSendHandler;
+    DisconnectPostSendHandler disconnectPostSendHandler;
+    ErrorPreSendHandler errorPreSendHandler;
 
-    private final String sessionId = "test-session-id";
-    private final String joinCode = "TEV23";
-    private final String playerName = "testPlayer";
+    final String sessionId = "test-session-id";
+    final String joinCode = "TEV23";
+    final String playerName = "testPlayer";
 
     @BeforeEach
     void setUp() {
@@ -183,8 +183,8 @@ class CustomStompChannelInterceptorTest {
             Menu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
-            given(roomQueryService.findByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
-            given(menuQueryService.findById(1L)).willReturn(testMenu);
+            given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
+            given(menuQueryService.getById(1L)).willReturn(testMenu);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);

@@ -1,7 +1,10 @@
 package coffeeshout.room.domain.repository;
 
+import static org.springframework.util.Assert.notNull;
+
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +37,8 @@ public class MemoryRoomRepository implements RoomRepository {
 
     @Override
     public void deleteByJoinCode(JoinCode joinCode) {
+        notNull(joinCode, "JoinCode는 null일 수 없습니다.");
+
         rooms.remove(joinCode);
     }
 }
