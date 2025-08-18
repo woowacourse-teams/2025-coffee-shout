@@ -1,3 +1,4 @@
+import { DESIGN_TOKENS } from '@/constants/design';
 import styled from '@emotion/styled';
 
 type Props = {
@@ -36,7 +37,7 @@ export const ProgressCircle = styled.circle<Props>`
 
 export const CountText = styled.span`
   color: ${({ theme }) => theme.color.gray[700]};
-  font-size: 0.75rem; // ~12px
+  font-size: ${DESIGN_TOKENS.typography.small};
   font-weight: 700;
   text-align: center;
 `;

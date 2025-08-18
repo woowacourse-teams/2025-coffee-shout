@@ -4,6 +4,7 @@ import { Size } from '@/types/styles';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { cardVariants, circleVariants } from '../../constants/variants';
+import { DESIGN_TOKENS } from '@/constants/design';
 
 type Props = {
   $size?: Size;
@@ -36,9 +37,9 @@ const getCardTextColor = ($card?: Card) => {
 };
 
 const cardTextFontSize = {
-  small: '0.75rem', // ~12px
-  medium: '1rem', // ~16px
-  large: '1.25rem', // ~20px
+  small: DESIGN_TOKENS.typography.small, // ~12px
+  medium: DESIGN_TOKENS.typography.h4, // ~16px
+  large: DESIGN_TOKENS.typography.h3, // ~20px
 };
 
 export const Container = styled.div<Props>`

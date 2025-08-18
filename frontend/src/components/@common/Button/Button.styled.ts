@@ -4,9 +4,9 @@ import styled from '@emotion/styled';
 export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading' | 'ready';
 
 type Props = {
-  $height: Size;
   $variant: ButtonVariant;
   $width: string;
+  $height: Size;
 };
 
 export const Container = styled.button<Props>`
