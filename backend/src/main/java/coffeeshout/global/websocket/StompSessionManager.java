@@ -103,6 +103,9 @@ public class StompSessionManager {
             playerSessionMap.remove(playerKey);
             log.info("세션 매핑 제거: playerKey={}, sessionId={}", playerKey, sessionId);
         }
+
+        // 중복 disconnect 방지 세트 정리(메모리 누수 방지 목적)
+        processedDisconnections.remove(sessionId);
     }
 
     /**
