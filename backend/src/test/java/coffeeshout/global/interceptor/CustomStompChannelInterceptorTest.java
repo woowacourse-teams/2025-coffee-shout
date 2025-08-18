@@ -73,7 +73,7 @@ class CustomStompChannelInterceptorTest {
 
         // 핸들러들 생성
         connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
-                menuQueryService, delayedPlayerRemovalService);
+                delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
                 delayedPlayerRemovalService);
         disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
