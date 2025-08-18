@@ -56,7 +56,7 @@ const LobbyPage = () => {
 
       setMenuId(menuId);
     },
-    [setMenuId, myName]
+    [setMenuId, myName, setParticipants]
   );
 
   // TODO: 나중에 외부 state 로 분리할 것
