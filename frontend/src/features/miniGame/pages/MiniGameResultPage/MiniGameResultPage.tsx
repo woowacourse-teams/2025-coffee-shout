@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '@/apis/rest/api';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import Button from '@/components/@common/Button/Button';
@@ -8,21 +8,31 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import Layout from '@/layouts/Layout';
-import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
 import { colorList } from '@/constants/color';
-import { MiniGameType, PlayerRank, PlayerScore } from '@/types/miniGame';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import Layout from '@/layouts/Layout';
+import { MiniGameType } from '@/types/miniGame/common';
 import { Probability } from '@/types/roulette';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
-type RankResponse = {
+type PlayerRank = {
+  playerName: string;
+  rank: number;
+};
+type PlayerRankResponse = {
   ranks: PlayerRank[];
 };
-type ScoreResponse = {
+
+type PlayerScore = {
+  playerName: string;
+  score: number;
+};
+type PlayerScoreResponse = {
   scores: PlayerScore[];
 };
 
@@ -32,7 +42,7 @@ const MiniGameResultPage = () => {
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
-
+  const { getParticipantColorIndex } = useParticipants();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const [ranks, setRanks] = useState<PlayerRank[] | null>(null);
   const [scores, setScores] = useState<PlayerScore[] | null>(null);
@@ -70,10 +80,10 @@ const MiniGameResultPage = () => {
       try {
         setLoading(true);
 
-        const { ranks } = await api.get<RankResponse>(
+        const { ranks } = await api.get<PlayerRankResponse>(
           `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`
         );
-        const { scores } = await api.get<ScoreResponse>(
+        const { scores } = await api.get<PlayerScoreResponse>(
           `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`
         );
         ranks.sort((a, b) => a.rank - b.rank);
@@ -119,7 +129,10 @@ const MiniGameResultPage = () => {
                 <Headline3>
                   <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
                 </Headline3>
-                <PlayerCard name={playerRank.playerName} playerColor={'#FF6B6B'}>
+                <PlayerCard
+                  name={playerRank.playerName}
+                  playerColor={colorList[getParticipantColorIndex(playerRank.playerName)]}
+                >
                   <Headline4>
                     {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
                   </Headline4>

@@ -1,20 +1,11 @@
 import { Client, IFrame } from '@stomp/stompjs';
 import { useCallback, useState } from 'react';
-import { ConnectionParams } from '../constants/constants';
 import { createStompClient } from '../utils/createStompClient';
 import WebSocketErrorHandler from '../utils/WebSocketErrorHandler';
 
 export const useWebSocketConnection = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
-  const validateConnectionParams = useCallback((params: ConnectionParams): boolean => {
-    const { joinCode, myName, menuId } = params;
-    if (!joinCode || !myName || !menuId) {
-      return false;
-    }
-    return true;
-  }, []);
 
   const handleConnect = useCallback(() => {
     setIsConnected(true);
@@ -39,11 +30,10 @@ export const useWebSocketConnection = () => {
   }, []);
 
   const setupStompClient = useCallback(
-    (params: ConnectionParams): Client => {
+    (joinCode: string, myName: string): Client => {
       const stompClient = createStompClient({
-        joinCode: params.joinCode,
-        playerName: params.myName,
-        menuId: params.menuId,
+        joinCode,
+        playerName: myName,
       });
 
       stompClient.onConnect = handleConnect;
@@ -56,23 +46,37 @@ export const useWebSocketConnection = () => {
     [handleConnect, handleDisconnect, handleStompError, handleWebSocketError]
   );
 
+  const validateClient = useCallback(() => {
+    if (client && isConnected) return false;
+
+    if (client && !isConnected) {
+      client.deactivate();
+      setClient(null);
+    }
+
+    return true;
+  }, [client, isConnected]);
+
+  const validateConnectionParams = useCallback((joinCode: string, myName: string) => {
+    if (!joinCode || !myName) {
+      console.error('❌ WebSocket 연결 실패: 참여코드 또는 이름이 없습니다.', {
+        joinCode,
+        myName,
+      });
+      return false;
+    }
+    return true;
+  }, []);
+
   const startSocket = useCallback(
-    (joinCode: string, myName: string, menuId: number) => {
-      if (client && isConnected) return;
+    (joinCode: string, myName: string) => {
+      if (!validateClient() || !validateConnectionParams(joinCode, myName)) return;
 
-      if (client && !isConnected) {
-        client.deactivate();
-        setClient(null);
-      }
-
-      const params = { joinCode, myName, menuId };
-      if (!validateConnectionParams(params)) return;
-
-      const stompClient = setupStompClient(params);
+      const stompClient = setupStompClient(joinCode, myName);
       setClient(stompClient);
       stompClient.activate();
     },
-    [client, isConnected, validateConnectionParams, setupStompClient]
+    [validateClient, validateConnectionParams, setupStompClient]
   );
 
   const stopSocket = useCallback(() => {

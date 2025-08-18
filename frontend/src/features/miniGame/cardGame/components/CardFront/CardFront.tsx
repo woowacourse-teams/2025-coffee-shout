@@ -1,12 +1,12 @@
 import CardIcon from '@/assets/sign-inversion-icon.svg';
 import { ColorList } from '@/constants/color';
+import { Card } from '@/types/miniGame/cardGame';
 import { Size } from '@/types/styles';
-import { Card } from '../../constants/cards';
 import * as S from './CardFront.styled';
 
 type Props = {
   size?: Size;
-  playerColor?: ColorList;
+  playerColor?: ColorList | null;
   card: Card;
 };
 

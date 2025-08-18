@@ -2,7 +2,7 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import { createContext, useContext } from 'react';
 
 export type WebSocketContextType = {
-  startSocket: (joinCode: string, myName: string, menuId: number) => void;
+  startSocket: (joinCode: string, myName: string) => void;
   stopSocket: () => void;
   send: <T>(destination: string, body?: T, onError?: (error: Error) => void) => void;
   subscribe: <T>(
