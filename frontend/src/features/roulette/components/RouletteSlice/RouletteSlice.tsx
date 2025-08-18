@@ -12,20 +12,33 @@ const RouletteSlice = ({ player, strokeColor }: Props) => {
   const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
   const textPosition = getTextPosition(centerAngle);
 
+  const isFullCircle = player.startAngle === 0 && player.endAngle === 360;
+
   return (
     <g key={player.playerName}>
-      <path
-        d={describeArc({
-          cx: WHEEL_CONFIG.CENTER,
-          cy: WHEEL_CONFIG.CENTER,
-          r: WHEEL_CONFIG.RADIUS,
-          startAngle: player.startAngle,
-          endAngle: player.endAngle,
-        })}
-        fill={player.playerColor}
-        stroke={strokeColor}
-        strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
-      />
+      {isFullCircle ? (
+        <circle
+          cx={WHEEL_CONFIG.CENTER}
+          cy={WHEEL_CONFIG.CENTER}
+          r={WHEEL_CONFIG.RADIUS}
+          fill={player.playerColor}
+          stroke={strokeColor}
+          strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
+        />
+      ) : (
+        <path
+          d={describeArc({
+            cx: WHEEL_CONFIG.CENTER,
+            cy: WHEEL_CONFIG.CENTER,
+            r: WHEEL_CONFIG.RADIUS,
+            startAngle: player.startAngle,
+            endAngle: player.endAngle,
+          })}
+          fill={player.playerColor}
+          stroke={strokeColor}
+          strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
+        />
+      )}
       <S.PlayerNameText
         x={textPosition.x}
         y={textPosition.y}
