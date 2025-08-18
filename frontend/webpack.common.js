@@ -62,6 +62,7 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
+      favicon: './public/favicon.ico',
     }),
     new webpack.DefinePlugin(envKeys),
     sentryWebpackPlugin({
