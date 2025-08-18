@@ -30,10 +30,10 @@ public class StompSessionManager {
      * 플레이어 세션 매핑 등록
      */
     public void registerPlayerSession(String joinCode, String playerName, String sessionId) {
-        String playerKey = createPlayerKey(joinCode, playerName);
+        final String playerKey = createPlayerKey(joinCode, playerName);
 
         // 기존 세션이 있으면 정리
-        String oldSessionId = playerSessionMap.get(playerKey);
+        final String oldSessionId = playerSessionMap.get(playerKey);
         if (oldSessionId != null) {
             log.info("기존 플레이어 세션 정리: playerKey={}, oldSessionId={}", playerKey, oldSessionId);
             sessionPlayerMap.remove(oldSessionId);
@@ -48,12 +48,12 @@ public class StompSessionManager {
      * 플레이어의 기존 세션 ID 조회
      */
     public boolean hasSessionId(String joinCode, String playerName) {
-        String playerKey = createPlayerKey(joinCode, playerName);
+        final String playerKey = createPlayerKey(joinCode, playerName);
         return playerSessionMap.containsKey(playerKey);
     }
 
     public String getSessionId(String joinCode, String playerName) {
-        String playerKey = createPlayerKey(joinCode, playerName);
+        final String playerKey = createPlayerKey(joinCode, playerName);
 
         isTrue(playerSessionMap.containsKey(playerKey),
                 "플레이어 세션이 존재하지 않습니다: joinCode=%s, playerName=%s".formatted(joinCode, playerName));
@@ -80,7 +80,7 @@ public class StompSessionManager {
      */
     public String extractJoinCode(String playerKey) {
         validatePlayerKey(playerKey);
-        String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
+        final String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts[0];
     }
 
@@ -97,7 +97,7 @@ public class StompSessionManager {
      * 세션 매핑 제거
      */
     public void removeSession(String sessionId) {
-        String playerKey = sessionPlayerMap.remove(sessionId);
+        final String playerKey = sessionPlayerMap.remove(sessionId);
         if (playerKey != null) {
             playerSessionMap.remove(playerKey);
             log.info("세션 매핑 제거: playerKey={}, sessionId={}", playerKey, sessionId);
@@ -140,9 +140,9 @@ public class StompSessionManager {
         if (playerKey == null || !playerKey.contains(PLAYER_KEY_DELIMITER)) {
             return false;
         }
-        String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
+        final String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         return parts.length == EXPECTED_PLAYER_KEY_PARTS &&
-               !parts[0].isEmpty() && !parts[1].isEmpty();
+                !parts[0].isEmpty() && !parts[1].isEmpty();
     }
 
     /**
@@ -155,9 +155,10 @@ public class StompSessionManager {
         if (!playerKey.contains(PLAYER_KEY_DELIMITER)) {
             throw new IllegalArgumentException("플레이어 키에 구분자('" + PLAYER_KEY_DELIMITER + "')가 없습니다: " + playerKey);
         }
-        String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
+        final String[] parts = playerKey.split(PLAYER_KEY_DELIMITER);
         if (parts.length != EXPECTED_PLAYER_KEY_PARTS) {
-            throw new IllegalArgumentException("플레이어 키 형식이 잘못되었습니다. 예상: joinCode" + PLAYER_KEY_DELIMITER + "playerName, 실제: " + playerKey);
+            throw new IllegalArgumentException(
+                    "플레이어 키 형식이 잘못되었습니다. 예상: joinCode" + PLAYER_KEY_DELIMITER + "playerName, 실제: " + playerKey);
         }
         if (parts[0].isEmpty() || parts[1].isEmpty()) {
             throw new IllegalArgumentException("joinCode 또는 playerName이 비어있습니다: " + playerKey);

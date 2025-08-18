@@ -179,15 +179,6 @@ public class Room {
         return false;
     }
 
-    public void reJoin(PlayerName playerName, Menu menu) {
-        validateRoomReady();
-        validateCanJoin();
-        validatePlayerNameNotDuplicate(playerName);
-
-        final Player player = createPlayer(playerName, menu);
-        join(player);
-    }
-
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -232,7 +223,7 @@ public class Room {
 
     private void promoteNewHost() {
         final Player newHost = players.getRandomPlayer();
-        newHost.updateReadyState(true);
+        newHost.promote();
         this.host = newHost;
     }
 }
