@@ -11,7 +11,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import Layout from '@/layouts/Layout';
-import { MiniGameType } from '@/types/miniGame';
+import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
