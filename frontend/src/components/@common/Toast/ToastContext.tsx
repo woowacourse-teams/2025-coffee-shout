@@ -26,31 +26,44 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
     }
   }, []);
 
-  useEffect(() => {
-    return () => clearTimer();
-  }, [clearTimer]);
+  const resetToastState = useCallback(() => {
+    setMessage('');
+    setIsExiting(false);
+    timer.current = null;
+    exitTimer.current = null;
+  }, []);
 
-  const showToast = useCallback(
-    ({ message, type = 'info', duration = 3000 }: ToastOptions) => {
-      clearTimer();
-      setIsExiting(false);
+  const displayToast = useCallback((message: string, type: ToastType) => {
+    setIsExiting(false);
+    setMessage(message);
+    setType(type);
+  }, []);
 
-      setMessage(message);
-      setType(type);
-
+  const setupExitTimer = useCallback(
+    (duration: number) => {
       timer.current = setTimeout(() => {
         setIsExiting(true);
 
         exitTimer.current = setTimeout(() => {
-          setMessage('');
-          setIsExiting(false);
-          timer.current = null;
-          exitTimer.current = null;
+          resetToastState();
         }, 300);
       }, duration);
     },
-    [clearTimer]
+    [resetToastState]
   );
+
+  const showToast = useCallback(
+    ({ message, type = 'info', duration = 3000 }: ToastOptions) => {
+      clearTimer();
+      displayToast(message, type);
+      setupExitTimer(duration);
+    },
+    [clearTimer, displayToast, setupExitTimer]
+  );
+
+  useEffect(() => {
+    return () => clearTimer();
+  }, [clearTimer]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
