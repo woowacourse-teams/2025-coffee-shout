@@ -23,12 +23,12 @@ public class CardGameEventListener {
 
     @EventListener
     public void handleSelectCard(CardSelectEvent cardSelectEvent) {
-        snedCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
+        sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
     }
 
     @EventListener
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
-        snedCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
+        sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
     }
 
     @EventListener
@@ -41,7 +41,7 @@ public class CardGameEventListener {
         );
     }
 
-    private void snedCardGameState(CardGame cardSelectEvent, JoinCode cardSelectEvent1) {
+    private void sendCardGameState(CardGame cardSelectEvent, JoinCode cardSelectEvent1) {
         CardGame cardGame = cardSelectEvent;
         JoinCode joinCode = cardSelectEvent1;
         final MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
