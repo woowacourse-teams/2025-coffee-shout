@@ -18,6 +18,7 @@ management:
   metrics:
     enable:
       tomcat: true
+
   prometheus:
     metrics:
       export:
