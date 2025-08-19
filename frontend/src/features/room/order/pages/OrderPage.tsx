@@ -7,7 +7,6 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import IconButton from '@/components/@common/IconButton/IconButton';
-import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -19,7 +18,6 @@ const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { stopSocket, isConnected } = useWebSocket();
-  const { participants } = useParticipants();
   const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
 
   const handleToggle = () => {
@@ -51,11 +49,7 @@ const OrderPage = () => {
           <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
           <IconButton iconSrc={DetailIcon} onClick={handleToggle} />
         </S.ListHeader>
-        {viewMode === 'simple' ? (
-          <MenuCount participants={participants} />
-        ) : (
-          <PlayerMenu participants={participants} />
-        )}
+        {viewMode === 'simple' ? <MenuCount /> : <PlayerMenu />}
       </Layout.Content>
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         <Button variant="primary" onClick={handleClickGoMain}>

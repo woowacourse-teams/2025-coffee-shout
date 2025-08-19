@@ -1,13 +1,10 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import * as S from './MenuCount.styled';
-import { Player } from '@/types/player';
 
-type Props = {
-  participants: Player[];
-};
-
-const MenuCount = ({ participants }: Props) => {
+const MenuCount = () => {
+  const { participants } = useParticipants();
   const simpleViewMap = new Map<string, number>();
 
   participants.forEach((participant) => {
