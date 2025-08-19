@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
+import coffeeshout.minigame.commom.task.TaskManager;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -46,7 +46,7 @@ class CardGameServiceRealTimeTest {
     RoomService roomService;
 
     @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    CardGameTaskExecutors cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -87,7 +87,7 @@ class CardGameServiceRealTimeTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
+                TaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
             });
         }
