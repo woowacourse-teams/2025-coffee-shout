@@ -12,8 +12,9 @@ export const PlayerTypeProvider = ({ children }: PropsWithChildren) => {
   const setHost = () => {
     setPlayerType('HOST');
   };
+
   return (
-    <PlayerTypeContext.Provider value={{ playerType, setGuest, setHost }}>
+    <PlayerTypeContext.Provider value={{ playerType, setPlayerType, setGuest, setHost }}>
       {children}
     </PlayerTypeContext.Provider>
   );

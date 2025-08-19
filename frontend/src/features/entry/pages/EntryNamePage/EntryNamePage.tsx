@@ -66,11 +66,7 @@ const EntryNamePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button
-          variant={isButtonDisabled ? 'disabled' : 'primary'}
-          onClick={handleNavigateToMenu}
-          height="large"
-        >
+        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToMenu}>
           메뉴 선택하러 가기
         </Button>
       </Layout.ButtonBar>

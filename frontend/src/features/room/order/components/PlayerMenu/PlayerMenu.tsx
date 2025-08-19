@@ -1,12 +1,10 @@
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import * as S from './PlayerMenu.styled';
-import { Player } from '@/types/player';
 
-type Props = {
-  participants: Player[];
-};
+const PlayerMenu = () => {
+  const { participants } = useParticipants();
 
-const PlayerMenu = ({ participants }: Props) => {
   return (
     <S.OrderList>
       {participants.map((participant, index) => (
