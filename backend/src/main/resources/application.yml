@@ -27,7 +27,7 @@ management:
           - 0.9
           - 0.99
       maximum-expected-value:
-        http.server.requests: 2s # 예상 최대 응답 시간
+        http.server.requests: 3s # 예상 최대 응답 시간
 
   prometheus:
     metrics:
