@@ -76,7 +76,7 @@ tasks.register<Exec>("generateAsyncApiHtml") {
     commandLine(
         "npx", "-y", "@asyncapi/cli@latest",
         "generate", "fromTemplate", "asyncapi.yml",
-        "@asyncapi/html-template@3.0.0",
+        "@asyncapi/html-template@3.3.1",
         "--use-new-generator",
         "-o", "src/main/resources/static/docs",
         "--force-write",
