@@ -7,23 +7,14 @@ phases:
     commands:
       - cd frontend
       - npm install
+
   build:
     commands:
       - npm run build
+
   post_build:
     commands:
       - ls -al dist
-      - echo Post build phase started on `date`
-
-      # S3에 업로드 (GitHub Actions의 aws s3 sync와 동일)
-      - echo "Uploading to S3..."
-      - aws s3 sync frontend s3://techcourse-project-2025/coffee-shout/$FE_PATH/ --delete
-
-      # CloudFront 무효화
-      - echo "Creating CloudFront invalidation..."
-      - aws cloudfront create-invalidation --distribution-id $AWS_DISTRIBUTION_ID --paths "$FE_CACHE_PATH"
-
-      - echo Build completed on `date`
 
 artifacts:
   base-directory: frontend/dist
