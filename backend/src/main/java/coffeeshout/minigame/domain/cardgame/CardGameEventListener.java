@@ -1,5 +1,6 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import coffeeshout.generator.MessageResponse;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.dto.CardGameStartEvent;
@@ -22,16 +23,28 @@ public class CardGameEventListener {
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
     public void handleSelectCard(CardSelectEvent cardSelectEvent) {
         sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
     }
 
     @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
         sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
     }
 
     @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/round",
+            returnType = MiniGameStartMessage.class
+    )
     public void handleStart(CardGameStartEvent cardGameStartEvent) {
         CardGame cardGame = cardGameStartEvent.cardGame();
         JoinCode joinCode = cardGameStartEvent.joinCode();

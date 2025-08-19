@@ -3,7 +3,6 @@ package coffeeshout.minigame.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
@@ -13,26 +12,23 @@ import coffeeshout.common.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.minigame.commom.task.TaskManager;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +87,7 @@ class CardGameServiceTest extends ServiceTest {
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
 
-                MiniGameTaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
+                TaskManager<CardGameTaskType> executor = cardGameTaskExecutors.get(joinCode);
                 softly.assertThat(executor).isNotNull();
             });
         }
@@ -132,7 +128,7 @@ class CardGameServiceTest extends ServiceTest {
             // then
             verify(messagingTemplate, atLeast(6))
                     .convertAndSend(
-                            eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                            eq("/topic/room/" + joinCode.value() + "/gameState"),
                             any(WebSocketResponse.class)
                     );
         }
@@ -147,7 +143,7 @@ class CardGameServiceTest extends ServiceTest {
             cardGame.startPlay();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), host.getName().value(), 0);
 
             // then
             assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
@@ -159,11 +155,11 @@ class CardGameServiceTest extends ServiceTest {
             cardGame.startPlay();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), host.getName().value(), 0);
 
             // then
             verify(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    eq("/topic/room/" + joinCode.value() + "/gameState"),
                     any(WebSocketResponse.class)
             );
         }
@@ -176,11 +172,11 @@ class CardGameServiceTest extends ServiceTest {
 
             // when & then
             // 첫 번째 플레이어가 카드 선택
-            cardGameService.selectCard(joinCode.getValue(), players.get(0).getName().value(), 0);
+            cardGameService.selectCard(joinCode.value(), players.get(0).getName().value(), 0);
 
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), players.get(1).getName().value(), 0)
+                    cardGameService.selectCard(joinCode.value(), players.get(1).getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -188,7 +184,7 @@ class CardGameServiceTest extends ServiceTest {
         void 게임이_플레이_상태가_아니면_예외를_반환한다() {
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0)
+                    cardGameService.selectCard(joinCode.value(), host.getName().value(), 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -199,7 +195,7 @@ class CardGameServiceTest extends ServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
+                    cardGameService.selectCard(joinCode.value(), "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -210,7 +206,7 @@ class CardGameServiceTest extends ServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 999)
+                    cardGameService.selectCard(joinCode.value(), host.getName().value(), 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
     }

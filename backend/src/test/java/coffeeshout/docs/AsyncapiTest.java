@@ -2,7 +2,6 @@ package coffeeshout.docs;
 
 import coffeeshout.generator.AsyncApiGenerator;
 import coffeeshout.generator.JsonSchemaEnumType;
-import coffeeshout.generator.TestMessage;
 import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +42,7 @@ public class AsyncapiTest {
         for (Field field : MiniGameStateMessage.class.getDeclaredFields()) {
             JsonSchemaEnumType ann = field.getAnnotation(JsonSchemaEnumType.class);
             if (ann != null) {
-                Class<? extends Enum<?>> enumClass = ann.value();
+                Class<? extends Enum<?>> enumClass = ann.enumType();
 
                 // enum 값 배열 만들기
                 ArrayNode enumValues = mapper.createArrayNode();
@@ -120,7 +119,15 @@ public class AsyncapiTest {
     void operation테스트() throws JsonProcessingException {
         ObjectNode operation = mapper.createObjectNode();
         AsyncApiGenerator generator = new AsyncApiGenerator();
-        generator.generateOperation(operation);
+        generator.generateSendOperation(operation);
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(operation));
+    }
+
+    @Test
+    void topic_operation테스트() throws JsonProcessingException {
+        ObjectNode operation = mapper.createObjectNode();
+        AsyncApiGenerator generator = new AsyncApiGenerator();
+        generator.generateTopicOperation(operation);
         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(operation));
     }
 
@@ -139,7 +146,8 @@ public class AsyncapiTest {
         generator.generateMessage(message);
 
         ObjectNode operation = mapper.createObjectNode();
-        generator.generateOperation(operation);
+        generator.generateSendOperation(operation);
+        generator.generateTopicOperation(operation);
 
         root.put("asyncapi", "3.0.0");
         root.put("info", generator.generateMeta());

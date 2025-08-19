@@ -28,7 +28,42 @@ public class AsyncApiGenerator {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public JsonNode generateOperation(ObjectNode operationNode) {
+    public JsonNode generateTopicOperation(ObjectNode operationNode) {
+        /*
+            1. MessageMapping을 찾는다.
+            2. MessageMapping에 따라서 json정의
+            3. Operation이 있으면 summery, description 정의
+            4. MessageResponse있으면 reply정의
+         */
+        final Reflections reflections = new Reflections("coffeeshout", Scanners.MethodsAnnotated);
+        final Set<Method> methods = reflections.getMethodsAnnotatedWith(MessageResponse.class);
+        for (var method : methods) {
+            if (!isTopic(method)) {
+                continue;
+            }
+            ObjectNode body = mapper.createObjectNode();
+            Operation operation = method.getAnnotation(Operation.class);
+            MessageResponse messageResponse = method.getAnnotation(MessageResponse.class);
+            body.put("action", "receive");
+            body.put("channel", operationChannelRef(messageResponse.path(), "/topic"));
+            if (operation != null) {
+                body.put("summary", operation.summery());
+                body.put("description", operation.description());
+            }
+            ArrayNode messagesArray = mapper.createArrayNode();
+            messagesArray.add(messageParameterNode(messageResponse.returnType().getSimpleName()));
+            body.put("messages", messagesArray);
+            operationNode.put(messageResponse.path(), body);
+        }
+        return operationNode;
+    }
+
+    private boolean isTopic(Method method) {
+        return method.getAnnotation(MessageMapping.class) == null;
+    }
+
+
+    public JsonNode generateSendOperation(ObjectNode operationNode) {
         /*
             1. MessageMapping을 찾는다.
             2. MessageMapping에 따라서 json정의
@@ -57,7 +92,7 @@ public class AsyncApiGenerator {
             body.put("messages", messagesArray);
             if (messageResponse != null) {
                 ObjectNode reply = mapper.createObjectNode();
-                reply.put("channel", operationChannelRef(messageResponse.value(), "/topic"));
+                reply.put("channel", operationChannelRef(messageResponse.path(), "/topic"));
                 ArrayNode responseNodes = mapper.createArrayNode();
                 responseNodes.add(messageParameterNode(messageResponse.returnType().getSimpleName()));
                 reply.put("messages", responseNodes);
@@ -98,7 +133,7 @@ public class AsyncApiGenerator {
         final Set<Method> methods = reflections.getMethodsAnnotatedWith(MessageResponse.class);
         for (var method : methods) {
             MessageResponse annotation = method.getAnnotation(MessageResponse.class);
-            for (var payload : getParams(annotation.value())) {
+            for (var payload : getParams(annotation.path())) {
                 ret.add(payload);
             }
         }
@@ -138,7 +173,7 @@ public class AsyncApiGenerator {
         configBuilder.forFields().withEnumResolver(field -> {
                     JsonSchemaEnumType annotation = field.getAnnotation(JsonSchemaEnumType.class);
                     if (annotation != null) {
-                        Class<? extends Enum<?>> enumClass = annotation.value();
+                        Class<? extends Enum<?>> enumClass = annotation.enumType();
                         return Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList();
                     }
                     return null;
@@ -209,7 +244,7 @@ public class AsyncApiGenerator {
         final Set<Method> methods = reflections.getMethodsAnnotatedWith(MessageResponse.class);
         for (Method method : methods) {
             final MessageResponse annotation = method.getAnnotation(MessageResponse.class);
-            final String path = "/topic" + annotation.value();
+            final String path = "/topic" + annotation.path();
             final ObjectNode body = mapper.createObjectNode();
             final ObjectNode messageNode = mapper.createObjectNode();
             final ObjectNode paramNode = mapper.createObjectNode();
