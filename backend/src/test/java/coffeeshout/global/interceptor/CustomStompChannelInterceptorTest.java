@@ -76,8 +76,7 @@ class CustomStompChannelInterceptorTest {
                 delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
                 delayedPlayerRemovalService);
-        disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
-                delayedPlayerRemovalService);
+        disconnectPostSendHandler = new DisconnectPostSendHandler(webSocketMetricService);
         errorPreSendHandler = new ErrorPreSendHandler(sessionManager, webSocketMetricService,
                 delayedPlayerRemovalService);
 
@@ -290,23 +289,6 @@ class CustomStompChannelInterceptorTest {
             disconnectPostSendHandler.handle(accessor, sessionId, false);
 
             // then - 세션이 여전히 존재하는지 확인 (처리되지 않음)
-            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
-            then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
-        }
-
-        @Test
-        void 중복_처리_시_무시한다() {
-            // given - 먼저 세션을 등록하고 중복 처리 상태로 설정
-            sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
-            sessionManager.isDisconnectionProcessed(sessionId); // 중복 처리 상태로 만듦
-
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
-            accessor.setSessionId(sessionId);
-
-            // when
-            disconnectPostSendHandler.handle(accessor, sessionId, true);
-
-            // then - 세션이 여전히 존재하는지 확인 (중복 처리로 무시됨)
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
         }
