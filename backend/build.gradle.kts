@@ -73,15 +73,26 @@ tasks.register<Exec>("generateAsyncApiHtml") {
 
     dependsOn("generateAsyncApiYaml")
 
+    val outputDir = layout.buildDirectory.dir("generated-resources/static/docs")
+
     commandLine(
         "npx", "-y", "@asyncapi/cli@latest",
         "generate", "fromTemplate", "asyncapi.yml",
         "@asyncapi/html-template@3.3.1",
         "--use-new-generator",
-        "-o", "src/main/resources/static/docs",
+        "-o", outputDir.get().asFile.absolutePath,
         "--force-write",
         "-p", "singleFile=true"
     )
+    outputs.dir(outputDir)
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir(layout.buildDirectory.dir("generated-resources"))
+        }
+    }
 }
 
 /**
