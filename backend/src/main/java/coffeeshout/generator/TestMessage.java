@@ -1,14 +1,12 @@
-package coffeeshout.room.ui.request;
+package coffeeshout.generator;
 
-import coffeeshout.generator.JsonSchemaEnumType;
-import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.minigame.domain.task.CardGameTaskType;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
 import javax.validation.constraints.NotNull;
 
 @WebsocketMessage
-public record MenuChangeMessage(
+public record TestMessage(
 
         @JsonSchemaEnumType(CardGameTaskType.class)
         String playerName,

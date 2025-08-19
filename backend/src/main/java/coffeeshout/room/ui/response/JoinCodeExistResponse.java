@@ -1,5 +1,8 @@
 package coffeeshout.room.ui.response;
 
+import coffeeshout.generator.WebsocketMessage;
+
+@WebsocketMessage
 public record JoinCodeExistResponse(
         boolean exist
 ) {

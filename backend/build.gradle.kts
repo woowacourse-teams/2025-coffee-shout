@@ -31,6 +31,12 @@ dependencies {
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39")
+    implementation("org.reflections:reflections:0.10.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
+    implementation ("com.github.victools:jsonschema-generator:4.37.0")
+
+
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

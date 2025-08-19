@@ -1,10 +1,12 @@
 package coffeeshout.minigame.ui.request;
 
+import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.minigame.ui.command.MiniGameCommand;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@WebsocketMessage
 public record MiniGameMessage(
         CommandType commandType,
         JsonNode commandRequest
