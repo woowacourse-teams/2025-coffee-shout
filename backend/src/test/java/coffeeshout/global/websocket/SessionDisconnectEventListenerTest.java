@@ -3,6 +3,7 @@ package coffeeshout.global.websocket;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import coffeeshout.global.websocket.event.SessionDisconnectEventListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

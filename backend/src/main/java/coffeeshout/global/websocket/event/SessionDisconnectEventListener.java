@@ -1,5 +1,7 @@
-package coffeeshout.global.websocket;
+package coffeeshout.global.websocket.event;
 
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
+import coffeeshout.global.websocket.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -17,7 +19,7 @@ public class SessionDisconnectEventListener {
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
         final String sessionId = event.getSessionId();
-        
+
         log.info("세션 연결 해제 감지: sessionId={}", sessionId);
 
         // 중복 처리 방지
