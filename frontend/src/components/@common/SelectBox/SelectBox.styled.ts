@@ -101,7 +101,7 @@ export const Content = styled.ul<ContentProps>`
   border-radius: 4px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
-  max-height: 200px;
+  max-height: 160px;
   overflow-y: auto;
 
   margin: 0;
