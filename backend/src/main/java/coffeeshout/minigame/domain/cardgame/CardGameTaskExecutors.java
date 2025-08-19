@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.commom.task.TaskManager;
+import coffeeshout.minigame.commom.task.TaskManager;
 import coffeeshout.room.domain.JoinCode;
 import java.util.HashMap;
 import java.util.Map;

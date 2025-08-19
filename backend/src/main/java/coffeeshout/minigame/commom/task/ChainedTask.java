@@ -1,4 +1,4 @@
-package coffeeshout.commom.task;
+package coffeeshout.minigame.commom.task;
 
 import java.time.Duration;
 import java.time.Instant;
