@@ -7,12 +7,6 @@ on:
     paths:
       - "frontend/**"
 
-  # 커밋이 푸시될 때
-  push:
-    branches: [fe/dev, fe/prod]
-    paths:
-      - "frontend/**"
-
   # 다른 워크플로우에서 호출할 수 있도록 설정
   workflow_call:
     outputs:
