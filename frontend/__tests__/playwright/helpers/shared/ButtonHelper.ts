@@ -46,6 +46,14 @@ export class ButtonHelper extends BaseButtonHelper {
     await this.clickButton('메뉴 선택하러 가기');
   }
 
+  async clickSkipDescriptionIfExists() {
+    const skipButton = this.getButton('건너뛰기');
+    const isVisible = await skipButton.isVisible();
+    if (isVisible) {
+      await skipButton.click();
+    }
+  }
+
   async clickGoToCreateRoom() {
     await this.clickButton('방 만들러 가기');
   }

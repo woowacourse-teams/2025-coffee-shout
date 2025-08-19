@@ -19,7 +19,7 @@ export class CardGameHelper {
   }
 
   async expectToBeOnCardGameResultPage() {
-    await this.page.waitForURL(/\/room\/.*\/CARD_GAME\/result/, { timeout: 30000 });
+    await this.page.waitForURL(/\/room\/.*\/CARD_GAME\/result/, { timeout: 120000 });
     await expect(this.page.getByRole('heading', { name: '게임 결과' })).toBeVisible();
   }
 

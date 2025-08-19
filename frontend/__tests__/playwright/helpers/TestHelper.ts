@@ -39,6 +39,7 @@ export class TestHelper {
     await this.form.selectMenu(menuIndex);
     await this.button.clickGoToCreateRoom();
     await this.lobby.expectToBeOnLobbyPage();
+    await this.button.clickSkipDescriptionIfExists();
   }
 
   /**
@@ -60,6 +61,7 @@ export class TestHelper {
     await this.form.selectMenu(menuIndex);
     await this.button.clickEnterRoom();
     await this.lobby.expectToBeOnLobbyPage();
+    await this.button.clickSkipDescriptionIfExists();
   }
 
   /**

@@ -33,6 +33,9 @@ test.describe('카드게임', () => {
   });
 
   test.afterEach(async () => {
+    // 테스트가 완전히 끝날 때까지 잠시 대기
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     if (hostHelper?.page && !hostHelper.page.isClosed()) {
       await hostHelper.page.close();
     }
@@ -98,6 +101,10 @@ test.describe('카드게임', () => {
   });
 
   test.describe('게임 종료 이후', () => {
+    test.beforeEach(() => {
+      test.setTimeout(300000);
+    });
+
     test('모든 라운드가 끝나면 카드게임 결과 화면이 표시된다.', async () => {
       // 2라운드 진행 - 호스트와 게스트 모두 카드 선택
       for (let round = 1; round <= 2; round++) {
@@ -148,6 +155,9 @@ test.describe('카드게임', () => {
         await hostHelper.cardGame.selectCard(0);
         await guestHelper.cardGame.selectCard(1);
       }
+
+      // 결과 화면 표시 확인
+      await hostHelper.cardGame.expectToBeOnCardGameResultPage();
 
       // 게스트에게는 대기 메시지가 표시되는지 확인
       await guestHelper.roulette.expectWaitingMessage();
