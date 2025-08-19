@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -32,6 +33,25 @@ public class RestExceptionHandler {
             @Override
             public String getMessage() {
                 return "서버 오류가 발생했습니다.";
+            }
+        });
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFoundException(
+            NoResourceFoundException exception,
+            HttpServletRequest request
+    ) {
+        logWarning(exception, request);
+        return getProblemDetail(HttpStatus.NOT_FOUND, exception, new ErrorCode() {
+            @Override
+            public String getCode() {
+                return "RESOURCE_NOT_FOUND";
+            }
+
+            @Override
+            public String getMessage() {
+                return "요청한 리소스를 찾을 수 없습니다.";
             }
         });
     }
