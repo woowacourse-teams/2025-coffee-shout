@@ -7,8 +7,6 @@ import coffeeshout.room.ui.request.RoomCreateRequest;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
-import coffeeshout.room.ui.response.MiniGameResponse;
-import coffeeshout.room.ui.response.MiniGameSelectedResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;

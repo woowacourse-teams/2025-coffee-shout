@@ -17,7 +17,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -125,7 +124,6 @@ public class RoomWebSocketController {
     )
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
         final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
-        roomService.delayCleanUp(joinCode);
 
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
                 WebSocketResponse.success(winner));

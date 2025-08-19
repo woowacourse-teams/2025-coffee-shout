@@ -26,17 +26,4 @@ public class WebSocketExceptionHandler {
                 WebSocketResponse.error("처리 중 오류가 발생했습니다.")
         );
     }
-
-    private String extractJoinCodeFromDestination(String destination) {
-        if (destination == null) {
-            return null;
-        }
-
-        // "/app/room/{joinCode}/..." 패턴에서 joinCode 추출
-        final String[] parts = destination.split("/");
-        if (parts.length >= 4 && "room".equals(parts[2])) {
-            return parts[3];
-        }
-        return null;
-    }
 }

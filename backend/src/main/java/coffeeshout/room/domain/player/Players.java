@@ -67,4 +67,8 @@ public class Players {
     public Player getRandomPlayer() {
         return players.get(RANDOM.nextInt(players.size()));
     }
+
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
 }

@@ -170,7 +170,7 @@ public class Room {
             players.removePlayer(playerName);
 
             // 호스트가 나간 경우 새로운 호스트 지정
-            if (host.sameName(playerName) && players.getPlayerCount() > 0) {
+            if (host.sameName(playerName) && !players.isEmpty()) {
                 promoteNewHost();
             }
 
@@ -180,13 +180,8 @@ public class Room {
         return false;
     }
 
-    public void reJoin(PlayerName playerName, Menu menu) {
-        validateRoomReady();
-        validateCanJoin();
-        validatePlayerNameNotDuplicate(playerName);
-
-        final Player player = createPlayer(playerName, menu);
-        join(player);
+    public boolean isEmpty() {
+        return players.isEmpty();
     }
 
     private boolean hasEnoughPlayers() {
@@ -224,16 +219,9 @@ public class Room {
         }
     }
 
-    private Player createPlayer(PlayerName playerName, Menu menu) {
-        if (host.sameName(playerName)) {
-            return Player.createHost(playerName, menu);
-        }
-        return Player.createGuest(playerName, menu);
-    }
-
     private void promoteNewHost() {
         final Player newHost = players.getRandomPlayer();
-        newHost.updateReadyState(true);
+        newHost.promote();
         this.host = newHost;
     }
 }

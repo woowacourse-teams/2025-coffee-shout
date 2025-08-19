@@ -15,7 +15,6 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class RoomService {
     private final JoinCodeGenerator joinCodeGenerator;
 
     public Room createRoom(String hostName, Long menuId) {
-        final Menu menu = menuQueryService.findById(menuId);
+        final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
 
@@ -40,8 +39,8 @@ public class RoomService {
     }
 
     public Room enterRoom(String joinCode, String guestName, Long menuId) {
-        final Menu menu = menuQueryService.findById(menuId);
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Menu menu = menuQueryService.getById(menuId);
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         room.joinGuest(new PlayerName(guestName), menu);
 
@@ -49,14 +48,14 @@ public class RoomService {
     }
 
     public List<Player> getAllPlayers(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         return room.getPlayers();
     }
 
     public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        final Menu menu = menuQueryService.findById(menuId);
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
         player.selectMenu(menu);
@@ -65,7 +64,7 @@ public class RoomService {
     }
 
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player player = room.findPlayer(new PlayerName(playerName));
 
         player.updateReadyState(isReady);
@@ -74,7 +73,7 @@ public class RoomService {
     }
 
     public Map<Player, Probability> getProbabilities(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         return room.getProbabilities();
     }
@@ -85,7 +84,7 @@ public class RoomService {
     }
 
     public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.clearMiniGames();
 
         miniGameTypes.forEach(miniGameType -> {
@@ -103,45 +102,45 @@ public class RoomService {
     }
 
     public Winner spinRoulette(String joinCode, String hostName) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
         return room.spinRoulette(host);
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         return room.hasDuplicatePlayerName(new PlayerName(guestName));
     }
 
-    public void delayCleanUp(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-
-        roomCommandService.delayCleanUp(room, Duration.ofHours(1));
-    }
-
     public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Playable miniGame = room.findMiniGame(miniGameType);
 
         return miniGame.getScores();
     }
 
     public MiniGameResult getMiniGameRanks(String joinCode, MiniGameType miniGameType) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Playable miniGame = room.findMiniGame(miniGameType);
 
         return miniGame.getResult();
     }
 
     public List<MiniGameType> getSelectedMiniGames(String joinCode) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.getSelectedMiniGameTypes();
     }
 
     public boolean removePlayer(String joinCode, String playerName) {
-        final Room room = roomQueryService.findByJoinCode(new JoinCode(joinCode));
-        return room.removePlayer(new PlayerName(playerName));
+        final JoinCode code = new JoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(code);
+        final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
+        if (room.isEmpty()) {
+            roomCommandService.delete(code);
+        }
+
+        return isRemoved;
     }
 }
