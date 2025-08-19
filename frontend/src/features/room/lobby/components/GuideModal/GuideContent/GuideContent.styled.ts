@@ -9,8 +9,8 @@ export const ContentContainer = styled.div`
 `;
 
 export const ImageContainer = styled.div`
-  width: 200px;
-  height: 380px;
+  width: 40%;
+  height: 70%;
   margin: 16px 0px;
 `;
 
