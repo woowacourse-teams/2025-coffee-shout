@@ -17,14 +17,12 @@ const appVersion = packageJson.version;
 
 const envKeys = Object.keys(mergedEnv).reduce(
   (acc, key) => {
-    if (key.startsWith('REACT_APP_')) {
-      acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
-    }
+    acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
     return acc;
   },
   {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-    'process.env.REACT_APP_VERSION': JSON.stringify(appVersion),
+    'process.env.VERSION': JSON.stringify(appVersion),
   }
 );
 
