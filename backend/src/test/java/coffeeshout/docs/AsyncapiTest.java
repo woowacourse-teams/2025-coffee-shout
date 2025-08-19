@@ -164,5 +164,6 @@ public class AsyncapiTest {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String yaml = yamlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         System.out.println(yaml);
+        generator.generateAsyncapiYml();
     }
 }

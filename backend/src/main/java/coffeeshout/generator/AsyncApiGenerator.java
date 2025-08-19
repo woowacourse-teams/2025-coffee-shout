@@ -4,14 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import com.github.victools.jsonschema.generator.SchemaVersion;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,14 +26,60 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.stereotype.Component;
 
 public class AsyncApiGenerator {
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void generateAsyncapiYml() throws IOException {
+        ObjectNode root = mapper.createObjectNode();
+        ObjectNode channel = mapper.createObjectNode();
+        generateAppChannel(channel);
+        generateTopicChannel(channel);
+
+        ObjectNode schema = mapper.createObjectNode();
+        generateSchema(schema);
+
+        ObjectNode message = mapper.createObjectNode();
+        generateMessage(message);
+
+        ObjectNode operation = mapper.createObjectNode();
+        generateSendOperation(operation);
+        generateTopicOperation(operation);
+
+        root.put("asyncapi", "3.0.0");
+        root.put("info", generateMeta());
+
+        root.put("channels", channel);
+        root.put("operations", operation);
+
+        ObjectNode components = mapper.createObjectNode();
+        components.put("messages", message);
+        components.put("schemas", schema);
+
+        root.put("components", components);
+
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        String yaml = yamlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        Path path = Paths.get("asyncapi.yml"); // 현재 실행 경로에 저장
+        Files.write(path, yaml.getBytes(StandardCharsets.UTF_8));
+
+       /*
+       asyncapi generate fromTemplate asyncapi.yml @asyncapi/html-template@3.0.0 --use-new-generator -o ./output/dev --force-write -p singleFile=true
+       이 요청 보내서 파일 생성하기 index.html파일 생성하기
+
+
+        */
+    }
 
     public JsonNode generateTopicOperation(ObjectNode operationNode) {
         /*
@@ -143,7 +196,7 @@ public class AsyncApiGenerator {
     public JsonNode generateMeta() {
         final ObjectNode metadata = mapper.createObjectNode();
         metadata.put("title", "coffee-shout wesocket docs");
-        metadata.put("version", "2025-08-17T11:33:48Z");
+        metadata.put("version", LocalDateTime.now().toString());
         metadata.put("description", "커피빵에서 사용되는 웹소켓 명세서");
         return metadata;
     }
@@ -304,5 +357,9 @@ public class AsyncApiGenerator {
             results.add(matcher.group(1));
         }
         return results;
+    }
+
+    public static void main(String[] args) throws Exception {
+        new AsyncApiGenerator().generateAsyncapiYml();
     }
 }

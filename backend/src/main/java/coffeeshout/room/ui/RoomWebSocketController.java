@@ -31,7 +31,7 @@ public class RoomWebSocketController {
             returnType = PlayerResponse.class
     )
     @Operation(
-            summery = "summery",
+            summery = "summary",
             description = "description"
     )
     @MessageMapping("/room/{joinCode}/update-players")
