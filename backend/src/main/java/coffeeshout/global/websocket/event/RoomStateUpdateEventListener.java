@@ -24,13 +24,18 @@ public class RoomStateUpdateEventListener {
         try {
             log.info("방 상태 업데이트 이벤트 처리: joinCode={}, reason={}", event.joinCode(), event.reason());
 
-            sendPlayerStatus(event.joinCode());
-            sendProbabilitiesStatus(event.joinCode());
+            broadcastRoomState(event.joinCode());
 
             log.info("방 상태 브로드캐스트 완료: joinCode={}", event.joinCode());
-
         } catch (Exception e) {
             log.error("방 상태 업데이트 이벤트 처리 실패: joinCode={}, reason={}", event.joinCode(), event.reason(), e);
+        }
+    }
+
+    private void broadcastRoomState(String joinCode) {
+        if (roomService.roomExists(joinCode)) {
+            sendPlayerStatus(joinCode);
+            sendProbabilitiesStatus(joinCode);
         }
     }
 
