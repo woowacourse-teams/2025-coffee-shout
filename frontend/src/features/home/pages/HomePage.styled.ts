@@ -13,9 +13,18 @@ export const Logo = styled.img`
   right: 20px;
   -webkit-user-drag: none;
   user-select: none;
+  width: 50%;
 
-  @media (max-height: 675px) {
-    display: none;
+  @media (max-height: 650px) {
+    width: 45%;
+  }
+
+  @media (max-height: 580px) {
+    width: 35%;
+  }
+
+  @media (max-height: 500px) {
+    width: 25%;
   }
 `;
 
