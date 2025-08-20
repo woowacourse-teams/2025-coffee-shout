@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
@@ -71,7 +72,9 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player player = room.findPlayer(new PlayerName(playerName));
 
-        player.updateReadyState(isReady);
+        if (player.getPlayerType() != PlayerType.HOST) {
+            player.updateReadyState(isReady);
+        }
 
         return room.getPlayers();
     }
