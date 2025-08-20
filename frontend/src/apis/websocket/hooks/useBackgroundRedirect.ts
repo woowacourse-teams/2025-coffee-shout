@@ -21,7 +21,6 @@ export const useBackgroundRedirect = ({ isConnected, isVisible }: Props) => {
     const currentUser = participants.find((participant) => participant.playerName === myName);
 
     if (!participants.length || !currentUser) {
-      console.log('❌ 사용자 정보에서 자기 자신을 찾을 수 없음 - 홈으로 리디렉션');
       navigate('/', { replace: true });
     }
   }, [myName, participants, navigate]);
