@@ -3,6 +3,7 @@ package coffeeshout.room.application;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 
 import coffeeshout.room.domain.JoinCode;
@@ -31,11 +32,11 @@ class DelayedRoomRemovalServiceTest {
     @SuppressWarnings("rawtypes")
     ScheduledFuture scheduledFuture;
 
-    private DelayedRoomRemovalService delayedRoomRemovalService;
+    DelayedRoomRemovalService delayedRoomRemovalService;
 
     @BeforeEach
     void setUp() {
-        Duration removalDelay = Duration.ofMillis(500);
+        Duration removalDelay = Duration.ofMillis(100);
 
         delayedRoomRemovalService = new DelayedRoomRemovalService(
                 taskScheduler,
@@ -81,6 +82,26 @@ class DelayedRoomRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void RoomCommandService가_정상_호출된다() {
             JoinCode joinCode = new JoinCode("ABCDE");
+            given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
+                    .willAnswer(invocation -> {
+                        Runnable task = invocation.getArgument(0);
+                        task.run();
+                        return scheduledFuture;
+                    });
+
+            delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
+
+            then(roomCommandService).should().delete(joinCode);
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        void RoomCommandService에서_예외_발생해도_안전하게_처리한다() {
+            JoinCode joinCode = new JoinCode("ABCDE");
+            willThrow(new RuntimeException("방 삭제 실패"))
+                    .given(roomCommandService)
+                    .delete(any(JoinCode.class));
+
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willAnswer(invocation -> {
                         Runnable task = invocation.getArgument(0);
