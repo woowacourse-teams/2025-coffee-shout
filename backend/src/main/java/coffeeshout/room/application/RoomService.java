@@ -152,7 +152,7 @@ public class RoomService {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
         } catch (Exception e) {
-            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode, e);
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.value(), e);
         }
     }
 }
