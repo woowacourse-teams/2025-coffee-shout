@@ -29,11 +29,7 @@ export const useBackgroundRedirect = ({ isConnected, isVisible }: Props) => {
     if (!isVisible && isConnected) {
       wasConnectedBeforeBackground.current = true;
     } else if (isVisible && wasConnectedBeforeBackground.current) {
-      const timeoutId = setTimeout(() => {
-        checkUserExistsAndRedirect();
-      }, 200);
-
-      return () => clearTimeout(timeoutId);
+      checkUserExistsAndRedirect();
     }
   }, [isVisible, isConnected, checkUserExistsAndRedirect]);
 };
