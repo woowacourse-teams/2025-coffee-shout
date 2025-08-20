@@ -61,19 +61,20 @@ tasks.register<JavaExec>("generateAsyncApiYaml") {
     group = "documentation"
     description = "Generate asyncapi.yml using AsyncApiGenerator"
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("coffeeshout.generator.AsyncApiGenerator") // 여기에 main 메서드 있어야 함
+    mainClass.set("coffeeshout.generator.AsyncApiGenerator")
+    outputs.file("asyncapi.yml")
 }
 
 /**
  * 2. AsyncAPI CLI로 HTML 생성
  */
-tasks.register<Exec>("generateAsyncApiHtml") {
+val generateAsyncApiHtml = tasks.register<Exec>("generateAsyncApiHtml") {
     group = "documentation"
     description = "Generate HTML docs from asyncapi.yml"
 
     dependsOn("generateAsyncApiYaml")
 
-    val outputDir = layout.buildDirectory.dir("generated-resources/static/docs")
+    val outputDir = layout.buildDirectory.dir("generated-docs/static/docs")
 
     commandLine(
         "npx", "-y", "@asyncapi/cli@latest",
@@ -87,17 +88,12 @@ tasks.register<Exec>("generateAsyncApiHtml") {
     outputs.dir(outputDir)
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDir(layout.buildDirectory.dir("generated-resources"))
-        }
-    }
-}
-
 /**
- * 3. build 시 자동 실행
+ * 3. bootJar에 결과물 포함시키기
  */
-tasks.named("build") {
-    dependsOn("generateAsyncApiHtml")
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    dependsOn(generateAsyncApiHtml) // jar 만들기 전에 docs 생성
+    from(layout.buildDirectory.dir("generated-docs")) {
+        into("BOOT-INF/classes/") // 리소스로 들어가게
+    }
 }
