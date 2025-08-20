@@ -29,11 +29,13 @@ public class RoomService {
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
     private final JoinCodeGenerator joinCodeGenerator;
+    private final DelayedRoomRemovalService delayedRoomRemovalService;
 
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
+        delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
     }
