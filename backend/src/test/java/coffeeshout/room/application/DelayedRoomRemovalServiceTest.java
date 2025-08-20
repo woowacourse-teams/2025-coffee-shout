@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import coffeeshout.room.domain.JoinCode;
@@ -14,23 +15,22 @@ import java.util.concurrent.ScheduledFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class DelayedRoomRemovalServiceTest {
 
-    @MockitoBean
+    @Mock
     RoomCommandService roomCommandService;
 
-    @MockitoBean
+    @Mock
     TaskScheduler taskScheduler;
 
-    @Mock
-    @SuppressWarnings("rawtypes")
-    ScheduledFuture scheduledFuture;
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    ScheduledFuture scheduledFuture = mock(ScheduledFuture.class);
 
     DelayedRoomRemovalService delayedRoomRemovalService;
 
