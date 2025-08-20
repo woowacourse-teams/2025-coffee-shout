@@ -15,6 +15,7 @@ import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
@@ -44,8 +45,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Autowired
     private MenuRepository menuRepository;
 
+    @Autowired
+    private JoinCodeGenerator joinCodeGenerator;
+
     private Room testRoom;
-    private Menu testMenu;
 
     @BeforeEach
     void setUp() {
@@ -286,10 +289,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     private void setupTestData() {
         // 메뉴 생성
-        testMenu = menuRepository.findAll().get(0);
+        final Menu testMenu = menuRepository.findAll().get(0);
 
-        // 방 생성 - 호스트와 함께
-        JoinCode joinCode = new JoinCode("TEST2"); // 5자리로 수정
+        // 고유한 JoinCode 생성으로 테스트 격리
+        JoinCode joinCode = joinCodeGenerator.generate();
         PlayerName hostName = new PlayerName("호스트꾹이");
         testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
 

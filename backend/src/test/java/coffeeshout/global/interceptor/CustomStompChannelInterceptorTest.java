@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
@@ -13,9 +12,8 @@ import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler
 import coffeeshout.global.interceptor.handler.presend.ConnectPreSendHandler;
 import coffeeshout.global.interceptor.handler.presend.ErrorPreSendHandler;
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.PlayerDisconnectionService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
@@ -32,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -43,54 +40,45 @@ import org.springframework.messaging.support.MessageBuilder;
 class CustomStompChannelInterceptorTest {
 
     @Mock
-    private WebSocketMetricService webSocketMetricService;
+    WebSocketMetricService webSocketMetricService;
 
     @Mock
-    private RoomQueryService roomQueryService;
+    RoomQueryService roomQueryService;
 
     @Mock
-    private MenuQueryService menuQueryService;
+    MenuQueryService menuQueryService;
 
     @Mock
-    private MessageChannel channel;
+    MessageChannel channel;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
-    private StompSessionManager sessionManager;
-    private CustomStompChannelInterceptor interceptor;
+    StompSessionManager sessionManager;
+    CustomStompChannelInterceptor interceptor;
 
-    private ConnectPreSendHandler connectPreSendHandler;
-    private ConnectPostSendHandler connectPostSendHandler;
-    private DisconnectPostSendHandler disconnectPostSendHandler;
-    private ErrorPreSendHandler errorPreSendHandler;
+    ConnectPreSendHandler connectPreSendHandler;
+    ConnectPostSendHandler connectPostSendHandler;
+    DisconnectPostSendHandler disconnectPostSendHandler;
+    ErrorPreSendHandler errorPreSendHandler;
 
-    private final String sessionId = "test-session-id";
-    private final String joinCode = "TEV23";
-    private final String playerName = "testPlayer";
+    final String sessionId = "test-session-id";
+    final String joinCode = "TEV23";
+    final String playerName = "testPlayer";
 
     @BeforeEach
     void setUp() {
         // 실제 구현체 생성
         sessionManager = new StompSessionManager();
-        final RoomService roomService = mock(RoomService.class);
-        final PlayerDisconnectionService playerDisconnectionService = new PlayerDisconnectionService(sessionManager,
-                roomService);
-        eventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(Object event) {
-            }
-        };
 
         // 핸들러들 생성
         connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
-                menuQueryService);
+                delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
-        disconnectPostSendHandler = new DisconnectPostSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService, eventPublisher);
+                delayedPlayerRemovalService);
+        disconnectPostSendHandler = new DisconnectPostSendHandler(webSocketMetricService);
         errorPreSendHandler = new ErrorPreSendHandler(sessionManager, webSocketMetricService,
-                playerDisconnectionService);
+                delayedPlayerRemovalService);
 
         // 핸들러 레지스트리 생성
         final StompHandlerRegistry handlerRegistry = new StompHandlerRegistry(
@@ -194,8 +182,8 @@ class CustomStompChannelInterceptorTest {
             Menu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
-            given(roomQueryService.findByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
-            given(menuQueryService.findById(1L)).willReturn(testMenu);
+            given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
+            given(menuQueryService.getById(1L)).willReturn(testMenu);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);
@@ -304,23 +292,6 @@ class CustomStompChannelInterceptorTest {
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
         }
-
-        @Test
-        void 중복_처리_시_무시한다() {
-            // given - 먼저 세션을 등록하고 중복 처리 상태로 설정
-            sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
-            sessionManager.isDisconnectionProcessed(sessionId); // 중복 처리 상태로 만듦
-
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
-            accessor.setSessionId(sessionId);
-
-            // when
-            disconnectPostSendHandler.handle(accessor, sessionId, true);
-
-            // then - 세션이 여전히 존재하는지 확인 (중복 처리로 무시됨)
-            assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
-            then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
-        }
     }
 
     @Nested
@@ -339,7 +310,6 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션이 제거되었는지 확인
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
         }
 

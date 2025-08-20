@@ -1,6 +1,5 @@
 package coffeeshout.global.log;
 
-import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -8,7 +7,6 @@ import coffeeshout.room.domain.player.Player;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;

@@ -11,9 +11,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameRound;
 import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutorsV2;
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
+import coffeeshout.minigame.commom.task.TaskManager;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
@@ -47,7 +47,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     ObjectMapper objectMapper;
 
     @Autowired
-    CardGameTaskExecutorsV2 cardGameTaskExecutors;
+    CardGameTaskExecutors cardGameTaskExecutors;
 
     JoinCode joinCode;
 
@@ -67,7 +67,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @AfterEach
     void tearDown() {
         // 실행 중인 모든 태스크 취소 및 스레드 정리
-        MiniGameTaskManager<CardGameTaskType> manager = cardGameTaskExecutors.get(joinCode);
+        TaskManager<CardGameTaskType> manager = cardGameTaskExecutors.get(joinCode);
         manager.cancelAll();
     }
 
@@ -106,7 +106,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
             softly.assertThat(startResponse.miniGameType()).isEqualTo(MiniGameType.CARD_GAME);
 
             MiniGameStateMessage loadingStateResponse = responses.get().data();
-            softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+            softly.assertThat(loadingStateResponse.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
             softly.assertThat(loadingStateResponse.currentRound()).isEqualTo(CardGameRound.FIRST.name());
         });
     }
@@ -128,14 +128,14 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         sendStartGame(session, joinCode, host.getName().value());
 
         MiniGameStateMessage loadingState = responses.get().data(); // 게임 로딩 state 응답 (LOADING)
-        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
 
-        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_DESCRIPTION);
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
-        MiniGameStateMessage descriptionState = responses.get().data();
-        assertThat(descriptionState.cardGameState()).isEqualTo(CardGameState.DESCRIPTION.name());
+        responses.get(); // PREPARE
 
-        MiniGameStateMessage playingState = responses.get().data();
+        MiniGameStateMessage playingState = responses.get().data(); // 게임 시작 state 응답 (PLAYING)
+        assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
 
         String playerName = "꾹이";
         int cardIndex = 0;
@@ -179,15 +179,17 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // LOADING 상태 확인
         MiniGameStateMessage loadingState = responses.get().data();
-        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.LOADING.name());
+        assertThat(loadingState.cardGameState()).isEqualTo(CardGameState.FIRST_LOADING.name());
 
+        responses.get(); // PREPARE
 
-        MiniGameStateMessage descriptionState = responses.get().data();
+        // PLAYING 상태 확인
+        MiniGameStateMessage playingState = responses.get().data();
 
-        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_DESCRIPTION);
+        cardGameTaskExecutors.get(joinCode).join(CardGameTaskType.FIRST_ROUND_LOADING);
 
-        assertThat(descriptionState.cardGameState()).isEqualTo(CardGameState.DESCRIPTION.name());
-        assertThat(descriptionState.currentRound()).isEqualTo(CardGameRound.FIRST.name());
+        assertThat(playingState.cardGameState()).isEqualTo(CardGameState.PLAYING.name());
+        assertThat(playingState.currentRound()).isEqualTo(CardGameRound.FIRST.name());
 
         // 모든 플레이어가 카드 선택
         for (int i = 0; i < players.size(); i++) {
@@ -201,7 +203,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         }
 
         // 첫 번째 라운드 완료 후 SCORE_BOARD 상태로 변경
-        MiniGameStateMessage scoreBoardState = responses.get(12, TimeUnit.SECONDS).data();
+        MiniGameStateMessage scoreBoardState = responses.get(11, TimeUnit.SECONDS).data();
         assertThat(scoreBoardState.cardGameState()).isEqualTo(CardGameState.SCORE_BOARD.name());
 
         // 두 번째 라운드 시작
@@ -229,7 +231,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
-        responses.get(); // DESCRIPTION
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         // when
@@ -286,7 +288,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
-        responses.get(); // DESCRIPTION
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         // when
@@ -347,7 +349,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         sendStartGame(session, joinCode, host.getName().value());
         responses.get(); // LOADING
-        responses.get(); // DESCRIPTION
+        responses.get(); // PREPARE
         responses.get(); // PLAYING
 
         String playerName = "꾹이";

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e  # 에러 발생 시 즉시 종료
+export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [BEFORE_INSTALL] 커피빵 게임 서버 배포 준비 ==="
 

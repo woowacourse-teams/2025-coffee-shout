@@ -1,26 +1,25 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.domain.task.CardGameTaskType;
-import coffeeshout.minigame.domain.task.MiniGameTaskManager;
+import coffeeshout.minigame.commom.task.TaskManager;
 import coffeeshout.room.domain.JoinCode;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CardGameTaskExecutorsV2 {
+public class CardGameTaskExecutors {
 
-    private final Map<JoinCode, MiniGameTaskManager<CardGameTaskType>> roomTaskExecutorMap;
+    private final Map<JoinCode, TaskManager<CardGameTaskType>> roomTaskExecutorMap;
 
-    public CardGameTaskExecutorsV2() {
+    public CardGameTaskExecutors() {
         this.roomTaskExecutorMap = new HashMap<>();
     }
 
-    public void put(JoinCode joinCode, MiniGameTaskManager<CardGameTaskType> executor) {
+    public void put(JoinCode joinCode, TaskManager<CardGameTaskType> executor) {
         roomTaskExecutorMap.put(joinCode, executor);
     }
 
-    public MiniGameTaskManager<CardGameTaskType> get(JoinCode joinCode) {
+    public TaskManager<CardGameTaskType> get(JoinCode joinCode) {
         return roomTaskExecutorMap.get(joinCode);
     }
 
