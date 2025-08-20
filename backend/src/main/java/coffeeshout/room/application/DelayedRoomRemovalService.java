@@ -22,9 +22,16 @@ public class DelayedRoomRemovalService {
             @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
             @Value("${room.removalDelay}") Duration removalDelay,
             RoomCommandService roomCommandService) {
+        validateRemovalDuration(removalDelay);
         this.taskScheduler = taskScheduler;
         this.removeDuration = removalDelay;
         this.roomCommandService = roomCommandService;
+    }
+
+    private void validateRemovalDuration(Duration removalDelay) {
+        if (removalDelay == null || removalDelay.isNegative() || removalDelay.isZero()) {
+            throw new IllegalArgumentException("지연 삭제 시간은 양수여야 합니다.");
+        }
     }
 
     public void scheduleRemoveRoom(JoinCode joinCode) {
