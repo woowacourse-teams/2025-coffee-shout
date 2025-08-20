@@ -1,18 +1,22 @@
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useCallback, useEffect, useRef } from 'react';
 import { WEBSOCKET_CONFIG } from '../constants/constants';
-import { usePageVisibility } from './usePageVisibility';
 
 type Props = {
   isConnected: boolean;
+  isVisible: boolean;
   startSocket: (joinCode: string, myName: string) => void;
   stopSocket: () => void;
 };
 
-export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket }: Props) => {
+export const useWebSocketReconnection = ({
+  isConnected,
+  isVisible,
+  startSocket,
+  stopSocket,
+}: Props) => {
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
   const { joinCode, myName } = useIdentifier();
-  const { isVisible } = usePageVisibility();
   const wasConnectedBeforeBackground = useRef(false);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
@@ -88,8 +92,4 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
       resetReconnectAttempts();
     }
   }, [isConnected, resetReconnectAttempts]);
-
-  return {
-    isVisible,
-  };
 };

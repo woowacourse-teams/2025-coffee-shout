@@ -13,8 +13,8 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <IdentifierProvider>
-        <WebSocketProvider>
-          <ParticipantsProvider>
+        <ParticipantsProvider>
+          <WebSocketProvider>
             <PlayerTypeProvider>
               <ProbabilityHistoryProvider>
                 <ToastProvider>
@@ -24,8 +24,8 @@ const App = () => {
                 </ToastProvider>
               </ProbabilityHistoryProvider>
             </PlayerTypeProvider>
-          </ParticipantsProvider>
-        </WebSocketProvider>
+          </WebSocketProvider>
+        </ParticipantsProvider>
       </IdentifierProvider>
     </ThemeProvider>
   );
