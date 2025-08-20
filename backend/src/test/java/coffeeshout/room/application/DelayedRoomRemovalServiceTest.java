@@ -29,7 +29,7 @@ class DelayedRoomRemovalServiceTest {
     @Mock
     TaskScheduler taskScheduler;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     ScheduledFuture scheduledFuture = mock(ScheduledFuture.class);
 
     DelayedRoomRemovalService delayedRoomRemovalService;

@@ -19,8 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoomService {
@@ -35,7 +37,7 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
-        delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
+        scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
     }
@@ -144,5 +146,13 @@ public class RoomService {
         }
 
         return isRemoved;
+    }
+
+    private void scheduleRemoveRoom(JoinCode joinCode) {
+        try {
+            delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
+        } catch (Exception e) {
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode, e);
+        }
     }
 }
