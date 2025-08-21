@@ -1,6 +1,5 @@
 package coffeeshout.minigame.ui.response;
 
-import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.room.domain.player.Player;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 
-@WebsocketMessage
 public record MiniGameStateMessage(
         String cardGameState,
         String currentRound,

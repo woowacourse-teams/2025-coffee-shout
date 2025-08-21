@@ -1,8 +1,5 @@
 package coffeeshout.room.ui.response;
 
-import coffeeshout.generator.WebsocketMessage;
-
-@WebsocketMessage
 public record GuestNameExistResponse(
         boolean exist
 ) {
