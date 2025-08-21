@@ -3,6 +3,9 @@ spring:
     name:
       coffee-shout
 
+room:
+  removalDelay: 1h
+
 logging:
   level:
     root: info
@@ -18,6 +21,7 @@ management:
   metrics:
     enable:
       tomcat: true
+
   prometheus:
     metrics:
       export:

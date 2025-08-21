@@ -2,8 +2,10 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
-import coffeeshout.config.TestConfig;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
@@ -26,13 +28,12 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestConfig.class)
 class RoomServiceTest {
 
     @Autowired
@@ -40,6 +41,9 @@ class RoomServiceTest {
 
     @Autowired
     TestDataHelper testDataHelper;
+
+    @SpyBean
+    DelayedRoomRemovalService delayedRoomRemovalService;
 
     @Test
     void 방을_생성한다() {
@@ -451,5 +455,18 @@ class RoomServiceTest {
 
         // then
         assertThat(roomService.roomExists(joinCode.value())).isTrue();
+    }
+
+    @Test
+    void 방_생성_시_방_삭제_스케줄러가_호출된다() {
+        // given
+        String hostName = "호스트";
+        Long menuId = 1L;
+
+        // when
+        Room room = roomService.createRoom(hostName, menuId);
+
+        // then
+        verify(delayedRoomRemovalService).scheduleRemoveRoom(room.getJoinCode());
     }
 }
