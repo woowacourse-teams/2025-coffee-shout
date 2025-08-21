@@ -1,11 +1,13 @@
 package coffeeshout.minigame.ui.response;
 
+import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.NonNull;
 
+@WebsocketMessage
 public record MiniGameRanksMessage(List<MiniGameRankMessage> ranks) {
 
     public record MiniGameRankMessage(

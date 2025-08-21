@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [APPLICATION_START] 커피빵 게임 서버 시작 ==="
 

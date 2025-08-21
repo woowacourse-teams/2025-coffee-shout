@@ -1,8 +1,10 @@
 package coffeeshout.room.ui.response;
 
+import coffeeshout.generator.WebsocketMessage;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerType;
 
+@WebsocketMessage
 public record PlayerResponse(
         String playerName,
         MenuResponse menuResponse,

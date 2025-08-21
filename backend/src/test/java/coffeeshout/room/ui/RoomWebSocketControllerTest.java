@@ -24,6 +24,7 @@ import coffeeshout.room.ui.response.ProbabilityResponse;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
@@ -465,7 +466,6 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     private static Customization getColorIndexCustomization(String path) {
         return new Customization(path, (actual, expect) -> {
-            System.out.println("actual: " + actual + " expect: " + expect);
             if (expect instanceof Integer value) {
                 return value >= 0 && value <= 9;
             }

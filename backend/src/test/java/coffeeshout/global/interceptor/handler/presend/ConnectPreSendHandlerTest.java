@@ -5,7 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import coffeeshout.global.exception.GlobalErrorCode;
+import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -13,7 +16,6 @@ import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.MenuType;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -35,7 +37,7 @@ class ConnectPreSendHandlerTest {
     private RoomQueryService roomQueryService;
 
     @Mock
-    private MenuQueryService menuQueryService;
+    private DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     private StompSessionManager sessionManager;
     private ConnectPreSendHandler connectPreSendHandler;
@@ -52,7 +54,7 @@ class ConnectPreSendHandlerTest {
                 sessionManager,
                 webSocketMetricService,
                 roomQueryService,
-                menuQueryService
+                delayedPlayerRemovalService
         );
     }
 
@@ -129,23 +131,6 @@ class ConnectPreSendHandlerTest {
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
             then(webSocketMetricService).should().startConnection(sessionId);
         }
-
-        @Test
-        void menuId가_없으면_세션_등록하지_않는다() {
-            // given
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
-            accessor.setSessionId(sessionId);
-            accessor.setNativeHeader("joinCode", joinCode);
-            accessor.setNativeHeader("playerName", playerName);
-            // menuId 헤더 누락
-
-            // when
-            connectPreSendHandler.handle(accessor, sessionId);
-
-            // then
-            assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
-        }
     }
 
     @Nested
@@ -162,8 +147,7 @@ class ConnectPreSendHandlerTest {
             Menu testMenu = createTestMenu();
             Room testRoom = createPlayingRoom(testMenu);
 
-            given(roomQueryService.findByJoinCode(any(JoinCode.class))).willReturn(testRoom);
-            given(menuQueryService.findById(1L)).willReturn(testMenu);
+            given(roomQueryService.getByJoinCode(any(JoinCode.class))).willReturn(testRoom);
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);
@@ -181,8 +165,8 @@ class ConnectPreSendHandlerTest {
 
             StompHeaderAccessor accessor = createConnectAccessor();
 
-            given(roomQueryService.findByJoinCode(any(JoinCode.class)))
-                    .willThrow(new RuntimeException("Room not found"));
+            given(roomQueryService.getByJoinCode(any(JoinCode.class)))
+                    .willThrow(new NotExistElementException(GlobalErrorCode.NOT_EXIST, "방이 존재하지 않습니다."));
 
             // when
             connectPreSendHandler.handle(accessor, sessionId);
