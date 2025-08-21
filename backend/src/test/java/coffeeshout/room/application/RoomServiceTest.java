@@ -1,11 +1,9 @@
 package coffeeshout.room.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
+import coffeeshout.common.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
@@ -27,14 +25,10 @@ import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class RoomServiceTest {
+class RoomServiceTest extends ServiceTest {
 
     @Autowired
     RoomService roomService;
@@ -42,7 +36,7 @@ class RoomServiceTest {
     @Autowired
     TestDataHelper testDataHelper;
 
-    @SpyBean
+    @MockitoSpyBean
     DelayedRoomRemovalService delayedRoomRemovalService;
 
     @Test

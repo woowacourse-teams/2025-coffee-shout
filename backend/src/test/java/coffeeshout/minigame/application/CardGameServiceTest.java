@@ -1,6 +1,7 @@
 package coffeeshout.minigame.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doReturn;
@@ -27,6 +28,7 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -108,14 +110,16 @@ class CardGameServiceTest extends ServiceTest {
 
             // when
             cardGameService.start(cardGameSpy, joinCode.value());
-            cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
 
-            Map<Player, Probability> probabilities = room.getProbabilities();
-            assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
-                    players.get(0), new Probability(750),
-                    players.get(1), new Probability(1625),
-                    players.get(2), new Probability(3375),
-                    players.get(3), new Probability(4250)));
+            await().atMost(1, TimeUnit.SECONDS)
+                    .untilAsserted(() -> {
+                        Map<Player, Probability> probabilities = room.getProbabilities();
+                        assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
+                                players.get(0), new Probability(750),
+                                players.get(1), new Probability(1625),
+                                players.get(2), new Probability(3375),
+                                players.get(3), new Probability(4250)));
+                    });
         }
 
         @Test
@@ -123,14 +127,16 @@ class CardGameServiceTest extends ServiceTest {
             // when
             cardGameService.start(cardGame, joinCode.value());
 
-            cardGameTaskExecutors.get(joinCode).joinAll(CardGameTaskType.FIRST_ROUND_LOADING);
-
             // then
-            verify(messagingTemplate, atLeast(6))
-                    .convertAndSend(
-                            eq("/topic/room/" + joinCode.value() + "/gameState"),
-                            any(WebSocketResponse.class)
-                    );
+            await().atMost(1, TimeUnit.SECONDS)
+                    .untilAsserted(() -> {
+                        verify(messagingTemplate, atLeast(6))
+                                .convertAndSend(
+                                        eq("/topic/room/" + joinCode.value() + "/gameState"),
+                                        any(WebSocketResponse.class)
+                                );
+                    });
+
         }
     }
 

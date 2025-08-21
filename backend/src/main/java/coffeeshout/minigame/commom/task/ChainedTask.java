@@ -2,7 +2,6 @@ package coffeeshout.minigame.commom.task;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -27,17 +26,6 @@ public class ChainedTask {
 
     public void setNextTask(ChainedTask nextChainedTask) {
         this.nextChainedTask = nextChainedTask;
-    }
-
-    public void join() throws ExecutionException, InterruptedException {
-        this.future.get();
-    }
-
-    public void joinAll() throws ExecutionException, InterruptedException {
-        this.future.get();
-        if (nextChainedTask != null) {
-            this.nextChainedTask.joinAll();
-        }
     }
 
     public void cancel() {

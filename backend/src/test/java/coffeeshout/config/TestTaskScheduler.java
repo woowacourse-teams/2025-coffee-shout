@@ -7,11 +7,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class TestTaskScheduler extends ThreadPoolTaskScheduler {
 
     public TestTaskScheduler() {
-        this.setPoolSize(1);
+        this.setPoolSize(2);
         this.setThreadNamePrefix("mini-game-task");
         this.setDaemon(false);
         this.setWaitForTasksToCompleteOnShutdown(true);
-        this.setAwaitTerminationSeconds(30);
+        this.setAwaitTerminationSeconds(10);
         this.initialize();
     }
 
