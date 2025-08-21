@@ -10,7 +10,7 @@ public class TestTaskScheduler extends ThreadPoolTaskScheduler {
         this.setPoolSize(2);
         this.setThreadNamePrefix("mini-game-task");
         this.setDaemon(false);
-        this.setWaitForTasksToCompleteOnShutdown(true);
+        this.setWaitForTasksToCompleteOnShutdown(false);
         this.setAwaitTerminationSeconds(10);
         this.initialize();
     }
