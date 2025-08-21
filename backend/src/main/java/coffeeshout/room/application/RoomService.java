@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
@@ -19,8 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoomService {
@@ -29,11 +32,13 @@ public class RoomService {
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
     private final JoinCodeGenerator joinCodeGenerator;
+    private final DelayedRoomRemovalService delayedRoomRemovalService;
 
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
+        scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
     }
@@ -67,7 +72,9 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player player = room.findPlayer(new PlayerName(playerName));
 
-        player.updateReadyState(isReady);
+        if (player.getPlayerType() != PlayerType.HOST) {
+            player.updateReadyState(isReady);
+        }
 
         return room.getPlayers();
     }
@@ -142,5 +149,13 @@ public class RoomService {
         }
 
         return isRemoved;
+    }
+
+    private void scheduleRemoveRoom(JoinCode joinCode) {
+        try {
+            delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
+        } catch (Exception e) {
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.value(), e);
+        }
     }
 }

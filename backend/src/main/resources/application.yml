@@ -3,6 +3,9 @@ spring:
     name:
       coffee-shout
 
+room:
+  removalDelay: 1h
+
 logging:
   level:
     root: info
