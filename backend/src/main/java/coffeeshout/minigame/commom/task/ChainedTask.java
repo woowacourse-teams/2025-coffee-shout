@@ -35,18 +35,6 @@ public class ChainedTask {
         future.cancel(false);
     }
 
-    public void cancelDelay(TaskScheduler scheduler) {
-        if (nextChainedTask == null || !nextChainedTask.isStarted() || nextChainedTask.isDone()) {
-            return;
-        }
-        nextChainedTask.cancel();
-        nextChainedTask.start(scheduler);
-    }
-
-    public boolean isDone() {
-        return isStarted() && future.isDone();
-    }
-
     private Runnable chainedRunnable(TaskScheduler scheduler) {
         if (nextChainedTask == null) {
             return runnable;
