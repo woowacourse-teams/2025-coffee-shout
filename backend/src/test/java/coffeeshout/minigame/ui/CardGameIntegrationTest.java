@@ -1,8 +1,5 @@
 package coffeeshout.minigame.ui;
 
-import coffeeshout.common.ApiEnums;
-import coffeeshout.common.ApiSchema;
-import coffeeshout.common.EnumMapping;
 import coffeeshout.common.MessageResponse;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
@@ -10,12 +7,7 @@ import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.domain.cardgame.CardGameState;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
-import coffeeshout.minigame.domain.cardgame.card.CardType;
-import coffeeshout.minigame.ui.request.command.StartMiniGameCommand;
-import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
@@ -24,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,22 +48,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    @ApiEnums({
-            @EnumMapping(field = "cardGameState", enumClass = CardGameState.class),
-            @EnumMapping(field = "cardType", enumClass = CardType.class),
-            @EnumMapping(field = "currentRound", enumClass = CardGameRound.class)
-    })
-    @ApiSchema(description = """
-            [미니게임을 시작한다]
-            
-            - /app/room/{joinCode}/minigame/command로 요청을 보내면 게임이 시작된다.
-            - 게임이 시작되면 CardGameTaskType에 지정된 Task들을 이용해서 자동으로 카드게임의 태스크를 실행한다.
-            - Task별로 카드게임을 실행한다. (Task마다 실행 시간이 존재한다.)
-            
-            """,
-            responseType = MiniGameStateMessage.class,
-            requestType = StartMiniGameCommand.class
-    )
     void 카드게임을_실행한다() throws JSONException {
         // given
         String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.value());
@@ -185,9 +160,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("""
-            설명~~~
-            """)
     void 카드를_선택한다() throws Exception {
         // given
         String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.value());
