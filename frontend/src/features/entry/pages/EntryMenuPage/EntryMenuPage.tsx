@@ -11,6 +11,7 @@ import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
+import useToast from '@/components/@common/Toast/useToast';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -43,6 +44,7 @@ const EntryMenuPage = () => {
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
+  const { showToast } = useToast();
   const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,14 +87,20 @@ const EntryMenuPage = () => {
 
   const handleNavigateToLobby = async () => {
     if (!myName) {
-      alert('닉네임을 다시 입력해주세요.');
+      showToast({
+        type: 'error',
+        message: '닉네임을 다시 입력해주세요.',
+      });
       navigate(-1);
       return;
     }
 
     const menuId = selectedValue.id;
     if (menuId === -1) {
-      alert('메뉴를 선택하지 않았습니다.');
+      showToast({
+        type: 'error',
+        message: '메뉴를 선택하지 않았습니다.',
+      });
       return;
     }
 
@@ -124,11 +132,20 @@ const EntryMenuPage = () => {
       if (playerType === 'GUEST') return await handleGuest();
     } catch (error) {
       if (error instanceof ApiError) {
-        alert('방 생성/참가에 실패했습니다.');
+        showToast({
+          type: 'error',
+          message: '방 생성/참가에 실패했습니다.',
+        });
       } else if (error instanceof NetworkError) {
-        alert('네트워크 연결을 확인해주세요.');
+        showToast({
+          type: 'error',
+          message: '네트워크 연결을 확인해주세요.',
+        });
       } else {
-        alert('알 수 없는 오류가 발생했습니다.');
+        showToast({
+          type: 'error',
+          message: '알 수 없는 오류가 발생했습니다.',
+        });
       }
     } finally {
       setLoading(false);

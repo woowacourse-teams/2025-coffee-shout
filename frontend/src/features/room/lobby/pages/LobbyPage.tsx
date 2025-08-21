@@ -26,6 +26,7 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
+import useToast from '@/components/@common/Toast/useToast';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -35,6 +36,7 @@ const LobbyPage = () => {
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
+  const { showToast } = useToast();
   const { playerType, setPlayerType } = usePlayerType();
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
@@ -104,12 +106,18 @@ const LobbyPage = () => {
 
   const handleClickGameStartButton = () => {
     if (participants.length < 2) {
-      alert('참여자가 없어 게임을 진행할 수 없습니다.');
+      showToast({
+        type: 'error',
+        message: '참여자가 없어 게임을 진행할 수 없습니다.',
+      });
       return;
     }
 
     if (selectedMiniGames.length === 0) {
-      alert('선택된 미니게임이 없어 게임을 진행할 수 없습니다.');
+      showToast({
+        type: 'error',
+        message: '선택된 미니게임이 없어 게임을 진행할 수 없습니다.',
+      });
       return;
     }
 
