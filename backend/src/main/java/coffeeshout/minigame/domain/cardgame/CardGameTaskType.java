@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain.cardgame;
 
-import coffeeshout.minigame.commom.task.ChainedTask;
+import coffeeshout.minigame.common.task.ChainedTask;
 import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.Room;

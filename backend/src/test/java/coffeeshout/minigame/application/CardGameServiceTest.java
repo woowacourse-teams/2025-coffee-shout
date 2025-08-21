@@ -9,11 +9,11 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.common.ServiceTest;
+import coffeeshout.global.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayerProbabilitiesFixture;
 import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.minigame.commom.task.TaskManager;
+import coffeeshout.minigame.common.task.TaskManager;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;

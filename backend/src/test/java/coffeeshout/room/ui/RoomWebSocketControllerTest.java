@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.common.MessageResponse;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;

@@ -1,4 +1,4 @@
-package coffeeshout.common;
+package coffeeshout.global;
 
 public record MessageResponse(long duration, String payload) {
 }

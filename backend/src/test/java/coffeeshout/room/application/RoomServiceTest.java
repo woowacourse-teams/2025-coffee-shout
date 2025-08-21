@@ -3,7 +3,7 @@ package coffeeshout.room.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.common.ServiceTest;
+import coffeeshout.global.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;

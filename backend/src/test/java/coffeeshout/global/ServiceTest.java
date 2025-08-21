@@ -1,4 +1,4 @@
-package coffeeshout.common;
+package coffeeshout.global;
 
 import coffeeshout.config.ServiceTestConfig;
 import org.springframework.boot.test.context.SpringBootTest;

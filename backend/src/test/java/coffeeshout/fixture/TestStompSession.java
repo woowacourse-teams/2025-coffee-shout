@@ -1,6 +1,6 @@
 package coffeeshout.fixture;
 
-import coffeeshout.common.MessageResponse;
+import coffeeshout.global.MessageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;

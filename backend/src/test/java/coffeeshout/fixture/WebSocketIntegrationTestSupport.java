@@ -2,9 +2,8 @@ package coffeeshout.fixture;
 
 import static org.skyscreamer.jsonassert.JSONCompareMode.LENIENT;
 
-import coffeeshout.common.MessageResponse;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.config.IntegrationTestConfig;
-import coffeeshout.config.ServiceTestConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
