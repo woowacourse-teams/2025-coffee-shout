@@ -1,7 +1,6 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
 import DetailIcon from '@/assets/detail-icon.svg';
-import DownloadIcon from '@/assets/download-icon.svg';
 import Button from '@/components/@common/Button/Button';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline2 from '@/components/@common/Headline2/Headline2';
@@ -51,12 +50,9 @@ const OrderPage = () => {
         </S.ListHeader>
         {viewMode === 'simple' ? <MenuCount /> : <PlayerMenu />}
       </Layout.Content>
-      <Layout.ButtonBar flexRatios={[5.5, 1]}>
+      <Layout.ButtonBar>
         <Button variant="primary" onClick={handleClickGoMain}>
           메인 화면으로 가기
-        </Button>
-        <Button variant="primary" onClick={() => {}}>
-          <img src={DownloadIcon} />
         </Button>
       </Layout.ButtonBar>
     </Layout>
