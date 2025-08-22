@@ -21,11 +21,6 @@ export const ParticipantSection = ({ participants }: Props) => {
   const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
 
   const handleModifyMenu = () => {
-    if (!mySelect) {
-      alert('⚠️ 내 정보가 존재하지 않아 메뉴 변경 모달을 열 수 없습니다.');
-      return;
-    }
-
     openModal(<MenuModifyModal myMenu={mySelect.menuResponse.name} onClose={closeModal} />, {
       title: '음료 변경',
       showCloseButton: true,

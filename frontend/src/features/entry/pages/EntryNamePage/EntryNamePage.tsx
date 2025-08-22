@@ -10,6 +10,7 @@ import Layout from '@/layouts/Layout';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
+import useToast from '@/components/@common/Toast/useToast';
 
 const MAX_NAME_LENGTH = 10;
 
@@ -22,6 +23,7 @@ const EntryNamePage = () => {
   const navigate = useNavigate();
   const { setMyName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
+  const { showToast } = useToast();
 
   const handleNavigateToHome = () => {
     navigate('/');
@@ -34,7 +36,10 @@ const EntryNamePage = () => {
       );
 
       if (exist) {
-        alert('중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.');
+        showToast({
+          type: 'error',
+          message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
+        });
         return;
       }
     }
