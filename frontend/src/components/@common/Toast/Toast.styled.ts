@@ -51,7 +51,7 @@ export const Container = styled.div<Props>`
     0 1px 2px rgba(0, 0, 0, 0.24);
   padding: 4px 16px;
   z-index: ${Z_INDEX.TOAST};
-  bottom: 24px;
+  bottom: 82px;
   left: 50%;
   transform: translateX(-50%);
 
