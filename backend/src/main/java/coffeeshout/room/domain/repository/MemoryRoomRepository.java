@@ -4,7 +4,6 @@ import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

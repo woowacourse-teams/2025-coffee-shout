@@ -54,7 +54,7 @@ public class Roulette {
     }
 
     public Map<Player, Probability> getProbabilities() {
-        return Map.copyOf(playerProbabilities);
+        return new LinkedHashMap<>(playerProbabilities);
     }
 
     public boolean removePlayer(PlayerName playerName) {

@@ -1,8 +1,7 @@
-package coffeeshout.minigame.commom.task;
+package coffeeshout.minigame.common.task;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import org.springframework.scheduling.TaskScheduler;
 
 public class TaskManager<T> {
@@ -27,24 +26,6 @@ public class TaskManager<T> {
     public void startWith(T type) {
         final ChainedTask chainedTask = tasks.get(type);
         chainedTask.start(scheduler);
-    }
-
-    public void cancel(T type) {
-        final ChainedTask chainedTask = tasks.get(type);
-        chainedTask.cancel();
-    }
-
-    public void cancelDelay(T type) {
-        final ChainedTask chainedTask = tasks.get(type);
-        chainedTask.cancelDelay(scheduler);
-    }
-
-    public void joinAll(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).joinAll();
-    }
-
-    public void join(T type) throws ExecutionException, InterruptedException {
-        tasks.get(type).join();
     }
 
     public void cancelAll() {
