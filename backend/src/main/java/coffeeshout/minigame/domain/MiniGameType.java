@@ -3,9 +3,11 @@ package coffeeshout.minigame.domain;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.Playable;
+import generator.annotaions.WebSocketMessage;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@WebSocketMessage
 public enum MiniGameType {
 
     CARD_GAME,

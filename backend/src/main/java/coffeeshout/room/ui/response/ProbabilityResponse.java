@@ -2,8 +2,10 @@ package coffeeshout.room.ui.response;
 
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
+import generator.annotaions.WebSocketMessage;
 import java.util.Map.Entry;
 
+@WebSocketMessage
 public record ProbabilityResponse(
         PlayerResponse playerResponse,
         Double probability

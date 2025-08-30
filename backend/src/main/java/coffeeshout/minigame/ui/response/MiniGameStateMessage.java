@@ -4,10 +4,12 @@ import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import generator.annotaions.WebSocketMessage;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 
+@WebSocketMessage
 public record MiniGameStateMessage(
         String cardGameState,
         String currentRound,

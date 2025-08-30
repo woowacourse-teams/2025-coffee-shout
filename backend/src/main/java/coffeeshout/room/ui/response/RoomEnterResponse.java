@@ -1,7 +1,9 @@
 package coffeeshout.room.ui.response;
 
 import coffeeshout.room.domain.Room;
+import generator.annotaions.WebSocketMessage;
 
+@WebSocketMessage
 public record RoomEnterResponse(
         String joinCode) {
 

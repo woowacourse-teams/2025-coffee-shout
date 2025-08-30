@@ -1,7 +1,9 @@
 package coffeeshout.room.ui.response;
 
 import coffeeshout.room.domain.player.Winner;
+import generator.annotaions.WebSocketMessage;
 
+@WebSocketMessage
 public record WinnerResponse(
         String playerName,
         Integer colorIndex,

@@ -8,6 +8,8 @@ import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
+import generator.annotaions.MessageResponse;
+import generator.annotaions.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -22,16 +24,40 @@ public class CardGameEventListener {
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @EventListener
+    @MessageResponse(
+            path = "/topic/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
+    @Operation(
+            description = "description",
+            summary = "summary"
+    )
     public void handleSelectCard(CardSelectEvent cardSelectEvent) {
         sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
     }
 
     @EventListener
+    @MessageResponse(
+            path = "/topic/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
+    @Operation(
+            description = "description",
+            summary = "summary"
+    )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
         sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
     }
 
     @EventListener
+    @MessageResponse(
+            path = "/topic/room/{joinCode}/round",
+            returnType = MiniGameStartMessage.class
+    )
+    @Operation(
+            description = "description",
+            summary = "summary"
+    )
     public void handleStart(CardGameStartEvent cardGameStartEvent) {
         CardGame cardGame = cardGameStartEvent.cardGame();
         JoinCode joinCode = cardGameStartEvent.joinCode();
