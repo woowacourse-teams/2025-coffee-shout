@@ -29,11 +29,14 @@ public class CardGameEventListener {
             returnType = MiniGameStateMessage.class
     )
     @Operation(
-            description = "description",
-            summary = "summary"
+            summary = "카드 게임 상태 변경 이벤트 처리",
+            description = """
+                    카드 게임의 상태가 변경되었을 때 발생하는 이벤트를 처리합니다.
+                    게임 진행 상태의 변화를 감지하고 해당 방의 모든 참가자에게 업데이트된 게임 상태를 전달합니다.
+                    """
     )
-    public void handleSelectCard(CardSelectEvent cardSelectEvent) {
-        sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
+    public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
+        sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
     }
 
     @EventListener
@@ -42,11 +45,14 @@ public class CardGameEventListener {
             returnType = MiniGameStateMessage.class
     )
     @Operation(
-            description = "description",
-            summary = "summary"
+            summary = "카드 선택 이벤트 처리 및 게임 상태 브로드캐스트",
+            description = """
+                    카드 게임에서 플레이어가 카드를 선택했을 때 발생하는 이벤트를 처리합니다.
+                    게임 상태를 업데이트하고 해당 방의 모든 참가자에게 최신 게임 상태를 브로드캐스트합니다.
+                    """
     )
-    public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
-        sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
+    public void handleSelectCard(CardSelectEvent cardSelectEvent) {
+        sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
     }
 
     @EventListener
@@ -55,8 +61,12 @@ public class CardGameEventListener {
             returnType = MiniGameStartMessage.class
     )
     @Operation(
-            description = "description",
-            summary = "summary"
+            summary = "카드 게임 시작 이벤트 처리 및 라운드 시작 알림",
+            description = """
+                    카드 게임이 시작될 때 발생하는 이벤트를 처리합니다.
+                    새로운 라운드가 시작되었음을 해당 방의 모든 참가자에게 알리고
+                    게임 타입 정보를 포함한 시작 메시지를 브로드캐스트합니다.
+                    """
     )
     public void handleStart(CardGameStartEvent cardGameStartEvent) {
         CardGame cardGame = cardGameStartEvent.cardGame();

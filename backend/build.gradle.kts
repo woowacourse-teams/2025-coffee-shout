@@ -20,7 +20,7 @@ configurations {
 }
 
 repositories {
-    mavenLocal()   // 👈 이거 꼭 있어야 로컬에서 찾음
+    mavenLocal()
     mavenCentral()
 }
 
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("com.async-websocket:docs-generator:1.0.0")
+    implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.1")
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")
