@@ -2,9 +2,7 @@ package coffeeshout.room.ui.response;
 
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerType;
-import generator.annotaions.WebSocketMessage;
 
-@WebSocketMessage
 public record PlayerResponse(
         String playerName,
         MenuResponse menuResponse,
