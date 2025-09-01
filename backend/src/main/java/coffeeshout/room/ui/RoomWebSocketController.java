@@ -28,7 +28,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-players")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = PlayerResponse.class
     )
     @Operation(
@@ -50,7 +50,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-menus")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = PlayerResponse.class
     )
     @Operation(
@@ -73,7 +73,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-ready")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = PlayerResponse.class
     )
     @Operation(
@@ -97,7 +97,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/get-probabilities")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = ProbabilityResponse.class
     )
     @Operation(
@@ -119,7 +119,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-minigames")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = MiniGameType.class
     )
     @Operation(
@@ -140,7 +140,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
     @MessageResponse(
-            path = "/topic/room/{joinCode}",
+            path = "/room/{joinCode}",
             returnType = WinnerResponse.class
     )
     @Operation(

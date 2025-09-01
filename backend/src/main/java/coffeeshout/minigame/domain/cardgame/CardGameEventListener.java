@@ -25,7 +25,7 @@ public class CardGameEventListener {
 
     @EventListener
     @MessageResponse(
-            path = "/topic/room/{joinCode}/gameState",
+            path = "/room/{joinCode}/gameState",
             returnType = MiniGameStateMessage.class
     )
     @Operation(
@@ -41,7 +41,7 @@ public class CardGameEventListener {
 
     @EventListener
     @MessageResponse(
-            path = "/topic/room/{joinCode}/gameState",
+            path = "/room/{joinCode}/gameState",
             returnType = MiniGameStateMessage.class
     )
     @Operation(
@@ -57,7 +57,7 @@ public class CardGameEventListener {
 
     @EventListener
     @MessageResponse(
-            path = "/topic/room/{joinCode}/round",
+            path = "/room/{joinCode}/round",
             returnType = MiniGameStartMessage.class
     )
     @Operation(

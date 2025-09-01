@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.4")
+    implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.5")
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")

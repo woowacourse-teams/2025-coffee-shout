@@ -30,3 +30,14 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
+
+websocket:
+  docs:
+    base-package: "coffeeshout"
+    app-path: "/app"
+    topic-path: "/topic"
+    server-url: "http://localhost:8080/ws"
+    info:
+      title: "커피빵 WebSocket API 명세서"
+      version: "1.0.0"
+      description: "실시간 웹소켓 통신 API 문서"
