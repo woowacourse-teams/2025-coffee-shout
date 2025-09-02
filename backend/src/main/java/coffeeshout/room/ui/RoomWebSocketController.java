@@ -29,7 +29,8 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/update-players")
     @MessageResponse(
             path = "/room/{joinCode}",
-            returnType = PlayerResponse.class
+            returnType = List.class,
+            genericType = PlayerResponse.class
     )
     @Operation(
             summary = "플레이어 목록 업데이트 및 브로드캐스트",
@@ -51,7 +52,8 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/update-menus")
     @MessageResponse(
             path = "/room/{joinCode}",
-            returnType = PlayerResponse.class
+            returnType = List.class,
+            genericType = PlayerResponse.class
     )
     @Operation(
             summary = "플레이어 메뉴 선택 업데이트 및 브로드캐스트",
@@ -74,7 +76,8 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/update-ready")
     @MessageResponse(
             path = "/room/{joinCode}",
-            returnType = PlayerResponse.class
+            returnType = List.class,
+            genericType = PlayerResponse.class
     )
     @Operation(
             summary = "플레이어 준비 상태 변경 및 브로드캐스트",
@@ -98,7 +101,8 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/get-probabilities")
     @MessageResponse(
             path = "/room/{joinCode}",
-            returnType = ProbabilityResponse.class
+            returnType = List.class,
+            genericType = ProbabilityResponse.class
     )
     @Operation(
             summary = "룰렛 확률 정보 조회 및 브로드캐스트",
@@ -120,7 +124,8 @@ public class RoomWebSocketController {
     @MessageMapping("/room/{joinCode}/update-minigames")
     @MessageResponse(
             path = "/room/{joinCode}",
-            returnType = MiniGameType.class
+            returnType = List.class,
+            genericType = MiniGameType.class
     )
     @Operation(
             summary = "미니게임 목록 업데이트 및 브로드캐스트",
