@@ -1,17 +1,13 @@
 import { ColorList } from '@/constants/color';
-import * as S from './PlayerIcon.styled';
 import CoffeeCharacter from '@/assets/coffee-character.svg';
+import CircleIcon from '@/components/@common/CircleIcon/CircleIcon';
 
 type Props = {
   color: ColorList;
 };
 
 const PlayerIcon = ({ color }: Props) => {
-  return (
-    <S.Container color={color}>
-      <S.Icon src={CoffeeCharacter} alt="player-icon" />
-    </S.Container>
-  );
+  return <CircleIcon color={color} iconSrc={CoffeeCharacter} iconAlt="player-icon" />;
 };
 
 export default PlayerIcon;
