@@ -17,8 +17,8 @@ const IconTextItem = ({
   showBorder = false,
 }: Props) => {
   return (
-    <S.Container showBorder={showBorder}>
-      <S.Wrapper gap={gap}>
+    <S.Container $showBorder={showBorder}>
+      <S.Wrapper $gap={gap}>
         <S.IconWrapper>{iconContent}</S.IconWrapper>
         <S.TextWrapper>{textContent}</S.TextWrapper>
       </S.Wrapper>

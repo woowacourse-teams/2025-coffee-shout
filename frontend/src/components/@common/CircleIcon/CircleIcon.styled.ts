@@ -1,14 +1,14 @@
-import { ColorList } from '@/constants/color';
+import { ColorKey } from '@/constants/color';
 import styled from '@emotion/styled';
 
 type Props = {
-  color: ColorList;
+  $color: ColorKey;
 };
 
 export const Container = styled.div<Props>`
   width: 50px;
   height: 50px;
-  background-color: ${({ color }) => color};
+  background-color: ${({ $color }) => $color};
   border-radius: 50%;
   display: flex;
   justify-content: center;

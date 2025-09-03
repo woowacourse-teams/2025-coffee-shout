@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import { theme } from '@/styles/theme';
 
 type WrapperProps = {
-  gap: number;
+  $gap: number;
 };
 
 type ContainerProps = {
-  showBorder: boolean;
+  $showBorder: boolean;
 };
 
 export const Container = styled.div<ContainerProps>`
@@ -15,13 +15,13 @@ export const Container = styled.div<ContainerProps>`
   width: 100%;
   padding: 15px 0;
   justify-content: space-between;
-  ${({ showBorder }) => showBorder && `border-bottom: 1px solid ${theme.color.gray[200]};`}
+  ${({ $showBorder }) => $showBorder && `border-bottom: 1px solid ${theme.color.gray[200]};`}
 `;
 
 export const Wrapper = styled.div<WrapperProps>`
   display: flex;
   align-items: center;
-  gap: ${({ gap }) => gap}px;
+  gap: ${({ $gap }) => $gap}px;
   flex: 1;
   min-width: 0;
 `;
