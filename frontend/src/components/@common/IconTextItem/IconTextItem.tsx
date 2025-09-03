@@ -7,6 +7,7 @@ type Props = {
   rightContent?: ReactNode;
   gap?: number;
   showBorder?: boolean;
+  onClick?: () => void;
 };
 
 const IconTextItem = ({
@@ -15,9 +16,10 @@ const IconTextItem = ({
   rightContent,
   gap = 20,
   showBorder = false,
+  onClick,
 }: Props) => {
   return (
-    <S.Container $showBorder={showBorder}>
+    <S.Container $showBorder={showBorder} onClick={onClick}>
       <S.Wrapper $gap={gap}>
         <S.IconWrapper>{iconContent}</S.IconWrapper>
         <S.TextWrapper>{textContent}</S.TextWrapper>
