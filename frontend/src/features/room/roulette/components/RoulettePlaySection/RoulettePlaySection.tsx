@@ -53,8 +53,13 @@ const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
       />
       <S.ProbabilityText>
         <Headline4>
-          당첨 확률 {myProbabilityChange >= 0 ? '+' : ''}
-          {formatPercent.format(myProbabilityChange)}%
+          현재 확률 : {myCurrentProbability + '%'} {'('}
+          <S.ProbabilityChange isPositive={myProbabilityChange >= 0}>
+            {(myProbabilityChange >= 0 ? '+' : '') +
+              formatPercent.format(myProbabilityChange) +
+              '%'}
+          </S.ProbabilityChange>
+          {')'}
         </Headline4>
       </S.ProbabilityText>
     </S.Container>

@@ -4,8 +4,9 @@ import { ColorList } from '@/constants/color';
 import { PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
-import PlayerIcon from '@/components/@common/PlayerIcon/PlayerIcon';
+import PlayerIcon from '@/components/@composition/PlayerIcon/PlayerIcon';
 import CheckIcon from '@/assets/check-icon.svg';
+import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
 
 type Props = {
   name: string;
@@ -22,17 +23,17 @@ const PlayerCard = ({
   children,
 }: Props) => {
   return (
-    <S.Container>
-      <S.Wrapper>
-        <PlayerIcon color={playerColor} />
+    <IconTextItem
+      iconContent={<PlayerIcon color={playerColor} />}
+      textContent={
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
           {playerType === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}
           {playerType === 'GUEST' && isReady && <S.ReadyIcon src={CheckIcon} alt="ready" />}
         </S.NameWrapper>
-      </S.Wrapper>
-      {children}
-    </S.Container>
+      }
+      rightContent={children}
+    />
   );
 };
 
