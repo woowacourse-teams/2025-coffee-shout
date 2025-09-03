@@ -4,7 +4,7 @@ import { ColorList } from '@/constants/color';
 import { PlayerType } from '@/types/player';
 import { PropsWithChildren } from 'react';
 import * as S from './PlayerCard.styled';
-import PlayerIcon from '@/components/@common/PlayerIcon/PlayerIcon';
+import PlayerIcon from '@/components/@composition/PlayerIcon/PlayerIcon';
 import CheckIcon from '@/assets/check-icon.svg';
 import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
 

@@ -1,5 +1,6 @@
 import { ColorList } from '@/constants/color';
 import styled from '@emotion/styled';
+
 type Props = {
   color: ColorList;
 };

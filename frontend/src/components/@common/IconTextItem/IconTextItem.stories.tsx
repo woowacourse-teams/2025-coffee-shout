@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { colorList } from '@/constants/color';
 import IconTextItem from './IconTextItem';
-import PlayerIcon from '../PlayerIcon/PlayerIcon';
+import PlayerIcon from '../../@composition/PlayerIcon/PlayerIcon';
 
 const meta: Meta<typeof IconTextItem> = {
   title: 'Common/IconTextItem',
