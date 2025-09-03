@@ -10,7 +10,6 @@ import CardGameProvider from '../src/contexts/CardGame/CardGameProvider';
 import '../src/styles/global.css';
 import '../src/styles/reset.css';
 import { theme } from '../src/styles/theme';
-import { ParticipantsProvider } from '@/contexts/Participants/ParticipantsProvider';
 
 const preview: Preview = {
   decorators: [
