@@ -1,8 +1,7 @@
-import { ColorKey } from '@/constants/color';
 import styled from '@emotion/styled';
 
 type Props = {
-  $color: ColorKey;
+  $color: string;
 };
 
 export const Container = styled.div<Props>`

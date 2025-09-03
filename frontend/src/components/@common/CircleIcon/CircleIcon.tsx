@@ -1,8 +1,7 @@
-import { ColorKey } from '@/constants/color';
 import * as S from './CircleIcon.styled';
 
 type Props = {
-  color: ColorKey;
+  color: string;
   iconSrc: string;
   iconAlt?: string;
 };
