@@ -9,25 +9,28 @@ import { IdentifierProvider } from '../src/contexts/Identifier/IdentifierProvide
 import '../src/styles/global.css';
 import '../src/styles/reset.css';
 import { theme } from '../src/styles/theme';
+import { ParticipantsProvider } from '@/contexts/Participants/ParticipantsProvider';
 
 const preview: Preview = {
   decorators: [
     (Story) => (
-      <ThemeProvider theme={theme}>
-        <IdentifierProvider>
-          <WebSocketProvider>
-            <MemoryRouter>
-              <CardGameProvider>
-                <ToastProvider>
-                  <ModalProvider>
-                    <Story />
-                  </ModalProvider>
-                </ToastProvider>
-              </CardGameProvider>
-            </MemoryRouter>
-          </WebSocketProvider>
-        </IdentifierProvider>
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <IdentifierProvider>
+            <ParticipantsProvider>
+              <WebSocketProvider>
+                <CardGameProvider>
+                  <ToastProvider>
+                    <ModalProvider>
+                      <Story />
+                    </ModalProvider>
+                  </ToastProvider>
+                </CardGameProvider>
+              </WebSocketProvider>
+            </ParticipantsProvider>
+          </IdentifierProvider>
+        </ThemeProvider>
+      </MemoryRouter>
     ),
   ],
 };
