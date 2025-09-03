@@ -1,15 +1,21 @@
 import styled from '@emotion/styled';
+import { theme } from '@/styles/theme';
 
 type WrapperProps = {
   gap: number;
 };
 
-export const Container = styled.div`
+type ContainerProps = {
+  showBorder: boolean;
+};
+
+export const Container = styled.div<ContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
   padding: 15px 0;
   justify-content: space-between;
+  ${({ showBorder }) => showBorder && `border-bottom: 1px solid ${theme.color.gray[200]};`}
 `;
 
 export const Wrapper = styled.div<WrapperProps>`

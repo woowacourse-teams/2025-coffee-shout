@@ -53,3 +53,40 @@ export const PlayerCardWithChildren: Story = {
     ),
   ],
 };
+
+export const WithBorder: Story = {
+  args: {
+    iconContent: <PlayerIcon color={colorList[2]} />,
+    textContent: <span>하단 보더가 있는 아이템</span>,
+    showBorder: true,
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ width: '400px' }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const MultipleWithBorder: Story = {
+  render: () => (
+    <div style={{ width: '400px' }}>
+      <IconTextItem
+        iconContent={<PlayerIcon color={colorList[0]} />}
+        textContent={<span>첫 번째 아이템</span>}
+        showBorder={true}
+      />
+      <IconTextItem
+        iconContent={<PlayerIcon color={colorList[1]} />}
+        textContent={<span>두 번째 아이템</span>}
+        showBorder={true}
+      />
+      <IconTextItem
+        iconContent={<PlayerIcon color={colorList[2]} />}
+        textContent={<span>세 번째 아이템 (보더 없음)</span>}
+        showBorder={false}
+      />
+    </div>
+  ),
+};
