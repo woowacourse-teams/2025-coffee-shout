@@ -24,17 +24,16 @@ const PlayerCard = ({
 }: Props) => {
   return (
     <IconTextItem
-      iconComponent={<PlayerIcon color={playerColor} />}
-      textComponent={
+      iconContent={<PlayerIcon color={playerColor} />}
+      textContent={
         <S.NameWrapper>
           <Headline4>{name}</Headline4>
           {playerType === 'HOST' && <S.CrownIcon src={Crown} alt="crown" />}
           {playerType === 'GUEST' && isReady && <S.ReadyIcon src={CheckIcon} alt="ready" />}
         </S.NameWrapper>
       }
-    >
-      {children}
-    </IconTextItem>
+      rightContent={children}
+    />
   );
 };
 

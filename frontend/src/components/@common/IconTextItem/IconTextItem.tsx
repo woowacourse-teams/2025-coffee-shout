@@ -1,20 +1,21 @@
-import { ReactNode, PropsWithChildren } from 'react';
+import { ReactNode } from 'react';
 import * as S from './IconTextItem.styled';
 
 type Props = {
-  iconComponent: ReactNode;
-  textComponent: ReactNode;
+  iconContent: ReactNode;
+  textContent: ReactNode;
+  rightContent?: ReactNode;
   gap?: number;
-} & PropsWithChildren;
+};
 
-const IconTextItem = ({ iconComponent, textComponent, gap = 20, children }: Props) => {
+const IconTextItem = ({ iconContent, textContent, rightContent, gap = 20 }: Props) => {
   return (
     <S.Container>
       <S.Wrapper gap={gap}>
-        <S.IconWrapper>{iconComponent}</S.IconWrapper>
-        <S.TextWrapper>{textComponent}</S.TextWrapper>
+        <S.IconWrapper>{iconContent}</S.IconWrapper>
+        <S.TextWrapper>{textContent}</S.TextWrapper>
       </S.Wrapper>
-      {children}
+      {rightContent}
     </S.Container>
   );
 };

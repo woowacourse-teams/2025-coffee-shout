@@ -22,8 +22,8 @@ type Story = StoryObj<typeof IconTextItem>;
 
 export const Default: Story = {
   args: {
-    iconComponent: <PlayerIcon color={colorList[0]} />,
-    textComponent: <span>플레이어 이름</span>,
+    iconContent: <PlayerIcon color={colorList[0]} />,
+    textContent: <span>플레이어 이름</span>,
   },
   decorators: [
     (Story) => (
@@ -36,14 +36,14 @@ export const Default: Story = {
 
 export const PlayerCardWithChildren: Story = {
   args: {
-    iconComponent: <PlayerIcon color={colorList[1]} />,
-    textComponent: (
+    iconContent: <PlayerIcon color={colorList[1]} />,
+    textContent: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>김철수</h4>
       </div>
     ),
     gap: 20,
-    children: <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>10%</h4>,
+    rightContent: <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>10%</h4>,
   },
   decorators: [
     (Story) => (
