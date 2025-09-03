@@ -8,6 +8,8 @@ import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
+import generator.annotaions.MessageResponse;
+import generator.annotaions.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -22,16 +24,50 @@ public class CardGameEventListener {
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @EventListener
-    public void handleSelectCard(CardSelectEvent cardSelectEvent) {
-        sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
-    }
-
-    @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
+    @Operation(
+            summary = "카드 게임 상태 변경 이벤트 처리",
+            description = """
+                    카드 게임의 상태가 변경되었을 때 발생하는 이벤트를 처리합니다.
+                    게임 진행 상태의 변화를 감지하고 해당 방의 모든 참가자에게 업데이트된 게임 상태를 전달합니다.
+                    """
+    )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
         sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
     }
 
     @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/gameState",
+            returnType = MiniGameStateMessage.class
+    )
+    @Operation(
+            summary = "카드 선택 이벤트 처리 및 게임 상태 브로드캐스트",
+            description = """
+                    카드 게임에서 플레이어가 카드를 선택했을 때 발생하는 이벤트를 처리합니다.
+                    게임 상태를 업데이트하고 해당 방의 모든 참가자에게 최신 게임 상태를 브로드캐스트합니다.
+                    """
+    )
+    public void handleSelectCard(CardSelectEvent cardSelectEvent) {
+        sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
+    }
+
+    @EventListener
+    @MessageResponse(
+            path = "/room/{joinCode}/round",
+            returnType = MiniGameStartMessage.class
+    )
+    @Operation(
+            summary = "카드 게임 시작 이벤트 처리 및 라운드 시작 알림",
+            description = """
+                    카드 게임이 시작될 때 발생하는 이벤트를 처리합니다.
+                    새로운 라운드가 시작되었음을 해당 방의 모든 참가자에게 알리고
+                    게임 타입 정보를 포함한 시작 메시지를 브로드캐스트합니다.
+                    """
+    )
     public void handleStart(CardGameStartEvent cardGameStartEvent) {
         CardGame cardGame = cardGameStartEvent.cardGame();
         JoinCode joinCode = cardGameStartEvent.joinCode();

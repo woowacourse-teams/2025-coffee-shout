@@ -1,0 +1,3 @@
+websocket:
+  docs:
+    server-url: "https://api.dev.coffee-shout.com/ws"
