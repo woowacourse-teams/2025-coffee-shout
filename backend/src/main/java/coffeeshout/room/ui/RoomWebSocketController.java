@@ -100,7 +100,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/get-probabilities")
     @MessageResponse(
-            path = "/room/{joinCode}",
+            path = "/room/{joinCode}/roulette",
             returnType = List.class,
             genericType = ProbabilityResponse.class
     )
@@ -123,7 +123,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/update-minigames")
     @MessageResponse(
-            path = "/room/{joinCode}",
+            path = "/room/{joinCode}/minigame",
             returnType = List.class,
             genericType = MiniGameType.class
     )
@@ -145,7 +145,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
     @MessageResponse(
-            path = "/room/{joinCode}",
+            path = "/room/{joinCode}/winner",
             returnType = WinnerResponse.class
     )
     @Operation(
