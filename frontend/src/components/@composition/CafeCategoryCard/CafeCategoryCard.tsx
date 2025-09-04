@@ -11,12 +11,13 @@ type Props = {
 
 const CafeCategoryCard = ({ iconSrc, categoryName, onClick }: Props) => {
   return (
-    <IconTextItem
-      onClick={onClick}
-      iconContent={<CircleIcon iconSrc={iconSrc} color={COLOR_MAP['point-200']} />}
-      textContent={<S.CategoryName>{categoryName}</S.CategoryName>}
-      showBorder
-    />
+    <S.Container onClick={onClick}>
+      <IconTextItem
+        iconContent={<CircleIcon iconSrc={iconSrc} color={COLOR_MAP['point-200']} />}
+        textContent={<S.CategoryName>{categoryName}</S.CategoryName>}
+        showBorder
+      />
+    </S.Container>
   );
 };
 
