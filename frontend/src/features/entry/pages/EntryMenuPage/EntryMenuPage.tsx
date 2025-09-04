@@ -16,6 +16,7 @@ import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
 import SelectTemperature from './components/SelectMenu/SelectTemperature/SelectTemperature';
 import { Category, NewMenu } from '@/types/menu';
+import { TemperatureOption } from '@/components/@common/TemperatureToggle/temperatureOption';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -51,39 +52,9 @@ const EntryMenuPage = () => {
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<NewMenu | null>(null);
-  const [selectedValue, setSelectedValue] = useState<Option>({
-    id: -1,
-    name: '',
-  });
-  const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
+  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICED');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-
-        const menus = await api.get<MenusResponse>('/menus');
-        const options = menus.map((menu) => ({
-          id: menu.id,
-          name: menu.name,
-        }));
-        setCoffeeOptions(options);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setError(error.message);
-        } else if (error instanceof NetworkError) {
-          setError('네트워크 연결을 확인해주세요');
-        } else {
-          setError('알 수 없는 오류가 발생했습니다');
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     if (isConnected) {
@@ -111,8 +82,7 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const menuId = selectedValue.id;
-    if (menuId === -1) {
+    if (!selectedMenu) {
       showToast({
         type: 'error',
         message: '메뉴를 선택하지 않았습니다.',
@@ -121,21 +91,23 @@ const EntryMenuPage = () => {
     }
 
     const handleHost = async () => {
+      // api 형식 수정 필요
       const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
         hostName: myName,
-        menuId,
+        menuId: selectedMenu.id,
       });
       setJoinCode(joinCode);
       startSocket(joinCode, myName);
     };
 
     const handleGuest = async () => {
+      //api 형식 수정 필요
       const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
         '/rooms/enter',
         {
           joinCode,
           guestName: myName,
-          menuId,
+          menuId: selectedMenu.id,
         }
       );
       setJoinCode(_joinCode);
@@ -168,7 +140,6 @@ const EntryMenuPage = () => {
     }
   };
 
-  const isButtonDisabled = selectedValue.name === '' || loading;
   const isHost = playerType === 'HOST';
 
   const handleSetSelectedCategory = (category: Category) => {
@@ -178,6 +149,10 @@ const EntryMenuPage = () => {
 
   const handleSetSelectedMenu = (menu: NewMenu) => {
     setSelectedMenu(menu);
+  };
+
+  const handleChangeTemperature = (temperature: TemperatureOption) => {
+    setSelectedTemperature(temperature);
   };
 
   return (
@@ -193,6 +168,8 @@ const EntryMenuPage = () => {
               onClickMenu={handleSetSelectedMenu}
               categoryId={selectedCategory?.id ?? 0}
               selectedMenu={selectedMenu}
+              selectedTemperature={selectedTemperature}
+              onChangeTemperature={handleChangeTemperature}
             />
           )}
         </S.Container>

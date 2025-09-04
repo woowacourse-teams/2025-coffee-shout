@@ -13,11 +13,18 @@ type Props = {
   onClickMenu: (menu: NewMenu) => void;
   categoryId: number;
   selectedMenu: NewMenu | null;
+  selectedTemperature: TemperatureOption;
+  onChangeTemperature: (temperature: TemperatureOption) => void;
 };
 
-const SelectMenu = ({ onClickMenu, categoryId, selectedMenu }: Props) => {
+const SelectMenu = ({
+  onClickMenu,
+  categoryId,
+  selectedMenu,
+  selectedTemperature,
+  onChangeTemperature,
+}: Props) => {
   const [menus, setMenus] = useState<NewMenu[]>([]);
-  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICED');
 
   useEffect(() => {
     // (async () => {
@@ -28,19 +35,15 @@ const SelectMenu = ({ onClickMenu, categoryId, selectedMenu }: Props) => {
       {
         id: 1,
         name: '아메리카노',
-        temperatureAvailability: 'ICE_ONLY', // "ICE_ONLY", "HOT_ONLY", "BOTH"
+        temperatureAvailability: 'ICE_ONLY',
       },
       {
         id: 2,
         name: '카페라떼',
-        temperatureAvailability: 'ICE_ONLY', // "ICE_ONLY", "HOT_ONLY", "BOTH"
+        temperatureAvailability: 'ICE_ONLY',
       },
     ]);
   }, [categoryId]);
-
-  const handleChangeTemperature = (temperature: TemperatureOption) => {
-    setSelectedTemperature(temperature);
-  };
 
   return (
     <>
@@ -59,7 +62,7 @@ const SelectMenu = ({ onClickMenu, categoryId, selectedMenu }: Props) => {
             <SelectionCard color="rgb(255, 220, 249)" text={selectedMenu.name} />
             <TemperatureToggle
               selectedTemperature={selectedTemperature}
-              onChangeTemperature={handleChangeTemperature}
+              onChangeTemperature={onChangeTemperature}
             />
           </>
         )}
