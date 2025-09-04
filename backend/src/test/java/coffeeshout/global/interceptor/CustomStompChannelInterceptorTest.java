@@ -18,6 +18,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -99,7 +100,7 @@ class CustomStompChannelInterceptorTest {
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
             Message<?> message = MessageBuilder.createMessage("test", accessor.getMessageHeaders());
 
-            Menu testMenu = new Menu("coffee", MenuCategory.COFFEE);
+            Menu testMenu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
             testMenu.setId(1L);
 
             // when - preSend (연결 요청)
@@ -219,9 +220,9 @@ class CustomStompChannelInterceptorTest {
         }
 
         private Menu createTestMenu() {
-            Menu menu = new Menu("Test Menu", MenuCategory.COFFEE);
-            menu.setId(1L);
-            return menu;
+            Menu testMenu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
+            testMenu.setId(1L);
+            return testMenu;
         }
     }
 

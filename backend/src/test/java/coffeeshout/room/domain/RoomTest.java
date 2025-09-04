@@ -10,6 +10,7 @@ import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
+import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
@@ -33,7 +34,7 @@ class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, 호스트_한스, MenuFixture.아메리카노());
+        room = new Room(joinCode, 호스트_한스, MenuFixture.아메리카노(), MenuTemperature.ICE);
         ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 

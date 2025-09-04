@@ -15,6 +15,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -256,7 +257,7 @@ class ConnectPreSendHandlerTest {
     }
 
     private Menu createTestMenu() {
-        Menu menu = new Menu("Test Menu", MenuCategory.COFFEE);
+        Menu menu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
         menu.setId(1L);
         return menu;
     }
