@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.service;
 
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.repository.MenuRepository;
 import org.springframework.stereotype.Service;
 

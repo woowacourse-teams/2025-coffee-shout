@@ -6,7 +6,9 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
@@ -16,6 +18,7 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.ui.request.SelectedMenu;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,25 @@ public class RoomService {
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
 
+    public Room createRoom(String hostName, SelectedMenu selectedMenu) {
+        Menu menu = null;
+        if (selectedMenu.id() == 0) {
+            menu = new Menu(0L, selectedMenu.customName(), null, TemperatureAvailability.BOTH);
+        } else {
+            menu = menuQueryService.getById(selectedMenu.id());
+        }
+        final JoinCode joinCode = joinCodeGenerator.generate();
+        final Room room = Room.createNewRoom(
+                joinCode,
+                new PlayerName(hostName),
+                menu,
+                MenuTemperature.from(selectedMenu.temperature())
+        );
+        scheduleRemoveRoom(joinCode);
+
+        return roomCommandService.save(room);
+    }
+
     public Room createRoom(String hostName, Long menuId) {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
@@ -48,6 +70,19 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         room.joinGuest(new PlayerName(guestName), menu);
+
+        return roomCommandService.save(room);
+    }
+
+    public Room enterRoom(String joinCode, String guestName, SelectedMenu selectedMenu) {
+        Menu menu = null;
+        if (selectedMenu.id() == 0) {
+            menu = new Menu(0L, selectedMenu.customName(), null, TemperatureAvailability.BOTH);
+        } else {
+            menu = menuQueryService.getById(selectedMenu.id());
+        }        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+
+        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.from(selectedMenu.temperature()));
 
         return roomCommandService.save(room);
     }

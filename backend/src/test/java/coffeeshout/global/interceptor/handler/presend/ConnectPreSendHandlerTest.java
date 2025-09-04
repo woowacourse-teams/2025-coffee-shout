@@ -13,8 +13,8 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -256,7 +256,7 @@ class ConnectPreSendHandlerTest {
     }
 
     private Menu createTestMenu() {
-        Menu menu = new Menu("Test Menu", MenuType.COFFEE);
+        Menu menu = new Menu("Test Menu", MenuCategory.COFFEE);
         menu.setId(1L);
         return menu;
     }

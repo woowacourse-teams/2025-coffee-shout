@@ -58,7 +58,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -69,7 +69,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -80,7 +80,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -91,7 +91,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -131,7 +131,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -142,7 +142,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -153,7 +153,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -164,7 +164,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":2,
                             "name":"카페라떼",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -205,7 +205,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -216,7 +216,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -227,7 +227,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -238,7 +238,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "menuCategory":"COFFEE"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -274,7 +274,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "menuResponse":{
                                "id":1,
                                "name":"아메리카노",
-                               "menuType":"COFFEE"
+                               "menuCategory":"COFFEE"
                             },
                             "playerType":"HOST",
                             "isReady":true,
@@ -288,7 +288,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "menuResponse":{
                                "id":1,
                                "name":"아메리카노",
-                               "menuType":"COFFEE"
+                               "menuCategory":"COFFEE"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -302,7 +302,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "menuResponse":{
                                "id":1,
                                "name":"아메리카노",
-                               "menuType":"COFFEE"
+                               "menuCategory":"COFFEE"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -316,7 +316,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "menuResponse":{
                                "id":1,
                                "name":"아메리카노",
-                               "menuType":"COFFEE"
+                               "menuCategory":"COFFEE"
                             },
                             "playerType":"GUEST",
                             "isReady":false,

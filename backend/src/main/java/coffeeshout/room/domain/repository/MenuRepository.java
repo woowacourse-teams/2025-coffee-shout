@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.repository;
 
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
 import java.util.List;
 import java.util.Optional;
 

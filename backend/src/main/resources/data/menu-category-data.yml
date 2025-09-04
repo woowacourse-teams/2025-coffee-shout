@@ -1,0 +1,15 @@
+menuCategories:
+  - id: 1
+    name: "커피"
+
+  - id: 2
+    name: "스무디"
+
+  - id: 3
+    name: "에이드"
+
+  - id: 4
+    name: "티"
+
+  - id: 5
+    name: "티 라떼"

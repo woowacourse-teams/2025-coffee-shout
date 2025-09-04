@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.repository;
 
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,9 @@ public class MemoryMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
+        if (menu.getId() != null && idGenerator.get() != menu.getId()) {
+            throw new IllegalArgumentException("id가 올바르지 않습니다.");
+        }
         menu.setId(idGenerator.getAndIncrement());
         menus.put(menu.getId(), menu);
         return menus.get(menu.getId());

@@ -3,7 +3,7 @@ package coffeeshout.fixture;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;

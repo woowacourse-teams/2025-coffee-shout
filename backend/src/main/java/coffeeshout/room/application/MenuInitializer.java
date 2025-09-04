@@ -1,7 +1,8 @@
 package coffeeshout.room.application;
 
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
+import coffeeshout.room.domain.service.MenuCategoryCommandService;
 import coffeeshout.room.domain.service.MenuCommandService;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -28,9 +29,12 @@ public class MenuInitializer {
         final InputStream inputStream = new ClassPathResource("data/menu-data.yml").getInputStream();
         final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
 
-        menuDtos.getMenus().forEach(item ->
-                menuCommandService.save(new Menu(item.getName(), item.getMenuType()))
-        );
+        menuDtos.getMenus().forEach(item -> menuCommandService.save(new Menu(
+                item.getId(),
+                item.getName(),
+                item.getCategoryId(),
+                TemperatureAvailability.from(item.getTemperatureAvailability())
+        )));
     }
 
     @Setter
@@ -42,8 +46,9 @@ public class MenuInitializer {
     @Setter
     @Getter
     protected static class MenuDto {
+        private Long id;
         private String name;
-        private MenuType menuType;
-
+        private Long categoryId;
+        private String temperatureAvailability;
     }
 }

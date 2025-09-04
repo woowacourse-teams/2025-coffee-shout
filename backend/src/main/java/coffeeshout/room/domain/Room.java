@@ -6,8 +6,8 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.player.ColorUsage;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
@@ -39,9 +39,9 @@ public class Room {
     private Player host;
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
+    public Room(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature) {
         this.joinCode = joinCode;
-        this.host = Player.createHost(hostName, menu);
+        this.host = Player.createHost(hostName, menu, menuTemperature);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
@@ -52,7 +52,11 @@ public class Room {
     }
 
     public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu) {
-        return new Room(joinCode, hostName, menu);
+        return new Room(joinCode, hostName, menu, MenuTemperature.ICE);
+    }
+
+    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature) {
+        return new Room(joinCode, hostName, menu, menuTemperature);
     }
 
     public void joinGuest(PlayerName guestName, Menu menu) {
@@ -60,6 +64,13 @@ public class Room {
         validateCanJoin();
         validatePlayerNameNotDuplicate(guestName);
         join(Player.createGuest(guestName, menu));
+    }
+
+    public void joinGuest(PlayerName guestName, Menu menu, MenuTemperature menuTemperature) {
+        validateRoomReady();
+        validateCanJoin();
+        validatePlayerNameNotDuplicate(guestName);
+        join(Player.createGuest(guestName, menu, menuTemperature));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
