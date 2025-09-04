@@ -6,7 +6,6 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.player.ColorUsage;
 import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -38,6 +37,7 @@ public class Room {
 
     private Player host;
     private RoomState roomState;
+    private String qrCodeUrl;
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
         this.joinCode = joinCode;
@@ -182,6 +182,10 @@ public class Room {
 
     public boolean isEmpty() {
         return players.isEmpty();
+    }
+
+    public void updateQrCodeUrl(String qrCodeUrl) {
+        this.qrCodeUrl = qrCodeUrl;
     }
 
     private boolean hasEnoughPlayers() {

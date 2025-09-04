@@ -28,7 +28,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.retry:spring-retry")
     implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.7")
+
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.zxing:javase:3.5.3")
+
+    implementation("io.awspring.cloud:spring-cloud-aws-starter:3.4.0")
+    implementation("software.amazon.awssdk:s3:2.33.1")
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")

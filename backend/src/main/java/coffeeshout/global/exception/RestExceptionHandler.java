@@ -5,6 +5,7 @@ import static coffeeshout.global.log.LogAspect.NOTIFICATION_MARKER;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
+import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,13 @@ public class RestExceptionHandler {
     ) {
         logWarning(exception, request);
         return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
+    }
+
+    @ExceptionHandler(QRCodeGenerationException.class)
+    public ProblemDetail handleQRCodeGenerationException(QRCodeGenerationException exception,
+                                                         HttpServletRequest request) {
+        logError(exception, request);
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
     }
 
     private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {
