@@ -1,9 +1,10 @@
 import { theme } from '@/styles/theme';
 import styled from '@emotion/styled';
+import { TemperatureOption } from '../temperatureOption';
 
 type Props = {
   $position: 'left' | 'right';
-  $option: 'HOT' | 'ICED';
+  $option: TemperatureOption;
   $selected: boolean;
 };
 
@@ -24,13 +25,13 @@ export const Container = styled.div<Props>`
   color: ${({ $option, $selected }) => getTextColor($option, $selected)};
 `;
 
-const getBackgroundColor = (option: 'HOT' | 'ICED', selected: boolean) => {
+const getBackgroundColor = (option: TemperatureOption, selected: boolean) => {
   if (option === 'HOT' && selected) return '#FF4242';
   if (option === 'ICED' && selected) return '#236ED8';
   return theme.color.white;
 };
 
-const getTextColor = (option: 'HOT' | 'ICED', selected: boolean) => {
+const getTextColor = (option: TemperatureOption, selected: boolean) => {
   if (option === 'HOT' && selected) return theme.color.white;
   if (option === 'ICED' && selected) return theme.color.white;
   return theme.color.gray[200];
