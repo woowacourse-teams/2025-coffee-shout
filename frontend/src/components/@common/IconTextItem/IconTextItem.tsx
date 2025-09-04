@@ -7,6 +7,7 @@ type Props = {
   rightContent?: ReactNode;
   gap?: number;
   showBorder?: boolean;
+  onClick?: () => void;
 };
 
 const IconTextItem = ({
