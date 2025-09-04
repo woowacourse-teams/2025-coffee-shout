@@ -14,7 +14,8 @@ import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
-import SelectTemperature from './components/SelectTemperature/SelectTemperature';
+import SelectTemperature from './components/SelectMenu/SelectTemperature/SelectTemperature';
+import { Category, NewMenu } from '@/types/menu';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -48,10 +49,16 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
-  const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<NewMenu | null>(null);
+  const [selectedValue, setSelectedValue] = useState<Option>({
+    id: -1,
+    name: '',
+  });
   const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
 
   useEffect(() => {
     (async () => {
@@ -84,8 +91,14 @@ const EntryMenuPage = () => {
     }
   }, [isConnected, joinCode, navigate]);
 
-  const handleNavigateToName = () => {
-    navigate('/entry/name');
+  const handleNavigateToBefore = () => {
+    if (currentView === 'menu' && !selectedMenu) {
+      setCurrentView('category');
+    } else if (currentView === 'menu' && selectedMenu) {
+      setSelectedMenu(null);
+    } else if (currentView === 'category') {
+      navigate('/entry/name');
+    }
   };
 
   const handleNavigateToLobby = async () => {
@@ -158,20 +171,37 @@ const EntryMenuPage = () => {
   const isButtonDisabled = selectedValue.name === '' || loading;
   const isHost = playerType === 'HOST';
 
+  const handleSetSelectedCategory = (category: Category) => {
+    setSelectedCategory(category);
+    setCurrentView('menu');
+  };
+
+  const handleSetSelectedMenu = (menu: NewMenu) => {
+    setSelectedMenu(menu);
+  };
+
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={() => {}} />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToBefore} />} />
       <Layout.Content>
         <S.Container>
-          {/* <SelectCategory /> */}
-          {/* <SelectMenu />
-           */}
-          <SelectTemperature />
+          {currentView === 'category' && (
+            <SelectCategory onClickCategory={handleSetSelectedCategory} />
+          )}
+          {currentView === 'menu' && (
+            <SelectMenu
+              onClickMenu={handleSetSelectedMenu}
+              categoryId={selectedCategory?.id ?? 0}
+              selectedMenu={selectedMenu}
+            />
+          )}
         </S.Container>
       </Layout.Content>
-      <Layout.ButtonBar>
-        <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
-      </Layout.ButtonBar>
+      {currentView === 'menu' && selectedMenu && (
+        <Layout.ButtonBar>
+          <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
+        </Layout.ButtonBar>
+      )}
     </Layout>
   );
 };
