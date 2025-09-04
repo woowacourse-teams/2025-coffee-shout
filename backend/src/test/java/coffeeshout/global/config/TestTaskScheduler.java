@@ -1,4 +1,4 @@
-package coffeeshout.config;
+package coffeeshout.global.config;
 
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;

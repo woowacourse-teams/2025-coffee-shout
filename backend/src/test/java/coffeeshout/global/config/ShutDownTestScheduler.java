@@ -1,4 +1,4 @@
-package coffeeshout.config;
+package coffeeshout.global.config;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 

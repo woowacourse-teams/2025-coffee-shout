@@ -19,7 +19,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 
 @Slf4j
 @Service
-@Profile("!local")
+@Profile("!local & !test")
 public class S3Service implements StorageService {
 
     private final S3Client s3Client;
