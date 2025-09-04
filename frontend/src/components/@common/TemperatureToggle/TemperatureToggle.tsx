@@ -4,12 +4,12 @@ import * as S from './TemperatureToggle.styled';
 
 type Props = {
   selectedTemperature: TemperatureOption;
-  onClick: (option: TemperatureOption) => void;
+  onChangeTemperature: (option: TemperatureOption) => void;
 };
 
 const TEMPERATURE_OPTIONS: TemperatureOption[] = ['ICED', 'HOT'];
 
-const TemperatureToggle = ({ selectedTemperature, onClick }: Props) => {
+const TemperatureToggle = ({ selectedTemperature, onChangeTemperature }: Props) => {
   return (
     <S.Container>
       {TEMPERATURE_OPTIONS.map((option, index) => (
@@ -18,7 +18,7 @@ const TemperatureToggle = ({ selectedTemperature, onClick }: Props) => {
           option={option}
           position={index === 0 ? 'left' : 'right'}
           selected={selectedTemperature === option}
-          onClick={() => onClick(option)}
+          onClick={() => onChangeTemperature(option)}
         />
       ))}
     </S.Container>
