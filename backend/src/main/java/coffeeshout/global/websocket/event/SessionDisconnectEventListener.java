@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Slf4j
@@ -19,8 +20,10 @@ public class SessionDisconnectEventListener {
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
         final String sessionId = event.getSessionId();
+        final CloseStatus closeStatus = event.getCloseStatus();
 
-        log.info("세션 연결 해제 감지: sessionId={}", sessionId);
+        log.info("세션 연결 해제 감지: sessionId={}, closeStatus={}, reason={}", sessionId, closeStatus,
+                closeStatus.getReason());
 
         // 중복 처리 방지
         if (sessionManager.isDisconnectionProcessed(sessionId)) {
