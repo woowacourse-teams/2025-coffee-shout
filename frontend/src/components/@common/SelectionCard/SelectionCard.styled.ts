@@ -14,19 +14,17 @@ export const Container = styled.div<Props>`
   border-radius: 4px;
   align-items: center;
   gap: 10px;
+  padding-left: 8px;
 `;
 
-export const IconContainer = styled.div`
+export const Icon = styled.img`
   object-fit: cover;
   object-position: top;
   flex-shrink: 0;
   margin-top: 14px;
+  margin-left: -8px;
   width: 40px;
-`;
-
-export const Icon = styled.img`
-  width: 100%;
-  height: 50px;
+  height: 40px;
 `;
 
 export const Text = styled.span`

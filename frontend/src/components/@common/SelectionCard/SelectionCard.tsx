@@ -9,7 +9,7 @@ type Props = {
 const SelectionCard = ({ color = '#ffb2b2', text, iconSrc }: Props) => {
   return (
     <S.Container color={color}>
-      <S.IconContainer>{iconSrc && <S.Icon src={iconSrc} alt="icon" />}</S.IconContainer>
+      {iconSrc && <S.Icon src={iconSrc} alt="icon" />}
       <S.Text>{text}</S.Text>
     </S.Container>
   );
