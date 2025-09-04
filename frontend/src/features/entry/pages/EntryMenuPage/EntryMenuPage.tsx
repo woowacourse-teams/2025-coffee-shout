@@ -12,6 +12,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import SelectCategory from './components/SelectCategory/SelectCategory';
+import SelectMenu from './components/SelectMenu/SelectMenu';
+import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 
 // TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
 type MenusResponse = {
@@ -157,28 +160,17 @@ const EntryMenuPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleNavigateToName} />} />
+      <Layout.TopBar left={<BackButton onClick={() => {}} />} />
       <Layout.Content>
         <S.Container>
-          <Headline3>메뉴를 선택해주세요</Headline3>
-          {loading ? (
-            <div>로딩 중...</div>
-          ) : error ? (
-            <div>{error}</div>
-          ) : (
-            <SelectBox
-              options={coffeeOptions}
-              value={selectedValue.name}
-              onChange={(value: Option) => setSelectedValue(value)}
-              placeholder="메뉴를 선택해주세요"
-            />
-          )}
+          {/* <SelectCategory /> */}
+          {/* <SelectMenu />
+           */}
+          <SelectTemperature />
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToLobby}>
-          {isHost ? '방 만들러 가기' : '방 참가하기'}
-        </Button>
+        <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
       </Layout.ButtonBar>
     </Layout>
   );
