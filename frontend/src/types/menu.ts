@@ -15,4 +15,5 @@ export type MenuType = 'COFFEE' | 'ADE' | 'SMOOTHIE' | 'FRAPPUCCINO' | 'ETC';
 export type Category = {
   id: number;
   name: string;
+  imgUrl: string;
 };

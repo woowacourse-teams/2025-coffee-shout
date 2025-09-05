@@ -28,6 +28,8 @@ type RoomResponse = {
   joinCode: string;
 };
 
+type CategoriesResponse = Category[];
+
 const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
@@ -40,6 +42,41 @@ const EntryMenuPage = () => {
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICED');
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      // const data = await api.get<CategoriesResponse>('/menu-categories');
+      // setCategories(data);
+      setCategories([
+        {
+          id: 1,
+          name: '커피',
+          imgUrl: 'https://picsum.photos/200',
+        },
+        {
+          id: 2,
+          name: '스무디',
+          imgUrl: 'https://picsum.photos/200',
+        },
+        {
+          id: 3,
+          name: '에이드',
+          imgUrl: 'https://picsum.photos/200',
+        },
+        {
+          id: 4,
+          name: '티',
+          imgUrl: 'https://picsum.photos/200',
+        },
+        {
+          id: 5,
+          name: '티 라떼',
+          imgUrl: 'https://picsum.photos/200',
+        },
+      ]);
+    })();
+  }, []);
 
   useEffect(() => {
     if (isConnected) {
@@ -147,12 +184,12 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           {currentView === 'category' && (
-            <SelectCategory onClickCategory={handleSetSelectedCategory} />
+            <SelectCategory categories={categories} onClickCategory={handleSetSelectedCategory} />
           )}
-          {currentView === 'menu' && (
+          {currentView === 'menu' && selectedCategory && (
             <SelectMenu
               onClickMenu={handleSetSelectedMenu}
-              categoryId={selectedCategory?.id ?? 0}
+              selectedCategory={selectedCategory}
               selectedMenu={selectedMenu}
               selectedTemperature={selectedTemperature}
               onChangeTemperature={handleChangeTemperature}

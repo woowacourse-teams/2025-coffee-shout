@@ -14,7 +14,7 @@ const meta: Meta<typeof SelectionCard> = {
       control: { type: 'color' },
       description: '카드의 배경색',
     },
-    iconSrc: {
+    imgUrl: {
       control: { type: 'text' },
       description: '아이콘 이미지 경로',
     },
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof SelectionCard>;
 export const Default: Story = {
   args: {
     color: '#ffb2b2',
-    iconSrc: CoffeeIcon,
+    imgUrl: CoffeeIcon,
     text: 'SelectionCard',
   },
 };

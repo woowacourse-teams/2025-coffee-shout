@@ -3,7 +3,7 @@ import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import CoffeeIcon from '@/assets/coffee.svg';
-import { NewMenu } from '@/types/menu';
+import { Category, NewMenu } from '@/types/menu';
 import { useEffect, useState } from 'react';
 import { api } from '@/apis/rest/api';
 import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
@@ -11,7 +11,7 @@ import { TemperatureOption } from '@/components/@common/TemperatureToggle/temper
 
 type Props = {
   onClickMenu: (menu: NewMenu) => void;
-  categoryId: number;
+  selectedCategory: Category;
   selectedMenu: NewMenu | null;
   selectedTemperature: TemperatureOption;
   onChangeTemperature: (temperature: TemperatureOption) => void;
@@ -19,7 +19,7 @@ type Props = {
 
 const SelectMenu = ({
   onClickMenu,
-  categoryId,
+  selectedCategory,
   selectedMenu,
   selectedTemperature,
   onChangeTemperature,
@@ -28,7 +28,7 @@ const SelectMenu = ({
 
   useEffect(() => {
     // (async () => {
-    //   const menus = await api.get<NewMenu[]>(`/menu-categories/${categoryId}/menus`);
+    //   const menus = await api.get<NewMenu[]>(`/menu-categories/${selectedCategory}/menus`);
     //   setMenus(menus);
     // })();
     setMenus([
@@ -43,13 +43,17 @@ const SelectMenu = ({
         temperatureAvailability: 'ICE_ONLY',
       },
     ]);
-  }, [categoryId]);
+  }, [selectedCategory]);
 
   return (
     <>
       <Headline3>메뉴를 선택해주세요</Headline3>
       <S.Wrapper>
-        <SelectionCard color="#eb63d4" text="커피" iconSrc={CoffeeIcon} />
+        <SelectionCard
+          color="#eb63d4"
+          text={selectedCategory.name}
+          imgUrl={selectedCategory.imgUrl}
+        />
         {!selectedMenu && (
           <S.MenuList>
             {menus.map((menu) => (
