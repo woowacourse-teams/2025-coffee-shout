@@ -51,10 +51,6 @@ public class Room {
         join(host);
     }
 
-    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu) {
-        return new Room(joinCode, hostName, menu, MenuTemperature.ICE);
-    }
-
     public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature) {
         return new Room(joinCode, hostName, menu, menuTemperature);
     }

@@ -16,6 +16,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
@@ -269,7 +270,7 @@ class ConnectPreSendHandlerTest {
     }
 
     private Room createPlayingRoom(Menu menu) {
-        Room room = Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+        Room room = Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu, MenuTemperature.ICE);
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         return room;

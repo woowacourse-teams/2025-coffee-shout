@@ -24,19 +24,6 @@ class CustomMenuTest {
     }
 
     @Test
-    @DisplayName("CustomMenu의 ID는 항상 0이다")
-    void CustomMenu의_ID는_항상_0이다() {
-        // given
-        CustomMenu customMenu = new CustomMenu("custom coffee", "custom.jpg");
-
-        // when
-        Long id = customMenu.getId();
-
-        // then
-        assertThat(id).isEqualTo(0L);
-    }
-
-    @Test
     @DisplayName("CustomMenu는 카테고리 이미지 URL을 직접 관리한다")
     void CustomMenu는_카테고리_이미지_URL을_직접_관리한다() {
         // given

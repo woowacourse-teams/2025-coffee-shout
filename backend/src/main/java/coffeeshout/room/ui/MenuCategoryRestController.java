@@ -23,7 +23,7 @@ public class MenuCategoryRestController {
     private final MenuCategoryService menuCategoryService;
 
     @GetMapping
-    public ResponseEntity<List<MenuCategoryResponse>> getAllMenuCategory() {
+    public ResponseEntity<List<MenuCategoryResponse>> getAllMenuCategories() {
         final List<MenuCategory> menuCategories = menuCategoryService.getAll();
         return ResponseEntity.ok(MenuCategoryResponse.from(menuCategories));
     }

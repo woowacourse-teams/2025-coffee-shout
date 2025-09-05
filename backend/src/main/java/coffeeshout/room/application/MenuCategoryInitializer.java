@@ -2,7 +2,6 @@ package coffeeshout.room.application;
 
 import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.service.MenuCategoryCommandService;
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -23,14 +22,14 @@ public class MenuCategoryInitializer implements DataInitializable {
 
     public void init() throws IOException {
         final Yaml yaml = new Yaml();
-        final InputStream inputStream = new ClassPathResource("data/menu-category-data.yml").getInputStream();
-        final MenuCategoryDtos menuCategoryDtos = yaml.loadAs(inputStream, MenuCategoryDtos.class);
-
-        menuCategoryDtos.getMenuCategories().forEach(item -> menuCategoryCommandService.save(new MenuCategory(
-                item.getId(),
-                item.getName(),
-                item.getImageUrl()
-        )));
+        try (final InputStream inputStream = new ClassPathResource("data/menu-category-data.yml").getInputStream()) {
+            final MenuCategoryDtos menuCategoryDtos = yaml.loadAs(inputStream, MenuCategoryDtos.class);
+            menuCategoryDtos.getMenuCategories().forEach(item -> menuCategoryCommandService.save(new MenuCategory(
+                    item.getId(),
+                    item.getName(),
+                    item.getImageUrl()
+            )));
+        }
     }
 
     @Setter

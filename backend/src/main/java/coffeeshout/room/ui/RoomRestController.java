@@ -28,7 +28,7 @@ public class RoomRestController {
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
-        final Room room = roomService.createRoom(request.playerName(), request.selectedMenu());
+        final Room room = roomService.createRoom(request.playerName(), request.selectedMenuRequest());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
@@ -38,7 +38,7 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @RequestBody RoomEnterRequest request
     ) {
-        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.selectedMenu());
+        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.selectedMenuRequest());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
     }

@@ -1,9 +1,7 @@
 package coffeeshout.room.application;
 
-import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
-import coffeeshout.room.domain.service.MenuCategoryCommandService;
 import coffeeshout.room.domain.service.MenuCategoryQueryService;
 import coffeeshout.room.domain.service.MenuCommandService;
 import java.io.IOException;
@@ -23,23 +21,23 @@ public class MenuInitializer implements DataInitializable {
 
     public MenuInitializer(
             MenuCommandService menuCommandService,
-            MenuCategoryQueryService menuCategoryCommandService
+            MenuCategoryQueryService menuCategoryQueryService
     ) {
         this.menuCommandService = menuCommandService;
-        this.menuCategoryQueryService = menuCategoryCommandService;
+        this.menuCategoryQueryService = menuCategoryQueryService;
     }
 
     public void init() throws IOException {
         final Yaml yaml = new Yaml();
-        final InputStream inputStream = new ClassPathResource("data/menu-data.yml").getInputStream();
-        final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
-
-        menuDtos.getMenus().forEach(item -> menuCommandService.save(new ProvidedMenu(
-                item.getId(),
-                item.getName(),
-                menuCategoryQueryService.getById(item.getCategoryId()),
-                TemperatureAvailability.from(item.getTemperatureAvailability())
-        )));
+        try (final InputStream inputStream = new ClassPathResource("data/menu-data.yml").getInputStream()) {
+            final MenuDtos menuDtos = yaml.loadAs(inputStream, MenuDtos.class);
+            menuDtos.getMenus().forEach(item -> menuCommandService.save(new ProvidedMenu(
+                    item.getId(),
+                    item.getName(),
+                    menuCategoryQueryService.getById(item.getCategoryId()),
+                    TemperatureAvailability.from(item.getTemperatureAvailability())
+            )));
+        }
     }
 
     @Setter

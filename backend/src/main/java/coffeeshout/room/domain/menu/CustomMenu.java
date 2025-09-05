@@ -16,6 +16,6 @@ public class CustomMenu extends Menu {
 
     @Override
     public Long getId() {
-        return 0L;
+        throw new IllegalStateException("CustomMenu는 id가 없습니다.");
     }
 }

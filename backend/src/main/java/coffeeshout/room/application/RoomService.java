@@ -9,7 +9,6 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
-import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
@@ -19,11 +18,10 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.ui.request.SelectedMenu;
+import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,42 +53,24 @@ public class RoomService {
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
-    public Room createRoom(String hostName, SelectedMenu selectedMenu) {
-        final Menu menu = convertMenu(selectedMenu);
+    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
+        final Menu menu = convertMenu(selectedMenuRequest);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(
                 joinCode,
                 new PlayerName(hostName),
                 menu,
-                MenuTemperature.from(selectedMenu.temperature())
+                MenuTemperature.from(selectedMenuRequest.temperature())
         );
         scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
     }
 
-    public Room createRoom(String hostName, Long menuId) {
-        final Menu menu = menuQueryService.getById(menuId);
-        final JoinCode joinCode = joinCodeGenerator.generate();
-        final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
-        scheduleRemoveRoom(joinCode);
-
-        return roomCommandService.save(room);
-    }
-
-    public Room enterRoom(String joinCode, String guestName, Long menuId) {
-        final Menu menu = menuQueryService.getById(menuId);
+    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        room.joinGuest(new PlayerName(guestName), menu);
-
-        return roomCommandService.save(room);
-    }
-
-    public Room enterRoom(String joinCode, String guestName, SelectedMenu selectedMenu) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Menu menu = convertMenu(selectedMenu);
-        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.from(selectedMenu.temperature()));
+        final Menu menu = convertMenu(selectedMenuRequest);
+        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.from(selectedMenuRequest.temperature()));
 
         return roomCommandService.save(room);
     }
@@ -202,10 +182,10 @@ public class RoomService {
         }
     }
 
-    private Menu convertMenu(SelectedMenu selectedMenu) {
-        if (selectedMenu.id() == 0) {
-            return new CustomMenu(selectedMenu.customName(), defaultCategoryImage);
+    private Menu convertMenu(SelectedMenuRequest selectedMenuRequest) {
+        if (selectedMenuRequest.id() == 0) {
+            return new CustomMenu(selectedMenuRequest.customName(), defaultCategoryImage);
         }
-        return menuQueryService.getById(selectedMenu.id());
+        return menuQueryService.getById(selectedMenuRequest.id());
     }
 }

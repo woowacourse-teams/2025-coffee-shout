@@ -19,6 +19,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
@@ -221,7 +222,7 @@ class CustomStompChannelInterceptorTest {
         }
 
         private Room createTestRoom(Menu menu) {
-            return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+            return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu, MenuTemperature.ICE);
         }
 
         private ProvidedMenu createTestMenu() {
