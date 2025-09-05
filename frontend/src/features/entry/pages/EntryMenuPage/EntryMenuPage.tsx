@@ -3,8 +3,6 @@ import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import Headline3 from '@/components/@common/Headline3/Headline3';
-import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
@@ -14,33 +12,19 @@ import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
-import SelectTemperature from './components/SelectMenu/SelectTemperature/SelectTemperature';
 import { Category, NewMenu } from '@/types/menu';
 import { TemperatureOption } from '@/components/@common/TemperatureToggle/temperatureOption';
 
-// TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
-type MenusResponse = {
-  id: number;
-  name: string;
-  category: string;
-}[];
-
-type CreateRoomRequest = {
-  hostName: string;
-  menuId: number;
+type RoomRequest = {
+  playerName: string;
+  menu: {
+    id: number;
+    customName: string | null;
+    temperature: TemperatureOption;
+  };
 };
 
-type CreateRoomResponse = {
-  joinCode: string;
-};
-
-type EnterRoomRequest = {
-  joinCode: string;
-  guestName: string;
-  menuId: number;
-};
-
-type EnterRoomResponse = {
+type RoomResponse = {
   joinCode: string;
 };
 
@@ -52,6 +36,7 @@ const EntryMenuPage = () => {
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<NewMenu | null>(null);
+  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICED');
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
@@ -72,6 +57,34 @@ const EntryMenuPage = () => {
     }
   };
 
+  const createRoomRequestBody = () => {
+    return {
+      playerName: myName,
+      menu: {
+        id: selectedMenu ? selectedMenu.id : 0,
+        customName: customMenuName,
+        temperature: selectedTemperature,
+      },
+    };
+  };
+
+  const createUrl = () => {
+    if (playerType === 'HOST') {
+      return `/rooms`;
+    } else {
+      return `/rooms/${joinCode}`;
+    }
+  };
+
+  const handleRoomRequest = async () => {
+    const { joinCode } = await api.post<RoomResponse, RoomRequest>(
+      createUrl(),
+      createRoomRequestBody()
+    );
+    setJoinCode(joinCode);
+    startSocket(joinCode, myName);
+  };
+
   const handleNavigateToLobby = async () => {
     if (!myName) {
       showToast({
@@ -90,34 +103,9 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const handleHost = async () => {
-      // api 형식 수정 필요
-      const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-        hostName: myName,
-        menuId: selectedMenu.id,
-      });
-      setJoinCode(joinCode);
-      startSocket(joinCode, myName);
-    };
-
-    const handleGuest = async () => {
-      //api 형식 수정 필요
-      const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
-        '/rooms/enter',
-        {
-          joinCode,
-          guestName: myName,
-          menuId: selectedMenu.id,
-        }
-      );
-      setJoinCode(_joinCode);
-      startSocket(_joinCode, myName);
-    };
-
     try {
       setLoading(true);
-      if (playerType === 'HOST') return await handleHost();
-      if (playerType === 'GUEST') return await handleGuest();
+      await handleRoomRequest();
     } catch (error) {
       if (error instanceof ApiError) {
         showToast({
@@ -139,8 +127,6 @@ const EntryMenuPage = () => {
       setLoading(false);
     }
   };
-
-  const isHost = playerType === 'HOST';
 
   const handleSetSelectedCategory = (category: Category) => {
     setSelectedCategory(category);
