@@ -9,6 +9,6 @@ public record MenuResponse(
 ) {
 
     public static MenuResponse from(Menu menu) {
-        return new MenuResponse(menu.getId(), menu.getName(), menu.getMenuCategory().getImageUrl());
+        return new MenuResponse(menu.getId(), menu.getName(), menu.getCategoryImageUrl());
     }
 }

@@ -2,8 +2,8 @@ package coffeeshout.room.ui;
 
 import coffeeshout.room.application.MenuCategoryService;
 import coffeeshout.room.application.MenuService;
-import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.ui.response.MenuCategoryResponse;
 import coffeeshout.room.ui.response.SelectableMenuResponse;
 import java.util.List;
@@ -30,7 +30,7 @@ public class MenuCategoryRestController {
 
     @GetMapping("/{categoryId}/menus")
     public ResponseEntity<List<SelectableMenuResponse>> getMenusByCategory(@PathVariable("categoryId") Long categoryId) {
-        final List<Menu> menus = menuService.getAllMenuByCategoryId(categoryId);
+        final List<ProvidedMenu> menus = menuService.getAllMenuByCategoryId(categoryId);
         return ResponseEntity.ok(SelectableMenuResponse.from(menus));
     }
 }

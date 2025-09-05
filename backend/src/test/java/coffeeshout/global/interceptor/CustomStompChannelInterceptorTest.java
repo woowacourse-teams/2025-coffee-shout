@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
 import coffeeshout.global.interceptor.handler.postsend.ConnectPostSendHandler;
 import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler;
@@ -18,6 +19,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
@@ -100,9 +102,12 @@ class CustomStompChannelInterceptorTest {
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
             Message<?> message = MessageBuilder.createMessage("test", accessor.getMessageHeaders());
 
-            Menu testMenu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
-            testMenu.setId(1L);
-
+            Menu menu = new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
             // when - preSend (연결 요청)
             Message<?> preSendResult = interceptor.preSend(message, channel);
 
@@ -220,9 +225,12 @@ class CustomStompChannelInterceptorTest {
         }
 
         private Menu createTestMenu() {
-            Menu testMenu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
-            testMenu.setId(1L);
-            return testMenu;
+            return new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
         }
     }
 

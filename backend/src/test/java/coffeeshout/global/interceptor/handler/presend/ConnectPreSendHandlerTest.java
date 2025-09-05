@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.exception.GlobalErrorCode;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
@@ -15,6 +16,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -257,8 +259,12 @@ class ConnectPreSendHandlerTest {
     }
 
     private Menu createTestMenu() {
-        Menu menu = new Menu("Test Menu", 1L, TemperatureAvailability.BOTH);
-        menu.setId(1L);
+        Menu menu = new ProvidedMenu(
+                1L,
+                "라떼",
+                MenuCategoryFixture.커피(),
+                TemperatureAvailability.BOTH
+        );
         return menu;
     }
 

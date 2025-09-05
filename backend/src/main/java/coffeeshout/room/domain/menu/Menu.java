@@ -3,36 +3,17 @@ package coffeeshout.room.domain.menu;
 import lombok.Getter;
 
 @Getter
-public class Menu {
+public abstract class Menu {
 
-    private Long id;
     private final String name;
-    private final MenuCategory menuCategory;
     private final TemperatureAvailability temperatureAvailability;
 
-    public Menu(
-            Long id,
-            String name,
-            MenuCategory menuCategory,
-            TemperatureAvailability temperatureAvailability
-    ) {
-        this.id = id;
+    protected Menu(String name, TemperatureAvailability temperatureAvailability) {
         this.name = name;
-        this.menuCategory = menuCategory;
         this.temperatureAvailability = temperatureAvailability;
     }
 
-    public Menu(
-            String name,
-            MenuCategory menuCategory,
-            TemperatureAvailability temperatureAvailability
-    ) {
-        this.name = name;
-        this.menuCategory = menuCategory;
-        this.temperatureAvailability = temperatureAvailability;
-    }
+    public abstract String getCategoryImageUrl();
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    public abstract Long getId();
 }
