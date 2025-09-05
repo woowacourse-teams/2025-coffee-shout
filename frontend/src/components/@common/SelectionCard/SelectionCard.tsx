@@ -3,13 +3,13 @@ import * as S from './SelectionCard.styled';
 type Props = {
   color: string;
   text: string;
-  imgUrl?: string;
+  imageUrl?: string;
 };
 
-const SelectionCard = ({ color = '#ffb2b2', text, imgUrl }: Props) => {
+const SelectionCard = ({ color = '#ffb2b2', text, imageUrl }: Props) => {
   return (
     <S.Container color={color}>
-      {imgUrl && <S.Icon src={imgUrl} alt="icon" />}
+      {imageUrl && <S.Icon src={imageUrl} alt="icon" />}
       <S.Text>{text}</S.Text>
     </S.Container>
   );

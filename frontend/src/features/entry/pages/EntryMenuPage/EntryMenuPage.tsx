@@ -12,7 +12,7 @@ import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
-import { Category, NewMenu } from '@/types/menu';
+import { Category, Menu } from '@/types/menu';
 import { TemperatureOption } from '@/types/menu';
 
 type RoomRequest = {
@@ -37,7 +37,7 @@ const EntryMenuPage = () => {
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedMenu, setSelectedMenu] = useState<NewMenu | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
   const [customMenuName, setCustomMenuName] = useState<string | null>(null);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
   const [loading, setLoading] = useState(true);
@@ -46,35 +46,8 @@ const EntryMenuPage = () => {
 
   useEffect(() => {
     (async () => {
-      // const data = await api.get<CategoriesResponse>('/menu-categories');
-      // setCategories(data);
-      setCategories([
-        {
-          id: 1,
-          name: '커피',
-          imgUrl: 'https://picsum.photos/200',
-        },
-        {
-          id: 2,
-          name: '스무디',
-          imgUrl: 'https://picsum.photos/200',
-        },
-        {
-          id: 3,
-          name: '에이드',
-          imgUrl: 'https://picsum.photos/200',
-        },
-        {
-          id: 4,
-          name: '티',
-          imgUrl: 'https://picsum.photos/200',
-        },
-        {
-          id: 5,
-          name: '티 라떼',
-          imgUrl: 'https://picsum.photos/200',
-        },
-      ]);
+      const data = await api.get<CategoriesResponse>('/menu-categories');
+      setCategories(data);
     })();
   }, []);
 
@@ -170,7 +143,7 @@ const EntryMenuPage = () => {
     setCurrentView('menu');
   };
 
-  const handleSetSelectedMenu = (menu: NewMenu) => {
+  const handleSetSelectedMenu = (menu: Menu) => {
     setSelectedMenu(menu);
   };
 

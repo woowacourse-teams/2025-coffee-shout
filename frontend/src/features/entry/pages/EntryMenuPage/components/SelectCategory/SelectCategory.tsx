@@ -1,7 +1,6 @@
 import * as S from './SelectCategory.styled';
 import CafeCategoryCard from '@/components/@composition/CafeCategoryCard/CafeCategoryCard';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import { api } from '@/apis/rest/api';
 import { Category } from '@/types/menu';
 
 type Props = {
@@ -17,7 +16,7 @@ const SelectCategory = ({ categories, onClickCategory }: Props) => {
         {categories.map((category) => (
           <CafeCategoryCard
             key={category.id}
-            imgUrl={category.imgUrl}
+            imageUrl={category.imageUrl}
             categoryName={category.name}
             onClick={() => onClickCategory(category)}
           />

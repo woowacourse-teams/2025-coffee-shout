@@ -2,16 +2,17 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
-import { Category, NewMenu, TemperatureAvailability } from '@/types/menu';
+import { Category, Menu, TemperatureAvailability } from '@/types/menu';
 import { useEffect, useState } from 'react';
 import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
 import { TemperatureOption } from '@/types/menu';
 import TemperatureOnly from '@/components/@common/TemperatureOnly/TemperatureOnly';
+import { api } from '@/apis/rest/api';
 
 type Props = {
-  onMenuSelect: (menu: NewMenu) => void;
+  onMenuSelect: (menu: Menu) => void;
   selectedCategory: Category;
-  selectedMenu: NewMenu | null;
+  selectedMenu: Menu | null;
   selectedTemperature: TemperatureOption;
   onChangeTemperature: (temperature: TemperatureOption) => void;
 };
@@ -23,25 +24,13 @@ const SelectMenu = ({
   selectedTemperature,
   onChangeTemperature,
 }: Props) => {
-  const [menus, setMenus] = useState<NewMenu[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
 
   useEffect(() => {
-    // (async () => {
-    //   const menus = await api.get<NewMenu[]>(`/menu-categories/${selectedCategory}/menus`);
-    //   setMenus(menus);
-    // })();
-    setMenus([
-      {
-        id: 1,
-        name: '아메리카노',
-        temperatureAvailability: 'ICE_ONLY',
-      },
-      {
-        id: 2,
-        name: '카페라떼',
-        temperatureAvailability: 'ICE_ONLY',
-      },
-    ]);
+    (async () => {
+      const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategory}/menus`);
+      setMenus(menus);
+    })();
   }, [selectedCategory]);
 
   const TEMPERATURE_AVAILABILITY_MAP: Record<
@@ -52,7 +41,7 @@ const SelectMenu = ({
     ICE_ONLY: 'ICE',
   } as const;
 
-  const handleClickMenu = (menu: NewMenu) => {
+  const handleClickMenu = (menu: Menu) => {
     onMenuSelect(menu);
     if (menu.temperatureAvailability === 'ICE_ONLY') {
       onChangeTemperature('ICE');
@@ -68,7 +57,7 @@ const SelectMenu = ({
         <SelectionCard
           color="#eb63d4"
           text={selectedCategory.name}
-          imgUrl={selectedCategory.imgUrl}
+          imageUrl={selectedCategory.imageUrl}
         />
         {!selectedMenu && (
           <S.MenuList>

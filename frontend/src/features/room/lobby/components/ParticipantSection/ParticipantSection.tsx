@@ -52,7 +52,7 @@ export const ParticipantSection = ({ participants }: Props) => {
         isReady={mySelect.isReady}
         playerType={mySelect.playerType}
       >
-        <S.Menu src={getMenuIcon(mySelect.menuResponse.menuType)} onClick={handleModifyMenu} />
+        <S.Menu src={mySelect.menuResponse.categoryImageUrl} onClick={handleModifyMenu} />
       </PlayerCard>
       <Divider />
       <S.ScrollableWrapper>
@@ -67,7 +67,7 @@ export const ParticipantSection = ({ participants }: Props) => {
               isReady={participant.isReady}
               playerType={participant.playerType}
             >
-              <S.Menu src={getMenuIcon(participant.menuResponse.menuType)} />
+              <S.Menu src={participant.menuResponse.categoryImageUrl} />
             </PlayerCard>
           ))
         )}
