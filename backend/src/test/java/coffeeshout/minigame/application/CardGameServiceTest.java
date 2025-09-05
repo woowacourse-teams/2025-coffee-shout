@@ -65,7 +65,7 @@ class CardGameServiceTest extends ServiceTest {
         host = players.get(0);
         room = roomService.createRoom(
                 host.getName().value(),
-                new SelectedMenuRequest(1L, null, MenuTemperature.ICE.name())
+                new SelectedMenuRequest(1L, null, MenuTemperature.ICE)
         );
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());

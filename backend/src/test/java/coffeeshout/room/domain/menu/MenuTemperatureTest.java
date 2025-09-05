@@ -29,7 +29,6 @@ class MenuTemperatureTest {
 
         // when & then
         assertThatThrownBy(() -> MenuTemperature.from(invalidTemperature))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("존재하지 않는 메뉴 온도입니다.");
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

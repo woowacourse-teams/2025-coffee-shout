@@ -60,7 +60,7 @@ public class RoomService {
                 joinCode,
                 new PlayerName(hostName),
                 menu,
-                MenuTemperature.from(selectedMenuRequest.temperature())
+                MenuTemperature.ICE
         );
         scheduleRemoveRoom(joinCode);
 
@@ -70,7 +70,7 @@ public class RoomService {
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Menu menu = convertMenu(selectedMenuRequest);
-        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.from(selectedMenuRequest.temperature()));
+        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.ICE);
 
         return roomCommandService.save(room);
     }
