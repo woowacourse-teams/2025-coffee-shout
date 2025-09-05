@@ -37,7 +37,6 @@ public class Room {
 
     private Player host;
     private RoomState roomState;
-    private String qrCodeUrl;
 
     public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
         this.joinCode = joinCode;
@@ -185,7 +184,7 @@ public class Room {
     }
 
     public void updateQrCodeUrl(String qrCodeUrl) {
-        this.qrCodeUrl = qrCodeUrl;
+        this.joinCode.updateQrCodeUrl(qrCodeUrl);
     }
 
     private boolean hasEnoughPlayers() {

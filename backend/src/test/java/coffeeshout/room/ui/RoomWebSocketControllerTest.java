@@ -39,8 +39,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 플레이어_목록을_조회한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/update-players", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-players", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -106,8 +106,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 플레이어_메뉴를_변경한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/update-menus", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-menus", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -179,8 +179,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 준비_상태를_변경한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/update-ready", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-ready", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -191,7 +191,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                   "playerName": "루키",
                   "isReady": false
                 }
-                """, joinCode.value()));
+                """, joinCode.getValue()));
 
         // then
         MessageResponse readyResponse = responses.get();
@@ -253,8 +253,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 플레이어들의_확률을_조회한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/roulette", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/get-probabilities", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s/roulette", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/get-probabilities", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -333,8 +333,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 미니게임을_선택한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/minigame", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/update-minigames", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s/minigame", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-minigames", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -359,12 +359,12 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 룰렛을_돌려서_당첨자를_선택한다() throws JSONException {
+    void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
 
-        String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 

@@ -39,7 +39,7 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
-        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().value());
+        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
         room.updateQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
@@ -158,7 +158,7 @@ public class RoomService {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
         } catch (Exception e) {
-            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.value(), e);
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
         }
     }
 }

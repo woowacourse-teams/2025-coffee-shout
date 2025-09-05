@@ -72,7 +72,7 @@ public class CardGameEventListener {
         CardGame cardGame = cardGameStartEvent.cardGame();
         JoinCode joinCode = cardGameStartEvent.joinCode();
         messagingTemplate.convertAndSend(
-                String.format(GAME_START_DESTINATION_FORMAT, joinCode.value()),
+                String.format(GAME_START_DESTINATION_FORMAT, joinCode.getValue()),
                 WebSocketResponse.success(new MiniGameStartMessage(cardGame.getMiniGameType()))
         );
     }
@@ -81,7 +81,7 @@ public class CardGameEventListener {
         CardGame cardGame = cardSelectEvent;
         JoinCode joinCode = cardSelectEvent1;
         final MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
-        final String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.value());
+        final String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.getValue());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(message));
     }
 }

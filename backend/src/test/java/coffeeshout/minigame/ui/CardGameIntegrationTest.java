@@ -50,8 +50,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @Test
     void 카드게임을_실행한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
@@ -162,8 +162,8 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @Test
     void 카드를_선택한다() throws Exception {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.value());
+        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.getValue());
 
         var responses = session.subscribe(subscribeUrlFormat);
 
