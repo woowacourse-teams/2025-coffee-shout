@@ -17,3 +17,5 @@ export type Category = {
   name: string;
   imgUrl: string;
 };
+
+export type TemperatureOption = 'HOT' | 'ICE';

@@ -5,7 +5,7 @@ const SelectTemperature = () => {
   return (
     <>
       <SelectionCard color="#ffebfc" text="아메리카노" />
-      <TemperatureToggle selectedTemperature="ICED" onChangeTemperature={() => {}} />
+      <TemperatureToggle selectedTemperature="ICE" onChangeTemperature={() => {}} />
     </>
   );
 };

@@ -7,7 +7,7 @@ type Props = {
   onChangeTemperature: (option: TemperatureOption) => void;
 };
 
-const TEMPERATURE_OPTIONS: TemperatureOption[] = ['ICED', 'HOT'];
+const TEMPERATURE_OPTIONS: TemperatureOption[] = ['ICE', 'HOT'];
 
 const TemperatureToggle = ({ selectedTemperature, onChangeTemperature }: Props) => {
   return (

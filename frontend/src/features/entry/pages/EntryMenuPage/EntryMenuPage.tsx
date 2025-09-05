@@ -39,7 +39,7 @@ const EntryMenuPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<NewMenu | null>(null);
   const [customMenuName, setCustomMenuName] = useState<string | null>(null);
-  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICED');
+  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
   const [categories, setCategories] = useState<Category[]>([]);
