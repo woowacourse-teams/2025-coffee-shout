@@ -13,7 +13,7 @@ import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
 import { Category, NewMenu } from '@/types/menu';
-import { TemperatureOption } from '@/components/@common/TemperatureToggle/temperatureOption';
+import { TemperatureOption } from '@/types/menu';
 
 type RoomRequest = {
   playerName: string;
@@ -188,7 +188,7 @@ const EntryMenuPage = () => {
           )}
           {currentView === 'menu' && selectedCategory && (
             <SelectMenu
-              onClickMenu={handleSetSelectedMenu}
+              onMenuSelect={handleSetSelectedMenu}
               selectedCategory={selectedCategory}
               selectedMenu={selectedMenu}
               selectedTemperature={selectedTemperature}

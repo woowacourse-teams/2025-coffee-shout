@@ -4,10 +4,12 @@ export type Menu = {
   menuType: MenuType;
 };
 
+export type TemperatureAvailability = 'ICE_ONLY' | 'HOT_ONLY' | 'BOTH';
+
 export type NewMenu = {
   id: number;
   name: string;
-  temperatureAvailability: 'ICE_ONLY' | 'HOT_ONLY' | 'BOTH';
+  temperatureAvailability: TemperatureAvailability;
 };
 
 export type MenuType = 'COFFEE' | 'ADE' | 'SMOOTHIE' | 'FRAPPUCCINO' | 'ETC';

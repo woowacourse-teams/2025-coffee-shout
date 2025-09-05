@@ -1,4 +1,4 @@
-import { TemperatureOption } from './temperatureOption';
+import { TemperatureOption } from '@/types/menu';
 import TemperatureOptionButton from './TemperatureOptionButton/TemperatureOptionButton';
 import * as S from './TemperatureToggle.styled';
 
