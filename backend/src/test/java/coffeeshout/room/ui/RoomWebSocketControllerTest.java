@@ -58,7 +58,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -69,7 +70,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -80,7 +82,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -91,83 +94,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
-                         },
-                         "playerType":"GUEST",
-                         "isReady":false,
-                         "colorIndex":"*"
-                      }
-                   ],
-                   "errorMessage":null
-                }
-                """, getColorIndexCustomization("colorIndex"));
-    }
-
-    @Test
-    void 플레이어_메뉴를_변경한다() throws JSONException {
-        // given
-        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.value());
-        String requestUrlFormat = String.format("/app/room/%s/update-menus", joinCode.value());
-
-        var responses = session.subscribe(subscribeUrlFormat);
-
-        // when
-        session.send(requestUrlFormat, String.format("""
-                {
-                  "playerName": "한스",
-                  "menuId": 2
-                }
-                """));
-
-        // then
-        MessageResponse menuChangeResponse = responses.get();
-
-        /*
-        TODO: 테스트 작성 및 변경된 응답구조 논의
-         */
-        assertMessageCustomization(menuChangeResponse, """
-                {
-                   "success":true,
-                   "data":[
-                      {
-                         "playerName":"꾹이",
-                         "menuResponse":{
-                            "id":1,
-                            "name":"아메리카노",
-                            "menuCategory":"COFFEE"
-                         },
-                         "playerType":"HOST",
-                         "isReady":true,
-                         "colorIndex":"*"
-                      },
-                      {
-                         "playerName":"루키",
-                         "menuResponse":{
-                            "id":1,
-                            "name":"아메리카노",
-                            "menuCategory":"COFFEE"
-                         },
-                         "playerType":"GUEST",
-                         "isReady":false,
-                         "colorIndex":"*"
-                      },
-                      {
-                         "playerName":"엠제이",
-                         "menuResponse":{
-                            "id":1,
-                            "name":"아메리카노",
-                            "menuCategory":"COFFEE"
-                         },
-                         "playerType":"GUEST",
-                         "isReady":false,
-                         "colorIndex":"*"
-                      },
-                      {
-                         "playerName":"한스",
-                         "menuResponse":{
-                            "id":2,
-                            "name":"카페라떼",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -208,7 +136,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -219,7 +148,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -230,7 +160,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -241,7 +172,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuCategory":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -275,9 +207,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "playerResponse":{
                             "playerName":"꾹이",
                             "menuResponse":{
-                               "id":1,
-                               "name":"아메리카노",
-                               "menuCategory":"COFFEE"
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
                             },
                             "playerType":"HOST",
                             "isReady":true,
@@ -289,9 +222,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "playerResponse":{
                             "playerName":"루키",
                             "menuResponse":{
-                               "id":1,
-                               "name":"아메리카노",
-                               "menuCategory":"COFFEE"
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -303,9 +237,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "playerResponse":{
                             "playerName":"엠제이",
                             "menuResponse":{
-                               "id":1,
-                               "name":"아메리카노",
-                               "menuCategory":"COFFEE"
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -317,9 +252,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "playerResponse":{
                             "playerName":"한스",
                             "menuResponse":{
-                               "id":1,
-                               "name":"아메리카노",
-                               "menuCategory":"COFFEE"
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,

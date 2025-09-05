@@ -185,7 +185,7 @@ class CustomStompChannelInterceptorTest {
             sessionManager.registerPlayerSession(joinCode, playerName, oldSessionId);
 
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
-            Menu testMenu = createTestMenu();
+            ProvidedMenu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
             given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
@@ -224,7 +224,7 @@ class CustomStompChannelInterceptorTest {
             return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
         }
 
-        private Menu createTestMenu() {
+        private ProvidedMenu createTestMenu() {
             return new ProvidedMenu(
                     1L,
                     "라떼",

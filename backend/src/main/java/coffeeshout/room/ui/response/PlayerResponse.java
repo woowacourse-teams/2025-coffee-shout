@@ -5,7 +5,7 @@ import coffeeshout.room.domain.player.PlayerType;
 
 public record PlayerResponse(
         String playerName,
-        PlayerMenuResponse playerMenuResponse,
+        PlayerMenuResponse menuResponse,
         PlayerType playerType,
         Boolean isReady,
         Integer colorIndex
