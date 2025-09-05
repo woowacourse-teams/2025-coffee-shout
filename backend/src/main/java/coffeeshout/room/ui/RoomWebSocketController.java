@@ -88,12 +88,14 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.changePlayerReadyState(joinCode, message.playerName(),
-                        message.isReady())
+        final List<PlayerResponse> responses = roomService.changePlayerReadyState(
+                        joinCode,
+                        message.playerName(),
+                        message.isReady()
+                )
                 .stream()
                 .map(PlayerResponse::from)
                 .toList();
-
         messagingTemplate.convertAndSend("/topic/room/" + joinCode,
                 WebSocketResponse.success(responses));
     }

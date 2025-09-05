@@ -26,7 +26,7 @@ menus:
 
   - id: 6
     name: "아이스티"
-    categoryId: 6
+    categoryId: 3
     temperatureAvailability: "BOTH"
 
   - id: 7

@@ -122,6 +122,9 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         // then
         MessageResponse menuChangeResponse = responses.get();
 
+        /*
+        TODO: 테스트 작성 및 변경된 응답구조 논의
+         */
         assertMessageCustomization(menuChangeResponse, """
                 {
                    "success":true,

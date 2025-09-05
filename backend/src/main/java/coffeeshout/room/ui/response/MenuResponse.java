@@ -5,10 +5,10 @@ import coffeeshout.room.domain.menu.Menu;
 public record MenuResponse(
         Long id,
         String name,
-        Long categoryId
+        String categoryImageUrl
 ) {
 
     public static MenuResponse from(Menu menu) {
-        return new MenuResponse(menu.getId(), menu.getName(), menu.getMenuCategoryId());
+        return new MenuResponse(menu.getId(), menu.getName(), menu.getMenuCategory().getImageUrl());
     }
 }

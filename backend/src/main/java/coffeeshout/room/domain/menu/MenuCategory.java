@@ -6,11 +6,13 @@ import lombok.Getter;
 public class MenuCategory {
 
     private Long id;
-    private String name;
+    private final String name;
+    private final String imageUrl;
 
-    public MenuCategory(Long id, String name) {
+    public MenuCategory(Long id, String name, String imageUrl) {
         this.id = id;
         this.name = name;
+        this.imageUrl = imageUrl;
     }
 
     public void setId(Long id) {

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 @Component
-public class MenuCategoryInitializer {
+public class MenuCategoryInitializer implements DataInitializable {
 
     private final MenuCategoryCommandService menuCategoryCommandService;
 
@@ -21,15 +21,15 @@ public class MenuCategoryInitializer {
         this.menuCategoryCommandService = menuCategoryCommandService;
     }
 
-    @PostConstruct
-    private void init() throws IOException {
+    public void init() throws IOException {
         final Yaml yaml = new Yaml();
         final InputStream inputStream = new ClassPathResource("data/menu-category-data.yml").getInputStream();
         final MenuCategoryDtos menuCategoryDtos = yaml.loadAs(inputStream, MenuCategoryDtos.class);
 
         menuCategoryDtos.getMenuCategories().forEach(item -> menuCategoryCommandService.save(new MenuCategory(
                 item.getId(),
-                item.getName()
+                item.getName(),
+                item.getImageUrl()
         )));
     }
 
@@ -44,5 +44,6 @@ public class MenuCategoryInitializer {
     protected static class MenuCategoryDto {
         private Long id;
         private String name;
+        private String imageUrl;
     }
 }

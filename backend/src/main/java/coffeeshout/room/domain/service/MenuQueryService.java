@@ -33,7 +33,7 @@ public class MenuQueryService {
 
     public List<Menu> getAllByCategoryId(Long categoryId) {
         return menuRepository.findAll().stream()
-                .filter(menu -> Objects.equals(menu.getMenuCategoryId(), categoryId))
+                .filter(menu -> Objects.equals(menu.getMenuCategory().getId(), categoryId))
                 .toList();
     }
 }

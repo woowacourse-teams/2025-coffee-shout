@@ -15,4 +15,9 @@ public class MenuCategoryQueryService {
     public List<MenuCategory> getAll() {
         return menuCategoryRepository.getAll();
     }
+
+    public MenuCategory getById(Long id) {
+        return menuCategoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴 카테고리입니다."));
+    }
 }
