@@ -1,12 +1,13 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.config.properties.QrProperties;
+import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import jakarta.validation.constraints.NotBlank;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +33,16 @@ public class ZxingQrCodeGenerator implements QrCodeGenerator {
     }
 
     @Override
-    public byte[] generate(String contents) throws IOException {
-        try {
+    public byte[] generate(@NotBlank String contents) throws IOException {
+        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             final BitMatrix bitMatrix = qrCodeWriter.encode(contents, BarcodeFormat.QR_CODE, width, height);
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             MatrixToImageWriter.writeToStream(bitMatrix, IMAGE_FORMAT, outputStream);
 
             return outputStream.toByteArray();
         } catch (WriterException e) {
-            log.error("QR코드 생성 중 에러 발생: {}", e.getMessage());
+            log.error("QR코드 생성 실패: contents={}, width={}, height={}, error={}",
+                    contents, width, height, e.toString());
             throw new IOException(e);
         }
     }

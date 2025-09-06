@@ -7,8 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.config.properties.QrProperties;
-import coffeeshout.config.properties.QrProperties.PresignedUrl;
+import coffeeshout.global.config.properties.QrProperties;
+import coffeeshout.global.config.properties.QrProperties.PresignedUrl;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.RoomErrorCode;
 import io.micrometer.core.instrument.MeterRegistry;

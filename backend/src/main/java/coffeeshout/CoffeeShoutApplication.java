@@ -1,6 +1,6 @@
 package coffeeshout;
 
-import coffeeshout.config.properties.QrProperties;
+import coffeeshout.global.config.properties.QrProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

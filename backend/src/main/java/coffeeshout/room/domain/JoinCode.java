@@ -18,7 +18,7 @@ public final class JoinCode {
     private final String value;
     private String qrCodeUrl;
 
-    public JoinCode(@NonNull String value) {
+    public JoinCode(String value) {
         validate(value);
         this.value = value;
     }
@@ -32,7 +32,7 @@ public final class JoinCode {
                 .collect(Collectors.joining()));
     }
 
-    public void assignQrCodeUrl(String qrCodeUrl) {
+    public void assignQrCodeUrl(@NonNull String qrCodeUrl) {
         if (qrCodeUrl.isBlank()) {
             throw new IllegalArgumentException("QR 코드 URL은 공백일 수 없습니다. qrCOdeUrl: " + qrCodeUrl);
         }

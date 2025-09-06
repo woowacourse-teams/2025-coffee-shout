@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.config.properties.QrProperties;
-import coffeeshout.global.exception.custom.StorageServiceException;
+import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
+import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;

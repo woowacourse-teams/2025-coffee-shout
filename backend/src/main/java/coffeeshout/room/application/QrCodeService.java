@@ -1,15 +1,12 @@
 package coffeeshout.room.application;
 
-import coffeeshout.config.properties.QrProperties;
+import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
-import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,12 +47,10 @@ public class QrCodeService {
         }
     }
 
-    @Retryable(retryFor = StorageServiceException.class, backoff = @Backoff(delay = 1000, multiplier = 2))
     private String uploadToStorage(String contents, byte[] qrCodeImage) {
         return storageService.upload(contents, qrCodeImage);
     }
 
-    @Retryable(retryFor = StorageServiceException.class, backoff = @Backoff(delay = 1000, multiplier = 2))
     private String getStorageUrl(String storageKey) {
         return storageService.getUrl(storageKey);
     }
