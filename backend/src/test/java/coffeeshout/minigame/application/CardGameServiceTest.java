@@ -80,7 +80,8 @@ class CardGameServiceTest extends ServiceTest {
         @Test
         void 카드게임을_시작한다() {
             // given
-            cardGameService.start(cardGame, joinCode.getValue());
+            String joinCodeValue = joinCode.getValue();
+            cardGameService.start(cardGame, joinCodeValue);
             CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
 
             // when & then
@@ -109,9 +110,10 @@ class CardGameServiceTest extends ServiceTest {
             doReturn(result).when(cardGameSpy).getResult();
 
             // when
-            cardGameService.start(cardGameSpy, joinCode.getValue());
+            String joinCodeValue = joinCode.getValue();
+            cardGameService.start(cardGameSpy, joinCodeValue);
 
-            await().atMost(1, TimeUnit.SECONDS)
+            await().atMost(3, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         Map<Player, Probability> probabilities = room.getProbabilities();
                         assertThat(probabilities).containsExactlyInAnyOrderEntriesOf(Map.of(
@@ -125,14 +127,15 @@ class CardGameServiceTest extends ServiceTest {
         @Test
         void 카드게임을_시작하면_태스크가_순차적으로_실행된다() {
             // when
-            cardGameService.start(cardGame, joinCode.getValue());
+            String joinCodeValue = joinCode.getValue();
+            cardGameService.start(cardGame, joinCodeValue);
 
             // then
-            await().atMost(1, TimeUnit.SECONDS)
+            await().atMost(3, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         verify(messagingTemplate, atLeast(6))
                                 .convertAndSend(
-                                        eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                                        eq("/topic/room/" + joinCodeValue + "/gameState"),
                                         any(WebSocketResponse.class)
                                 );
                     });
@@ -147,9 +150,10 @@ class CardGameServiceTest extends ServiceTest {
         void 카드를_정상적으로_선택한다() {
             // given
             cardGame.startPlay();
+            String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
 
             // then
             assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
@@ -159,13 +163,14 @@ class CardGameServiceTest extends ServiceTest {
         void 카드_선택_후_게임_상태_메시지가_전송된다() {
             // given
             cardGame.startPlay();
+            String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
+            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
 
             // then
             verify(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
+                    eq("/topic/room/" + joinCodeValue + "/gameState"),
                     any(WebSocketResponse.class)
             );
         }

@@ -8,8 +8,8 @@ public class QRCodeGenerationException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public QRCodeGenerationException(ErrorCode errorCode, String message) {
-        super(message);
+    public QRCodeGenerationException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
         this.errorCode = errorCode;
     }
 }

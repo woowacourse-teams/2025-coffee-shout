@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public final class JoinCode {
@@ -17,9 +18,8 @@ public final class JoinCode {
     private final String value;
     private String qrCodeUrl;
 
-    public JoinCode(String value) {
-        validateLength(value);
-        validateCharacters(value);
+    public JoinCode(@NonNull String value) {
+        validate(value);
         this.value = value;
     }
 
@@ -32,8 +32,20 @@ public final class JoinCode {
                 .collect(Collectors.joining()));
     }
 
-    public void updateQrCodeUrl(String qrCodeUrl) {
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        if (qrCodeUrl.isBlank()) {
+            throw new IllegalArgumentException("QR 코드 URL은 공백일 수 없습니다. qrCOdeUrl: " + qrCodeUrl);
+        }
         this.qrCodeUrl = qrCodeUrl;
+    }
+
+    private void validate(String value) {
+        if (value == null) {
+            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_NULL, "참여 코드는 null일 수 없습니다.");
+        }
+
+        validateLength(value);
+        validateCharacters(value);
     }
 
     private void validateLength(String value) {

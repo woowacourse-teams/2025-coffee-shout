@@ -183,8 +183,8 @@ public class Room {
         return players.isEmpty();
     }
 
-    public void updateQrCodeUrl(String qrCodeUrl) {
-        this.joinCode.updateQrCodeUrl(qrCodeUrl);
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        this.joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 
     private boolean hasEnoughPlayers() {

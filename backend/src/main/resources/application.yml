@@ -4,15 +4,13 @@ spring:
       coffee-shout
   cloud:
     aws:
-      region:
-        static: ap-northeast-2
       s3:
         bucket: ${S3_BUCKET_NAME:techcourse-project-2025/coffee-shout}
 
 room:
   removalDelay: 1h
   qr:
-    prefix: ${QR_CODE_PREFIX:https://coffee-shout.com/join/}
+    prefix: ${QR_CODE_PREFIX:https://coffee-shout.com/join}
     width: 150
     height: 150
     presignedUrl:

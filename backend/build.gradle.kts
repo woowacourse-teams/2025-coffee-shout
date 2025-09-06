@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -34,8 +35,7 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.google.zxing:javase:3.5.3")
 
-    implementation("io.awspring.cloud:spring-cloud-aws-starter:3.4.0")
-    implementation("software.amazon.awssdk:s3:2.33.1")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.4.0")
 
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")

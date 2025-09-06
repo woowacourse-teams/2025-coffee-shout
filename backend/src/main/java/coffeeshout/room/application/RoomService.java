@@ -40,7 +40,7 @@ public class RoomService {
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
-        room.updateQrCodeUrl(qrCodeUrl);
+        room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);

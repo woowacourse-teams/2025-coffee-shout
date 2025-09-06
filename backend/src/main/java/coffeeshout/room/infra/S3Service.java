@@ -1,10 +1,15 @@
-package coffeeshout.room.application;
+package coffeeshout.room.infra;
 
+import coffeeshout.config.properties.QrProperties;
+import coffeeshout.global.exception.custom.StorageServiceException;
+import coffeeshout.room.application.StorageService;
+import coffeeshout.room.domain.RoomErrorCode;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.net.URL;
 import java.time.Duration;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -32,12 +37,12 @@ public class S3Service implements StorageService {
     public S3Service(S3Client s3Client,
                      S3Presigner s3Presigner,
                      @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
-                     @Value("${room.qr.presignedUrl.expirationHours}") int presignedUrlExpirationHours,
+                     QrProperties qrProperties,
                      MeterRegistry meterRegistry) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.bucketName = bucketName;
-        this.presignedUrlExpirationHours = presignedUrlExpirationHours;
+        this.presignedUrlExpirationHours = qrProperties.presignedUrl().expirationHours();
         this.meterRegistry = meterRegistry;
         this.s3UploadTimer = Timer.builder("s3.upload.time")
                 .description("Time taken to upload QR code to S3")
@@ -45,16 +50,27 @@ public class S3Service implements StorageService {
     }
 
     @Override
-    public String uploadDataAndGetUrl(String contents, byte[] data) {
+    public String upload(@NonNull String contents, byte[] data) {
         try {
-            String s3Key = uploadQrCodeToS3(contents, data);
-            return generatePresignedUrl(s3Key);
+            return uploadQrCodeToS3(contents, data);
         } catch (Exception e) {
             meterRegistry.counter("s3.qr.upload.failed",
-                    "contents", contents,
                     "error", e.getClass().getSimpleName()).increment();
-            log.error("S3 QR 코드 업로드 및 URL 생성 실패: contents={}, error={}", contents, e.getMessage(), e);
-            throw new RuntimeException("S3 QR 코드 업로드에 실패했습니다.", e);
+            log.error("S3 QR 코드 업로드 실패: contents={}, error={}", contents, e.getMessage(), e);
+            throw new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage());
+        }
+    }
+
+    @Override
+    public String getUrl(String storageKey) {
+        try {
+            return generatePresignedUrl(storageKey);
+        } catch (Exception e) {
+            meterRegistry.counter("s3.qr.url.signing.failed",
+                    "error", e.getClass().getSimpleName()).increment();
+            log.error("S3 Presigned URL 생성 실패: storageKey={}, error={}", storageKey, e.getMessage(), e);
+            throw new StorageServiceException(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED,
+                    RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage());
         }
     }
 
@@ -67,12 +83,13 @@ public class S3Service implements StorageService {
                     .bucket(bucketName)
                     .key(s3Key)
                     .contentType("image/png")
+                    .contentLength((long) qrCodeImage.length)
                     .build();
 
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(qrCodeImage));
             log.info("QR 코드 S3 업로드 완료: contents={}, s3Key={}", contents, s3Key);
 
-            meterRegistry.counter("s3.upload.success", "contents", contents).increment();
+            meterRegistry.counter("s3.upload.success").increment();
             return s3Key;
         });
     }
@@ -87,7 +104,8 @@ public class S3Service implements StorageService {
                 .build();
 
         URL presignedUrl = s3Presigner.presignGetObject(presignRequest).url();
-        log.info("Presigned URL 생성 완료: s3Key={}, url={}", s3Key, presignedUrl.toString());
+        log.info("Presigned URL 생성 완료: s3Key={}, expiresInHours={}", s3Key, presignedUrlExpirationHours);
+        meterRegistry.counter("s3.url.signing.success", "storageKey", s3Key).increment();
 
         return presignedUrl.toString();
     }

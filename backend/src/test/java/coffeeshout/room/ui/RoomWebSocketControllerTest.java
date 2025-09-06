@@ -1,9 +1,9 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
@@ -39,8 +39,9 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 플레이어_목록을_조회한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.getValue());
-        String requestUrlFormat = String.format("/app/room/%s/update-players", joinCode.getValue());
+        String joinCodeValue = joinCode.getValue();
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCodeValue);
+        String requestUrlFormat = String.format("/app/room/%s/update-players", joinCodeValue);
 
         var responses = session.subscribe(subscribeUrlFormat);
 

@@ -1,11 +1,11 @@
 package coffeeshout.minigame.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.room.domain.JoinCode;
@@ -50,8 +50,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @Test
     void 카드게임을_실행한다() throws JSONException {
         // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCode.getValue());
-        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCode.getValue());
+        String joinCodeValue = joinCode.getValue();
+        String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCodeValue);
+        String requestUrlFormat = String.format("/app/room/%s/minigame/command", joinCodeValue);
 
         var responses = session.subscribe(subscribeUrlFormat);
 

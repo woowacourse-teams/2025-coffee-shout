@@ -1,5 +1,6 @@
 package coffeeshout.room.infra;
 
+import coffeeshout.config.properties.QrProperties;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -9,7 +10,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -23,22 +23,26 @@ public class ZxingQrCodeGenerator implements QrCodeGenerator {
     private final QRCodeWriter qrCodeWriter;
 
     public ZxingQrCodeGenerator(
-            @Value("${room.qr.height}") int height,
-            @Value("${room.qr.width}") int width,
+            QrProperties qrProperties,
             QRCodeWriter qrCodeWriter
     ) {
-        this.height = height;
-        this.width = width;
+        this.height = qrProperties.height();
+        this.width = qrProperties.width();
         this.qrCodeWriter = qrCodeWriter;
     }
 
     @Override
-    public byte[] generate(String url) throws WriterException, IOException {
-        final BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, width, height);
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    public byte[] generate(String contents) throws IOException {
+        try {
+            final BitMatrix bitMatrix = qrCodeWriter.encode(contents, BarcodeFormat.QR_CODE, width, height);
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        MatrixToImageWriter.writeToStream(bitMatrix, IMAGE_FORMAT, outputStream);
+            MatrixToImageWriter.writeToStream(bitMatrix, IMAGE_FORMAT, outputStream);
 
-        return outputStream.toByteArray();
+            return outputStream.toByteArray();
+        } catch (WriterException e) {
+            log.error("QR코드 생성 중 에러 발생: {}", e.getMessage());
+            throw new IOException(e);
+        }
     }
 }
