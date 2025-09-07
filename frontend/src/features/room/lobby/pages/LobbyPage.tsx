@@ -135,7 +135,7 @@ const LobbyPage = () => {
 
   const handleShare = () => {
     openModal(<JoinCodeModal onClose={closeModal} />, {
-      title: '초대 코드',
+      title: '친구 초대하기',
       showCloseButton: true,
     });
   };
