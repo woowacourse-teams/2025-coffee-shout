@@ -3,7 +3,7 @@ import JoinCodeModal from './JoinCodeModal';
 import useModal from '@/components/@common/Modal/useModal';
 
 const meta = {
-  title: 'Common/JoinCodeModal',
+  title: 'Features/Lobby/JoinCodeModal',
   component: JoinCodeModal,
   parameters: {
     layout: 'centered',
