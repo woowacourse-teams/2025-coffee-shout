@@ -40,7 +40,7 @@ const EntryMenuPage = () => {
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
   const [customMenuName] = useState<string | null>(null);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
-  const [_, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -150,6 +150,11 @@ const EntryMenuPage = () => {
   const handleChangeTemperature = (temperature: TemperatureOption) => {
     setSelectedTemperature(temperature);
   };
+
+  //임시 로딩 컴포넌트
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Layout>
