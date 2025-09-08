@@ -181,11 +181,11 @@ const EntryMenuPage = () => {
       </Layout.Content>
       {shouldShowButtonBar && playerType === 'HOST' ? (
         <Layout.ButtonBar>
-          <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
+          <Button onClick={handleNavigateToLobby}>방 만들러 가기</Button>
         </Layout.ButtonBar>
       ) : (
         <Layout.ButtonBar>
-          <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
+          <Button onClick={handleNavigateToLobby}>방 참가하기</Button>
         </Layout.ButtonBar>
       )}
     </Layout>
