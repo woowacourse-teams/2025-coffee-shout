@@ -8,7 +8,6 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 import { Player } from '@/types/player';
 import * as S from './ParticipantSection.styled';
-import { getMenuIcon } from './utils/getMenuIcon';
 
 const TOTAL_PARTICIPANTS = 9;
 
