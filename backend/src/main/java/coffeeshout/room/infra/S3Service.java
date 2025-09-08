@@ -8,7 +8,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.net.URL;
 import java.time.Duration;
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,7 +91,7 @@ public class S3Service implements StorageService {
 
     private String uploadQrCodeToS3(String contents, byte[] qrCodeImage) throws Exception {
         return s3UploadTimer.recordCallable(() -> {
-            String s3Key = "qr-code/" + contents + "/" + UUID.randomUUID() + ".png";
+            String s3Key = "coffee-shout/qr-code/" + contents + ".png";
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

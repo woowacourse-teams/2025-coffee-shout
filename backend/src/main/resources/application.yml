@@ -5,7 +5,7 @@ spring:
   cloud:
     aws:
       s3:
-        bucket: ${S3_BUCKET_NAME:techcourse-project-2025/coffee-shout}
+        bucket: ${S3_BUCKET_NAME:techcourse-project-2025}
 
 room:
   removalDelay: 1h
