@@ -30,6 +30,8 @@ type RoomResponse = {
 
 type CategoriesResponse = Category[];
 
+type CurrentView = 'category' | 'menu';
+
 const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
@@ -41,7 +43,7 @@ const EntryMenuPage = () => {
   const [customMenuName] = useState<string | null>(null);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'category' | 'menu'>('category');
+  const [currentView, setCurrentView] = useState<CurrentView>('category');
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
