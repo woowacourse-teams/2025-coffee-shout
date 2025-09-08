@@ -156,6 +156,8 @@ const EntryMenuPage = () => {
     return <div>Loading...</div>;
   }
 
+  const shouldShowButtonBar = currentView === 'menu' && selectedMenu;
+
   return (
     <Layout>
       <Layout.TopBar left={<BackButton onClick={handleNavigateToBefore} />} />
@@ -175,7 +177,11 @@ const EntryMenuPage = () => {
           )}
         </S.Container>
       </Layout.Content>
-      {currentView === 'menu' && selectedMenu && (
+      {shouldShowButtonBar && playerType === 'HOST' ? (
+        <Layout.ButtonBar>
+          <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
+        </Layout.ButtonBar>
+      ) : (
         <Layout.ButtonBar>
           <Button onClick={handleNavigateToLobby}>방만들러 가기</Button>
         </Layout.ButtonBar>
