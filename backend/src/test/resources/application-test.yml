@@ -1,3 +1,9 @@
+spring:
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+
 logging:
   level:
     org.springframework.web.socket: DEBUG

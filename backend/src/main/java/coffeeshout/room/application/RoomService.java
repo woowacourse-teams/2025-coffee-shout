@@ -6,10 +6,8 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
-import coffeeshout.room.domain.menu.MenuTemperature;
-import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.player.Menu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
@@ -19,10 +17,10 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,7 @@ public class RoomService {
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
+    private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final String defaultCategoryImage;
@@ -62,18 +61,18 @@ public class RoomService {
                 new PlayerName(hostName),
                 new SelectedMenu(menu, selectedMenuRequest.temperature())
         );
+        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
+        room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
     }
 
-    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+    public Room enterRoom(String joinCode, String guestName, Long menuId) {
+        final Menu menu = menuQueryService.getById(menuId);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Menu menu = convertMenu(selectedMenuRequest);
-        room.joinGuest(
-                new PlayerName(guestName),
-                new SelectedMenu(menu, selectedMenuRequest.temperature())
-        );
+
+        room.joinGuest(new PlayerName(guestName), menu);
 
         return roomCommandService.save(room);
     }
@@ -89,7 +88,7 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
-        player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
+        player.selectMenu(menu);
 
         return room.getPlayers();
     }
