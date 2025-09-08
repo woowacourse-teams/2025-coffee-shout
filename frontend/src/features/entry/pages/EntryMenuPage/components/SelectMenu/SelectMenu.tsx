@@ -2,12 +2,10 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
-import { Category, Menu, TemperatureAvailability } from '@/types/menu';
+import { Category, Menu, TemperatureOption } from '@/types/menu';
 import { useEffect, useState } from 'react';
-import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
-import { TemperatureOption } from '@/types/menu';
-import TemperatureOnly from '@/components/@common/TemperatureOnly/TemperatureOnly';
 import { api } from '@/apis/rest/api';
+import SelectTemperature from './SelectTemperature/SelectTemperature';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
@@ -32,14 +30,6 @@ const SelectMenu = ({
       setMenus(menus);
     })();
   }, [selectedCategory]);
-
-  const TEMPERATURE_AVAILABILITY_MAP: Record<
-    Exclude<TemperatureAvailability, 'BOTH'>,
-    TemperatureOption
-  > = {
-    HOT_ONLY: 'HOT',
-    ICE_ONLY: 'ICE',
-  } as const;
 
   const handleClickMenu = (menu: Menu) => {
     onMenuSelect(menu);
@@ -68,17 +58,11 @@ const SelectMenu = ({
         )}
         {selectedMenu && (
           <>
-            <SelectionCard color="rgb(255, 220, 249)" text={selectedMenu.name} />
-            {selectedMenu.temperatureAvailability === 'BOTH' ? (
-              <TemperatureToggle
-                selectedTemperature={selectedTemperature}
-                onChangeTemperature={onChangeTemperature}
-              />
-            ) : (
-              <TemperatureOnly
-                temperature={TEMPERATURE_AVAILABILITY_MAP[selectedMenu.temperatureAvailability]}
-              />
-            )}
+            <SelectTemperature
+              selectedMenu={selectedMenu}
+              selectedTemperature={selectedTemperature}
+              onChangeTemperature={onChangeTemperature}
+            />
           </>
         )}
       </S.Wrapper>
