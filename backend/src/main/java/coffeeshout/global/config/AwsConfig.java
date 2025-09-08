@@ -25,7 +25,7 @@ public class AwsConfig {
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()
                 .region(DefaultAwsRegionProviderChain.builder().build().getRegion())
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                .credentialsProvider(DefaultCredentialsProvider.builder().build())
                 .build();
     }
 }
