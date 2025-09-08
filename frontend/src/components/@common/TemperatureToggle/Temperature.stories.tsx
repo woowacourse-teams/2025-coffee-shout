@@ -31,7 +31,7 @@ export const HotSelected: Story = {
   },
 };
 
-export const IcedSelected: Story = {
+export const IceSelected: Story = {
   args: {
     selectedTemperature: 'ICE',
   },

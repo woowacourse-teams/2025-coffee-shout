@@ -11,7 +11,7 @@ const meta: Meta<typeof TemperatureOnly> = {
     temperature: {
       control: { type: 'select' },
       options: ['HOT', 'ICE'],
-      description: '온도 옵션 (HOT 또는 ICED)',
+      description: '온도 옵션 (HOT 또는 ICE)',
     },
   },
 };
@@ -30,7 +30,7 @@ export const HotOnly: Story = {
   ),
 };
 
-export const IcedOnly: Story = {
+export const IceOnly: Story = {
   args: {
     temperature: 'ICE',
   },
