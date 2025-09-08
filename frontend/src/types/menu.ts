@@ -1,3 +1,5 @@
+export type TemperatureOption = 'HOT' | 'ICE';
+
 export type TemperatureAvailability = 'ICE_ONLY' | 'HOT_ONLY' | 'BOTH';
 
 export type Menu = {
@@ -12,8 +14,6 @@ export type PlayerMenu = {
   temperature: TemperatureOption;
   categoryImageUrl: string;
 };
-
-export type TemperatureOption = 'HOT' | 'ICE';
 
 export type MenuType = 'COFFEE' | 'ADE' | 'SMOOTHIE' | 'FRAPPUCCINO' | 'ETC';
 
