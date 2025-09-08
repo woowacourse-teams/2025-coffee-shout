@@ -1,5 +1,7 @@
 package coffeeshout.global.config;
 
+import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -8,6 +10,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Profile({"test", "local"})
+@EnableAutoConfiguration(exclude = {S3AutoConfiguration.class})
 @Configuration
 public class AwsLocalConfig {
 

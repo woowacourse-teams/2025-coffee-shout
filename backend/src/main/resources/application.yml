@@ -4,8 +4,6 @@ spring:
       coffee-shout
   cloud:
     aws:
-      region:
-        static: ap-northeast-2
       s3:
         bucket: ${S3_BUCKET_NAME:techcourse-project-2025}
 

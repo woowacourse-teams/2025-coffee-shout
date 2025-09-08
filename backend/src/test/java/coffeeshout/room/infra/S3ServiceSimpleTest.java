@@ -66,8 +66,7 @@ class S3ServiceSimpleTest {
         String result = s3Service.upload(contents, data);
 
         // then
-        assertThat(result).startsWith("qr-code/" + contents + "/")
-                .endsWith(".png");
+        assertThat(result).isEqualTo("coffee-shout/qr-code/" + contents + ".png");
 
         verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
     }

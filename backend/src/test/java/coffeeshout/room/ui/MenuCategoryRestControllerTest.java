@@ -2,6 +2,7 @@ package coffeeshout.room.ui;
 
 import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.fixture.MenuFixture;
+import coffeeshout.global.config.IntegrationTestConfig;
 import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.repository.MenuCategoryRepository;
@@ -12,7 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
+@Import({IntegrationTestConfig.class})
 @AutoConfigureMockMvc
 class MenuCategoryRestControllerTest {
 
@@ -44,13 +49,13 @@ class MenuCategoryRestControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Repository 직접 초기화 (Mockito 사용하지 않음)
+        // Repository 직접 초기화
         ReflectionTestUtils.setField(menuCategoryRepository, "menuCategories", new ConcurrentHashMap<>());
         ReflectionTestUtils.setField(menuCategoryRepository, "idGenerator", new AtomicLong(1));
         ReflectionTestUtils.setField(menuRepository, "menus", new ConcurrentHashMap<>());
         ReflectionTestUtils.setField(menuRepository, "idGenerator", new AtomicLong(1));
 
-        // 테스트 데이터 직접 저장 (DataInitializer 사용하지 않고 fixture로)
+        // 테스트 데이터 직접 저장
         커피 = menuCategoryRepository.save(MenuCategoryFixture.커피());
         티 = menuCategoryRepository.save(MenuCategoryFixture.티());
         에이드 = menuCategoryRepository.save(MenuCategoryFixture.에이드());
