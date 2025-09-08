@@ -23,6 +23,7 @@ import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.OrderMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -71,7 +72,7 @@ class CardGameServiceTest extends ServiceTest {
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
         for (int i = 1; i < players.size(); i++) {
-            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
+            room.joinGuest(players.get(i).getName(), new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         }
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);

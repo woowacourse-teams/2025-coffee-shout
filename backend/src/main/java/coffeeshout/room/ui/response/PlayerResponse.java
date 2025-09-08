@@ -30,10 +30,10 @@ public record PlayerResponse(
 
         public static PlayerMenuResponse from(Player player) {
             return new PlayerMenuResponse(
-                    player.getMenu().getId(),
-                    player.getMenu().getName(),
-                    player.getMenuTemperature().name(),
-                    player.getMenu().getCategoryImageUrl()
+                    player.getOrderMenu().menu().getId(),
+                    player.getOrderMenu().menu().getName(),
+                    player.getOrderMenu().menuTemperature().name(),
+                    player.getOrderMenu().menu().getCategoryImageUrl()
             );
         }
     }

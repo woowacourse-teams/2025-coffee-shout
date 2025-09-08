@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.OrderMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
@@ -59,8 +60,7 @@ public class RoomService {
         final Room room = Room.createNewRoom(
                 joinCode,
                 new PlayerName(hostName),
-                menu,
-                MenuTemperature.ICE
+                new OrderMenu(menu, selectedMenuRequest.temperature())
         );
         scheduleRemoveRoom(joinCode);
 
@@ -70,7 +70,10 @@ public class RoomService {
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Menu menu = convertMenu(selectedMenuRequest);
-        room.joinGuest(new PlayerName(guestName), menu, MenuTemperature.ICE);
+        room.joinGuest(
+                new PlayerName(guestName),
+                new OrderMenu(menu, selectedMenuRequest.temperature())
+        );
 
         return roomCommandService.save(room);
     }
@@ -86,7 +89,7 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
-        player.selectMenu(menu);
+        player.selectMenu(new OrderMenu(menu, MenuTemperature.ICE));
 
         return room.getPlayers();
     }

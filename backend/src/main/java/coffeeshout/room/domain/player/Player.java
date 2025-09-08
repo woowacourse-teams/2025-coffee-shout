@@ -1,7 +1,6 @@
 package coffeeshout.room.domain.player;
 
-import coffeeshout.room.domain.menu.Menu;
-import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.OrderMenu;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -10,37 +9,27 @@ public class Player {
 
     private final PlayerName name;
     private PlayerType playerType;
-    private Menu menu;
-    private MenuTemperature menuTemperature;
+    private OrderMenu orderMenu;
     private Boolean isReady;
     private Integer colorIndex;
 
-    private Player(PlayerName name, Menu menu, Boolean isReady, PlayerType playerType, MenuTemperature menuTemperature) {
+    private Player(PlayerName name, OrderMenu orderMenu, Boolean isReady, PlayerType playerType) {
         this.name = name;
-        this.menu = menu;
-        this.isReady = isReady;
         this.playerType = playerType;
-        this.menuTemperature = menuTemperature;
+        this.orderMenu = orderMenu;
+        this.isReady = isReady;
     }
 
-    public static Player createHost(PlayerName name, Menu menu) {
-        return new Player(name, menu, true, PlayerType.HOST, MenuTemperature.ICE);
+    public static Player createHost(PlayerName name, OrderMenu orderMenu) {
+        return new Player(name, orderMenu, true, PlayerType.HOST);
     }
 
-    public static Player createHost(PlayerName name, Menu menu, MenuTemperature menuTemperature) {
-        return new Player(name, menu, true, PlayerType.HOST, menuTemperature);
+    public static Player createGuest(PlayerName name, OrderMenu orderMenu) {
+        return new Player(name, orderMenu, false, PlayerType.GUEST);
     }
 
-    public static Player createGuest(PlayerName name, Menu menu) {
-        return new Player(name, menu, false, PlayerType.GUEST, MenuTemperature.ICE);
-    }
-
-    public static Player createGuest(PlayerName name, Menu menu, MenuTemperature menuTemperature) {
-        return new Player(name, menu, false, PlayerType.GUEST, menuTemperature);
-    }
-
-    public void selectMenu(Menu menu) {
-        this.menu = menu;
+    public void selectMenu(OrderMenu orderMenu) {
+        this.orderMenu = orderMenu;
     }
 
     public boolean sameName(PlayerName playerName) {
