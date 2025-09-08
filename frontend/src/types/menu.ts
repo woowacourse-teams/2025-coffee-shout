@@ -15,8 +15,6 @@ export type PlayerMenu = {
   categoryImageUrl: string;
 };
 
-export type MenuType = 'COFFEE' | 'ADE' | 'SMOOTHIE' | 'FRAPPUCCINO' | 'ETC';
-
 export type Category = {
   id: number;
   name: string;
