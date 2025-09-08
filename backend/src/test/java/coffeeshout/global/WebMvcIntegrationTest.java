@@ -1,6 +1,6 @@
 package coffeeshout.global;
 
-import coffeeshout.config.IntegrationTestConfig;
+import coffeeshout.global.config.IntegrationTestConfig;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;

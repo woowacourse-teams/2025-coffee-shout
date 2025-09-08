@@ -59,7 +59,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -70,7 +71,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -81,7 +83,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          "menuResponse":{
                             "id":1,
                             "name":"아메리카노",
-                            "menuType":"COFFEE"
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,

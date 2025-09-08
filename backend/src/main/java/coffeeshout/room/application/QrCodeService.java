@@ -20,10 +20,12 @@ public class QrCodeService {
     private final MeterRegistry meterRegistry;
     private final Timer qrCodeGenerationTimer;
 
-    public QrCodeService(QrProperties qrProperties,
-                         QrCodeGenerator qrCodeGenerator,
-                         StorageService storageService,
-                         MeterRegistry meterRegistry) {
+    public QrCodeService(
+            QrProperties qrProperties,
+            QrCodeGenerator qrCodeGenerator,
+            StorageService storageService,
+            MeterRegistry meterRegistry
+    ) {
         this.qrCodePrefix = qrProperties.prefix();
         this.qrCodeGenerator = qrCodeGenerator;
         this.storageService = storageService;

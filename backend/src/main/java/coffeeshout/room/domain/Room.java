@@ -6,6 +6,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
@@ -221,5 +222,9 @@ public class Room {
         final Player newHost = players.getRandomPlayer();
         newHost.promote();
         this.host = newHost;
+    }
+
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 }

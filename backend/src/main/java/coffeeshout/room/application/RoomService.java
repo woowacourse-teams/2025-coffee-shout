@@ -6,8 +6,10 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
@@ -17,10 +19,10 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,7 @@ public class RoomService {
             RoomQueryService roomQueryService,
             RoomCommandService roomCommandService,
             MenuQueryService menuQueryService,
+            QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
             @Value("${menu-category.default-image}") String defaultCategoryImage
@@ -48,6 +51,7 @@ public class RoomService {
         this.roomQueryService = roomQueryService;
         this.roomCommandService = roomCommandService;
         this.menuQueryService = menuQueryService;
+        this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
         this.defaultCategoryImage = defaultCategoryImage;
@@ -68,11 +72,11 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-    public Room enterRoom(String joinCode, String guestName, Long menuId) {
-        final Menu menu = menuQueryService.getById(menuId);
+    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
-        room.joinGuest(new PlayerName(guestName), menu);
+        room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
 
         return roomCommandService.save(room);
     }
@@ -88,7 +92,7 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
-        player.selectMenu(menu);
+        player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
 
         return room.getPlayers();
     }
@@ -180,7 +184,7 @@ public class RoomService {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
         } catch (Exception e) {
-            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.value(), e);
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
         }
     }
 
