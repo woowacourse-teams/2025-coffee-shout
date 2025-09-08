@@ -69,7 +69,7 @@ const EntryMenuPage = () => {
     }
   };
 
-  const createRoomRequestBody = () => {
+  const createRoomRequestBody = (): RoomRequest => {
     return {
       playerName: myName,
       menu: {
