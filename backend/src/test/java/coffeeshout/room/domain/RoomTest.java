@@ -11,7 +11,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.menu.MenuTemperature;
-import coffeeshout.room.domain.menu.OrderMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
@@ -35,7 +35,7 @@ class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room(joinCode, 호스트_한스, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room = new Room(joinCode, 호스트_한스, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 
@@ -44,14 +44,14 @@ class RoomTest {
         // given
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
-        assertThat(room.getHost()).isEqualTo(Player.createHost(호스트_한스, new OrderMenu(MenuFixture.아메리카노(),
+        assertThat(room.getHost()).isEqualTo(Player.createHost(호스트_한스, new SelectedMenu(MenuFixture.아메리카노(),
                 MenuTemperature.ICE)));
     }
 
     @Test
     void READY_상태에서는_플레이어가_참여할_수_있다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
         assertThat(room.getPlayers()).hasSize(2);
@@ -60,11 +60,11 @@ class RoomTest {
     @Test
     void READY_상태가_아니면_참여할_수_없다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then
-        assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))
+        assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))
                 .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY_TO_JOIN);
     }
@@ -72,10 +72,10 @@ class RoomTest {
     @Test
     void 중복된_이름으로_참여할_수_없다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
-        assertThatThrownBy(() -> room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.라떼(), MenuTemperature.ICE)))
+        assertThatThrownBy(() -> room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.라떼(), MenuTemperature.ICE)))
                 .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.DUPLICATE_PLAYER_NAME);
     }
@@ -84,11 +84,11 @@ class RoomTest {
     void 방이_가득_차면_참여할_수_없다() {
         // given
         for (int i = 1; i < 9; i++) {
-            room.joinGuest(new PlayerName("guest" + i), new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+            room.joinGuest(new PlayerName("guest" + i), new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         }
 
         // when & then
-        assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), new OrderMenu(MenuFixture.아메리카노(),
+        assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), new SelectedMenu(MenuFixture.아메리카노(),
                 MenuTemperature.ICE)))
                 .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
@@ -159,9 +159,9 @@ class RoomTest {
     @Test
     void 룰렛을_시작하면_상태가_DONE으로_변하고_한_명은_선택된다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        room.joinGuest(게스트_루키, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        room.joinGuest(게스트_엠제이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         Player host = room.findPlayer(호스트_한스);
@@ -176,7 +176,7 @@ class RoomTest {
     @Test
     void 룰렛은_호스트만_돌릴_수_있다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player guest = room.findPlayer(게스트_꾹이);
 
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
@@ -199,7 +199,7 @@ class RoomTest {
     @Test
     void 룰렛은_게임_중일때만_돌릴_수_있다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.findPlayer(호스트_한스);
 
         // when & then
@@ -212,14 +212,14 @@ class RoomTest {
         // given
 
         // when & then
-        assertThat(room.isHost(Player.createHost(호스트_한스, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isTrue();
-        assertThat(room.isHost(Player.createGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isFalse();
+        assertThat(room.isHost(Player.createHost(호스트_한스, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isTrue();
+        assertThat(room.isHost(Player.createGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isFalse();
     }
 
     @Test
     void 호스트가_아니면_미니게임을_추가할_수_없다() {
         // given
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
@@ -232,7 +232,7 @@ class RoomTest {
         // given
         CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
         assertThatThrownBy(() -> room.removeMiniGame(게스트_꾹이, cardGame))
@@ -244,7 +244,7 @@ class RoomTest {
         // given
         CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
         Player guest = room.findPlayer(게스트_꾹이);
 
@@ -261,7 +261,7 @@ class RoomTest {
         // given
         CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
         room.addMiniGame(호스트_한스, cardGame);
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
 
         // when & then
@@ -273,9 +273,9 @@ class RoomTest {
     @Test
     void 호스트가_나가면_남은_플레이어_중_랜덤으로_새_호스트가_된다() {
         // given
-        room.joinGuest(게스트_루키, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        room.joinGuest(게스트_엠제이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         
         Player originalHost = room.getHost();
         assertThat(originalHost.getName()).isEqualTo(호스트_한스);
@@ -313,8 +313,8 @@ class RoomTest {
     @Test
     void 게스트가_나가면_호스트는_그대로다() {
         // given
-        room.joinGuest(게스트_루키, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        room.joinGuest(게스트_꾹이, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         
         Player originalHost = room.getHost();
         assertThat(originalHost.getName()).isEqualTo(호스트_한스);

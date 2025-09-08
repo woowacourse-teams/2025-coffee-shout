@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.player;
 
-import coffeeshout.room.domain.menu.OrderMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -9,27 +9,27 @@ public class Player {
 
     private final PlayerName name;
     private PlayerType playerType;
-    private OrderMenu orderMenu;
+    private SelectedMenu selectedMenu;
     private Boolean isReady;
     private Integer colorIndex;
 
-    private Player(PlayerName name, OrderMenu orderMenu, Boolean isReady, PlayerType playerType) {
+    private Player(PlayerName name, SelectedMenu selectedMenu, Boolean isReady, PlayerType playerType) {
         this.name = name;
         this.playerType = playerType;
-        this.orderMenu = orderMenu;
+        this.selectedMenu = selectedMenu;
         this.isReady = isReady;
     }
 
-    public static Player createHost(PlayerName name, OrderMenu orderMenu) {
-        return new Player(name, orderMenu, true, PlayerType.HOST);
+    public static Player createHost(PlayerName name, SelectedMenu selectedMenu) {
+        return new Player(name, selectedMenu, true, PlayerType.HOST);
     }
 
-    public static Player createGuest(PlayerName name, OrderMenu orderMenu) {
-        return new Player(name, orderMenu, false, PlayerType.GUEST);
+    public static Player createGuest(PlayerName name, SelectedMenu selectedMenu) {
+        return new Player(name, selectedMenu, false, PlayerType.GUEST);
     }
 
-    public void selectMenu(OrderMenu orderMenu) {
-        this.orderMenu = orderMenu;
+    public void selectMenu(SelectedMenu selectedMenu) {
+        this.selectedMenu = selectedMenu;
     }
 
     public boolean sameName(PlayerName playerName) {

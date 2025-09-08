@@ -17,7 +17,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.MenuTemperature;
-import coffeeshout.room.domain.menu.OrderMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
@@ -233,7 +233,7 @@ class RoomServiceTest extends ServiceTest {
         Player host = players.get(0);
 
         // then
-        assertThat(host.getOrderMenu().menu().getId()).isEqualTo(1L);
+        assertThat(host.getSelectedMenu().menu().getId()).isEqualTo(1L);
     }
 
     @Test
@@ -350,7 +350,7 @@ class RoomServiceTest extends ServiceTest {
         JoinCode joinCode = createdRoom.getJoinCode();
 
         PlayerName guestName = new PlayerName("게스트1");
-        createdRoom.joinGuest(guestName, new OrderMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
         assertThat(roomService.isGuestNameDuplicated(joinCode.value(), guestName.value())).isTrue();
