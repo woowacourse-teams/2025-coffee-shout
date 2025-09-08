@@ -7,6 +7,7 @@ import coffeeshout.room.ui.request.RoomCreateRequest;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
+import coffeeshout.room.ui.response.QrCodeResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 @RequestMapping("/rooms")
@@ -39,6 +41,20 @@ public class RoomRestController {
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
     }
+
+// 비동기 처리 시 필요
+//    @GetMapping("/{joinCode}/qr-url")
+//    public DeferredResult<ResponseEntity<QrCodeResponse>> getQrCode(@RequestParam String joinCode) {
+//        final DeferredResult<ResponseEntity<QrCodeResponse>> deferredResult = new DeferredResult<>(5000L);
+//
+//        deferredResult.onTimeout(
+//                () -> deferredResult.setErrorResult(
+//                        ResponseEntity.internalServerError()
+//                )
+//        );
+//
+//        return deferredResult;
+//    }
 
     @GetMapping("/check-joinCode")
     public ResponseEntity<JoinCodeExistResponse> checkJoinCode(@RequestParam String joinCode) {

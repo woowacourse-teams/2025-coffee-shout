@@ -2,9 +2,19 @@ spring:
   application:
     name:
       coffee-shout
+  cloud:
+    aws:
+      s3:
+        bucket: ${S3_BUCKET_NAME:techcourse-project-2025/coffee-shout}
 
 room:
   removalDelay: 1h
+  qr:
+    prefix: ${QR_CODE_PREFIX:https://coffee-shout.com/join}
+    width: 150
+    height: 150
+    presignedUrl:
+      expirationHours: 1
 
 logging:
   level:
@@ -42,3 +52,4 @@ websocket:
       title: "커피빵 WebSocket API 명세서"
       version: "1.0.0"
       description: "실시간 웹소켓 통신 API 문서"
+

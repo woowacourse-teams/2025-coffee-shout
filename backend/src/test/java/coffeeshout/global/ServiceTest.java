@@ -1,6 +1,6 @@
 package coffeeshout.global;
 
-import coffeeshout.config.ServiceTestConfig;
+import coffeeshout.global.config.ServiceTestConfig;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

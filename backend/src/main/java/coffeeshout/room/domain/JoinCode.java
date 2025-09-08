@@ -4,18 +4,23 @@ import coffeeshout.global.exception.custom.InvalidArgumentException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NonNull;
 
-public record JoinCode(
-        String value
-) {
+@Getter
+public final class JoinCode {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
 
-    public JoinCode {
-        validateLength(value);
-        validateCharacters(value);
+    private final String value;
+    private String qrCodeUrl;
+
+    public JoinCode(String value) {
+        validate(value);
+        this.value = value;
     }
 
     public static JoinCode generate() {
@@ -25,6 +30,22 @@ public record JoinCode(
                 .limit(CODE_LENGTH)
                 .map(JoinCode::convertAsciiToString)
                 .collect(Collectors.joining()));
+    }
+
+    public void assignQrCodeUrl(@NonNull String qrCodeUrl) {
+        if (qrCodeUrl.isBlank()) {
+            throw new IllegalArgumentException("QR 코드 URL은 공백일 수 없습니다. qrCOdeUrl: " + qrCodeUrl);
+        }
+        this.qrCodeUrl = qrCodeUrl;
+    }
+
+    private void validate(String value) {
+        if (value == null) {
+            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_NULL, "참여 코드는 null일 수 없습니다.");
+        }
+
+        validateLength(value);
+        validateCharacters(value);
     }
 
     private void validateLength(String value) {
@@ -52,4 +73,28 @@ public record JoinCode(
     private boolean isValidCharacter(int charCode) {
         return CHARSET.indexOf(charCode) > -1;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        var that = (JoinCode) obj;
+        return Objects.equals(this.value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
+    public String toString() {
+        return "JoinCode[" +
+                "value=" + value + ']';
+    }
+
 }

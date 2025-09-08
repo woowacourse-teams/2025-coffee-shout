@@ -31,6 +31,7 @@ public class RoomService {
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
+    private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
 
@@ -38,6 +39,8 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
         final JoinCode joinCode = joinCodeGenerator.generate();
         final Room room = Room.createNewRoom(joinCode, new PlayerName(hostName), menu);
+        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
+        room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
@@ -155,7 +158,7 @@ public class RoomService {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
         } catch (Exception e) {
-            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.value(), e);
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
         }
     }
 }
