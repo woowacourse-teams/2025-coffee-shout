@@ -47,8 +47,20 @@ public class S3Service implements StorageService {
                 .description("Time taken to upload QR code to S3")
                 .register(meterRegistry);
         this.s3PresignerTimer = Timer.builder("s3.presigner.upload.timer").register(meterRegistry);
-    }
 
+        log.info("S3Service 초기화 - bucketName: {}, presignedUrlExpirationHours: {}",
+                bucketName, presignedUrlExpirationHours);
+        
+        try {
+            log.info("S3Client 설정 - serviceName: {}", s3Client.serviceName());
+            log.info("S3Client region: {}", s3Client.serviceClientConfiguration().region());
+            
+            s3Client.headBucket(builder -> builder.bucket(bucketName));
+            log.info("S3 버킷 접근 성공: {}", bucketName);
+        } catch (Exception e) {
+            log.error("S3 설정 또는 권한 오류: {}", e.getMessage(), e);
+        }
+    }
     @Override
     public String upload(@NonNull String contents, byte[] data) {
         if (data.length == 0) {
@@ -61,7 +73,7 @@ public class S3Service implements StorageService {
             meterRegistry.counter("s3.qr.upload.failed",
                     "error", e.getClass().getSimpleName()).increment();
             log.error("S3 QR 코드 업로드 실패: contents={}, error={}", contents, e.getMessage(), e);
-            throw new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage());
+            throw new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage(), e);
         }
     }
 
