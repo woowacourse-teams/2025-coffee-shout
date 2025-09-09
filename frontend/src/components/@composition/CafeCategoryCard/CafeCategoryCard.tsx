@@ -4,16 +4,16 @@ import CircleIcon from '@/components/@common/CircleIcon/CircleIcon';
 import { COLOR_MAP } from '@/constants/color';
 
 type Props = {
-  iconSrc: string;
+  imageUrl: string;
   categoryName: string;
   onClick: () => void;
 };
 
-const CafeCategoryCard = ({ iconSrc, categoryName, onClick }: Props) => {
+const CafeCategoryCard = ({ imageUrl, categoryName, onClick }: Props) => {
   return (
     <S.Container onClick={onClick}>
       <IconTextItem
-        iconContent={<CircleIcon iconSrc={iconSrc} color={COLOR_MAP['point-200']} />}
+        iconContent={<CircleIcon imageUrl={imageUrl} color={COLOR_MAP['point-200']} />}
         textContent={<S.CategoryName>{categoryName}</S.CategoryName>}
         showBorder
       />

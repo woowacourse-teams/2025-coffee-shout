@@ -1,4 +1,4 @@
-import { TemperatureOption } from './temperatureOption';
+import { TemperatureOption } from '@/types/menu';
 import TemperatureOptionButton from './TemperatureOptionButton/TemperatureOptionButton';
 import * as S from './TemperatureToggle.styled';
 
@@ -7,7 +7,7 @@ type Props = {
   onChangeTemperature: (option: TemperatureOption) => void;
 };
 
-const TEMPERATURE_OPTIONS: TemperatureOption[] = ['ICED', 'HOT'];
+const TEMPERATURE_OPTIONS: TemperatureOption[] = ['ICE', 'HOT'];
 
 const TemperatureToggle = ({ selectedTemperature, onChangeTemperature }: Props) => {
   return (

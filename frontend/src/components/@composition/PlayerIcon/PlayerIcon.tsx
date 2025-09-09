@@ -7,7 +7,7 @@ type Props = {
 };
 
 const PlayerIcon = ({ color }: Props) => {
-  return <CircleIcon color={color} iconSrc={CoffeeCharacter} iconAlt="player-icon" />;
+  return <CircleIcon color={color} imageUrl={CoffeeCharacter} iconAlt="player-icon" />;
 };
 
 export default PlayerIcon;

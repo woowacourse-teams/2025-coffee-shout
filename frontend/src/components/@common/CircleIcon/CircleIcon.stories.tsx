@@ -25,7 +25,7 @@ type Story = StoryObj<typeof CircleIcon>;
 export const Default: Story = {
   args: {
     color: colorList[0],
-    iconSrc: CoffeeCharacter,
+    imageUrl: CoffeeCharacter,
     iconAlt: 'coffee-icon',
   },
   decorators: [
@@ -42,7 +42,7 @@ export const AllColors: Story = {
     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
       {colorList.map((color) => (
         <div key={color} style={{ textAlign: 'center' }}>
-          <CircleIcon color={color} iconSrc={CoffeeCharacter} iconAlt="coffee-icon" />
+          <CircleIcon color={color} imageUrl={CoffeeCharacter} iconAlt="coffee-icon" />
           <div style={{ fontSize: '12px', marginTop: '8px', color: '#666' }}>{color}</div>
         </div>
       ))}
@@ -53,8 +53,8 @@ export const AllColors: Story = {
 export const DifferentIcons: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-      <CircleIcon color={colorList[0]} iconSrc={CoffeeCharacter} iconAlt="coffee" />
-      <CircleIcon color={colorList[2]} iconSrc={CoffeeIcon} iconAlt="check" />
+      <CircleIcon color={colorList[0]} imageUrl={CoffeeCharacter} iconAlt="coffee" />
+      <CircleIcon color={colorList[2]} imageUrl={CoffeeIcon} iconAlt="check" />
     </div>
   ),
 };

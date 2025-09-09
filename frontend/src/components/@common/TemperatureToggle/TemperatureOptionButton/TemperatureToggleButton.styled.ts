@@ -1,6 +1,6 @@
 import { theme } from '@/styles/theme';
 import styled from '@emotion/styled';
-import { TemperatureOption } from '../temperatureOption';
+import { TemperatureOption } from '@/types/menu';
 
 type Props = {
   $position: 'left' | 'right';
@@ -22,17 +22,11 @@ export const Container = styled.div<Props>`
   border-radius: ${({ $position }) => ($position === 'left' ? '4px 0 0 4px' : '0 4px 4px 0')};
   cursor: pointer;
   ${({ theme }) => theme.typography.paragraph}
-  color: ${({ $option, $selected }) => getTextColor($option, $selected)};
+  color: ${({ $selected }) => ($selected ? theme.color.white : theme.color.gray[200])};
 `;
 
 const getBackgroundColor = (option: TemperatureOption, selected: boolean) => {
-  if (option === 'HOT' && selected) return '#FF4242';
-  if (option === 'ICED' && selected) return '#236ED8';
+  if (option === 'HOT' && selected) return theme.color.red;
+  if (option === 'ICE' && selected) return theme.color.blue;
   return theme.color.white;
-};
-
-const getTextColor = (option: TemperatureOption, selected: boolean) => {
-  if (option === 'HOT' && selected) return theme.color.white;
-  if (option === 'ICED' && selected) return theme.color.white;
-  return theme.color.gray[200];
 };
