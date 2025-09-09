@@ -15,7 +15,12 @@ phases:
 
   pre_build:
     commands:
-      - sed 's/\${/$/g; s/}//g' src/main/resources/application.yml | envsubst > /tmp/application.yml
+      - echo $S3_BUCKET_NAME
+      - echo $S3_QR_KEY_PREFIX
+      - sed 's/\${/$/g; s/}//g' src/main/resources/application.yml > /tmp/application-tmp.yml
+      - cat /tmp/application-tmp.yml
+      - envsubst < /tmp/application-tmp.yml > /tmp/application.yml
+      - cat /tmp/application.yml
       - cp /tmp/application.yml src/main/resources/application.yml
       - cat src/main/resources/application.yml
 
