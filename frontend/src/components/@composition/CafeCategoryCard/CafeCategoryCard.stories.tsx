@@ -18,7 +18,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Coffee: Story = {
   args: {
-    iconSrc: CoffeeIcon,
+    imageUrl: CoffeeIcon,
     categoryName: '커피',
     onClick: () => alert('커피 카테고리 클릭!'),
   },
@@ -33,7 +33,7 @@ export const Coffee: Story = {
 
 export const Smoothie: Story = {
   args: {
-    iconSrc: SmoothieIcon,
+    imageUrl: SmoothieIcon,
     categoryName: '스무디',
     onClick: () => alert('스무디 카테고리 클릭!'),
   },
@@ -48,7 +48,7 @@ export const Smoothie: Story = {
 
 export const Ade: Story = {
   args: {
-    iconSrc: AdeIcon,
+    imageUrl: AdeIcon,
     categoryName: '에이드',
     onClick: () => alert('에이드 카테고리 클릭!'),
   },
@@ -65,17 +65,17 @@ export const CategoryList: Story = {
   render: () => (
     <div style={{ width: '400px' }}>
       <CafeCategoryCard
-        iconSrc={CoffeeIcon}
+        imageUrl={CoffeeIcon}
         categoryName="커피"
         onClick={() => alert('커피 카테고리 클릭!')}
       />
       <CafeCategoryCard
-        iconSrc={SmoothieIcon}
+        imageUrl={SmoothieIcon}
         categoryName="스무디"
         onClick={() => alert('스무디 카테고리 클릭!')}
       />
       <CafeCategoryCard
-        iconSrc={AdeIcon}
+        imageUrl={AdeIcon}
         categoryName="에이드"
         onClick={() => alert('에이드 카테고리 클릭!')}
       />

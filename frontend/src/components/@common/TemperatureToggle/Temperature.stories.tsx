@@ -17,7 +17,7 @@ const meta: Meta<typeof TemperatureToggle> = {
   argTypes: {
     selectedTemperature: {
       control: { type: 'select' },
-      options: ['HOT', 'ICED'],
+      options: ['HOT', 'ICE'],
     },
   },
 };
@@ -31,8 +31,8 @@ export const HotSelected: Story = {
   },
 };
 
-export const IcedSelected: Story = {
+export const IceSelected: Story = {
   args: {
-    selectedTemperature: 'ICED',
+    selectedTemperature: 'ICE',
   },
 };

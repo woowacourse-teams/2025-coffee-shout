@@ -1,4 +1,4 @@
-import { TemperatureOption } from '../temperatureOption';
+import { TemperatureOption } from '@/types/menu';
 import * as S from './TemperatureToggleButton.styled';
 
 type Props = {
