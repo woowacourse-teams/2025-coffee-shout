@@ -48,7 +48,7 @@ class S3ServiceSimpleTest {
         QrProperties qrProperties = new QrProperties(null, 150, 150,
                 new PresignedUrl(presignedUrlExpirationHours));
         String bucketName = "test-bucket";
-        s3Service = new S3Service(s3Client, s3Presigner, bucketName, qrProperties, meterRegistry);
+        s3Service = new S3Service(s3Client, s3Presigner, bucketName, qrProperties, meterRegistry, "test");
     }
 
     @Test
@@ -66,7 +66,7 @@ class S3ServiceSimpleTest {
         String result = s3Service.upload(contents, data);
 
         // then
-        assertThat(result).startsWith("qr-code/" + contents + "/")
+        assertThat(result).startsWith("coffee-shout/qr-code/" + contents)
                 .endsWith(".png");
 
         verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
