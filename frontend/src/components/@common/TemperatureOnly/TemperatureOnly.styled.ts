@@ -12,7 +12,8 @@ export const Container = styled.div<Props>`
   justify-content: center;
   width: 100%;
   height: 40px;
-  background-color: ${({ $temperature }) => ($temperature === 'HOT' ? '#FF4242' : '#236ED8')};
+  background-color: ${({ $temperature, theme }) =>
+    $temperature === 'HOT' ? theme.color.red : theme.color.blue};
   border-radius: 4px;
   color: ${({ theme }) => theme.color.white};
   ${({ theme }) => theme.typography.paragraph}
