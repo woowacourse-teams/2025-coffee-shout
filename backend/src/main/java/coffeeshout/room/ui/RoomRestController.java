@@ -6,7 +6,6 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
-import coffeeshout.room.ui.response.QrCodeResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 @RequestMapping("/rooms")
@@ -30,7 +28,7 @@ public class RoomRestController {
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
-        final Room room = roomService.createRoom(request.playerName(), request.selectedMenuRequest());
+        final Room room = roomService.createRoom(request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
@@ -40,7 +38,7 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @RequestBody RoomEnterRequest request
     ) {
-        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.selectedMenuRequest());
+        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
     }
