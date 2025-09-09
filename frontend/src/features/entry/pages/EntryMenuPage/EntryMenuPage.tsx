@@ -117,7 +117,7 @@ const EntryMenuPage = () => {
     }
 
     try {
-      setLoading(true);
+      // setLoading(true);
       await handleRoomRequest();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -137,7 +137,7 @@ const EntryMenuPage = () => {
         });
       }
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
