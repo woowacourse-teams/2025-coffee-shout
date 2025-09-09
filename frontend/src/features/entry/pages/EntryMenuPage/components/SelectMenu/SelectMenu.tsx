@@ -26,7 +26,7 @@ const SelectMenu = ({
 
   useEffect(() => {
     (async () => {
-      const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategory}/menus`);
+      const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategory.id}/menus`);
       setMenus(menus);
     })();
   }, [selectedCategory]);
