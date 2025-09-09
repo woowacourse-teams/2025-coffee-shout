@@ -31,12 +31,15 @@ public class S3Service implements StorageService {
     private final MeterRegistry meterRegistry;
     private final Timer s3UploadTimer;
     private final Timer s3PresignerTimer;
+    private final String profileName;
 
     public S3Service(S3Client s3Client,
                      S3Presigner s3Presigner,
                      @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
                      QrProperties qrProperties,
-                     MeterRegistry meterRegistry) {
+                     MeterRegistry meterRegistry,
+                     @Value("${spring.profiles.active}") String profileName
+    ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.bucketName = bucketName;
@@ -46,6 +49,7 @@ public class S3Service implements StorageService {
                 .description("Time taken to upload QR code to S3")
                 .register(meterRegistry);
         this.s3PresignerTimer = Timer.builder("s3.presigner.upload.timer").register(meterRegistry);
+        this.profileName = profileName;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class S3Service implements StorageService {
 
     private String uploadQrCodeToS3(String contents, byte[] qrCodeImage) throws Exception {
         return s3UploadTimer.recordCallable(() -> {
-            String s3Key = "coffee-shout/qr-code/" + contents + ".png";
+            String s3Key = "coffee-shout/qr-code/" + contents + "-" + profileName + ".png";
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

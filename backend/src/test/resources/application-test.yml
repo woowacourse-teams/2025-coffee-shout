@@ -9,3 +9,7 @@ logging:
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG
     coffeeshout: DEBUG
+
+room:
+  qr:
+    prefix: https://coffee-shout.com/join/
