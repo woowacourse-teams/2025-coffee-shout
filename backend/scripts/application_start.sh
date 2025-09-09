@@ -43,12 +43,13 @@ JVM_OPTS="$JVM_OPTS -Xloggc:logs/gc.log"
 JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 
 # 환경 프로파일 설정
-SPRING_PROFILE=${ENVIRONMENT:dev}
+SPRING_PROFILE=${ENVIRONMENT:-dev}
+export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
 echo "   🌍 환경 프로파일: $SPRING_PROFILE"
 
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
-nohup java "$JVM_OPTS" \
+nohup java $JVM_OPTS \
     -Dspring.profiles.active="$SPRING_PROFILE" \
     -jar app/coffee-shout-backend.jar \
     > logs/application.log 2>&1 &

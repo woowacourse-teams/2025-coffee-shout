@@ -1,6 +1,7 @@
 package coffeeshout.room.infra;
 
 import coffeeshout.global.config.properties.QrProperties;
+import coffeeshout.global.config.properties.S3Properties;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.application.StorageService;
 import coffeeshout.room.domain.RoomErrorCode;
@@ -35,14 +36,14 @@ public class S3Service implements StorageService {
 
     public S3Service(S3Client s3Client,
                      S3Presigner s3Presigner,
-                     @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
+                     S3Properties s3Properties,
                      QrProperties qrProperties,
                      MeterRegistry meterRegistry,
-                     @Value("${spring.profiles.active}") String profileName
+                     @Value("${spring.profiles.active:default}") String profileName
     ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
-        this.bucketName = bucketName;
+        this.bucketName = s3Properties.bucket();
         this.presignedUrlExpirationHours = qrProperties.presignedUrl().expirationHours();
         this.meterRegistry = meterRegistry;
         this.s3UploadTimer = Timer.builder("s3.upload.time")

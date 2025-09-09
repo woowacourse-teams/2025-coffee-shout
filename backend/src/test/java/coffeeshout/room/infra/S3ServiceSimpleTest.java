@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.config.properties.QrProperties.PresignedUrl;
+import coffeeshout.global.config.properties.S3Properties;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.RoomErrorCode;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -47,8 +48,8 @@ class S3ServiceSimpleTest {
         int presignedUrlExpirationHours = 24;
         QrProperties qrProperties = new QrProperties(null, 150, 150,
                 new PresignedUrl(presignedUrlExpirationHours));
-        String bucketName = "test-bucket";
-        s3Service = new S3Service(s3Client, s3Presigner, bucketName, qrProperties, meterRegistry, "test");
+        S3Properties s3Properties = new S3Properties("test-bucket");
+        s3Service = new S3Service(s3Client, s3Presigner, s3Properties, qrProperties, meterRegistry, "test");
     }
 
     @Test
@@ -66,9 +67,10 @@ class S3ServiceSimpleTest {
         String result = s3Service.upload(contents, data);
 
         // then
-        assertThat(result).startsWith("coffee-shout/qr-code/" + contents)
-                .endsWith(".png");
+        String expectedKey = "coffee-shout/qr-code/" + contents + "-test.png";
 
+
+        assertThat(result).hasToString(expectedKey);
         verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
     }
 
