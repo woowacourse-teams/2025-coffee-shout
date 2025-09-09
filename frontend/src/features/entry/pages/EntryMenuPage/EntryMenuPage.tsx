@@ -51,6 +51,7 @@ const EntryMenuPage = () => {
       const data = await api.get<CategoriesResponse>('/menu-categories');
       setCategories(data);
     })();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
