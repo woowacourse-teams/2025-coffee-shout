@@ -83,7 +83,6 @@ public class S3Service implements StorageService {
     private String uploadQrCodeToS3(String contents, byte[] qrCodeImage) throws Exception {
         return s3UploadTimer.recordCallable(() -> {
             String s3Key = s3KeyPrefix + "/" + contents + ".png";
-            log.info("S3Key = {}, bucketName = {}", s3Key, bucketName);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
