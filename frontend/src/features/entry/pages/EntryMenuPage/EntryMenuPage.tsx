@@ -61,12 +61,20 @@ const EntryMenuPage = () => {
   }, [isConnected, joinCode, navigate]);
 
   const handleNavigateToBefore = () => {
-    if (currentView === 'menu' && !selectedMenu) {
-      setCurrentView('category');
-    } else if (currentView === 'menu' && selectedMenu) {
-      setSelectedMenu(null);
-    } else if (currentView === 'category') {
-      navigate('/entry/name');
+    switch (currentView) {
+      case 'menu':
+        if (selectedMenu) {
+          setSelectedMenu(null);
+        } else {
+          setCurrentView('category');
+        }
+        break;
+      case 'category':
+        navigate('/entry/name');
+        break;
+      default:
+        navigate('/entry/name');
+        break;
     }
   };
 
