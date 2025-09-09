@@ -5,7 +5,7 @@ import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import { Category, Menu, TemperatureOption } from '@/types/menu';
 import { useEffect, useState } from 'react';
 import { api } from '@/apis/rest/api';
-import SelectTemperature from './SelectTemperature/SelectTemperature';
+import SelectTemperature from '../SelectTemperature/SelectTemperature';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
@@ -59,7 +59,8 @@ const SelectMenu = ({
         {selectedMenu && (
           <>
             <SelectTemperature
-              selectedMenu={selectedMenu}
+              menuName={selectedMenu.name}
+              temperatureAvailability={selectedMenu.temperatureAvailability}
               selectedTemperature={selectedTemperature}
               onChangeTemperature={onChangeTemperature}
             />
