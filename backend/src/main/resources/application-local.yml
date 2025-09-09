@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    aws:
+      s3:
+        enabled: false
+
+room:
+  qr:
+    prefix: http://localhost:8080/join/
+
+logging:
+  level:
+    coffeeshout: DEBUG
+    org.springframework.web: INFO
