@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
 import coffeeshout.global.interceptor.handler.postsend.ConnectPostSendHandler;
 import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler;
@@ -16,8 +17,11 @@ import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -99,9 +103,12 @@ class CustomStompChannelInterceptorTest {
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
             Message<?> message = MessageBuilder.createMessage("test", accessor.getMessageHeaders());
 
-            Menu testMenu = new Menu("coffee", MenuType.COFFEE);
-            testMenu.setId(1L);
-
+            Menu menu = new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
             // when - preSend (연결 요청)
             Message<?> preSendResult = interceptor.preSend(message, channel);
 
@@ -179,7 +186,7 @@ class CustomStompChannelInterceptorTest {
             sessionManager.registerPlayerSession(joinCode, playerName, oldSessionId);
 
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
-            Menu testMenu = createTestMenu();
+            ProvidedMenu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
             given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
@@ -215,13 +222,19 @@ class CustomStompChannelInterceptorTest {
         }
 
         private Room createTestRoom(Menu menu) {
-            return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+            return Room.createNewRoom(new JoinCode(joinCode),
+                    new PlayerName(playerName),
+                    new SelectedMenu(menu, MenuTemperature.ICE)
+            );
         }
 
-        private Menu createTestMenu() {
-            Menu menu = new Menu("Test Menu", MenuType.COFFEE);
-            menu.setId(1L);
-            return menu;
+        private ProvidedMenu createTestMenu() {
+            return new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
         }
     }
 

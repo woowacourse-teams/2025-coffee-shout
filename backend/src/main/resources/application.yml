@@ -53,3 +53,5 @@ websocket:
       version: "1.0.0"
       description: "실시간 웹소켓 통신 API 문서"
 
+menu-category:
+  default-image: "default image"

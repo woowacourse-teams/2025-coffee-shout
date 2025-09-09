@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.exception.GlobalErrorCode;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
@@ -13,8 +14,11 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -256,13 +260,21 @@ class ConnectPreSendHandlerTest {
     }
 
     private Menu createTestMenu() {
-        Menu menu = new Menu("Test Menu", MenuType.COFFEE);
-        menu.setId(1L);
+        Menu menu = new ProvidedMenu(
+                1L,
+                "라떼",
+                MenuCategoryFixture.커피(),
+                TemperatureAvailability.BOTH
+        );
         return menu;
     }
 
     private Room createPlayingRoom(Menu menu) {
-        Room room = Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+        Room room = Room.createNewRoom(
+                new JoinCode(joinCode),
+                new PlayerName(playerName),
+                new SelectedMenu(menu, MenuTemperature.ICE)
+        );
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         return room;

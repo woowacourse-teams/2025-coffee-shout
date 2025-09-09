@@ -1,26 +1,37 @@
 package coffeeshout.fixture;
 
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuCategory;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class MenuFixture {
 
     public static Menu 아메리카노() {
-        final Menu 아메리카노 = new Menu("아메리카노", MenuType.COFFEE);
-        ReflectionTestUtils.setField(아메리카노, "id", 1L);
-        return 아메리카노;
+        return new ProvidedMenu(
+                1L,
+                "아메리카노",
+                MenuCategoryFixture.커피(),
+                TemperatureAvailability.BOTH
+        );
     }
 
     public static Menu 라떼() {
-        final Menu 라떼 = new Menu("라떼", MenuType.COFFEE);
-        ReflectionTestUtils.setField(라떼, "id", 2L);
-        return 라떼;
+        return new ProvidedMenu(
+                2L,
+                "라떼",
+                MenuCategoryFixture.커피(),
+                TemperatureAvailability.BOTH
+        );
     }
 
     public static Menu 아이스티() {
-        final Menu 아이스티 = new Menu("아이스티", MenuType.ADE);
-        ReflectionTestUtils.setField(아이스티, "id", 3L);
-        return 아이스티;
+        return new ProvidedMenu(
+                3L,
+                "아이스티",
+                MenuCategoryFixture.에이드(),
+                TemperatureAvailability.BOTH
+        );
     }
 }

@@ -2,6 +2,8 @@ package coffeeshout.fixture;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Players;
 
 public final class RoomFixture {
@@ -10,10 +12,14 @@ public final class RoomFixture {
     }
 
     public static Room 호스트_꾹이() {
-        Room room = new Room(new JoinCode("A4B2C"), PlayerFixture.호스트꾹이().getName(), MenuFixture.아메리카노());
+        Room room = new Room(
+                new JoinCode("A4B2C"),
+                PlayerFixture.호스트꾹이().getName(),
+                new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
+        );
         Players players = new Players();
         PlayerProbabilitiesFixture.루키_엠제이_한스_리스트().forEach(players::join);
-        players.getPlayers().forEach(player -> room.joinGuest(player.getName(), player.getMenu()));
+        players.getPlayers().forEach(player -> room.joinGuest(player.getName(), player.getSelectedMenu()));
         return room;
     }
 }

@@ -6,7 +6,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
@@ -38,9 +38,9 @@ public class Room {
     private Player host;
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
+    public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
         this.joinCode = joinCode;
-        this.host = Player.createHost(hostName, menu);
+        this.host = Player.createHost(hostName, selectedMenu);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
@@ -50,15 +50,15 @@ public class Room {
         join(host);
     }
 
-    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu) {
-        return new Room(joinCode, hostName, menu);
+    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
+        return new Room(joinCode, hostName, selectedMenu);
     }
 
-    public void joinGuest(PlayerName guestName, Menu menu) {
+    public void joinGuest(PlayerName guestName, SelectedMenu selectedMenu) {
         validateRoomReady();
         validateCanJoin();
         validatePlayerNameNotDuplicate(guestName);
-        join(Player.createGuest(guestName, menu));
+        join(Player.createGuest(guestName, selectedMenu));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
@@ -183,10 +183,6 @@ public class Room {
         return players.isEmpty();
     }
 
-    public void assignQrCodeUrl(String qrCodeUrl) {
-        this.joinCode.assignQrCodeUrl(qrCodeUrl);
-    }
-
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -226,5 +222,9 @@ public class Room {
         final Player newHost = players.getRandomPlayer();
         newHost.promote();
         this.host = newHost;
+    }
+
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 }

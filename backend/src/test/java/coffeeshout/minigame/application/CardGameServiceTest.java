@@ -23,9 +23,12 @@ import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -61,12 +64,15 @@ class CardGameServiceTest extends ServiceTest {
     void setUp() {
         List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
         host = players.get(0);
-        room = roomService.createRoom(host.getName().value(), 1L);
+        room = roomService.createRoom(
+                host.getName().value(),
+                new SelectedMenuRequest(1L, null, MenuTemperature.ICE)
+        );
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
         for (int i = 1; i < players.size(); i++) {
-            room.joinGuest(players.get(i).getName(), MenuFixture.아메리카노());
+            room.joinGuest(players.get(i).getName(), new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         }
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);

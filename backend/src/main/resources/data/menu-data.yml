@@ -1,15 +1,35 @@
 menus:
-  - name: "아메리카노"
-    menuType: "COFFEE"
-  - name: "카페라떼"
-    menuType: "COFFEE"
-  - name: "카푸치노"
-    menuType: "COFFEE"
-  - name: "에스프레소"
-    menuType: "COFFEE"
-  - name: "프라푸치노"
-    menuType: "FRAPPUCCINO"
-  - name: "아이스티"
-    menuType: "ADE"
-  - name: "딸기 스무디"
-    menuType: "SMOOTHIE"
+  - id: 1
+    name: "아메리카노"
+    categoryId: 1
+    temperatureAvailability: "BOTH"
+
+  - id: 2
+    name: "카페라떼"
+    categoryId: 1
+    temperatureAvailability: "BOTH"
+
+  - id: 3
+    name: "카푸치노"
+    categoryId: 1
+    temperatureAvailability: "BOTH"
+
+  - id: 4
+    name: "에스프레소"
+    categoryId: 1
+    temperatureAvailability: "BOTH"
+
+  - id: 5
+    name: "프라푸치노"
+    categoryId: 1
+    temperatureAvailability: "BOTH"
+
+  - id: 6
+    name: "아이스티"
+    categoryId: 3
+    temperatureAvailability: "BOTH"
+
+  - id: 7
+    name: "딸기 스무디"
+    categoryId: 2
+    temperatureAvailability: "ICE_ONLY"

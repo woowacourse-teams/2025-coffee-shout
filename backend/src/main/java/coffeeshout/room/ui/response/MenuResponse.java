@@ -1,15 +1,14 @@
 package coffeeshout.room.ui.response;
 
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
 
 public record MenuResponse(
         Long id,
         String name,
-        MenuType menuType
+        String categoryImageUrl
 ) {
 
     public static MenuResponse from(Menu menu) {
-        return new MenuResponse(menu.getId(), menu.getName(), menu.getMenuType());
+        return new MenuResponse(menu.getId(), menu.getName(), menu.getCategoryImageUrl());
     }
 }
