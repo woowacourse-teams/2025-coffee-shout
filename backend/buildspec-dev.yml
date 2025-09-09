@@ -15,9 +15,9 @@ phases:
 
   pre_build:
     commands:
-      - envsubst < src/main/resources/application-dev.yml > /tmp/application-dev.yml
-      - mv /tmp/application-dev.yml src/main/resources/application-dev.yml
-      - cat src/main/resources/application-dev.yml
+      - envsubst < src/main/resources/application.yml > /tmp/application.yml
+      - mv /tmp/application.yml src/main/resources/application.yml
+      - cat src/main/resources/application.yml
 
   build:
     commands:
