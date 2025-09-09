@@ -5,16 +5,16 @@ spring:
   cloud:
     aws:
       s3:
-        bucket: ${S3_BUCKET_NAME:techcourse-project-2025}
+        bucket: ${S3_BUCKET_NAME}
 
 room:
   removalDelay: 1h
   qr:
-    prefix: ${QR_CODE_PREFIX:https://coffee-shout.com/join}
     width: 150
     height: 150
     presignedUrl:
       expirationHours: 1
+    s3-key-prefix: ${S3_QR_KEY_PREFIX :""}
 
 logging:
   level:

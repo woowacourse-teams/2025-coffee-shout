@@ -1,6 +1,7 @@
 package coffeeshout.room.infra;
 
 import coffeeshout.global.config.properties.QrProperties;
+import coffeeshout.global.config.properties.S3Properties;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.application.StorageService;
 import coffeeshout.room.domain.RoomErrorCode;
@@ -10,7 +11,6 @@ import java.net.URL;
 import java.time.Duration;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -31,21 +31,24 @@ public class S3Service implements StorageService {
     private final MeterRegistry meterRegistry;
     private final Timer s3UploadTimer;
     private final Timer s3PresignerTimer;
+    private final String s3KeyPrefix;
 
     public S3Service(S3Client s3Client,
                      S3Presigner s3Presigner,
-                     @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
+                     S3Properties s3Properties,
                      QrProperties qrProperties,
-                     MeterRegistry meterRegistry) {
+                     MeterRegistry meterRegistry
+    ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
-        this.bucketName = bucketName;
+        this.bucketName = s3Properties.bucket();
         this.presignedUrlExpirationHours = qrProperties.presignedUrl().expirationHours();
         this.meterRegistry = meterRegistry;
         this.s3UploadTimer = Timer.builder("s3.upload.time")
                 .description("Time taken to upload QR code to S3")
                 .register(meterRegistry);
         this.s3PresignerTimer = Timer.builder("s3.presigner.upload.timer").register(meterRegistry);
+        this.s3KeyPrefix = qrProperties.s3KeyPrefix();
     }
 
     @Override
@@ -79,7 +82,7 @@ public class S3Service implements StorageService {
 
     private String uploadQrCodeToS3(String contents, byte[] qrCodeImage) throws Exception {
         return s3UploadTimer.recordCallable(() -> {
-            String s3Key = "coffee-shout/qr-code/" + contents + ".png";
+            String s3Key = s3KeyPrefix + "/" + contents + ".png";
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

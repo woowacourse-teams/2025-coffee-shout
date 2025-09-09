@@ -37,7 +37,7 @@ class QrCodeServiceTest {
 
     @BeforeEach
     void setUp() {
-        QrProperties qrProperties = new QrProperties(qrCodePrefix, 10, 100, null);
+        QrProperties qrProperties = new QrProperties(qrCodePrefix, 10, 100, null, "");
         qrCodeService = new QrCodeService(qrProperties, qrCodeGenerator, storageService, meterRegistry);
     }
 
