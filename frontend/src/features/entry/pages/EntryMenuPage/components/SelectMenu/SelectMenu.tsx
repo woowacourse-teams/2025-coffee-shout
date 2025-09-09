@@ -57,14 +57,12 @@ const SelectMenu = ({
           </S.MenuList>
         )}
         {selectedMenu && (
-          <>
-            <SelectTemperature
-              menuName={selectedMenu.name}
-              temperatureAvailability={selectedMenu.temperatureAvailability}
-              selectedTemperature={selectedTemperature}
-              onChangeTemperature={onChangeTemperature}
-            />
-          </>
+          <SelectTemperature
+            menuName={selectedMenu.name}
+            temperatureAvailability={selectedMenu.temperatureAvailability}
+            selectedTemperature={selectedTemperature}
+            onChangeTemperature={onChangeTemperature}
+          />
         )}
       </S.Wrapper>
     </>

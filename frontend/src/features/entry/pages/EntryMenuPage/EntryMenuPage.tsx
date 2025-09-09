@@ -14,6 +14,8 @@ import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
 import { Category, Menu } from '@/types/menu';
 import { TemperatureOption } from '@/types/menu';
+import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
+import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 
 type RoomRequest = {
   playerName: string;
@@ -30,7 +32,7 @@ type RoomResponse = {
 
 type CategoriesResponse = Category[];
 
-type CurrentView = 'category' | 'menu';
+type CurrentView = 'category' | 'menu' | 'customMenu';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
@@ -40,7 +42,8 @@ const EntryMenuPage = () => {
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-  const [customMenuName] = useState<string | null>(null);
+  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
+  const [isMenuInputCompleted, setIsMenuInputCompleted] = useState(false);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('category');
@@ -71,6 +74,9 @@ const EntryMenuPage = () => {
         break;
       case 'category':
         navigate('/entry/name');
+        break;
+      case 'customMenu':
+        setCurrentView('category');
         break;
       default:
         navigate('/entry/name');
@@ -162,12 +168,26 @@ const EntryMenuPage = () => {
     setSelectedTemperature(temperature);
   };
 
+  const handleNavigateToCustomMenu = () => {
+    setCurrentView('customMenu');
+  };
+
+  const handleChangeCustomMenuName = (customMenuName: string) => {
+    setCustomMenuName(customMenuName);
+  };
+
+  const handleClickDoneButton = () => {
+    setIsMenuInputCompleted(true);
+  };
+
+  const shouldShowButtonBar =
+    (currentView === 'menu' && selectedMenu) ||
+    (currentView === 'customMenu' && isMenuInputCompleted);
+
   //임시 로딩 컴포넌트
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  const shouldShowButtonBar = currentView === 'menu' && selectedMenu;
 
   return (
     <Layout>
@@ -186,17 +206,29 @@ const EntryMenuPage = () => {
               onChangeTemperature={handleChangeTemperature}
             />
           )}
+          {currentView === 'customMenu' && (
+            <InputCustomMenu
+              customMenuName={customMenuName}
+              onChangeCustomMenuName={handleChangeCustomMenuName}
+              selectedTemperature={selectedTemperature}
+              onChangeTemperature={handleChangeTemperature}
+              onClickDoneButton={handleClickDoneButton}
+              isMenuInputCompleted={isMenuInputCompleted}
+            />
+          )}
         </S.Container>
+        {currentView !== 'customMenu' && <CustomMenuButton onClick={handleNavigateToCustomMenu} />}
       </Layout.Content>
-      {shouldShowButtonBar && playerType === 'HOST' ? (
-        <Layout.ButtonBar>
-          <Button onClick={handleNavigateToLobby}>방 만들러 가기</Button>
-        </Layout.ButtonBar>
-      ) : (
-        <Layout.ButtonBar>
-          <Button onClick={handleNavigateToLobby}>방 참가하기</Button>
-        </Layout.ButtonBar>
-      )}
+      {shouldShowButtonBar &&
+        (playerType === 'HOST' ? (
+          <Layout.ButtonBar>
+            <Button onClick={handleNavigateToLobby}>방 만들러 가기</Button>
+          </Layout.ButtonBar>
+        ) : (
+          <Layout.ButtonBar>
+            <Button onClick={handleNavigateToLobby}>방 참가하기</Button>
+          </Layout.ButtonBar>
+        ))}
     </Layout>
   );
 };
