@@ -13,6 +13,12 @@ phases:
       - ls -la
       - chmod +x ./gradlew
 
+  pre_build:
+    commands:
+      - envsubst < src/main/resources/application-dev.yml > /tmp/application-dev.yml
+      - mv /tmp/application-dev.yml src/main/resources/application-dev.yml
+      - cat src/main/resources/application-dev.yml
+
   build:
     commands:
       # dev 환경에서는 특정 테스트 제외하고 빌드
