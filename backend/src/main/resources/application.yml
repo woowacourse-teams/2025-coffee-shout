@@ -14,6 +14,7 @@ room:
     height: 150
     presignedUrl:
       expirationHours: 1
+    s3-key-prefix: ${S3_QR_KEY_PREFIX :""}
 
 logging:
   level:

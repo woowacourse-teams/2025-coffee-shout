@@ -47,9 +47,9 @@ class S3ServiceSimpleTest {
     void setUp() {
         int presignedUrlExpirationHours = 24;
         QrProperties qrProperties = new QrProperties(null, 150, 150,
-                new PresignedUrl(presignedUrlExpirationHours));
+                new PresignedUrl(presignedUrlExpirationHours), "");
         S3Properties s3Properties = new S3Properties("test-bucket");
-        s3Service = new S3Service(s3Client, s3Presigner, s3Properties, qrProperties, meterRegistry, "test");
+        s3Service = new S3Service(s3Client, s3Presigner, s3Properties, qrProperties, meterRegistry);
     }
 
     @Test
@@ -67,7 +67,7 @@ class S3ServiceSimpleTest {
         String result = s3Service.upload(contents, data);
 
         // then
-        String expectedKey = "coffee-shout/qr-code/" + contents + "-test.png";
+        String expectedKey = "/TEST123.png";
 
 
         assertThat(result).hasToString(expectedKey);

@@ -11,7 +11,6 @@ import java.net.URL;
 import java.time.Duration;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -32,14 +31,13 @@ public class S3Service implements StorageService {
     private final MeterRegistry meterRegistry;
     private final Timer s3UploadTimer;
     private final Timer s3PresignerTimer;
-    private final String profileName;
+    private final String s3KeyPrefix;
 
     public S3Service(S3Client s3Client,
                      S3Presigner s3Presigner,
                      S3Properties s3Properties,
                      QrProperties qrProperties,
-                     MeterRegistry meterRegistry,
-                     @Value("${spring.profiles.active:default}") String profileName
+                     MeterRegistry meterRegistry
     ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
@@ -50,7 +48,7 @@ public class S3Service implements StorageService {
                 .description("Time taken to upload QR code to S3")
                 .register(meterRegistry);
         this.s3PresignerTimer = Timer.builder("s3.presigner.upload.timer").register(meterRegistry);
-        this.profileName = profileName;
+        this.s3KeyPrefix = qrProperties.s3KeyPrefix();
     }
 
     @Override
@@ -84,7 +82,7 @@ public class S3Service implements StorageService {
 
     private String uploadQrCodeToS3(String contents, byte[] qrCodeImage) throws Exception {
         return s3UploadTimer.recordCallable(() -> {
-            String s3Key = "coffee-shout/qr-code/" + contents + "-" + profileName + ".png";
+            String s3Key = s3KeyPrefix + "/" + contents + ".png";
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
