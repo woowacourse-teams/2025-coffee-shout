@@ -3,10 +3,6 @@ spring:
     aws:
       s3:
         enabled: false
-  data:
-    redis:
-      port: 6379
-      host: localhost
 
 room:
   qr:
