@@ -64,19 +64,29 @@ const EntryMenuPage = () => {
     }
   }, [isConnected, joinCode, navigate]);
 
+  const resetMenuState = () => {
+    setSelectedCategory(null);
+    setSelectedMenu(null);
+    setCustomMenuName(null);
+    setIsMenuInputCompleted(false);
+    setSelectedTemperature('ICE');
+  };
+
   const handleNavigateToBefore = () => {
     switch (currentView) {
-      case 'selectMenu':
-        if (selectedMenu) {
-          setSelectedMenu(null);
-        } else {
-          setCurrentView('selectCategory');
-        }
-        break;
       case 'selectCategory':
         navigate('/entry/name');
         break;
+      case 'selectMenu':
+        setSelectedMenu(null);
+        setCurrentView('selectCategory');
+        break;
       case 'InputCustomMenu':
+        setCustomMenuName(null);
+        setCurrentView('selectCategory');
+        break;
+      case 'selectTemperature':
+        resetMenuState();
         setCurrentView('selectCategory');
         break;
       default:
@@ -86,7 +96,7 @@ const EntryMenuPage = () => {
   };
 
   const createRoomRequestBody = (): RoomRequest => {
-    return {
+    const requestBody = {
       playerName: myName,
       menu: {
         id: selectedMenu ? selectedMenu.id : 0,
@@ -94,6 +104,8 @@ const EntryMenuPage = () => {
         temperature: selectedTemperature,
       },
     };
+    console.log('requestBody', requestBody);
+    return requestBody;
   };
 
   const createUrl = () => {
@@ -123,7 +135,7 @@ const EntryMenuPage = () => {
       return;
     }
 
-    if (!selectedMenu) {
+    if (!selectedMenu && !customMenuName) {
       showToast({
         type: 'error',
         message: '메뉴를 선택하지 않았습니다.',
@@ -168,6 +180,7 @@ const EntryMenuPage = () => {
     } else if (menu.temperatureAvailability === 'HOT_ONLY') {
       setSelectedTemperature('HOT');
     }
+    setCurrentView('selectTemperature');
   };
 
   const handleChangeTemperature = (temperature: TemperatureOption) => {
@@ -175,6 +188,7 @@ const EntryMenuPage = () => {
   };
 
   const handleNavigateToCustomMenu = () => {
+    resetMenuState();
     setCurrentView('InputCustomMenu');
   };
 
@@ -184,11 +198,10 @@ const EntryMenuPage = () => {
 
   const handleClickDoneButton = () => {
     setIsMenuInputCompleted(true);
+    setCurrentView('selectTemperature');
   };
 
-  const shouldShowButtonBar =
-    (currentView === 'selectMenu' && selectedMenu) ||
-    (currentView === 'InputCustomMenu' && isMenuInputCompleted);
+  const shouldShowButtonBar = currentView === 'selectTemperature';
 
   //임시 로딩 컴포넌트
   if (loading) {
@@ -203,41 +216,43 @@ const EntryMenuPage = () => {
           {currentView === 'selectCategory' && (
             <SelectCategory categories={categories} onClickCategory={handleSetSelectedCategory} />
           )}
-          {currentView === 'selectMenu' && selectedCategory && (
-            <SelectMenu
-              onMenuSelect={handleSetSelectedMenu}
-              selectedCategory={selectedCategory}
-              selectedMenu={selectedMenu}
-            >
-              {selectedMenu && (
-                <SelectTemperature
-                  menuName={selectedMenu.name}
-                  temperatureAvailability={selectedMenu.temperatureAvailability}
-                  selectedTemperature={selectedTemperature}
-                  onChangeTemperature={handleChangeTemperature}
-                />
-              )}
-            </SelectMenu>
-          )}
-          {currentView === 'InputCustomMenu' && (
-            <InputCustomMenu
-              customMenuName={customMenuName}
-              onChangeCustomMenuName={handleChangeCustomMenuName}
-              onClickDoneButton={handleClickDoneButton}
-              isMenuInputCompleted={isMenuInputCompleted}
-            >
-              {isMenuInputCompleted && (
-                <SelectTemperature
-                  menuName={customMenuName || ''}
-                  temperatureAvailability={'BOTH'}
-                  selectedTemperature={selectedTemperature}
-                  onChangeTemperature={handleChangeTemperature}
-                />
-              )}
-            </InputCustomMenu>
-          )}
+          {(currentView === 'selectMenu' || currentView === 'selectTemperature') &&
+            selectedCategory && (
+              <SelectMenu
+                onMenuSelect={handleSetSelectedMenu}
+                selectedCategory={selectedCategory}
+                selectedMenu={selectedMenu}
+              >
+                {selectedMenu && (
+                  <SelectTemperature
+                    menuName={selectedMenu.name}
+                    temperatureAvailability={selectedMenu.temperatureAvailability}
+                    selectedTemperature={selectedTemperature}
+                    onChangeTemperature={handleChangeTemperature}
+                  />
+                )}
+              </SelectMenu>
+            )}
+          {(currentView === 'InputCustomMenu' || currentView === 'selectTemperature') &&
+            !selectedMenu && (
+              <InputCustomMenu
+                customMenuName={customMenuName}
+                onChangeCustomMenuName={handleChangeCustomMenuName}
+                onClickDoneButton={handleClickDoneButton}
+                isMenuInputCompleted={isMenuInputCompleted}
+              >
+                {isMenuInputCompleted && (
+                  <SelectTemperature
+                    menuName={customMenuName || ''}
+                    temperatureAvailability={'BOTH'}
+                    selectedTemperature={selectedTemperature}
+                    onChangeTemperature={handleChangeTemperature}
+                  />
+                )}
+              </InputCustomMenu>
+            )}
         </S.Container>
-        {currentView !== 'InputCustomMenu' && (
+        {currentView !== 'InputCustomMenu' && currentView !== 'selectTemperature' && (
           <CustomMenuButton onClick={handleNavigateToCustomMenu} />
         )}
       </Layout.Content>
