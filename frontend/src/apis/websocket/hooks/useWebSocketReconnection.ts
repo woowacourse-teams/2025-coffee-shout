@@ -18,12 +18,14 @@ export const useWebSocketReconnection = ({
   // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
   const { joinCode, myName } = useIdentifier();
   const wasConnectedBeforeBackground = useRef(false);
+  const wasConnectedBeforeOffline = useRef(false);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
 
   const resetReconnectAttempts = useCallback(() => {
     reconnectAttemptsRef.current = 0;
     wasConnectedBeforeBackground.current = false;
+    wasConnectedBeforeOffline.current = false;
   }, []);
 
   const clearReconnectTimeout = useCallback(() => {
@@ -44,9 +46,9 @@ export const useWebSocketReconnection = ({
     return false;
   }, []);
 
-  const logReconnectAttempt = useCallback(() => {
+  const logReconnectAttempt = useCallback((reason: string) => {
     console.log(
-      `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${
+      `🔄 ${reason} - 웹소켓 재연결 시도 (시도: ${
         reconnectAttemptsRef.current + 1
       }/${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS})`
     );
@@ -60,12 +62,15 @@ export const useWebSocketReconnection = ({
     }, WEBSOCKET_CONFIG.RECONNECT_DELAY_MS);
   }, [startSocket, joinCode, myName]);
 
-  const attemptReconnect = useCallback(() => {
-    if (checkAndHandleMaxAttempts()) return;
-    logReconnectAttempt();
-    clearReconnectTimeout();
-    scheduleReconnect();
-  }, [checkAndHandleMaxAttempts, logReconnectAttempt, clearReconnectTimeout, scheduleReconnect]);
+  const attemptReconnect = useCallback(
+    (reason: string) => {
+      if (checkAndHandleMaxAttempts()) return;
+      logReconnectAttempt(reason);
+      clearReconnectTimeout();
+      scheduleReconnect();
+    },
+    [checkAndHandleMaxAttempts, logReconnectAttempt, clearReconnectTimeout, scheduleReconnect]
+  );
 
   /**
    * 앱 전환 감지 및 재연결 로직
@@ -76,7 +81,7 @@ export const useWebSocketReconnection = ({
       console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
       stopSocket();
     } else if (isVisible && wasConnectedBeforeBackground.current && !isConnected) {
-      attemptReconnect();
+      attemptReconnect('앱이 포그라운드로 전환됨');
     }
 
     return () => {
@@ -92,4 +97,34 @@ export const useWebSocketReconnection = ({
       resetReconnectAttempts();
     }
   }, [isConnected, resetReconnectAttempts]);
+
+  /**
+   * 네트워크 상태 변화 감지 및 재연결 로직
+   */
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('🌐 네트워크 연결됨');
+
+      if (wasConnectedBeforeOffline.current && !isConnected) {
+        attemptReconnect('네트워크 연결 복구됨');
+      }
+    };
+
+    const handleOffline = () => {
+      console.log('🌐 네트워크 연결 끊김');
+
+      if (isConnected) {
+        wasConnectedBeforeOffline.current = true;
+        stopSocket();
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [isConnected, stopSocket, attemptReconnect]);
 };
