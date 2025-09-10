@@ -8,9 +8,10 @@ import * as S from './JoinCodeModal.styled';
 
 type props = {
   onClose: () => void;
+  qrCodeUrl: string;
 };
 
-const JoinCodeModal = ({ onClose }: props) => {
+const JoinCodeModal = ({ onClose, qrCodeUrl }: props) => {
   const { joinCode } = useIdentifier();
   const [activeTab, setActiveTab] = useState(0);
   const tabs = ['QR코드', '초대코드'];
@@ -22,7 +23,7 @@ const JoinCodeModal = ({ onClose }: props) => {
   };
 
   const handleShareLink = async () => {
-    const shareUrl = `${window.location.origin}/join?code=${joinCode}`;
+    const shareUrl = `${window.location.origin}/join/${joinCode}`;
     await navigator.clipboard.writeText(shareUrl);
     alert('링크가 복사되었습니다.');
     onClose();
@@ -34,7 +35,7 @@ const JoinCodeModal = ({ onClose }: props) => {
       {activeTab === 0 ? (
         <S.QRSection>
           <S.QRCode>
-            <S.QRPlaceholder />
+            <img src={qrCodeUrl} alt="QR Code" />
           </S.QRCode>
           <S.ShareButton onClick={handleShareLink}>링크 공유하기</S.ShareButton>
           <S.Wrapper>
