@@ -1,4 +1,4 @@
-package coffeeshout.global.config;
+package coffeeshout.global.config.aws;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

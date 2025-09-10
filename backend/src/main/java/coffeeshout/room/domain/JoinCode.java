@@ -1,6 +1,7 @@
 package coffeeshout.room.domain;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public final class JoinCode {
+public final class JoinCode implements Serializable {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
