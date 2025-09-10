@@ -22,7 +22,6 @@ public record PlayerResponse(
     }
 
     public record PlayerMenuResponse(
-            Long id,
             String name,
             String temperature,
             String categoryImageUrl
@@ -30,7 +29,6 @@ public record PlayerResponse(
 
         public static PlayerMenuResponse from(Player player) {
             return new PlayerMenuResponse(
-                    player.getSelectedMenu().menu().getId(),
                     player.getSelectedMenu().menu().getName(),
                     player.getSelectedMenu().menuTemperature().name(),
                     player.getSelectedMenu().menu().getCategoryImageUrl()
