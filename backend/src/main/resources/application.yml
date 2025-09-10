@@ -7,6 +7,13 @@ spring:
       s3:
         bucket: ${S3_BUCKET_NAME}
 
+  data:
+    redis:
+      port: 6379
+      host: ${REDIS_HOST:localhost}
+      ssl:
+        enabled: true
+
 room:
   removalDelay: 1h
   qr:
