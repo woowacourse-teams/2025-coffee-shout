@@ -2,8 +2,7 @@ import * as S from './CustomMenuButton.styled';
 import WriteIcon from '@/assets/write-icon.svg';
 
 interface Props {
-  onClick?: () => void;
-  isFixed?: boolean;
+  onClick: () => void;
 }
 
 const CustomMenuButton = ({ onClick }: Props) => {
