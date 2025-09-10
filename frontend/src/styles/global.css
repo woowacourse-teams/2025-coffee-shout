@@ -32,6 +32,7 @@ body {
   width: 100%;
   height: 100dvh;
   margin: 0 auto;
+  position: relative;
 }
 
 /* 모든 요소에 확대/터치/선택/효과 제거 */
