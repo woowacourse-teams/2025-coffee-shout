@@ -6,5 +6,4 @@ export const Z_INDEX = {
   BACKDROP: 990,
   MODAL: 999,
   TOAST: 1000,
-  CUSTOM_MENU_BUTTON: 800,
 } as const;
