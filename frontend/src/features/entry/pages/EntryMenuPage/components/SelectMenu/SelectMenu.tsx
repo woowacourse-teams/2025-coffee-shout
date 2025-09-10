@@ -2,26 +2,18 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
-import { Category, Menu, TemperatureOption } from '@/types/menu';
-import { useEffect, useState } from 'react';
+import { Category, Menu } from '@/types/menu';
+import { useEffect, useState, ReactNode } from 'react';
 import { api } from '@/apis/rest/api';
-import SelectTemperature from '../SelectTemperature/SelectTemperature';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
   selectedCategory: Category;
   selectedMenu: Menu | null;
-  selectedTemperature: TemperatureOption;
-  onChangeTemperature: (temperature: TemperatureOption) => void;
+  children?: ReactNode;
 };
 
-const SelectMenu = ({
-  onMenuSelect,
-  selectedCategory,
-  selectedMenu,
-  selectedTemperature,
-  onChangeTemperature,
-}: Props) => {
+const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: Props) => {
   const [menus, setMenus] = useState<Menu[]>([]);
 
   useEffect(() => {
@@ -33,11 +25,6 @@ const SelectMenu = ({
 
   const handleClickMenu = (menu: Menu) => {
     onMenuSelect(menu);
-    if (menu.temperatureAvailability === 'ICE_ONLY') {
-      onChangeTemperature('ICE');
-    } else if (menu.temperatureAvailability === 'HOT_ONLY') {
-      onChangeTemperature('HOT');
-    }
   };
 
   return (
@@ -56,14 +43,7 @@ const SelectMenu = ({
             ))}
           </S.MenuList>
         )}
-        {selectedMenu && (
-          <SelectTemperature
-            menuName={selectedMenu.name}
-            temperatureAvailability={selectedMenu.temperatureAvailability}
-            selectedTemperature={selectedTemperature}
-            onChangeTemperature={onChangeTemperature}
-          />
-        )}
+        {selectedMenu && children}
       </S.Wrapper>
     </>
   );

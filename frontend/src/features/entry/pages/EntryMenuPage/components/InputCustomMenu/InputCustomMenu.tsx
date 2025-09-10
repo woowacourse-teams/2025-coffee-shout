@@ -1,27 +1,23 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
 import * as S from './InputCustomMenu.styled';
-import SelectTemperature from '../SelectTemperature/SelectTemperature';
-import { TemperatureOption } from '@/types/menu';
 
 type Props = {
   customMenuName: string | null;
   onChangeCustomMenuName: (customMenuName: string) => void;
-  selectedTemperature: TemperatureOption;
-  onChangeTemperature: (temperature: TemperatureOption) => void;
   onClickDoneButton: () => void;
   isMenuInputCompleted: boolean;
+  children?: ReactNode;
 };
 
 const InputCustomMenu = ({
   customMenuName,
   onChangeCustomMenuName,
-  selectedTemperature,
-  onChangeTemperature,
   onClickDoneButton,
   isMenuInputCompleted,
+  children,
 }: Props) => {
   const handleChangeCustomMenuInput = (e: ChangeEvent<HTMLInputElement>) => {
     onChangeCustomMenuName(e.target.value);
@@ -40,14 +36,7 @@ const InputCustomMenu = ({
             onClickDoneButton={onClickDoneButton}
           />
         )}
-        {isMenuInputCompleted && (
-          <SelectTemperature
-            menuName={customMenuName || ''}
-            temperatureAvailability={'BOTH'}
-            selectedTemperature={selectedTemperature}
-            onChangeTemperature={onChangeTemperature}
-          />
-        )}
+        {isMenuInputCompleted && children}
       </S.Wrapper>
     </>
   );
