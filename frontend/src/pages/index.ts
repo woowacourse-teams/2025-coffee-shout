@@ -9,3 +9,4 @@ export { default as LobbyPage } from '../features/room/lobby/pages/LobbyPage';
 export { default as OrderPage } from '../features/room/order/pages/OrderPage';
 export { default as RoulettePlayPage } from '../features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage';
 export { default as RouletteResultPage } from '../features/room/roulette/pages/RouletteResultPage/RouletteResultPage';
+export { default as QRJoinPage } from '../features/join/pages/QRJoinPage';

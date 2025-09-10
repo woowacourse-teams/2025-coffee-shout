@@ -12,6 +12,7 @@ import {
   OrderPage,
   RoulettePlayPage,
   RouletteResultPage,
+  QRJoinPage,
 } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
 
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: 'join/:joinCode',
+        element: <QRJoinPage />,
       },
       {
         path: '*',
