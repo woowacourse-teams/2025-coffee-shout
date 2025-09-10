@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import { ApiError } from '@/apis/rest/error';
 
 const MAX_NAME_LENGTH = 10;
 
@@ -31,15 +32,26 @@ const EntryNamePage = () => {
 
   const handleNavigateToMenu = async () => {
     if (playerType === 'GUEST') {
-      const { exist } = await api.get<PlayerNameCheckResponse>(
-        `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`
-      );
+      try {
+        const { exist } = await api.get<PlayerNameCheckResponse>(
+          `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`
+        );
 
-      if (exist) {
-        showToast({
-          type: 'error',
-          message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
-        });
+        if (exist) {
+          showToast({
+            type: 'error',
+            message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
+          });
+          return;
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          showToast({
+            type: 'error',
+            message: error.message,
+          });
+        }
+
         return;
       }
     }
