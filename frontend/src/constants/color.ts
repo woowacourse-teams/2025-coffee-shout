@@ -36,4 +36,6 @@ export const colorList = [
   '#2ba727',
 ] as const;
 
+export const categoryColorList = [theme.color.point[200], '#FFD6A8', '#FEE685', '#D8F999'] as const;
+
 export type ColorList = (typeof colorList)[number];

@@ -21,6 +21,7 @@ export const Coffee: Story = {
     imageUrl: CoffeeIcon,
     categoryName: '커피',
     onClick: () => alert('커피 카테고리 클릭!'),
+    color: '#8B4513',
   },
   decorators: [
     (Story) => (
@@ -36,6 +37,7 @@ export const Smoothie: Story = {
     imageUrl: SmoothieIcon,
     categoryName: '스무디',
     onClick: () => alert('스무디 카테고리 클릭!'),
+    color: '#32CD32',
   },
   decorators: [
     (Story) => (
@@ -51,6 +53,7 @@ export const Ade: Story = {
     imageUrl: AdeIcon,
     categoryName: '에이드',
     onClick: () => alert('에이드 카테고리 클릭!'),
+    color: '#87CEEB',
   },
   decorators: [
     (Story) => (
@@ -68,16 +71,19 @@ export const CategoryList: Story = {
         imageUrl={CoffeeIcon}
         categoryName="커피"
         onClick={() => alert('커피 카테고리 클릭!')}
+        color="#8B4513"
       />
       <CafeCategoryCard
         imageUrl={SmoothieIcon}
         categoryName="스무디"
         onClick={() => alert('스무디 카테고리 클릭!')}
+        color="#32CD32"
       />
       <CafeCategoryCard
         imageUrl={AdeIcon}
         categoryName="에이드"
         onClick={() => alert('에이드 카테고리 클릭!')}
+        color="#87CEEB"
       />
     </div>
   ),
