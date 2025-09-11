@@ -104,7 +104,6 @@ const EntryMenuPage = () => {
         temperature: selectedTemperature,
       },
     };
-    console.log('requestBody', requestBody);
     return requestBody;
   };
 
