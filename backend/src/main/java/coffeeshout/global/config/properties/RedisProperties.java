@@ -1,7 +1,8 @@
 package coffeeshout.global.config.properties;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -9,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "spring.data.redis")
 public record RedisProperties(
         @NotBlank String host,
-        @Positive int port,
+        @Min(1) @Max(65535) int port,
         Ssl ssl
 ) {
     public record Ssl(boolean enabled) {
