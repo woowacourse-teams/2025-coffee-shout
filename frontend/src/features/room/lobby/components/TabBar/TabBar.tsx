@@ -9,7 +9,7 @@ type Props = {
 
 const TabBar = ({ tabs, activeTab, onTabChange }: Props) => {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const indicatorRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement | null>(null);
 
   const setTabRef = useCallback(
     (index: number) => (el: HTMLButtonElement | null) => {
