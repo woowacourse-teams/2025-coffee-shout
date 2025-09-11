@@ -8,7 +8,6 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import SelectMenu from './components/SelectMenu/SelectMenu';
@@ -18,7 +17,7 @@ import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuBu
 import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import { categoryColorList, MenuColorMap } from '@/constants/color';
-import { theme } from '@/styles/theme';
+import * as S from './EntryMenuPage.styled';
 
 type RoomRequest = {
   playerName: string;
@@ -261,7 +260,6 @@ const EntryMenuPage = () => {
                     temperatureAvailability={'BOTH'}
                     selectedTemperature={selectedTemperature}
                     onChangeTemperature={handleChangeTemperature}
-                    selectionCardColor={MenuColorMap[theme.color.point[200]]}
                   />
                 )}
               </InputCustomMenu>

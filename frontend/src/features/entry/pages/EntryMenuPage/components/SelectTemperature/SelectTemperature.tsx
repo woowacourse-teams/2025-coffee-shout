@@ -2,13 +2,14 @@ import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
 import TemperatureOnly from '@/components/@common/TemperatureOnly/TemperatureOnly';
 import { TemperatureAvailability, TemperatureOption } from '@/types/menu';
+import { theme } from '@/styles/theme';
 
 type Props = {
   menuName: string;
   temperatureAvailability: TemperatureAvailability;
   selectedTemperature: TemperatureOption;
-  selectionCardColor: string;
   onChangeTemperature: (temperature: TemperatureOption) => void;
+  selectionCardColor?: string;
 };
 
 const TEMPERATURE_AVAILABILITY_MAP: Record<
@@ -24,7 +25,7 @@ const SelectTemperature = ({
   temperatureAvailability,
   selectedTemperature,
   onChangeTemperature,
-  selectionCardColor,
+  selectionCardColor = theme.color.point[200],
 }: Props) => {
   return (
     <>
