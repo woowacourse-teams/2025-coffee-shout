@@ -33,7 +33,7 @@ type RoomResponse = {
 
 type CategoriesResponse = Category[];
 
-type CurrentView = 'selectCategory' | 'selectMenu' | 'InputCustomMenu' | 'selectTemperature';
+type CurrentView = 'selectCategory' | 'selectMenu' | 'inputCustomMenu' | 'selectTemperature';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ const EntryMenuPage = () => {
         setSelectedMenu(null);
         setCurrentView('selectCategory');
         break;
-      case 'InputCustomMenu':
+      case 'inputCustomMenu':
         setCustomMenuName(null);
         setCurrentView('selectCategory');
         break;
@@ -189,7 +189,7 @@ const EntryMenuPage = () => {
 
   const handleNavigateToCustomMenu = () => {
     resetMenuState();
-    setCurrentView('InputCustomMenu');
+    setCurrentView('inputCustomMenu');
   };
 
   const handleChangeCustomMenuName = (customMenuName: string) => {
@@ -233,7 +233,7 @@ const EntryMenuPage = () => {
                 )}
               </SelectMenu>
             )}
-          {(currentView === 'InputCustomMenu' || currentView === 'selectTemperature') &&
+          {(currentView === 'inputCustomMenu' || currentView === 'selectTemperature') &&
             !selectedMenu && (
               <InputCustomMenu
                 customMenuName={customMenuName}
@@ -252,7 +252,7 @@ const EntryMenuPage = () => {
               </InputCustomMenu>
             )}
         </S.Container>
-        {currentView !== 'InputCustomMenu' && currentView !== 'selectTemperature' && (
+        {currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature' && (
           <CustomMenuButton onClick={handleNavigateToCustomMenu} />
         )}
       </Layout.Content>
