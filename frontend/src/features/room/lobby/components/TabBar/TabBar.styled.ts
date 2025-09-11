@@ -16,7 +16,6 @@ export const Tab = styled.button<{ isActive: boolean }>`
   cursor: pointer;
   transition: color 0.2s ease;
   position: relative;
-  z-index: 1;
 
   &:hover {
     color: ${({ theme }) => theme.color.point[400]};
@@ -31,5 +30,4 @@ export const Indicator = styled.div`
   transition:
     transform 0.3s ease,
     width 0.3s ease;
-  z-index: 2;
 `;
