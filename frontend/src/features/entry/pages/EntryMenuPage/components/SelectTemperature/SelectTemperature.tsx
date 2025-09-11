@@ -7,6 +7,7 @@ type Props = {
   menuName: string;
   temperatureAvailability: TemperatureAvailability;
   selectedTemperature: TemperatureOption;
+  selectionCardColor: string;
   onChangeTemperature: (temperature: TemperatureOption) => void;
 };
 
@@ -23,10 +24,11 @@ const SelectTemperature = ({
   temperatureAvailability,
   selectedTemperature,
   onChangeTemperature,
+  selectionCardColor,
 }: Props) => {
   return (
     <>
-      <SelectionCard color="rgb(255, 220, 249)" text={menuName} />
+      <SelectionCard color={selectionCardColor} text={menuName} />
       {temperatureAvailability === 'BOTH' ? (
         <TemperatureToggle
           selectedTemperature={selectedTemperature}

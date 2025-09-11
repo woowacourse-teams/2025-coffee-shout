@@ -4,6 +4,7 @@ import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
 import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 import * as S from './InputCustomMenu.styled';
+import { theme } from '@/styles/theme';
 
 type Props = {
   customMenuName: string | null;
@@ -27,7 +28,7 @@ const InputCustomMenu = ({
     <>
       <Headline3>메뉴를 입력해주세요</Headline3>
       <S.Wrapper>
-        <SelectionCard color="#eb63d4" text="직접 입력" imageUrl={CustomMenuIcon} />
+        <SelectionCard color={theme.color.point[200]} text="직접 입력" imageUrl={CustomMenuIcon} />
         {!isMenuInputCompleted && (
           <CustomMenuInput
             placeholder="메뉴를 입력해주세요"

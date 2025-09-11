@@ -17,7 +17,8 @@ import { TemperatureOption } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
 import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
-import { categoryColorList } from '@/constants/color';
+import { categoryColorList, MenuColorMap } from '@/constants/color';
+import { theme } from '@/styles/theme';
 
 type RoomRequest = {
   playerName: string;
@@ -241,6 +242,7 @@ const EntryMenuPage = () => {
                     temperatureAvailability={selectedMenu.temperatureAvailability}
                     selectedTemperature={selectedTemperature}
                     onChangeTemperature={handleChangeTemperature}
+                    selectionCardColor={MenuColorMap[selectedCategory.color]}
                   />
                 )}
               </SelectMenu>
@@ -259,6 +261,7 @@ const EntryMenuPage = () => {
                     temperatureAvailability={'BOTH'}
                     selectedTemperature={selectedTemperature}
                     onChangeTemperature={handleChangeTemperature}
+                    selectionCardColor={MenuColorMap[theme.color.point[200]]}
                   />
                 )}
               </InputCustomMenu>
