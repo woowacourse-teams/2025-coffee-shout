@@ -26,6 +26,7 @@ type RoomRequest = {
 
 type RoomResponse = {
   joinCode: string;
+  qrCodeUrl: string;
 };
 
 type CategoriesResponse = Category[];
@@ -45,6 +46,7 @@ const EntryMenuPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('category');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -56,9 +58,13 @@ const EntryMenuPage = () => {
 
   useEffect(() => {
     if (isConnected) {
-      navigate(`/room/${joinCode}/lobby`);
+      navigate(`/room/${joinCode}/lobby`, {
+        state: {
+          qrCodeUrl,
+        },
+      });
     }
-  }, [isConnected, joinCode, navigate]);
+  }, [isConnected, joinCode, navigate, qrCodeUrl]);
 
   const handleNavigateToBefore = () => {
     switch (currentView) {
@@ -98,11 +104,12 @@ const EntryMenuPage = () => {
   };
 
   const handleRoomRequest = async () => {
-    const { joinCode } = await api.post<RoomResponse, RoomRequest>(
+    const { joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
       createUrl(),
       createRoomRequestBody()
     );
     setJoinCode(joinCode);
+    setQrCodeUrl(qrCodeUrl);
     startSocket(joinCode, myName);
   };
 
