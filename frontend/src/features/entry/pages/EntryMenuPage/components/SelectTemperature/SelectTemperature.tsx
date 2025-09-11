@@ -1,10 +1,11 @@
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
 import TemperatureOnly from '@/components/@common/TemperatureOnly/TemperatureOnly';
-import { Menu, TemperatureAvailability, TemperatureOption } from '@/types/menu';
+import { TemperatureAvailability, TemperatureOption } from '@/types/menu';
 
 type Props = {
-  selectedMenu: Menu;
+  menuName: string;
+  temperatureAvailability: TemperatureAvailability;
   selectedTemperature: TemperatureOption;
   onChangeTemperature: (temperature: TemperatureOption) => void;
 };
@@ -17,19 +18,22 @@ const TEMPERATURE_AVAILABILITY_MAP: Record<
   ICE_ONLY: 'ICE',
 } as const;
 
-const SelectTemperature = ({ selectedMenu, selectedTemperature, onChangeTemperature }: Props) => {
+const SelectTemperature = ({
+  menuName,
+  temperatureAvailability,
+  selectedTemperature,
+  onChangeTemperature,
+}: Props) => {
   return (
     <>
-      <SelectionCard color="rgb(255, 220, 249)" text={selectedMenu.name} />
-      {selectedMenu.temperatureAvailability === 'BOTH' ? (
+      <SelectionCard color="rgb(255, 220, 249)" text={menuName} />
+      {temperatureAvailability === 'BOTH' ? (
         <TemperatureToggle
           selectedTemperature={selectedTemperature}
           onChangeTemperature={onChangeTemperature}
         />
       ) : (
-        <TemperatureOnly
-          temperature={TEMPERATURE_AVAILABILITY_MAP[selectedMenu.temperatureAvailability]}
-        />
+        <TemperatureOnly temperature={TEMPERATURE_AVAILABILITY_MAP[temperatureAvailability]} />
       )}
     </>
   );
