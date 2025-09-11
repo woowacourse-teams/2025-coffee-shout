@@ -4,14 +4,14 @@ import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import * as S from './JoinCodeModal.styled';
+import * as S from './InvitationModal.styled';
 
 type props = {
   onClose: () => void;
   qrCodeUrl: string;
 };
 
-const JoinCodeModal = ({ onClose, qrCodeUrl }: props) => {
+const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
   const { joinCode } = useIdentifier();
   const [activeTab, setActiveTab] = useState(0);
   const tabs = ['QR코드', '초대코드'];
@@ -60,4 +60,4 @@ const JoinCodeModal = ({ onClose, qrCodeUrl }: props) => {
   );
 };
 
-export default JoinCodeModal;
+export default InvitationModal;

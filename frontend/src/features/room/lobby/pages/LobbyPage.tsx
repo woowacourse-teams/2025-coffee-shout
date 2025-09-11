@@ -21,12 +21,12 @@ import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -135,7 +135,7 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<JoinCodeModal onClose={closeModal} qrCodeUrl={qrCodeUrl} />, {
+    openModal(<InvitationModal onClose={closeModal} qrCodeUrl={qrCodeUrl} />, {
       title: '친구 초대하기',
       showCloseButton: true,
     });

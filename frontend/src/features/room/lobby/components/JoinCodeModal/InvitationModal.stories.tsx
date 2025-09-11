@@ -1,25 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import JoinCodeModal from './JoinCodeModal';
+import InvitationModal from './InvitationModal';
 import useModal from '@/components/@common/Modal/useModal';
 
 const meta = {
-  title: 'Features/Lobby/JoinCodeModal',
-  component: JoinCodeModal,
+  title: 'Features/Lobby/InvitationModal',
+  component: InvitationModal,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof JoinCodeModal>;
+} satisfies Meta<typeof InvitationModal>;
 
 export default meta;
 
-type Story = StoryObj<typeof JoinCodeModal>;
+type Story = StoryObj<typeof InvitationModal>;
 
 export const Default: Story = {
   render: () => {
     const { openModal } = useModal();
 
-    const ModalContent = () => <JoinCodeModal onClose={() => {}} qrCodeUrl={''} />;
+    const ModalContent = () => <InvitationModal onClose={() => {}} qrCodeUrl={''} />;
 
     const handleOpen = () => {
       openModal(ModalContent());
