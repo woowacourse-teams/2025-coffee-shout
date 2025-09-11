@@ -42,7 +42,7 @@ const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: 
             ))}
           </S.MenuList>
         )}
-        {selectedMenu && children}
+        {children}
       </S.Wrapper>
     </>
   );

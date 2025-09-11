@@ -36,7 +36,7 @@ const InputCustomMenu = ({
             onClickDoneButton={onClickDoneButton}
           />
         )}
-        {isMenuInputCompleted && children}
+        {children}
       </S.Wrapper>
     </>
   );
