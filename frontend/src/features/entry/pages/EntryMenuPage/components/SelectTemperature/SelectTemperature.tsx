@@ -25,7 +25,7 @@ const SelectTemperature = ({
   temperatureAvailability,
   selectedTemperature,
   onChangeTemperature,
-  selectionCardColor = theme.color.point[200],
+  selectionCardColor = theme.color.point[50],
 }: Props) => {
   return (
     <>
