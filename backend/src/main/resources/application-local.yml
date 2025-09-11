@@ -3,6 +3,10 @@ spring:
     aws:
       s3:
         enabled: false
+  data:
+    redis:
+      ssl:
+        enabled: false
 
 room:
   qr:
