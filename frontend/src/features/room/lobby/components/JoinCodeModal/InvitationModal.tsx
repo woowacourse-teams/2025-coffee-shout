@@ -13,7 +13,7 @@ type props = {
 
 const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
   const { joinCode } = useIdentifier();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
 
   const handleCopy = async () => {
@@ -33,8 +33,8 @@ const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
 
   return (
     <S.Container>
-      <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-      {activeTab === 0 ? (
+      <TabBar tabs={tabs} activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex} />
+      {activeTabIndex === 0 ? (
         <QRSection qrCodeUrl={qrCodeUrl} handleShareLink={handleShareLink} />
       ) : (
         <CodeSection handleCopy={handleCopy} joinCode={joinCode} />

@@ -22,7 +22,7 @@ export const Default: Story = {
 
     return (
       <div style={{ width: '400px' }}>
-        <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabBar tabs={tabs} activeTabIndex={activeTab} onTabChange={setActiveTab} />
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <p>현재 활성 탭: {tabs[activeTab]}</p>
         </div>
@@ -38,7 +38,7 @@ export const ThreeTabs: Story = {
 
     return (
       <div style={{ width: '500px' }}>
-        <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabBar tabs={tabs} activeTabIndex={activeTab} onTabChange={setActiveTab} />
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <p>현재 활성 탭: {tabs[activeTab]}</p>
         </div>

@@ -3,11 +3,11 @@ import * as S from './TabBar.styled';
 
 type Props = {
   tabs: string[];
-  activeTab: number;
+  activeTabIndex: number;
   onTabChange: (index: number) => void;
 };
 
-const TabBar = ({ tabs, activeTab, onTabChange }: Props) => {
+const TabBar = ({ tabs, activeTabIndex, onTabChange }: Props) => {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const indicatorRef = useRef<HTMLDivElement | null>(null);
 
@@ -19,7 +19,7 @@ const TabBar = ({ tabs, activeTab, onTabChange }: Props) => {
   );
 
   useEffect(() => {
-    const activeTabElement = tabRefs.current[activeTab];
+    const activeTabElement = tabRefs.current[activeTabIndex];
     const indicator = indicatorRef.current;
 
     if (activeTabElement && indicator) {
@@ -27,7 +27,7 @@ const TabBar = ({ tabs, activeTab, onTabChange }: Props) => {
       indicator.style.transform = `translateX(${offsetLeft}px)`;
       indicator.style.width = `${offsetWidth}px`;
     }
-  }, [activeTab]);
+  }, [activeTabIndex]);
 
   return (
     <S.Container>
@@ -35,7 +35,7 @@ const TabBar = ({ tabs, activeTab, onTabChange }: Props) => {
         <S.Tab
           key={index}
           ref={setTabRef(index)}
-          isActive={index === activeTab}
+          isActive={index === activeTabIndex}
           onClick={() => onTabChange(index)}
         >
           {tab}
