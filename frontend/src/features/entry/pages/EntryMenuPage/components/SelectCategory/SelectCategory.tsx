@@ -1,12 +1,12 @@
 import * as S from './SelectCategory.styled';
 import CafeCategoryCard from '@/components/@composition/CafeCategoryCard/CafeCategoryCard';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import { Category } from '@/types/menu';
+import { CategoryWithColor } from '@/types/menu';
 import { categoryColorList } from '@/constants/color';
 
 type Props = {
-  categories: Category[];
-  onClickCategory: (category: Category) => void;
+  categories: CategoryWithColor[];
+  onClickCategory: (category: CategoryWithColor) => void;
 };
 
 const SelectCategory = ({ categories, onClickCategory }: Props) => {
