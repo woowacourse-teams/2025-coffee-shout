@@ -48,7 +48,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:testcontainers-bom:1.20.4")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
