@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -18,7 +20,8 @@ public final class JoinCode {
     private final String value;
     private String qrCodeUrl;
 
-    public JoinCode(String value) {
+    @JsonCreator
+    public JoinCode(@JsonProperty("value") String value) {
         validate(value);
         this.value = value;
     }

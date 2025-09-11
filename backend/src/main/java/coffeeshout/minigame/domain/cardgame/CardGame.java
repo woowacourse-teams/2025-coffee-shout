@@ -14,6 +14,8 @@ import coffeeshout.room.domain.player.PlayerName;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -27,6 +29,19 @@ public class CardGame implements Playable {
     private PlayerHands playerHands;
     private CardGameRound round;
     private CardGameState state;
+
+    @JsonCreator
+    public CardGame(
+            @JsonProperty("deck") Deck deck,
+            @JsonProperty("playerHands") PlayerHands playerHands,
+            @JsonProperty("round") CardGameRound round,
+            @JsonProperty("state") CardGameState state
+    ) {
+        this.deck = deck;
+        this.playerHands = playerHands;
+        this.round = round;
+        this.state = state;
+    }
 
     public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
         this.round = CardGameRound.READY;
