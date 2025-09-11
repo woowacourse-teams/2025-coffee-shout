@@ -2,7 +2,6 @@ package coffeeshout.global.config;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -25,9 +24,8 @@ public class TestContainerConfig {
     private static final Logger logger = LoggerFactory.getLogger(TestContainerConfig.class);
     private static final Object CONTAINER_LOCK = new Object();
     private static volatile GenericContainer<?> valkeyContainer;
-    private static final AtomicBoolean isInitialized = new AtomicBoolean(false);
-    
-    private static final int VALKEY_PORT = 6379; // 로컬 실행 시 포트가 중복되어 오류가 발생할 수 있다.
+
+    private static final int VALKEY_PORT = 6379;
 
     static {
         initializeContainer();
@@ -53,7 +51,6 @@ public class TestContainerConfig {
 
                     startContainerSafely();
                     registerShutdownHook();
-                    isInitialized.set(true);
                     
                     logger.info("Valkey TestContainer initialized successfully on {}:{}", 
                               valkeyContainer.getHost(), valkeyContainer.getMappedPort(VALKEY_PORT));
