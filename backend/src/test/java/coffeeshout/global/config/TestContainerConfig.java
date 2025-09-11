@@ -44,14 +44,13 @@ public class TestContainerConfig {
                     valkeyContainer = new GenericContainer<>(DockerImageName.parse("valkey/valkey:latest"))
                             .withExposedPorts(VALKEY_PORT)
                             .withCommand("valkey-server", "--appendonly", "yes")
+                            .withEnv("VALKEY_DISABLE_COMMANDS", "CONFIG,SHUTDOWN,DEBUG,EVAL,SCRIPT") // FLUSHALL 테스트용 허용
                             .withReuse(true)
-                            .withLabel("testcontainers.reuse.enable", "true")
                             .waitingFor(Wait.forListeningPort())
                             .withLogConsumer(new Slf4jLogConsumer(logger).withPrefix("VALKEY"));
 
                     startContainerSafely();
-                    registerShutdownHook();
-                    
+
                     logger.info("Valkey TestContainer initialized successfully on {}:{}", 
                               valkeyContainer.getHost(), valkeyContainer.getMappedPort(VALKEY_PORT));
                 } catch (Exception e) {
@@ -74,20 +73,6 @@ public class TestContainerConfig {
             logger.error("Failed to start Valkey container", e);
             throw new RuntimeException("Container startup failed", e);
         }
-    }
-
-    private static void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (valkeyContainer != null && valkeyContainer.isRunning()) {
-                try {
-                    logger.info("Cleaning up Valkey data before shutdown...");
-                    valkeyContainer.execInContainer("valkey-cli", "FLUSHALL");
-                    logger.info("Valkey data cleanup completed");
-                } catch (Exception e) {
-                    logger.warn("Failed to flush Valkey data during shutdown: {}", e.getMessage());
-                }
-            }
-        }, "valkey-cleanup-thread"));
     }
 
     @DynamicPropertySource
@@ -117,7 +102,8 @@ public class TestContainerConfig {
                 valkeyContainer.getMappedPort(VALKEY_PORT)
         );
         factory.setValidateConnection(true);
-        
+        factory.afterPropertiesSet();
+
         logger.info("Created Redis connection factory for {}:{}", 
                    valkeyContainer.getHost(), valkeyContainer.getMappedPort(VALKEY_PORT));
         

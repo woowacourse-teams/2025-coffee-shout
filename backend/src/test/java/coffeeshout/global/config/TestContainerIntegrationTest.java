@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @IntegrationTest
@@ -18,9 +17,6 @@ class TestContainerIntegrationTest {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @BeforeEach
     void setUp() {
@@ -134,7 +130,7 @@ class TestContainerIntegrationTest {
         String value2 = "value2";
 
         // when
-        redisTemplate.execute((RedisCallback<Object>) connection -> {
+        stringRedisTemplate.execute((RedisCallback<Object>) connection -> {
             connection.multi();
             connection.stringCommands().set(key1.getBytes(), value1.getBytes());
             connection.stringCommands().set(key2.getBytes(), value2.getBytes());

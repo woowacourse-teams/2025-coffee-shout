@@ -7,6 +7,10 @@ spring:
     compose:
       enabled: true
       file: docker-compose.yml
+  data:
+    redis:
+      ssl:
+        enabled: false
 
 room:
   qr:

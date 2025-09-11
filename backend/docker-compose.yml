@@ -2,12 +2,11 @@ services:
   valkey:
     image: 'valkey/valkey:latest'
     environment:
-      - 'VALKEY_DISABLE_COMMANDS=FLUSHDB,KEYS,PEXPIRE,DEL,CONFIG,SHUTDOWN,DEBUG,EVAL,SCRIPT'
+      - 'VALKEY_DISABLE_COMMANDS=FLUSHALL,FLUSHDB,KEYS,PEXPIRE,DEL,CONFIG,SHUTDOWN,DEBUG,EVAL,SCRIPT'
     ports:
       - "6379:6379"
     volumes:
-      - 'valkey_data:/data'
+      - type: tmpfs
+        target: /data
     command: valkey-server --appendonly yes
 
-volumes:
-  valkey_data:

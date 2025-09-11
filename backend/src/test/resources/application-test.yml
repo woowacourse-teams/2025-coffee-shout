@@ -3,6 +3,10 @@ spring:
     aws:
       region:
         static: ap-northeast-2
+  data:
+    redis:
+      ssl:
+        enabled: false
 
 logging:
   level:
