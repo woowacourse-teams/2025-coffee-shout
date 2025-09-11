@@ -3,6 +3,10 @@ spring:
     aws:
       s3:
         enabled: false
+  docker:
+    compose:
+      enabled: true
+      file: docker-compose.yml
 
 room:
   qr:
