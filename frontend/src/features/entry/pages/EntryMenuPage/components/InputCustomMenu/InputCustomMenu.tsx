@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode } from 'react';
+import { ChangeEvent, ComponentProps } from 'react';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
@@ -9,8 +9,7 @@ type Props = {
   onChangeCustomMenuName: (customMenuName: string) => void;
   onClickDoneButton: () => void;
   isMenuInputCompleted: boolean;
-  children?: ReactNode;
-};
+} & ComponentProps<'div'>;
 
 const InputCustomMenu = ({
   customMenuName,
