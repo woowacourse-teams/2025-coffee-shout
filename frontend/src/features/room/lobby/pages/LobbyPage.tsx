@@ -16,23 +16,24 @@ import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import JoinCodeModal from '../components/JoinCodeModal/JoinCodeModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import * as S from './LobbyPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
+  const { qrCodeUrl } = useLocation().state;
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
@@ -134,8 +135,8 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<JoinCodeModal onClose={closeModal} />, {
-      title: '초대 코드',
+    openModal(<InvitationModal onClose={closeModal} qrCodeUrl={qrCodeUrl} />, {
+      title: '친구 초대하기',
       showCloseButton: true,
     });
   };
