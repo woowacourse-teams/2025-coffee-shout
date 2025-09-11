@@ -17,15 +17,17 @@ const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
   const tabs = ['QR코드', '초대코드'];
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(joinCode);
-    alert('초대 코드가 복사되었습니다.');
-    onClose();
+    copyToClipboard(joinCode, '초대 코드가 복사되었습니다.');
   };
 
   const handleShareLink = async () => {
     const shareUrl = `${window.location.origin}/join/${joinCode}`;
-    await navigator.clipboard.writeText(shareUrl);
-    alert('링크가 복사되었습니다.');
+    copyToClipboard(shareUrl, '참여 링크가 복사되었습니다.');
+  };
+
+  const copyToClipboard = async (text: string, message: string) => {
+    await navigator.clipboard.writeText(text);
+    alert(message);
     onClose();
   };
 
