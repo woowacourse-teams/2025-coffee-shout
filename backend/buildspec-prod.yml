@@ -15,7 +15,7 @@ phases:
 
   build:
     commands:
-      - # prod 환경에서는 모든 테스트 실행
+      # prod 환경에서는 모든 테스트 실행
       - ./gradlew test
       - ./gradlew build
       - ls -la build/libs/
