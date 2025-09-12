@@ -194,4 +194,9 @@ public class RoomService {
         }
         return menuQueryService.getById(selectedMenuRequest.id());
     }
+
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
 }

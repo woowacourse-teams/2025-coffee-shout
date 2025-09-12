@@ -183,6 +183,10 @@ public class Room {
         return players.isEmpty();
     }
 
+    public boolean isReadyState() {
+        return roomState == RoomState.READY;
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
