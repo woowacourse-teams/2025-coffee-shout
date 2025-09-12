@@ -1,18 +1,22 @@
 spring:
   application:
-    name:
-      coffee-shout
-  cloud:
-    aws:
-      s3:
-        bucket: ${S3_BUCKET_NAME}
-
+    name: coffee-shout
   data:
     redis:
       port: 6379
       host: ${REDIS_HOST:localhost}
       ssl:
-        enabled: true
+        enabled: ${REDIS_SSL_ENABLED:false}  # 기본값은 false, 운영환경에서는 true
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  cloud:
+    aws:
+      s3:
+        bucket: ${S3_BUCKET_NAME}
 
 room:
   removalDelay: 1h
@@ -26,6 +30,8 @@ room:
 logging:
   level:
     root: info
+    coffeeshout.global.config.redis: debug  # Redis 디버깅용
+    org.springframework.data.redis: info
 
 management:
   endpoint:
@@ -38,11 +44,11 @@ management:
   metrics:
     enable:
       tomcat: true
-
   prometheus:
     metrics:
       export:
         enabled: true
+
 server:
   tomcat:
     mbeanregistry:

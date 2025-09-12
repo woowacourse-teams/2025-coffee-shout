@@ -7,9 +7,11 @@ import coffeeshout.room.domain.Room;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-@Repository
+//@Repository
+//@Profile("!redis") // redis 프로파일이 아닐 때만 활성화
 public class MemoryRoomRepository implements RoomRepository {
 
     private final Map<JoinCode, Room> rooms;
