@@ -139,12 +139,20 @@ public class RoomDtoConverter {
     }
 
     private PlayableDto toPlayableDto(Playable playable) {
-        List<PlayerScoreDto> scores = playable.getScores().entrySet().stream()
-                .map(entry -> new PlayerScoreDto(
-                        entry.getKey().getName().value(),
-                        entry.getValue().getValue()
-                ))
-                .toList();
+        List<PlayerScoreDto> scores;
+        try {
+            scores = playable.getScores().entrySet().stream()
+                    .map(entry -> new PlayerScoreDto(
+                            entry.getKey().getName().value(),
+                            entry.getValue().getValue()
+                    ))
+                    .toList();
+        } catch (Exception e) {
+            // 게임이 아직 시작되지 않은 경우 빈 점수 반환
+            log.debug("게임 점수 조회 실패 (아직 시작되지 않음): miniGameType={}, error={}", 
+                    playable.getMiniGameType(), e.getMessage());
+            scores = Collections.emptyList();
+        }
 
         Map<String, Object> gameState = new HashMap<>();
         
