@@ -180,6 +180,11 @@ public class RoomService {
         return isRemoved;
     }
 
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
+
     private void scheduleRemoveRoom(JoinCode joinCode) {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
