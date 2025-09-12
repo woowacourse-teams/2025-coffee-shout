@@ -1,7 +1,7 @@
 package coffeeshout.global.config;
 
+import coffeeshout.global.config.properties.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,24 +15,21 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
+    private final RedisProperties redisProperties;
 
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-
-    @Value("${spring.data.redis.ssl.enabled:false}")
-    private boolean sslEnabled;
+    public RedisConfig(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = 
-            new RedisStandaloneConfiguration(redisHost, redisPort);
+            new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
         
         LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
             LettuceClientConfiguration.builder();
         
-        if (sslEnabled) {
+        if (redisProperties.ssl().enabled()) {
             clientConfig.useSsl();
         }
         

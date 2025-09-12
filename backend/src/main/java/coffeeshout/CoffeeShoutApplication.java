@@ -1,12 +1,10 @@
 package coffeeshout;
 
-import coffeeshout.global.config.properties.QrProperties;
-import coffeeshout.global.config.properties.S3Properties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
-@EnableConfigurationProperties({QrProperties.class, S3Properties.class})
+@ConfigurationPropertiesScan
 @SpringBootApplication
 public class CoffeeShoutApplication {
 

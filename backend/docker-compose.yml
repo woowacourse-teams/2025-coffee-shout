@@ -1,15 +1,14 @@
-version: '3.8'
-
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: coffeeshout-redis
+  valkey:
+    image: 'valkey/valkey:latest'
+    environment:
+      - 'VALKEY_DISABLE_COMMANDS=FLUSHALL,FLUSHDB,KEYS,PEXPIRE,DEL,CONFIG,SHUTDOWN,DEBUG,EVAL,SCRIPT'
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes
     volumes:
-      - redis-data:/data
-    restart: unless-stopped
+      - type: tmpfs
+        target: /data
+    command: valkey-server --appendonly yes
 
 volumes:
   redis-data:

@@ -3,10 +3,12 @@ spring:
     aws:
       s3:
         enabled: false
+  docker:
+    compose:
+      enabled: true
+      file: docker-compose.yml
   data:
     redis:
-      host: localhost
-      port: 6379
       ssl:
         enabled: false
 
