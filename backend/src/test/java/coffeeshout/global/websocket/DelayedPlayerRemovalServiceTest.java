@@ -69,6 +69,19 @@ class DelayedPlayerRemovalServiceTest {
 
         @Test
         @SuppressWarnings("unchecked")
+        void 게임중이면_지연_삭제를_스케줄링_안한다() {
+            // given
+            given(roomService.isReadyState("ABC23")).willReturn(false);
+
+            // when
+            delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
+
+            // then
+            then(taskScheduler).should(never()).schedule(any(Runnable.class), any(Instant.class));
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
         void 서로_다른_플레이어는_독립적으로_스케줄링된다() {
             // given
             String anotherPlayerKey = "DEF456:박영희";
