@@ -45,6 +45,6 @@ export const MenuColorMap = {
   '#FFD6A8': '#FFF7ED',
   '#FEE685': '#FFFBEB',
   '#D8F999': '#F7FEE7',
-} as const;
+} as const satisfies Record<CategoryColorKey, string>;
 
 export type ColorList = (typeof colorList)[number];
