@@ -60,7 +60,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -72,7 +72,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -84,7 +84,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -96,7 +96,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -138,7 +138,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"HOST",
                          "isReady":true,
@@ -150,7 +150,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -162,7 +162,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -174,7 +174,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             "id":1,
                             "name":"아메리카노",
                             "temperature":"ICE",
-                            "categoryImageUrl":"커피.jpg"
+                            "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                          },
                          "playerType":"GUEST",
                          "isReady":false,
@@ -211,7 +211,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                                 "id":1,
                                 "name":"아메리카노",
                                 "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
+                                "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                             },
                             "playerType":"HOST",
                             "isReady":true,
@@ -226,7 +226,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                                 "id":1,
                                 "name":"아메리카노",
                                 "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
+                                "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -241,7 +241,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                                 "id":1,
                                 "name":"아메리카노",
                                 "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
+                                "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
@@ -256,7 +256,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                                 "id":1,
                                 "name":"아메리카노",
                                 "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
+                                "categoryImageUrl":"https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/coffee-shout/images/coffee.svg"
                             },
                             "playerType":"GUEST",
                             "isReady":false,
