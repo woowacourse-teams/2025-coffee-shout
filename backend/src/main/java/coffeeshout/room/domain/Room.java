@@ -21,16 +21,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 @Getter
+@RedisHash("room")
 public class Room {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
+    @Id
     private final JoinCode joinCode;
     private final Players players;
     private final Roulette roulette;
@@ -40,24 +42,24 @@ public class Room {
     private Player host;
     private RoomState roomState;
 
-    @JsonCreator
-    public Room(
-            @JsonProperty("joinCode") JoinCode joinCode,
-            @JsonProperty("host") Player host,
-            @JsonProperty("players") Players players,
-            @JsonProperty("roulette") Roulette roulette,
-            @JsonProperty("miniGames") Queue<Playable> miniGames,
-            @JsonProperty("finishedGames") List<Playable> finishedGames,
-            @JsonProperty("roomState") RoomState roomState
-    ) {
-        this.joinCode = joinCode;
-        this.host = host;
-        this.players = players;
-        this.roulette = roulette;
-        this.miniGames = miniGames;
-        this.finishedGames = finishedGames;
-        this.roomState = roomState;
-    }
+//    @JsonCreator
+//    public Room(
+//            @JsonProperty("joinCode") JoinCode joinCode,
+//            @JsonProperty("host") Player host,
+//            @JsonProperty("players") Players players,
+//            @JsonProperty("roulette") Roulette roulette,
+//            @JsonProperty("miniGames") Queue<Playable> miniGames,
+//            @JsonProperty("finishedGames") List<Playable> finishedGames,
+//            @JsonProperty("roomState") RoomState roomState
+//    ) {
+//        this.joinCode = joinCode;
+//        this.host = host;
+//        this.players = players;
+//        this.roulette = roulette;
+//        this.miniGames = miniGames;
+//        this.finishedGames = finishedGames;
+//        this.roomState = roomState;
+//    }
 
     public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
         this.joinCode = joinCode;

@@ -1,7 +1,7 @@
 package coffeeshout.global.config;
 
-import coffeeshout.global.redis.RedisRoomRepository;
 import coffeeshout.room.domain.repository.MemoryRoomRepository;
+import coffeeshout.room.domain.repository.RedisRoomRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

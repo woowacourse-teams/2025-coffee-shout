@@ -1,10 +1,9 @@
-package coffeeshout.global.redis;
+package coffeeshout.room.domain.repository;
 
 import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.repository.RoomRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
