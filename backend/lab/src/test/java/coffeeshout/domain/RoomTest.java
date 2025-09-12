@@ -12,42 +12,39 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class RoomTest {
 
+    class SomeClass implements SomeInterface {
+
+    }
+
     @Autowired
     private RoomRepository roomRepository;
-
-    class SomeClass implements SomeInterface {
-        private final int a = 0;
-    }
 
     @Test
     void RoomTest() {
         // given
-        final Room room = new Room(
-                "ABCDE",
-                List.of(
-                        new Player(new PlayerName("hans1")),
-                        new Player(new PlayerName("hans2"))
-                ),
-                RoomState.PLAYING
+        final JoinCode joinCode = new JoinCode("ABCDE");
+        final List<Player> players = List.of(
+                new Player(new PlayerName("hans1")),
+                new Player(new PlayerName("hans2"))
         );
+        final RoomState roomState = RoomState.PLAYING;
+        final SomeInterface some = new SomeClass();
+        final Room room = new Room(joinCode, players, roomState, some);
 
         // when
         final Room savedRoom = roomRepository.save(room);
 
         // then
-        assertThat(savedRoom.getJoinCode()).isEqualTo("ABCDE");
+        assertThat(savedRoom.getJoinCode().getValue()).isEqualTo("ABCDE");
 
-        final Optional<Room> foundRoom = roomRepository.findById("ABCDE");
+        final Optional<Room> foundRoom = roomRepository.findById(joinCode);
 
         assertThat(foundRoom).isPresent();
 
         final Room gotRoom = foundRoom.get();
 
-        assertThat(gotRoom.getRoomState()).isEqualTo(RoomState.PLAYING);
-        assertThat(gotRoom.getJoinCode()).isEqualTo("ABCDE");
+        assertThat(gotRoom.getRoomState()).isEqualTo(roomState);
+        assertThat(gotRoom.getJoinCode().getValue()).isEqualTo("ABCDE");
         assertThat(gotRoom.getHost().get(0).getName().value()).isEqualTo("hans1");
-
-
     }
-
 }
