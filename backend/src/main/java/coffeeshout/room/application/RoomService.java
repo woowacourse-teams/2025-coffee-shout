@@ -128,7 +128,9 @@ public class RoomService {
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
-        return room.getAllMiniGame().stream()
+        final Room saved = roomCommandService.save(room);
+
+        return saved.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
     }
