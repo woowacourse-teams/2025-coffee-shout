@@ -40,7 +40,7 @@ export const categoryColorList = [theme.color.point[200], '#FFD6A8', '#FEE685', 
 
 export type CategoryColorKey = (typeof categoryColorList)[number];
 
-export const MenuColorMap = {
+export const MenuColorMap: Record<CategoryColorKey, string> = {
   [theme.color.point[200]]: theme.color.point[50],
   '#FFD6A8': '#FFF7ED',
   '#FEE685': '#FFFBEB',
