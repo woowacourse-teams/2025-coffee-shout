@@ -1,20 +1,28 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
-import {
-  EntryMenuPage,
-  EntryNamePage,
-  HomePage,
-  LobbyPage,
-  MiniGamePlayPage,
-  MiniGameReadyPage,
-  MiniGameResultPage,
-  NotFoundPage,
-  OrderPage,
-  RoulettePlayPage,
-  RouletteResultPage,
-  QRJoinPage,
-} from './pages';
+import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
+import { lazy } from 'react';
+
+const LobbyPage = lazy(() => import('./features/room/lobby/pages/LobbyPage'));
+const MiniGamePlayPage = lazy(
+  () => import('./features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage')
+);
+const MiniGameReadyPage = lazy(
+  () => import('./features/miniGame/pages/MiniGameReady/MiniGameReadyPage')
+);
+const MiniGameResultPage = lazy(
+  () => import('./features/miniGame/pages/MiniGameResultPage/MiniGameResultPage')
+);
+const NotFoundPage = lazy(() => import('./features/notFound/pages/NotFoundPage'));
+const OrderPage = lazy(() => import('./features/room/order/pages/OrderPage'));
+const RoulettePlayPage = lazy(
+  () => import('./features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage')
+);
+const RouletteResultPage = lazy(
+  () => import('./features/room/roulette/pages/RouletteResultPage/RouletteResultPage')
+);
+const QRJoinPage = lazy(() => import('./features/join/pages/QRJoinPage'));
 
 const router = createBrowserRouter([
   {
