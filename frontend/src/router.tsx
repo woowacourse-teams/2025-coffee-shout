@@ -6,23 +6,40 @@ import { lazy } from 'react';
 
 const LobbyPage = lazy(() => import('./features/room/lobby/pages/LobbyPage'));
 const MiniGamePlayPage = lazy(
-  () => import('./features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage')
+  () =>
+    import(
+      /*webpackChunkName: "miniGamePlayPage"*/ './features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage'
+    )
 );
 const MiniGameReadyPage = lazy(
-  () => import('./features/miniGame/pages/MiniGameReady/MiniGameReadyPage')
+  () =>
+    import(
+      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReady/MiniGameReadyPage'
+    )
 );
 const MiniGameResultPage = lazy(
-  () => import('./features/miniGame/pages/MiniGameResultPage/MiniGameResultPage')
+  () =>
+    import(
+      /*webpackChunkName: "miniGameResultPage"*/ './features/miniGame/pages/MiniGameResultPage/MiniGameResultPage'
+    )
 );
 const NotFoundPage = lazy(() => import('./features/notFound/pages/NotFoundPage'));
 const OrderPage = lazy(() => import('./features/room/order/pages/OrderPage'));
 const RoulettePlayPage = lazy(
-  () => import('./features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage')
+  () =>
+    import(
+      /*webpackChunkName: "roulettePlayPage"*/ './features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage'
+    )
 );
 const RouletteResultPage = lazy(
-  () => import('./features/room/roulette/pages/RouletteResultPage/RouletteResultPage')
+  () =>
+    import(
+      /*webpackChunkName: "rouletteResultPage"*/ './features/room/roulette/pages/RouletteResultPage/RouletteResultPage'
+    )
 );
-const QRJoinPage = lazy(() => import('./features/join/pages/QRJoinPage'));
+const QRJoinPage = lazy(
+  () => import(/*webpackChunkName: "qrJoinPage"*/ './features/join/pages/QRJoinPage')
+);
 
 const router = createBrowserRouter([
   {
