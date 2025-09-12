@@ -22,13 +22,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 @Getter
+@RedisHash("room")
 public class Room {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
+    @Id
     private final JoinCode joinCode;
     private final Players players;
     private final Roulette roulette;

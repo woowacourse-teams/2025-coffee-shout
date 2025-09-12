@@ -3,6 +3,12 @@ spring:
     aws:
       region:
         static: ap-northeast-2
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      ssl:
+        enabled: false
 
 logging:
   level:
