@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.repository.RoomRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class RoomTest {
 
-    class SomeClass implements SomeInterface {
-
-    }
 
     @Autowired
     private RoomRepository roomRepository;
@@ -28,8 +26,9 @@ class RoomTest {
                 new Player(new PlayerName("hans2"))
         );
         final RoomState roomState = RoomState.PLAYING;
-        final SomeInterface some = new SomeClass();
-        final Room room = new Room(joinCode, players, roomState, some);
+        final Map<Player, RoomState> map = Map.of(new Player(new PlayerName("asb")), RoomState.DONE);
+        final SomeInterface some = new SomeImplementation();
+        final Room room = new Room(joinCode, players, roomState, map, some);
 
         // when
         final Room savedRoom = roomRepository.save(room);
@@ -45,6 +44,9 @@ class RoomTest {
 
         assertThat(gotRoom.getRoomState()).isEqualTo(roomState);
         assertThat(gotRoom.getJoinCode().getValue()).isEqualTo("ABCDE");
+        assertThat(gotRoom.getSomeInterface().getA()).isEqualTo(1);
         assertThat(gotRoom.getHost().get(0).getName().value()).isEqualTo("hans1");
+
+        System.out.println(room.getMap());
     }
 }

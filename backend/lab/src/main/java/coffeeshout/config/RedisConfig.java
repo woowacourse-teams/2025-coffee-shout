@@ -15,7 +15,9 @@ public class RedisConfig {
         return new RedisCustomConversions(
                 Arrays.asList(
                         new JoinCodeToBytesConverter(),
-                        new BytesToJoinCodeConverter()
+                        new BytesToJoinCodeConverter(),
+                        new PlayerToBytesConverter(),
+                        new BytesToPlayerConverter()
                 )
         );
     }
