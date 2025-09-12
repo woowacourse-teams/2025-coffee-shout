@@ -16,7 +16,8 @@ phases:
   build:
     commands:
       # prod 환경에서는 모든 테스트 실행
-      - ./gradlew build
+      - ./gradlew test
+      - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
       - echo "Found JAR file:" $JAR_FILE
