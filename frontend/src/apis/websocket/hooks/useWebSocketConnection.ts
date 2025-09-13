@@ -47,9 +47,13 @@ export const useWebSocketConnection = () => {
   );
 
   const validateClient = useCallback(() => {
-    if (client && isConnected) return false;
+    if (client && isConnected) {
+      console.log('⚠️ 이미 연결된 클라이언트가 있습니다. 중복 연결을 방지합니다.');
+      return false;
+    }
 
     if (client && !isConnected) {
+      console.log('🧹 이전 클라이언트 정리 중...');
       client.deactivate();
       setClient(null);
     }
@@ -72,6 +76,7 @@ export const useWebSocketConnection = () => {
     (joinCode: string, myName: string) => {
       if (!validateClient() || !validateConnectionParams(joinCode, myName)) return;
 
+      console.log('🚀 WebSocket 연결 시작...', { joinCode, myName });
       const stompClient = setupStompClient(joinCode, myName);
       setClient(stompClient);
       stompClient.activate();
@@ -82,6 +87,7 @@ export const useWebSocketConnection = () => {
   const stopSocket = useCallback(() => {
     if (!client || !isConnected) return;
 
+    console.log('🛑 WebSocket 연결 종료...');
     client.deactivate();
     setIsConnected(false);
     setClient(null);
