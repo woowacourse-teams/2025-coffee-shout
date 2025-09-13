@@ -20,13 +20,11 @@ export const useWebSocketConnection = () => {
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
-    setClient(null);
   }, []);
 
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
-    setClient(null);
   }, []);
 
   const setupStompClient = useCallback(
@@ -38,7 +36,7 @@ export const useWebSocketConnection = () => {
 
       stompClient.onConnect = handleConnect;
       stompClient.onDisconnect = handleDisconnect;
-      stompClient.onStompError = (frame: IFrame) => handleStompError(frame);
+      stompClient.onStompError = handleStompError;
       stompClient.onWebSocketError = (event: Event) => handleWebSocketError(event, stompClient);
 
       return stompClient;
@@ -85,13 +83,13 @@ export const useWebSocketConnection = () => {
   );
 
   const stopSocket = useCallback(() => {
-    if (!client || !isConnected) return;
+    if (!client) return;
 
     console.log('🛑 WebSocket 연결 종료...');
     client.deactivate();
     setIsConnected(false);
     setClient(null);
-  }, [client, isConnected]);
+  }, [client]);
 
   return {
     client,
