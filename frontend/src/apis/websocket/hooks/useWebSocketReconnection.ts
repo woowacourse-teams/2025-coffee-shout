@@ -13,7 +13,7 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   const { joinCode, myName } = useIdentifier();
   const reconnectTimerRef = useRef<number | null>(null);
   const wasBackgrounded = useRef(false);
-  const hasInitialized = useRef(false);
+  const hasCheckedRefresh = useRef(false);
 
   const clearReconnectTimer = useCallback(() => {
     if (reconnectTimerRef.current) {
@@ -33,9 +33,23 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
    * 새로고침 감지
    */
   useEffect(() => {
-    if (!hasInitialized.current && !isConnected && joinCode && myName) {
+    if (hasCheckedRefresh.current) return;
+
+    let isReload = false;
+
+    try {
+      const navigationEntries = performance.getEntriesByType(
+        'navigation'
+      ) as PerformanceNavigationTiming[];
+      isReload = navigationEntries.length > 0 && navigationEntries[0].type === 'reload';
+    } catch (error) {
+      console.warn('performance.getEntriesByType not supported:', error);
+      isReload = document.referrer === window.location.href;
+    }
+
+    if (isReload && !isConnected && joinCode && myName && startSocket) {
       console.log('🔄 새로고침 감지 - 웹소켓 재연결 시도:', { myName, joinCode });
-      hasInitialized.current = true;
+      hasCheckedRefresh.current = true;
       startSocket(joinCode, myName);
     }
   }, [myName, joinCode, isConnected, startSocket]);
