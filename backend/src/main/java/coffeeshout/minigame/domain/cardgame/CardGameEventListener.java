@@ -8,6 +8,9 @@ import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.service.RoomCommandService;
+import coffeeshout.room.domain.service.RoomQueryService;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ public class CardGameEventListener {
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final RoomQueryService roomQueryService;
+    private final RoomCommandService roomCommandService;
 
     @EventListener
     @MessageResponse(
@@ -37,6 +42,12 @@ public class CardGameEventListener {
     )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
         sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
+        
+        // 게임이 끝났으면 Room 상태를 Redis에 저장
+        if (cardGameStateChangeEvent.cardGame().getState() == CardGameState.DONE) {
+            Room room = roomQueryService.getByJoinCode(cardGameStateChangeEvent.joinCode());
+            roomCommandService.save(room);
+        }
     }
 
     @EventListener
