@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
+import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
@@ -14,6 +15,7 @@ import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
@@ -423,7 +425,10 @@ class RoomServiceTest extends ServiceTest {
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
         final Room restoredRoom = roomRepository.findByJoinCode(joinCode).get();
-        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
+
+        // 실제 CardGame을 완료된 상태로 생성
+        CardGame cardGame = createCompletedCardGame(restoredRoom.getPlayers());
+        List<CardGame> miniGames = List.of(cardGame);
         ReflectionTestUtils.setField(restoredRoom, "finishedGames", miniGames);
         roomRepository.save(restoredRoom); // Redis에도 업데이트된 상태로 저장
 
@@ -502,5 +507,31 @@ class RoomServiceTest extends ServiceTest {
 
         // then
         verify(delayedRoomRemovalService).scheduleRemoveRoom(room.getJoinCode());
+    }
+
+    private CardGame createCompletedCardGame(List<Player> players) {
+        CardGame cardGame = new CardGame(new CardGameDeckStub());
+        cardGame.startGame(players);
+
+        // 첫 번째 라운드 완료
+        cardGame.startRound(); // FIRST 라운드 시작
+        cardGame.updateDescription();
+        cardGame.startPlay();
+
+        // 각 플레이어가 카드 선택 (꾹이가 더 좋은 카드를 선택하도록)
+        cardGame.selectCard(players.get(0), 0); // 꾹이 - 첫 번째 카드 (40점)
+        cardGame.selectCard(players.get(1), 5); // 루키 - 마지막 카드 (-10점)
+
+        // 두 번째 라운드 완료
+        cardGame.startRound(); // SECOND 라운드 시작
+        cardGame.updateDescription();
+        cardGame.startPlay();
+
+        // 두 번째 라운드 카드 선택
+        cardGame.selectCard(players.get(0), 6); // 꾹이 - 곱하기 4배 카드
+        cardGame.selectCard(players.get(1), 8); // 루키 - 곱하기 0배 카드
+
+        cardGame.changeDoneState();
+        return cardGame;
     }
 }
