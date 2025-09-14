@@ -42,7 +42,9 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
     }
   }, [playerType, myName, participants, navigate]);
 
-  // 웹소켓 연결되고 participants가 로드된 후 유효성 검사
+  /**
+   * 웹소켓 연결되고 participants가 로드된 후 유효성 검사
+   */
   useEffect(() => {
     if (isConnected && participants.length > 0) {
       const timeoutId = setTimeout(() => {
