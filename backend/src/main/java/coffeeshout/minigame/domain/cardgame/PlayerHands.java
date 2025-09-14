@@ -74,4 +74,9 @@ public class PlayerHands {
                 .findFirst()
                 .map(Entry::getKey);
     }
+
+    // Redis 복원을 위한 메서드
+    public Map<Player, CardHand> getPlayerHandsMap() {
+        return playerHands;
+    }
 }

@@ -415,14 +415,12 @@ class RoomServiceTest extends ServiceTest {
     @Test
     void 미니게임의_순위를_반환한다(@Autowired RoomRepository roomRepository) {
         // given
-        String hostName = "호스트";
+        String hostName = "꾹이";
         SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1",
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "루키",
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
-                new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
 
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);

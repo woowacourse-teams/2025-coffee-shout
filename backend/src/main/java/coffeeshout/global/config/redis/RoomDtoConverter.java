@@ -1,14 +1,23 @@
 package coffeeshout.global.config.redis;
 
+import coffeeshout.global.config.redis.dto.CardDto;
+import coffeeshout.global.config.redis.dto.CardHandDto;
 import coffeeshout.global.config.redis.dto.MenuDto;
 import coffeeshout.global.config.redis.dto.PlayableDto;
 import coffeeshout.global.config.redis.dto.PlayerDto;
+import coffeeshout.global.config.redis.dto.PlayerHandsDto;
 import coffeeshout.global.config.redis.dto.PlayerProbabilityDto;
 import coffeeshout.global.config.redis.dto.PlayerScoreDto;
 import coffeeshout.global.config.redis.dto.RoomDto;
 import coffeeshout.global.config.redis.dto.SelectedMenuDto;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardHand;
+import coffeeshout.minigame.domain.cardgame.PlayerHands;
+import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
+import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
+import coffeeshout.minigame.domain.cardgame.card.MultiplierCard;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -22,6 +31,7 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.MenuQueryService;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +113,16 @@ public class RoomDtoConverter {
             try {
                 MiniGameType miniGameType = MiniGameType.valueOf(playableDto.getMiniGameType());
                 Playable finishedGame = miniGameType.createMiniGame();
+                
+                // 게임 시작 상태로 초기화 (playerHands 초기화)
+                finishedGame.startGame(room.getPlayers());
+                
+                // CardGame의 경우 저장된 PlayerHands 정보 복원
+                if (finishedGame instanceof CardGame cardGame && playableDto.getPlayerHands() != null) {
+                    PlayerHands restoredPlayerHands = toPlayerHands(playableDto.getPlayerHands(), room.getPlayers());
+                    cardGame.restorePlayerHands(restoredPlayerHands);
+                }
+                
                 room.restoreFinishedGame(finishedGame);
                 log.debug("완료된 미니게임 복원: joinCode={}, miniGameType={}", 
                         dto.getJoinCode(), miniGameType);
@@ -182,6 +202,8 @@ public class RoomDtoConverter {
 
     private PlayableDto toPlayableDto(Playable playable) {
         List<PlayerScoreDto> scores;
+        PlayerHandsDto playerHandsDto = null;
+        
         try {
             scores = playable.getScores().entrySet().stream()
                     .map(entry -> new PlayerScoreDto(
@@ -202,14 +224,27 @@ public class RoomDtoConverter {
         if (playable instanceof CardGame cardGame) {
             gameState.put("round", cardGame.getRound().name());
             gameState.put("state", cardGame.getState().name());
-            // 필요한 다른 상태들도 추가 가능
+            
+            // PlayerHands 정보 저장
+            try {
+                // CardGame에 PlayerHands getter 있는지 확인 후 저장
+                java.lang.reflect.Field playerHandsField = CardGame.class.getDeclaredField("playerHands");
+                playerHandsField.setAccessible(true);
+                PlayerHands playerHands = (PlayerHands) playerHandsField.get(cardGame);
+                if (playerHands != null) {
+                    playerHandsDto = toPlayerHandsDto(playerHands);
+                }
+            } catch (Exception e) {
+                log.warn("CardGame playerHands 저장 실패: error={}", e.getMessage());
+            }
         }
 
         return new PlayableDto(
                 playable.getMiniGameType().name(),
                 playable.getClass().getSimpleName(),
                 scores,
-                gameState
+                gameState,
+                playerHandsDto
         );
     }
 
@@ -231,5 +266,69 @@ public class RoomDtoConverter {
         } else {
             throw new IllegalArgumentException("지원하지 않는 Menu 타입: " + dto.getType());
         }
+    }
+
+    // CardGame PlayerHands 관련 변환 메서드들
+    private CardDto toCardDto(Card card) {
+        return new CardDto(
+                card.getType().name(),
+                card.getValue(),
+                card.getClass().getSimpleName()
+        );
+    }
+
+    private Card toCard(CardDto dto) {
+        CardType cardType = CardType.valueOf(dto.getType());
+        int value = dto.getValue();
+        
+        return switch (cardType) {
+            case ADDITION -> new AdditionCard(value);
+            case MULTIPLIER -> new MultiplierCard(value);
+        };
+    }
+
+    private CardHandDto toCardHandDto(CardHand cardHand) {
+        List<CardDto> cards = new ArrayList<>();
+        cardHand.forEach(card -> cards.add(toCardDto(card)));
+        return new CardHandDto(cards);
+    }
+
+    private CardHand toCardHand(CardHandDto dto) {
+        CardHand cardHand = new CardHand();
+        for (CardDto cardDto : dto.getCards()) {
+            Card card = toCard(cardDto);
+            cardHand.put(card);
+        }
+        return cardHand;
+    }
+
+    private PlayerHandsDto toPlayerHandsDto(PlayerHands playerHands) {
+        Map<String, CardHandDto> playerHandsMap = new HashMap<>();
+        
+        for (Map.Entry<Player, CardHand> entry : playerHands.getPlayerHandsMap().entrySet()) {
+            String playerName = entry.getKey().getName().value();
+            CardHand cardHand = entry.getValue();
+            playerHandsMap.put(playerName, toCardHandDto(cardHand));
+        }
+        
+        return new PlayerHandsDto(playerHandsMap);
+    }
+
+    private PlayerHands toPlayerHands(PlayerHandsDto dto, List<Player> players) {
+        PlayerHands playerHands = new PlayerHands(players);
+        
+        // dto에서 각 플레이어의 카드 정보를 복원
+        for (Player player : players) {
+            String playerName = player.getName().value();
+            if (dto.getPlayerHands().containsKey(playerName)) {
+                CardHandDto cardHandDto = dto.getPlayerHands().get(playerName);
+                for (CardDto cardDto : cardHandDto.getCards()) {
+                    Card card = toCard(cardDto);
+                    playerHands.put(player, card);
+                }
+            }
+        }
+        
+        return playerHands;
     }
 }

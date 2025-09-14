@@ -104,4 +104,9 @@ public class CardGame implements Playable {
     public void changeDoneState() {
         this.state = CardGameState.DONE;
     }
+
+    // Redis 복원을 위한 메서드
+    public void restorePlayerHands(PlayerHands playerHands) {
+        this.playerHands = playerHands;
+    }
 }
