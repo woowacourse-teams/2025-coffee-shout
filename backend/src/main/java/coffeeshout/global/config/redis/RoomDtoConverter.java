@@ -53,7 +53,9 @@ public class RoomDtoConverter {
                 .miniGames(room.getAllMiniGame().stream()
                         .map(this::toPlayableDto)
                         .toList())
-                .finishedGames(Collections.emptyList()) // finishedGames는 일단 빈 리스트로
+                .finishedGames(room.getFinishedGames().stream()
+                        .map(this::toPlayableDto)
+                        .toList())
                 .build();
     }
 
@@ -95,6 +97,20 @@ public class RoomDtoConverter {
                             toSelectedMenu(playerDto.getSelectedMenu())
                     );
                 });
+
+        // Room 상태 복원 - finishedGames 복원
+        dto.getFinishedGames().forEach(playableDto -> {
+            try {
+                MiniGameType miniGameType = MiniGameType.valueOf(playableDto.getMiniGameType());
+                Playable finishedGame = miniGameType.createMiniGame();
+                room.restoreFinishedGame(finishedGame);
+                log.debug("완료된 미니게임 복원: joinCode={}, miniGameType={}", 
+                        dto.getJoinCode(), miniGameType);
+            } catch (Exception e) {
+                log.warn("완료된 미니게임 복원 실패: joinCode={}, miniGameType={}, error={}", 
+                        dto.getJoinCode(), playableDto.getMiniGameType(), e.getMessage());
+            }
+        });
 
         // Room 상태 복원 - miniGames 복원
         dto.getMiniGames().forEach(playableDto -> {
