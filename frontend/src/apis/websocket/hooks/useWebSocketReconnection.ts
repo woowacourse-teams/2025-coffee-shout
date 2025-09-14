@@ -1,19 +1,15 @@
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { useCallback, useEffect, useRef } from 'react';
 
 type Props = {
   isConnected: boolean;
-  isVisible: boolean;
   startSocket: (joinCode: string, myName: string) => void;
   stopSocket: () => void;
 };
 
-export const useWebSocketReconnection = ({
-  isConnected,
-  isVisible,
-  startSocket,
-  stopSocket,
-}: Props) => {
+export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket }: Props) => {
+  const { isVisible } = usePageVisibility();
   const { joinCode, myName } = useIdentifier();
   const reconnectTimerRef = useRef<number | null>(null);
   const wasBackgrounded = useRef(false);
