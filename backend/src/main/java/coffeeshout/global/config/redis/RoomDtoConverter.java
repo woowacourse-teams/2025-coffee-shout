@@ -86,6 +86,11 @@ public class RoomDtoConverter {
 
         Room room = Room.createNewRoom(joinCode, hostName, hostSelectedMenu);
 
+        // 호스트의 ready 상태 복원 (Redis에서 복원된 값으로 덮어쓰기)
+        Player host = room.getHost();
+        host.updateReadyState(hostDto.getIsReady());
+        log.debug("호스트 ready 상태 복원: name={}, isReady={}", hostDto.getName(), hostDto.getIsReady());
+
         // roomState 복원
         if (dto.getRoomState() != null) {
             try {
@@ -103,10 +108,12 @@ public class RoomDtoConverter {
         dto.getPlayers().stream()
                 .filter(playerDto -> !playerDto.getName().equals(hostDto.getName()))
                 .forEach(playerDto -> {
-                    log.debug("게스트 복원 중: playerName={}, type={}", playerDto.getName(), playerDto.getPlayerType());
+                    log.debug("게스트 복원 중: playerName={}, type={}, isReady={}", 
+                             playerDto.getName(), playerDto.getPlayerType(), playerDto.getIsReady());
                     room.restoreGuest(
                             new PlayerName(playerDto.getName()),
-                            toSelectedMenu(playerDto.getSelectedMenu())
+                            toSelectedMenu(playerDto.getSelectedMenu()),
+                            playerDto.getIsReady()
                     );
                 });
         

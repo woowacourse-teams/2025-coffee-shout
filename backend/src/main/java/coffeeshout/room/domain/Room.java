@@ -238,8 +238,10 @@ public class Room {
         this.roomState = roomState;
     }
 
-    public void restoreGuest(PlayerName guestName, SelectedMenu selectedMenu) {
-        join(Player.createGuest(guestName, selectedMenu));
+    public void restoreGuest(PlayerName guestName, SelectedMenu selectedMenu, Boolean isReady) {
+        Player guest = Player.createGuest(guestName, selectedMenu);
+        guest.updateReadyState(isReady);
+        join(guest);
     }
 
     // Redis 복원을 위한 패키지 전용 메소드

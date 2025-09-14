@@ -105,7 +105,8 @@ public class RoomService {
             player.updateReadyState(isReady);
         }
 
-        return room.getPlayers();
+        final Room saved = roomCommandService.save(room);
+        return saved.getPlayers();
     }
 
     public Map<Player, Probability> getProbabilities(String joinCode) {

@@ -44,7 +44,10 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
     @AfterEach
     void tearDown(@Autowired CardGameTaskExecutors cardGameTaskExecutors) {
-        cardGameTaskExecutors.get(joinCode).cancelAll();
+        var taskManager = cardGameTaskExecutors.get(joinCode);
+        if (taskManager != null) {
+            taskManager.cancelAll();
+        }
     }
 
     @Test
