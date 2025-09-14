@@ -57,14 +57,14 @@ const EntryMenuPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
+    if (joinCode && qrCodeUrl && selectedMenu && isConnected) {
       navigate(`/room/${joinCode}/lobby`, {
         state: {
           qrCodeUrl,
         },
       });
     }
-  }, [isConnected, joinCode, navigate, qrCodeUrl]);
+  }, [myName, selectedMenu, isConnected, joinCode, navigate, qrCodeUrl]);
 
   const handleNavigateToBefore = () => {
     switch (currentView) {
