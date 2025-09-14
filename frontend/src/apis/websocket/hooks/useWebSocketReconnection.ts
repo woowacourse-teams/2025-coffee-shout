@@ -18,12 +18,19 @@ export const useWebSocketReconnection = ({
   const reconnectTimerRef = useRef<number | null>(null);
   const wasBackgrounded = useRef(false);
 
+  const clearReconnectTimer = useCallback(() => {
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+  }, []);
+
   const scheduleReconnect = useCallback(() => {
-    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+    clearReconnectTimer();
     reconnectTimerRef.current = window.setTimeout(() => {
       if (joinCode && myName) startSocket(joinCode, myName);
     }, 200);
-  }, [joinCode, myName, startSocket]);
+  }, [joinCode, myName, startSocket, clearReconnectTimer]);
 
   /**
    * 백그라운드 ↔ 포그라운드
@@ -41,10 +48,17 @@ export const useWebSocketReconnection = ({
       scheduleReconnect();
     }
 
-    return () => {
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    };
-  }, [isVisible, isConnected, joinCode, myName, startSocket, stopSocket, scheduleReconnect]);
+    return () => clearReconnectTimer();
+  }, [
+    isVisible,
+    isConnected,
+    joinCode,
+    myName,
+    startSocket,
+    stopSocket,
+    scheduleReconnect,
+    clearReconnectTimer,
+  ]);
 
   /**
    * 온라인/오프라인 감지
@@ -63,7 +77,15 @@ export const useWebSocketReconnection = ({
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      clearReconnectTimer();
     };
-  }, [isConnected, joinCode, myName, startSocket, stopSocket, scheduleReconnect]);
+  }, [
+    isConnected,
+    joinCode,
+    myName,
+    startSocket,
+    stopSocket,
+    scheduleReconnect,
+    clearReconnectTimer,
+  ]);
 };
