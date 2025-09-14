@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
@@ -393,13 +392,14 @@ class RoomServiceTest extends ServiceTest {
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "루키",
-                new SelectedMenuRequest(2L, null, MenuTemperature.ICE)); // MiniGameDummy와 일치하도록 수정
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
-                new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
+                new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
-        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
-        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
-        roomRepository.save(createdRoom); // Redis에도 업데이트된 상태로 저장
+        final Room restoredRoom = roomRepository.findByJoinCode(joinCode).get();
+
+        CardGame cardGame = createCompletedCardGame(restoredRoom.getPlayers());
+        List<CardGame> miniGames = List.of(cardGame);
+        ReflectionTestUtils.setField(restoredRoom, "finishedGames", miniGames);
+        roomRepository.save(restoredRoom); // Redis에도 업데이트된 상태로 저장
 
         // when
         Map<Player, MiniGameScore> miniGameScores = roomService.getMiniGameScores(
@@ -409,8 +409,8 @@ class RoomServiceTest extends ServiceTest {
 
         // then
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(miniGameScores.get(PlayerFixture.호스트꾹이()).getValue()).isEqualTo(20);
-            softly.assertThat(miniGameScores.get(PlayerFixture.게스트루키()).getValue()).isEqualTo(-10);
+            softly.assertThat(miniGameScores.get(PlayerFixture.호스트꾹이()).getValue()).isEqualTo(160);
+            softly.assertThat(miniGameScores.get(PlayerFixture.게스트루키()).getValue()).isEqualTo(0);
         });
     }
 
