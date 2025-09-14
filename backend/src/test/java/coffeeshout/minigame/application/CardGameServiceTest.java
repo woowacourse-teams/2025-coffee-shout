@@ -27,6 +27,7 @@ import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
@@ -45,6 +46,9 @@ class CardGameServiceTest extends ServiceTest {
 
     @Autowired
     RoomQueryService roomQueryService;
+
+    @Autowired
+    RoomCommandService roomCommandService;
 
     @Autowired
     RoomService roomService;
@@ -78,6 +82,7 @@ class CardGameServiceTest extends ServiceTest {
             player.updateReadyState(true);
         }
         cardGame = (CardGame) room.startNextGame(host.getName().value());
+        roomCommandService.save(room);
     }
 
     @Nested
@@ -205,7 +210,6 @@ class CardGameServiceTest extends ServiceTest {
             // when & then
             final String name = host.getName().value();
             final String joinCodeValue = joinCode.getValue();
-
 
             assertThatThrownBy(() ->
                     cardGameService.selectCard(joinCodeValue, name, 0)
