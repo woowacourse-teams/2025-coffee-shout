@@ -26,7 +26,7 @@ import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
-import { useParticipantCheck } from '../hooks/useParticipantCheck';
+import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
@@ -46,7 +46,7 @@ const LobbyPage = () => {
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const isReady = checkPlayerReady(myName) ?? false;
 
-  useParticipantCheck({ isConnected });
+  useParticipantValidation({ isConnected });
 
   const handleParticipant = useCallback(
     (data: Player[]) => {
@@ -228,16 +228,6 @@ const LobbyPage = () => {
       />
     ),
   };
-
-  useEffect(() => {
-    if (!playerType) {
-      navigate('/', { replace: true });
-    }
-  }, [playerType, navigate]);
-
-  if (!playerType) {
-    return null;
-  }
 
   return (
     <Layout>

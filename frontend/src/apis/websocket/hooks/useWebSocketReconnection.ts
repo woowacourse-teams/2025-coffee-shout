@@ -13,6 +13,7 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   const { joinCode, myName } = useIdentifier();
   const reconnectTimerRef = useRef<number | null>(null);
   const wasBackgrounded = useRef(false);
+  const hasInitialized = useRef(false);
 
   const clearReconnectTimer = useCallback(() => {
     if (reconnectTimerRef.current) {
@@ -29,7 +30,18 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   }, [joinCode, myName, startSocket, clearReconnectTimer]);
 
   /**
-   * 백그라운드 ↔ 포그라운드
+   * 새로고침 감지
+   */
+  useEffect(() => {
+    if (!hasInitialized.current && !isConnected && joinCode && myName) {
+      console.log('🔄 새로고침 감지 - 웹소켓 재연결 시도:', { myName, joinCode });
+      hasInitialized.current = true;
+      startSocket(joinCode, myName);
+    }
+  }, [myName, joinCode, isConnected, startSocket]);
+
+  /**
+   * 백그라운드 ↔ 포그라운드 감지
    */
   useEffect(() => {
     if (!isVisible && isConnected) {
