@@ -5,12 +5,13 @@ import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import useModal from '@/components/@common/Modal/useModal';
+import useToast from '@/components/@common/Toast/useToast';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
@@ -21,12 +22,12 @@ import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
+import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
+import { useParticipantCheck } from '../hooks/useParticipantCheck';
 import * as S from './LobbyPage.styled';
-import useToast from '@/components/@common/Toast/useToast';
-import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -34,7 +35,7 @@ type SectionComponents = Record<SectionType, ReactElement>;
 const LobbyPage = () => {
   const navigate = useNavigate();
   const { qrCodeUrl } = useLocation().state;
-  const { send } = useWebSocket();
+  const { send, isConnected } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { showToast } = useToast();
@@ -44,6 +45,8 @@ const LobbyPage = () => {
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const isReady = checkPlayerReady(myName) ?? false;
+
+  useParticipantCheck({ isConnected });
 
   const handleParticipant = useCallback(
     (data: Player[]) => {

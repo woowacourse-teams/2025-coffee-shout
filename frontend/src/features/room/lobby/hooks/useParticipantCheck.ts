@@ -5,18 +5,19 @@ import { useNavigate } from 'react-router-dom';
 
 type Props = {
   isConnected: boolean;
-  isVisible: boolean;
 };
 
-export const useBackgroundRedirect = ({ isConnected, isVisible }: Props) => {
-  // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
+export const useParticipantCheck = ({ isConnected }: Props) => {
   const { myName } = useIdentifier();
   const { participants } = useParticipants();
-  const wasConnectedBeforeBackground = useRef(false);
   const navigate = useNavigate();
+  const wasReconnected = useRef(false);
 
   const checkUserExistsAndRedirect = useCallback(() => {
-    if (!myName) return;
+    if (!myName) {
+      navigate('/', { replace: true });
+      return;
+    }
 
     const currentUser = participants.find((participant) => participant.playerName === myName);
 
@@ -26,10 +27,19 @@ export const useBackgroundRedirect = ({ isConnected, isVisible }: Props) => {
   }, [myName, participants, navigate]);
 
   useEffect(() => {
-    if (!isVisible && isConnected) {
-      wasConnectedBeforeBackground.current = true;
-    } else if (isVisible && wasConnectedBeforeBackground.current) {
-      checkUserExistsAndRedirect();
+    if (isConnected && wasReconnected.current) {
+      const timeoutId = setTimeout(() => {
+        checkUserExistsAndRedirect();
+        wasReconnected.current = false;
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
     }
-  }, [isVisible, isConnected, checkUserExistsAndRedirect]);
+  }, [isConnected, participants, checkUserExistsAndRedirect]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      wasReconnected.current = true;
+    }
+  }, [isConnected]);
 };

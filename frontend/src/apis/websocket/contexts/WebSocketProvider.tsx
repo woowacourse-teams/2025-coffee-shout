@@ -1,5 +1,4 @@
 import { PropsWithChildren } from 'react';
-import { useBackgroundRedirect } from '../hooks/useBackgroundRedirect';
 import { usePageVisibility } from '../hooks/usePageVisibility';
 import { useWebSocketConnection } from '../hooks/useWebSocketConnection';
 import { useWebSocketMessaging } from '../hooks/useWebSocketMessaging';
@@ -18,11 +17,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     isVisible,
     startSocket,
     stopSocket,
-  });
-
-  useBackgroundRedirect({
-    isConnected,
-    isVisible,
   });
 
   const contextValue: WebSocketContextType = {
