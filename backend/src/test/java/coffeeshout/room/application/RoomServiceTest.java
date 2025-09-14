@@ -422,9 +422,10 @@ class RoomServiceTest extends ServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "루키",
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
+        final Room restoredRoom = roomRepository.findByJoinCode(joinCode).get();
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
-        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
-        roomRepository.save(createdRoom); // Redis에도 업데이트된 상태로 저장
+        ReflectionTestUtils.setField(restoredRoom, "finishedGames", miniGames);
+        roomRepository.save(restoredRoom); // Redis에도 업데이트된 상태로 저장
 
         // when
         MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.getValue(), MiniGameType.CARD_GAME);

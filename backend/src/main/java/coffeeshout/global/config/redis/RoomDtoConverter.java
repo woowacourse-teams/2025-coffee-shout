@@ -99,28 +99,42 @@ public class RoomDtoConverter {
         }
 
         // 나머지 플레이어들 추가 (호스트 제외)
+        log.debug("플레이어 복원 시작: 전체 플레이어 수={}, 호스트={}", dto.getPlayers().size(), hostDto.getName());
         dto.getPlayers().stream()
                 .filter(playerDto -> !playerDto.getName().equals(hostDto.getName()))
                 .forEach(playerDto -> {
+                    log.debug("게스트 복원 중: playerName={}, type={}", playerDto.getName(), playerDto.getPlayerType());
                     room.restoreGuest(
                             new PlayerName(playerDto.getName()),
                             toSelectedMenu(playerDto.getSelectedMenu())
                     );
                 });
+        
+        log.debug("플레이어 복원 완료: 현재 Room 플레이어 수={}", room.getPlayers().size());
+        room.getPlayers().forEach(p -> 
+            log.debug("복원된 플레이어: name={}, type={}", p.getName().value(), p.getPlayerType()));
+
 
         // Room 상태 복원 - finishedGames 복원
+        log.debug("FinishedGames 복원 시작: finishedGames 수={}", dto.getFinishedGames().size());
         dto.getFinishedGames().forEach(playableDto -> {
             try {
                 MiniGameType miniGameType = MiniGameType.valueOf(playableDto.getMiniGameType());
+                log.debug("미니게임 복원 시작: type={}, hasPlayerHands={}", 
+                         miniGameType, playableDto.getPlayerHands() != null);
+                
                 Playable finishedGame = miniGameType.createMiniGame();
                 
                 // 게임 시작 상태로 초기화 (playerHands 초기화)
                 finishedGame.startGame(room.getPlayers());
+                log.debug("게임 시작 완료: playerCount={}", room.getPlayers().size());
                 
                 // CardGame의 경우 저장된 PlayerHands 정보 복원
                 if (finishedGame instanceof CardGame cardGame && playableDto.getPlayerHands() != null) {
+                    log.debug("PlayerHands 복원 시작: 현재 room 플레이어 수={}", room.getPlayers().size());
                     PlayerHands restoredPlayerHands = toPlayerHands(playableDto.getPlayerHands(), room.getPlayers());
                     cardGame.restorePlayerHands(restoredPlayerHands);
+                    log.debug("PlayerHands 복원 완료");
                 }
                 
                 room.restoreFinishedGame(finishedGame);
@@ -129,6 +143,7 @@ public class RoomDtoConverter {
             } catch (Exception e) {
                 log.warn("완료된 미니게임 복원 실패: joinCode={}, miniGameType={}, error={}", 
                         dto.getJoinCode(), playableDto.getMiniGameType(), e.getMessage());
+                e.printStackTrace();
             }
         });
 
@@ -315,20 +330,40 @@ public class RoomDtoConverter {
     }
 
     private PlayerHands toPlayerHands(PlayerHandsDto dto, List<Player> players) {
+        log.debug("PlayerHands 복원: DTO 플레이어 수={}, 실제 플레이어 수={}", 
+                  dto.getPlayerHands().size(), players.size());
+        
+        // DTO에 저장된 플레이어 이름들 출력
+        dto.getPlayerHands().keySet().forEach(name -> 
+            log.debug("DTO에 저장된 플레이어: {}", name));
+        
+        // 실제 플레이어들 출력
+        players.forEach(p -> 
+            log.debug("실제 플레이어: {}", p.getName().value()));
+        
         PlayerHands playerHands = new PlayerHands(players);
         
-        // dto에서 각 플레이어의 카드 정보를 복원
         for (Player player : players) {
             String playerName = player.getName().value();
+            log.debug("플레이어 처리 중: {}", playerName);
+            
             if (dto.getPlayerHands().containsKey(playerName)) {
                 CardHandDto cardHandDto = dto.getPlayerHands().get(playerName);
+                log.debug("카드 복원: player={}, cards={}", playerName, cardHandDto.getCards().size());
+                
                 for (CardDto cardDto : cardHandDto.getCards()) {
                     Card card = toCard(cardDto);
                     playerHands.put(player, card);
+                    log.debug("카드 추가: player={}, cardType={}, cardValue={}", 
+                             playerName, cardDto.getType(), cardDto.getValue());
                 }
+            } else {
+                log.warn("PlayerHands DTO에서 플레이어를 찾을 수 없음: {}, DTO keys={}", 
+                        playerName, dto.getPlayerHands().keySet());
             }
         }
         
+        log.debug("PlayerHands 복원 완료");
         return playerHands;
     }
 }
