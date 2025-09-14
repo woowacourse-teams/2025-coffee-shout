@@ -25,6 +25,7 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ class RoomServiceTest extends ServiceTest {
 
     @MockitoSpyBean
     DelayedRoomRemovalService delayedRoomRemovalService;
+    @Autowired
+    private RoomCommandService roomCommandService;
 
     @Test
     void 방을_생성한다() {
@@ -358,6 +361,7 @@ class RoomServiceTest extends ServiceTest {
 
         PlayerName guestName = new PlayerName("게스트1");
         createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        roomCommandService.save(createdRoom);
 
         // when & then
         assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();
@@ -370,18 +374,19 @@ class RoomServiceTest extends ServiceTest {
         String hostName = "호스트";
         SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1",
+        createdRoom = roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1",
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
+        createdRoom = roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
                 new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
         ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+        Room savedRoom = roomCommandService.save(createdRoom);
 
         // when
-        Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
+        Winner winner = roomService.spinRoulette(savedRoom.getJoinCode().getValue(), hostName);
 
         // then
         assertThat(winner).isNotNull();
-        assertThat(createdRoom.getPlayers().stream().map(Player::getName)).contains(winner.name());
+        assertThat(savedRoom.getPlayers().stream().map(Player::getName)).contains(winner.name());
     }
 
     @Test

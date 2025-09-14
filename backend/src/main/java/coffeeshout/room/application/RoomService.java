@@ -141,14 +141,16 @@ public class RoomService {
 
     public Winner spinRoulette(String joinCode, String hostName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        log.debug("spinRoulette - 요청 hostName: {}, 플레이어 수: {}", 
-            hostName, room.getPlayers().size());
+        log.debug("spinRoulette - 요청 hostName: {}, 플레이어 수: {}",
+                hostName, room.getPlayers().size());
         room.getPlayers().forEach(p -> log.debug("플레이어: {}, 타입: {}", p.getName().value(), p.getPlayerType()));
-        
+
         final Player host = room.findPlayer(new PlayerName(hostName));
         log.debug("찾은 호스트: {}, 실제 호스트: {}", host.getName().value(), room.getHost().getName().value());
 
-        return room.spinRoulette(host);
+        final Winner winner = room.spinRoulette(host);
+        roomCommandService.save(room);
+        return winner;
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
