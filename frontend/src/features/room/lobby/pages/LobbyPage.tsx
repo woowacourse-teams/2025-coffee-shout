@@ -99,10 +99,10 @@ const LobbyPage = () => {
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   useEffect(() => {
-    if (joinCode) {
+    if (joinCode && isConnected) {
       send(`/room/${joinCode}/update-players`);
     }
-  }, [playerType, joinCode, send]);
+  }, [playerType, joinCode, send, isConnected]);
 
   const handleNavigateToHome = () => {
     navigate('/');
@@ -184,10 +184,10 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (joinCode) {
+    if (joinCode && isConnected) {
       send(`/room/${joinCode}/get-probabilities`);
     }
-  }, [playerType, joinCode, send]);
+  }, [playerType, joinCode, send, isConnected]);
 
   useEffect(() => {
     (async () => {
