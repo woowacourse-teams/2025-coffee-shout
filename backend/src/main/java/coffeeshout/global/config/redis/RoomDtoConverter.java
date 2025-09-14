@@ -1,20 +1,34 @@
 package coffeeshout.global.config.redis;
 
-import coffeeshout.global.config.redis.dto.*;
-import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.global.config.redis.dto.MenuDto;
+import coffeeshout.global.config.redis.dto.PlayableDto;
+import coffeeshout.global.config.redis.dto.PlayerDto;
+import coffeeshout.global.config.redis.dto.PlayerProbabilityDto;
+import coffeeshout.global.config.redis.dto.PlayerScoreDto;
+import coffeeshout.global.config.redis.dto.RoomDto;
+import coffeeshout.global.config.redis.dto.SelectedMenuDto;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.room.domain.*;
-import coffeeshout.room.domain.menu.*;
-import coffeeshout.room.domain.player.*;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Playable;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
+import coffeeshout.room.domain.menu.CustomMenu;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.MenuQueryService;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -60,11 +74,23 @@ public class RoomDtoConverter {
 
         Room room = Room.createNewRoom(joinCode, hostName, hostSelectedMenu);
 
+        // roomState 복원
+        if (dto.getRoomState() != null) {
+            try {
+                RoomState roomState = RoomState.valueOf(dto.getRoomState());
+                room.restoreRoomState(roomState);
+                log.debug("roomState 복원: joinCode={}, roomState={}", dto.getJoinCode(), roomState);
+            } catch (Exception e) {
+                log.warn("roomState 복원 실패: joinCode={}, roomState={}, error={}",
+                        dto.getJoinCode(), dto.getRoomState(), e.getMessage());
+            }
+        }
+
         // 나머지 플레이어들 추가 (호스트 제외)
         dto.getPlayers().stream()
                 .filter(playerDto -> !playerDto.getName().equals(hostDto.getName()))
                 .forEach(playerDto -> {
-                    room.joinGuest(
+                    room.restoreGuest(
                             new PlayerName(playerDto.getName()),
                             toSelectedMenu(playerDto.getSelectedMenu())
                     );
@@ -76,15 +102,15 @@ public class RoomDtoConverter {
                 MiniGameType miniGameType = MiniGameType.valueOf(playableDto.getMiniGameType());
                 Playable miniGame = miniGameType.createMiniGame();
                 room.addMiniGame(hostName, miniGame);
-                log.debug("미니게임 복원: joinCode={}, miniGameType={}", 
+                log.debug("미니게임 복원: joinCode={}, miniGameType={}",
                         dto.getJoinCode(), miniGameType);
             } catch (Exception e) {
-                log.warn("미니게임 복원 실패: joinCode={}, miniGameType={}, error={}", 
+                log.warn("미니게임 복원 실패: joinCode={}, miniGameType={}, error={}",
                         dto.getJoinCode(), playableDto.getMiniGameType(), e.getMessage());
             }
         });
 
-        log.debug("Room 복원 완료: joinCode={}, players={}, miniGames={}", 
+        log.debug("Room 복원 완료: joinCode={}, players={}, miniGames={}",
                 dto.getJoinCode(), dto.getPlayers().size(), dto.getMiniGames().size());
 
         return room;
@@ -149,13 +175,13 @@ public class RoomDtoConverter {
                     .toList();
         } catch (Exception e) {
             // 게임이 아직 시작되지 않은 경우 빈 점수 반환
-            log.debug("게임 점수 조회 실패 (아직 시작되지 않음): miniGameType={}, error={}", 
+            log.debug("게임 점수 조회 실패 (아직 시작되지 않음): miniGameType={}, error={}",
                     playable.getMiniGameType(), e.getMessage());
             scores = Collections.emptyList();
         }
 
         Map<String, Object> gameState = new HashMap<>();
-        
+
         // CardGame의 경우 추가 상태 정보 저장
         if (playable instanceof CardGame cardGame) {
             gameState.put("round", cardGame.getRound().name());

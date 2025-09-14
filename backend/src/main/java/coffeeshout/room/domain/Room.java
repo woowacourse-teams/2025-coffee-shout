@@ -61,6 +61,10 @@ public class Room {
         join(Player.createGuest(guestName, selectedMenu));
     }
 
+    public void restoreGuest(PlayerName guestName, SelectedMenu selectedMenu) {
+        join(Player.createGuest(guestName, selectedMenu));
+    }
+
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
         isTrue(host.sameName(hostName), "호스트가 아닙니다.");
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
@@ -230,5 +234,10 @@ public class Room {
 
     public void assignQrCodeUrl(String qrCodeUrl) {
         joinCode.assignQrCodeUrl(qrCodeUrl);
+    }
+
+    // Redis 복원을 위한 패키지 전용 메소드
+    public void restoreRoomState(RoomState roomState) {
+        this.roomState = roomState;
     }
 }

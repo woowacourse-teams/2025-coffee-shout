@@ -1,9 +1,9 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
@@ -299,9 +299,10 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 룰렛을_돌려서_당첨자를_선택한다() {
+    void 룰렛을_돌려서_당첨자를_선택한다(@Autowired RoomRepository roomRepository) {
         // given
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
+        roomRepository.save(testRoom); // Redis에도 업데이트된 상태로 저장
 
         String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
         String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());

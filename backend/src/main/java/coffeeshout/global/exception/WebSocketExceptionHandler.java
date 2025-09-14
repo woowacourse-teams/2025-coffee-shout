@@ -19,6 +19,9 @@ public class WebSocketExceptionHandler {
             @Header("simpSessionId") String sessionId,
             @Header("simpDestination") String destination
     ) {
+        // 로그에 정확한 에러 메시지 출력
+        System.out.println("WebSocket 에러 발생: " + e.getMessage());
+        e.printStackTrace();
 
         messagingTemplate.convertAndSendToUser(
                 sessionId,
