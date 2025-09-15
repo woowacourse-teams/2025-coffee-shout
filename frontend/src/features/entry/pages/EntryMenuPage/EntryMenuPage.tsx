@@ -4,7 +4,7 @@ import Button from '@/components/@common/Button/Button';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
@@ -14,13 +14,13 @@ import { useCustomMenu } from './hooks/useCustomMenu';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
 import { useCategories } from './hooks/useCategories';
+import { useMenu } from './hooks/useMenu';
 import * as S from './EntryMenuPage.styled';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
 import { MenuColorMap } from '@/constants/color';
 import { theme } from '@/styles/theme';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import MenuList from './components/MenuList/MenuList';
-import { api } from '@/apis/rest/api';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
 import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
@@ -50,16 +50,8 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { loading, categories } = useCategories();
-  const [menus, setMenus] = useState<Menu[]>([]);
-
-  useEffect(() => {
-    if (!selectedCategory) return;
-    (async () => {
-      const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategory.id}/menus`);
-      setMenus(menus);
-    })();
-  }, [selectedCategory]);
+  const { loading: categoriesLoading, categories, error: categoriesError } = useCategories();
+  const { menus, loading: menusLoading, error: menusError } = useMenu(selectedCategory?.id ?? null);
 
   const { qrCodeUrl, proceedToRoom } = useRoomManagement();
 
@@ -132,8 +124,17 @@ const EntryMenuPage = () => {
   };
 
   //임시 로딩 컴포넌트
-  if (loading) {
+  if (categoriesLoading || menusLoading) {
     return <div>Loading...</div>;
+  }
+
+  // 에러 처리
+  if (categoriesError) {
+    return <div>카테고리를 불러오는데 실패했습니다: {categoriesError.message}</div>;
+  }
+
+  if (menusError) {
+    return <div>메뉴를 불러오는데 실패했습니다: {menusError.message}</div>;
   }
 
   return (
