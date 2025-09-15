@@ -112,6 +112,25 @@ const EntryMenuPage = () => {
     setCustomMenuName(e.target.value);
   };
 
+  const viewChildren = {
+    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectTemperature: (
+      <SelectTemperature
+        temperatureAvailability={selectedMenu?.temperatureAvailability ?? 'BOTH'}
+        selectedTemperature={selectedTemperature}
+        onChangeTemperature={selectTemperature}
+      />
+    ),
+    inputCustomMenu: (
+      <CustomMenuInput
+        placeholder="메뉴를 입력해주세요"
+        value={customMenuName || ''}
+        onChange={handleChangeCustomMenuInput}
+        onClickDoneButton={handleCustomMenuDone}
+      />
+    ),
+  };
+
   //임시 로딩 컴포넌트
   if (loading) {
     return <div>Loading...</div>;
@@ -137,24 +156,7 @@ const EntryMenuPage = () => {
               }}
               showSelectedMenuCard={currentView === 'selectTemperature'}
             >
-              {currentView === 'selectMenu' && (
-                <MenuList menus={menus} onClickMenu={handleMenuSelect} />
-              )}
-              {currentView === 'selectTemperature' && (
-                <SelectTemperature
-                  temperatureAvailability={selectedMenu?.temperatureAvailability ?? 'BOTH'}
-                  selectedTemperature={selectedTemperature}
-                  onChangeTemperature={selectTemperature}
-                />
-              )}
-              {currentView === 'inputCustomMenu' && (
-                <CustomMenuInput
-                  placeholder="메뉴를 입력해주세요"
-                  value={customMenuName || ''}
-                  onChange={handleChangeCustomMenuInput}
-                  onClickDoneButton={handleCustomMenuDone}
-                />
-              )}
+              {viewChildren[currentView]}
             </MenuSelectionLayout>
           )}
         </S.Container>
