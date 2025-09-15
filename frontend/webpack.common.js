@@ -9,27 +9,25 @@ import webpack from 'webpack';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const dotenvEnv = dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed || {};
-const mergedEnv = { ...process.env, ...dotenvEnv };
-
 const packageJson = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
 const appVersion = packageJson.version;
 
-// 👇 config를 함수로 만들어서 argv.mode를 활용
 export default (env, argv) => {
   const mode = argv.mode || 'development';
 
-  const envKeys = Object.keys(mergedEnv).reduce(
-    (acc, key) => {
-      acc[`process.env.${key}`] = JSON.stringify(mergedEnv[key]);
-      return acc;
-    },
-    {
-      // 👇 mode 값으로 자동 주입
-      'process.env.NODE_ENV': JSON.stringify(mode),
-      'process.env.VERSION': JSON.stringify(appVersion),
-    }
-  );
+  // mode 기반 .env 파일 로드 (없으면 기본 .env)
+  dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+
+  const mergedEnv = { ...process.env };
+
+  // envKeys 만드는 헬퍼
+  const envKeys = {
+    'process.env.NODE_ENV': JSON.stringify(mode),
+    'process.env.VERSION': JSON.stringify(appVersion),
+    ...Object.fromEntries(
+      Object.entries(mergedEnv).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
+    ),
+  };
 
   return {
     mode,
@@ -43,26 +41,14 @@ export default (env, argv) => {
     },
     module: {
       rules: [
-        {
-          test: /\.tsx?$/,
-          use: 'ts-loader',
-          exclude: /node_modules/,
-        },
-        {
-          test: /\.(png|svg|jpg|jpeg|gif)$/i,
-          type: 'asset/resource',
-        },
-        {
-          test: /\.css$/i,
-          use: ['style-loader', 'css-loader'],
-        },
+        { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
+        { test: /\.(png|svg|jpg|jpeg|gif)$/i, type: 'asset/resource' },
+        { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
       ],
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-      },
+      alias: { '@': path.resolve(__dirname, 'src') },
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -75,9 +61,7 @@ export default (env, argv) => {
         org: 'woowacourse-7th-fe',
         project: '2025-coffee-shout',
         release: appVersion,
-        sourcemaps: {
-          disable: mode !== 'production',
-        },
+        sourcemaps: { disable: mode !== 'production' },
       }),
     ],
     devServer: {
