@@ -62,35 +62,33 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
       console.log('📱 백그라운드 전환 - 소켓 연결 해제');
       wasBackgrounded.current = true;
       stopSocket();
+      return;
     }
 
-    if (isVisible && !isConnected && joinCode && myName && wasBackgrounded.current) {
+    if (isVisible && !isConnected && wasBackgrounded.current) {
       wasBackgrounded.current = false;
       console.log('📱 포그라운드 복귀 - 소켓 재연결');
       scheduleReconnect();
     }
 
     return () => clearReconnectTimer();
-  }, [
-    isVisible,
-    isConnected,
-    joinCode,
-    myName,
-    startSocket,
-    stopSocket,
-    scheduleReconnect,
-    clearReconnectTimer,
-  ]);
+  }, [isVisible, isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
 
   /**
    * 온라인/오프라인 감지
    */
   useEffect(() => {
     const handleOnline = () => {
-      if (!isConnected && joinCode && myName) scheduleReconnect();
+      if (!isConnected) {
+        console.log('🌐 온라인 감지 - 소켓 재연결');
+        scheduleReconnect();
+      }
     };
     const handleOffline = () => {
-      if (isConnected) stopSocket();
+      if (isConnected) {
+        console.log('🌐 오프라인 감지 - 소켓 연결 해제');
+        stopSocket();
+      }
     };
 
     window.addEventListener('online', handleOnline);
@@ -101,13 +99,5 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
       window.removeEventListener('offline', handleOffline);
       clearReconnectTimer();
     };
-  }, [
-    isConnected,
-    joinCode,
-    myName,
-    startSocket,
-    stopSocket,
-    scheduleReconnect,
-    clearReconnectTimer,
-  ]);
+  }, [isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
 };
