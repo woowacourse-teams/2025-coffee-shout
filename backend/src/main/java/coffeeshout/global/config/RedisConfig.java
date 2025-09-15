@@ -1,7 +1,13 @@
 package coffeeshout.global.config;
 
 import coffeeshout.global.config.properties.RedisProperties;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,7 +15,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -23,23 +29,22 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = 
-            new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
-        
-        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
-            LettuceClientConfiguration.builder();
-        
+        RedisStandaloneConfiguration redisStandaloneConfiguration =
+                new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
+
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig =
+                LettuceClientConfiguration.builder();
+
         if (redisProperties.ssl().enabled()) {
             clientConfig.useSsl();
         }
-        
+
         return new LettuceConnectionFactory(redisStandaloneConfiguration, clientConfig.build());
     }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(
-            RedisConnectionFactory redisConnectionFactory,
-            ObjectMapper objectMapper
+            RedisConnectionFactory redisConnectionFactory
     ) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -48,13 +53,35 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
-        // 객체 값 직렬화 (JSON 형태로 저장)
-        final GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer(
-                objectMapper);
-        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+        ObjectMapper redisObjectMapper = getRedisObjectMapper();
 
-        redisTemplate.afterPropertiesSet();
+        // 객체 값 직렬화 (타입 정보를 포함한 JSON 형태로 저장)
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(
+                redisObjectMapper,
+                Object.class
+        );
+
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
         return redisTemplate;
+    }
+
+    private static ObjectMapper getRedisObjectMapper() {
+        // Redis용 ObjectMapper - 필드만 직렬화하도록 설정
+        ObjectMapper redisObjectMapper = new ObjectMapper();
+
+        redisObjectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        redisObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+        // 알 수 없는 프로퍼티 무시
+        redisObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        redisObjectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+        return redisObjectMapper;
     }
 }

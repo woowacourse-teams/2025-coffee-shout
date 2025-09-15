@@ -1,8 +1,10 @@
 package coffeeshout.room.domain.menu;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 public class ProvidedMenu extends Menu {
 

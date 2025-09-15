@@ -1,15 +1,17 @@
 package coffeeshout.room.domain.menu;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 public class MenuCategory {
 
     @Setter
     private Long id;
-    private final String name;
-    private final String imageUrl;
+    private String name;
+    private String imageUrl;
 
     public MenuCategory(Long id, String name, String imageUrl) {
         this.id = id;

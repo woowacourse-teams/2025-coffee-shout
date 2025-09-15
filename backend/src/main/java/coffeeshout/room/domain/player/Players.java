@@ -4,7 +4,6 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import lombok.Getter;
@@ -18,9 +17,10 @@ public class Players {
     private final ColorUsage colorUsage;
 
     public Players() {
-        this.players = Collections.synchronizedList(new ArrayList<>());
+        this.players = new ArrayList<>();
         this.colorUsage = new ColorUsage();
     }
+
 
     public Player join(Player player) {
         player.assignColorIndex(colorUsage.pickRandomOne());

@@ -18,12 +18,17 @@ public class RedisRoomRepository implements RoomRepository {
 
     @Override
     public Optional<Room> findByJoinCode(JoinCode joinCode) {
-        return Optional.of((Room) redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), "info"));
+        final Object room = redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), "info");
+        if(!(room instanceof Room)) {
+            throw new IllegalStateException("저장된 객체의 타입이 Room이 아닙니다.");
+        }
+
+        return Optional.ofNullable((Room) room);
     }
 
     @Override
     public boolean existsByJoinCode(JoinCode joinCode) {
-        return true;
+        return redisTemplate.opsForHash().hasKey(String.format(ROOM_KEY, joinCode.getValue()), "info");
     }
 
     @Override

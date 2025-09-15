@@ -22,17 +22,19 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class Room {
 
     private static final int MAXIMUM_GUEST_COUNT = 9;
     private static final int MINIMUM_GUEST_COUNT = 2;
 
-    private final JoinCode joinCode;
-    private final Players players;
-    private final Queue<Playable> miniGames;
-    private final List<Playable> finishedGames;
+    private JoinCode joinCode;
+    private Players players;
+    private Queue<Playable> miniGames;
+    private List<Playable> finishedGames;
 
     private Player host;
     private RoomState roomState;

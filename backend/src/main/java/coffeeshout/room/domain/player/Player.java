@@ -4,11 +4,13 @@ import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.Objects;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class Player {
 
-    private final PlayerName name;
+    private PlayerName name;
     private PlayerType playerType;
     private SelectedMenu selectedMenu;
     private Boolean isReady;
