@@ -11,7 +11,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.PlayerProbabilitiesFixture;
+import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.common.task.TaskManager;
@@ -26,6 +26,8 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
@@ -62,8 +64,8 @@ class CardGameServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<Player> players = PlayerProbabilitiesFixture.PLAYERS;
-        host = players.get(0);
+        Players players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
+        host = players.getPlayer(new PlayerName("꾹이"));
         room = roomService.createRoom(
                 host.getName().value(),
                 new SelectedMenuRequest(1L, null, MenuTemperature.ICE)
@@ -71,8 +73,11 @@ class CardGameServiceTest extends ServiceTest {
         joinCode = room.getJoinCode();
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
-        for (int i = 1; i < players.size(); i++) {
-            room.joinGuest(players.get(i).getName(), new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        for (int i = 1; i < players.getPlayers().size(); i++) {
+            room.joinGuest(
+                    players.getPlayers().get(i).getName(),
+                    new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
+            );
         }
         for (Player player : room.getPlayers()) {
             player.updateReadyState(true);
@@ -126,7 +131,8 @@ class CardGameServiceTest extends ServiceTest {
                                 players.get(0), new Probability(750),
                                 players.get(1), new Probability(1625),
                                 players.get(2), new Probability(3375),
-                                players.get(3), new Probability(4250)));
+                                players.get(3), new Probability(4250)
+                        ));
                     });
         }
 
@@ -205,7 +211,6 @@ class CardGameServiceTest extends ServiceTest {
             // when & then
             final String name = host.getName().value();
             final String joinCodeValue = joinCode.getValue();
-
 
             assertThatThrownBy(() ->
                     cardGameService.selectCard(joinCodeValue, name, 0)

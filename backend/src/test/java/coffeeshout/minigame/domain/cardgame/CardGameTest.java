@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
-import coffeeshout.fixture.PlayerProbabilitiesFixture;
+import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
@@ -27,8 +27,7 @@ class CardGameTest {
 
     @BeforeEach
     void setUp() {
-        players = new Players();
-        PlayerProbabilitiesFixture.PLAYERS.forEach(players::join);
+        players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
 
         cardGame = new CardGameFake(deckGenerator);
         cardGame.startGame(players.getPlayers());
@@ -117,7 +116,7 @@ class CardGameTest {
         }
 
         @Test
-        void 플레이어들이_같은_카드를_선택하면_예외를_반환한다(){
+        void 플레이어들이_같은_카드를_선택하면_예외를_반환한다() {
             // given
             cardGame.startPlay();
             Player player1 = players.getPlayer(new PlayerName("꾹이"));

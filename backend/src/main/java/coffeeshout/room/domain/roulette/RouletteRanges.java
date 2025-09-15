@@ -1,20 +1,20 @@
 package coffeeshout.room.domain.roulette;
 
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Players;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RouletteRanges {
 
     private final List<RouletteRange> ranges;
 
-    public RouletteRanges(Map<Player, Probability> probabilities) {
+    public RouletteRanges(Players players) {
         this.ranges = new ArrayList<>();
 
-        probabilities.forEach((player, probability) -> ranges.add(generateRange(
+        players.getPlayers().forEach(player -> ranges.add(generateRange(
                 endValue() + 1,
-                probability.value(),
+                player.getProbability().value(),
                 player
         )));
     }
