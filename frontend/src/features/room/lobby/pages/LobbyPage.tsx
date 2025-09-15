@@ -33,7 +33,7 @@ type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const { qrCodeUrl } = useLocation().state;
+  const { qrCodeUrl } = useLocation().state || {};
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
@@ -227,10 +227,10 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (!playerType) {
+    if (!playerType || !qrCodeUrl) {
       navigate('/', { replace: true });
     }
-  }, [playerType, navigate]);
+  }, [playerType, navigate, qrCodeUrl]);
 
   if (!playerType) {
     return null;
