@@ -17,6 +17,7 @@ import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import { categoryColorList, MenuColorMap } from '@/constants/color';
 import { useMenuSelection } from './hooks/useMenuSelection';
+import { useCustomMenu } from './hooks/useCustomMenu';
 import * as S from './EntryMenuPage.styled';
 
 type RoomRequest = {
@@ -43,8 +44,6 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
-  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
-  const [isMenuInputCompleted, setIsMenuInputCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
   const [categories, setCategories] = useState<CategoryWithColor[]>([]);
@@ -59,6 +58,14 @@ const EntryMenuPage = () => {
     selectTemperature,
     resetMenuSelection,
   } = useMenuSelection();
+
+  const {
+    customMenuName,
+    isCustomMenuInputCompleted,
+    setCustomMenuName,
+    completeMenuInput,
+    resetCustomMenu,
+  } = useCustomMenu();
 
   useEffect(() => {
     (async () => {
@@ -85,8 +92,7 @@ const EntryMenuPage = () => {
 
   const resetMenuState = () => {
     resetMenuSelection();
-    setCustomMenuName(null);
-    setIsMenuInputCompleted(false);
+    resetCustomMenu();
   };
 
   const handleSetSelectedCategoryWrapper = (category: CategoryWithColor) => {
@@ -108,7 +114,7 @@ const EntryMenuPage = () => {
         setCurrentView('selectCategory');
         break;
       case 'inputCustomMenu':
-        setCustomMenuName(null);
+        resetCustomMenu();
         setCurrentView('selectCategory');
         break;
       case 'selectTemperature':
@@ -199,12 +205,8 @@ const EntryMenuPage = () => {
     setCurrentView('inputCustomMenu');
   };
 
-  const handleChangeCustomMenuName = (customMenuName: string) => {
-    setCustomMenuName(customMenuName);
-  };
-
   const handleClickDoneButton = () => {
-    setIsMenuInputCompleted(true);
+    completeMenuInput();
     setCurrentView('selectTemperature');
   };
 
@@ -248,11 +250,11 @@ const EntryMenuPage = () => {
             !selectedMenu && (
               <InputCustomMenu
                 customMenuName={customMenuName}
-                onChangeCustomMenuName={handleChangeCustomMenuName}
+                onChangeCustomMenuName={setCustomMenuName}
                 onClickDoneButton={handleClickDoneButton}
-                isMenuInputCompleted={isMenuInputCompleted}
+                isMenuInputCompleted={isCustomMenuInputCompleted}
               >
-                {isMenuInputCompleted && (
+                {isCustomMenuInputCompleted && (
                   <SelectTemperature
                     menuName={customMenuName || ''}
                     temperatureAvailability={'BOTH'}
