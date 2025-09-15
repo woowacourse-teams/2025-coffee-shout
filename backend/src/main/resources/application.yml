@@ -12,6 +12,7 @@ spring:
       port: 6379
       ssl:
         enabled: true
+      host: localhost
 
 room:
   removalDelay: 1h
