@@ -123,12 +123,23 @@ const EntryMenuPage = () => {
     ),
   };
 
+  const categorySelection = {
+    color: selectedCategory?.color ?? theme.color.point[200],
+    name: selectedCategory?.name ?? '직접입력',
+    imageUrl: selectedCategory?.imageUrl ?? CustomMenuIcon,
+  };
+
+  const menuSelection = {
+    color: MenuColorMap[selectedCategory?.color ?? theme.color.point[200]],
+    name: selectedMenu?.name ?? customMenuName ?? '',
+  };
+
   //임시 로딩 컴포넌트
   if (categoriesLoading || menusLoading) {
     return <div>Loading...</div>;
   }
 
-  // 에러 처리
+  // 임시 에러 처리
   if (categoriesError) {
     return <div>카테고리를 불러오는데 실패했습니다: {categoriesError.message}</div>;
   }
@@ -146,15 +157,8 @@ const EntryMenuPage = () => {
             <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
           ) : (
             <MenuSelectionLayout
-              categorySelection={{
-                color: selectedCategory?.color ?? theme.color.point[200],
-                name: selectedCategory?.name ?? '직접입력',
-                imageUrl: selectedCategory?.imageUrl ?? CustomMenuIcon,
-              }}
-              menuSelection={{
-                color: MenuColorMap[selectedCategory?.color ?? theme.color.point[200]],
-                name: selectedMenu?.name ?? customMenuName ?? '',
-              }}
+              categorySelection={categorySelection}
+              menuSelection={menuSelection}
               showSelectedMenuCard={currentView === 'selectTemperature'}
             >
               {viewChildren[currentView]}
