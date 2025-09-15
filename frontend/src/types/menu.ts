@@ -1,3 +1,5 @@
+import { CategoryColorKey } from '@/constants/color';
+
 export type TemperatureOption = 'HOT' | 'ICE';
 
 export type TemperatureAvailability = 'ICE_ONLY' | 'HOT_ONLY' | 'BOTH';
@@ -20,3 +22,5 @@ export type Category = {
   name: string;
   imageUrl: string;
 };
+
+export type CategoryWithColor = Category & { color: CategoryColorKey };

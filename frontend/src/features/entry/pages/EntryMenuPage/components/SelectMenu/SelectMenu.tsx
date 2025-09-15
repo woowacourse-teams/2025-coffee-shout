@@ -2,26 +2,17 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
-import { Category, Menu, TemperatureOption } from '@/types/menu';
-import { useEffect, useState } from 'react';
+import { CategoryWithColor, Menu } from '@/types/menu';
+import { useEffect, useState, PropsWithChildren } from 'react';
 import { api } from '@/apis/rest/api';
-import SelectTemperature from './SelectTemperature/SelectTemperature';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
-  selectedCategory: Category;
+  selectedCategory: CategoryWithColor;
   selectedMenu: Menu | null;
-  selectedTemperature: TemperatureOption;
-  onChangeTemperature: (temperature: TemperatureOption) => void;
-};
+} & PropsWithChildren;
 
-const SelectMenu = ({
-  onMenuSelect,
-  selectedCategory,
-  selectedMenu,
-  selectedTemperature,
-  onChangeTemperature,
-}: Props) => {
+const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: Props) => {
   const [menus, setMenus] = useState<Menu[]>([]);
 
   useEffect(() => {
@@ -33,11 +24,6 @@ const SelectMenu = ({
 
   const handleClickMenu = (menu: Menu) => {
     onMenuSelect(menu);
-    if (menu.temperatureAvailability === 'ICE_ONLY') {
-      onChangeTemperature('ICE');
-    } else if (menu.temperatureAvailability === 'HOT_ONLY') {
-      onChangeTemperature('HOT');
-    }
   };
 
   return (
@@ -45,7 +31,7 @@ const SelectMenu = ({
       <Headline3>메뉴를 선택해주세요</Headline3>
       <S.Wrapper>
         <SelectionCard
-          color="#eb63d4"
+          color={selectedCategory.color}
           text={selectedCategory.name}
           imageUrl={selectedCategory.imageUrl}
         />
@@ -56,15 +42,7 @@ const SelectMenu = ({
             ))}
           </S.MenuList>
         )}
-        {selectedMenu && (
-          <>
-            <SelectTemperature
-              selectedMenu={selectedMenu}
-              selectedTemperature={selectedTemperature}
-              onChangeTemperature={onChangeTemperature}
-            />
-          </>
-        )}
+        {children}
       </S.Wrapper>
     </>
   );

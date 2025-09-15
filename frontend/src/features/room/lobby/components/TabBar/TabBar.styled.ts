@@ -10,6 +10,7 @@ export const Tab = styled.button<{ isActive: boolean }>`
   flex: 1;
   padding: 1rem;
   font-weight: ${({ isActive }) => (isActive ? '600' : '400')};
+  font-size: 16px;
   color: ${({ theme, isActive }) => (isActive ? theme.color.point[400] : theme.color.gray[600])};
   border: none;
   background: transparent;

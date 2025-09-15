@@ -34,7 +34,7 @@ type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const { qrCodeUrl } = useLocation().state;
+  const { qrCodeUrl } = useLocation().state || {};
   const { send, isConnected } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();

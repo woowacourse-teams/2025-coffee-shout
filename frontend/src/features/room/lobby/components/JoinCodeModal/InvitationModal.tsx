@@ -61,7 +61,9 @@ const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
       <S.QRCode>
         <img src={qrCodeUrl} alt="QR Code" />
       </S.QRCode>
-      <S.ShareButton onClick={handleShareLink}>링크 공유하기</S.ShareButton>
+      <S.ShareButton onClick={handleShareLink}>
+        <Paragraph>링크 공유하기</Paragraph>
+      </S.ShareButton>
       <S.Wrapper>
         <Paragraph>QR코드를 스캔하면</Paragraph>
         <Paragraph>바로 게임에 참여할 수 있어요!</Paragraph>

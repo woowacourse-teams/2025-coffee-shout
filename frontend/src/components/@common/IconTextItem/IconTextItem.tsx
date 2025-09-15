@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import * as S from './IconTextItem.styled';
+import Paragraph from '../Paragraph/Paragraph';
 
 type Props = {
   iconContent: ReactNode;
@@ -21,7 +22,9 @@ const IconTextItem = ({
     <S.Container $showBorder={showBorder}>
       <S.Wrapper $gap={gap}>
         <S.IconWrapper>{iconContent}</S.IconWrapper>
-        <S.TextWrapper>{textContent}</S.TextWrapper>
+        <S.TextWrapper>
+          <Paragraph>{textContent}</Paragraph>
+        </S.TextWrapper>
       </S.Wrapper>
       {rightContent}
     </S.Container>
