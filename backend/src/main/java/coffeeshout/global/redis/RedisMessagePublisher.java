@@ -1,5 +1,8 @@
 package coffeeshout.global.redis;
 
+import coffeeshout.global.redis.event.minigame.CardSelectedEvent;
+import coffeeshout.global.redis.event.minigame.MiniGameCompletedEvent;
+import coffeeshout.global.redis.event.minigame.MiniGameRoundProgressEvent;
 import coffeeshout.global.redis.event.minigame.MiniGameStartedEvent;
 import coffeeshout.global.redis.event.minigame.MiniGamesUpdatedEvent;
 import coffeeshout.global.redis.event.player.HostPromotedEvent;
@@ -62,6 +65,18 @@ public class RedisMessagePublisher {
 
     public void publishMiniGameStarted(MiniGameStartedEvent event) {
         publish("minigame:started", event);
+    }
+
+    public void publishCardSelected(CardSelectedEvent event) {
+        publish("minigame:card:selected", event);
+    }
+
+    public void publishMiniGameRoundProgress(MiniGameRoundProgressEvent event) {
+        publish("minigame:round:progress", event);
+    }
+
+    public void publishMiniGameCompleted(MiniGameCompletedEvent event) {
+        publish("minigame:completed", event);
     }
 
     public void publishRouletteSpun(RouletteSpunEvent event) {

@@ -9,13 +9,14 @@ import coffeeshout.global.redis.event.player.PlayerJoinedEvent;
 import coffeeshout.global.redis.event.player.PlayerMenuSelectedEvent;
 import coffeeshout.global.redis.event.player.PlayerReadyStateChangedEvent;
 import coffeeshout.global.redis.event.player.PlayerRemovedEvent;
-import coffeeshout.global.redis.event.roulette.RouletteSpunEvent;
+import coffeeshout.global.redis.event.room.RoomStateChangedEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -85,7 +86,7 @@ public class RoomService {
         room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
-        return roomCommandService.save(room);
+        return roomCommandService.saveAndPublishCreated(room);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
@@ -202,6 +203,13 @@ public class RoomService {
         Winner winner = room.spinRoulette(host);
         roomCommandService.save(room);
 
+        // 룸 상태 변경 이벤트 발행 (PLAYING -> DONE)
+        messagePublisher.publishRoomStateChanged(new RoomStateChangedEvent(
+                joinCode,
+                RoomState.DONE,
+                instanceConfig.getInstanceId()
+        ));
+
         // 룰렛 스핀 이벤트 발행
         messagePublisher.publishRouletteSpun(new RouletteSpunEvent(
                 joinCode,
@@ -305,6 +313,13 @@ public class RoomService {
         final Playable currentGame = room.startNextGame(hostName);
 
         roomCommandService.save(room);
+
+        // 룸 상태 변경 이벤트 발행 (READY -> PLAYING)
+        messagePublisher.publishRoomStateChanged(new RoomStateChangedEvent(
+                joinCode,
+                RoomState.PLAYING,
+                instanceConfig.getInstanceId()
+        ));
 
         // 미니게임 시작 이벤트 발행
         messagePublisher.publishMiniGameStarted(new MiniGameStartedEvent(

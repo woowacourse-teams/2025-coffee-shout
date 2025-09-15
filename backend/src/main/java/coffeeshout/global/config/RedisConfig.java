@@ -1,8 +1,10 @@
 package coffeeshout.global.config;
 
 import coffeeshout.global.config.properties.RedisProperties;
+import coffeeshout.global.redis.listener.CardGameSyncListener;
 import coffeeshout.global.redis.listener.MiniGameSyncListener;
 import coffeeshout.global.redis.listener.PlayerSyncListener;
+import coffeeshout.global.redis.listener.RoomStateSyncListener;
 import coffeeshout.global.redis.listener.RoomSyncListener;
 import coffeeshout.global.redis.listener.RouletteSyncListener;
 import coffeeshout.global.redis.listener.WebSocketSyncListener;
@@ -69,8 +71,10 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory connectionFactory,
             RoomSyncListener roomSyncListener,
+            RoomStateSyncListener roomStateSyncListener,
             PlayerSyncListener playerSyncListener,
             MiniGameSyncListener miniGameSyncListener,
+            CardGameSyncListener cardGameSyncListener,
             RouletteSyncListener rouletteSyncListener,
             WebSocketSyncListener webSocketSyncListener
     ) {
@@ -80,7 +84,7 @@ public class RedisConfig {
         // Room 관련 채널 구독
         container.addMessageListener(roomSyncListener, new PatternTopic("room:created"));
         container.addMessageListener(roomSyncListener, new PatternTopic("room:deleted"));
-        container.addMessageListener(roomSyncListener, new PatternTopic("room:state"));
+        container.addMessageListener(roomStateSyncListener, new PatternTopic("room:state"));
 
         // Player 관련 채널 구독
         container.addMessageListener(playerSyncListener, new PatternTopic("player:joined"));
@@ -92,6 +96,11 @@ public class RedisConfig {
         // MiniGame 관련 채널 구독
         container.addMessageListener(miniGameSyncListener, new PatternTopic("minigame:updated"));
         container.addMessageListener(miniGameSyncListener, new PatternTopic("minigame:started"));
+        container.addMessageListener(miniGameSyncListener, new PatternTopic("minigame:completed"));
+        container.addMessageListener(miniGameSyncListener, new PatternTopic("minigame:round:progress"));
+        
+        // CardGame 전용 채널 구독
+        container.addMessageListener(cardGameSyncListener, new PatternTopic("minigame:card:selected"));
 
         // Roulette 관련 채널 구독
         container.addMessageListener(rouletteSyncListener, new PatternTopic("roulette:spin"));

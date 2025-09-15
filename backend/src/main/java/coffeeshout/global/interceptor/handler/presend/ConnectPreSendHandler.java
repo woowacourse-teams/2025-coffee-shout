@@ -73,8 +73,6 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
     private void handlePlayerFirstConnection(String joinCode, String playerName) {
         log.info("플레이어 첫 연결: joinCode={}, playerName={}", joinCode, playerName);
-        // TODO: 필요한 경우 첫 연결 시 추가 검증 로직 구현
-        // 현재는 REST API에서 방 참여가 이미 완료되었다고 가정
     }
 
     private void handlePlayerReconnection(String joinCode, String playerName, String newSessionId) {
@@ -95,14 +93,11 @@ public class ConnectPreSendHandler implements PreSendHandler {
             log.warn("재연결 실패: joinCode={}, playerName={}, error={}", joinCode, playerName, e.getMessage());
             // 재연결 실패 시 기존 매핑 제거하고 방에서 플레이어 제거
             sessionManager.removeSession(newSessionId);
-//            final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
-            // TODO: 플레이어 disconnect 처리 로직 필요 (다른 핸들러에서 처리)
         }
     }
 
     private void disconnectSession(String sessionId, String reason) {
         log.warn("세션 연결 거부: sessionId={}, reason={}", sessionId, reason);
-        // TODO: 필요한 경우 실제 세션 강제 종료 로직 구현
         // 현재는 클라이언트가 연결 실패를 감지하여 자동으로 처리한다고 가정
         sessionManager.removeSession(sessionId);
     }

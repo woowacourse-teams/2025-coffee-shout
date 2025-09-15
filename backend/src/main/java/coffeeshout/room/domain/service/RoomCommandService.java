@@ -21,13 +21,12 @@ public class RoomCommandService {
     private final InstanceConfig instanceConfig;
 
     public Room save(Room room) {
+        return roomRepository.save(room);
+    }
+
+    public Room saveAndPublishCreated(Room room) {
         Room saved = roomRepository.save(room);
-
-        // 새로 생성된 방인지 확인 (ID나 생성 여부로 판단)
-        // 이 부분은 Room이 새로 생성되었는지 확인하는 로직이 필요함
-        // 현재는 단순히 모든 save를 방 생성으로 처리
         publishRoomCreated(saved);
-
         return saved;
     }
 
