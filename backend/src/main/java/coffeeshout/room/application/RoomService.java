@@ -10,6 +10,7 @@ import coffeeshout.global.redis.event.player.PlayerMenuSelectedEvent;
 import coffeeshout.global.redis.event.player.PlayerReadyStateChangedEvent;
 import coffeeshout.global.redis.event.player.PlayerRemovedEvent;
 import coffeeshout.global.redis.event.room.RoomStateChangedEvent;
+import coffeeshout.global.redis.event.roulette.RouletteSpinEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -211,7 +212,7 @@ public class RoomService {
         ));
 
         // 룰렛 스핀 이벤트 발행
-        messagePublisher.publishRouletteSpun(new RouletteSpunEvent(
+        messagePublisher.publishRouletteSpin(new RouletteSpinEvent(
                 joinCode,
                 winner,
                 instanceConfig.getInstanceId()

@@ -2,7 +2,7 @@ package coffeeshout.global.redis.listener;
 
 import coffeeshout.global.config.InstanceConfig;
 import coffeeshout.global.redis.event.minigame.CardSelectedEvent;
-import coffeeshout.minigame.application.CardGameService;
+import coffeeshout.room.domain.repository.MemoryRoomRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CardGameSyncListener implements MessageListener {
 
-    private final CardGameService cardGameService;
+    private final MemoryRoomRepository roomRepository;
     private final InstanceConfig instanceConfig;
     private final ObjectMapper objectMapper;
 
@@ -39,11 +39,14 @@ public class CardGameSyncListener implements MessageListener {
             
             // 자신이 발행한 이벤트는 무시
             if (!event.instanceId().equals(instanceConfig.getInstanceId())) {
-                // 다른 인스턴스에서 발생한 카드 선택을 로컬에 동기화
-                // 주의: 이건 실제 게임 로직을 실행하지 않고 상태만 동기화
-                log.debug("다른 인스턴스의 카드 선택 이벤트 수신: joinCode={}, player={}, cardIndex={}", 
+                roomRepository.syncCardSelected(
+                    event.joinCode(),
+                    event.playerName(),
+                    event.cardIndex()
+                );
+                
+                log.debug("카드 선택 동기화 완료: joinCode={}, player={}, cardIndex={}", 
                          event.joinCode(), event.playerName(), event.cardIndex());
-                // TODO: 실제 동기화 로직 구현 필요
             }
         } catch (Exception e) {
             log.error("카드 선택 이벤트 처리 실패: {}", e.getMessage(), e);

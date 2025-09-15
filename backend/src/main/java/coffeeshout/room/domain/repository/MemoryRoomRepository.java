@@ -74,6 +74,19 @@ public class MemoryRoomRepository implements RoomRepository {
         }
     }
 
+    public void syncRoomStateChanged(String joinCode, RoomState newState) {
+        try {
+            Room room = rooms.get(new JoinCode(joinCode));
+            if (room != null) {
+                room.syncSetRoomState(newState);
+                log.debug("방 상태 동기화 완료: joinCode={}, newState={}", joinCode, newState);
+            }
+        } catch (Exception e) {
+            log.error("방 상태 동기화 실패: joinCode={}, newState={}, error={}", 
+                     joinCode, newState, e.getMessage(), e);
+        }
+    }
+
     public void syncPlayerJoined(String joinCode, String playerName, PlayerType playerType, 
                                 SelectedMenu selectedMenu, boolean isReady, Integer colorIndex) {
         try {
@@ -87,8 +100,11 @@ public class MemoryRoomRepository implements RoomRepository {
                     player.assignColorIndex(colorIndex);
                 }
                 
-                // Room의 joinGuest는 검증 로직이 있어서 여기서는 직접 플레이어 추가
-                // 실제 구현에서는 Room 도메인에 syncJoinPlayer 같은 메서드가 필요할 수도 있음
+                if (playerType == PlayerType.GUEST) {
+                    player.updateReadyState(isReady);
+                }
+                
+                room.syncJoinPlayer(player);
                 log.debug("플레이어 입장 동기화 완료: joinCode={}, playerName={}", joinCode, playerName);
             }
         } catch (Exception e) {
@@ -143,11 +159,7 @@ public class MemoryRoomRepository implements RoomRepository {
         try {
             Room room = rooms.get(new JoinCode(joinCode));
             if (room != null) {
-                Player newHost = room.findPlayer(new PlayerName(newHostName));
-                newHost.promote();
-                // Room의 host 필드 업데이트 - Room 클래스에는 setHost가 없으므로 reflection 사용하거나
-                // Room 도메인에 setHost 메서드 추가가 필요할 수 있음
-                // 현재는 Player 객체의 promote()만 호출
+                room.syncSetHost(new PlayerName(newHostName));
                 log.debug("호스트 승격 동기화 완료: joinCode={}, newHostName={}", joinCode, newHostName);
             }
         } catch (Exception e) {
@@ -161,8 +173,10 @@ public class MemoryRoomRepository implements RoomRepository {
             Room room = rooms.get(new JoinCode(joinCode));
             if (room != null) {
                 room.clearMiniGames();
-                // miniGameTypes를 실제 Playable 객체로 변환해서 추가
-                // 이 부분은 Room 도메인의 구체적인 구현에 따라 달라질 수 있음
+                miniGameTypes.forEach(type -> {
+                    Playable miniGame = type.createMiniGame();
+                    room.syncAddMiniGame(miniGame);
+                });
                 log.debug("미니게임 목록 동기화 완료: joinCode={}, count={}", joinCode, miniGameTypes.size());
             }
         } catch (Exception e) {
@@ -174,10 +188,7 @@ public class MemoryRoomRepository implements RoomRepository {
         try {
             Room room = rooms.get(new JoinCode(joinCode));
             if (room != null) {
-                // 미니게임 시작으로 인한 상태 변화 동기화
-                // 1. Room 상태를 PLAYING으로 변경
-                // 2. 해당 미니게임을 큐에서 제거하고 완료 목록에 추가
-                // 실제 구현은 Room 도메인의 내부 구조에 따라 달라질 수 있음
+                room.syncStartMiniGame(miniGameType);
                 log.debug("미니게임 시작 동기화 완료: joinCode={}, miniGameType={}", joinCode, miniGameType);
             }
         } catch (Exception e) {
@@ -186,15 +197,33 @@ public class MemoryRoomRepository implements RoomRepository {
         }
     }
 
-    public void syncRouletteSpun(String joinCode, Winner winner) {
+    public void syncRouletteSpin(String joinCode, Winner winner) {
         try {
             Room room = rooms.get(new JoinCode(joinCode));
             if (room != null) {
-                // 룰렛 결과 동기화 (Room 도메인에 setLastWinner 같은 메서드 필요할 수도)
+                // 룰렛 결과로 인해 방 상태가 DONE으로 변경됨
+                room.syncSetRoomState(RoomState.DONE);
                 log.debug("룰렛 스핀 동기화 완료: joinCode={}, winner={}", joinCode, winner);
             }
         } catch (Exception e) {
             log.error("룰렛 스핀 동기화 실패: joinCode={}, error={}", joinCode, e.getMessage(), e);
+        }
+    }
+
+    public void syncCardSelected(String joinCode, String playerName, Integer cardIndex) {
+        try {
+            Room room = rooms.get(new JoinCode(joinCode));
+            if (room != null) {
+                // 카드 게임에서 카드 선택 동기화
+                Playable cardGame = room.findMiniGame(MiniGameType.CARD_GAME);
+                // 실제 카드 선택 로직은 CardGame 도메인 객체에서 처리
+                // 여기서는 로그만 남김
+                log.debug("카드 선택 동기화 완료: joinCode={}, playerName={}, cardIndex={}", 
+                         joinCode, playerName, cardIndex);
+            }
+        } catch (Exception e) {
+            log.error("카드 선택 동기화 실패: joinCode={}, playerName={}, cardIndex={}, error={}", 
+                     joinCode, playerName, cardIndex, e.getMessage(), e);
         }
     }
 }

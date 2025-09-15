@@ -13,7 +13,7 @@ import coffeeshout.global.redis.event.player.PlayerRemovedEvent;
 import coffeeshout.global.redis.event.room.RoomCreatedEvent;
 import coffeeshout.global.redis.event.room.RoomDeletedEvent;
 import coffeeshout.global.redis.event.room.RoomStateChangedEvent;
-import coffeeshout.global.redis.event.roulette.RouletteSpunEvent;
+import coffeeshout.global.redis.event.roulette.RouletteSpinEvent;
 import coffeeshout.global.redis.event.websocket.WebSocketBroadcastEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class RedisMessagePublisher {
         publish("minigame:completed", event);
     }
 
-    public void publishRouletteSpun(RouletteSpunEvent event) {
+    public void publishRouletteSpin(RouletteSpinEvent event) {
         publish("roulette:spin", event);
     }
 

@@ -1,7 +1,7 @@
 package coffeeshout.global.redis.listener;
 
 import coffeeshout.global.config.InstanceConfig;
-import coffeeshout.global.redis.event.roulette.RouletteSpunEvent;
+import coffeeshout.global.redis.event.roulette.RouletteSpinEvent;
 import coffeeshout.room.domain.repository.MemoryRoomRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +35,13 @@ public class RouletteSyncListener implements MessageListener {
 
     private void handleRouletteSpin(String messageBody) {
         try {
-            RouletteSpunEvent event = objectMapper.readValue(messageBody, RouletteSpunEvent.class);
+            RouletteSpinEvent event = objectMapper.readValue(messageBody, RouletteSpinEvent.class);
 
             if (event.instanceId().equals(instanceConfig.getInstanceId())) {
                 return;
             }
 
-            roomRepository.syncRouletteSpun(event.joinCode(), event.winner());
+            roomRepository.syncRouletteSpin(event.joinCode(), event.winner());
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패: error={}", e.getMessage(), e);
