@@ -1,10 +1,10 @@
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import { useEffect, useState, PropsWithChildren } from 'react';
 import { api } from '@/apis/rest/api';
+import MenuList from '../MenuList/MenuList';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
@@ -35,13 +35,7 @@ const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: 
           text={selectedCategory.name}
           imageUrl={selectedCategory.imageUrl}
         />
-        {!selectedMenu && (
-          <S.MenuList>
-            {menus.map((menu) => (
-              <MenuListItem key={menu.id} text={menu.name} onClick={() => handleClickMenu(menu)} />
-            ))}
-          </S.MenuList>
-        )}
+        {!selectedMenu && <MenuList menus={menus} onClickMenu={handleClickMenu} />}
         {children}
       </S.Wrapper>
     </>

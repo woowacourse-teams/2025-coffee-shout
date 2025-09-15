@@ -12,7 +12,6 @@ import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
 import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
-import { MenuColorMap } from '@/constants/color';
 import { useMenuSelection } from './hooks/useMenuSelection';
 import { useCustomMenu } from './hooks/useCustomMenu';
 import { useRoomManagement } from './hooks/useRoomManagement';
@@ -123,11 +122,9 @@ const EntryMenuPage = () => {
               >
                 {selectedMenu && (
                   <SelectTemperature
-                    menuName={selectedMenu.name}
                     temperatureAvailability={selectedMenu.temperatureAvailability}
                     selectedTemperature={selectedTemperature}
                     onChangeTemperature={selectTemperature}
-                    selectionCardColor={MenuColorMap[selectedCategory.color]}
                   />
                 )}
               </SelectMenu>
@@ -142,7 +139,6 @@ const EntryMenuPage = () => {
               >
                 {isCustomMenuInputCompleted && (
                   <SelectTemperature
-                    menuName={customMenuName || ''}
                     temperatureAvailability={'BOTH'}
                     selectedTemperature={selectedTemperature}
                     onChangeTemperature={selectTemperature}
