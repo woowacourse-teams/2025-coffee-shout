@@ -24,7 +24,9 @@ type RoomResponse = {
 
 export const useRoomManagement = () => {
   const navigate = useNavigate();
+  //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
+
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
