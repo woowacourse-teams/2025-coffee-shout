@@ -44,31 +44,8 @@ public class PlayerDisconnectionService {
 
             log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
 
-            // 방에서 플레이어 제거
-            removePlayerFromRoom(joinCode, playerName);
-
         } catch (Exception e) {
             log.error("플레이어 연결 해제 처리 실패: playerKey={}, sessionId={}, reason={}", playerKey, sessionId, reason, e);
-        }
-    }
-
-    /**
-     * 방에서 플레이어 제거
-     */
-    private void removePlayerFromRoom(String joinCode, String playerName) {
-        try {
-            // 방에서 플레이어 제거
-            boolean removed = roomService.removePlayer(joinCode, playerName);
-
-            if (removed) {
-                eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
-                log.info("플레이어 방에서 제거 완료: joinCode={}, playerName={}", joinCode, playerName);
-                return;
-            }
-
-            log.warn("플레이어 제거 실패 (이미 없음): joinCode={}, playerName={}", joinCode, playerName);
-        } catch (Exception e) {
-            log.error("방에서 플레이어 제거 실패: joinCode={}, playerName={}", joinCode, playerName, e);
         }
     }
 }
