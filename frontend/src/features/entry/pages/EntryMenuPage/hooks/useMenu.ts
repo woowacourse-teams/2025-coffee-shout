@@ -30,5 +30,9 @@ export const useMenu = (selectedCategoryId: number | null) => {
     fetchMenus();
   }, [selectedCategoryId]);
 
-  return { menus, loading, error };
+  const resetMenus = () => {
+    setMenus([]);
+  };
+
+  return { menus, loading, error, resetMenus };
 };

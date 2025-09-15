@@ -27,21 +27,21 @@ export const useViewNavigation = () => {
     navigate('/entry/name');
   };
 
-  const handleNavigateToBefore = (onResetMenu: () => void, onResetCustomMenu: () => void) => {
+  const handleNavigateToBefore = (onResetMenu: () => void) => {
     switch (currentView) {
       case 'selectCategory':
         navigateToName();
         break;
       case 'selectMenu':
         navigateToCategory();
+        onResetMenu();
         break;
       case 'inputCustomMenu':
-        onResetCustomMenu();
+        onResetMenu();
         navigateToCategory();
         break;
       case 'selectTemperature':
         onResetMenu();
-        onResetCustomMenu();
         navigateToCategory();
         break;
       default:

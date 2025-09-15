@@ -50,8 +50,8 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { loading: categoriesLoading, categories, error: categoriesError } = useCategories();
-  const { menus, loading: menusLoading, error: menusError } = useMenu(selectedCategory?.id ?? null);
+  const { categories } = useCategories();
+  const { menus, resetMenus } = useMenu(selectedCategory?.id ?? null);
 
   const { qrCodeUrl, proceedToRoom } = useRoomManagement();
 
@@ -68,6 +68,7 @@ const EntryMenuPage = () => {
   const resetMenuState = () => {
     resetMenuSelection();
     resetCustomMenu();
+    resetMenus();
   };
 
   const handleCategorySelect = (category: CategoryWithColor) => {
@@ -81,7 +82,7 @@ const EntryMenuPage = () => {
   };
 
   const handleGoBack = () => {
-    handleNavigateToBefore(resetMenuState, resetCustomMenu);
+    handleNavigateToBefore(resetMenuState);
   };
 
   const handleCustomMenuClick = () => {
@@ -136,19 +137,6 @@ const EntryMenuPage = () => {
 
   const shouldShowCustomMenuButton =
     currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature';
-  //임시 로딩 컴포넌트
-  if (categoriesLoading || menusLoading) {
-    return <div>Loading...</div>;
-  }
-
-  // 임시 에러 처리
-  if (categoriesError) {
-    return <div>카테고리를 불러오는데 실패했습니다: {categoriesError.message}</div>;
-  }
-
-  if (menusError) {
-    return <div>메뉴를 불러오는데 실패했습니다: {menusError.message}</div>;
-  }
 
   return (
     <Layout>
