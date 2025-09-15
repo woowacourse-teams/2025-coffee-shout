@@ -98,8 +98,6 @@ const EntryMenuPage = () => {
     proceedToRoom(selectedMenu, customMenuName, selectedTemperature);
   };
 
-  const shouldShowButtonBar = currentView === 'selectTemperature';
-
   const handleChangeCustomMenuInput = (e: ChangeEvent<HTMLInputElement>) => {
     setCustomMenuName(e.target.value);
   };
@@ -134,6 +132,10 @@ const EntryMenuPage = () => {
     name: selectedMenu?.name ?? customMenuName ?? '',
   };
 
+  const shouldShowButtonBar = currentView === 'selectTemperature';
+
+  const shouldShowCustomMenuButton =
+    currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature';
   //임시 로딩 컴포넌트
   if (categoriesLoading || menusLoading) {
     return <div>Loading...</div>;
@@ -165,9 +167,7 @@ const EntryMenuPage = () => {
             </MenuSelectionLayout>
           )}
         </S.Container>
-        {currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature' && (
-          <CustomMenuButton onClick={handleCustomMenuClick} />
-        )}
+        {shouldShowCustomMenuButton && <CustomMenuButton onClick={handleCustomMenuClick} />}
       </Layout.Content>
       {shouldShowButtonBar &&
         (playerType === 'HOST' ? (
