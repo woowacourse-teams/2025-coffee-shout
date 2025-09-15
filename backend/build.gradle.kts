@@ -27,9 +27,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.redisson:redisson-spring-boot-starter")
     
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.7")
@@ -50,6 +52,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 tasks.withType<Test> {

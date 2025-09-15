@@ -14,6 +14,12 @@ spring:
       ssl:
         enabled: true
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ${RABBIT_MQ_USERNAME:guest}
+    password: ${RABBIT_MQ_PASSWORD:guest}
+
 room:
   removalDelay: 1h
   qr:
