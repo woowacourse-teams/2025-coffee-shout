@@ -10,8 +10,3 @@ export const Container = styled.button`
   background: none;
   cursor: pointer;
 `;
-
-export const Text = styled.span`
-  ${({ theme }) => theme.typography.paragraph}
-  color: ${({ theme }) => theme.color.gray[800]};
-`;
