@@ -96,6 +96,8 @@ public class RoomService {
         final Player player = room.findPlayer(new PlayerName(playerName));
         player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
 
+        roomCommandService.save(room);
+
         return room.getPlayers();
     }
 
@@ -106,6 +108,8 @@ public class RoomService {
         if (player.getPlayerType() != PlayerType.HOST) {
             player.updateReadyState(isReady);
         }
+
+        roomCommandService.save(room);
 
         return room.getPlayers();
     }
@@ -130,6 +134,8 @@ public class RoomService {
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
+        roomCommandService.save(room);
+
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
@@ -143,7 +149,11 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
-        return room.spinRoulette(host, new Roulette(new RoulettePicker()));
+        Winner winner = room.spinRoulette(host, new Roulette(new RoulettePicker()));
+
+        roomCommandService.save(room);
+
+        return winner;
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
