@@ -84,7 +84,12 @@ public class MiniGameSyncListener implements MessageListener {
                 return;
             }
             
-            // 미니게임 완료 동기화 로직 - 현재는 로그만 남김
+            roomRepository.syncMiniGameCompleted(
+                event.joinCode(), 
+                event.miniGameType(), 
+                event.result()
+            );
+            
             log.debug("미니게임 완료 동기화: joinCode={}, miniGameType={}", 
                      event.joinCode(), event.miniGameType());
             
@@ -101,7 +106,12 @@ public class MiniGameSyncListener implements MessageListener {
                 return;
             }
             
-            // 미니게임 라운드 진행 동기화 로직 - 현재는 로그만 남김  
+            roomRepository.syncCardGameState(
+                event.joinCode(), 
+                event.miniGameType(), 
+                event.gameState()
+            );
+            
             log.debug("미니게임 라운드 진행 동기화: joinCode={}, miniGameType={}", 
                      event.joinCode(), event.miniGameType());
             

@@ -74,4 +74,19 @@ public class PlayerHands {
                 .findFirst()
                 .map(Entry::getKey);
     }
+
+    // ============= 동기화용 메서드들 =============
+    
+    /**
+     * 현재 라운드의 플레이어별 카드 선택 상태 반환
+     */
+    public Map<String, Integer> getCurrentRoundSelections() {
+        // 현재는 단순화된 버전으로 구현
+        // 실제로는 각 플레이어의 현재 라운드 카드 선택 정보를 반환해야 함
+        return playerHands.entrySet().stream()
+                .collect(Collectors.toMap(
+                    entry -> entry.getKey().getName().value(),
+                    entry -> entry.getValue().size() // 임시로 카드 개수 반환
+                ));
+    }
 }

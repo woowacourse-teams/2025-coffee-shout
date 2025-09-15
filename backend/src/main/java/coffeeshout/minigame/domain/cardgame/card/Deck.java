@@ -63,4 +63,20 @@ public class Deck {
         final int randomNumber = ThreadLocalRandom.current().nextInt(0, cards.size());
         return cards.get(randomNumber);
     }
+
+    // ============= 동기화용 메서드들 =============
+    
+    /**
+     * 현재 사용 가능한(뽑히지 않은) 카드들 반환
+     */
+    public List<Card> getAvailableCards() {
+        return getRemainingCards();
+    }
+
+    /**
+     * 뽑힌 카드들 반환
+     */
+    public List<Card> getPickedCards() {
+        return new ArrayList<>(pickedCards);
+    }
 }

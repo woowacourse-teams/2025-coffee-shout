@@ -2,6 +2,7 @@ package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.common.task.ChainedTask;
 import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
+import coffeeshout.minigame.domain.dto.MiniGameCompletedLocalEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.Room;
 import java.util.Arrays;
@@ -82,7 +83,16 @@ public enum CardGameTaskType {
                 cardGame.changeDoneState();
                 MiniGameResult result = cardGame.getResult();
                 room.applyMiniGameResult(result);
+                
+                // 카드게임 상태 변경 이벤트 발행
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
+                
+                // 🔥 미니게임 완료 이벤트 발행 (Redis 동기화용)
+                eventPublisher.publishEvent(new MiniGameCompletedLocalEvent(
+                    room.getJoinCode(),
+                    cardGame.getMiniGameType(),
+                    result
+                ));
             }, getState().getDurationMillis());
         }
     },

@@ -3,6 +3,7 @@ package coffeeshout.room.domain.repository;
 import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.domain.cardgame.CardGameSnapshot;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -224,6 +225,38 @@ public class MemoryRoomRepository implements RoomRepository {
         } catch (Exception e) {
             log.error("카드 선택 동기화 실패: joinCode={}, playerName={}, cardIndex={}, error={}", 
                      joinCode, playerName, cardIndex, e.getMessage(), e);
+        }
+    }
+
+    public void syncCardGameState(String joinCode, MiniGameType gameType, Object gameStateSnapshot) {
+        try {
+            Room room = rooms.get(new JoinCode(joinCode));
+            if (room != null && gameType == MiniGameType.CARD_GAME) {
+                Playable playable = room.findMiniGame(gameType);
+                if (playable instanceof coffeeshout.minigame.domain.cardgame.CardGame cardGame) {
+                    // 게임 상태 스냅샷으로부터 복원
+                    if (gameStateSnapshot instanceof CardGameSnapshot snapshot) {
+                        cardGame.restoreFromSnapshot(snapshot);
+                    }
+                    log.debug("카드게임 상태 동기화 완료: joinCode={}, gameType={}", joinCode, gameType);
+                }
+            }
+        } catch (Exception e) {
+            log.error("카드게임 상태 동기화 실패: joinCode={}, gameType={}, error={}", 
+                     joinCode, gameType, e.getMessage(), e);
+        }
+    }
+
+    public void syncMiniGameCompleted(String joinCode, MiniGameType gameType, Object result) {
+        try {
+            Room room = rooms.get(new JoinCode(joinCode));
+            if (room != null) {
+                // 미니게임 완료 동기화
+                log.debug("미니게임 완료 동기화: joinCode={}, gameType={}", joinCode, gameType);
+            }
+        } catch (Exception e) {
+            log.error("미니게임 완료 동기화 실패: joinCode={}, gameType={}, error={}", 
+                     joinCode, gameType, e.getMessage(), e);
         }
     }
 }

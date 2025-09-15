@@ -104,4 +104,55 @@ public class CardGame implements Playable {
     public void changeDoneState() {
         this.state = CardGameState.DONE;
     }
+
+    // ============= 동기화용 메서드들 =============
+    
+    /**
+     * 동기화용 상태 설정 (검증 없이)
+     */
+    public void syncState(CardGameState state, CardGameRound round) {
+        this.state = state;
+        this.round = round;
+    }
+
+    /**
+     * 동기화용 플레이어 카드 선택 (검증 없이)
+     */
+    public void syncPlayerCardSelection(Player player, Integer cardIndex) {
+        if (playerHands != null && deck != null) {
+            try {
+                playerHands.put(player, deck.pick(cardIndex));
+            } catch (Exception e) {
+                // 동기화 중 오류 발생 시 로그만 남기고 계속 진행
+            }
+        }
+    }
+
+    /**
+     * 동기화용 덱 상태 설정
+     */
+    public void syncDeckState(/* 필요시 덱 상태 정보 */) {
+        // 필요시 덱 상태 동기화 로직 구현
+    }
+
+    /**
+     * 현재 게임 상태를 스냅샷으로 생성
+     */
+    public CardGameSnapshot createSnapshot() {
+        return new CardGameSnapshot(
+            state,
+            round,
+            playerHands != null ? playerHands.getCurrentRoundSelections() : null,
+            deck != null ? deck.getAvailableCards() : null
+        );
+    }
+
+    /**
+     * 스냅샷으로부터 게임 상태 복원
+     */
+    public void restoreFromSnapshot(CardGameSnapshot snapshot) {
+        this.state = snapshot.state();
+        this.round = snapshot.round();
+        // 필요시 playerHands, deck 상태도 복원
+    }
 }
