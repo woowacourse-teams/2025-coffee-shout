@@ -2,6 +2,6 @@
 .DS_Store
 /dist/
 
-*.env
+*.env.*
 
 .cursor/

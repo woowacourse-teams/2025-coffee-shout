@@ -24,6 +24,7 @@ export default (env, argv) => {
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
+    'process.env': JSON.stringify(mergedEnv),
     ...Object.fromEntries(
       Object.entries(mergedEnv).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
     ),
