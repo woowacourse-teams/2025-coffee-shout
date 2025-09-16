@@ -8,28 +8,25 @@ import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvid
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
-import { Suspense } from 'react';
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <IdentifierProvider>
-          <ParticipantsProvider>
-            <WebSocketProvider>
-              <PlayerTypeProvider>
-                <ProbabilityHistoryProvider>
-                  <ToastProvider>
-                    <ModalProvider>
-                      <Outlet />
-                    </ModalProvider>
-                  </ToastProvider>
-                </ProbabilityHistoryProvider>
-              </PlayerTypeProvider>
-            </WebSocketProvider>
-          </ParticipantsProvider>
-        </IdentifierProvider>
-      </Suspense>
+      <IdentifierProvider>
+        <ParticipantsProvider>
+          <WebSocketProvider>
+            <PlayerTypeProvider>
+              <ProbabilityHistoryProvider>
+                <ToastProvider>
+                  <ModalProvider>
+                    <Outlet />
+                  </ModalProvider>
+                </ToastProvider>
+              </ProbabilityHistoryProvider>
+            </PlayerTypeProvider>
+          </WebSocketProvider>
+        </ParticipantsProvider>
+      </IdentifierProvider>
     </ThemeProvider>
   );
 };

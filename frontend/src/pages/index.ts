@@ -1,3 +1,12 @@
 export { default as EntryMenuPage } from '../features/entry/pages/EntryMenuPage/EntryMenuPage';
 export { default as EntryNamePage } from '../features/entry/pages/EntryNamePage/EntryNamePage';
 export { default as HomePage } from '../features/home/pages/HomePage';
+export { default as MiniGamePlayPage } from '../features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage';
+export { default as MiniGameReadyPage } from '../features/miniGame/pages/MiniGameReady/MiniGameReadyPage';
+export { default as MiniGameResultPage } from '../features/miniGame/pages/MiniGameResultPage/MiniGameResultPage';
+export { default as NotFoundPage } from '../features/notFound/pages/NotFoundPage';
+export { default as LobbyPage } from '../features/room/lobby/pages/LobbyPage';
+export { default as OrderPage } from '../features/room/order/pages/OrderPage';
+export { default as RoulettePlayPage } from '../features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage';
+export { default as RouletteResultPage } from '../features/room/roulette/pages/RouletteResultPage/RouletteResultPage';
+export { default as QRJoinPage } from '../features/join/pages/QRJoinPage';
