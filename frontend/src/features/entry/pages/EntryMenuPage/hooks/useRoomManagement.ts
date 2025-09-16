@@ -7,8 +7,9 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
+import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
 
-type RoomRequest = {
+export type RoomRequest = {
   playerName: string;
   menu: {
     id: number;
@@ -32,41 +33,18 @@ export const useRoomManagement = () => {
   const { showToast } = useToast();
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
-  const createRoomRequestBody = (
-    selectedMenu: Menu | null,
-    customMenuName: string | null,
-    selectedTemperature: TemperatureOption
-  ): RoomRequest => {
-    return {
-      playerName: myName,
-      menu: {
-        id: selectedMenu ? selectedMenu.id : 0,
-        customName: customMenuName,
-        temperature: selectedTemperature,
-      },
-    };
-  };
-
-  const createUrl = () => {
-    if (playerType === 'HOST') {
-      return `/rooms`;
-    } else {
-      return `/rooms/${joinCode}`;
-    }
-  };
-
   const handleRoomRequest = async (
     selectedMenu: Menu | null,
     customMenuName: string | null,
     selectedTemperature: TemperatureOption
   ) => {
-    const { joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-      createUrl(),
-      createRoomRequestBody(selectedMenu, customMenuName, selectedTemperature)
+    const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
+      createUrl(playerType, joinCode),
+      createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
     );
-    setJoinCode(joinCode);
+    setJoinCode(_joinCode);
     setQrCodeUrl(qrCodeUrl);
-    startSocket(joinCode, myName);
+    startSocket(_joinCode, myName);
   };
 
   const validateMenuSelection = (selectedMenu: Menu | null, customMenuName: string | null) => {
