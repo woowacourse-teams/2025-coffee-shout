@@ -15,12 +15,10 @@ const appVersion = packageJson.version;
 export default (env, argv) => {
   const mode = argv.mode || 'development';
 
-  // mode 기반 .env 파일 로드 (없으면 기본 .env)
   dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
 
   const mergedEnv = { ...process.env };
 
-  // envKeys 만드는 헬퍼
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
