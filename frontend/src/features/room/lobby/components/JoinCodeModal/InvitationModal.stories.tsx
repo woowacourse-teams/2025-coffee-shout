@@ -19,7 +19,7 @@ export const Default: Story = {
   render: () => {
     const { openModal } = useModal();
 
-    const ModalContent = () => <InvitationModal onClose={() => {}} qrCodeUrl={''} />;
+    const ModalContent = () => <InvitationModal onClose={() => {}} />;
 
     const handleOpen = () => {
       openModal(ModalContent());

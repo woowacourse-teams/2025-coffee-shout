@@ -1,6 +1,4 @@
 export const WEBSOCKET_CONFIG = {
-  MAX_RECONNECT_ATTEMPTS: 5,
-  RECONNECT_DELAY_MS: 1000,
   TOPIC_PREFIX: '/topic',
   APP_PREFIX: '/app',
 } as const;

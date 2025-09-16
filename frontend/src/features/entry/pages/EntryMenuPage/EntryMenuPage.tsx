@@ -41,7 +41,7 @@ const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode } = useIdentifier();
+  const { joinCode, myName, qrCodeUrl, setJoinCode, setQrCodeUrl } = useIdentifier();
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithColor | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
@@ -51,7 +51,6 @@ const EntryMenuPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
   const [categories, setCategories] = useState<CategoryWithColor[]>([]);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -67,14 +66,10 @@ const EntryMenuPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
-      navigate(`/room/${joinCode}/lobby`, {
-        state: {
-          qrCodeUrl,
-        },
-      });
+    if (joinCode && qrCodeUrl && selectedMenu && isConnected) {
+      navigate(`/room/${joinCode}/lobby`);
     }
-  }, [isConnected, joinCode, navigate, qrCodeUrl]);
+  }, [joinCode, qrCodeUrl, selectedMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
     setSelectedCategory(null);

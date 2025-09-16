@@ -11,7 +11,6 @@ export type WebSocketContextType = {
     onError?: (error: Error) => void
   ) => StompSubscription | null;
   isConnected: boolean;
-  isVisible: boolean;
   client: Client | null;
 };
 
