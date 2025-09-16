@@ -10,19 +10,3 @@ services:
         target: /data
     command: valkey-server --appendonly yes
 
-  rabbitmq:
-    image: rabbitmq:4.1.4-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
-      - "61613:61613" # STOMP 포트
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
