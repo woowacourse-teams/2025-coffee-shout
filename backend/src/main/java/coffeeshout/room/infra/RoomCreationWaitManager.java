@@ -31,6 +31,13 @@ public class RoomCreationWaitManager {
             final Room result = future.get(timeoutSeconds, TimeUnit.SECONDS);
             log.info("방 생성 완료: eventId={}", eventId);
             return result;
+        } catch (java.util.concurrent.ExecutionException e) {
+            log.error("방 생성 대기 실패: eventId={}", eventId, e);
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
         } catch (Exception e) {
             log.error("방 생성 대기 실패: eventId={}", eventId, e);
             return null;
