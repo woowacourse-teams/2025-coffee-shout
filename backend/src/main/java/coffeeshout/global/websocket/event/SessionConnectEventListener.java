@@ -36,7 +36,17 @@ public class SessionConnectEventListener {
         final String sessionId = event.getMessage().getHeaders().get("simpSessionId", String.class);
         final int totalConnections = sessionManager.getTotalConnectedClientCount();
         
-        log.info("웹소켓 연결 완료: sessionId={}, 현재 연결된 클라이언트 수={}", sessionId, totalConnections);
+        // 플레이어 정보 가져오기 (있으면)
+        String playerInfo = "";
+        if (sessionManager.hasPlayerKey(sessionId)) {
+            final String playerKey = sessionManager.getPlayerKey(sessionId);
+            final String joinCode = sessionManager.extractJoinCode(playerKey);
+            final String playerName = sessionManager.extractPlayerName(playerKey);
+            playerInfo = String.format(", joinCode=%s, playerName=%s", joinCode, playerName);
+        }
+        
+        log.info("웹소켓 연결 완료: sessionId={}, 현재 연결된 클라이언트 수={}{}", 
+                sessionId, totalConnections, playerInfo);
         webSocketMetricService.completeConnection(sessionId);
     }
 }
