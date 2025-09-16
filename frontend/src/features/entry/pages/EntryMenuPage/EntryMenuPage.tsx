@@ -14,7 +14,7 @@ import { useCustomMenu } from './hooks/useCustomMenu';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
 import { useCategories } from './hooks/useCategories';
-import { useMenu } from './hooks/useMenu';
+import { useMenus } from './hooks/useMenus';
 import * as S from './EntryMenuPage.styled';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
 import { MenuColorMap } from '@/constants/color';
@@ -51,7 +51,7 @@ const EntryMenuPage = () => {
   } = useViewNavigation();
 
   const { categories } = useCategories();
-  const { menus, resetMenus } = useMenu(selectedCategory?.id ?? null);
+  const { menus, resetMenus } = useMenus(selectedCategory?.id ?? null);
 
   const { qrCodeUrl, proceedToRoom } = useRoomManagement();
 

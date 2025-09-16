@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu } from '@/types/menu';
 import { api } from '@/apis/rest/api';
 
-export const useMenu = (selectedCategoryId: number | null) => {
+export const useMenus = (selectedCategoryId: number | null) => {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
