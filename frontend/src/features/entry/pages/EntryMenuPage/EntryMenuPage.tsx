@@ -69,7 +69,7 @@ const EntryMenuPage = () => {
     if (joinCode && qrCodeUrl && selectedMenu && isConnected) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [myName, selectedMenu, isConnected, joinCode, navigate, qrCodeUrl]);
+  }, [joinCode, qrCodeUrl, selectedMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
     setSelectedCategory(null);
