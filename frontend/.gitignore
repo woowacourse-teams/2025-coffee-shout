@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-*.env
+*.env.*
 .eslintcache
 *storybook.log
 storybook-static
