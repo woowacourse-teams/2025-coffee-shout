@@ -17,7 +17,7 @@ import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
@@ -34,7 +34,6 @@ type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const { qrCodeUrl } = useLocation().state || {};
   const { send, isConnected } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
@@ -138,7 +137,7 @@ const LobbyPage = () => {
   };
 
   const handleShare = () => {
-    openModal(<InvitationModal onClose={closeModal} qrCodeUrl={qrCodeUrl} />, {
+    openModal(<InvitationModal onClose={closeModal} />, {
       title: '친구 초대하기',
       showCloseButton: true,
     });

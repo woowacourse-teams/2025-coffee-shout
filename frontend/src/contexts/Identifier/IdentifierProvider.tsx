@@ -4,6 +4,7 @@ import { IdentifierContext } from './IdentifierContext';
 const STORAGE_KEYS = {
   JOIN_CODE: 'coffee-shout-join-code',
   MY_NAME: 'coffee-shout-my-name',
+  QR_CODE_URL: 'coffee-shout-qr-code-url',
 } as const;
 
 export const IdentifierProvider = ({ children }: PropsWithChildren) => {
@@ -12,6 +13,9 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
   });
   const [myName, setMyName] = useState<string>(() => {
     return sessionStorage.getItem(STORAGE_KEYS.MY_NAME) || '';
+  });
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>(() => {
+    return sessionStorage.getItem(STORAGE_KEYS.QR_CODE_URL) || '';
   });
 
   useEffect(() => {
@@ -30,6 +34,14 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
     }
   }, [myName]);
 
+  useEffect(() => {
+    if (qrCodeUrl) {
+      sessionStorage.setItem(STORAGE_KEYS.QR_CODE_URL, qrCodeUrl);
+    } else {
+      sessionStorage.removeItem(STORAGE_KEYS.QR_CODE_URL);
+    }
+  }, [qrCodeUrl]);
+
   const clearJoinCode = useCallback(() => {
     setJoinCode('');
   }, []);
@@ -38,10 +50,15 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
     setMyName('');
   }, []);
 
+  const clearQrCodeUrl = useCallback(() => {
+    setQrCodeUrl('');
+  }, []);
+
   const clearIdentifier = useCallback(() => {
     clearJoinCode();
     clearMyName();
-  }, [clearJoinCode, clearMyName]);
+    clearQrCodeUrl();
+  }, [clearJoinCode, clearMyName, clearQrCodeUrl]);
 
   return (
     <IdentifierContext.Provider
@@ -52,6 +69,9 @@ export const IdentifierProvider = ({ children }: PropsWithChildren) => {
         myName,
         setMyName,
         clearMyName,
+        qrCodeUrl,
+        setQrCodeUrl,
+        clearQrCodeUrl,
         clearIdentifier,
       }}
     >
