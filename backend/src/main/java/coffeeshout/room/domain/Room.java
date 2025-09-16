@@ -93,7 +93,6 @@ public class Room {
         isTrue(isHost(host), "호스트만 룰렛을 돌릴 수 있습니다.");
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        // TODO 룰렛을 돌리기 전에 모든 게임들을 플레이해야 한다.
         final Winner winner = roulette.spin();
         roomState = RoomState.DONE;
         return winner;
@@ -230,5 +229,57 @@ public class Room {
 
     public void assignQrCodeUrl(String qrCodeUrl) {
         joinCode.assignQrCodeUrl(qrCodeUrl);
+    }
+
+    // ============= 동기화용 메서드들 =============
+    
+    /**
+     * 동기화용 플레이어 추가 (검증 없이)
+     * 다른 인스턴스에서 이미 검증된 플레이어를 동기화할 때 사용
+     */
+    public void syncJoinPlayer(Player player) {
+        players.join(player);
+        roulette.join(player);
+    }
+
+    /**
+     * 동기화용 호스트 변경 (검증 없이)
+     */
+    public void syncSetHost(PlayerName newHostName) {
+        Player newHost = players.getPlayer(newHostName);
+        newHost.promote();
+        this.host = newHost;
+    }
+
+    /**
+     * 동기화용 방 상태 변경
+     */
+    public void syncSetRoomState(RoomState newState) {
+        this.roomState = newState;
+    }
+
+    /**
+     * 동기화용 미니게임 추가 (호스트 검증 없이)
+     */
+    public void syncAddMiniGame(Playable miniGame) {
+        if (miniGames.size() <= 5) {
+            miniGames.add(miniGame);
+        }
+    }
+
+    /**
+     * 동기화용 미니게임 시작 처리
+     */
+    public void syncStartMiniGame(MiniGameType miniGameType) {
+        // 해당 미니게임을 큐에서 찾아서 시작된 게임 목록으로 이동
+        miniGames.removeIf(game -> {
+            if (game.getMiniGameType() == miniGameType) {
+                game.startGame(players.getPlayers());
+                finishedGames.add(game);
+                return true;
+            }
+            return false;
+        });
+        this.roomState = RoomState.PLAYING;
     }
 }

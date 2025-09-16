@@ -1,11 +1,23 @@
 package coffeeshout.room.application;
 
+import coffeeshout.global.config.InstanceConfig;
+import coffeeshout.global.redis.RedisMessagePublisher;
+import coffeeshout.global.redis.event.minigame.MiniGameStartedEvent;
+import coffeeshout.global.redis.event.minigame.MiniGamesUpdatedEvent;
+import coffeeshout.global.redis.event.player.HostPromotedEvent;
+import coffeeshout.global.redis.event.player.PlayerJoinedEvent;
+import coffeeshout.global.redis.event.player.PlayerMenuSelectedEvent;
+import coffeeshout.global.redis.event.player.PlayerReadyStateChangedEvent;
+import coffeeshout.global.redis.event.player.PlayerRemovedEvent;
+import coffeeshout.global.redis.event.room.RoomStateChangedEvent;
+import coffeeshout.global.redis.event.roulette.RouletteSpinEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -37,6 +49,8 @@ public class RoomService {
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
+    private final RedisMessagePublisher messagePublisher;
+    private final InstanceConfig instanceConfig;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -46,6 +60,8 @@ public class RoomService {
             QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
+            RedisMessagePublisher messagePublisher,
+            InstanceConfig instanceConfig,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -54,6 +70,8 @@ public class RoomService {
         this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
+        this.messagePublisher = messagePublisher;
+        this.instanceConfig = instanceConfig;
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
@@ -69,7 +87,7 @@ public class RoomService {
         room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
-        return roomCommandService.save(room);
+        return roomCommandService.saveAndPublishCreated(room);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
@@ -77,8 +95,21 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
+        Room saved = roomCommandService.save(room);
 
-        return roomCommandService.save(room);
+        // 플레이어 입장 이벤트 발행
+        Player joinedPlayer = saved.findPlayer(new PlayerName(guestName));
+        messagePublisher.publishPlayerJoined(new PlayerJoinedEvent(
+                joinCode,
+                guestName,
+                joinedPlayer.getPlayerType(),
+                joinedPlayer.getSelectedMenu(),
+                joinedPlayer.getIsReady(),
+                joinedPlayer.getColorIndex(),
+                instanceConfig.getInstanceId()
+        ));
+
+        return saved;
     }
 
     public List<Player> getAllPlayers(String joinCode) {
@@ -92,7 +123,18 @@ public class RoomService {
         final Menu menu = menuQueryService.getById(menuId);
 
         final Player player = room.findPlayer(new PlayerName(playerName));
-        player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
+        SelectedMenu selectedMenu = new SelectedMenu(menu, MenuTemperature.ICE);
+        player.selectMenu(selectedMenu);
+
+        roomCommandService.save(room);
+
+        // 플레이어 메뉴 선택 이벤트 발행
+        messagePublisher.publishPlayerMenuSelected(new PlayerMenuSelectedEvent(
+                joinCode,
+                playerName,
+                selectedMenu,
+                instanceConfig.getInstanceId()
+        ));
 
         return room.getPlayers();
     }
@@ -103,6 +145,15 @@ public class RoomService {
 
         if (player.getPlayerType() != PlayerType.HOST) {
             player.updateReadyState(isReady);
+            roomCommandService.save(room);
+
+            // 플레이어 준비 상태 변경 이벤트 발행
+            messagePublisher.publishPlayerReadyStateChanged(new PlayerReadyStateChangedEvent(
+                    joinCode,
+                    playerName,
+                    isReady,
+                    instanceConfig.getInstanceId()
+            ));
         }
 
         return room.getPlayers();
@@ -128,6 +179,15 @@ public class RoomService {
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
+        roomCommandService.save(room);
+
+        // 미니게임 목록 업데이트 이벤트 발행
+        messagePublisher.publishMiniGamesUpdated(new MiniGamesUpdatedEvent(
+                joinCode,
+                miniGameTypes,
+                instanceConfig.getInstanceId()
+        ));
+
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
@@ -141,7 +201,24 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
-        return room.spinRoulette(host);
+        Winner winner = room.spinRoulette(host);
+        roomCommandService.save(room);
+
+        // 룸 상태 변경 이벤트 발행 (PLAYING -> DONE)
+        messagePublisher.publishRoomStateChanged(new RoomStateChangedEvent(
+                joinCode,
+                RoomState.DONE,
+                instanceConfig.getInstanceId()
+        ));
+
+        // 룰렛 스핀 이벤트 발행
+        messagePublisher.publishRouletteSpin(new RouletteSpinEvent(
+                joinCode,
+                winner,
+                instanceConfig.getInstanceId()
+        ));
+
+        return winner;
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
@@ -172,9 +249,41 @@ public class RoomService {
     public boolean removePlayer(String joinCode, String playerName) {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
+        
+        // 제거되는 플레이어가 호스트인지 확인
+        final Player removingPlayer = room.findPlayer(new PlayerName(playerName));
+        final boolean wasHost = room.isHost(removingPlayer);
+        
         final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-        if (room.isEmpty()) {
-            roomCommandService.delete(code);
+        
+        if (isRemoved) {
+            // 호스트가 나갔고 방이 비어있지 않으면 새로운 호스트가 승격됨
+            String newHostName = null;
+            if (wasHost && !room.isEmpty()) {
+                newHostName = room.getHost().getName().value();
+            }
+            
+            if (room.isEmpty()) {
+                roomCommandService.delete(code);
+            } else {
+                roomCommandService.save(room);
+            }
+
+            // 플레이어 제거 이벤트 발행
+            messagePublisher.publishPlayerRemoved(new PlayerRemovedEvent(
+                    joinCode,
+                    playerName,
+                    instanceConfig.getInstanceId()
+            ));
+
+            // 호스트 승격 이벤트 발행
+            if (newHostName != null) {
+                messagePublisher.publishHostPromoted(new HostPromotedEvent(
+                        joinCode,
+                        newHostName,
+                        instanceConfig.getInstanceId()
+                ));
+            }
         }
 
         return isRemoved;
@@ -198,5 +307,29 @@ public class RoomService {
     public boolean isReadyState(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.isReadyState();
+    }
+
+    public Playable startMiniGame(String joinCode, String hostName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Playable currentGame = room.startNextGame(hostName);
+
+        roomCommandService.save(room);
+
+        // 룸 상태 변경 이벤트 발행 (READY -> PLAYING)
+        messagePublisher.publishRoomStateChanged(new RoomStateChangedEvent(
+                joinCode,
+                RoomState.PLAYING,
+                instanceConfig.getInstanceId()
+        ));
+
+        // 미니게임 시작 이벤트 발행
+        messagePublisher.publishMiniGameStarted(new MiniGameStartedEvent(
+                joinCode,
+                currentGame.getMiniGameType(),
+                room.getPlayers().stream().map(p -> p.getName().value()).toList(),
+                instanceConfig.getInstanceId()
+        ));
+
+        return currentGame;
     }
 }

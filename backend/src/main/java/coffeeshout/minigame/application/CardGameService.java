@@ -2,6 +2,9 @@ package coffeeshout.minigame.application;
 
 import static coffeeshout.minigame.domain.cardgame.CardGameTaskType.FIRST_ROUND_LOADING;
 
+import coffeeshout.global.config.InstanceConfig;
+import coffeeshout.global.redis.RedisMessagePublisher;
+import coffeeshout.global.redis.event.minigame.CardSelectedEvent;
 import coffeeshout.minigame.domain.dto.CardGameStartEvent;
 import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -29,18 +32,24 @@ public class CardGameService implements MiniGameService {
     private final CardGameTaskExecutors cardGameTaskExecutors;
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedisMessagePublisher messagePublisher;
+    private final InstanceConfig instanceConfig;
 
     @Autowired
     public CardGameService(
             RoomQueryService roomQueryService,
             CardGameTaskExecutors cardGameTaskExecutors,
             @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            RedisMessagePublisher messagePublisher,
+            InstanceConfig instanceConfig
     ) {
         this.roomQueryService = roomQueryService;
         this.cardGameTaskExecutors = cardGameTaskExecutors;
         this.scheduler = scheduler;
         this.eventPublisher = eventPublisher;
+        this.messagePublisher = messagePublisher;
+        this.instanceConfig = instanceConfig;
     }
 
     @Override
@@ -63,7 +72,17 @@ public class CardGameService implements MiniGameService {
         final CardGame cardGame = getCardGame(roomJoinCode);
         final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
         cardGame.selectCard(player, cardIndex);
+        
+        // 로컬 이벤트 발행
         eventPublisher.publishEvent(new CardSelectEvent(roomJoinCode, cardGame));
+        
+        // Redis 이벤트 발행 (다른 서버 인스턴스로 동기화)
+        messagePublisher.publishCardSelected(new CardSelectedEvent(
+                joinCode,
+                playerName,
+                cardIndex,
+                instanceConfig.getInstanceId()
+        ));
     }
 
     private CardGame getCardGame(JoinCode joinCode) {

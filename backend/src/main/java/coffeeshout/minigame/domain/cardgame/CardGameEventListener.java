@@ -1,5 +1,8 @@
 package coffeeshout.minigame.domain.cardgame;
 
+import coffeeshout.global.config.InstanceConfig;
+import coffeeshout.global.redis.RedisMessagePublisher;
+import coffeeshout.global.redis.event.minigame.MiniGameRoundProgressEvent;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.dto.CardGameStartEvent;
@@ -22,6 +25,8 @@ public class CardGameEventListener {
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final RedisMessagePublisher messagePublisher;
+    private final InstanceConfig instanceConfig;
 
     @EventListener
     @MessageResponse(
@@ -36,7 +41,24 @@ public class CardGameEventListener {
                     """
     )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
-        sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
+        CardGame cardGame = cardGameStateChangeEvent.cardGame();
+        JoinCode joinCode = cardGameStateChangeEvent.joinCode();
+        
+        // 기존 웹소켓 전송 (LoggingSimpMessagingTemplate이 Redis 동기화도 처리함)
+        sendCardGameState(cardGame, joinCode);
+        
+        // 🔥 추가: 카드게임 상태 변경 Redis 동기화
+        try {
+            CardGameSnapshot snapshot = cardGame.createSnapshot();
+            messagePublisher.publishMiniGameRoundProgress(new MiniGameRoundProgressEvent(
+                joinCode.getValue(),
+                cardGame.getMiniGameType(),
+                snapshot,
+                instanceConfig.getInstanceId()
+            ));
+        } catch (Exception e) {
+            // 동기화 실패해도 게임은 계속 진행
+        }
     }
 
     @EventListener
@@ -52,6 +74,8 @@ public class CardGameEventListener {
                     """
     )
     public void handleSelectCard(CardSelectEvent cardSelectEvent) {
+        // 카드 선택은 이미 CardGameService에서 Redis 동기화됨
+        // 여기서는 웹소켓 전송만 처리 (LoggingSimpMessagingTemplate이 Redis 동기화도 처리함)
         sendCardGameState(cardSelectEvent.cardGame(), cardSelectEvent.joinCode());
     }
 
