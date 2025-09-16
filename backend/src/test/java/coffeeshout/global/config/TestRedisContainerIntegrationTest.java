@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 @IntegrationTest
 @DisplayName("TestContainer 통합 테스트")
-class TestContainerIntegrationTest {
+class TestRedisContainerIntegrationTest {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -27,9 +27,9 @@ class TestContainerIntegrationTest {
     @DisplayName("TestContainer Valkey 연결 확인")
     void testValkeyConnectionIsAvailable() {
         // given & when
-        Boolean isContainerRunning = TestContainerConfig.isContainerRunning();
-        String host = TestContainerConfig.getContainerHost();
-        Integer port = TestContainerConfig.getContainerPort();
+        Boolean isContainerRunning = TestRedisContainerConfig.isContainerRunning();
+        String host = TestRedisContainerConfig.getContainerHost();
+        Integer port = TestRedisContainerConfig.getContainerPort();
 
         // then
         assertThat(isContainerRunning).isTrue();

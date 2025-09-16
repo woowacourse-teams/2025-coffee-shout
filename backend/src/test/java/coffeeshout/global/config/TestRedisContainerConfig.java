@@ -17,11 +17,11 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-@TestConfiguration
+@TestConfiguration(proxyBeanMethods = false)
 @Profile("test")
-public class TestContainerConfig {
+public class TestRedisContainerConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(TestContainerConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestRedisContainerConfig.class);
     private static final Object CONTAINER_LOCK = new Object();
     private static volatile GenericContainer<?> valkeyContainer;
 

@@ -1,6 +1,8 @@
 package coffeeshout.global.config;
 
 
+import coffeeshout.global.config.properties.RabbitMQProperties;
+import coffeeshout.global.config.properties.RabbitMQProperties.Heartbeat;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -17,17 +19,31 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private final TaskScheduler taskScheduler;
     private final ChannelInterceptor channelInterceptor;
+    private final RabbitMQProperties rabbitMQProperties;
 
-    public WebSocketMessageBrokerConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
-                                        ChannelInterceptor channelInterceptor) {
+    public WebSocketMessageBrokerConfig(
+            @Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
+            ChannelInterceptor channelInterceptor,
+            RabbitMQProperties rabbitMQProperties
+    ) {
         this.taskScheduler = taskScheduler;
         this.channelInterceptor = channelInterceptor;
+        this.rabbitMQProperties = rabbitMQProperties;
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic/", "/queue/")
-                .setHeartbeatValue(new long[]{4000, 4000})
+        final Heartbeat heartbeat = rabbitMQProperties.stomp().heartbeat();
+
+        config.enableStompBrokerRelay("/topic/", "/queue/")
+                .setRelayHost(rabbitMQProperties.host())
+                .setRelayPort(rabbitMQProperties.stomp().port())
+                .setClientLogin(rabbitMQProperties.username())
+                .setClientPasscode(rabbitMQProperties.password())
+                .setSystemLogin(rabbitMQProperties.username())
+                .setSystemPasscode(rabbitMQProperties.password())
+                .setSystemHeartbeatReceiveInterval(heartbeat.receive())
+                .setSystemHeartbeatSendInterval(heartbeat.send())
                 .setTaskScheduler(taskScheduler);
 
         config.setApplicationDestinationPrefixes("/app");

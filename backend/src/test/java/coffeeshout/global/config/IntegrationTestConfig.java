@@ -8,7 +8,7 @@ import org.springframework.scheduling.TaskScheduler;
 
 @TestConfiguration
 @Profile("test")
-@Import(TestContainerConfig.class)
+@Import({TestRedisContainerConfig.class, TestRabbitMqContainerConfig.class})
 public class IntegrationTestConfig {
 
     @Bean(name = "miniGameTaskScheduler")

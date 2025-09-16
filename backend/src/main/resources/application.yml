@@ -15,10 +15,15 @@ spring:
         enabled: true
 
   rabbitmq:
-    host: rabbitmq
+    host: localhost
     port: 5672
-    username: ${RABBIT_MQ_USERNAME:guest}
-    password: ${RABBIT_MQ_PASSWORD:guest}
+    username: guest
+    password: guest
+    stomp:
+      port: 61613
+      heartbeat:
+        send: 4000
+        receive: 4000
 
 room:
   removalDelay: 1h
