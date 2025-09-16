@@ -56,14 +56,10 @@ const EntryMenuPage = () => {
   const { qrCodeUrl, proceedToRoom } = useRoomManagement();
 
   useEffect(() => {
-    if (isConnected) {
-      navigate(`/room/${joinCode}/lobby`, {
-        state: {
-          qrCodeUrl,
-        },
-      });
+    if (joinCode && qrCodeUrl && selectedMenu && isConnected) {
+      navigate(`/room/${joinCode}/lobby`);
     }
-  }, [isConnected, joinCode, navigate, qrCodeUrl]);
+  }, [joinCode, qrCodeUrl, selectedMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetMenuSelection();

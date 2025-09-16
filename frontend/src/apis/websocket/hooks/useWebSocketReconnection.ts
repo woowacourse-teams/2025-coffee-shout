@@ -1,95 +1,103 @@
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { useCallback, useEffect, useRef } from 'react';
-import { WEBSOCKET_CONFIG } from '../constants/constants';
 
 type Props = {
   isConnected: boolean;
-  isVisible: boolean;
   startSocket: (joinCode: string, myName: string) => void;
   stopSocket: () => void;
 };
 
-export const useWebSocketReconnection = ({
-  isConnected,
-  isVisible,
-  startSocket,
-  stopSocket,
-}: Props) => {
-  // TODO: 웹소켓 provider에 도메인 정보가 있는 것은 좋지 않음. 추후 리팩토링 필요
+export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket }: Props) => {
+  const { isVisible } = usePageVisibility();
   const { joinCode, myName } = useIdentifier();
-  const wasConnectedBeforeBackground = useRef(false);
-  const reconnectTimeoutRef = useRef<number | null>(null);
-  const reconnectAttemptsRef = useRef(0);
+  const reconnectTimerRef = useRef<number | null>(null);
+  const wasBackgrounded = useRef(false);
+  const hasCheckedRefresh = useRef(false);
 
-  const resetReconnectAttempts = useCallback(() => {
-    reconnectAttemptsRef.current = 0;
-    wasConnectedBeforeBackground.current = false;
-  }, []);
-
-  const clearReconnectTimeout = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
+  const clearReconnectTimer = useCallback(() => {
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
     }
-  }, []);
-
-  const checkAndHandleMaxAttempts = useCallback(() => {
-    if (reconnectAttemptsRef.current >= WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS) {
-      console.log(
-        `❌ 최대 재연결 시도 횟수 초과 (${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS}회) - 재연결 중단`
-      );
-      wasConnectedBeforeBackground.current = false;
-      return true;
-    }
-    return false;
-  }, []);
-
-  const logReconnectAttempt = useCallback(() => {
-    console.log(
-      `📱 앱이 포그라운드로 전환됨 - 웹소켓 재연결 시도 (시도: ${
-        reconnectAttemptsRef.current + 1
-      }/${WEBSOCKET_CONFIG.MAX_RECONNECT_ATTEMPTS})`
-    );
   }, []);
 
   const scheduleReconnect = useCallback(() => {
-    reconnectTimeoutRef.current = window.setTimeout(() => {
-      console.log('🔄 웹소켓 재연결 시작');
-      reconnectAttemptsRef.current += 1;
-      startSocket(joinCode, myName);
-    }, WEBSOCKET_CONFIG.RECONNECT_DELAY_MS);
-  }, [startSocket, joinCode, myName]);
-
-  const attemptReconnect = useCallback(() => {
-    if (checkAndHandleMaxAttempts()) return;
-    logReconnectAttempt();
-    clearReconnectTimeout();
-    scheduleReconnect();
-  }, [checkAndHandleMaxAttempts, logReconnectAttempt, clearReconnectTimeout, scheduleReconnect]);
+    clearReconnectTimer();
+    reconnectTimerRef.current = window.setTimeout(() => {
+      if (joinCode && myName) startSocket(joinCode, myName);
+    }, 200);
+  }, [joinCode, myName, startSocket, clearReconnectTimer]);
 
   /**
-   * 앱 전환 감지 및 재연결 로직
+   * 새로고침 감지
+   */
+  useEffect(() => {
+    if (hasCheckedRefresh.current) return;
+
+    let isReload = false;
+
+    try {
+      const navigationEntries = performance.getEntriesByType(
+        'navigation'
+      ) as PerformanceNavigationTiming[];
+      isReload = navigationEntries.length > 0 && navigationEntries[0].type === 'reload';
+    } catch (error) {
+      console.warn('performance.getEntriesByType not supported:', error);
+      isReload = document.referrer === window.location.href;
+    }
+
+    if (isReload && !isConnected && joinCode && myName && startSocket) {
+      console.log('🔄 새로고침 감지 - 웹소켓 재연결 시도:', { myName, joinCode });
+      hasCheckedRefresh.current = true;
+      startSocket(joinCode, myName);
+    }
+  }, [myName, joinCode, isConnected, startSocket]);
+
+  /**
+   * 백그라운드 ↔ 포그라운드 감지
    */
   useEffect(() => {
     if (!isVisible && isConnected) {
-      wasConnectedBeforeBackground.current = true;
-      console.log('📱 앱이 백그라운드로 전환됨 - 웹소켓 연결 해제');
+      console.log('📱 백그라운드 전환 - 소켓 연결 해제');
+      wasBackgrounded.current = true;
       stopSocket();
-    } else if (isVisible && wasConnectedBeforeBackground.current && !isConnected) {
-      attemptReconnect();
+      return;
     }
 
-    return () => {
-      clearReconnectTimeout();
-    };
-  }, [isVisible, isConnected, stopSocket, attemptReconnect, clearReconnectTimeout]);
+    if (isVisible && !isConnected && wasBackgrounded.current) {
+      wasBackgrounded.current = false;
+      console.log('📱 포그라운드 복귀 - 소켓 재연결');
+      scheduleReconnect();
+    }
+
+    return () => clearReconnectTimer();
+  }, [isVisible, isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
 
   /**
-   * 연결 성공 시 재연결 시도 횟수 리셋
+   * 온라인/오프라인 감지
    */
   useEffect(() => {
-    if (isConnected) {
-      resetReconnectAttempts();
-    }
-  }, [isConnected, resetReconnectAttempts]);
+    const handleOnline = () => {
+      if (!isConnected) {
+        console.log('🌐 온라인 감지 - 소켓 재연결');
+        scheduleReconnect();
+      }
+    };
+    const handleOffline = () => {
+      if (isConnected) {
+        console.log('🌐 오프라인 감지 - 소켓 연결 해제');
+        stopSocket();
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearReconnectTimer();
+    };
+  }, [isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
 };

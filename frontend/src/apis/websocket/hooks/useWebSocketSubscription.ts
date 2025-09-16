@@ -1,9 +1,11 @@
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { StompSubscription } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import { useWebSocket } from '../contexts/WebSocketContext';
 
 export const useWebSocketSubscription = <T>(destination: string, onData: (data: T) => void) => {
-  const { subscribe, isConnected, isVisible } = useWebSocket();
+  const { isVisible } = usePageVisibility();
+  const { subscribe, isConnected } = useWebSocket();
   const subscriptionRef = useRef<StompSubscription | null>(null);
 
   useEffect(() => {

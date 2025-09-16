@@ -1,5 +1,5 @@
 import { reportWebSocketError } from '@/apis/utils/reportSentryError';
-import { Client, IFrame } from '@stomp/stompjs';
+import { Client, IFrame, StompSocketState } from '@stomp/stompjs';
 import { WebSocketErrorOptions } from '../constants/constants';
 
 class WebSocketError extends Error {
@@ -74,14 +74,18 @@ class WebSocketErrorHandler {
   }
 
   static handleWebSocketError(event: Event, stompClient: Client): WebSocketError {
-    const errorMessage = `WebSocket 연결 오류: ${event.type}`;
+    const readyState = stompClient.webSocket?.readyState;
+    const readyStateText = readyState !== undefined ? StompSocketState[readyState] : 'UNKNOWN';
+
+    const errorMessage = `WebSocket 연결 오류: ${event.type} (상태: ${readyStateText})`;
 
     return this.handleError(errorMessage, {
       type: 'connection',
       extra: {
         eventType: event.type,
         url: stompClient.webSocket?.url,
-        readyState: stompClient.webSocket?.readyState,
+        readyState,
+        readyStateText,
       },
     });
   }
