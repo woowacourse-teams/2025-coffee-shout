@@ -15,15 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor
 @Getter
 public class CardGame implements Playable {
 
     private static final int ADDITION_CARD_COUNT = 7;
     private static final int MULTIPLIER_CARD_COUNT = 2;
 
-    private final Deck deck;
+    private Deck deck;
     private PlayerHands playerHands;
     private CardGameRound round;
     private CardGameState state;
@@ -68,7 +70,7 @@ public class CardGame implements Playable {
         this.state = CardGameState.PLAYING;
     }
 
-    public void selectCard(Player player, Integer cardIndex) {
+    public void selectCard(PlayerName player, Integer cardIndex) {
         state(state == CardGameState.PLAYING, "현재 게임이 진행중인 상태가 아닙니다.");
         playerHands.put(player, deck.pick(cardIndex));
     }
@@ -89,7 +91,7 @@ public class CardGame implements Playable {
         final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
-            playerHands.put(player, card);
+            playerHands.put(player.getName(), card);
         }
     }
 

@@ -2,18 +2,18 @@ package coffeeshout.minigame.application;
 
 import static coffeeshout.minigame.domain.cardgame.CardGameTaskType.FIRST_ROUND_LOADING;
 
-import coffeeshout.minigame.domain.dto.CardGameStartEvent;
-import coffeeshout.minigame.domain.dto.CardSelectEvent;
+import coffeeshout.minigame.common.task.TaskManager;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
-import coffeeshout.minigame.common.task.TaskManager;
+import coffeeshout.minigame.domain.dto.CardGameStartEvent;
+import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +29,21 @@ public class CardGameService implements MiniGameService {
     private final CardGameTaskExecutors cardGameTaskExecutors;
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher eventPublisher;
+    private final RoomCommandService roomCommandService;
 
     @Autowired
     public CardGameService(
             RoomQueryService roomQueryService,
             CardGameTaskExecutors cardGameTaskExecutors,
             @Qualifier("miniGameTaskScheduler") TaskScheduler scheduler,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            RoomCommandService roomCommandService
     ) {
         this.roomQueryService = roomQueryService;
         this.cardGameTaskExecutors = cardGameTaskExecutors;
         this.scheduler = scheduler;
         this.eventPublisher = eventPublisher;
+        this.roomCommandService = roomCommandService;
     }
 
     @Override
@@ -60,14 +63,11 @@ public class CardGameService implements MiniGameService {
 
     public void selectCard(String joinCode, String playerName, Integer cardIndex) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final CardGame cardGame = getCardGame(roomJoinCode);
-        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
-        cardGame.selectCard(player, cardIndex);
-        eventPublisher.publishEvent(new CardSelectEvent(roomJoinCode, cardGame));
-    }
+        final Room room = roomQueryService.getByJoinCode(roomJoinCode);
+        final CardGame cardGame = (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+        cardGame.selectCard(new PlayerName(playerName), cardIndex);
 
-    private CardGame getCardGame(JoinCode joinCode) {
-        final Room room = roomQueryService.getByJoinCode(joinCode);
-        return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+        eventPublisher.publishEvent(new CardSelectEvent(roomJoinCode, cardGame));
+        roomCommandService.save(room);
     }
 }

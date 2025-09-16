@@ -28,7 +28,9 @@ import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
+import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
@@ -46,7 +48,7 @@ class CardGameServiceTest extends ServiceTest {
     CardGameService cardGameService;
 
     @Autowired
-    RoomQueryService roomQueryService;
+    RoomCommandService roomCommandService;
 
     @Autowired
     RoomService roomService;
@@ -61,6 +63,8 @@ class CardGameServiceTest extends ServiceTest {
     Room room;
 
     CardGame cardGame;
+    @Autowired
+    private RoomQueryService roomQueryService;
 
     @BeforeEach
     void setUp() {
@@ -83,6 +87,8 @@ class CardGameServiceTest extends ServiceTest {
             player.updateReadyState(true);
         }
         cardGame = (CardGame) room.startNextGame(host.getName().value());
+
+        roomCommandService.save(room);
     }
 
     @Nested
@@ -123,6 +129,7 @@ class CardGameServiceTest extends ServiceTest {
             // when
             String joinCodeValue = joinCode.getValue();
             cardGameService.start(cardGameSpy, joinCodeValue);
+            roomCommandService.save(room);
 
             await().atMost(3, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
@@ -163,6 +170,7 @@ class CardGameServiceTest extends ServiceTest {
             // given
             cardGame.startPlay();
             String joinCodeValue = joinCode.getValue();
+            roomCommandService.save(room);
 
             // when
             cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
@@ -176,6 +184,7 @@ class CardGameServiceTest extends ServiceTest {
             // given
             cardGame.startPlay();
             String joinCodeValue = joinCode.getValue();
+            roomCommandService.save(room);
 
             // when
             cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
@@ -192,6 +201,7 @@ class CardGameServiceTest extends ServiceTest {
             // given
             cardGame.startPlay();
             List<Player> players = room.getPlayers();
+            roomCommandService.save(room);
 
             // when & then
             // 첫 번째 플레이어가 카드 선택
@@ -221,6 +231,7 @@ class CardGameServiceTest extends ServiceTest {
         void 존재하지_않는_플레이어면_예외를_반환한다() {
             // given
             cardGame.startPlay();
+            roomCommandService.save(room);
 
             final String joinCodeValue = joinCode.getValue();
 
@@ -234,6 +245,7 @@ class CardGameServiceTest extends ServiceTest {
         void 잘못된_카드_인덱스면_예외를_반환한다() {
             // given
             cardGame.startPlay();
+            roomCommandService.save(room);
             final String joinCodeValue = joinCode.getValue();
             final String hostName = host.getName().value();
 

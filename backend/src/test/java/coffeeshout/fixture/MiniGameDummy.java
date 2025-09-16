@@ -9,7 +9,10 @@ import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map;
 
+
 public class MiniGameDummy implements Playable {
+
+    private String dummy = "dummy";
 
     @Override
     public MiniGameResult getResult() {

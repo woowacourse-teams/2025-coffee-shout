@@ -58,7 +58,7 @@ class PlayerHandsTest {
             Card card = AdditionCard.PLUS_40;
 
             // when
-            playerHands.put(player, card);
+            playerHands.put(player.getName(), card);
 
             // then
             assertThat(playerHands.totalHandSize()).isEqualTo(1);
@@ -71,8 +71,8 @@ class PlayerHandsTest {
             Player player2 = players.getPlayer(new PlayerName("루키"));
 
             // when
-            playerHands.put(player1, AdditionCard.PLUS_40);
-            playerHands.put(player2, AdditionCard.PLUS_30);
+            playerHands.put(player1.getName(), AdditionCard.PLUS_40);
+            playerHands.put(player2.getName(), AdditionCard.PLUS_30);
 
             // then
             assertThat(playerHands.totalHandSize()).isEqualTo(2);
@@ -84,8 +84,8 @@ class PlayerHandsTest {
             Player player = players.getPlayer(new PlayerName("꾹이"));
 
             // when
-            playerHands.put(player, AdditionCard.PLUS_40);
-            playerHands.put(player, MultiplierCard.DOUBLE);
+            playerHands.put(player.getName(), AdditionCard.PLUS_40);
+            playerHands.put(player.getName(), MultiplierCard.DOUBLE);
 
             // then
             assertThat(playerHands.totalHandSize()).isEqualTo(2);
@@ -104,13 +104,13 @@ class PlayerHandsTest {
         @Test
         void 첫번째_라운드가_끝났는지_확인한다() {
             // given
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), AdditionCard.PLUS_40);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), AdditionCard.PLUS_30);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), AdditionCard.PLUS_20);
+            playerHands.put(new PlayerName("꾹이"), AdditionCard.PLUS_40);
+            playerHands.put(new PlayerName("루키"), AdditionCard.PLUS_30);
+            playerHands.put(new PlayerName("한스"), AdditionCard.PLUS_20);
             assertThat(playerHands.isRoundFinished()).isFalse();
 
             // when
-            playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.PLUS_10);
+            playerHands.put(new PlayerName("엠제이"), AdditionCard.PLUS_10);
 
             // then
             assertThat(playerHands.isRoundFinished()).isTrue();
@@ -119,17 +119,17 @@ class PlayerHandsTest {
         @Test
         void 두번째_라운드가_끝났는지_확인한다() {
             // given - 첫 번째 라운드
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), AdditionCard.PLUS_40);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), AdditionCard.PLUS_30);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), AdditionCard.PLUS_20);
-            playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.PLUS_10);
+            playerHands.put(new PlayerName("꾹이"), AdditionCard.PLUS_40);
+            playerHands.put(new PlayerName("루키"), AdditionCard.PLUS_30);
+            playerHands.put(new PlayerName("한스"), AdditionCard.PLUS_20);
+            playerHands.put(new PlayerName("엠제이"), AdditionCard.PLUS_10);
 
             // when - 두 번째 라운드
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), MultiplierCard.DOUBLE);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), MultiplierCard.QUADRUPLE);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), MultiplierCard.INVERT);
+            playerHands.put(new PlayerName("꾹이"), MultiplierCard.DOUBLE);
+            playerHands.put(new PlayerName("루키"), MultiplierCard.QUADRUPLE);
+            playerHands.put(new PlayerName("한스"), MultiplierCard.INVERT);
             assertThat(playerHands.isRoundFinished()).isFalse();
-            playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.ZERO);
+            playerHands.put(new PlayerName("엠제이"), AdditionCard.ZERO);
 
             // then
             assertThat(playerHands.isRoundFinished()).isTrue();
@@ -171,10 +171,10 @@ class PlayerHandsTest {
             Player player1 = players.getPlayer(new PlayerName("꾹이"));
             Player player2 = players.getPlayer(new PlayerName("루키"));
 
-            playerHands.put(player1, AdditionCard.PLUS_40);
-            playerHands.put(player1, MultiplierCard.DOUBLE);
-            playerHands.put(player2, AdditionCard.PLUS_30);
-            playerHands.put(player2, MultiplierCard.INVERT);
+            playerHands.put(player1.getName(), AdditionCard.PLUS_40);
+            playerHands.put(player1.getName(), MultiplierCard.DOUBLE);
+            playerHands.put(player2.getName(), AdditionCard.PLUS_30);
+            playerHands.put(player2.getName(), MultiplierCard.INVERT);
 
             // when
             Map<Player, MiniGameScore> scores = playerHands.scoreByPlayer();
@@ -205,8 +205,8 @@ class PlayerHandsTest {
         @Test
         void 첫번째_라운드에서_선택하지_않은_플레이어를_조회한다() {
             // given
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), AdditionCard.PLUS_40);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), AdditionCard.PLUS_30);
+            playerHands.put(new PlayerName("꾹이"), AdditionCard.PLUS_40);
+            playerHands.put(new PlayerName("루키"), AdditionCard.PLUS_30);
 
             // when
             List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(CardGameRound.FIRST);
@@ -224,13 +224,13 @@ class PlayerHandsTest {
         @Test
         void 두번째_라운드에서_선택하지_않은_플레이어를_조회한다() {
             // given - 첫 번째 라운드 완료
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), AdditionCard.PLUS_40);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), AdditionCard.PLUS_30);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), AdditionCard.PLUS_20);
-            playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.PLUS_10);
+            playerHands.put(new PlayerName("꾹이"), AdditionCard.PLUS_40);
+            playerHands.put(new PlayerName("루키"), AdditionCard.PLUS_30);
+            playerHands.put(new PlayerName("한스"), AdditionCard.PLUS_20);
+            playerHands.put(new PlayerName("엠제이"), AdditionCard.PLUS_10);
 
             // 두 번째 라운드 일부 선택
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), MultiplierCard.DOUBLE);
+            playerHands.put(new PlayerName("꾹이"), MultiplierCard.DOUBLE);
 
             // when
             List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(CardGameRound.SECOND);
@@ -249,10 +249,10 @@ class PlayerHandsTest {
         @Test
         void 모든_플레이어가_선택했으면_빈_리스트를_반환한다() {
             // given
-            playerHands.put(players.getPlayer(new PlayerName("꾹이")), AdditionCard.PLUS_40);
-            playerHands.put(players.getPlayer(new PlayerName("루키")), AdditionCard.PLUS_30);
-            playerHands.put(players.getPlayer(new PlayerName("한스")), AdditionCard.PLUS_20);
-            playerHands.put(players.getPlayer(new PlayerName("엠제이")), AdditionCard.PLUS_10);
+            playerHands.put(new PlayerName("꾹이"), AdditionCard.PLUS_40);
+            playerHands.put(new PlayerName("루키"), AdditionCard.PLUS_30);
+            playerHands.put(new PlayerName("한스"), AdditionCard.PLUS_20);
+            playerHands.put(new PlayerName("엠제이"), AdditionCard.PLUS_10);
 
             // when
             List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(CardGameRound.FIRST);
@@ -270,7 +270,7 @@ class PlayerHandsTest {
             // given
             Player player = players.getPlayer(new PlayerName("꾹이"));
             Card card = AdditionCard.PLUS_40;
-            playerHands.put(player, card);
+            playerHands.put(player.getName(), card);
 
             // when
             Optional<Player> cardOwner = playerHands.findCardOwner(card, CardGameRound.FIRST);
@@ -286,9 +286,9 @@ class PlayerHandsTest {
         void 두번째_라운드에서_카드_소유자를_찾는다() {
             // given
             Player player = players.getPlayer(new PlayerName("꾹이"));
-            playerHands.put(player, AdditionCard.PLUS_40); // 첫 번째 라운드
+            playerHands.put(player.getName(), AdditionCard.PLUS_40); // 첫 번째 라운드
             Card secondRoundCard = MultiplierCard.DOUBLE;
-            playerHands.put(player, secondRoundCard); // 두 번째 라운드
+            playerHands.put(player.getName(), secondRoundCard); // 두 번째 라운드
 
             // when
             Optional<Player> cardOwner = playerHands.findCardOwner(secondRoundCard, CardGameRound.SECOND);
@@ -317,7 +317,7 @@ class PlayerHandsTest {
             // given
             Player player = players.getPlayer(new PlayerName("꾹이"));
             Card card = AdditionCard.PLUS_40;
-            playerHands.put(player, card); // 첫 번째 라운드
+            playerHands.put(player.getName(), card); // 첫 번째 라운드
 
             // when - 두 번째 라운드에서 첫 번째 라운드 카드를 찾음
             Optional<Player> cardOwner = playerHands.findCardOwner(card, CardGameRound.SECOND);

@@ -1,5 +1,8 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class AdditionCard extends Card {
 
     public static final AdditionCard PLUS_40 = new AdditionCard(40);

@@ -17,12 +17,12 @@ public final class CardGameDeckStub implements CardGameDeckGenerator {
                 new AdditionCard(20),
                 new AdditionCard(10),
                 new AdditionCard(0),
-                new AdditionCard(-10)
+                new AdditionCard(-10),
+                new AdditionCard(-20)
         );
         List<Card> multiplierCards = List.of(
                 new MultiplierCard(4),
-                new MultiplierCard(2),
-                new MultiplierCard(0)
+                new MultiplierCard(2)
         );
         return new StubDeck(additionCards, multiplierCards);
     }

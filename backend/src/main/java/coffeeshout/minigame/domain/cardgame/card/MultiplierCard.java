@@ -1,5 +1,8 @@
 package coffeeshout.minigame.domain.cardgame.card;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class MultiplierCard extends Card {
 
     public static final MultiplierCard QUADRUPLE = new MultiplierCard(4);

@@ -191,7 +191,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
                    }
                 }
                 """);
-        MessageResponse firstRoundPlaying = responses.get();
+        MessageResponse firstRoundPlaying = responses.get(10, TimeUnit.SECONDS);
 
         // then
         assertMessageCustomization(firstRoundPlaying, """

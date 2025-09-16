@@ -8,13 +8,15 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor
 @Getter
 public class Deck {
 
-    private final List<Card> cards;
-    private final List<Card> pickedCards;
+    private List<Card> cards;
+    private List<Card> pickedCards;
 
     public Deck(@NonNull List<Card> additionCards, @NonNull List<Card> multiplierCards) {
         this.cards = new ArrayList<>();

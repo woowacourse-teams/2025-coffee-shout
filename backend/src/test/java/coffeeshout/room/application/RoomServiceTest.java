@@ -24,6 +24,8 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.service.RoomCommandService;
+import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,12 @@ class RoomServiceTest extends ServiceTest {
 
     @MockitoSpyBean
     DelayedRoomRemovalService delayedRoomRemovalService;
+
+    @Autowired
+    private RoomCommandService roomCommandService;
+
+    @Autowired
+    private RoomQueryService roomQueryService;
 
     @Test
     void 방을_생성한다() {
@@ -354,6 +362,7 @@ class RoomServiceTest extends ServiceTest {
 
         PlayerName guestName = new PlayerName("게스트1");
         createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        roomCommandService.save(createdRoom);
 
         // when & then
         assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();
@@ -366,16 +375,21 @@ class RoomServiceTest extends ServiceTest {
         String hostName = "호스트";
         SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.READY);
+        roomCommandService.save(createdRoom);
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+
+        Room room = roomQueryService.getByJoinCode(createdRoom.getJoinCode());
+        ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
+        roomCommandService.save(room);
 
         // when
         Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
 
         // then
         assertThat(winner).isNotNull();
-        assertThat(createdRoom.getPlayers().stream().map(Player::getName)).contains(winner.name());
+        assertThat(room.getPlayers().stream().map(Player::getName)).contains(winner.name());
     }
 
     @Test
@@ -390,6 +404,7 @@ class RoomServiceTest extends ServiceTest {
 
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
+        roomCommandService.save(createdRoom);
 
         // when
         Map<Player, MiniGameScore> miniGameScores = roomService.getMiniGameScores(
@@ -411,11 +426,11 @@ class RoomServiceTest extends ServiceTest {
         SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
+        roomCommandService.save(createdRoom);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
 
         // when
         MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.getValue(), MiniGameType.CARD_GAME);

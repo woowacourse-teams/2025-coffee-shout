@@ -9,6 +9,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.service.RoomCommandService;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,15 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
     Room testRoom;
 
+    RoomCommandService roomCommandService;
+
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+    void setUp() throws Exception {
         testRoom = RoomFixture.호스트_꾹이();
         joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
         host = testRoom.getHost();
 
-        roomRepository.save(testRoom);
+        roomCommandService.save(testRoom);
         session = createSession();
     }
 
@@ -302,6 +305,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
+        roomCommandService.save(testRoom);
 
         String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
         String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());

@@ -19,6 +19,9 @@ public class RedisRoomRepository implements RoomRepository {
     @Override
     public Optional<Room> findByJoinCode(JoinCode joinCode) {
         final Object room = redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), "info");
+        if(room == null) {
+            return Optional.empty();
+        }
         if(!(room instanceof Room)) {
             throw new IllegalStateException("저장된 객체의 타입이 Room이 아닙니다.");
         }

@@ -4,6 +4,7 @@ import coffeeshout.minigame.common.task.ChainedTask;
 import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.RoomUpdateEvent;
 import java.util.Arrays;
 import lombok.Getter;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,6 +16,7 @@ public enum CardGameTaskType {
         public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
             return new ChainedTask(() -> {
                 cardGame.startRound();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -24,6 +26,7 @@ public enum CardGameTaskType {
         public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
             return new ChainedTask(() -> {
                 cardGame.updateDescription();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -33,6 +36,7 @@ public enum CardGameTaskType {
         public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
             return new ChainedTask(() -> {
                 cardGame.startPlay();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -43,6 +47,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -52,6 +57,7 @@ public enum CardGameTaskType {
         public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
             return new ChainedTask(() -> {
                 cardGame.startRound();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -61,6 +67,7 @@ public enum CardGameTaskType {
         public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
             return new ChainedTask(() -> {
                 cardGame.startPlay();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -71,6 +78,7 @@ public enum CardGameTaskType {
             return new ChainedTask(() -> {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }
@@ -82,6 +90,7 @@ public enum CardGameTaskType {
                 cardGame.changeDoneState();
                 MiniGameResult result = cardGame.getResult();
                 room.applyMiniGameResult(result);
+                eventPublisher.publishEvent(new RoomUpdateEvent(room));
                 eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
             }, getState().getDurationMillis());
         }

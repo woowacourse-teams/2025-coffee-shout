@@ -2,12 +2,14 @@ package coffeeshout.minigame.domain.cardgame.card;
 
 import java.util.Objects;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public abstract class Card {
 
-    private final CardType type;
-    private final int value;
+    private CardType type;
+    private int value;
 
     protected Card(CardType type, int value) {
         this.type = type;
