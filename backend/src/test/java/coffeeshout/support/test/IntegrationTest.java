@@ -1,6 +1,7 @@
 package coffeeshout.support.test;
 
 import coffeeshout.global.config.IntegrationTestConfig;
+import coffeeshout.global.config.TestContainerConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,6 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(IntegrationTestConfig.class)
+@Import({IntegrationTestConfig.class, TestContainerConfig.class})
 public @interface IntegrationTest {
 }
