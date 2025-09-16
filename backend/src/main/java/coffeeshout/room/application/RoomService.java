@@ -6,6 +6,8 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import java.util.concurrent.CompletableFuture;
+import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -19,6 +21,8 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.infra.RoomEventPublisher;
+import coffeeshout.room.infra.RoomCreationWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +41,8 @@ public class RoomService {
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
+    private final RoomEventPublisher roomEventPublisher;
+    private final RoomCreationWaitManager roomCreationWaitManager;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -46,6 +52,8 @@ public class RoomService {
             QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
+            RoomEventPublisher roomEventPublisher,
+            RoomCreationWaitManager roomCreationWaitManager,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -54,12 +62,42 @@ public class RoomService {
         this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
+        this.roomEventPublisher = roomEventPublisher;
+        this.roomCreationWaitManager = roomCreationWaitManager;
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        final Menu menu = convertMenu(selectedMenuRequest);
+        // joinCode 먼저 생성
         final JoinCode joinCode = joinCodeGenerator.generate();
+        
+        // 이벤트 발행만 함 - 실제 생성은 리스너에서
+        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
+        
+        // Future 등록
+        roomCreationWaitManager.registerWait(event.getEventId());
+        
+        // 이벤트 발행
+        roomEventPublisher.publishRoomCreateEvent(event);
+        
+        // Future로 결과 대기 (최대 5초)
+        final Room room = roomCreationWaitManager.waitForCompletion(event.getEventId(), 5);
+        
+        if (room == null) {
+            log.error("방 생성 이벤트 처리 실패: eventId={}, joinCode={}", event.getEventId(), joinCode.getValue());
+            throw new RuntimeException("방 생성 실패");
+        }
+        
+        log.info("방 생성 완료: joinCode={}, eventId={}", room.getJoinCode().getValue(), event.getEventId());
+        return room;
+    }
+    
+    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
+        return createRoomInternal(hostName, selectedMenuRequest, new JoinCode(joinCode));
+    }
+    
+    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, JoinCode joinCode) {
+        final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = Room.createNewRoom(
                 joinCode,
                 new PlayerName(hostName),

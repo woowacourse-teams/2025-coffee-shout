@@ -11,6 +11,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.ChannelTopic;
 
 @Configuration
 public class RedisConfig {
@@ -23,10 +25,10 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = 
+        final RedisStandaloneConfiguration redisStandaloneConfiguration = 
             new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
         
-        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
+        final LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
             LettuceClientConfiguration.builder();
         
         if (redisProperties.ssl().enabled()) {
@@ -41,7 +43,7 @@ public class RedisConfig {
             RedisConnectionFactory redisConnectionFactory,
             ObjectMapper objectMapper
     ) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         // 문자열 키 직렬화
@@ -56,5 +58,17 @@ public class RedisConfig {
 
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+    
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        return container;
+    }
+    
+    @Bean
+    public ChannelTopic roomEventTopic() {
+        return new ChannelTopic("room.events");
     }
 }
