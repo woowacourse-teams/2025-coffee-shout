@@ -1,7 +1,7 @@
 import { ApiError, NetworkError } from './error';
 import { reportApiError } from '@/apis/utils/reportSentryError';
 
-const getApiUrl = () => process.env.API_URL;
+const API_URL = process.env.API_URL;
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -34,7 +34,7 @@ export const apiRequest = async <T, TData>(
     retry = { count: 0, delay: 1000 },
   } = options;
 
-  let requestUrl = getApiUrl() + url;
+  let requestUrl = API_URL + url;
 
   if (params) {
     const searchParams = new URLSearchParams();
