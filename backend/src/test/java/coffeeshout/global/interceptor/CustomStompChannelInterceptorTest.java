@@ -19,8 +19,8 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
-import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
@@ -76,7 +76,7 @@ class CustomStompChannelInterceptorTest {
         sessionManager = new StompSessionManager();
 
         // 핸들러들 생성
-        connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
+        connectPreSendHandler = new ConnectPreSendHandler(sessionManager, roomQueryService,
                 delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
                 delayedPlayerRemovalService);
@@ -118,9 +118,6 @@ class CustomStompChannelInterceptorTest {
 
             // when - postSend (연결 성공)
             interceptor.postSend(message, channel, true);
-
-            // then - 메트릭 완료 호출 확인
-            then(webSocketMetricService).should().completeConnection(sessionId);
         }
 
         @Test
@@ -169,7 +166,6 @@ class CustomStompChannelInterceptorTest {
             // then - 실제 세션 매니저 상태 검증
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         /**
@@ -218,7 +214,6 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션 등록되지 않았는지 확인
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         private Room createTestRoom(Menu menu) {
@@ -240,19 +235,6 @@ class CustomStompChannelInterceptorTest {
 
     @Nested
     class ConnectPostSendHandler_테스트 {
-
-        @Test
-        void 연결_성공_시_메트릭을_완료_상태로_업데이트한다() {
-            // given
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
-            accessor.setSessionId(sessionId);
-
-            // when
-            connectPostSendHandler.handle(accessor, sessionId, true);
-
-            // then
-            then(webSocketMetricService).should().completeConnection(sessionId);
-        }
 
         @Test
         void 연결_실패_시_세션을_제거하고_메트릭을_실패_상태로_업데이트한다() {
