@@ -15,9 +15,8 @@ const appVersion = packageJson.version;
 export default (env, argv) => {
   const mode = argv.mode || 'development';
 
-  dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
-
-  const mergedEnv = { ...process.env };
+  const dotenvEnv = dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+  const mergedEnv = { ...process.env, ...dotenvEnv };
 
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
