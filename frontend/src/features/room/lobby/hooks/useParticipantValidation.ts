@@ -15,22 +15,27 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
   const { playerType } = usePlayerType();
   const navigate = useNavigate();
 
+  const navigateToHome = useCallback(
+    (reason: string) => {
+      console.log(`${reason} - 홈으로 리디렉션`);
+      navigate('/', { replace: true });
+    },
+    [navigate]
+  );
+
   const validateUserExistsAndRedirect = useCallback(async () => {
     if (!joinCode) {
-      console.log('joinCode가 없음 - 홈으로 리디렉션');
-      navigate('/', { replace: true });
+      navigateToHome('joinCode가 없음');
       return;
     }
 
     if (!playerType) {
-      console.log('playerType이 없음 - 홈으로 리디렉션');
-      navigate('/', { replace: true });
+      navigateToHome('playerType이 없음');
       return;
     }
 
     if (!myName) {
-      console.log('해당 사용자 닉네임이 없음 - 홈으로 리디렉션');
-      navigate('/', { replace: true });
+      navigateToHome('해당 사용자 닉네임이 없음');
       return;
     }
 
@@ -40,13 +45,12 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
       );
 
       if (!exist) {
-        console.log('방이 존재하지 않음 - 홈으로 리디렉션');
-        navigate('/', { replace: true });
+        navigateToHome('방이 존재하지 않음');
         return;
       }
     } catch (error) {
       console.error('방 존재 여부 체크 실패:', error);
-      navigate('/', { replace: true });
+      navigateToHome('방 존재 여부 체크 실패');
       return;
     }
 
@@ -58,10 +62,9 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
     const currentUser = participants.find((participant) => participant.playerName === myName);
 
     if (!currentUser) {
-      console.log('사용자 정보에서 자기 자신을 찾을 수 없음 - 홈으로 리디렉션');
-      navigate('/', { replace: true });
+      navigateToHome('사용자 정보에서 자기 자신을 찾을 수 없음');
     }
-  }, [playerType, myName, joinCode, participants, navigate]);
+  }, [joinCode, playerType, myName, participants, navigateToHome]);
 
   /**
    * 웹소켓 연결되고 participants가 로드된 후 유효성 검사
