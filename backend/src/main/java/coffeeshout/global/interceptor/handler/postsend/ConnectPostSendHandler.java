@@ -27,9 +27,7 @@ public class ConnectPostSendHandler implements PostSendHandler {
     @Override
     public void handle(StompHeaderAccessor accessor, String sessionId, boolean sent) {
         if (sent) {
-            // 서버에서 CONNECTED 응답을 성공적으로 보냈을 때 연결 완료 처리
-            log.info("WebSocket 연결 완료: sessionId={}", sessionId);
-            webSocketMetricService.completeConnection(sessionId);
+            // 서버에서 CONNECTED 응답을 성공적으로 보냈을 때 - 이벤트 리스너에서 처리
             return;
         }
 
