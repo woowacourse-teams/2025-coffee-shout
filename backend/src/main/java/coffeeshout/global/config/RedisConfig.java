@@ -71,4 +71,9 @@ public class RedisConfig {
     public ChannelTopic roomEventTopic() {
         return new ChannelTopic("room.events");
     }
+    
+    @Bean
+    public ChannelTopic broadcastEventTopic() {
+        return new ChannelTopic("room.broadcast");
+    }
 }

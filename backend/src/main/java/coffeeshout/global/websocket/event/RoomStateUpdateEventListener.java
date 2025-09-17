@@ -1,8 +1,9 @@
 package coffeeshout.global.websocket.event;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.infra.BroadcastEventPublisher;
+import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
+import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import coffeeshout.room.ui.response.PlayerResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class RoomStateUpdateEventListener {
 
     private final RoomService roomService;
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final BroadcastEventPublisher broadcastEventPublisher;
 
     @EventListener
     public void handleRoomStateUpdate(RoomStateUpdateEvent event) {
@@ -44,8 +45,8 @@ public class RoomStateUpdateEventListener {
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+        broadcastEventPublisher.publishPlayerUpdateEvent(event);
     }
 
     private void sendProbabilitiesStatus(String joinCode) {
@@ -54,7 +55,7 @@ public class RoomStateUpdateEventListener {
                 .map(ProbabilityResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
-                WebSocketResponse.success(responses));
+        final ProbabilityUpdateBroadcastEvent event = ProbabilityUpdateBroadcastEvent.create(joinCode, responses);
+        broadcastEventPublisher.publishProbabilityUpdateEvent(event);
     }
 }

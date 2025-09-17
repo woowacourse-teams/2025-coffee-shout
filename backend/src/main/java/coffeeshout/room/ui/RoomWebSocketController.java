@@ -1,9 +1,13 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.infra.BroadcastEventPublisher;
+import coffeeshout.room.ui.event.ErrorBroadcastEvent;
+import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
+import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
+import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
+import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
@@ -23,7 +27,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final BroadcastEventPublisher broadcastEventPublisher;
     private final RoomService roomService;
 
     @MessageMapping("/room/{joinCode}/update-players")
@@ -45,8 +49,8 @@ public class RoomWebSocketController {
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+        broadcastEventPublisher.publishPlayerUpdateEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-menus")
@@ -69,8 +73,8 @@ public class RoomWebSocketController {
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+        broadcastEventPublisher.publishPlayerUpdateEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-ready")
@@ -87,18 +91,22 @@ public class RoomWebSocketController {
                     모든 참가자에게 변경된 준비 상태를 실시간으로 전달합니다.
                     """
     )
-    public void broadcastReady(@DestinationVariable final String joinCode, final ReadyChangeMessage message) {
+    public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
         roomService.changePlayerReadyStateAsync(joinCode, message.playerName(), message.isReady())
                 .thenAccept(players -> {
                     final List<PlayerResponse> responses = players.stream()
                             .map(PlayerResponse::from)
                             .toList();
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                            WebSocketResponse.success(responses));
+                    final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+                    broadcastEventPublisher.publishPlayerUpdateEvent(event);
                 })
                 .exceptionally(throwable -> {
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
-                            WebSocketResponse.error("ready 상태 변경 실패: " + throwable.getMessage()));
+                    final ErrorBroadcastEvent errorEvent = ErrorBroadcastEvent.create(
+                            joinCode,
+                            "ready 상태 변경 실패: " + throwable.getMessage(),
+                            "/topic/room/" + joinCode + "/error"
+                    );
+                    broadcastEventPublisher.publishErrorEvent(errorEvent);
                     return null;
                 });
     }
@@ -122,8 +130,8 @@ public class RoomWebSocketController {
                 .map(ProbabilityResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
-                WebSocketResponse.success(responses));
+        final ProbabilityUpdateBroadcastEvent event = ProbabilityUpdateBroadcastEvent.create(joinCode, responses);
+        broadcastEventPublisher.publishProbabilityUpdateEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")
@@ -143,12 +151,17 @@ public class RoomWebSocketController {
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         roomService.updateMiniGamesAsync(joinCode, message.hostName(), message.miniGameTypes())
                 .thenAccept(selectedMiniGames -> {
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
-                            WebSocketResponse.success(selectedMiniGames));
+                    final MiniGameUpdateBroadcastEvent event = MiniGameUpdateBroadcastEvent.create(joinCode,
+                            selectedMiniGames);
+                    broadcastEventPublisher.publishMiniGameUpdateEvent(event);
                 })
                 .exceptionally(throwable -> {
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
-                            WebSocketResponse.error("미니게임 선택 실패: " + throwable.getMessage()));
+                    final ErrorBroadcastEvent errorEvent = ErrorBroadcastEvent.create(
+                            joinCode,
+                            "미니게임 선택 실패: " + throwable.getMessage(),
+                            "/topic/room/" + joinCode + "/error"
+                    );
+                    broadcastEventPublisher.publishErrorEvent(errorEvent);
                     return null;
                 });
     }
@@ -168,12 +181,17 @@ public class RoomWebSocketController {
         roomService.spinRouletteAsync(joinCode, message.hostName())
                 .thenAccept(winner -> {
                     final WinnerResponse response = WinnerResponse.from(winner);
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
-                            WebSocketResponse.success(response));
+                    final WinnerAnnouncementBroadcastEvent event = WinnerAnnouncementBroadcastEvent.create(joinCode,
+                            response);
+                    broadcastEventPublisher.publishWinnerAnnouncementEvent(event);
                 })
                 .exceptionally(throwable -> {
-                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
-                            WebSocketResponse.error("룰렛 스핀 실패: " + throwable.getMessage()));
+                    final ErrorBroadcastEvent errorEvent = ErrorBroadcastEvent.create(
+                            joinCode,
+                            "룰렛 스핀 실패: " + throwable.getMessage(),
+                            "/topic/room/" + joinCode + "/error"
+                    );
+                    broadcastEventPublisher.publishErrorEvent(errorEvent);
                     return null;
                 });
     }
