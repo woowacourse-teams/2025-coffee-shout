@@ -7,7 +7,6 @@ import coffeeshout.room.ui.event.ErrorBroadcastEvent;
 import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
-import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
@@ -43,30 +42,6 @@ public class RoomWebSocketController {
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
         final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-
-        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
-        broadcastEventPublisher.publishPlayerUpdateEvent(event);
-    }
-
-    @MessageMapping("/room/{joinCode}/update-menus")
-    @MessageResponse(
-            path = "/room/{joinCode}",
-            returnType = List.class,
-            genericType = PlayerResponse.class
-    )
-    @Operation(
-            summary = "플레이어 메뉴 선택 업데이트 및 브로드캐스트",
-            description = """
-                    플레이어의 메뉴 선택을 업데이트하고 변경된 플레이어 목록을 브로드캐스트합니다.
-                    특정 플레이어가 메뉴를 선택하면 해당 정보를 저장하고 모든 참가자에게 업데이트된 상태를 전달합니다.
-                    """
-    )
-    public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(),
-                        message.menuId())
                 .stream()
                 .map(PlayerResponse::from)
                 .toList();

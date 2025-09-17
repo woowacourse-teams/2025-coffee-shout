@@ -5,7 +5,6 @@ import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.ui.event.ErrorBroadcastEvent;
 import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -43,11 +42,6 @@ public class BroadcastEventSubscriber implements MessageListener {
                 return;
             }
 
-            if (body.contains("\"broadcastEventType\":\"PROBABILITY_UPDATE\"")) {
-                handleProbabilityUpdateBroadcast(body);
-                return;
-            }
-
             if (body.contains("\"broadcastEventType\":\"MINI_GAME_UPDATE\"")) {
                 handleMiniGameUpdateBroadcast(body);
                 return;
@@ -80,21 +74,6 @@ public class BroadcastEventSubscriber implements MessageListener {
 
         } catch (final Exception e) {
             log.error("플레이어 업데이트 브로드캐스트 처리 실패", e);
-        }
-    }
-
-    private void handleProbabilityUpdateBroadcast(String body) {
-        try {
-            final ProbabilityUpdateBroadcastEvent event = objectMapper.readValue(body,
-                    ProbabilityUpdateBroadcastEvent.class);
-
-            log.info("확률 업데이트 브로드캐스트 수신: joinCode={}", event.joinCode());
-
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/roulette",
-                    WebSocketResponse.success(event.probabilities()));
-
-        } catch (final Exception e) {
-            log.error("확률 업데이트 브로드캐스트 처리 실패", e);
         }
     }
 
