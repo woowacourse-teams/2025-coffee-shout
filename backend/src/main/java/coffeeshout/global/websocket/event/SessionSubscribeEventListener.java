@@ -36,7 +36,10 @@ public class SessionSubscribeEventListener {
         
         log.info("구독 시작: sessionId={}, destination={}, subscriptionId={}{}", 
                 sessionId, destination, subscriptionId, playerInfo);
-                
+        
+        // 구독 정보 추가
+        subscriptionInfoService.addSubscription(sessionId, destination, subscriptionId);
+        
         // INFO 레벨에서도 상세 구독 정보 로깅 (구독자 수 포함)
         subscriptionInfoService.logSubscriptionInfo(destination);
     }
@@ -58,5 +61,8 @@ public class SessionSubscribeEventListener {
         
         log.info("구독 해제: sessionId={}, subscriptionId={}{}", 
                 sessionId, subscriptionId, playerInfo);
+        
+        // 구독 정보 제거 - subscriptionId로 정확한 destination 찾아서 제거
+        subscriptionInfoService.removeSubscriptionById(sessionId, subscriptionId);
     }
 }

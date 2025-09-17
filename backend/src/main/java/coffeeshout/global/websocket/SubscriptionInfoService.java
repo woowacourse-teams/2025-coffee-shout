@@ -1,94 +1,112 @@
 package coffeeshout.global.websocket;
 
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
-import org.springframework.messaging.simp.broker.SubscriptionRegistry;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 
 @Slf4j
 @Service
 public class SubscriptionInfoService {
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    private SubscriptionRegistry subscriptionRegistry;
+    // destination별 구독자 수를 직접 관리
+    private final ConcurrentMap<String, Set<String>> subscriptions = new ConcurrentHashMap<>();
+    
+    // subscriptionId -> destination 매핑 관리
+    private final ConcurrentMap<String, String> subscriptionToDestination = new ConcurrentHashMap<>();
 
     /**
-     * 특정 destination의 구독 정보 조회
+     * 구독 추가
      */
-    public MultiValueMap<String, String> findSubscriptions(String destination) {
-        ensureInitialized();
+    public void addSubscription(String sessionId, String destination, String subscriptionId) {
+        subscriptions.computeIfAbsent(destination, k -> ConcurrentHashMap.newKeySet()).add(sessionId);
+        subscriptionToDestination.put(subscriptionId, destination);
+        log.debug("구독 추가: sessionId={}, destination={}, subscriptionId={}, 현재 구독자수={}",
+                sessionId, destination, subscriptionId, getSubscriberCount(destination));
+    }
 
-        if (subscriptionRegistry == null) {
-            log.warn("SubscriptionRegistry가 초기화되지 않았습니다");
-            return new org.springframework.util.LinkedMultiValueMap<>();
+    /**
+     * 구독 제거
+     */
+    public void removeSubscription(String sessionId, String destination) {
+        Set<String> sessions = subscriptions.get(destination);
+        if (sessions != null) {
+            sessions.remove(sessionId);
+            if (sessions.isEmpty()) {
+                subscriptions.remove(destination);
+            }
         }
+        log.debug("구독 제거: sessionId={}, destination={}, 현재 구독자수={}",
+                sessionId, destination, getSubscriberCount(destination));
+    }
 
-        try {
-            // 메시지 생성해서 구독 정보 조회
-            Message<?> message = MessageBuilder.withPayload(new byte[0])
-                    .setHeader("simpDestination", destination)
-                    .build();
-
-            return subscriptionRegistry.findSubscriptions(message);
-        } catch (Exception e) {
-            log.error("구독 정보 조회 실패: destination={}, error={}", destination, e.getMessage());
-            return new org.springframework.util.LinkedMultiValueMap<>();
+    /**
+     * subscriptionId로 구독 제거
+     */
+    public void removeSubscriptionById(String sessionId, String subscriptionId) {
+        String destination = subscriptionToDestination.remove(subscriptionId);
+        if (destination != null) {
+            removeSubscription(sessionId, destination);
+        } else {
+            log.warn("subscriptionId에 해당하는 destination을 찾을 수 없음: subscriptionId={}", subscriptionId);
         }
+    }
+    /**
+     * 세션의 모든 구독 제거
+     */
+    public void removeAllSubscriptions(String sessionId) {
+        // subscriptionId -> destination 매핑에서 해당 세션 관련 항목들 제거
+        subscriptionToDestination.entrySet().removeIf(entry -> {
+            String destination = entry.getValue();
+            Set<String> sessions = subscriptions.get(destination);
+            return sessions != null && sessions.contains(sessionId);
+        });
+        
+        // destination별 구독에서 세션 제거
+        subscriptions.entrySet().removeIf(entry -> {
+            entry.getValue().remove(sessionId);
+            return entry.getValue().isEmpty();
+        });
+        log.debug("세션의 모든 구독 제거: sessionId={}", sessionId);
     }
 
     /**
      * 특정 destination의 구독자 수 조회
      */
     public int getSubscriberCount(String destination) {
-        MultiValueMap<String, String> subscriptions = findSubscriptions(destination);
-        // 실제 구독 수 계산 (각 세션의 구독 ID 개수 합산)
-        return subscriptions.values().stream()
-                .mapToInt(List::size)
-                .sum();
+        Set<String> sessions = subscriptions.get(destination);
+        return sessions != null ? sessions.size() : 0;
     }
 
     /**
      * 특정 destination의 구독 정보 로깅
      */
     public void logSubscriptionInfo(String destination) {
-        MultiValueMap<String, String> subscriptions = findSubscriptions(destination);
+        int count = getSubscriberCount(destination);
 
-        if (subscriptions.isEmpty()) {
+        if (count == 0) {
             log.info("구독자 없음: destination={}", destination);
             return;
         }
 
-        // 실제 구독 수 계산 (각 세션의 구독 ID 개수 합산)
-        int totalSubscriptions = subscriptions.values().stream()
-                .mapToInt(List::size)
-                .sum();
+        log.info("구독 정보: destination={}, 구독자 수={}", destination, count);
 
-        log.info("구독 정보: destination={}, 구독자 수={}", destination, totalSubscriptions);
-
-        subscriptions.forEach((sessionId, subscriptionIds) ->
-                log.info("  - sessionId={}, subscriptionIds={}", sessionId, subscriptionIds)
-        );
+        Set<String> sessions = subscriptions.get(destination);
+        if (sessions != null) {
+            sessions.forEach(sessionId ->
+                    log.info("  - sessionId={}", sessionId)
+            );
+        }
     }
 
-    private void ensureInitialized() {
-        if (subscriptionRegistry == null) {
-            try {
-                // SimpleBrokerMessageHandler에서 SubscriptionRegistry 가져오기
-                SimpleBrokerMessageHandler simpleBrokerMessageHandler =
-                        applicationContext.getBean(SimpleBrokerMessageHandler.class);
-                this.subscriptionRegistry = simpleBrokerMessageHandler.getSubscriptionRegistry();
-                log.info("SubscriptionRegistry 초기화 완료: {}", subscriptionRegistry.getClass().getSimpleName());
-            } catch (Exception e) {
-                log.warn("SubscriptionRegistry 초기화 실패: {}", e.getMessage());
-            }
-        }
+    /**
+     * 전체 구독 정보 조회 (디버깅용)
+     */
+    public void logAllSubscriptions() {
+        log.info("=== 전체 구독 정보 ===");
+        subscriptions.forEach((destination, sessions) ->
+                log.info("destination={}, 구독자수={}", destination, sessions.size())
+        );
     }
 }
