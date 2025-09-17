@@ -1,6 +1,6 @@
 import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { StompSubscription } from '@stomp/stompjs';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useWebSocket } from '../contexts/WebSocketContext';
 
 export const useWebSocketSubscription = <T>(destination: string, onData: (data: T) => void) => {
@@ -9,13 +9,17 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const lastConnectedRef = useRef(false);
 
+  const unsubscribe = useCallback(() => {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+      console.log(`🔌 웹소켓 구독 해제: ${destination}`);
+    }
+  }, [destination]);
+
   useEffect(() => {
     if (!isConnected || !isVisible) {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-        console.log(`🔌 웹소켓 구독 해제: ${destination}`);
-      }
+      unsubscribe();
       lastConnectedRef.current = false;
       return;
     }
@@ -34,12 +38,6 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
       }
     }
 
-    return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-        console.log(`🔌 웹소켓 구독 해제: ${destination}`);
-      }
-    };
-  }, [isConnected, isVisible, subscribe, destination, onData, client]);
+    return unsubscribe;
+  }, [isConnected, isVisible, subscribe, destination, onData, client, unsubscribe]);
 };
