@@ -6,7 +6,6 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
-import java.util.concurrent.CompletableFuture;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.CustomMenu;
@@ -71,33 +70,30 @@ public class RoomService {
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         // joinCode 먼저 생성
         final JoinCode joinCode = joinCodeGenerator.generate();
-        
+
         // 이벤트 발행만 함 - 실제 생성은 리스너에서
         final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
-        
+
         // Future 등록
         roomEventWaitManager.registerWait(event.getEventId());
-        
+
         // 이벤트 발행
         roomEventPublisher.publishRoomCreateEvent(event);
-        
+
         // Future로 결과 대기 (최대 5초)
         final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
-        
+
         if (room == null) {
             log.error("방 생성 이벤트 처리 실패: eventId={}, joinCode={}", event.getEventId(), joinCode.getValue());
             throw new RuntimeException("방 생성 실패");
         }
-        
+
         log.info("방 생성 완료: joinCode={}, eventId={}", room.getJoinCode().getValue(), event.getEventId());
         return room;
     }
-    
-    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
-        return createRoomInternal(hostName, selectedMenuRequest, new JoinCode(joinCode));
-    }
-    
-    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, JoinCode joinCode) {
+
+    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue) {
+        final JoinCode joinCode = new JoinCode(joinCodeValue);
         final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = Room.createNewRoom(
                 joinCode,
@@ -114,23 +110,23 @@ public class RoomService {
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         // 이벤트 발행만 함 - 실제 처리는 리스너에서
         final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
-        
+
         // Future 등록
         roomEventWaitManager.registerWait(event.getEventId());
-        
+
         // 이벤트 발행
         roomEventPublisher.publishRoomJoinEvent(event);
-        
+
         // Future로 결과 대기 (최대 5초)
         final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
-        
+
         if (room == null) {
-            log.error("방 참가 이벤트 처리 실패: eventId={}, joinCode={}, guestName={}", 
+            log.error("방 참가 이벤트 처리 실패: eventId={}, joinCode={}, guestName={}",
                     event.getEventId(), joinCode, guestName);
             throw new RuntimeException("방 참가 실패");
         }
-        
-        log.info("방 참가 완료: joinCode={}, guestName={}, eventId={}", 
+
+        log.info("방 참가 완료: joinCode={}, guestName={}, eventId={}",
                 joinCode, guestName, event.getEventId());
         return room;
     }
@@ -167,7 +163,7 @@ public class RoomService {
         if (player.getPlayerType() == PlayerType.HOST) {
             return room.getPlayers();
         }
-        
+
         player.updateReadyState(isReady);
         return room.getPlayers();
     }
@@ -237,11 +233,11 @@ public class RoomService {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
         final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-        
+
         if (!room.isEmpty()) {
             return isRemoved;
         }
-        
+
         roomCommandService.delete(code);
         return isRemoved;
     }
