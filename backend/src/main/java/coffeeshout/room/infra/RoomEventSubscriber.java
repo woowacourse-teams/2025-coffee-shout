@@ -7,7 +7,9 @@ import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Winner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -58,6 +60,11 @@ public class RoomEventSubscriber implements MessageListener {
 
             if (body.contains("\"eventType\":\"MINI_GAME_SELECT\"")) {
                 handleMiniGameSelectEvent(body);
+                return;
+            }
+
+            if (body.contains("\"eventType\":\"ROULETTE_SPIN\"")) {
+                handleRouletteSpinEvent(body);
                 return;
             }
 
@@ -185,6 +192,37 @@ public class RoomEventSubscriber implements MessageListener {
 
         } catch (final Exception e) {
             log.error("미니게임 선택 이벤트 처리 실패", e);
+
+            if (event == null) {
+                return;
+            }
+
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
+        }
+    }
+
+    private void handleRouletteSpinEvent(final String body) {
+        RouletteSpinEvent event = null;
+        try {
+            event = objectMapper.readValue(body, RouletteSpinEvent.class);
+
+            log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
+                    event.eventId(), event.joinCode(), event.hostName());
+
+            // 모든 인스턴스가 동일하게 처리
+            final Winner winner = roomService.spinRouletteInternal(
+                    event.joinCode(),
+                    event.hostName()
+            );
+
+            // 룰렛 스핀 성공 알림
+            roomEventWaitManager.notifySuccess(event.eventId(), winner);
+
+            log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
+                    event.eventId(), event.joinCode(), winner.name().value());
+
+        } catch (final Exception e) {
+            log.error("룰렛 스핀 이벤트 처리 실패", e);
 
             if (event == null) {
                 return;

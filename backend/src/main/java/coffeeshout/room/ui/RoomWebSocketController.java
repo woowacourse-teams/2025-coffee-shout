@@ -165,9 +165,16 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
-        final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
-                WebSocketResponse.success(winner));
+        roomService.spinRouletteAsync(joinCode, message.hostName())
+                .thenAccept(winner -> {
+                    final WinnerResponse response = WinnerResponse.from(winner);
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
+                            WebSocketResponse.success(response));
+                })
+                .exceptionally(throwable -> {
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
+                            WebSocketResponse.error("룰렛 스핀 실패: " + throwable.getMessage()));
+                    return null;
+                });
     }
 }

@@ -10,6 +10,7 @@ import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -136,6 +137,19 @@ public class RoomService {
         );
     }
 
+    public CompletableFuture<Winner> spinRouletteAsync(String joinCode, String hostName) {
+        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, hostName);
+
+        return processEventAsync(
+                event.eventId(),
+                () -> roomEventPublisher.publishRouletteSpinEvent(event),
+                "룰렛 스핀",
+                String.format("joinCode=%s, hostName=%s", joinCode, hostName),
+                winner -> String.format("joinCode=%s, hostName=%s, winner=%s", joinCode, hostName,
+                        winner.name().value())
+        );
+    }
+
     private <T> CompletableFuture<T> processEventAsync(
             String eventId,
             Runnable eventPublisher,
@@ -198,6 +212,18 @@ public class RoomService {
         }
     }
 
+    public Winner spinRoulette(String joinCode, String hostName) {
+        try {
+            return spinRouletteAsync(joinCode, hostName).join();
+        } catch (final Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("룰렛 스핀 실패", cause);
+        }
+    }
+
     // === Internal 메서드들 (Redis 리스너용) ===
 
     public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue) {
@@ -237,36 +263,6 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        try {
-            return updateMiniGamesAsync(joinCode, hostName, miniGameTypes).join();
-        } catch (final Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("미니게임 선택 실패", cause);
-        }
-    }
-
-
-    // === 나머지 기존 메서드들 (변경 없음) ===
-    public List<Player> getAllPlayers(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        return room.getPlayers();
-    }
-
-    public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Menu menu = menuQueryService.getById(menuId);
-
-        final Player player = room.findPlayer(new PlayerName(playerName));
-        player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
-
-        return room.getPlayers();
-    }
-
     public List<MiniGameType> updateMiniGamesInternal(String joinCode, String hostName,
                                                       List<MiniGameType> miniGameTypes) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
@@ -284,6 +280,43 @@ public class RoomService {
                 .toList();
     }
 
+    public Winner spinRouletteInternal(String joinCode, String hostName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Player host = room.findPlayer(new PlayerName(hostName));
+
+        return room.spinRoulette(host);
+    }
+
+    // === 나머지 기존 메서드들 (변경 없음) ===
+
+    public List<Player> getAllPlayers(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+
+        return room.getPlayers();
+    }
+
+    public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Menu menu = menuQueryService.getById(menuId);
+
+        final Player player = room.findPlayer(new PlayerName(playerName));
+        player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
+
+        return room.getPlayers();
+    }
+
+    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
+        try {
+            return updateMiniGamesAsync(joinCode, hostName, miniGameTypes).join();
+        } catch (final Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("미니게임 선택 실패", cause);
+        }
+    }
+
     public Map<Player, Probability> getProbabilities(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
@@ -297,13 +330,6 @@ public class RoomService {
 
     public boolean roomExists(String joinCode) {
         return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
-    }
-
-    public Winner spinRoulette(String joinCode, String hostName) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Player host = room.findPlayer(new PlayerName(hostName));
-
-        return room.spinRoulette(host);
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {

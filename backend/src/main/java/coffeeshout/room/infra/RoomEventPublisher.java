@@ -4,6 +4,7 @@ import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.event.RouletteSpinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,6 +55,16 @@ public class RoomEventPublisher {
                     event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
         } catch (final Exception e) {
             log.error("미니게임 선택 이벤트 발행 실패: eventId={}", event.eventId(), e);
+        }
+    }
+
+    public void publishRouletteSpinEvent(final RouletteSpinEvent event) {
+        try {
+            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            log.info("룰렛 스핀 이벤트 발행됨: eventId={}, joinCode={}, hostName={}",
+                    event.eventId(), event.joinCode(), event.hostName());
+        } catch (final Exception e) {
+            log.error("룰렛 스핀 이벤트 발행 실패: eventId={}", event.eventId(), e);
         }
     }
 }
