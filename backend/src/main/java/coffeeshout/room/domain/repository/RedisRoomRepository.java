@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import java.time.Duration;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,15 +15,18 @@ import org.springframework.stereotype.Repository;
 public class RedisRoomRepository implements RoomRepository {
 
     private static final String ROOM_KEY = "room:%s";
+    private static final Duration ROOM_DEFAULT_TTL = Duration.ofHours(1);
+
     private final RedisTemplate<String, Object> redisTemplate;
+
 
     @Override
     public Optional<Room> findByJoinCode(JoinCode joinCode) {
         final Object room = redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), "info");
-        if(room == null) {
+        if (room == null) {
             return Optional.empty();
         }
-        if(!(room instanceof Room)) {
+        if (!(room instanceof Room)) {
             throw new IllegalStateException("저장된 객체의 타입이 Room이 아닙니다.");
         }
 
@@ -36,7 +40,8 @@ public class RedisRoomRepository implements RoomRepository {
 
     @Override
     public Room save(Room room) {
-        redisTemplate.opsForHash().put(String.format(ROOM_KEY, room.getJoinCode().getValue()), "info", room);
+        redisTemplate.opsForHash().put(createRedisKey(room.getJoinCode()), "info", room);
+        redisTemplate.expire(String.format(ROOM_KEY, room.getJoinCode().getValue()), ROOM_DEFAULT_TTL);
         return room;
     }
 
@@ -44,5 +49,9 @@ public class RedisRoomRepository implements RoomRepository {
     public void deleteByJoinCode(JoinCode joinCode) {
         notNull(joinCode, "JoinCode는 null일 수 없습니다.");
         redisTemplate.opsForHash().delete(String.format(ROOM_KEY, joinCode.getValue()), "info");
+    }
+
+    private String createRedisKey(JoinCode joinCode) {
+        return String.format(ROOM_KEY, joinCode.getValue());
     }
 }
