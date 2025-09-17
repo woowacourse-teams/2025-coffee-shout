@@ -1,11 +1,10 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
-import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import * as S from './RoulettePlaySection.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { useRouletteTransition } from '@/features/roulette/hooks/useRouletteTransition';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
+import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
 
 type Props = {
   isSpinning: boolean;
@@ -40,7 +39,9 @@ const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
 
   return (
     <S.Container>
-      <RouletteWheelWrapper finalRotation={finalRotation} isSpinning={isSpinning} />
+      <S.RouletteWheelWrapper>
+        <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+      </S.RouletteWheelWrapper>
       <S.ProbabilityText>
         <Headline4>
           현재 확률 : {myCurrentProbability + '%'} {'('}
@@ -57,29 +58,3 @@ const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
 };
 
 export default RoulettePlaySection;
-
-const RouletteWheelWrapper = ({
-  finalRotation,
-  isSpinning,
-}: {
-  finalRotation: number;
-  isSpinning: boolean;
-}) => {
-  const { probabilityHistory } = useProbabilityHistory();
-  const animatedSectors = useRouletteTransition(
-    probabilityHistory.prev,
-    probabilityHistory.current
-  );
-
-  if (!animatedSectors) return null;
-
-  return (
-    <S.Wrapper>
-      <RouletteWheel
-        sectors={animatedSectors}
-        finalRotation={finalRotation}
-        isSpinning={isSpinning}
-      />
-    </S.Wrapper>
-  );
-};

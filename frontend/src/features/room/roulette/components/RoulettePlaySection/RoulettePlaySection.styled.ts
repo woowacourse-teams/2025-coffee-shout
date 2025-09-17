@@ -10,7 +10,7 @@ export const Container = styled.div`
   justify-content: center;
 `;
 
-export const Wrapper = styled.div`
+export const RouletteWheelWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
