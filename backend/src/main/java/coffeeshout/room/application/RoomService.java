@@ -1,10 +1,9 @@
 package coffeeshout.room.application;
 
+import coffeeshout.minigame.application.MiniGameServiceManager;
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
@@ -37,6 +36,7 @@ public class RoomService {
     private final RoomCommandService roomCommandService;
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
+    private final MiniGameServiceManager miniGameManager;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final String defaultCategoryImage;
@@ -46,6 +46,7 @@ public class RoomService {
             RoomCommandService roomCommandService,
             MenuQueryService menuQueryService,
             QrCodeService qrCodeService,
+            MiniGameServiceManager miniGameManager,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
             @Value("${menu-category.default-image}") String defaultCategoryImage
@@ -54,6 +55,7 @@ public class RoomService {
         this.roomCommandService = roomCommandService;
         this.menuQueryService = menuQueryService;
         this.qrCodeService = qrCodeService;
+        this.miniGameManager = miniGameManager;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
         this.defaultCategoryImage = defaultCategoryImage;
@@ -130,15 +132,12 @@ public class RoomService {
         room.clearMiniGames();
 
         miniGameTypes.forEach(miniGameType -> {
-            final Playable miniGame = miniGameType.createMiniGame();
-            room.addMiniGame(new PlayerName(hostName), miniGame);
+            room.addMiniGame(new PlayerName(hostName), miniGameType);
         });
 
         roomCommandService.save(room);
 
-        return room.getAllMiniGame().stream()
-                .map(Playable::getMiniGameType)
-                .toList();
+        return room.getAllMiniGame();
     }
 
     public boolean roomExists(String joinCode) {
@@ -148,11 +147,9 @@ public class RoomService {
     public Winner spinRoulette(String joinCode, String hostName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
-
-        Winner winner = room.spinRoulette(host, new Roulette(new RoulettePicker()));
+        final Winner winner = room.spinRoulette(host, new Roulette(new RoulettePicker()));
 
         roomCommandService.save(room);
-
         return winner;
     }
 
@@ -162,23 +159,9 @@ public class RoomService {
         return room.hasDuplicatePlayerName(new PlayerName(guestName));
     }
 
-    public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = room.findMiniGame(miniGameType);
-
-        return miniGame.getScores();
-    }
-
-    public MiniGameResult getMiniGameRanks(String joinCode, MiniGameType miniGameType) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Playable miniGame = room.findMiniGame(miniGameType);
-
-        return miniGame.getResult();
-    }
-
     public List<MiniGameType> getSelectedMiniGames(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.getSelectedMiniGameTypes();
+        return room.getAllMiniGame();
     }
 
     public boolean removePlayer(String joinCode, String playerName) {
@@ -190,6 +173,24 @@ public class RoomService {
         }
 
         return isRemoved;
+    }
+
+    public void applyMiniGameResult(String joinCode, MiniGameResult miniGameResult) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        room.applyMiniGameResult(miniGameResult);
+        roomCommandService.save(room);
+    }
+
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
+
+    public void startNextGame(String joinCode, String hostName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        MiniGameType miniGameType = room.startNextGame(hostName);
+        miniGameManager.startGame(miniGameType, joinCode, room.getPlayers());
+        roomCommandService.save(room);
     }
 
     private void scheduleRemoveRoom(JoinCode joinCode) {
@@ -205,10 +206,5 @@ public class RoomService {
             return new CustomMenu(selectedMenuRequest.customName(), defaultCategoryImage);
         }
         return menuQueryService.getById(selectedMenuRequest.id());
-    }
-
-    public boolean isReadyState(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.isReadyState();
     }
 }

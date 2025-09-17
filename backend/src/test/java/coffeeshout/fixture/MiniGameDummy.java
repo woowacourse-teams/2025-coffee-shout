@@ -6,13 +6,10 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGameScore;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
-import java.util.List;
 import java.util.Map;
 
 
 public class MiniGameDummy implements Playable {
-
-    private String dummy = "dummy";
 
     @Override
     public MiniGameResult getResult() {
@@ -30,9 +27,5 @@ public class MiniGameDummy implements Playable {
     @Override
     public MiniGameType getMiniGameType() {
         return MiniGameType.CARD_GAME;
-    }
-
-    @Override
-    public void startGame(List<Player> players) {
     }
 }

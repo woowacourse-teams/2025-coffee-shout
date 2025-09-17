@@ -4,16 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
-import coffeeshout.global.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
-import coffeeshout.fixture.MiniGameDummy;
-import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.NotExistElementException;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -76,7 +71,6 @@ class RoomServiceTest extends ServiceTest {
         // given
         String hostName = "호스트";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(999L, null, MenuTemperature.ICE);
-
 
         // when & then
         assertThatThrownBy(() -> roomService.createRoom(hostName, selectedMenuRequest))
@@ -390,56 +384,6 @@ class RoomServiceTest extends ServiceTest {
         // then
         assertThat(winner).isNotNull();
         assertThat(room.getPlayers().stream().map(Player::getName)).contains(winner.name());
-    }
-
-    @Test
-    void 미니게임의_점수를_반환한다() {
-        // given
-        String hostName = "호스트";
-        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-
-        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
-        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
-        roomCommandService.save(createdRoom);
-
-        // when
-        Map<Player, MiniGameScore> miniGameScores = roomService.getMiniGameScores(
-                joinCode.getValue(),
-                MiniGameType.CARD_GAME
-        );
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(miniGameScores.get(PlayerFixture.호스트꾹이()).getValue()).isEqualTo(20);
-            softly.assertThat(miniGameScores.get(PlayerFixture.게스트루키()).getValue()).isEqualTo(-10);
-        });
-    }
-
-    @Test
-    void 미니게임의_순위를_반환한다() {
-        // given
-        String hostName = "호스트";
-        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
-        List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
-        ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
-        roomCommandService.save(createdRoom);
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-
-        // when
-        MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.getValue(), MiniGameType.CARD_GAME);
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(miniGameRanks.getPlayerRank(PlayerFixture.호스트꾹이())).isEqualTo(1);
-            softly.assertThat(miniGameRanks.getPlayerRank(PlayerFixture.게스트루키())).isEqualTo(2);
-        });
     }
 
     @Test

@@ -9,6 +9,7 @@ import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
@@ -28,9 +29,7 @@ class CardGameTest {
     @BeforeEach
     void setUp() {
         players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
-
-        cardGame = new CardGameFake(deckGenerator);
-        cardGame.startGame(players.getPlayers());
+        cardGame = new CardGameFake(players.getPlayers(), new JoinCode("A4B5C"), deckGenerator);
     }
 
     @Nested

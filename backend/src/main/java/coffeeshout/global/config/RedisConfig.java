@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,14 +68,13 @@ public class RedisConfig {
     }
 
     private static ObjectMapper getRedisObjectMapper() {
-        // Redis용 ObjectMapper - 필드만 직렬화하도록 설정
         ObjectMapper redisObjectMapper = new ObjectMapper();
 
         redisObjectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         redisObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-        // 알 수 없는 프로퍼티 무시
         redisObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        redisObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         redisObjectMapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,

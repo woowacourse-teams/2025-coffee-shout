@@ -15,7 +15,6 @@ import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +32,8 @@ public class Room {
 
     private JoinCode joinCode;
     private Players players;
-    private Queue<Playable> miniGames;
-    private List<Playable> finishedGames;
-
+    private Queue<MiniGameType> miniGames;
+    private List<MiniGameType> finishedGames;
     private Player host;
     private RoomState roomState;
 
@@ -61,16 +59,16 @@ public class Room {
         join(Player.createGuest(guestName, selectedMenu));
     }
 
-    public void addMiniGame(PlayerName hostName, Playable miniGame) {
+    public void addMiniGame(PlayerName hostName, MiniGameType miniGameType) {
         isTrue(host.sameName(hostName), "호스트가 아닙니다.");
         state(miniGames.size() <= 5, "미니게임은 5개 이하여야 합니다.");
-        miniGames.add(miniGame);
+        miniGames.add(miniGameType);
     }
 
-    public void removeMiniGame(PlayerName hostName, Playable miniGame) {
+    public void removeMiniGame(PlayerName hostName, MiniGameType miniGameType) {
         isTrue(host.sameName(hostName), "호스트가 아닙니다.");
-        isTrue(miniGames.stream().anyMatch(m -> m.getMiniGameType() == miniGame.getMiniGameType()), "미니게임이 존재하지 않습니다.");
-        miniGames.removeIf(m -> m.getMiniGameType() == miniGame.getMiniGameType());
+        isTrue(miniGames.contains(miniGameType), "미니게임이 존재하지 않습니다.");
+        miniGames.remove(miniGameType);
     }
 
     public void applyMiniGameResult(MiniGameResult miniGameResult) {
@@ -121,39 +119,24 @@ public class Room {
                 .collect(Collectors.toMap(player -> player, Player::getProbability));
     }
 
-    public List<Playable> getAllMiniGame() {
-        return Collections.unmodifiableList(new ArrayList<>(miniGames));
+    public List<MiniGameType> getAllMiniGame() {
+        return List.copyOf(miniGames);
     }
 
-    public List<MiniGameType> getSelectedMiniGameTypes() {
-        return getAllMiniGame().stream()
-                .map(Playable::getMiniGameType)
-                .toList();
-    }
-
-    public Playable findMiniGame(MiniGameType miniGameType) {
-        return finishedGames.stream()
-                .filter(minigame -> minigame.getMiniGameType() == miniGameType)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 미니게임이 존재하지 않습니다."));
-    }
-
-    public Playable startNextGame(String hostName) {
+    public MiniGameType startNextGame(String hostName) {
         state(host.sameName(new PlayerName(hostName)), "호스트가 게임을 시작할 수 있습니다.");
         state(players.isAllReady(), "모든 플레이어가 준비완료해야합니다.");
         state(players.getPlayerCount() >= 2, "게임을 시작하려면 플레이어가 2명 이상이어야 합니다.");
         state(!miniGames.isEmpty(), "시작할 게임이 없습니다.");
         state(roomState == RoomState.READY, "게임을 시작할 수 있는 상태가 아닙니다.");
 
-        Playable currentGame = miniGames.poll();
-
-        currentGame.startGame(players.getPlayers());
+        MiniGameType currentGameType = miniGames.poll();
 
         roomState = RoomState.PLAYING;
 
-        finishedGames.add(currentGame);
+        finishedGames.add(currentGameType);
 
-        return currentGame;
+        return currentGameType;
     }
 
     public void clearMiniGames() {

@@ -8,6 +8,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -25,12 +26,19 @@ public class CardGame implements Playable {
     private static final int ADDITION_CARD_COUNT = 7;
     private static final int MULTIPLIER_CARD_COUNT = 2;
 
+    private JoinCode joinCode;
     private Deck deck;
     private PlayerHands playerHands;
     private CardGameRound round;
     private CardGameState state;
 
-    public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
+    public CardGame(
+            @NonNull List<Player> players,
+            @NonNull JoinCode joinCode,
+            @NonNull CardGameDeckGenerator deckGenerator
+    ) {
+        this.joinCode = joinCode;
+        this.playerHands = new PlayerHands(players);
         this.round = CardGameRound.READY;
         this.state = CardGameState.READY;
         this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
@@ -44,11 +52,6 @@ public class CardGame implements Playable {
     @Override
     public MiniGameType getMiniGameType() {
         return MiniGameType.CARD_GAME;
-    }
-
-    @Override
-    public void startGame(List<Player> players) {
-        playerHands = new PlayerHands(players);
     }
 
     @Override
