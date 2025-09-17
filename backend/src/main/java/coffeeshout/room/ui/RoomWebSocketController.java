@@ -87,17 +87,20 @@ public class RoomWebSocketController {
                     모든 참가자에게 변경된 준비 상태를 실시간으로 전달합니다.
                     """
     )
-    public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.changePlayerReadyState(
-                        joinCode,
-                        message.playerName(),
-                        message.isReady()
-                )
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+    public void broadcastReady(@DestinationVariable final String joinCode, final ReadyChangeMessage message) {
+        roomService.changePlayerReadyStateAsync(joinCode, message.playerName(), message.isReady())
+                .thenAccept(players -> {
+                    final List<PlayerResponse> responses = players.stream()
+                            .map(PlayerResponse::from)
+                            .toList();
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode,
+                            WebSocketResponse.success(responses));
+                })
+                .exceptionally(throwable -> {
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
+                            WebSocketResponse.error("ready 상태 변경 실패: " + throwable.getMessage()));
+                    return null;
+                });
     }
 
     @MessageMapping("/room/{joinCode}/get-probabilities")

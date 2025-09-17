@@ -1,5 +1,6 @@
 package coffeeshout.room.infra;
 
+import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RoomEventPublisher {
-    
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic roomEventTopic;
-    
+
     public void publishRoomCreateEvent(RoomCreateEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
@@ -24,14 +25,24 @@ public class RoomEventPublisher {
             log.error("방 생성 이벤트 발행 실패: eventId={}", event.getEventId(), e);
         }
     }
-    
+
     public void publishRoomJoinEvent(RoomJoinEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("방 참가 이벤트 발행됨: eventId={}, joinCode={}, guestName={}", 
+            log.info("방 참가 이벤트 발행됨: eventId={}, joinCode={}, guestName={}",
                     event.getEventId(), event.getJoinCode(), event.getGuestName());
         } catch (Exception e) {
             log.error("방 참가 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+        }
+    }
+
+    public void publishPlayerReadyEvent(final PlayerReadyEvent event) {
+        try {
+            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            log.info("플레이어 ready 이벤트 발행됨: eventId={}, joinCode={}, playerName={}, isReady={}",
+                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+        } catch (Exception e) {
+            log.error("플레이어 ready 이벤트 발행 실패: eventId={}", event.getEventId(), e);
         }
     }
 }

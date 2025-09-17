@@ -6,6 +6,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.CustomMenu;
@@ -70,60 +71,78 @@ public class RoomService {
     }
 
     // === 비동기 메서드들 (Controller용) ===
-    
-    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        // joinCode 먼저 생성
-        final JoinCode joinCode = joinCodeGenerator.generate();
 
-        // 이벤트 발행만 함 - 실제 생성은 리스너에서
+    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
+        final JoinCode joinCode = joinCodeGenerator.generate();
         final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
 
-        // Future 등록
-        final CompletableFuture<Room> future = roomEventWaitManager.registerWait(event.getEventId());
-
-        // 이벤트 발행
-        roomEventPublisher.publishRoomCreateEvent(event);
-
-        // 5초 타임아웃과 정리 작업 포함해서 Future 반환
-        return future.orTimeout(5, TimeUnit.SECONDS)
-                .whenComplete((room, throwable) -> {
-                    roomEventWaitManager.cleanup(event.getEventId());
-                    if (throwable != null) {
-                        log.error("방 생성 비동기 처리 실패: eventId={}, joinCode={}", 
-                                event.getEventId(), joinCode.getValue(), throwable);
-                    } else {
-                        log.info("방 생성 비동기 처리 완료: joinCode={}, eventId={}", 
-                                room.getJoinCode().getValue(), event.getEventId());
-                    }
-                });
+        return processEventAsync(
+                event.getEventId(),
+                () -> roomEventPublisher.publishRoomCreateEvent(event),
+                "방 생성",
+                String.format("joinCode=%s", joinCode.getValue()),
+                room -> String.format("joinCode=%s", room.getJoinCode().getValue())
+        );
     }
 
-    public CompletableFuture<Room> enterRoomAsync(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        // 이벤트 발행만 함 - 실제 처리는 리스너에서
+    public CompletableFuture<Room> enterRoomAsync(
+            String joinCode,
+            String guestName,
+            SelectedMenuRequest selectedMenuRequest
+    ) {
         final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
 
-        // Future 등록
-        final CompletableFuture<Room> future = roomEventWaitManager.registerWait(event.getEventId());
+        return processEventAsync(
+                event.getEventId(),
+                () -> roomEventPublisher.publishRoomJoinEvent(event),
+                "방 참가",
+                String.format("joinCode=%s, guestName=%s", joinCode, guestName),
+                room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
+        );
+    }
 
-        // 이벤트 발행
-        roomEventPublisher.publishRoomJoinEvent(event);
+    public CompletableFuture<List<Player>> changePlayerReadyStateAsync(
+            String joinCode,
+            String playerName,
+            Boolean isReady
+    ) {
+        final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, playerName, isReady);
 
-        // 5초 타임아웃과 정리 작업 포함해서 Future 반환
+        return processEventAsync(
+                event.getEventId(),
+                () -> roomEventPublisher.publishPlayerReadyEvent(event),
+                "플레이어 ready",
+                String.format("joinCode=%s, playerName=%s, isReady=%s", joinCode, playerName, isReady),
+                players -> String.format("joinCode=%s, playerName=%s, isReady=%s", joinCode, playerName, isReady)
+        );
+    }
+
+    private <T> CompletableFuture<T> processEventAsync(
+            String eventId,
+            Runnable eventPublisher,
+            String operationName,
+            String logParams,
+            java.util.function.Function<T, String> successLogParams
+    ) {
+
+        final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
+        eventPublisher.run();
+
         return future.orTimeout(5, TimeUnit.SECONDS)
-                .whenComplete((room, throwable) -> {
-                    roomEventWaitManager.cleanup(event.getEventId());
+                .whenComplete((result, throwable) -> {
+                    roomEventWaitManager.cleanup(eventId);
                     if (throwable != null) {
-                        log.error("방 참가 비동기 처리 실패: eventId={}, joinCode={}, guestName={}", 
-                                event.getEventId(), joinCode, guestName, throwable);
-                    } else {
-                        log.info("방 참가 비동기 처리 완료: joinCode={}, guestName={}, eventId={}", 
-                                joinCode, guestName, event.getEventId());
+                        log.error("{} 비동기 처리 실패: eventId={}, {}",
+                                operationName, eventId, logParams, throwable);
+                        return;
                     }
+                    log.info("{} 비동기 처리 완료: {}, eventId={}",
+                            operationName, successLogParams.apply(result), eventId);
                 });
     }
 
     // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
-    
+
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         try {
             return createRoomAsync(hostName, selectedMenuRequest).join();
@@ -145,6 +164,18 @@ public class RoomService {
                 throw (RuntimeException) cause;
             }
             throw new RuntimeException("방 참가 실패", cause);
+        }
+    }
+
+    public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
+        try {
+            return changePlayerReadyStateAsync(joinCode, playerName, isReady).join();
+        } catch (final Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("플레이어 ready 상태 변경 실패", cause);
         }
     }
 
@@ -174,6 +205,19 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
+    public List<Player> changePlayerReadyStateInternal(String joinCode, String playerName, Boolean isReady) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Player player = room.findPlayer(new PlayerName(playerName));
+
+        if (player.getPlayerType() == PlayerType.HOST) {
+            return room.getPlayers();
+        }
+
+        player.updateReadyState(isReady);
+        roomCommandService.save(room);
+        return room.getPlayers();
+    }
+
     // === 나머지 기존 메서드들 (변경 없음) ===
 
     public List<Player> getAllPlayers(String joinCode) {
@@ -189,18 +233,6 @@ public class RoomService {
         final Player player = room.findPlayer(new PlayerName(playerName));
         player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
 
-        return room.getPlayers();
-    }
-
-    public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Player player = room.findPlayer(new PlayerName(playerName));
-
-        if (player.getPlayerType() == PlayerType.HOST) {
-            return room.getPlayers();
-        }
-
-        player.updateReadyState(isReady);
         return room.getPlayers();
     }
 

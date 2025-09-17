@@ -2,10 +2,13 @@ package coffeeshout.room.infra;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -32,27 +35,32 @@ public class RoomEventSubscriber implements MessageListener {
     }
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {
+    public void onMessage(final Message message, final byte[] pattern) {
         try {
             final String body = new String(message.getBody());
-            
+
             if (body.contains("\"hostName\"")) {
                 handleRoomCreateEvent(body);
                 return;
             }
-            
+
             if (body.contains("\"guestName\"")) {
                 handleRoomJoinEvent(body);
                 return;
             }
-            
+
+            if (body.contains("\"playerName\"") && body.contains("\"isReady\"")) {
+                handlePlayerReadyEvent(body);
+                return;
+            }
+
             log.warn("알 수 없는 이벤트 타입: {}", body);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("이벤트 처리 실패", e);
         }
     }
-    
-    private void handleRoomCreateEvent(String body) {
+
+    private void handleRoomCreateEvent(final String body) {
         RoomCreateEvent event = null;
         try {
             event = objectMapper.readValue(body, RoomCreateEvent.class);
@@ -72,18 +80,18 @@ public class RoomEventSubscriber implements MessageListener {
 
             log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", event.getEventId(), event.getJoinCode());
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
-            
+
             if (event == null) {
                 return;
             }
-            
+
             roomEventWaitManager.notifyFailure(event.getEventId(), e);
         }
     }
-    
-    private void handleRoomJoinEvent(String body) {
+
+    private void handleRoomJoinEvent(final String body) {
         RoomJoinEvent event = null;
         try {
             event = objectMapper.readValue(body, RoomJoinEvent.class);
@@ -101,16 +109,48 @@ public class RoomEventSubscriber implements MessageListener {
             // 방 참가 성공 알림
             roomEventWaitManager.notifySuccess(event.getEventId(), room);
 
-            log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}", 
+            log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}",
                     event.getEventId(), event.getJoinCode(), event.getGuestName());
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("방 참가 이벤트 처리 실패", e);
-            
+
             if (event == null) {
                 return;
             }
-            
+
+            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+        }
+    }
+
+    private void handlePlayerReadyEvent(final String body) {
+        PlayerReadyEvent event = null;
+        try {
+            event = objectMapper.readValue(body, PlayerReadyEvent.class);
+
+            log.info("플레이어 ready 이벤트 수신: eventId={}, joinCode={}, playerName={}, isReady={}",
+                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+
+            // 모든 인스턴스가 동일하게 처리
+            final List<Player> players = roomService.changePlayerReadyStateInternal(
+                    event.getJoinCode(),
+                    event.getPlayerName(),
+                    event.getIsReady()
+            );
+
+            // ready 상태 변경 성공 알림
+            roomEventWaitManager.notifySuccess(event.getEventId(), players);
+
+            log.info("플레이어 ready 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}, isReady={}",
+                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+
+        } catch (final Exception e) {
+            log.error("플레이어 ready 이벤트 처리 실패", e);
+
+            if (event == null) {
+                return;
+            }
+
             roomEventWaitManager.notifyFailure(event.getEventId(), e);
         }
     }
