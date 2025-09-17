@@ -23,9 +23,20 @@ room:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
 
+
+otel:
+  exporter:
+    otlp:
+      protocol: grpc
+      endpoint: http://localhost:4317
+  traces:
+    exporter: jaeger
+
 logging:
   level:
     root: info
+    io.opentelemetry.exporter.logging.LoggingSpanExporter: DEBUG
+    io.opentelemetry: TRACE
 
 management:
   endpoint:

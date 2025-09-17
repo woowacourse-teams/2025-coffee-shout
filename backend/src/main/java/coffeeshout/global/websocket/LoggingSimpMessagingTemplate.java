@@ -1,6 +1,7 @@
 package coffeeshout.global.websocket;
 
 import coffeeshout.global.ui.WebSocketResponse;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,6 +14,7 @@ public class LoggingSimpMessagingTemplate {
 
     private final SimpMessagingTemplate messagingTemplate;
 
+    @WithSpan("websocket.message.send")
     public void convertAndSend(String destination, Object payload) {
         WebSocketResponse response = (WebSocketResponse) payload;
         long startNanos = System.nanoTime();
