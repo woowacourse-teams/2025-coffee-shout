@@ -1,5 +1,6 @@
 package coffeeshout.global.websocket;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -10,35 +11,21 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
-import jakarta.annotation.PostConstruct;
-import java.util.List;
-
 @Slf4j
 @Service
 public class SubscriptionInfoService {
 
     @Autowired
     private ApplicationContext applicationContext;
-    
-    private SubscriptionRegistry subscriptionRegistry;
 
-    @PostConstruct
-    public void init() {
-        try {
-            // SimpleBrokerMessageHandler에서 SubscriptionRegistry 가져오기
-            SimpleBrokerMessageHandler simpleBrokerMessageHandler = 
-                    applicationContext.getBean(SimpleBrokerMessageHandler.class);
-            this.subscriptionRegistry = simpleBrokerMessageHandler.getSubscriptionRegistry();
-            log.info("SubscriptionRegistry 초기화 완료: {}", subscriptionRegistry.getClass().getSimpleName());
-        } catch (Exception e) {
-            log.warn("SubscriptionRegistry 초기화 실패: {}", e.getMessage());
-        }
-    }
+    private SubscriptionRegistry subscriptionRegistry;
 
     /**
      * 특정 destination의 구독 정보 조회
      */
     public MultiValueMap<String, String> findSubscriptions(String destination) {
+        ensureInitialized();
+
         if (subscriptionRegistry == null) {
             log.warn("SubscriptionRegistry가 초기화되지 않았습니다");
             return new org.springframework.util.LinkedMultiValueMap<>();
@@ -49,7 +36,7 @@ public class SubscriptionInfoService {
             Message<?> message = MessageBuilder.withPayload(new byte[0])
                     .setHeader("simpDestination", destination)
                     .build();
-            
+
             return subscriptionRegistry.findSubscriptions(message);
         } catch (Exception e) {
             log.error("구독 정보 조회 실패: destination={}, error={}", destination, e.getMessage());
@@ -73,7 +60,7 @@ public class SubscriptionInfoService {
      */
     public void logSubscriptionInfo(String destination) {
         MultiValueMap<String, String> subscriptions = findSubscriptions(destination);
-        
+
         if (subscriptions.isEmpty()) {
             log.info("구독자 없음: destination={}", destination);
             return;
@@ -85,9 +72,23 @@ public class SubscriptionInfoService {
                 .sum();
 
         log.info("구독 정보: destination={}, 구독자 수={}", destination, totalSubscriptions);
-        
-        subscriptions.forEach((sessionId, subscriptionIds) -> 
-            log.info("  - sessionId={}, subscriptionIds={}", sessionId, subscriptionIds)
+
+        subscriptions.forEach((sessionId, subscriptionIds) ->
+                log.info("  - sessionId={}, subscriptionIds={}", sessionId, subscriptionIds)
         );
+    }
+
+    private void ensureInitialized() {
+        if (subscriptionRegistry == null) {
+            try {
+                // SimpleBrokerMessageHandler에서 SubscriptionRegistry 가져오기
+                SimpleBrokerMessageHandler simpleBrokerMessageHandler =
+                        applicationContext.getBean(SimpleBrokerMessageHandler.class);
+                this.subscriptionRegistry = simpleBrokerMessageHandler.getSubscriptionRegistry();
+                log.info("SubscriptionRegistry 초기화 완료: {}", subscriptionRegistry.getClass().getSimpleName());
+            } catch (Exception e) {
+                log.warn("SubscriptionRegistry 초기화 실패: {}", e.getMessage());
+            }
+        }
     }
 }
