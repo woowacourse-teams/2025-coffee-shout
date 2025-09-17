@@ -1,14 +1,13 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
-import coffeeshout.room.domain.repository.RoomRepository;
 import coffeeshout.room.domain.service.RoomCommandService;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +18,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
+    @Autowired
+    RoomCommandService roomCommandService;
+
     JoinCode joinCode;
 
     Player host;
@@ -26,8 +28,6 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     TestStompSession session;
 
     Room testRoom;
-
-    RoomCommandService roomCommandService;
 
     @BeforeEach
     void setUp() throws Exception {
