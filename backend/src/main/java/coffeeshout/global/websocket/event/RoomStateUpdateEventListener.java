@@ -3,8 +3,6 @@ package coffeeshout.global.websocket.event;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.infra.BroadcastEventPublisher;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import coffeeshout.room.ui.response.PlayerResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -37,12 +35,7 @@ public class RoomStateUpdateEventListener {
     }
 
     private void sendPlayerStatus(String joinCode) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-
-        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode);
         broadcastEventPublisher.publishPlayerUpdateEvent(event);
     }
 }

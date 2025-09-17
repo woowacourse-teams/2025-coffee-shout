@@ -41,12 +41,7 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-
-        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+        final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode);
         broadcastEventPublisher.publishPlayerUpdateEvent(event);
     }
 
@@ -67,10 +62,7 @@ public class RoomWebSocketController {
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
         roomService.changePlayerReadyStateAsync(joinCode, message.playerName(), message.isReady())
                 .thenAccept(players -> {
-                    final List<PlayerResponse> responses = players.stream()
-                            .map(PlayerResponse::from)
-                            .toList();
-                    final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
+                    final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode);
                     broadcastEventPublisher.publishPlayerUpdateEvent(event);
                 })
                 .exceptionally(throwable -> {
@@ -101,8 +93,7 @@ public class RoomWebSocketController {
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         roomService.updateMiniGamesAsync(joinCode, message.hostName(), message.miniGameTypes())
                 .thenAccept(selectedMiniGames -> {
-                    final MiniGameUpdateBroadcastEvent event = MiniGameUpdateBroadcastEvent.create(joinCode,
-                            selectedMiniGames);
+                    final MiniGameUpdateBroadcastEvent event = MiniGameUpdateBroadcastEvent.create(joinCode);
                     broadcastEventPublisher.publishMiniGameUpdateEvent(event);
                 })
                 .exceptionally(throwable -> {

@@ -2,12 +2,16 @@ package coffeeshout.room.infra;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.event.ErrorBroadcastEvent;
 import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
+import coffeeshout.room.ui.response.PlayerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -25,6 +29,7 @@ public class BroadcastEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic broadcastEventTopic;
+    private final RoomService roomService;
 
     @PostConstruct
     public void subscribe() {
@@ -69,8 +74,11 @@ public class BroadcastEventSubscriber implements MessageListener {
 
             log.info("플레이어 업데이트 브로드캐스트 수신: joinCode={}", event.joinCode());
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(),
-                    WebSocketResponse.success(event.players()));
+            final List<PlayerResponse> responses = roomService.getAllPlayers(event.joinCode()).stream()
+                    .map(PlayerResponse::from)
+                    .toList();
+
+            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(), WebSocketResponse.success(responses));
 
         } catch (final Exception e) {
             log.error("플레이어 업데이트 브로드캐스트 처리 실패", e);
@@ -83,8 +91,10 @@ public class BroadcastEventSubscriber implements MessageListener {
 
             log.info("미니게임 업데이트 브로드캐스트 수신: joinCode={}", event.joinCode());
 
+            final List<MiniGameType> selectedMiniGames = roomService.getSelectedMiniGames(event.joinCode());
+
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
-                    WebSocketResponse.success(event.miniGameTypes()));
+                    WebSocketResponse.success(selectedMiniGames));
 
         } catch (final Exception e) {
             log.error("미니게임 업데이트 브로드캐스트 처리 실패", e);
