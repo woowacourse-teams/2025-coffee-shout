@@ -7,7 +7,7 @@ public record WinnerAnnouncementBroadcastEvent(
         WinnerResponse winner
 ) implements BroadcastEvent {
 
-    public static WinnerAnnouncementBroadcastEvent create(final String joinCode, final WinnerResponse winner) {
+    public static WinnerAnnouncementBroadcastEvent create(String joinCode, WinnerResponse winner) {
         return new WinnerAnnouncementBroadcastEvent(joinCode, winner);
     }
 

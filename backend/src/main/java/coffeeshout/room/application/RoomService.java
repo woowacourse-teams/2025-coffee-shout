@@ -140,15 +140,17 @@ public class RoomService {
     }
 
     public CompletableFuture<Winner> spinRouletteAsync(String joinCode, String hostName) {
-        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, hostName);
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
+        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, hostName, winner);
 
         return processEventAsync(
                 event.eventId(),
                 () -> roomEventPublisher.publishRouletteSpinEvent(event),
                 "룰렛 스핀",
                 String.format("joinCode=%s, hostName=%s", joinCode, hostName),
-                winner -> String.format("joinCode=%s, hostName=%s, winner=%s", joinCode, hostName,
-                        winner.name().value())
+                winnerResponse -> String.format("joinCode=%s, hostName=%s, winner=%s", joinCode, hostName,
+                        winnerResponse.name().value())
         );
     }
 
@@ -280,13 +282,6 @@ public class RoomService {
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
                 .toList();
-    }
-
-    public Winner spinRouletteInternal(String joinCode, String hostName) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Player host = room.findPlayer(new PlayerName(hostName));
-
-        return room.spinRoulette(host, new Roulette(new RoulettePicker()));
     }
 
     // === 나머지 기존 메서드들 (변경 없음) ===

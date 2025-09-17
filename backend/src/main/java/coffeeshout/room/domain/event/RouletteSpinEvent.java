@@ -1,5 +1,6 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.room.domain.player.Winner;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -8,15 +9,17 @@ public record RouletteSpinEvent(
         RoomEventType eventType,
         String joinCode,
         String hostName,
+        Winner winner,
         LocalDateTime timestamp
 ) {
-    public static RouletteSpinEvent create(final String joinCode, final String hostName) {
+    public static RouletteSpinEvent create(String joinCode, String hostName, Winner winner) {
         return new RouletteSpinEvent(
                 UUID.randomUUID().toString(),
                 RoomEventType.ROULETTE_SPIN,
                 joinCode,
                 hostName,
-                LocalDateTime.now()
+                winner,
+                java.time.LocalDateTime.now()
         );
     }
 }

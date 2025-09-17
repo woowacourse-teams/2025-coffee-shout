@@ -209,11 +209,7 @@ public class RoomEventSubscriber implements MessageListener {
             log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
                     event.eventId(), event.joinCode(), event.hostName());
 
-            // 모든 인스턴스가 동일하게 처리
-            final Winner winner = roomService.spinRouletteInternal(
-                    event.joinCode(),
-                    event.hostName()
-            );
+            final Winner winner = event.winner();
 
             // 룰렛 스핀 성공 알림
             roomEventWaitManager.notifySuccess(event.eventId(), winner);
