@@ -23,10 +23,9 @@ public class SessionDisconnectEventListener {
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
         final String sessionId = event.getSessionId();
         final CloseStatus closeStatus = event.getCloseStatus();
-        final int totalConnections = sessionManager.getTotalConnectedClientCount();
 
-        log.info("세션 연결 해제 감지: sessionId={}, closeStatus={}, reason={}, 현재 연결된 클라이언트 수={}", 
-                sessionId, closeStatus, closeStatus.getReason(), totalConnections);
+        log.info("세션 연결 해제 감지: sessionId={}, closeStatus={}, reason={}", 
+                sessionId, closeStatus, closeStatus.getReason());
 
         // 구독 정보 정리
         subscriptionInfoService.removeAllSubscriptions(sessionId);

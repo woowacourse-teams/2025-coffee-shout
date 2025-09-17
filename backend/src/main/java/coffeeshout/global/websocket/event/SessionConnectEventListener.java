@@ -34,7 +34,6 @@ public class SessionConnectEventListener {
     @EventListener
     public void handleSessionConnected(SessionConnectedEvent event) {
         final String sessionId = event.getMessage().getHeaders().get("simpSessionId", String.class);
-        final int totalConnections = sessionManager.getTotalConnectedClientCount();
         
         // 플레이어 정보 가져오기 (있으면)
         String playerInfo = "";
@@ -45,8 +44,7 @@ public class SessionConnectEventListener {
             playerInfo = String.format(", joinCode=%s, playerName=%s", joinCode, playerName);
         }
         
-        log.info("웹소켓 연결 완료: sessionId={}, 현재 연결된 클라이언트 수={}{}", 
-                sessionId, totalConnections, playerInfo);
+        log.info("웹소켓 연결 완료: sessionId={}{}", sessionId, playerInfo);
         webSocketMetricService.completeConnection(sessionId);
     }
 }
