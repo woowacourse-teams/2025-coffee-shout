@@ -12,14 +12,16 @@ import lombok.Setter;
 public class PlayerReadyEvent {
 
     private String eventId;
+    private RoomEventType eventType;
     private String joinCode;
     private String playerName;
     private Boolean isReady;
     private LocalDateTime timestamp;
 
-    public static PlayerReadyEvent create(final String joinCode, final String playerName, final Boolean isReady) {
+    public static PlayerReadyEvent create(String joinCode, String playerName, Boolean isReady) {
         final PlayerReadyEvent event = new PlayerReadyEvent();
         event.eventId = UUID.randomUUID().toString();
+        event.eventType = RoomEventType.PLAYER_READY;
         event.joinCode = joinCode;
         event.playerName = playerName;
         event.isReady = isReady;

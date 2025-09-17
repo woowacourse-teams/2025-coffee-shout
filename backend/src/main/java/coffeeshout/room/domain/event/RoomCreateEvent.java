@@ -13,6 +13,7 @@ import lombok.Setter;
 public class RoomCreateEvent {
 
     private String eventId;
+    private RoomEventType eventType;
     private String hostName;
     private SelectedMenuRequest selectedMenuRequest;
     private String joinCode;
@@ -21,6 +22,7 @@ public class RoomCreateEvent {
     public static RoomCreateEvent create(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
         final RoomCreateEvent event = new RoomCreateEvent();
         event.eventId = UUID.randomUUID().toString();
+        event.eventType = RoomEventType.ROOM_CREATE;
         event.hostName = hostName;
         event.selectedMenuRequest = selectedMenuRequest;
         event.joinCode = joinCode;
