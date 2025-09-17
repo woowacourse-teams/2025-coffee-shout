@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.infra.BroadcastEventPublisher;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,13 +35,14 @@ class RoomStateUpdateEventListenerTest {
         final RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
 
         when(roomService.roomExists(joinCode)).thenReturn(true);
+        when(roomService.getAllPlayers(joinCode)).thenReturn(List.of());
 
         // when
         listener.handleRoomStateUpdate(event);
 
         // then
         verify(roomService).roomExists(joinCode);
-        verify(roomService, never()).getAllPlayers(joinCode);
+        verify(roomService).getAllPlayers(joinCode);
         verify(broadcastEventPublisher).publishPlayerUpdateEvent(any(PlayerUpdateBroadcastEvent.class));
     }
 

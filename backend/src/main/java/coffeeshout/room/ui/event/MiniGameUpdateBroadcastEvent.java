@@ -1,11 +1,15 @@
 package coffeeshout.room.ui.event;
 
+import coffeeshout.minigame.domain.MiniGameType;
+import java.util.List;
+
 public record MiniGameUpdateBroadcastEvent(
-        String joinCode
+        String joinCode,
+        List<MiniGameType> miniGameTypes
 ) implements BroadcastEvent {
 
-    public static MiniGameUpdateBroadcastEvent create(String joinCode) {
-        return new MiniGameUpdateBroadcastEvent(joinCode);
+    public static MiniGameUpdateBroadcastEvent create(final String joinCode, final List<MiniGameType> miniGameTypes) {
+        return new MiniGameUpdateBroadcastEvent(joinCode, miniGameTypes);
     }
 
     @Override
