@@ -20,6 +20,8 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.roulette.Roulette;
+import coffeeshout.room.domain.roulette.RoulettePicker;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
@@ -284,7 +286,7 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
-        return room.spinRoulette(host);
+        return room.spinRoulette(host, new Roulette(new RoulettePicker()));
     }
 
     // === 나머지 기존 메서드들 (변경 없음) ===

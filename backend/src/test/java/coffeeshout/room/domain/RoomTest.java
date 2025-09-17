@@ -36,7 +36,6 @@ class RoomTest {
     @BeforeEach
     void setUp() {
         room = new Room(joinCode, 호스트_한스, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        ReflectionTestUtils.setField(room, "roulette", roulette);
     }
 
     @Test
@@ -44,8 +43,12 @@ class RoomTest {
         // given
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
-        assertThat(room.getHost()).isEqualTo(Player.createHost(호스트_한스, new SelectedMenu(MenuFixture.아메리카노(),
-                MenuTemperature.ICE)));
+        assertThat(room.getHost()).isEqualTo(Player.createHost(
+                호스트_한스, new SelectedMenu(
+                        MenuFixture.아메리카노(),
+                        MenuTemperature.ICE
+                )
+        ));
     }
 
     @Test
@@ -88,8 +91,12 @@ class RoomTest {
         }
 
         // when & then
-        assertThatThrownBy(() -> room.joinGuest(new PlayerName("guest9"), new SelectedMenu(MenuFixture.아메리카노(),
-                MenuTemperature.ICE)))
+        assertThatThrownBy(() -> room.joinGuest(
+                new PlayerName("guest9"), new SelectedMenu(
+                        MenuFixture.아메리카노(),
+                        MenuTemperature.ICE
+                )
+        ))
                 .isInstanceOf(InvalidArgumentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
     }
@@ -166,11 +173,11 @@ class RoomTest {
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         Player host = room.findPlayer(호스트_한스);
 
-        Winner winner = room.spinRoulette(host);
+        Winner winner = room.spinRoulette(host, roulette);
 
         // when & then
         assertThat(room.getRoomState()).isEqualTo(RoomState.DONE);
-        assertThat(winner.name()).isEqualTo(new PlayerName("한스"));
+        assertThat(winner.name()).isEqualTo(new PlayerName("엠제이"));
     }
 
     @Test
@@ -182,7 +189,7 @@ class RoomTest {
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         // when & then
-        assertThatThrownBy(() -> room.spinRoulette(guest))
+        assertThatThrownBy(() -> room.spinRoulette(guest, roulette))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -192,7 +199,7 @@ class RoomTest {
         Player host = room.findPlayer(호스트_한스);
 
         // when & then
-        assertThatThrownBy(() -> room.spinRoulette(host))
+        assertThatThrownBy(() -> room.spinRoulette(host, roulette))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -203,7 +210,7 @@ class RoomTest {
         Player host = room.findPlayer(호스트_한스);
 
         // when & then
-        assertThatThrownBy(() -> room.spinRoulette(host))
+        assertThatThrownBy(() -> room.spinRoulette(host, roulette))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -212,8 +219,14 @@ class RoomTest {
         // given
 
         // when & then
-        assertThat(room.isHost(Player.createHost(호스트_한스, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isTrue();
-        assertThat(room.isHost(Player.createGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))).isFalse();
+        assertThat(room.isHost(Player.createHost(
+                호스트_한스,
+                new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
+        ))).isTrue();
+        assertThat(room.isHost(Player.createGuest(
+                게스트_꾹이,
+                new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
+        ))).isFalse();
     }
 
     @Test
@@ -276,7 +289,7 @@ class RoomTest {
         room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        
+
         Player originalHost = room.getHost();
         assertThat(originalHost.getName()).isEqualTo(호스트_한스);
         assertThat(room.getPlayers()).hasSize(4);
@@ -287,7 +300,7 @@ class RoomTest {
         // then
         assertThat(removed).isTrue();
         assertThat(room.getPlayers()).hasSize(3);
-        
+
         Player newHost = room.getHost();
         assertThat(newHost.getName()).isNotEqualTo(호스트_한스);
         assertThat(newHost.getName()).isIn(게스트_루키, 게스트_꾹이, 게스트_엠제이);
@@ -315,7 +328,7 @@ class RoomTest {
         // given
         room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        
+
         Player originalHost = room.getHost();
         assertThat(originalHost.getName()).isEqualTo(호스트_한스);
         assertThat(room.getPlayers()).hasSize(3);
