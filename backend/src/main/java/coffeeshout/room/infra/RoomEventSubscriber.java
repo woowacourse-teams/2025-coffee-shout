@@ -1,7 +1,9 @@
 package coffeeshout.room.infra;
 
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -39,18 +41,23 @@ public class RoomEventSubscriber implements MessageListener {
         try {
             final String body = new String(message.getBody());
 
-            if (body.contains("\"hostName\"")) {
+            if (body.contains("\"eventType\":\"ROOM_CREATE\"")) {
                 handleRoomCreateEvent(body);
                 return;
             }
 
-            if (body.contains("\"guestName\"")) {
+            if (body.contains("\"eventType\":\"ROOM_JOIN\"")) {
                 handleRoomJoinEvent(body);
                 return;
             }
 
-            if (body.contains("\"playerName\"") && body.contains("\"isReady\"")) {
+            if (body.contains("\"eventType\":\"PLAYER_READY\"")) {
                 handlePlayerReadyEvent(body);
+                return;
+            }
+
+            if (body.contains("\"eventType\":\"MINI_GAME_SELECT\"")) {
+                handleMiniGameSelectEvent(body);
                 return;
             }
 
@@ -146,6 +153,38 @@ public class RoomEventSubscriber implements MessageListener {
 
         } catch (final Exception e) {
             log.error("플레이어 ready 이벤트 처리 실패", e);
+
+            if (event == null) {
+                return;
+            }
+
+            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+        }
+    }
+
+    private void handleMiniGameSelectEvent(final String body) {
+        MiniGameSelectEvent event = null;
+        try {
+            event = objectMapper.readValue(body, MiniGameSelectEvent.class);
+
+            log.info("미니게임 선택 이벤트 수신: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
+                    event.getEventId(), event.getJoinCode(), event.getHostName(), event.getMiniGameTypes());
+
+            // 모든 인스턴스가 동일하게 처리
+            final List<MiniGameType> selectedMiniGames = roomService.updateMiniGamesInternal(
+                    event.getJoinCode(),
+                    event.getHostName(),
+                    event.getMiniGameTypes()
+            );
+
+            // 미니게임 선택 성공 알림
+            roomEventWaitManager.notifySuccess(event.getEventId(), selectedMiniGames);
+
+            log.info("미니게임 선택 이벤트 처리 완료: eventId={}, joinCode={}, selectedCount={}",
+                    event.getEventId(), event.getJoinCode(), selectedMiniGames.size());
+
+        } catch (final Exception e) {
+            log.error("미니게임 선택 이벤트 처리 실패", e);
 
             if (event == null) {
                 return;

@@ -141,11 +141,16 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.updateMiniGames(joinCode, message.hostName(),
-                message.miniGameTypes());
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
-                WebSocketResponse.success(responses));
+        roomService.updateMiniGamesAsync(joinCode, message.hostName(), message.miniGameTypes())
+                .thenAccept(selectedMiniGames -> {
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
+                            WebSocketResponse.success(selectedMiniGames));
+                })
+                .exceptionally(throwable -> {
+                    messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/error",
+                            WebSocketResponse.error("미니게임 선택 실패: " + throwable.getMessage()));
+                    return null;
+                });
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")

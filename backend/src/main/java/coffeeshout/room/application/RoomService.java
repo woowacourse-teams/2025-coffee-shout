@@ -6,6 +6,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -117,6 +118,23 @@ public class RoomService {
         );
     }
 
+    public CompletableFuture<List<MiniGameType>> updateMiniGamesAsync(
+            String joinCode,
+            String hostName,
+            List<MiniGameType> miniGameTypes
+    ) {
+        final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, hostName, miniGameTypes);
+
+        return processEventAsync(
+                event.getEventId(),
+                () -> roomEventPublisher.publishMiniGameSelectEvent(event),
+                "미니게임 선택",
+                String.format("joinCode=%s, hostName=%s, miniGameTypes=%s", joinCode, hostName, miniGameTypes),
+                selectedGames -> String.format("joinCode=%s, hostName=%s, selectedCount=%d", joinCode, hostName,
+                        selectedGames.size())
+        );
+    }
+
     private <T> CompletableFuture<T> processEventAsync(
             String eventId,
             Runnable eventPublisher,
@@ -218,8 +236,20 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    // === 나머지 기존 메서드들 (변경 없음) ===
+    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
+        try {
+            return updateMiniGamesAsync(joinCode, hostName, miniGameTypes).join();
+        } catch (final Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("미니게임 선택 실패", cause);
+        }
+    }
 
+
+    // === 나머지 기존 메서드들 (변경 없음) ===
     public List<Player> getAllPlayers(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
@@ -236,18 +266,8 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    public Map<Player, Probability> getProbabilities(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        return room.getProbabilities();
-    }
-
-    public List<MiniGameType> getAllMiniGames() {
-        return Arrays.stream(MiniGameType.values())
-                .toList();
-    }
-
-    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
+    public List<MiniGameType> updateMiniGamesInternal(String joinCode, String hostName,
+                                                      List<MiniGameType> miniGameTypes) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.clearMiniGames();
 
@@ -256,8 +276,21 @@ public class RoomService {
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
+        roomCommandService.save(room);
+
         return room.getAllMiniGame().stream()
                 .map(Playable::getMiniGameType)
+                .toList();
+    }
+
+    public Map<Player, Probability> getProbabilities(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+
+        return room.getProbabilities();
+    }
+
+    public List<MiniGameType> getAllMiniGames() {
+        return Arrays.stream(MiniGameType.values())
                 .toList();
     }
 

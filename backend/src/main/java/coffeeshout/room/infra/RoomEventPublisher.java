@@ -1,5 +1,6 @@
 package coffeeshout.room.infra;
 
+import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -43,6 +44,16 @@ public class RoomEventPublisher {
                     event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
         } catch (Exception e) {
             log.error("플레이어 ready 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+        }
+    }
+
+    public void publishMiniGameSelectEvent(final MiniGameSelectEvent event) {
+        try {
+            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            log.info("미니게임 선택 이벤트 발행됨: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
+                    event.getEventId(), event.getJoinCode(), event.getHostName(), event.getMiniGameTypes());
+        } catch (final Exception e) {
+            log.error("미니게임 선택 이벤트 발행 실패: eventId={}", event.getEventId(), e);
         }
     }
 }
