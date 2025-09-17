@@ -3,30 +3,23 @@ package coffeeshout.room.domain.event;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@Getter
-@Setter
-public class RoomJoinEvent {
-
-    private String eventId;
-    private RoomEventType eventType;
-    private String joinCode;
-    private String guestName;
-    private SelectedMenuRequest selectedMenuRequest;
-    private LocalDateTime timestamp;
-
+public record RoomJoinEvent(
+        String eventId,
+        RoomEventType eventType,
+        String joinCode,
+        String guestName,
+        SelectedMenuRequest selectedMenuRequest,
+        LocalDateTime timestamp
+) {
     public static RoomJoinEvent create(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        final RoomJoinEvent event = new RoomJoinEvent();
-        event.eventId = UUID.randomUUID().toString();
-        event.eventType = RoomEventType.ROOM_JOIN;
-        event.joinCode = joinCode;
-        event.guestName = guestName;
-        event.selectedMenuRequest = selectedMenuRequest;
-        event.timestamp = LocalDateTime.now();
-        return event;
+        return new RoomJoinEvent(
+                UUID.randomUUID().toString(),
+                RoomEventType.ROOM_JOIN,
+                joinCode,
+                guestName,
+                selectedMenuRequest,
+                LocalDateTime.now()
+        );
     }
 }

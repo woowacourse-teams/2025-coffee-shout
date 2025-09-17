@@ -73,19 +73,19 @@ public class RoomEventSubscriber implements MessageListener {
             event = objectMapper.readValue(body, RoomCreateEvent.class);
 
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
-                    event.getEventId(), event.getHostName(), event.getJoinCode());
+                    event.eventId(), event.hostName(), event.joinCode());
 
             // 모든 인스턴스가 동일하게 처리 (자신이 발행한 것도 포함)
             final Room room = roomService.createRoomInternal(
-                    event.getHostName(),
-                    event.getSelectedMenuRequest(),
-                    event.getJoinCode()
+                    event.hostName(),
+                    event.selectedMenuRequest(),
+                    event.joinCode()
             );
 
             // 방 생성 성공 알림
-            roomEventWaitManager.notifySuccess(event.getEventId(), room);
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
 
-            log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", event.getEventId(), event.getJoinCode());
+            log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", event.eventId(), event.joinCode());
 
         } catch (final Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
@@ -94,7 +94,7 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 
@@ -104,20 +104,20 @@ public class RoomEventSubscriber implements MessageListener {
             event = objectMapper.readValue(body, RoomJoinEvent.class);
 
             log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+                    event.eventId(), event.joinCode(), event.guestName());
 
             // 모든 인스턴스가 동일하게 처리
             final Room room = roomService.enterRoomInternal(
-                    event.getJoinCode(),
-                    event.getGuestName(),
-                    event.getSelectedMenuRequest()
+                    event.joinCode(),
+                    event.guestName(),
+                    event.selectedMenuRequest()
             );
 
             // 방 참가 성공 알림
-            roomEventWaitManager.notifySuccess(event.getEventId(), room);
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
 
             log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+                    event.eventId(), event.joinCode(), event.guestName());
 
         } catch (final Exception e) {
             log.error("방 참가 이벤트 처리 실패", e);
@@ -126,7 +126,7 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 
@@ -136,20 +136,20 @@ public class RoomEventSubscriber implements MessageListener {
             event = objectMapper.readValue(body, PlayerReadyEvent.class);
 
             log.info("플레이어 ready 이벤트 수신: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
 
             // 모든 인스턴스가 동일하게 처리
             final List<Player> players = roomService.changePlayerReadyStateInternal(
-                    event.getJoinCode(),
-                    event.getPlayerName(),
-                    event.getIsReady()
+                    event.joinCode(),
+                    event.playerName(),
+                    event.isReady()
             );
 
             // ready 상태 변경 성공 알림
-            roomEventWaitManager.notifySuccess(event.getEventId(), players);
+            roomEventWaitManager.notifySuccess(event.eventId(), players);
 
             log.info("플레이어 ready 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
 
         } catch (final Exception e) {
             log.error("플레이어 ready 이벤트 처리 실패", e);
@@ -158,7 +158,7 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 
@@ -168,20 +168,20 @@ public class RoomEventSubscriber implements MessageListener {
             event = objectMapper.readValue(body, MiniGameSelectEvent.class);
 
             log.info("미니게임 선택 이벤트 수신: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
-                    event.getEventId(), event.getJoinCode(), event.getHostName(), event.getMiniGameTypes());
+                    event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
 
             // 모든 인스턴스가 동일하게 처리
             final List<MiniGameType> selectedMiniGames = roomService.updateMiniGamesInternal(
-                    event.getJoinCode(),
-                    event.getHostName(),
-                    event.getMiniGameTypes()
+                    event.joinCode(),
+                    event.hostName(),
+                    event.miniGameTypes()
             );
 
             // 미니게임 선택 성공 알림
-            roomEventWaitManager.notifySuccess(event.getEventId(), selectedMiniGames);
+            roomEventWaitManager.notifySuccess(event.eventId(), selectedMiniGames);
 
             log.info("미니게임 선택 이벤트 처리 완료: eventId={}, joinCode={}, selectedCount={}",
-                    event.getEventId(), event.getJoinCode(), selectedMiniGames.size());
+                    event.eventId(), event.joinCode(), selectedMiniGames.size());
 
         } catch (final Exception e) {
             log.error("미니게임 선택 이벤트 처리 실패", e);
@@ -190,7 +190,7 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 }

@@ -21,9 +21,9 @@ public class RoomEventPublisher {
     public void publishRoomCreateEvent(RoomCreateEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("방 생성 이벤트 발행됨: eventId={}, hostName={}", event.getEventId(), event.getHostName());
+            log.info("방 생성 이벤트 발행됨: eventId={}, hostName={}", event.eventId(), event.hostName());
         } catch (Exception e) {
-            log.error("방 생성 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+            log.error("방 생성 이벤트 발행 실패: eventId={}", event.eventId(), e);
         }
     }
 
@@ -31,9 +31,9 @@ public class RoomEventPublisher {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("방 참가 이벤트 발행됨: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+                    event.eventId(), event.joinCode(), event.guestName());
         } catch (Exception e) {
-            log.error("방 참가 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+            log.error("방 참가 이벤트 발행 실패: eventId={}", event.eventId(), e);
         }
     }
 
@@ -41,9 +41,9 @@ public class RoomEventPublisher {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("플레이어 ready 이벤트 발행됨: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
         } catch (Exception e) {
-            log.error("플레이어 ready 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+            log.error("플레이어 ready 이벤트 발행 실패: eventId={}", event.eventId(), e);
         }
     }
 
@@ -51,9 +51,9 @@ public class RoomEventPublisher {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("미니게임 선택 이벤트 발행됨: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
-                    event.getEventId(), event.getJoinCode(), event.getHostName(), event.getMiniGameTypes());
+                    event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
         } catch (final Exception e) {
-            log.error("미니게임 선택 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+            log.error("미니게임 선택 이벤트 발행 실패: eventId={}", event.eventId(), e);
         }
     }
 }

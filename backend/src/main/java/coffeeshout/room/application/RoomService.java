@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -78,7 +79,7 @@ public class RoomService {
         final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishRoomCreateEvent(event),
                 "방 생성",
                 String.format("joinCode=%s", joinCode.getValue()),
@@ -94,7 +95,7 @@ public class RoomService {
         final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishRoomJoinEvent(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
@@ -110,7 +111,7 @@ public class RoomService {
         final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, playerName, isReady);
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishPlayerReadyEvent(event),
                 "플레이어 ready",
                 String.format("joinCode=%s, playerName=%s, isReady=%s", joinCode, playerName, isReady),
@@ -126,7 +127,7 @@ public class RoomService {
         final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, hostName, miniGameTypes);
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishMiniGameSelectEvent(event),
                 "미니게임 선택",
                 String.format("joinCode=%s, hostName=%s, miniGameTypes=%s", joinCode, hostName, miniGameTypes),
@@ -140,7 +141,7 @@ public class RoomService {
             Runnable eventPublisher,
             String operationName,
             String logParams,
-            java.util.function.Function<T, String> successLogParams
+            Function<T, String> successLogParams
     ) {
 
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
