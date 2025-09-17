@@ -40,6 +40,7 @@ public class DelayedPlayerRemovalService {
         if (!roomService.isReadyState(joinCode)) {
             return;
         }
+
         log.info("플레이어 지연 삭제 스케줄링: playerKey={}, sessionId={}, delay={}초",
                 playerKey, sessionId, REMOVAL_DELAY.getSeconds());
 
