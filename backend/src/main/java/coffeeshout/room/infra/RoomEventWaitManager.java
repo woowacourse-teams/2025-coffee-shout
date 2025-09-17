@@ -70,4 +70,9 @@ public class RoomEventWaitManager {
         future.completeExceptionally(throwable);
         log.debug("방 이벤트 실패 알림: eventId={}", eventId);
     }
+
+    public void cleanup(String eventId) {
+        pendingEvents.remove(eventId);
+        log.debug("방 이벤트 정리: eventId={}", eventId);
+    }
 }

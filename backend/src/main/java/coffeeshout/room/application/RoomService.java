@@ -27,6 +27,8 @@ import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,7 +69,9 @@ public class RoomService {
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
-    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
+    // === 비동기 메서드들 (Controller용) ===
+    
+    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
         // joinCode 먼저 생성
         final JoinCode joinCode = joinCodeGenerator.generate();
 
@@ -75,22 +79,76 @@ public class RoomService {
         final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
 
         // Future 등록
-        roomEventWaitManager.registerWait(event.getEventId());
+        final CompletableFuture<Room> future = roomEventWaitManager.registerWait(event.getEventId());
 
         // 이벤트 발행
         roomEventPublisher.publishRoomCreateEvent(event);
 
-        // Future로 결과 대기 (최대 5초)
-        final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
-
-        if (room == null) {
-            log.error("방 생성 이벤트 처리 실패: eventId={}, joinCode={}", event.getEventId(), joinCode.getValue());
-            throw new RuntimeException("방 생성 실패");
-        }
-
-        log.info("방 생성 완료: joinCode={}, eventId={}", room.getJoinCode().getValue(), event.getEventId());
-        return room;
+        // 5초 타임아웃과 정리 작업 포함해서 Future 반환
+        return future.orTimeout(5, TimeUnit.SECONDS)
+                .whenComplete((room, throwable) -> {
+                    roomEventWaitManager.cleanup(event.getEventId());
+                    if (throwable != null) {
+                        log.error("방 생성 비동기 처리 실패: eventId={}, joinCode={}", 
+                                event.getEventId(), joinCode.getValue(), throwable);
+                    } else {
+                        log.info("방 생성 비동기 처리 완료: joinCode={}, eventId={}", 
+                                room.getJoinCode().getValue(), event.getEventId());
+                    }
+                });
     }
+
+    public CompletableFuture<Room> enterRoomAsync(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        // 이벤트 발행만 함 - 실제 처리는 리스너에서
+        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+
+        // Future 등록
+        final CompletableFuture<Room> future = roomEventWaitManager.registerWait(event.getEventId());
+
+        // 이벤트 발행
+        roomEventPublisher.publishRoomJoinEvent(event);
+
+        // 5초 타임아웃과 정리 작업 포함해서 Future 반환
+        return future.orTimeout(5, TimeUnit.SECONDS)
+                .whenComplete((room, throwable) -> {
+                    roomEventWaitManager.cleanup(event.getEventId());
+                    if (throwable != null) {
+                        log.error("방 참가 비동기 처리 실패: eventId={}, joinCode={}, guestName={}", 
+                                event.getEventId(), joinCode, guestName, throwable);
+                    } else {
+                        log.info("방 참가 비동기 처리 완료: joinCode={}, guestName={}, eventId={}", 
+                                joinCode, guestName, event.getEventId());
+                    }
+                });
+    }
+
+    // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
+    
+    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
+        try {
+            return createRoomAsync(hostName, selectedMenuRequest).join();
+        } catch (Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("방 생성 실패", cause);
+        }
+    }
+
+    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        try {
+            return enterRoomAsync(joinCode, guestName, selectedMenuRequest).join();
+        } catch (Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("방 참가 실패", cause);
+        }
+    }
+
+    // === Internal 메서드들 (Redis 리스너용) ===
 
     public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue) {
         final JoinCode joinCode = new JoinCode(joinCodeValue);
@@ -107,30 +165,6 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        // 이벤트 발행만 함 - 실제 처리는 리스너에서
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
-
-        // Future 등록
-        roomEventWaitManager.registerWait(event.getEventId());
-
-        // 이벤트 발행
-        roomEventPublisher.publishRoomJoinEvent(event);
-
-        // Future로 결과 대기 (최대 5초)
-        final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
-
-        if (room == null) {
-            log.error("방 참가 이벤트 처리 실패: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), joinCode, guestName);
-            throw new RuntimeException("방 참가 실패");
-        }
-
-        log.info("방 참가 완료: joinCode={}, guestName={}, eventId={}",
-                joinCode, guestName, event.getEventId());
-        return room;
-    }
-
     public Room enterRoomInternal(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
@@ -139,6 +173,8 @@ public class RoomService {
 
         return roomCommandService.save(room);
     }
+
+    // === 나머지 기존 메서드들 (변경 없음) ===
 
     public List<Player> getAllPlayers(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
@@ -242,6 +278,11 @@ public class RoomService {
         return isRemoved;
     }
 
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
+
     private void scheduleRemoveRoom(JoinCode joinCode) {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
@@ -255,10 +296,5 @@ public class RoomService {
             return new CustomMenu(selectedMenuRequest.customName(), defaultCategoryImage);
         }
         return menuQueryService.getById(selectedMenuRequest.id());
-    }
-
-    public boolean isReadyState(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.isReadyState();
     }
 }
