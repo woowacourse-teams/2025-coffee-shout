@@ -53,7 +53,7 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
   );
 
   const showToast = useCallback(
-    ({ message, type = 'info', duration = 3000 }: ToastOptions) => {
+    ({ message, type = 'info', duration = 1200 }: ToastOptions) => {
       clearTimer();
       displayToast(message, type);
       setupExitTimer(duration);
