@@ -24,10 +24,10 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
       return;
     }
 
-    const shouldResubscribe =
+    const shouldSubscribe =
       !lastConnectedRef.current || (lastConnectedRef.current && !subscriptionRef.current);
 
-    if (shouldResubscribe) {
+    if (shouldSubscribe) {
       try {
         const subscription = subscribe<T>(destination, onData);
         subscriptionRef.current = subscription;
