@@ -7,8 +7,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.infra.BroadcastEventPublisher;
+import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
+import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,7 @@ class RoomStateUpdateEventListenerTest {
     private RoomService roomService;
 
     @Mock
-    private LoggingSimpMessagingTemplate messagingTemplate;
+    private BroadcastEventPublisher broadcastEventPublisher;
 
     @InjectMocks
     private RoomStateUpdateEventListener listener;
@@ -32,8 +34,8 @@ class RoomStateUpdateEventListenerTest {
     @Test
     void 방이_존재할_때는_상태_브로드캐스트를_수행한다() {
         // given
-        String joinCode = "TEST3";
-        RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
+        final String joinCode = "TEST3";
+        final RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
 
         when(roomService.roomExists(joinCode)).thenReturn(true);
         when(roomService.getAllPlayers(joinCode)).thenReturn(List.of());
@@ -46,14 +48,15 @@ class RoomStateUpdateEventListenerTest {
         verify(roomService).roomExists(joinCode);
         verify(roomService).getAllPlayers(joinCode);
         verify(roomService).getProbabilities(joinCode);
-        verify(messagingTemplate, times(2)).convertAndSend(anyString(), any());
+        verify(broadcastEventPublisher).publishPlayerUpdateEvent(any(PlayerUpdateBroadcastEvent.class));
+        verify(broadcastEventPublisher).publishProbabilityUpdateEvent(any(ProbabilityUpdateBroadcastEvent.class));
     }
 
     @Test
     void 방이_존재하지_않을_때는_상태_브로드캐스트를_수행하지_않는다() {
         // given
-        String joinCode = "ERROR";
-        RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
+        final String joinCode = "ERROR";
+        final RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
 
         when(roomService.roomExists(joinCode)).thenReturn(false);
 
@@ -64,6 +67,7 @@ class RoomStateUpdateEventListenerTest {
         verify(roomService).roomExists(joinCode);
         verify(roomService, never()).getAllPlayers(anyString());
         verify(roomService, never()).getProbabilities(anyString());
-        verify(messagingTemplate, never()).convertAndSend(anyString(), any());
+        verify(broadcastEventPublisher, never()).publishPlayerUpdateEvent(any(PlayerUpdateBroadcastEvent.class));
+        verify(broadcastEventPublisher, never()).publishProbabilityUpdateEvent(any(ProbabilityUpdateBroadcastEvent.class));
     }
 }
