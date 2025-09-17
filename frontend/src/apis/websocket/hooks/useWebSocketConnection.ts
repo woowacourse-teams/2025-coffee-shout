@@ -20,11 +20,13 @@ export const useWebSocketConnection = () => {
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
+    console.error('❌ StompError 발생');
   }, []);
 
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
+    console.error('❌ WebSocketError 발생');
   }, []);
 
   const setupStompClient = useCallback(
