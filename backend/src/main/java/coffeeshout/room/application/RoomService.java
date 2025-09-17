@@ -8,6 +8,7 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import java.util.concurrent.CompletableFuture;
 import coffeeshout.room.domain.event.RoomCreateEvent;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -22,7 +23,7 @@ import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.RoomEventPublisher;
-import coffeeshout.room.infra.RoomCreationWaitManager;
+import coffeeshout.room.infra.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class RoomService {
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomEventPublisher roomEventPublisher;
-    private final RoomCreationWaitManager roomCreationWaitManager;
+    private final RoomEventWaitManager roomEventWaitManager;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -53,7 +54,7 @@ public class RoomService {
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
             RoomEventPublisher roomEventPublisher,
-            RoomCreationWaitManager roomCreationWaitManager,
+            RoomEventWaitManager roomEventWaitManager,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -63,7 +64,7 @@ public class RoomService {
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
         this.roomEventPublisher = roomEventPublisher;
-        this.roomCreationWaitManager = roomCreationWaitManager;
+        this.roomEventWaitManager = roomEventWaitManager;
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
@@ -75,13 +76,13 @@ public class RoomService {
         final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
         
         // Future 등록
-        roomCreationWaitManager.registerWait(event.getEventId());
+        roomEventWaitManager.registerWait(event.getEventId());
         
         // 이벤트 발행
         roomEventPublisher.publishRoomCreateEvent(event);
         
         // Future로 결과 대기 (최대 5초)
-        final Room room = roomCreationWaitManager.waitForCompletion(event.getEventId(), 5);
+        final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
         
         if (room == null) {
             log.error("방 생성 이벤트 처리 실패: eventId={}, joinCode={}", event.getEventId(), joinCode.getValue());
@@ -111,6 +112,30 @@ public class RoomService {
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        // 이벤트 발행만 함 - 실제 처리는 리스너에서
+        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+        
+        // Future 등록
+        roomEventWaitManager.registerWait(event.getEventId());
+        
+        // 이벤트 발행
+        roomEventPublisher.publishRoomJoinEvent(event);
+        
+        // Future로 결과 대기 (최대 5초)
+        final Room room = roomEventWaitManager.waitForCompletion(event.getEventId(), 5);
+        
+        if (room == null) {
+            log.error("방 참가 이벤트 처리 실패: eventId={}, joinCode={}, guestName={}", 
+                    event.getEventId(), joinCode, guestName);
+            throw new RuntimeException("방 참가 실패");
+        }
+        
+        log.info("방 참가 완료: joinCode={}, guestName={}, eventId={}", 
+                joinCode, guestName, event.getEventId());
+        return room;
+    }
+
+    public Room enterRoomInternal(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
@@ -139,10 +164,11 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player player = room.findPlayer(new PlayerName(playerName));
 
-        if (player.getPlayerType() != PlayerType.HOST) {
-            player.updateReadyState(isReady);
+        if (player.getPlayerType() == PlayerType.HOST) {
+            return room.getPlayers();
         }
-
+        
+        player.updateReadyState(isReady);
         return room.getPlayers();
     }
 
@@ -211,10 +237,12 @@ public class RoomService {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
         final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-        if (room.isEmpty()) {
-            roomCommandService.delete(code);
+        
+        if (!room.isEmpty()) {
+            return isRemoved;
         }
-
+        
+        roomCommandService.delete(code);
         return isRemoved;
     }
 

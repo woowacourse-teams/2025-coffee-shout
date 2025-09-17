@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class RoomCreationWaitManager {
+public class RoomEventWaitManager {
     
-    private final ConcurrentHashMap<String, CompletableFuture<Room>> pendingCreations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CompletableFuture<Room>> pendingEvents = new ConcurrentHashMap<>();
     
     public CompletableFuture<Room> registerWait(String eventId) {
         final CompletableFuture<Room> future = new CompletableFuture<>();
-        pendingCreations.put(eventId, future);
-        log.debug("방 생성 Future 등록: eventId={}", eventId);
+        pendingEvents.put(eventId, future);
+        log.debug("방 이벤트 Future 등록: eventId={}", eventId);
         return future;
     }
     
     public Room waitForCompletion(String eventId, long timeoutSeconds) {
-        final CompletableFuture<Room> future = pendingCreations.get(eventId);
+        final CompletableFuture<Room> future = pendingEvents.get(eventId);
         if (future == null) {
             log.warn("등록되지 않은 이벤트 대기 시도: eventId={}", eventId);
             return null;
@@ -29,36 +29,44 @@ public class RoomCreationWaitManager {
         
         try {
             final Room result = future.get(timeoutSeconds, TimeUnit.SECONDS);
-            log.info("방 생성 완료: eventId={}", eventId);
+            log.info("방 이벤트 완료: eventId={}", eventId);
             return result;
         } catch (java.util.concurrent.ExecutionException e) {
-            log.error("방 생성 대기 실패: eventId={}", eventId, e);
+            log.error("방 이벤트 대기 실패: eventId={}", eventId, e);
             final Throwable cause = e.getCause();
+            
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
             }
+            
             throw new RuntimeException(cause);
         } catch (Exception e) {
-            log.error("방 생성 대기 실패: eventId={}", eventId, e);
+            log.error("방 이벤트 대기 실패: eventId={}", eventId, e);
             return null;
         } finally {
-            pendingCreations.remove(eventId);
+            pendingEvents.remove(eventId);
         }
     }
     
     public void notifySuccess(String eventId, Room room) {
-        final CompletableFuture<Room> future = pendingCreations.get(eventId);
-        if (future != null) {
-            future.complete(room);
-            log.debug("방 생성 성공 알림: eventId={}", eventId);
+        final CompletableFuture<Room> future = pendingEvents.get(eventId);
+        
+        if (future == null) {
+            return;
         }
+        
+        future.complete(room);
+        log.debug("방 이벤트 성공 알림: eventId={}", eventId);
     }
     
     public void notifyFailure(String eventId, Throwable throwable) {
-        final CompletableFuture<Room> future = pendingCreations.get(eventId);
-        if (future != null) {
-            future.completeExceptionally(throwable);
-            log.debug("방 생성 실패 알림: eventId={}", eventId);
+        final CompletableFuture<Room> future = pendingEvents.get(eventId);
+        
+        if (future == null) {
+            return;
         }
+        
+        future.completeExceptionally(throwable);
+        log.debug("방 이벤트 실패 알림: eventId={}", eventId);
     }
 }

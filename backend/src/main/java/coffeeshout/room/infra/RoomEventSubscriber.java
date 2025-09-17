@@ -3,6 +3,7 @@ package coffeeshout.room.infra;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class RoomEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
-    private final RoomCreationWaitManager roomCreationWaitManager;
+    private final RoomEventWaitManager roomEventWaitManager;
 
     @PostConstruct
     public void subscribe() {
@@ -32,9 +33,28 @@ public class RoomEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        RoomCreateEvent event = null;
         try {
             final String body = new String(message.getBody());
+            
+            if (body.contains("\"hostName\"")) {
+                handleRoomCreateEvent(body);
+                return;
+            }
+            
+            if (body.contains("\"guestName\"")) {
+                handleRoomJoinEvent(body);
+                return;
+            }
+            
+            log.warn("알 수 없는 이벤트 타입: {}", body);
+        } catch (Exception e) {
+            log.error("이벤트 처리 실패", e);
+        }
+    }
+    
+    private void handleRoomCreateEvent(String body) {
+        RoomCreateEvent event = null;
+        try {
             event = objectMapper.readValue(body, RoomCreateEvent.class);
 
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
@@ -48,29 +68,50 @@ public class RoomEventSubscriber implements MessageListener {
             );
 
             // 방 생성 성공 알림
-            roomCreationWaitManager.notifySuccess(event.getEventId(), room);
+            roomEventWaitManager.notifySuccess(event.getEventId(), room);
 
             log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", event.getEventId(), event.getJoinCode());
 
         } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
-            handleEventFailure(message, event, e);
+            
+            if (event == null) {
+                return;
+            }
+            
+            roomEventWaitManager.notifyFailure(event.getEventId(), e);
         }
     }
     
-    private void handleEventFailure(Message message, RoomCreateEvent event, Exception e) {
-        if (event != null) {
-            roomCreationWaitManager.notifyFailure(event.getEventId(), e);
-            return;
-        }
-        
-        // 이벤트 파싱 실패한 경우
+    private void handleRoomJoinEvent(String body) {
+        RoomJoinEvent event = null;
         try {
-            final String body = new String(message.getBody());
-            final RoomCreateEvent failedEvent = objectMapper.readValue(body, RoomCreateEvent.class);
-            roomCreationWaitManager.notifyFailure(failedEvent.getEventId(), e);
-        } catch (Exception ex) {
-            log.error("실패한 이벤트의 Future 처리 실패", ex);
+            event = objectMapper.readValue(body, RoomJoinEvent.class);
+
+            log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
+                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+
+            // 모든 인스턴스가 동일하게 처리
+            final Room room = roomService.enterRoomInternal(
+                    event.getJoinCode(),
+                    event.getGuestName(),
+                    event.getSelectedMenuRequest()
+            );
+
+            // 방 참가 성공 알림
+            roomEventWaitManager.notifySuccess(event.getEventId(), room);
+
+            log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}", 
+                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+
+        } catch (Exception e) {
+            log.error("방 참가 이벤트 처리 실패", e);
+            
+            if (event == null) {
+                return;
+            }
+            
+            roomEventWaitManager.notifyFailure(event.getEventId(), e);
         }
     }
 }

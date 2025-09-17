@@ -1,6 +1,7 @@
 package coffeeshout.room.infra;
 
 import coffeeshout.room.domain.event.RoomCreateEvent;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +22,16 @@ public class RoomEventPublisher {
             log.info("방 생성 이벤트 발행됨: eventId={}, hostName={}", event.getEventId(), event.getHostName());
         } catch (Exception e) {
             log.error("방 생성 이벤트 발행 실패: eventId={}", event.getEventId(), e);
+        }
+    }
+    
+    public void publishRoomJoinEvent(RoomJoinEvent event) {
+        try {
+            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            log.info("방 참가 이벤트 발행됨: eventId={}, joinCode={}, guestName={}", 
+                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+        } catch (Exception e) {
+            log.error("방 참가 이벤트 발행 실패: eventId={}", event.getEventId(), e);
         }
     }
 }
