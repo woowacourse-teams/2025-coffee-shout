@@ -19,7 +19,6 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
@@ -29,6 +28,7 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.RoomEventPublisher;
 import coffeeshout.room.infra.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
+import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -319,12 +319,6 @@ public class RoomService {
         }
     }
 
-    public Map<Player, Probability> getProbabilities(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        return room.getProbabilities();
-    }
-
     public List<MiniGameType> getAllMiniGames() {
         return Arrays.stream(MiniGameType.values())
                 .toList();
@@ -338,6 +332,13 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
         return room.hasDuplicatePlayerName(new PlayerName(guestName));
+    }
+
+    public List<ProbabilityResponse> getProbabilities(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.getPlayers().stream()
+                .map(ProbabilityResponse::from)
+                .toList();
     }
 
     public Map<Player, MiniGameScore> getMiniGameScores(String joinCode, MiniGameType miniGameType) {

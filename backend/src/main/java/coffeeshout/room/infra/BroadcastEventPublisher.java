@@ -4,7 +4,6 @@ import coffeeshout.room.ui.event.BroadcastEvent;
 import coffeeshout.room.ui.event.ErrorBroadcastEvent;
 import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +21,6 @@ public class BroadcastEventPublisher {
 
     public void publishPlayerUpdateEvent(PlayerUpdateBroadcastEvent event) {
         publishEvent(event, "플레이어 업데이트");
-    }
-
-    public void publishProbabilityUpdateEvent(ProbabilityUpdateBroadcastEvent event) {
-        publishEvent(event, "확률 업데이트");
     }
 
     public void publishMiniGameUpdateEvent(MiniGameUpdateBroadcastEvent event) {

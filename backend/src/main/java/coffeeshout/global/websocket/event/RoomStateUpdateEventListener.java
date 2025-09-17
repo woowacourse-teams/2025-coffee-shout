@@ -3,9 +3,7 @@ package coffeeshout.global.websocket.event;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.infra.BroadcastEventPublisher;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import coffeeshout.room.ui.response.PlayerResponse;
-import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +32,6 @@ public class RoomStateUpdateEventListener {
     private void broadcastRoomState(String joinCode) {
         if (roomService.roomExists(joinCode)) {
             sendPlayerStatus(joinCode);
-            sendProbabilitiesStatus(joinCode);
             log.info("방 상태 브로드캐스트 완료: joinCode={}", joinCode);
         }
     }
@@ -47,15 +44,5 @@ public class RoomStateUpdateEventListener {
 
         final PlayerUpdateBroadcastEvent event = PlayerUpdateBroadcastEvent.create(joinCode, responses);
         broadcastEventPublisher.publishPlayerUpdateEvent(event);
-    }
-
-    private void sendProbabilitiesStatus(String joinCode) {
-        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
-                .stream()
-                .map(ProbabilityResponse::from)
-                .toList();
-
-        final ProbabilityUpdateBroadcastEvent event = ProbabilityUpdateBroadcastEvent.create(joinCode, responses);
-        broadcastEventPublisher.publishProbabilityUpdateEvent(event);
     }
 }

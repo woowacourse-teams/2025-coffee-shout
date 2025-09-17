@@ -6,14 +6,12 @@ import coffeeshout.room.infra.BroadcastEventPublisher;
 import coffeeshout.room.ui.event.ErrorBroadcastEvent;
 import coffeeshout.room.ui.event.MiniGameUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import coffeeshout.room.ui.event.ProbabilityUpdateBroadcastEvent;
 import coffeeshout.room.ui.event.WinnerAnnouncementBroadcastEvent;
 import coffeeshout.room.ui.request.MenuChangeMessage;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
-import coffeeshout.room.ui.response.ProbabilityResponse;
 import coffeeshout.room.ui.response.WinnerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
@@ -109,29 +107,6 @@ public class RoomWebSocketController {
                     broadcastEventPublisher.publishErrorEvent(errorEvent);
                     return null;
                 });
-    }
-
-    @MessageMapping("/room/{joinCode}/get-probabilities")
-    @MessageResponse(
-            path = "/room/{joinCode}/roulette",
-            returnType = List.class,
-            genericType = ProbabilityResponse.class
-    )
-    @Operation(
-            summary = "룰렛 확률 정보 조회 및 브로드캐스트",
-            description = """
-                    룰렛 게임의 확률 정보를 조회하고 모든 참가자에게 브로드캐스트합니다.
-                    각 플레이어별 당첨 확률을 계산하여 룰렛 채널을 통해 실시간으로 전달합니다.
-                    """
-    )
-    public void broadcastProbabilities(@DestinationVariable String joinCode) {
-        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
-                .stream()
-                .map(ProbabilityResponse::from)
-                .toList();
-
-        final ProbabilityUpdateBroadcastEvent event = ProbabilityUpdateBroadcastEvent.create(joinCode, responses);
-        broadcastEventPublisher.publishProbabilityUpdateEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")

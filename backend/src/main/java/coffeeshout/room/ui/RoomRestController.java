@@ -2,10 +2,10 @@ package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
+import coffeeshout.room.ui.response.ProbabilityResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
@@ -75,6 +75,13 @@ public class RoomRestController {
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
 
+    @GetMapping("/probabilities")
+    public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@RequestParam String joinCode) {
+        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode);
+
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/minigames")
     public ResponseEntity<List<MiniGameType>> getMiniGames() {
         final List<MiniGameType> responses = roomService.getAllMiniGames();
@@ -83,7 +90,7 @@ public class RoomRestController {
     }
 
     @GetMapping("/minigames/selected")
-    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode){
+    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
         final List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
