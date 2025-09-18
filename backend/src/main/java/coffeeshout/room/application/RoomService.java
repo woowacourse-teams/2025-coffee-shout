@@ -25,16 +25,11 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.RoomEventPublisher;
-import coffeeshout.room.infra.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,8 +44,6 @@ public class RoomService {
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
-    private final RoomEventPublisher roomEventPublisher;
-    private final RoomEventWaitManager roomEventWaitManager;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -60,8 +53,6 @@ public class RoomService {
             QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
-            RoomEventPublisher roomEventPublisher,
-            RoomEventWaitManager roomEventWaitManager,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -70,165 +61,39 @@ public class RoomService {
         this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
-        this.roomEventPublisher = roomEventPublisher;
-        this.roomEventWaitManager = roomEventWaitManager;
         this.defaultCategoryImage = defaultCategoryImage;
-    }
-
-    // === 비동기 메서드들 (Controller용) ===
-
-    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        final JoinCode joinCode = joinCodeGenerator.generate();
-        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
-
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishRoomCreateEvent(event),
-                "방 생성",
-                String.format("joinCode=%s", joinCode.getValue()),
-                room -> String.format("joinCode=%s", room.getJoinCode().getValue())
-        );
-    }
-
-    public CompletableFuture<Room> enterRoomAsync(
-            String joinCode,
-            String guestName,
-            SelectedMenuRequest selectedMenuRequest
-    ) {
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
-
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishRoomJoinEvent(event),
-                "방 참가",
-                String.format("joinCode=%s, guestName=%s", joinCode, guestName),
-                room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
-        );
-    }
-
-    public CompletableFuture<List<Player>> changePlayerReadyStateAsync(
-            String joinCode,
-            String playerName,
-            Boolean isReady
-    ) {
-        final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, playerName, isReady);
-
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishPlayerReadyEvent(event),
-                "플레이어 ready",
-                String.format("joinCode=%s, playerName=%s, isReady=%s", joinCode, playerName, isReady),
-                players -> String.format("joinCode=%s, playerName=%s, isReady=%s", joinCode, playerName, isReady)
-        );
-    }
-
-    public CompletableFuture<List<MiniGameType>> updateMiniGamesAsync(
-            String joinCode,
-            String hostName,
-            List<MiniGameType> miniGameTypes
-    ) {
-        final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, hostName, miniGameTypes);
-
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishMiniGameSelectEvent(event),
-                "미니게임 선택",
-                String.format("joinCode=%s, hostName=%s, miniGameTypes=%s", joinCode, hostName, miniGameTypes),
-                selectedGames -> String.format("joinCode=%s, hostName=%s, selectedCount=%d", joinCode, hostName,
-                        selectedGames.size())
-        );
-    }
-
-    public CompletableFuture<Winner> spinRouletteAsync(String joinCode, String hostName) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
-        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, hostName, winner);
-
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishRouletteSpinEvent(event),
-                "룰렛 스핀",
-                String.format("joinCode=%s, hostName=%s", joinCode, hostName),
-                winnerResponse -> String.format("joinCode=%s, hostName=%s, winner=%s", joinCode, hostName,
-                        winnerResponse.name().value())
-        );
-    }
-
-    private <T> CompletableFuture<T> processEventAsync(
-            String eventId,
-            Runnable eventPublisher,
-            String operationName,
-            String logParams,
-            Function<T, String> successLogParams
-    ) {
-
-        final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
-        eventPublisher.run();
-
-        return future.orTimeout(5, TimeUnit.SECONDS)
-                .whenComplete((result, throwable) -> {
-                    roomEventWaitManager.cleanup(eventId);
-                    if (throwable != null) {
-                        log.error("{} 비동기 처리 실패: eventId={}, {}",
-                                operationName, eventId, logParams, throwable);
-                        return;
-                    }
-                    log.info("{} 비동기 처리 완료: {}, eventId={}",
-                            operationName, successLogParams.apply(result), eventId);
-                });
     }
 
     // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
 
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        try {
-            return createRoomAsync(hostName, selectedMenuRequest).join();
-        } catch (Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("방 생성 실패", cause);
-        }
+        final JoinCode joinCode = joinCodeGenerator.generate();
+        return createRoomInternal(hostName, selectedMenuRequest, joinCode.getValue());
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        try {
-            return enterRoomAsync(joinCode, guestName, selectedMenuRequest).join();
-        } catch (Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("방 참가 실패", cause);
-        }
+        return enterRoomInternal(joinCode, guestName, selectedMenuRequest);
     }
 
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        try {
-            return changePlayerReadyStateAsync(joinCode, playerName, isReady).join();
-        } catch (final Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("플레이어 ready 상태 변경 실패", cause);
-        }
+        return changePlayerReadyStateInternal(joinCode, playerName, isReady);
     }
 
     public Winner spinRoulette(String joinCode, String hostName) {
-        try {
-            return spinRouletteAsync(joinCode, hostName).join();
-        } catch (final Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("룰렛 스핀 실패", cause);
-        }
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
     }
 
     // === Internal 메서드들 (Redis 리스너용) ===
+
+    public Room getRoomByJoinCode(String joinCode) {
+        return roomQueryService.getByJoinCode(new JoinCode(joinCode));
+    }
+
+    public List<Player> getPlayersInternal(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.getPlayers();
+    }
 
     public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue) {
         final JoinCode joinCode = new JoinCode(joinCodeValue);
@@ -303,15 +168,7 @@ public class RoomService {
     }
 
     public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        try {
-            return updateMiniGamesAsync(joinCode, hostName, miniGameTypes).join();
-        } catch (final Exception e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("미니게임 선택 실패", cause);
-        }
+        return updateMiniGamesInternal(joinCode, hostName, miniGameTypes);
     }
 
     public List<MiniGameType> getAllMiniGames() {

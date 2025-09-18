@@ -4,6 +4,7 @@ public enum RoomEventType {
     ROOM_CREATE,
     ROOM_JOIN,
     PLAYER_READY,
+    PLAYER_LIST_UPDATE,
     MINI_GAME_SELECT,
     ROULETTE_SPIN
 }

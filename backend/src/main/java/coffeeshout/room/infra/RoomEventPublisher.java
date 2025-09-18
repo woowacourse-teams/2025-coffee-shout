@@ -1,6 +1,7 @@
 package coffeeshout.room.infra;
 
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
+import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -38,7 +39,17 @@ public class RoomEventPublisher {
         }
     }
 
-    public void publishPlayerReadyEvent(final PlayerReadyEvent event) {
+    public void publishPlayerListUpdateEvent(PlayerListUpdateEvent event) {
+        try {
+            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            log.info("플레이어 목록 업데이트 이벤트 발행됨: eventId={}, joinCode={}",
+                    event.eventId(), event.joinCode());
+        } catch (Exception e) {
+            log.error("플레이어 목록 업데이트 이벤트 발행 실패: eventId={}", event.eventId(), e);
+        }
+    }
+
+    public void publishPlayerReadyEvent(PlayerReadyEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("플레이어 ready 이벤트 발행됨: eventId={}, joinCode={}, playerName={}, isReady={}",
@@ -48,7 +59,7 @@ public class RoomEventPublisher {
         }
     }
 
-    public void publishMiniGameSelectEvent(final MiniGameSelectEvent event) {
+    public void publishMiniGameSelectEvent(MiniGameSelectEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("미니게임 선택 이벤트 발행됨: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
@@ -58,7 +69,7 @@ public class RoomEventPublisher {
         }
     }
 
-    public void publishRouletteSpinEvent(final RouletteSpinEvent event) {
+    public void publishRouletteSpinEvent(RouletteSpinEvent event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
             log.info("룰렛 스핀 이벤트 발행됨: eventId={}, joinCode={}, hostName={}",
