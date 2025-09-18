@@ -8,8 +8,9 @@ import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.PlayerHands;
-import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
+import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
 import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.player.Player;
@@ -37,10 +38,10 @@ class MiniGameServiceManagerTest extends ServiceTest {
         final CardGame cardGame = new CardGame(players, joinCode, new CardGameRandomDeckGenerator());
         final PlayerHands playerHands = new PlayerHands(players);
 
-        playerHands.put(new PlayerName("꾹이"), new AdditionCard(40));
-        playerHands.put(new PlayerName("루키"), new AdditionCard(30));
-        playerHands.put(new PlayerName("엠제이"), new AdditionCard(20));
-        playerHands.put(new PlayerName("한스"), new AdditionCard(10));
+        playerHands.put(new PlayerName("꾹이"), new Card(CardType.ADDITION, 40));
+        playerHands.put(new PlayerName("루키"), new Card(CardType.ADDITION, 30));
+        playerHands.put(new PlayerName("엠제이"), new Card(CardType.ADDITION, 20));
+        playerHands.put(new PlayerName("한스"), new Card(CardType.ADDITION, 10));
 
         ReflectionTestUtils.setField(cardGame, "playerHands", playerHands);
         cardGameCommandService.save(cardGame);
@@ -68,10 +69,10 @@ class MiniGameServiceManagerTest extends ServiceTest {
         final CardGame cardGame = new CardGame(players, joinCode, new CardGameRandomDeckGenerator());
         final PlayerHands playerHands = new PlayerHands(players);
 
-        playerHands.put(new PlayerName("꾹이"), new AdditionCard(40));
-        playerHands.put(new PlayerName("루키"), new AdditionCard(30));
-        playerHands.put(new PlayerName("엠제이"), new AdditionCard(20));
-        playerHands.put(new PlayerName("한스"), new AdditionCard(10));
+        playerHands.put(new PlayerName("꾹이"), new Card(CardType.ADDITION, 40));
+        playerHands.put(new PlayerName("루키"), new Card(CardType.ADDITION, 30));
+        playerHands.put(new PlayerName("엠제이"), new Card(CardType.ADDITION, 20));
+        playerHands.put(new PlayerName("한스"), new Card(CardType.ADDITION, 10));
 
         ReflectionTestUtils.setField(cardGame, "playerHands", playerHands);
         cardGameCommandService.save(cardGame);

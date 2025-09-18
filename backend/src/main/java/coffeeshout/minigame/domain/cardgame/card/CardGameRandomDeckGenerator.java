@@ -4,14 +4,13 @@ import java.util.List;
 
 public class CardGameRandomDeckGenerator implements CardGameDeckGenerator {
 
-    private static final AdditionCards ADDITION_CARDS = new AdditionCards();
-    private static final MultiplierCards MULTIPLIER_CARDS = new MultiplierCards();
 
     @Override
     public Deck generate(int additionCardCount, int multiplierCardCount) {
-        final List<Card> additionCards = ADDITION_CARDS.pickCards(additionCardCount);
-        final List<Card> multiplierCards = MULTIPLIER_CARDS.pickCards(multiplierCardCount);
+        final List<Card> additionCards = GameCard.getRandomAdditionCards(additionCardCount);
+        final List<Card> multiplierCards = GameCard.getRandomMultiplyCards(multiplierCardCount);
         final Deck deck = new Deck(additionCards, multiplierCards);
+        // TODO  Generator에서 섞는게 이상하다 ?????
         deck.shuffle();
         return deck;
     }

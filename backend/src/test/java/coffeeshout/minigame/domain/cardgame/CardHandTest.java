@@ -3,9 +3,8 @@ package coffeeshout.minigame.domain.cardgame;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
 import coffeeshout.minigame.domain.cardgame.card.Card;
-import coffeeshout.minigame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,9 +22,9 @@ class CardHandTest {
     @Test
     void 가지고_있는_카드들의_점수합을_반환한다() {
         // given
-        cardHand.put(new AdditionCard(10));
-        cardHand.put(new MultiplierCard(-2));
-        cardHand.put(new AdditionCard(30));
+        cardHand.put(new Card(CardType.ADDITION, 10));
+        cardHand.put(new Card(CardType.MULTIPLIER, -2));
+        cardHand.put(new Card(CardType.ADDITION, 30));
 
         // when
         CardGameScore cardGameScore = cardHand.calculateCardGameScore();
@@ -40,9 +39,9 @@ class CardHandTest {
     @Test
     void 해당_라운드에_해당_카드를_뽑았으면_true를_반환한다() {
         // given
-        Card firstRoundCard = new AdditionCard(10);
-        Card secondRoundCard = new MultiplierCard(-2);
-        Card notPickedCard = new MultiplierCard(1);
+        Card firstRoundCard = new Card(CardType.ADDITION, 10);
+        Card secondRoundCard = new Card(CardType.MULTIPLIER, 2);
+        Card notPickedCard = new Card(CardType.MULTIPLIER, 1);
         cardHand.put(firstRoundCard);
         cardHand.put(secondRoundCard);
 
@@ -58,7 +57,7 @@ class CardHandTest {
     @Test
     void 해당_라운드에_카드를_뽑았으면_true를_반환한다() {
         // given
-        cardHand.put(new AdditionCard(10));
+        cardHand.put(new Card(CardType.ADDITION, 10));
 
         // when & then
         SoftAssertions.assertSoftly(softly -> {
@@ -73,7 +72,7 @@ class CardHandTest {
         @Test
         void 카드를_추가한다() {
             // given
-            Card card = AdditionCard.PLUS_40;
+            Card card = new Card(CardType.ADDITION, 40);
 
             // when
             cardHand.put(card);
@@ -88,8 +87,8 @@ class CardHandTest {
         @Test
         void 여러_카드를_추가한다() {
             // given
-            Card card1 = AdditionCard.PLUS_40;
-            Card card2 = MultiplierCard.DOUBLE;
+            Card card1 = new Card(CardType.ADDITION, 40);
+            Card card2 = new Card(CardType.MULTIPLIER, 2);
 
             // when
             cardHand.put(card1);
@@ -110,7 +109,7 @@ class CardHandTest {
         @Test
         void 인덱스로_카드를_조회한다() {
             // given
-            Card card = AdditionCard.PLUS_30;
+            Card card = new Card(CardType.ADDITION, 30);
             cardHand.put(card);
 
             // when
@@ -143,8 +142,8 @@ class CardHandTest {
         @Test
         void 덧셈_카드만_있는_핸드의_점수를_계산한다() {
             // given
-            cardHand.put(AdditionCard.PLUS_40);
-            cardHand.put(AdditionCard.PLUS_30);
+            cardHand.put(new Card(CardType.ADDITION, 40));
+            cardHand.put(new Card(CardType.ADDITION, 30));
 
             // when
             CardGameScore score = cardHand.calculateCardGameScore();
@@ -160,7 +159,7 @@ class CardHandTest {
         @Test
         void 첫번째_라운드에서_선택했는지_확인한다() {
             // given
-            cardHand.put(AdditionCard.PLUS_40);
+            cardHand.put(new Card(CardType.ADDITION, 40));
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
@@ -172,8 +171,8 @@ class CardHandTest {
         @Test
         void 두번째_라운드에서_선택했는지_확인한다() {
             // given
-            cardHand.put(AdditionCard.PLUS_40); // 첫 번째 라운드
-            cardHand.put(MultiplierCard.DOUBLE); // 두 번째 라운드
+            cardHand.put(new Card(CardType.ADDITION, 40)); // 첫 번째 라운드
+            cardHand.put(new Card(CardType.MULTIPLIER, 2)); // 두 번째 라운드
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
@@ -198,8 +197,8 @@ class CardHandTest {
         @Test
         void 첫번째_라운드에_할당된_카드인지_확인한다() {
             // given
-            Card card1 = AdditionCard.PLUS_40;
-            Card card2 = MultiplierCard.DOUBLE;
+            Card card1 = new Card(CardType.ADDITION, 40);
+            Card card2 = new Card(CardType.MULTIPLIER, 2);
             cardHand.put(card1);
             cardHand.put(card2);
 
@@ -213,8 +212,8 @@ class CardHandTest {
         @Test
         void 두번째_라운드에_할당된_카드인지_확인한다() {
             // given
-            Card card1 = AdditionCard.PLUS_40;
-            Card card2 = MultiplierCard.DOUBLE;
+            Card card1 = new Card(CardType.ADDITION, 40);
+            Card card2 = new Card(CardType.MULTIPLIER, 2);
             cardHand.put(card1);
             cardHand.put(card2);
 
@@ -228,8 +227,8 @@ class CardHandTest {
         @Test
         void 존재하지_않는_카드는_할당되지_않은_카드이다() {
             // given
-            Card existingCard = AdditionCard.PLUS_40;
-            Card nonExistentCard = AdditionCard.PLUS_30;
+            Card existingCard = new Card(CardType.ADDITION, 40);
+            Card nonExistentCard = new Card(CardType.ADDITION, 30);
             cardHand.put(existingCard);
 
             // when & then
@@ -242,7 +241,7 @@ class CardHandTest {
         @Test
         void 라운드_범위를_벗어나면_할당되지_않은_카드이다() {
             // given
-            Card card = AdditionCard.PLUS_40;
+            Card card = new Card(CardType.ADDITION, 40);
             cardHand.put(card);
 
             // when & then
