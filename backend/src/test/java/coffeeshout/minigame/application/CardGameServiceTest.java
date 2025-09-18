@@ -52,7 +52,7 @@ class CardGameServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
-        players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
+        players = PlayersFixture.호스트꾹이_루키_엠제이_한스();
         host = players.getPlayer(new PlayerName("꾹이"));
         joinCode = new JoinCode("A4B5N");
     }

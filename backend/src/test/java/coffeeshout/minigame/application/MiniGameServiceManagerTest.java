@@ -34,7 +34,7 @@ class MiniGameServiceManagerTest extends ServiceTest {
     void 미니게임의_점수를_반환한다() {
         // given
         final JoinCode joinCode = new JoinCode("A4B5N");
-        final List<Player> players = PlayersFixture.호스트꾹이_루키_엠제이_한스.getPlayers();
+        final List<Player> players = PlayersFixture.호스트꾹이_루키_엠제이_한스().getPlayers();
         final CardGame cardGame = new CardGame(players, joinCode, new CardGameRandomDeckGenerator());
         final PlayerHands playerHands = new PlayerHands(players);
 
@@ -65,7 +65,7 @@ class MiniGameServiceManagerTest extends ServiceTest {
     void 미니게임의_순위를_반환한다() {
         // given
         final JoinCode joinCode = new JoinCode("A4B5N");
-        final List<Player> players = PlayersFixture.호스트꾹이_루키_엠제이_한스.getPlayers();
+        final List<Player> players = PlayersFixture.호스트꾹이_루키_엠제이_한스().getPlayers();
         final CardGame cardGame = new CardGame(players, joinCode, new CardGameRandomDeckGenerator());
         final PlayerHands playerHands = new PlayerHands(players);
 

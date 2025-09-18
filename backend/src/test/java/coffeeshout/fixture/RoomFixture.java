@@ -17,7 +17,7 @@ public final class RoomFixture {
                 PlayerFixture.호스트꾹이().getName(),
                 new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
         );
-        final Players players = PlayersFixture.루키_엠제이_한스_리스트;
+        final Players players = PlayersFixture.루키_엠제이_한스_리스트();
         players.getPlayers().forEach(player -> room.joinGuest(player.getName(), player.getSelectedMenu()));
         return room;
     }

@@ -14,7 +14,7 @@ class RouletteTest {
     @Test
     void 당첨자를_뽑는다() {
         // given
-        Players players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
+        Players players = PlayersFixture.호스트꾹이_루키_엠제이_한스();
         Roulette roulette = RouletteFixture.고정_끝값_반환();
 
         // when
