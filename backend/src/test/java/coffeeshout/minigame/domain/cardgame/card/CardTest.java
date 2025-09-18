@@ -22,7 +22,7 @@ class CardTest {
         return Stream.of(
                 Arguments.of(new Card(CardType.ADDITION, 10), new Card(CardType.ADDITION, 10)),
                 Arguments.of(
-                        new Card(CardType.ADDITION, 40), new Card(CardType.ADDITION, -40),
+                        new Card(CardType.ADDITION, -40), new Card(CardType.ADDITION, -40),
                         Arguments.of(new Card(CardType.MULTIPLIER, 4), new Card(CardType.MULTIPLIER, 4)),
                         Arguments.of(new Card(CardType.MULTIPLIER, 0), new Card(CardType.MULTIPLIER, 0)),
                         Arguments.of(new Card(CardType.MULTIPLIER, -1), new Card(CardType.MULTIPLIER, -1))
