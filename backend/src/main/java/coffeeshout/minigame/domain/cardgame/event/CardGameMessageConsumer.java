@@ -40,13 +40,13 @@ public class CardGameMessageConsumer {
     public void consumeCardGameStateChangeMessage(CardGameStateChangeMessage cardGameStateChangeMessage) {
         final JoinCode joinCode = new JoinCode(cardGameStateChangeMessage.joinCode());
         final Room room = roomQueryService.getByJoinCode(joinCode);
-        final CardGame cardGame = getCardGame(joinCode);
+        final CardGame cardGame = getCardGame(room);
         final CardGameTaskType currentTask = CardGameTaskType.valueOf(cardGameStateChangeMessage.currentTaskName());
         if (currentTask.isLastTask()) {
             return;
         }
         final CardGameTaskType nextTask = currentTask.nextTask();
-        final Instant instant = Instant.now().plusMillis(currentTask.getState().getDurationMillis().toMillis());
+        final Instant instant = Instant.ofEpochMilli(cardGameStateChangeMessage.nextTaskStartMillis());
         final Runnable runnable = nextTask.createTask(
                 cardGame,
                 room,
@@ -59,7 +59,7 @@ public class CardGameMessageConsumer {
     public void consumeCardGameStartMessage(CardGameStartMessage cardGameStartMessage) {
         final JoinCode joinCode = new JoinCode(cardGameStartMessage.joinCode());
         final Room room = roomQueryService.getByJoinCode(joinCode);
-        final CardGame cardGame = getCardGame(joinCode);
+        final CardGame cardGame = getCardGame(room);
         final CardGameTaskType currentTask = CardGameTaskType.valueOf(cardGameStartMessage.cardGameTaskType());
         final Runnable runnable = currentTask.createTask(
                 cardGame,
@@ -69,8 +69,7 @@ public class CardGameMessageConsumer {
         taskScheduler.schedule(runnable, Instant.now());
     }
 
-    private CardGame getCardGame(JoinCode joinCode) {
-        final Room room = roomQueryService.getByJoinCode(joinCode);
+    private CardGame getCardGame(Room room) {
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 }

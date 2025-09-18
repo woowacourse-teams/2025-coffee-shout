@@ -12,10 +12,12 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CardGameWebSocketBroker {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
@@ -23,9 +25,6 @@ public class CardGameWebSocketBroker {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
-    public CardGameWebSocketBroker(LoggingSimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-    }
 
     @EventListener
     @MessageResponse(
@@ -74,7 +73,7 @@ public class CardGameWebSocketBroker {
                     게임 타입 정보를 포함한 시작 메시지를 브로드캐스트합니다.
                     """
     )
-    public void sendMiniGameType(CardGameStartedEvent cardGameStartedEvent) {
+    public void sendCardGameStart(CardGameStartedEvent cardGameStartedEvent) {
         CardGame cardGame = cardGameStartedEvent.cardGame();
         JoinCode joinCode = cardGameStartedEvent.joinCode();
         messagingTemplate.convertAndSend(

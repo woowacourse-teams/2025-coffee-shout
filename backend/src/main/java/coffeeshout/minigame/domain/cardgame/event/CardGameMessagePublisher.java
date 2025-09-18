@@ -27,10 +27,12 @@ public class CardGameMessagePublisher {
     @EventListener
     public void publishCardGameStateChanged(CardGameStateChangedEvent cardGameStateChangedEvent) {
         final Room room = cardGameStateChangedEvent.room();
+        CardGameTaskType cardGameTaskType = cardGameStateChangedEvent.currentTask();
         publisher.publishEvent(new CardGameStateChangeMessage(
                 room.getJoinCode().getValue(),
-                cardGameStateChangedEvent.currentTask().name())
-        );
+                cardGameTaskType.name(),
+                System.currentTimeMillis() + cardGameTaskType.getState().getDurationMillis().toMillis()
+        ));
     }
 
     @EventListener
