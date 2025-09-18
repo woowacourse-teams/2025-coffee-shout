@@ -41,11 +41,11 @@ public class LogAspect {
     }
 
     @After(
-            value = "execution(* coffeeshout.minigame.application.MiniGameService.start(..)) && args(playable, joinCode)",
-            argNames = "playable,joinCode"
+            value = "execution(* coffeeshout.room.application.RoomService.startNextGame(..)) && args(joinCode, hostName)",
+            argNames = "joinCode,hostName"
     )
-    public void logMiniGameStart(Playable playable, String joinCode) {
-        log.info("JoinCode[{}] 미니게임 시작됨 - MiniGameType : {}", joinCode, playable.getMiniGameType());
+    public void logMiniGameStart(String joinCode, String hostName) {
+        log.info("JoinCode[{}] 미니게임 시작됨 - hostName : {}", joinCode, hostName);
     }
 
     @AfterReturning(
