@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.event;
 
-public enum     RoomEventType {
+public enum RoomEventType {
     ROOM_CREATE,
     ROOM_JOIN,
     PLAYER_READY,
