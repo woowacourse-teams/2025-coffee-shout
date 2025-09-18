@@ -1,7 +1,7 @@
 package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
+import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStateChangedEvent;
 import coffeeshout.room.domain.Room;
 import java.util.Arrays;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public enum CardGameTaskType {
         ) {
             return () -> {
                 cardGame.startRound();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -31,7 +31,7 @@ public enum CardGameTaskType {
         ) {
             return () -> {
                 cardGame.updateDescription();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -44,7 +44,7 @@ public enum CardGameTaskType {
         ) {
             return () -> {
                 cardGame.startPlay();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -58,7 +58,7 @@ public enum CardGameTaskType {
             return () -> {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -71,7 +71,7 @@ public enum CardGameTaskType {
         ) {
             return () -> {
                 cardGame.startRound();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -84,7 +84,7 @@ public enum CardGameTaskType {
         ) {
             return () -> {
                 cardGame.startPlay();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -98,7 +98,7 @@ public enum CardGameTaskType {
             return () -> {
                 cardGame.assignRandomCardsToUnselectedPlayers();
                 cardGame.changeScoreBoardState();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },
@@ -113,7 +113,7 @@ public enum CardGameTaskType {
                 cardGame.changeDoneState();
                 MiniGameResult result = cardGame.getResult();
                 room.applyMiniGameResult(result);
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room, cardGame, this));
+                eventPublisher.publishEvent(new CardGameStateChangedEvent(room, cardGame, this));
             };
         }
     },

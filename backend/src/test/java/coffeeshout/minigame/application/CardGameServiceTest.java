@@ -4,25 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.global.ServiceTest;
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameState;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
-import coffeeshout.minigame.domain.dto.CardGameStartEvent;
-import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
-import coffeeshout.minigame.domain.dto.CardSelectEvent;
+import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
+import coffeeshout.minigame.domain.cardgame.event.dto.CardSelectedEvent;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -31,24 +24,14 @@ import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
-import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
-import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class CardGameServiceTest extends ServiceTest {
 
@@ -106,7 +89,7 @@ class CardGameServiceTest extends ServiceTest {
                 softly.assertThat(cardGame).isNotNull();
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
-                verify(eventPublisher).publishEvent(any(CardGameStartEvent.class));
+                verify(eventPublisher).publishEvent(any(CardGameStartedEvent.class));
             });
         }
     }
@@ -137,7 +120,7 @@ class CardGameServiceTest extends ServiceTest {
             cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
 
             // then
-            verify(eventPublisher).publishEvent(any(CardSelectEvent.class));
+            verify(eventPublisher).publishEvent(any(CardSelectedEvent.class));
         }
 
         @Test

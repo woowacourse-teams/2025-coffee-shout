@@ -1,8 +1,10 @@
-package coffeeshout.minigame.domain.cardgame;
+package coffeeshout.minigame.domain.cardgame.event;
 
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.minigame.domain.dto.CardGameStartProcessEvent;
-import coffeeshout.minigame.domain.dto.CardGameStateDoneEvent;
+import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
+import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartProcessEvent;
+import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStateDoneEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -14,13 +16,13 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CardGameTaskEventListener {
+public class CardGameSubscribeEventListener {
 
     private final TaskScheduler taskScheduler;
     private final ApplicationEventPublisher publisher;
     private final RoomQueryService roomQueryService;
 
-    public CardGameTaskEventListener(
+    public CardGameSubscribeEventListener(
             @Qualifier("miniGameTaskScheduler") TaskScheduler taskScheduler,
             ApplicationEventPublisher publisher,
             RoomQueryService roomQueryService
@@ -31,11 +33,11 @@ public class CardGameTaskEventListener {
     }
 
     @EventListener
-    public void handleCardGameStateDone(CardGameStateDoneEvent cardGameStateDoneEvent) {
+    public void processCardGameStateDone(CardGameStateDoneEvent cardGameStateDoneEvent) {
         final JoinCode joinCode = new JoinCode(cardGameStateDoneEvent.joinCode());
         final Room room = roomQueryService.getByJoinCode(joinCode);
         final CardGame cardGame = getCardGame(joinCode);
-        final CardGameTaskType currentTask = CardGameTaskType.valueOf(cardGameStateDoneEvent.cardGameTaskType());
+        final CardGameTaskType currentTask = CardGameTaskType.valueOf(cardGameStateDoneEvent.currentTaskName());
         if (currentTask.isLastTask()) {
             return;
         }
@@ -50,7 +52,7 @@ public class CardGameTaskEventListener {
     }
 
     @EventListener
-    public void handleCardGameStart(CardGameStartProcessEvent cardGameStateDoneEvent) {
+    public void processCardGameStart(CardGameStartProcessEvent cardGameStateDoneEvent) {
         final JoinCode joinCode = new JoinCode(cardGameStateDoneEvent.joinCode());
         final Room room = roomQueryService.getByJoinCode(joinCode);
         final CardGame cardGame = getCardGame(joinCode);

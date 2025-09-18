@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.dto;
+package coffeeshout.minigame.domain.cardgame.event.dto;
 
 public record CardGameStartProcessEvent(
         String joinCode,
