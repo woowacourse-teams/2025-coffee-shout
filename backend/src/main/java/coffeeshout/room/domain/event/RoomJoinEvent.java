@@ -1,0 +1,25 @@
+package coffeeshout.room.domain.event;
+
+import coffeeshout.room.ui.request.SelectedMenuRequest;
+import java.time.Instant;
+import java.util.UUID;
+
+public record RoomJoinEvent(
+        String eventId,
+        RoomEventType eventType,
+        String joinCode,
+        String guestName,
+        SelectedMenuRequest selectedMenuRequest,
+        Instant timestamp
+) {
+    public static RoomJoinEvent create(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        return new RoomJoinEvent(
+                UUID.randomUUID().toString(),
+                RoomEventType.ROOM_JOIN,
+                joinCode,
+                guestName,
+                selectedMenuRequest,
+                Instant.now()
+        );
+    }
+}

@@ -6,6 +6,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -19,10 +20,15 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.infra.messaging.RoomBroadcastStreamProducer;
+import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +45,8 @@ public class RoomService {
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final MenuCommandService menuCommandService;
+    private final RoomEventWaitManager roomEventWaitManager;
+    private final RoomBroadcastStreamProducer roomBroadcastStreamProducer;
 
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
@@ -54,9 +62,49 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
+    private <T> CompletableFuture<T> processEventAsync(
+            String eventId,
+            Runnable eventPublisher,
+            String operationName,
+            String logParams,
+            Function<T, String> successLogParams
+    ) {
+
+        final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
+        eventPublisher.run();
+
+        return future.orTimeout(5, TimeUnit.SECONDS)
+                .whenComplete((result, throwable) -> {
+                    roomEventWaitManager.cleanup(eventId);
+                    if (throwable != null) {
+                        log.error("{} 비동기 처리 실패: eventId={}, {}",
+                                operationName, eventId, logParams, throwable);
+                        return;
+                    }
+                    log.info("{} 비동기 처리 완료: {}, eventId={}",
+                            operationName, successLogParams.apply(result), eventId);
+                });
+    }
+
     private void assignQrCodeUrl(Room room) {
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
         room.assignQrCodeUrl(qrCodeUrl);
+    }
+
+    public CompletableFuture<Room> enterRoomAsync(
+            String joinCode,
+            String guestName,
+            SelectedMenuRequest selectedMenuRequest
+    ) {
+        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+
+        return processEventAsync(
+                event.eventId(),
+                () -> roomBroadcastStreamProducer.broadcastEnterRoom(event),
+                "방 참가",
+                String.format("joinCode=%s, guestName=%s", joinCode, guestName),
+                room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
+        );
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {

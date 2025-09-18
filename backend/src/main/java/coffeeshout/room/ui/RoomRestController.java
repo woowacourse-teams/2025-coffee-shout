@@ -2,7 +2,6 @@ package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.application.messaging.RoomBroadcastStreamProducer;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
@@ -11,7 +10,6 @@ import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController {
 
     private final RoomService roomService;
-    private final RoomBroadcastStreamProducer roomBroadcastStreamProducer;
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
@@ -45,13 +42,16 @@ public class RoomRestController {
             @RequestBody RoomEnterRequest request
     ) {
         // TODO Subscribe에서 예외가 발생할 수 있어서 처리해야 한다.
-        return roomBroadcastStreamProducer.broadcastEnterRoomSync(joinCode, request.playerName(), request.menu())
-                .thenApply(v -> {
-                    Room room = roomService.getRoom(joinCode);
-                    log.info("Entered room: joinCode={}, playerName={}", joinCode, request.playerName());
-                    return ResponseEntity.ok(RoomEnterResponse.from(room));
-                }).orTimeout(3, TimeUnit.SECONDS)
-                .exceptionally(throwable -> ResponseEntity.internalServerError().build());
+        return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
+                .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
+                .exceptionally(throwable -> {
+                    // 원래 예외 추출
+                    final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
+                    if (cause instanceof RuntimeException runtimeException) {
+                        throw runtimeException;
+                    }
+                    throw new RuntimeException("방 참가 실패", cause);
+                });
     }
 
     @GetMapping("/check-joinCode")
