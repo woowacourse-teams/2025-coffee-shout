@@ -7,7 +7,6 @@ import coffeeshout.room.domain.player.PlayerName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
@@ -69,7 +68,7 @@ public class PlayerHands {
 
     public Optional<Player> findCardOwner(Card card, CardGameRound round) {
         return playerHands.stream()
-                .filter(playerHand -> playerHand.isAssign(card, round))
+                .filter(playerHand -> playerHand.isAssigned(card, round))
                 .findFirst()
                 .map(PlayerHand::getPlayer);
     }
