@@ -78,12 +78,12 @@ public class RoomService {
     // === 비동기 메서드들 (REST Controller용) ===
 
     public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        JoinCode joinCode = joinCodeGenerator.generate();
-        RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
+        final JoinCode joinCode = joinCodeGenerator.generate();
+        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishRoomCreateEvent(event),
+                event.getEventId(),
+                () -> roomEventPublisher.publishEvent(event),
                 "방 생성",
                 String.format("joinCode=%s", joinCode.getValue()),
                 room -> String.format("joinCode=%s", room.getJoinCode().getValue())
@@ -95,11 +95,11 @@ public class RoomService {
             String guestName,
             SelectedMenuRequest selectedMenuRequest
     ) {
-        RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishRoomJoinEvent(event),
+                event.getEventId(),
+                () -> roomEventPublisher.publishEvent(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
@@ -113,7 +113,7 @@ public class RoomService {
             String logParams,
             Function<T, String> successLogParams
     ) {
-        CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
+        final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
         eventPublisher.run();
 
         return future.orTimeout(5, TimeUnit.SECONDS)

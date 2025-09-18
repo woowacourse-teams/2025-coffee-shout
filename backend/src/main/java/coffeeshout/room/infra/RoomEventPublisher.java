@@ -1,11 +1,6 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.room.domain.event.MiniGameSelectEvent;
-import coffeeshout.room.domain.event.PlayerListUpdateEvent;
-import coffeeshout.room.domain.event.PlayerReadyEvent;
-import coffeeshout.room.domain.event.RoomCreateEvent;
-import coffeeshout.room.domain.event.RoomJoinEvent;
-import coffeeshout.room.domain.event.RouletteSpinEvent;
+import coffeeshout.room.domain.event.BaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,62 +15,15 @@ public class RoomEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic roomEventTopic;
 
-    public void publishRoomCreateEvent(RoomCreateEvent event) {
+    public <T extends BaseEvent> void publishEvent(T event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("방 생성 이벤트 발행됨: eventId={}, hostName={}", event.eventId(), event.hostName());
+            log.info("이벤트 발행됨: eventType={}, eventId={}", 
+                    event.getEventType(), event.getEventId());
         } catch (Exception e) {
-            log.error("방 생성 이벤트 발행 실패: eventId={}", event.eventId(), e);
-        }
-    }
-
-    public void publishRoomJoinEvent(RoomJoinEvent event) {
-        try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("방 참가 이벤트 발행됨: eventId={}, joinCode={}, guestName={}",
-                    event.eventId(), event.joinCode(), event.guestName());
-        } catch (Exception e) {
-            log.error("방 참가 이벤트 발행 실패: eventId={}", event.eventId(), e);
-        }
-    }
-
-    public void publishPlayerListUpdateEvent(PlayerListUpdateEvent event) {
-        try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("플레이어 목록 업데이트 이벤트 발행됨: eventId={}, joinCode={}",
-                    event.eventId(), event.joinCode());
-        } catch (Exception e) {
-            log.error("플레이어 목록 업데이트 이벤트 발행 실패: eventId={}", event.eventId(), e);
-        }
-    }
-
-    public void publishPlayerReadyEvent(PlayerReadyEvent event) {
-        try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("플레이어 ready 이벤트 발행됨: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
-        } catch (Exception e) {
-            log.error("플레이어 ready 이벤트 발행 실패: eventId={}", event.eventId(), e);
-        }
-    }
-
-    public void publishMiniGameSelectEvent(MiniGameSelectEvent event) {
-        try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("미니게임 선택 이벤트 발행됨: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
-                    event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
-        } catch (final Exception e) {
-            log.error("미니게임 선택 이벤트 발행 실패: eventId={}", event.eventId(), e);
-        }
-    }
-
-    public void publishRouletteSpinEvent(RouletteSpinEvent event) {
-        try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("룰렛 스핀 이벤트 발행됨: eventId={}, joinCode={}, hostName={}",
-                    event.eventId(), event.joinCode(), event.hostName());
-        } catch (final Exception e) {
-            log.error("룰렛 스핀 이벤트 발행 실패: eventId={}", event.eventId(), e);
+            log.error("이벤트 발행 실패: eventType={}, eventId={}", 
+                    event.getEventType(), event.getEventId(), e);
+            throw new RuntimeException("이벤트 발행 실패", e);
         }
     }
 }

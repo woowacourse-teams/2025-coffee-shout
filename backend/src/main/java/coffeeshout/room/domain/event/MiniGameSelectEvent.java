@@ -12,7 +12,8 @@ public record MiniGameSelectEvent(
         String hostName,
         List<MiniGameType> miniGameTypes,
         LocalDateTime timestamp
-) {
+) implements BaseEvent {
+    
     public static MiniGameSelectEvent create(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
         return new MiniGameSelectEvent(
                 UUID.randomUUID().toString(),
@@ -22,5 +23,20 @@ public record MiniGameSelectEvent(
                 miniGameTypes,
                 LocalDateTime.now()
         );
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
+    }
+
+    @Override
+    public RoomEventType getEventType() {
+        return eventType;
+    }
+
+    @Override
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }

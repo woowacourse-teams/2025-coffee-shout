@@ -46,7 +46,7 @@ public class RoomWebSocketController {
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
         final PlayerListUpdateEvent event = PlayerListUpdateEvent.create(joinCode);
-        roomEventPublisher.publishPlayerListUpdateEvent(event);
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-ready")
@@ -65,7 +65,7 @@ public class RoomWebSocketController {
     )
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
         final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, message.playerName(), message.isReady());
-        roomEventPublisher.publishPlayerReadyEvent(event);
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")
@@ -83,9 +83,9 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, message.hostName(),
+        final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, message.hostName(),
                 message.miniGameTypes());
-        roomEventPublisher.publishMiniGameSelectEvent(event);
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
@@ -103,6 +103,6 @@ public class RoomWebSocketController {
         final Room room = roomService.getRoomByJoinCode(joinCode);
         final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
         final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, message.hostName(), winner);
-        roomEventPublisher.publishRouletteSpinEvent(event);
+        roomEventPublisher.publishEvent(event);
     }
 }

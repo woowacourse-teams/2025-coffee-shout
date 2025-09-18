@@ -11,7 +11,8 @@ public record RouletteSpinEvent(
         String hostName,
         Winner winner,
         LocalDateTime timestamp
-) {
+) implements BaseEvent {
+    
     public static RouletteSpinEvent create(String joinCode, String hostName, Winner winner) {
         return new RouletteSpinEvent(
                 UUID.randomUUID().toString(),
@@ -19,7 +20,22 @@ public record RouletteSpinEvent(
                 joinCode,
                 hostName,
                 winner,
-                java.time.LocalDateTime.now()
+                LocalDateTime.now()
         );
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
+    }
+
+    @Override
+    public RoomEventType getEventType() {
+        return eventType;
+    }
+
+    @Override
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }
