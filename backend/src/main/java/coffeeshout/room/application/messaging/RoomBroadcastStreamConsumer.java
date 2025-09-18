@@ -98,6 +98,9 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
                     "instanceId", getInstanceId()
             );
             broadcastService.sendBroadcastResponse(requestId, errorResponse);
+
+            // 에러도 completion notification으로 전송
+            sendCompletionNotification(requestId, errorResponse);
         }
     }
 

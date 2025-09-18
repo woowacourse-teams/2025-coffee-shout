@@ -60,6 +60,9 @@ public class RoomService {
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        log.debug("enterRoom: joinCode={}, guestName={} selectedMenuRequest={}",
+                joinCode, guestName, selectedMenuRequest);
+
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 

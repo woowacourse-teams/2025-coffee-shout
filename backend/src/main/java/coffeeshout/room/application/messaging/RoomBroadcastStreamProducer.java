@@ -197,8 +197,15 @@ public class RoomBroadcastStreamProducer {
     public void handleCompletionNotification(String requestId, Object result) {
         CompletableFuture<Object> future = pendingRequests.remove(requestId);
         if (future != null && !future.isDone()) {
-            future.complete(result);
-            log.debug("Completed pending request: {}", requestId);
+            // 에러 응답인지 확인
+            if (result instanceof Map<?, ?> map && Boolean.TRUE.equals(map.get("error"))) {
+                String message = (String) map.get("message");
+                future.completeExceptionally(new RuntimeException(message));
+                log.debug("Completed pending request with error: {} - {}", requestId, message);
+            } else {
+                future.complete(result);
+                log.debug("Completed pending request: {}", requestId);
+            }
         }
     }
 
