@@ -12,7 +12,7 @@ const __dirname = dirname(__filename);
 const packageJson = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
 const appVersion = packageJson.version;
 
-export default (env, argv) => {
+export default (_, argv) => {
   const mode = argv.mode || 'development';
 
   const dotenvEnv = dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
