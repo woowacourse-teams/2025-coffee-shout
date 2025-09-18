@@ -1,5 +1,5 @@
 import NextStepIcon from '@/assets/next-step-icon.svg';
-import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
+import { useState, type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
 import * as S from './RoomActionButton.styled';
@@ -13,6 +13,7 @@ type Props = {
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
   const isTouch = isTouchDevice();
+  const [isTouching, setIsTouching] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     if (isTouch) return;
@@ -20,16 +21,29 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
     onClick?.(e);
   };
 
+  const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
+    if (!isTouch) return;
+
+    e.preventDefault();
+    setIsTouching(true);
+  };
+
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
     if (!isTouch) return;
 
     e.preventDefault();
-
     onClick?.(e);
+    setIsTouching(false);
   };
 
   return (
-    <S.Container onClick={handleClick} onTouchEnd={handleTouchEnd} {...rest}>
+    <S.Container
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      $isTouching={isTouching}
+      {...rest}
+    >
       <Headline3>{title}</Headline3>
       <div>
         {descriptions.map((description, index) => (
