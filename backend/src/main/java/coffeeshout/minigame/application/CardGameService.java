@@ -82,7 +82,7 @@ public class CardGameService implements MiniGameService {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final CardGame cardGame = cardGameQueryService.getByJoinCode(roomJoinCode);
         cardGame.selectCard(new PlayerName(playerName), cardIndex);
-        eventPublisher.publishEvent(new CardSelectEvent(roomJoinCode, cardGame));
         cardGameCommandService.save(cardGame);
+        eventPublisher.publishEvent(new CardSelectEvent(roomJoinCode, cardGame));
     }
 }
