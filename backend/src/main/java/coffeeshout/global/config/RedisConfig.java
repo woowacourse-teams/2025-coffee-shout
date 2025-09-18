@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -80,6 +83,9 @@ public class RedisConfig {
 
         BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(SERIALIZE_BASE_PACKAGE)
+                .allowIfSubType(List.class)
+                .allowIfSubType(Set.class)
+                .allowIfSubType(Map.class)
                 .build();
 
         redisObjectMapper.activateDefaultTyping(
