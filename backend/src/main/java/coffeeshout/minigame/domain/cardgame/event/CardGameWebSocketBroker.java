@@ -16,14 +16,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CardGameWebSocketEventListener {
+public class CardGameWebSocketBroker {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
-    public CardGameWebSocketEventListener(LoggingSimpMessagingTemplate messagingTemplate) {
+    public CardGameWebSocketBroker(LoggingSimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -83,9 +83,7 @@ public class CardGameWebSocketEventListener {
         );
     }
 
-    private void sendCardGameState(CardGame cardSelectEvent, JoinCode cardSelectEvent1) {
-        CardGame cardGame = cardSelectEvent;
-        JoinCode joinCode = cardSelectEvent1;
+    private void sendCardGameState(CardGame cardGame, JoinCode joinCode) {
         final MiniGameStateMessage message = MiniGameStateMessage.from(cardGame);
         final String destination = String.format(CARD_GAME_STATE_DESTINATION_FORMAT, joinCode.getValue());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(message));
