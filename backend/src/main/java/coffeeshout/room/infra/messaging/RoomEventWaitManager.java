@@ -35,6 +35,7 @@ public class RoomEventWaitManager {
         final CompletableFuture<Object> future = pendingEvents.get(eventId);
 
         if (future == null) {
+            log.warn("방 이벤트 실패 알림 시도: eventId={}에 해당하는 Future가 존재하지 않습니다.", eventId);
             return;
         }
 
