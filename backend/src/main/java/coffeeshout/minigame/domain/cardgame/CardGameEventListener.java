@@ -3,25 +3,36 @@ package coffeeshout.minigame.domain.cardgame;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.dto.CardGameStartEvent;
+import coffeeshout.minigame.domain.dto.CardGameStartProcessEvent;
 import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
+import coffeeshout.minigame.domain.dto.CardGameStateDoneEvent;
 import coffeeshout.minigame.domain.dto.CardSelectEvent;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CardGameEventListener {
 
     private static final String CARD_GAME_STATE_DESTINATION_FORMAT = "/topic/room/%s/gameState";
     private static final String GAME_START_DESTINATION_FORMAT = "/topic/room/%s/round";
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher publisher;
+
+    public CardGameEventListener(
+            LoggingSimpMessagingTemplate messagingTemplate,
+            ApplicationEventPublisher publisher
+    ) {
+        this.messagingTemplate = messagingTemplate;
+        this.publisher = publisher;
+    }
 
     @EventListener
     @MessageResponse(
@@ -36,7 +47,13 @@ public class CardGameEventListener {
                     """
     )
     public void handleChangeState(CardGameStateChangeEvent cardGameStateChangeEvent) {
-        sendCardGameState(cardGameStateChangeEvent.cardGame(), cardGameStateChangeEvent.joinCode());
+        final CardGame cardGame = cardGameStateChangeEvent.cardGame();
+        final Room room = cardGameStateChangeEvent.room();
+        sendCardGameState(cardGame, room.getJoinCode());
+        publisher.publishEvent(new CardGameStateDoneEvent(
+                room.getJoinCode().getValue(),
+                cardGameStateChangeEvent.currentTask().name())
+        );
     }
 
     @EventListener
@@ -75,6 +92,10 @@ public class CardGameEventListener {
                 String.format(GAME_START_DESTINATION_FORMAT, joinCode.getValue()),
                 WebSocketResponse.success(new MiniGameStartMessage(cardGame.getMiniGameType()))
         );
+        publisher.publishEvent(new CardGameStartProcessEvent(
+                joinCode.getValue(),
+                CardGameTaskType.getFirstTask().name()
+        ));
     }
 
     private void sendCardGameState(CardGame cardSelectEvent, JoinCode cardSelectEvent1) {

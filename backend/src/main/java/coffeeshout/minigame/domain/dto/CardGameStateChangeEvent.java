@@ -1,7 +1,12 @@
 package coffeeshout.minigame.domain.dto;
 
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.room.domain.JoinCode;
+import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
+import coffeeshout.room.domain.Room;
 
-public record CardGameStateChangeEvent(JoinCode joinCode, CardGame cardGame) {
+public record CardGameStateChangeEvent(
+        Room room,
+        CardGame cardGame,
+        CardGameTaskType currentTask
+) {
 }
