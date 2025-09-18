@@ -32,7 +32,6 @@ public class RoomRestController {
         return roomService.createRoomAsync(request.playerName(), request.menu())
                 .thenApply(room -> ResponseEntity.ok(RoomCreateResponse.from(room)))
                 .exceptionally(throwable -> {
-                    // 원래 예외 추출
                     final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
                     if (cause instanceof RuntimeException) {
                         throw (RuntimeException) cause;
@@ -49,7 +48,6 @@ public class RoomRestController {
         return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
                 .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
                 .exceptionally(throwable -> {
-                    // 원래 예외 추출
                     final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
                     if (cause instanceof RuntimeException) {
                         throw (RuntimeException) cause;

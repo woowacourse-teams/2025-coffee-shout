@@ -4,6 +4,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
@@ -35,6 +36,7 @@ public class RoomEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
+    private final RoomEventWaitManager roomEventWaitManager;
 
     @PostConstruct
     public void subscribe() {
@@ -84,43 +86,59 @@ public class RoomEventSubscriber implements MessageListener {
     }
 
     private void handleRoomCreateEvent(String body) {
+        RoomCreateEvent event = null;
         try {
-            final RoomCreateEvent event = objectMapper.readValue(body, RoomCreateEvent.class);
+            event = objectMapper.readValue(body, RoomCreateEvent.class);
 
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
                     event.eventId(), event.hostName(), event.joinCode());
 
-            roomService.createRoomInternal(
+            final Room room = roomService.createRoomInternal(
                     event.hostName(),
                     event.selectedMenuRequest(),
                     event.joinCode()
             );
 
+            // REST API 대기 중인 곳에 응답 알림
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
+
             log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", event.eventId(), event.joinCode());
 
-        } catch (final Exception e) {
+        } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
+
+            if (event != null) {
+                roomEventWaitManager.notifyFailure(event.eventId(), e);
+            }
         }
     }
 
     private void handleRoomJoinEvent(String body) {
+        RoomJoinEvent event = null;
         try {
-            final RoomJoinEvent event = objectMapper.readValue(body, RoomJoinEvent.class);
+            event = objectMapper.readValue(body, RoomJoinEvent.class);
 
             log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
                     event.eventId(), event.joinCode(), event.guestName());
 
-            roomService.enterRoomInternal(
+            final Room room = roomService.enterRoomInternal(
                     event.joinCode(),
                     event.guestName(),
                     event.selectedMenuRequest()
             );
 
+            // REST API 대기 중인 곳에 응답 알림
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
+
             log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}",
                     event.eventId(), event.joinCode(), event.guestName());
 
-        } catch (final Exception e) {
+        } catch (Exception e) {
             log.error("방 참가 이벤트 처리 실패", e);
+
+            if (event != null) {
+                roomEventWaitManager.notifyFailure(event.eventId(), e);
+            }
         }
     }
 

@@ -23,6 +23,8 @@ import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuQueryService;
+import coffeeshout.room.infra.RoomEventPublisher;
+import coffeeshout.room.infra.RoomEventWaitManager;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
@@ -30,6 +32,9 @@ import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,6 +49,8 @@ public class RoomService {
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
+    private final RoomEventPublisher roomEventPublisher;
+    private final RoomEventWaitManager roomEventWaitManager;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -53,6 +60,8 @@ public class RoomService {
             QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
+            RoomEventPublisher roomEventPublisher,
+            RoomEventWaitManager roomEventWaitManager,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -61,18 +70,89 @@ public class RoomService {
         this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
+        this.roomEventPublisher = roomEventPublisher;
+        this.roomEventWaitManager = roomEventWaitManager;
         this.defaultCategoryImage = defaultCategoryImage;
+    }
+
+    // === 비동기 메서드들 (REST Controller용) ===
+
+    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
+        JoinCode joinCode = joinCodeGenerator.generate();
+        RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
+
+        return processEventAsync(
+                event.eventId(),
+                () -> roomEventPublisher.publishRoomCreateEvent(event),
+                "방 생성",
+                String.format("joinCode=%s", joinCode.getValue()),
+                room -> String.format("joinCode=%s", room.getJoinCode().getValue())
+        );
+    }
+
+    public CompletableFuture<Room> enterRoomAsync(
+            String joinCode,
+            String guestName,
+            SelectedMenuRequest selectedMenuRequest
+    ) {
+        RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+
+        return processEventAsync(
+                event.eventId(),
+                () -> roomEventPublisher.publishRoomJoinEvent(event),
+                "방 참가",
+                String.format("joinCode=%s, guestName=%s", joinCode, guestName),
+                room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
+        );
+    }
+
+    private <T> CompletableFuture<T> processEventAsync(
+            String eventId,
+            Runnable eventPublisher,
+            String operationName,
+            String logParams,
+            Function<T, String> successLogParams
+    ) {
+        CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
+        eventPublisher.run();
+
+        return future.orTimeout(5, TimeUnit.SECONDS)
+                .whenComplete((result, throwable) -> {
+                    roomEventWaitManager.cleanup(eventId);
+                    if (throwable != null) {
+                        log.error("{} 비동기 처리 실패: eventId={}, {}",
+                                operationName, eventId, logParams, throwable);
+                        return;
+                    }
+                    log.info("{} 비동기 처리 완료: {}, eventId={}",
+                            operationName, successLogParams.apply(result), eventId);
+                });
     }
 
     // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
 
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        final JoinCode joinCode = joinCodeGenerator.generate();
-        return createRoomInternal(hostName, selectedMenuRequest, joinCode.getValue());
+        try {
+            return createRoomAsync(hostName, selectedMenuRequest).join();
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("방 생성 실패", cause);
+        }
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        return enterRoomInternal(joinCode, guestName, selectedMenuRequest);
+        try {
+            return enterRoomAsync(joinCode, guestName, selectedMenuRequest).join();
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("방 참가 실패", cause);
+        }
     }
 
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {

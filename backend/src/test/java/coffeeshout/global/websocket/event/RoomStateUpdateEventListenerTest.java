@@ -7,9 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.infra.BroadcastEventPublisher;
-import coffeeshout.room.ui.event.PlayerUpdateBroadcastEvent;
-import java.util.List;
+import coffeeshout.room.domain.event.PlayerListUpdateEvent;
+import coffeeshout.room.infra.RoomEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +22,7 @@ class RoomStateUpdateEventListenerTest {
     private RoomService roomService;
 
     @Mock
-    private BroadcastEventPublisher broadcastEventPublisher;
+    private RoomEventPublisher roomEventPublisher;
 
     @InjectMocks
     private RoomStateUpdateEventListener listener;
@@ -35,15 +34,13 @@ class RoomStateUpdateEventListenerTest {
         final RoomStateUpdateEvent event = new RoomStateUpdateEvent(joinCode, "test reason");
 
         when(roomService.roomExists(joinCode)).thenReturn(true);
-        when(roomService.getAllPlayers(joinCode)).thenReturn(List.of());
 
         // when
         listener.handleRoomStateUpdate(event);
 
         // then
         verify(roomService).roomExists(joinCode);
-        verify(roomService).getAllPlayers(joinCode);
-        verify(broadcastEventPublisher).publishPlayerUpdateEvent(any(PlayerUpdateBroadcastEvent.class));
+        verify(roomEventPublisher).publishPlayerListUpdateEvent(any(PlayerListUpdateEvent.class));
     }
 
     @Test
@@ -60,6 +57,6 @@ class RoomStateUpdateEventListenerTest {
         // then
         verify(roomService).roomExists(joinCode);
         verify(roomService, never()).getAllPlayers(anyString());
-        verify(broadcastEventPublisher, never()).publishPlayerUpdateEvent(any(PlayerUpdateBroadcastEvent.class));
+        verify(roomEventPublisher, never()).publishRoomCreateEvent(any());
     }
 }
