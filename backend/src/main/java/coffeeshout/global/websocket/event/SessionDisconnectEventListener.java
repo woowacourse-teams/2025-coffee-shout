@@ -2,6 +2,7 @@ package coffeeshout.global.websocket.event;
 
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
+import coffeeshout.global.websocket.SubscriptionInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -16,14 +17,18 @@ public class SessionDisconnectEventListener {
 
     private final StompSessionManager sessionManager;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
+    private final SubscriptionInfoService subscriptionInfoService;
 
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
         final String sessionId = event.getSessionId();
         final CloseStatus closeStatus = event.getCloseStatus();
 
-        log.info("세션 연결 해제 감지: sessionId={}, closeStatus={}, reason={}", sessionId, closeStatus,
-                closeStatus.getReason());
+        log.info("세션 연결 해제 감지: sessionId={}, closeStatus={}, reason={}", 
+                sessionId, closeStatus, closeStatus.getReason());
+
+        // 구독 정보 정리
+        subscriptionInfoService.removeAllSubscriptions(sessionId);
 
         // 중복 처리 방지
         if (sessionManager.isDisconnectionProcessed(sessionId)) {

@@ -10,9 +10,9 @@ spring:
   data:
     redis:
       port: 6379
-      host: ${REDIS_HOST:localhost}
       ssl:
         enabled: true
+      host: localhost
 
 room:
   removalDelay: 1h

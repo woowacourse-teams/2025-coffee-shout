@@ -1,6 +1,7 @@
 package coffeeshout.room.domain.player;
 
 import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.roulette.Probability;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ public class Player {
     private SelectedMenu selectedMenu;
     private Boolean isReady;
     private Integer colorIndex;
+    private Probability probability;
 
     private Player(PlayerName name, SelectedMenu selectedMenu, Boolean isReady, PlayerType playerType) {
         this.name = name;
@@ -42,6 +44,10 @@ public class Player {
 
     public void updateReadyState(Boolean isReady) {
         this.isReady = isReady;
+    }
+
+    public void updateProbability(Probability probability) {
+        this.probability = probability;
     }
 
     public void promote() {
