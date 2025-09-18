@@ -16,13 +16,14 @@ public class RedisRoomRepository implements RoomRepository {
 
     private static final String ROOM_KEY = "room:%s";
     private static final Duration ROOM_DEFAULT_TTL = Duration.ofHours(1);
+    private static final String FIELD_INFO = "info";
 
     private final RedisTemplate<String, Object> redisTemplate;
 
 
     @Override
     public Optional<Room> findByJoinCode(JoinCode joinCode) {
-        final Object room = redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), "info");
+        final Object room = redisTemplate.opsForHash().get(String.format(ROOM_KEY, joinCode.getValue()), FIELD_INFO);
         if (room == null) {
             return Optional.empty();
         }
@@ -35,12 +36,12 @@ public class RedisRoomRepository implements RoomRepository {
 
     @Override
     public boolean existsByJoinCode(JoinCode joinCode) {
-        return redisTemplate.opsForHash().hasKey(String.format(ROOM_KEY, joinCode.getValue()), "info");
+        return redisTemplate.opsForHash().hasKey(String.format(ROOM_KEY, joinCode.getValue()), FIELD_INFO);
     }
 
     @Override
     public Room save(Room room) {
-        redisTemplate.opsForHash().put(createRedisKey(room.getJoinCode()), "info", room);
+        redisTemplate.opsForHash().put(createRedisKey(room.getJoinCode()), FIELD_INFO, room);
         redisTemplate.expire(String.format(ROOM_KEY, room.getJoinCode().getValue()), ROOM_DEFAULT_TTL);
         return room;
     }
@@ -48,7 +49,7 @@ public class RedisRoomRepository implements RoomRepository {
     @Override
     public void deleteByJoinCode(JoinCode joinCode) {
         notNull(joinCode, "JoinCode는 null일 수 없습니다.");
-        redisTemplate.opsForHash().delete(String.format(ROOM_KEY, joinCode.getValue()), "info");
+        redisTemplate.opsForHash().delete(String.format(ROOM_KEY, joinCode.getValue()), FIELD_INFO);
     }
 
     private String createRedisKey(JoinCode joinCode) {

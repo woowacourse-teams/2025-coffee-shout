@@ -16,6 +16,7 @@ public class RedisCardGameRepository implements CardGameRepository {
 
     private static final String CARD_GAME_KEY = "cardGame:%s";
     private static final Duration CARD_GAME_DEFAULT_TTL = Duration.ofMinutes(10);
+    private static final String FIELD_INFO = "info";
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -23,7 +24,7 @@ public class RedisCardGameRepository implements CardGameRepository {
     public Optional<CardGame> findByJoinCode(JoinCode joinCode) {
         final Object cardGame = redisTemplate.opsForHash().get(
                 String.format(CARD_GAME_KEY, joinCode.getValue()),
-                "info"
+                FIELD_INFO
         );
 
         if (cardGame == null) {
@@ -41,7 +42,7 @@ public class RedisCardGameRepository implements CardGameRepository {
         final String key = createRedisKey(cardGame.getJoinCode());
         redisTemplate.opsForHash().put(
                 key,
-                "info",
+                FIELD_INFO,
                 cardGame
         );
         redisTemplate.expire(key, CARD_GAME_DEFAULT_TTL);
@@ -51,7 +52,7 @@ public class RedisCardGameRepository implements CardGameRepository {
     @Override
     public void deleteByJoinCode(JoinCode joinCode) {
         notNull(joinCode, "JoinCode는 null일 수 없습니다.");
-        redisTemplate.opsForHash().delete(String.format(CARD_GAME_KEY, joinCode.getValue()), "info");
+        redisTemplate.opsForHash().delete(String.format(CARD_GAME_KEY, joinCode.getValue()), FIELD_INFO);
     }
 
     private String createRedisKey(JoinCode joinCode) {
