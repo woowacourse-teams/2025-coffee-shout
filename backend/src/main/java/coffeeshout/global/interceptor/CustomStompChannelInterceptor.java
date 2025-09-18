@@ -8,13 +8,14 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CustomStompChannelInterceptor implements ChannelInterceptor {
+public class CustomStompChannelInterceptor implements ChannelInterceptor, ExecutorChannelInterceptor {
 
     private final StompHandlerRegistry handlerRegistry;
 

@@ -1,6 +1,8 @@
 package coffeeshout.global.config;
 
 
+import coffeeshout.global.interceptor.CustomExecutorChannelInterceptor;
+import io.opentelemetry.api.trace.Tracer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -17,11 +19,17 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private final TaskScheduler taskScheduler;
     private final ChannelInterceptor channelInterceptor;
+    private final Tracer tracer;
 
-    public WebSocketMessageBrokerConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
-                                        ChannelInterceptor channelInterceptor) {
+
+    public WebSocketMessageBrokerConfig(
+            @Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
+            ChannelInterceptor channelInterceptor,
+            Tracer tracer
+    ) {
         this.taskScheduler = taskScheduler;
         this.channelInterceptor = channelInterceptor;
+        this.tracer = tracer;
     }
 
     @Override
@@ -43,5 +51,10 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(channelInterceptor);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new CustomExecutorChannelInterceptor(tracer));
     }
 }

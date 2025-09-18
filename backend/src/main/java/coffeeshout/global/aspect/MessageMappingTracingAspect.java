@@ -23,33 +23,53 @@ public class MessageMappingTracingAspect {
     @Around("@annotation(org.springframework.messaging.handler.annotation.MessageMapping)")
     public Object traceMessageMapping(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        String className = joinPoint.getTarget().getClass().getSimpleName();
-        String methodName = joinPoint.getSignature().getName();
+        final String className = joinPoint.getTarget().getClass().getSimpleName();
+        final String methodName = joinPoint.getSignature().getName();
+        final String spanName = "websocket.handler." + className + "." + methodName;
 
-        Span span = tracer.spanBuilder("websocket.message." + methodName)
+        final Span span = tracer.spanBuilder(spanName)
                 .setSpanKind(SpanKind.SERVER)
                 .setAttribute("handler.class", className)
                 .setAttribute("handler.method", methodName)
+                .setAttribute("message.type", "inbound")
                 .startSpan();
 
         try (Scope scope = span.makeCurrent()) {
-            Object[] args = joinPoint.getArgs();
+            span.addEvent("message.handler.start");
+
+            final Object[] args = joinPoint.getArgs();
             for (int i = 0; i < args.length; i++) {
                 if (args[i] != null) {
-                    span.setAttribute("message.param." + i, args[i].toString());
+                    String paramType = args[i].getClass().getSimpleName();
+                    span.setAttribute("message.param." + i + ".type", paramType);
+
+                    // 민감한 정보는 로깅하지 않도록 필터링
+                    if (!isSensitiveData(args[i])) {
+                        span.setAttribute("message.param." + i + ".value", args[i].toString());
+                    }
                 }
             }
 
-            Object result = joinPoint.proceed();
+            final Object result = joinPoint.proceed();
+            span.addEvent("message.handler.success");
             span.setStatus(StatusCode.OK);
             return result;
 
         } catch (Exception e) {
+            span.addEvent("message.handler.error");
             span.recordException(e);
             span.setStatus(StatusCode.ERROR, e.getMessage());
             throw e;
         } finally {
             span.end();
         }
+    }
+
+    private boolean isSensitiveData(Object param) {
+        if (param == null) return false;
+        String paramString = param.toString().toLowerCase();
+        return paramString.contains("password") ||
+               paramString.contains("token") ||
+               paramString.contains("secret");
     }
 }
