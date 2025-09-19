@@ -41,7 +41,6 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @RequestBody RoomEnterRequest request
     ) {
-        // TODO Subscribe에서 예외가 발생할 수 있어서 처리해야 한다.
         return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
                 .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
                 .exceptionally(throwable -> {

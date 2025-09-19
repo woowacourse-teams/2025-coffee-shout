@@ -13,6 +13,8 @@ spring:
       ssl:
         enabled: true
       host: localhost
+      stream:
+        room-key: room:broadcast
 
 room:
   removalDelay: 1h
