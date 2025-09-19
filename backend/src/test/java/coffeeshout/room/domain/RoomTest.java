@@ -253,7 +253,7 @@ class RoomTest {
 
         // when
         guest.updateReadyState(true);
-        MiniGameType miniGameType = room.startNextGame(host.getName().value());
+        MiniGameType miniGameType = room.startNextGame(host.getName());
 
         // then
         assertThat(miniGameType).isEqualTo(MiniGameType.CARD_GAME);
@@ -267,7 +267,7 @@ class RoomTest {
         Player host = room.getHost();
 
         // when & then
-        assertThatThrownBy(() -> room.startNextGame(host.getName().value()))
+        assertThatThrownBy(() -> room.startNextGame(host.getName()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("모든 플레이어가 준비완료해야합니다.");
     }

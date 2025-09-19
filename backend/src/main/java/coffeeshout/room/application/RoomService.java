@@ -188,7 +188,7 @@ public class RoomService {
 
     public void startNextGame(String joinCode, String hostName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        MiniGameType miniGameType = room.startNextGame(hostName);
+        MiniGameType miniGameType = room.startNextGame(new PlayerName(hostName));
         miniGameManager.startGame(miniGameType, joinCode, room.getPlayers());
         roomCommandService.save(room);
     }
