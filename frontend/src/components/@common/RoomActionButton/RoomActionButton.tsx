@@ -1,9 +1,10 @@
 import NextStepIcon from '@/assets/next-step-icon.svg';
-import { useState, type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
+import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
 import * as S from './RoomActionButton.styled';
 import { isTouchDevice } from '@/utils/isTouchDevice';
+import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
   title: string;
@@ -12,28 +13,27 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const isTouch = isTouchDevice();
-  const [isTouching, setIsTouching] = useState(false);
+  const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isTouch) return;
+    if (isTouchDevice()) return;
 
     onClick?.(e);
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouch) return;
+    if (!isTouchDevice()) return;
 
     e.preventDefault();
-    setIsTouching(true);
+    startTouchPress();
   };
 
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouch) return;
+    if (!isTouchDevice()) return;
 
     e.preventDefault();
     onClick?.(e);
-    setIsTouching(false);
+    endTouchPress();
   };
 
   return (
