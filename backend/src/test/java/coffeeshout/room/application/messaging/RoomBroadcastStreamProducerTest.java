@@ -48,7 +48,7 @@ class RoomBroadcastStreamProducerTest {
         void enterRoomProcessing_UpdatesRoomEntityCorrectly() {
             // given
             String playerName = "인원 추가";
-            SelectedMenuRequest menu = new SelectedMenuRequest(4L, "에스프레소", MenuTemperature.ICE);
+            SelectedMenuRequest menu = new SelectedMenuRequest(4L, "바닐라라떼", MenuTemperature.ICE);
 
             producer.broadcastEnterRoom(RoomJoinEvent.create(joinCode, playerName, menu));
 
