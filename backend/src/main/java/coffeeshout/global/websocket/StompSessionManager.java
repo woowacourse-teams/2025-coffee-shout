@@ -125,6 +125,13 @@ public class StompSessionManager {
     }
 
     /**
+     * 현재 인스턴스에 연결된 전체 클라이언트 수 조회
+     */
+    public int getTotalConnectedClientCount() {
+        return sessionPlayerMap.size();
+    }
+
+    /**
      * 플레이어 키 생성 (public 메서드)
      */
     public String createPlayerKey(@NonNull String joinCode, @NonNull String playerName) {

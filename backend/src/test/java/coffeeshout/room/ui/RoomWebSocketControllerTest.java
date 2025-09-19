@@ -67,7 +67,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"HOST",
                          "isReady":true,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"루키",
@@ -79,7 +80,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"엠제이",
@@ -91,7 +93,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"한스",
@@ -103,7 +106,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       }
                    ],
                    "errorMessage":null
@@ -145,7 +149,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"HOST",
                          "isReady":true,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"루키",
@@ -157,7 +162,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"엠제이",
@@ -169,7 +175,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       },
                       {
                          "playerName":"한스",
@@ -181,7 +188,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                          },
                          "playerType":"GUEST",
                          "isReady":false,
-                         "colorIndex":"*"
+                         "colorIndex":"*",
+                         "probability": 25
                       }
                    ],
                    "errorMessage":null
@@ -218,7 +226,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"HOST",
                             "isReady":true,
-                            "colorIndex":"*"
+                            "colorIndex":"*",
+                            "probability": 25
                          },
                          "probability":25.0
                       },
@@ -233,7 +242,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":"*"
+                            "colorIndex":"*",
+                            "probability": 25
                          },
                          "probability":25.0
                       },
@@ -248,7 +258,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":"*"
+                            "colorIndex":"*",
+                            "probability": 25
                          },
                          "probability":25.0
                       },
@@ -263,7 +274,8 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
                             },
                             "playerType":"GUEST",
                             "isReady":false,
-                            "colorIndex":"*"
+                            "colorIndex":"*",
+                            "probability": 25
                          },
                          "probability":25.0
                       }

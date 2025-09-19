@@ -9,8 +9,10 @@ spring:
       file: docker-compose.yml
   data:
     redis:
+      host: localhost
       ssl:
         enabled: false
+
 
 room:
   qr:

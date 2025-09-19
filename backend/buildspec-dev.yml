@@ -19,6 +19,10 @@ phases:
       - envsubst < /tmp/application-tmp.yml > /tmp/application.yml
       - cp /tmp/application.yml src/main/resources/application.yml
 
+      - sed 's/\${/$/g; s/}//g' src/main/resources/application-dev.yml > /tmp/application-dev-tmp.yml
+      - envsubst < /tmp/application-dev-tmp.yml > /tmp/application-dev.yml
+      - cp /tmp/application-dev.yml src/main/resources/application-dev.yml
+
   build:
     commands:
       # dev 환경에서는 특정 테스트 제외하고 빌드

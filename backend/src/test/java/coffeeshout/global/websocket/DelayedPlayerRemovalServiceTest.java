@@ -78,6 +78,8 @@ class DelayedPlayerRemovalServiceTest {
 
             // then
             then(taskScheduler).should(never()).schedule(any(Runnable.class), any(Instant.class));
+            then(playerDisconnectionService).should(never()).cancelReady(any());
+            then(sessionManager).should(never()).removeSession(any());
         }
 
         @Test

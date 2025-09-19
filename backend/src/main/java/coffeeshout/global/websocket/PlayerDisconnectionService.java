@@ -44,7 +44,6 @@ public class PlayerDisconnectionService {
 
             log.info("플레이어 연결 해제 처리: joinCode={}, playerName={}, reason={}", joinCode, playerName, reason);
 
-            // 방에서 플레이어 제거
             removePlayerFromRoom(joinCode, playerName);
 
         } catch (Exception e) {
@@ -52,9 +51,6 @@ public class PlayerDisconnectionService {
         }
     }
 
-    /**
-     * 방에서 플레이어 제거
-     */
     private void removePlayerFromRoom(String joinCode, String playerName) {
         try {
             // 방에서 플레이어 제거
