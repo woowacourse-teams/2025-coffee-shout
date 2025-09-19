@@ -7,7 +7,6 @@ import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.MessageResponse;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
@@ -40,11 +39,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         room.addMiniGame(host.getName(), cardGame);
         roomRepository.save(room);
         session = createSession();
-    }
-
-    @AfterEach
-    void tearDown(@Autowired CardGameTaskExecutors cardGameTaskExecutors) {
-        cardGameTaskExecutors.get(joinCode).cancelAll();
     }
 
     @Test

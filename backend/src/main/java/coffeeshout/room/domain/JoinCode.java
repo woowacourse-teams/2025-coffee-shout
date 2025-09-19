@@ -93,8 +93,7 @@ public final class JoinCode {
 
     @Override
     public String toString() {
-        return "JoinCode[" +
-                "value=" + value + ']';
+        return value;
     }
 
 }
