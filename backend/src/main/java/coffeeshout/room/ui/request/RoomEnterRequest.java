@@ -1,8 +1,11 @@
 package coffeeshout.room.ui.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record RoomEnterRequest(
-        String playerName,
-        SelectedMenuRequest menu
+        @NotBlank String playerName,
+        @NotNull SelectedMenuRequest menu
 ) {
 
 }
