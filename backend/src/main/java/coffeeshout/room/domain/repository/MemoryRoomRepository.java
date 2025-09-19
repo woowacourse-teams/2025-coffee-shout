@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 
-@Repository
+//@Repository
 public class MemoryRoomRepository implements RoomRepository {
 
     private final Map<JoinCode, Room> rooms;

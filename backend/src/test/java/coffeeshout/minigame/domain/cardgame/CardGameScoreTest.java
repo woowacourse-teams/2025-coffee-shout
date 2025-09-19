@@ -2,8 +2,8 @@ package coffeeshout.minigame.domain.cardgame;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
-import coffeeshout.minigame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.domain.cardgame.card.Card;
+import coffeeshout.minigame.domain.cardgame.card.CardType;
 import org.junit.jupiter.api.Test;
 
 class CardGameScoreTest {
@@ -12,8 +12,8 @@ class CardGameScoreTest {
     void 카드_핸드로_점수를_생성한다() {
         // given
         CardHand hand = new CardHand();
-        hand.put(AdditionCard.PLUS_30);
-        hand.put(MultiplierCard.DOUBLE);
+        hand.put(new Card(CardType.ADDITION, 30));
+        hand.put(new Card(CardType.MULTIPLIER, 2));
 
         // when
         CardGameScore score = new CardGameScore(hand);
@@ -26,7 +26,7 @@ class CardGameScoreTest {
     void 덧셈_카드로_점수를_업데이트한다() {
         // given
         CardHand hand = new CardHand();
-        hand.put(AdditionCard.PLUS_40);
+        hand.put(new Card(CardType.ADDITION, 40));
 
         // when
         CardGameScore score = hand.calculateCardGameScore();
@@ -39,8 +39,8 @@ class CardGameScoreTest {
     void 곱셈_카드로_점수를_업데이트한다() {
         // given
         CardHand hand = new CardHand();
-        hand.put(AdditionCard.PLUS_10);
-        hand.put(MultiplierCard.DOUBLE);
+        hand.put(new Card(CardType.ADDITION, 10));
+        hand.put(new Card(CardType.MULTIPLIER, 2));
 
         // when
         CardGameScore score = hand.calculateCardGameScore();
@@ -53,8 +53,8 @@ class CardGameScoreTest {
     void 음수_덧셈_카드로_점수를_업데이트한다() {
         // given
         CardHand hand = new CardHand();
-        hand.put(AdditionCard.PLUS_30);
-        hand.put(AdditionCard.MINUS_10);
+        hand.put(new Card(CardType.ADDITION, 30));
+        hand.put(new Card(CardType.ADDITION, -10));
 
         // when
         CardGameScore score = hand.calculateCardGameScore();
@@ -67,13 +67,13 @@ class CardGameScoreTest {
     void 계산된_점수가_같으면_동일하다() {
         // given
         CardHand cardHand1 = new CardHand();
-        cardHand1.put(AdditionCard.PLUS_40);
-        cardHand1.put(MultiplierCard.INVERT);
+        cardHand1.put(new Card(CardType.ADDITION, 40));
+        cardHand1.put(new Card(CardType.MULTIPLIER, -1));
         CardGameScore score1 = new CardGameScore(cardHand1);
 
         CardHand cardHand2 = new CardHand();
-        cardHand2.put(AdditionCard.MINUS_10);
-        cardHand2.put(MultiplierCard.QUADRUPLE);
+        cardHand2.put(new Card(CardType.ADDITION, -10));
+        cardHand2.put(new Card(CardType.MULTIPLIER, 4));
         CardGameScore score2 = new CardGameScore(cardHand2);
 
         // when & then

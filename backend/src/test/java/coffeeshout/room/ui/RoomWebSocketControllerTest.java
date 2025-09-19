@@ -1,14 +1,14 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
-import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.domain.service.RoomCommandService;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
+
+    @Autowired
+    RoomCommandService roomCommandService;
 
     JoinCode joinCode;
 
@@ -27,12 +30,12 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     Room testRoom;
 
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+    void setUp() throws Exception {
         testRoom = RoomFixture.호스트_꾹이();
         joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
         host = testRoom.getHost();
 
-        roomRepository.save(testRoom);
+        roomCommandService.save(testRoom);
         session = createSession();
     }
 
@@ -314,6 +317,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
+        roomCommandService.save(testRoom);
 
         String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
         String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());

@@ -8,6 +8,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.card.Deck;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -15,20 +16,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor
 @Getter
 public class CardGame implements Playable {
 
     private static final int ADDITION_CARD_COUNT = 7;
     private static final int MULTIPLIER_CARD_COUNT = 2;
 
-    private final Deck deck;
+    private JoinCode joinCode;
+    private Deck deck;
     private PlayerHands playerHands;
     private CardGameRound round;
     private CardGameState state;
 
-    public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
+    public CardGame(
+            @NonNull List<Player> players,
+            @NonNull JoinCode joinCode,
+            @NonNull CardGameDeckGenerator deckGenerator
+    ) {
+        this.joinCode = joinCode;
+        this.playerHands = new PlayerHands(players);
         this.round = CardGameRound.READY;
         this.state = CardGameState.READY;
         this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
@@ -42,11 +52,6 @@ public class CardGame implements Playable {
     @Override
     public MiniGameType getMiniGameType() {
         return MiniGameType.CARD_GAME;
-    }
-
-    @Override
-    public void startGame(List<Player> players) {
-        playerHands = new PlayerHands(players);
     }
 
     @Override
@@ -68,7 +73,7 @@ public class CardGame implements Playable {
         this.state = CardGameState.PLAYING;
     }
 
-    public void selectCard(Player player, Integer cardIndex) {
+    public void selectCard(PlayerName player, Integer cardIndex) {
         state(state == CardGameState.PLAYING, "현재 게임이 진행중인 상태가 아닙니다.");
         playerHands.put(player, deck.pick(cardIndex));
     }
@@ -89,7 +94,7 @@ public class CardGame implements Playable {
         final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
         for (Player player : unselectedPlayers) {
             Card card = deck.pickRandom();
-            playerHands.put(player, card);
+            playerHands.put(player.getName(), card);
         }
     }
 

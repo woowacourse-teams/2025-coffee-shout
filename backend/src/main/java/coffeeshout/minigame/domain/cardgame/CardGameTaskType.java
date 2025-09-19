@@ -1,9 +1,11 @@
 package coffeeshout.minigame.domain.cardgame;
 
 import coffeeshout.minigame.common.task.ChainedTask;
+import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
+import coffeeshout.minigame.domain.cardgame.service.CardGameQueryService;
 import coffeeshout.minigame.domain.dto.CardGameStateChangeEvent;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.room.domain.Room;
+import coffeeshout.minigame.domain.dto.MiniGameCompletedEvent;
+import coffeeshout.room.domain.JoinCode;
 import java.util.Arrays;
 import lombok.Getter;
 import org.springframework.context.ApplicationEventPublisher;
@@ -12,78 +14,152 @@ import org.springframework.context.ApplicationEventPublisher;
 public enum CardGameTaskType {
     FIRST_ROUND_LOADING(CardGameState.FIRST_LOADING, CardGameRound.FIRST) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.startRound();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.startRound();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     FIRST_ROUND_DESCRIPTION(CardGameState.PREPARE, CardGameRound.FIRST) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.updateDescription();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.updateDescription();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     FIRST_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.FIRST) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.startPlay();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.startPlay();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     FIRST_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.FIRST) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.assignRandomCardsToUnselectedPlayers();
-                cardGame.changeScoreBoardState();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.assignRandomCardsToUnselectedPlayers();
+                        cardGame.changeScoreBoardState();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     SECOND_ROUND_LOADING(CardGameState.LOADING, CardGameRound.SECOND) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.startRound();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.startRound();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     SECOND_ROUND_PLAYING(CardGameState.PLAYING, CardGameRound.SECOND) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.startPlay();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.startPlay();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     SECOND_ROUND_SCORE_BOARD(CardGameState.SCORE_BOARD, CardGameRound.SECOND) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.assignRandomCardsToUnselectedPlayers();
-                cardGame.changeScoreBoardState();
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.assignRandomCardsToUnselectedPlayers();
+                        cardGame.changeScoreBoardState();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     GAME_FINISH_STATE(CardGameState.DONE, CardGameRound.SECOND) {
         @Override
-        public ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher) {
-            return new ChainedTask(() -> {
-                cardGame.changeDoneState();
-                MiniGameResult result = cardGame.getResult();
-                room.applyMiniGameResult(result);
-                eventPublisher.publishEvent(new CardGameStateChangeEvent(room.getJoinCode(), cardGame));
-            }, getState().getDurationMillis());
+        public ChainedTask createTask(
+                JoinCode joinCode,
+                ApplicationEventPublisher eventPublisher,
+                CardGameQueryService queryService,
+                CardGameCommandService commandService
+        ) {
+            return new ChainedTask(
+                    () -> {
+                        final CardGame cardGame = queryService.getByJoinCode(joinCode);
+                        cardGame.changeDoneState();
+                        commandService.save(cardGame);
+                        eventPublisher.publishEvent(new MiniGameCompletedEvent(
+                                cardGame.getJoinCode(),
+                                cardGame.getResult()
+                        ));
+                        eventPublisher.publishEvent(new CardGameStateChangeEvent(cardGame.getJoinCode(), cardGame));
+                    }, getState().getDurationMillis()
+            );
         }
     },
     ;
@@ -95,7 +171,12 @@ public enum CardGameTaskType {
         return CardGameTaskType.of(cardGame.getState(), cardGame.getRound());
     }
 
-    public abstract ChainedTask createTask(CardGame cardGame, Room room, ApplicationEventPublisher eventPublisher);
+    public abstract ChainedTask createTask(
+            JoinCode joinCode,
+            ApplicationEventPublisher eventPublisher,
+            CardGameQueryService queryService,
+            CardGameCommandService commandService
+    );
 
     CardGameTaskType(CardGameState state, CardGameRound round) {
         this.state = state;

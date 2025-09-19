@@ -20,11 +20,13 @@ class CardTest {
 
     static Stream<Arguments> 동일한_Card는_종류와_값이_같아야_한다() {
         return Stream.of(
-                Arguments.of(new AdditionCard(10), new AdditionCard(10)),
-                Arguments.of(new AdditionCard(-40), new AdditionCard(-40)),
-                Arguments.of(new MultiplierCard(4), new MultiplierCard(4)),
-                Arguments.of(new MultiplierCard(0), new MultiplierCard(0)),
-                Arguments.of(new MultiplierCard(-1), new MultiplierCard(-1))
+                Arguments.of(new Card(CardType.ADDITION, 10), new Card(CardType.ADDITION, 10)),
+                Arguments.of(
+                        new Card(CardType.ADDITION, -40), new Card(CardType.ADDITION, -40),
+                        Arguments.of(new Card(CardType.MULTIPLIER, 4), new Card(CardType.MULTIPLIER, 4)),
+                        Arguments.of(new Card(CardType.MULTIPLIER, 0), new Card(CardType.MULTIPLIER, 0)),
+                        Arguments.of(new Card(CardType.MULTIPLIER, -1), new Card(CardType.MULTIPLIER, -1))
+                )
         );
     }
 }

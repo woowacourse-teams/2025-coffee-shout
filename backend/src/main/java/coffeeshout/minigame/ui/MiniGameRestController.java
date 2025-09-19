@@ -1,11 +1,11 @@
 package coffeeshout.minigame.ui;
 
+import coffeeshout.minigame.application.MiniGameServiceManager;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.ui.response.MiniGameRanksResponse;
 import coffeeshout.minigame.ui.response.MiniGameScoresResponse;
-import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.player.Player;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MiniGameRestController {
 
-    private final RoomService roomService;
+    private final MiniGameServiceManager miniGameServiceManager;
 
     @GetMapping("/scores")
     public ResponseEntity<MiniGameScoresResponse> getScores(
             @RequestParam String joinCode,
             @RequestParam MiniGameType miniGameType
     ) {
-        Map<Player, MiniGameScore> result = roomService.getMiniGameScores(joinCode, miniGameType);
+        final Map<Player, MiniGameScore> result = miniGameServiceManager.getMiniGameScores(joinCode, miniGameType);
 
         return ResponseEntity.ok(MiniGameScoresResponse.from(result));
     }
@@ -37,7 +37,7 @@ public class MiniGameRestController {
             @RequestParam String joinCode,
             @RequestParam MiniGameType miniGameType
     ) {
-        final MiniGameResult result = roomService.getMiniGameRanks(joinCode, miniGameType);
+        final MiniGameResult result = miniGameServiceManager.getMiniGameRanks(joinCode, miniGameType);
 
         return ResponseEntity.ok(MiniGameRanksResponse.from(result));
     }

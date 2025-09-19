@@ -19,19 +19,8 @@ class DeckTest {
 
     @BeforeEach
     void setUp() {
-        additionCards = List.of(
-                AdditionCard.PLUS_40,
-                AdditionCard.PLUS_30,
-                AdditionCard.PLUS_20,
-                AdditionCard.PLUS_10,
-                AdditionCard.ZERO,
-                AdditionCard.MINUS_10,
-                AdditionCard.MINUS_20
-        );
-        multiplierCards = List.of(
-                MultiplierCard.QUADRUPLE,
-                MultiplierCard.DOUBLE
-        );
+        additionCards = GameCard.getRandomAdditionCards(7);
+        multiplierCards = GameCard.getRandomMultiplyCards(2);
         deck = new Deck(additionCards, multiplierCards);
     }
 
@@ -170,7 +159,7 @@ class DeckTest {
         @Test
         void 덱에_없는_카드의_선택_여부를_확인한다() {
             // given
-            Card cardNotInDeck = new AdditionCard(999);
+            Card cardNotInDeck = new Card(CardType.ADDITION, 999);
 
             // when & then
             assertThat(deck.getPickedCards().contains(cardNotInDeck)).isFalse();

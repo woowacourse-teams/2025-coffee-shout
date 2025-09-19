@@ -8,8 +8,6 @@ import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
@@ -113,7 +111,7 @@ class RoomTest {
         ReflectionTestUtils.setField(room, "miniGames", miniGames);
 
         // when
-        room.addMiniGame(호스트_한스, new MiniGameDummy());
+        room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME);
 
         // then
         assertThat(room.getMiniGames()).hasSize(5);
@@ -133,20 +131,18 @@ class RoomTest {
 
         ReflectionTestUtils.setField(room, "miniGames", miniGames);
 
-        MiniGameDummy miniGameDummy = new MiniGameDummy();
         // when & then
-        assertThatThrownBy(() -> room.addMiniGame(호스트_한스, miniGameDummy))
+        assertThatThrownBy(() -> room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void 미니게임을_제거한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
+        room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME);
 
         // when
-        room.removeMiniGame(호스트_한스, cardGame);
+        room.removeMiniGame(호스트_한스, MiniGameType.CARD_GAME);
 
         // then
         assertThat(room.getMiniGames()).isEmpty();
@@ -154,12 +150,9 @@ class RoomTest {
 
     @Test
     void 해당_미니게임이_없을_때_제거하면_예외를_발생한다() {
-        // given
-        MiniGameDummy miniGameDummy = new MiniGameDummy();
-
         // when & then
         assertThatThrownBy(() -> {
-            room.removeMiniGame(호스트_한스, miniGameDummy);
+            room.removeMiniGame(호스트_한스, MiniGameType.CARD_GAME);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -233,52 +226,48 @@ class RoomTest {
     void 호스트가_아니면_미니게임을_추가할_수_없다() {
         // given
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
-        MiniGameDummy miniGameDummy = new MiniGameDummy();
 
         // when & then
-        assertThatThrownBy(() -> room.addMiniGame(게스트_꾹이, miniGameDummy))
+        assertThatThrownBy(() -> room.addMiniGame(게스트_꾹이, MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 호스트가_아니면_미니게임을_제거할_수_없다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
+        room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
-        assertThatThrownBy(() -> room.removeMiniGame(게스트_꾹이, cardGame))
+        assertThatThrownBy(() -> room.removeMiniGame(게스트_꾹이, MiniGameType.CARD_GAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 미니게임을_시작한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
+        room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
         Player guest = room.findPlayer(게스트_꾹이);
 
         // when
         guest.updateReadyState(true);
-        Playable playable = room.startNextGame(host.getName().value());
+        MiniGameType miniGameType = room.startNextGame(host.getName());
 
         // then
-        assertThat(playable.getMiniGameType()).isEqualTo(MiniGameType.CARD_GAME);
+        assertThat(miniGameType).isEqualTo(MiniGameType.CARD_GAME);
     }
 
     @Test
     void 게임_시작_시_모든_플레이어가_레디_상태가_아니면_예외가_발생한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
-        room.addMiniGame(호스트_한스, cardGame);
+        room.addMiniGame(호스트_한스, MiniGameType.CARD_GAME);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
 
         // when & then
-        assertThatThrownBy(() -> room.startNextGame(host.getName().value()))
+        assertThatThrownBy(() -> room.startNextGame(host.getName()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("모든 플레이어가 준비완료해야합니다.");
     }

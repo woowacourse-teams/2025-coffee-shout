@@ -1,8 +1,12 @@
 package coffeeshout.room.domain.menu;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomMenu extends Menu {
 
-    private final String categoryImageUrl;
+    private String categoryImageUrl;
 
     public CustomMenu(String name, String categoryImageUrl) {
         super(name, TemperatureAvailability.BOTH);

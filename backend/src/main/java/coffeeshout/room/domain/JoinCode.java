@@ -6,16 +6,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public final class JoinCode {
 
     private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 5;
 
-    private final String value;
+    private String value;
     private String qrCodeUrl;
 
     public JoinCode(String value) {
@@ -50,15 +53,19 @@ public final class JoinCode {
 
     private void validateLength(String value) {
         if (value.length() != CODE_LENGTH) {
-            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_ILLEGAL_LENGTH,
-                    "5자리 코드여야 합니다. 현재 길이: " + value.length());
+            throw new InvalidArgumentException(
+                    RoomErrorCode.JOIN_CODE_ILLEGAL_LENGTH,
+                    "5자리 코드여야 합니다. 현재 길이: " + value.length()
+            );
         }
     }
 
     private void validateCharacters(String value) {
         if (value.chars().anyMatch(charCode -> !isValidCharacter(charCode))) {
-            throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_ILLEGAL_CHARACTER,
-                    "허용되지 않는 문자가 포함되어 있습니다. 현재 코드: " + value);
+            throw new InvalidArgumentException(
+                    RoomErrorCode.JOIN_CODE_ILLEGAL_CHARACTER,
+                    "허용되지 않는 문자가 포함되어 있습니다. 현재 코드: " + value
+            );
         }
     }
 

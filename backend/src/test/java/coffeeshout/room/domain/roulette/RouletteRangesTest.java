@@ -16,10 +16,9 @@ class RouletteRangesTest {
         Player player1 = PlayerFixture.호스트한스();
         Player player2 = PlayerFixture.호스트꾹이();
 
-        Players players = new Players() {{
-            join(player1);
-            join(player2);
-        }};
+        Players players = new Players();
+        players.join(player1);
+        players.join(player2);
 
         player1.updateProbability(new Probability(1500));
         player2.updateProbability(new Probability(8500));
@@ -40,9 +39,8 @@ class RouletteRangesTest {
         // given
         Player player1 = PlayerFixture.호스트엠제이();
 
-        Players players = new Players() {{
-            join(player1);
-        }};
+        Players players = new Players();
+        players.join(player1);
 
         RouletteRanges rouletteRanges = new RouletteRanges(players);
 
@@ -70,10 +68,9 @@ class RouletteRangesTest {
         Player player1 = PlayerFixture.호스트한스();
         Player player2 = PlayerFixture.호스트꾹이();
 
-        Players players = new Players() {{
-            join(player1);
-            join(player2);
-        }};
+        Players players = new Players();
+        players.join(player1);
+        players.join(player2);
 
         player1.updateProbability(new Probability(5000));
         player2.updateProbability(new Probability(5000));
