@@ -160,6 +160,6 @@ public enum CardGameTaskType {
     }
 
     private static String generateCorrelationId(Room room, CardGameTaskType task) {
-        return String.format("JoinCode: %s / gameState: %s", room, task.name());
+        return String.format("JoinCode: %s / gameState: %s", room.getJoinCode().getValue(), task.name());
     }
 }
