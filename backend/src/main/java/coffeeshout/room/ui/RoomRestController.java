@@ -8,6 +8,7 @@ import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class RoomRestController {
     @PostMapping("/{joinCode}")
     public CompletableFuture<ResponseEntity<RoomEnterResponse>> enterRoom(
             @PathVariable String joinCode,
-            @RequestBody RoomEnterRequest request
+            @Valid @RequestBody RoomEnterRequest request
     ) {
         // TODO Subscribe에서 예외가 발생할 수 있어서 처리해야 한다.
         return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
