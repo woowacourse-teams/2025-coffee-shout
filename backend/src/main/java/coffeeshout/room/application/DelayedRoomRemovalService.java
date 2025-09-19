@@ -42,7 +42,6 @@ public class DelayedRoomRemovalService {
     }
 
 
-    // TODO 방을 삭제하는 것은 이벤트로 처리해야 함
     private void executeRoomRemoval(JoinCode joinCode) {
         try {
             roomCommandService.delete(joinCode);

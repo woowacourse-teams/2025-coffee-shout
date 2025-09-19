@@ -13,6 +13,9 @@ spring:
       ssl:
         enabled: true
       host: localhost
+      stream:
+        room-key: room:broadcast
+        max-length: 1000
 
 room:
   removalDelay: 1h
@@ -22,6 +25,8 @@ room:
     presignedUrl:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
+  event:
+    timeout: 5
 
 logging:
   level:

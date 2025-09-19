@@ -1,13 +1,11 @@
 package coffeeshout.room.infra.messaging;
 
-import coffeeshout.global.messaging.RedisStreamBroadcastService;
+import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,14 +16,8 @@ import org.springframework.stereotype.Service;
 public class RoomBroadcastStreamProducer {
 
     private final StringRedisTemplate stringRedisTemplate;
-    private final ObjectMapper objectMapper;
     private final RoomJoinEventConverter roomJoinEventConverter;
-
-    @Value("${spring.application.name:app}")
-    private String applicationName;
-
-    @Value("${server.port:8080}")
-    private String serverPort;
+    private final RedisStreamProperties redisStreamProperties;
 
     public void broadcastEnterRoom(RoomJoinEvent event) {
         log.info("Broadcasting enter room event: joinCode={}, playerName={}", event.joinCode(),
@@ -36,8 +28,9 @@ public class RoomBroadcastStreamProducer {
             Map<String, String> flatMap = roomJoinEventConverter.toFlatMap(event);
 
             RecordId recordId = stringRedisTemplate.opsForStream().add(
-                    RedisStreamBroadcastService.BROADCAST_STREAM,
-                    flatMap
+                    redisStreamProperties.roomKey(),
+                    flatMap,
+                    XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
             log.info("Enter room broadcast sent: recordId={}", recordId.getValue());
@@ -45,10 +38,5 @@ public class RoomBroadcastStreamProducer {
             log.error("Failed to broadcast enter room event", e);
             throw new RuntimeException("Failed to broadcast enter room event", e);
         }
-    }
-
-
-    private String getInstanceId() {
-        return applicationName + "-" + serverPort;
     }
 }

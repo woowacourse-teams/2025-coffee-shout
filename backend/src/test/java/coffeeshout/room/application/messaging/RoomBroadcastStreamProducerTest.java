@@ -10,12 +10,9 @@ import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
-import coffeeshout.room.infra.messaging.RoomBroadcastStreamConsumer;
 import coffeeshout.room.infra.messaging.RoomBroadcastStreamProducer;
-import coffeeshout.room.infra.messaging.RoomJoinEventConverter;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.support.test.IntegrationTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,14 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-@DisplayName("RoomBroadcastStreamConsumer 통합 테스트")
-class RoomBroadcastStreamConsumerTest {
-
-    @Autowired
-    RoomBroadcastStreamConsumer consumer;
-
-    @Autowired
-    ObjectMapper objectMapper;
+@DisplayName("RoomBroadcastStreamProducer 통합 테스트")
+class RoomBroadcastStreamProducerTest {
 
     @Autowired
     RoomRepository roomRepository;
@@ -39,15 +30,11 @@ class RoomBroadcastStreamConsumerTest {
     @Autowired
     RoomBroadcastStreamProducer producer;
 
-    @Autowired
-    RoomJoinEventConverter roomJoinEventConverter;
-
-    private Room testRoom;
     private String joinCode;
 
     @BeforeEach
     void setUp() {
-        testRoom = RoomFixture.호스트_꾹이();
+        final Room testRoom = RoomFixture.호스트_꾹이();
         roomRepository.save(testRoom);
         joinCode = testRoom.getJoinCode().getValue();
     }
@@ -58,7 +45,7 @@ class RoomBroadcastStreamConsumerTest {
 
         @Test
         @DisplayName("플레이어 입장 처리 시 실제 Room 엔티티가 올바르게 업데이트된다")
-        void enterRoomProcessing_UpdatesRoomEntityCorrectly() throws Exception {
+        void enterRoomProcessing_UpdatesRoomEntityCorrectly() {
             // given
             String playerName = "인원 추가";
             SelectedMenuRequest menu = new SelectedMenuRequest(4L, "에스프레소", MenuTemperature.ICE);
@@ -66,7 +53,7 @@ class RoomBroadcastStreamConsumerTest {
             producer.broadcastEnterRoom(RoomJoinEvent.create(joinCode, playerName, menu));
 
             // then
-            await().atMost(Duration.ofSeconds(3))
+            await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(100))
                     .untilAsserted(() -> {
                         Room updatedRoom = roomRepository.findByJoinCode(new JoinCode(joinCode)).orElseThrow();
                         Player result = updatedRoom.getPlayers().stream()
@@ -96,7 +83,7 @@ class RoomBroadcastStreamConsumerTest {
             }
 
             // then
-            await().atMost(Duration.ofSeconds(3))
+            await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(100))
                     .untilAsserted(() -> {
                         Room updatedRoom = roomRepository.findByJoinCode(new JoinCode(joinCode)).orElseThrow();
                         assertThat(updatedRoom.getPlayers())

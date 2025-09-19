@@ -1,18 +1,15 @@
 package coffeeshout.room.infra.messaging;
 
-import coffeeshout.global.messaging.RedisStreamBroadcastService;
+import coffeeshout.global.config.properties.RedisStreamProperties;
+import coffeeshout.global.message.RedisStreamStartStrategy;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -22,32 +19,26 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRecord<String, String, String>> {
 
-    private final ObjectMapper objectMapper;
     private final RoomService roomService;
-    private final RedisStreamBroadcastService broadcastService;
     private final StreamMessageListenerContainer<String, MapRecord<String, String, String>> listenerContainer;
-    private final StringRedisTemplate stringRedisTemplate;
     private final RoomEventWaitManager roomEventWaitManager;
     private final RoomJoinEventConverter roomJoinEventConverter;
-
-    @Value("${spring.application.name:app}")
-    private String applicationName;
-
-    @Value("${server.port:8080}")
-    private String serverPort;
+    private final RedisStreamProperties redisStreamProperties;
+    private final RedisStreamStartStrategy redisStreamStartStrategy;
 
     /**
      * StreamMessageListenerContainer에 리스너 등록
+     * 테스트에서 latest는 오류가 발생하므로 fromStart를 사용한다.
      */
     @PostConstruct
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
         listenerContainer.receive(
-                StreamOffset.fromStart(RedisStreamBroadcastService.BROADCAST_STREAM),
+                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomKey()),
                 this
         );
 
-        log.info("Registered broadcast stream listener for: {}", RedisStreamBroadcastService.BROADCAST_STREAM);
+        log.info("Registered broadcast stream listener for: {}", redisStreamProperties.roomKey());
     }
 
     /**
@@ -96,9 +87,5 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
 
         return roomService.enterRoom(roomJoinEvent.joinCode(), roomJoinEvent.guestName(),
                 roomJoinEvent.selectedMenuRequest());
-    }
-
-    private String getInstanceId() {
-        return applicationName + "-" + serverPort;
     }
 }

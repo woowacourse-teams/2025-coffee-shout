@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -47,6 +48,9 @@ public class RoomService {
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
     private final RoomBroadcastStreamProducer roomBroadcastStreamProducer;
+
+    @Value("${room.event.timeout}")
+    private int eventTimeoutSeconds;
 
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
@@ -73,9 +77,9 @@ public class RoomService {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
         eventPublisher.run();
 
-        return future.orTimeout(5, TimeUnit.SECONDS)
+        return future.orTimeout(eventTimeoutSeconds, TimeUnit.SECONDS)
                 .whenComplete((result, throwable) -> {
-                    roomEventWaitManager.cleanup(eventId);
+                    // cleanup은 registerWait에서 자동으로 처리됨
                     if (throwable != null) {
                         log.error("{} 비동기 처리 실패: eventId={}, {}",
                                 operationName, eventId, logParams, throwable);
@@ -117,10 +121,6 @@ public class RoomService {
         room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
 
         return roomCommandService.save(room);
-    }
-
-    public Room getRoom(String joinCode) {
-        return roomQueryService.getByJoinCode(new JoinCode(joinCode));
     }
 
     public List<Player> getAllPlayers(String joinCode) {
