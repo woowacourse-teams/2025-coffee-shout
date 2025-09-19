@@ -35,7 +35,9 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Playable currentGame = room.startNextGame(command.hostName());
         final MiniGameType miniGameType = currentGame.getMiniGameType();
-        services.get(miniGameType).start(currentGame, joinCode);
+        
+        // 비동기 처리로 변경
+        services.get(miniGameType).startAsync(currentGame, joinCode);
     }
 
     @Override

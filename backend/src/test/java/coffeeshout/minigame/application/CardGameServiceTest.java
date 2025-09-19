@@ -2,11 +2,7 @@ package coffeeshout.minigame.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
@@ -61,15 +57,22 @@ class CardGameServiceTest extends ServiceTest {
                 new SelectedMenuRequest(1L, null, MenuTemperature.ICE)
         );
         joinCode = room.getJoinCode();
+//        roomService.updateMiniGames(joinCode.getValue(), host.getName().value(), List.of(MiniGameType.CARD_GAME));
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
         for (int i = 1; i < players.getPlayers().size(); i++) {
+//            roomService.enterRoom(joinCode.getValue(),
+//                    players.getPlayers().get(i).getName().value(),
+//                    new SelectedMenuRequest(1L, "아메키라노", MenuTemperature.ICE)
+//            );
+
             room.joinGuest(
                     players.getPlayers().get(i).getName(),
                     new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
             );
         }
         for (Player player : room.getPlayers()) {
+//            roomService.changePlayerReadyState(joinCode.getValue(), player.getName().value(), true);
             player.updateReadyState(true);
         }
         cardGame = (CardGame) room.startNextGame(host.getName().value());

@@ -14,7 +14,8 @@ public class SelectCardCommandHandler implements MiniGameCommandHandler<SelectCa
 
     @Override
     public void handle(String joinCode, SelectCardCommand command) {
-        cardGameService.selectCard(joinCode, command.playerName(), command.cardIndex());
+        // 비동기 처리로 변경
+        cardGameService.selectCardAsync(joinCode, command.playerName(), command.cardIndex());
     }
 
     @Override
