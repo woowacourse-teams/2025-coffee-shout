@@ -28,7 +28,7 @@ export const Container = styled.button<Props>`
         &:hover { background-color: ${activeColor}; }
       }
       
-      /* 터치 디바이스: isPressed 상태로 제어 */
+      /* 터치 디바이스: isTouching 상태로 제어 */
       ${$isTouching && `background-color: ${activeColor};`}
     `;
   }}
