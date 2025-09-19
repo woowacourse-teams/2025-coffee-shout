@@ -119,7 +119,7 @@ public class Room {
                 .collect(Collectors.toMap(player -> player, Player::getProbability));
     }
 
-    public List<MiniGameType> getAllMiniGame() {
+    public List<MiniGameType> getAllMiniGames() {
         return List.copyOf(miniGames);
     }
 

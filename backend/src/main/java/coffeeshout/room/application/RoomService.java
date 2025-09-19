@@ -137,7 +137,7 @@ public class RoomService {
 
         roomCommandService.save(room);
 
-        return room.getAllMiniGame();
+        return room.getAllMiniGames();
     }
 
     public boolean roomExists(String joinCode) {
@@ -161,7 +161,7 @@ public class RoomService {
 
     public List<MiniGameType> getSelectedMiniGames(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.getAllMiniGame();
+        return room.getAllMiniGames();
     }
 
     public boolean removePlayer(String joinCode, String playerName) {
