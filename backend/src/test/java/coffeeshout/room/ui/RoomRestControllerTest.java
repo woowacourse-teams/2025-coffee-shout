@@ -25,6 +25,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -152,6 +155,71 @@ class RoomRestControllerTest {
 
             mockMvc.perform(asyncDispatch(result))
                     .andExpect(status().isNotFound());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"호스트"})
+        void 잘못된_플레이어_이름으로_입장_시도_시_400_에러를_반환한다(String invalidPlayerName) throws Exception {
+            // given - 먼저 방을 생성
+            SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
+            RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
+
+            String createResponse = mockMvc.perform(post("/rooms")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createRequest)))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            RoomCreateResponse roomCreateResponse = objectMapper.readValue(createResponse, RoomCreateResponse.class);
+            String joinCode = roomCreateResponse.joinCode();
+
+            // given - 잘못된 플레이어 이름으로 입장 요청
+            SelectedMenuRequest guestMenuRequest = new SelectedMenuRequest(2L, "라떼", MenuTemperature.ICE);
+            RoomEnterRequest enterRequest = new RoomEnterRequest(invalidPlayerName, guestMenuRequest);
+
+            // when & then - 비동기 테스트
+            var result = mockMvc.perform(post("/rooms/{joinCode}", joinCode)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(enterRequest)))
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            mockMvc.perform(asyncDispatch(result))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void 메뉴_정보가_없는_경우_입장_시도_시_400_에러를_반환한다() throws Exception {
+            // given - 먼저 방을 생성
+            SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
+            RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
+
+            String createResponse = mockMvc.perform(post("/rooms")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createRequest)))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            RoomCreateResponse roomCreateResponse = objectMapper.readValue(createResponse, RoomCreateResponse.class);
+            String joinCode = roomCreateResponse.joinCode();
+
+            // given - 메뉴 정보가 없는 입장 요청
+            RoomEnterRequest enterRequest = new RoomEnterRequest("게스트", null);
+
+            // when & then - 비동기 테스트
+            var result = mockMvc.perform(post("/rooms/{joinCode}", joinCode)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(enterRequest)))
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            mockMvc.perform(asyncDispatch(result))
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
