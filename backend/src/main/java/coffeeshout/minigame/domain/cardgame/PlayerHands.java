@@ -4,14 +4,14 @@ import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.cardgame.card.Card;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayerHands {
 
     private List<PlayerHand> playerHands;
@@ -28,9 +28,8 @@ public class PlayerHands {
 
     public int totalHandSize() {
         return playerHands.stream()
-                .map(PlayerHand::handSize)
-                .reduce(0, Integer::sum);
-
+                .mapToInt(PlayerHand::handSize)
+                .sum();
     }
 
     public int playerCount() {
@@ -57,13 +56,10 @@ public class PlayerHands {
     }
 
     public List<Player> getUnselectedPlayers(CardGameRound round) {
-        final List<Player> players = new ArrayList<>();
-        playerHands.forEach(playerHand -> {
-            if (!playerHand.isSelected(round)) {
-                players.add(playerHand.getPlayer());
-            }
-        });
-        return players;
+        return playerHands.stream()
+                .filter(playerHand -> !playerHand.isSelected(round))
+                .map(PlayerHand::getPlayer)
+                .toList();
     }
 
     public Optional<Player> findCardOwner(Card card, CardGameRound round) {

@@ -3,10 +3,11 @@ package coffeeshout.room.domain.player;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.roulette.Probability;
 import java.util.Objects;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Player {
 

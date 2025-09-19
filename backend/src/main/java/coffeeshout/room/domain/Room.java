@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Room {
 
@@ -123,8 +124,8 @@ public class Room {
         return List.copyOf(miniGames);
     }
 
-    public MiniGameType startNextGame(String hostName) {
-        state(host.sameName(new PlayerName(hostName)), "호스트가 게임을 시작할 수 있습니다.");
+    public MiniGameType startNextGame(PlayerName hostName) {
+        state(host.sameName(hostName), "호스트가 게임을 시작할 수 있습니다.");
         state(players.isAllReady(), "모든 플레이어가 준비완료해야합니다.");
         state(players.getPlayerCount() >= 2, "게임을 시작하려면 플레이어가 2명 이상이어야 합니다.");
         state(!miniGames.isEmpty(), "시작할 게임이 없습니다.");

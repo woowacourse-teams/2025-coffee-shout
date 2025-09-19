@@ -1,8 +1,9 @@
 package coffeeshout.room.domain.menu;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomMenu extends Menu {
 
     private String categoryImageUrl;
