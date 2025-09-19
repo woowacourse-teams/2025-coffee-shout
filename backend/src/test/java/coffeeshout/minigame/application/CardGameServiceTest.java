@@ -64,8 +64,7 @@ class CardGameServiceTest extends ServiceTest {
         void 카드게임을_시작한다() {
             // given
             final JoinCode joinCode = new JoinCode("A5B7J");
-            final String joinCodeValue = joinCode.getValue();
-            cardGameService.start(joinCodeValue, players.getPlayers());
+            cardGameService.start(joinCode.getValue(), players.getPlayers());
 
             final CardGame cardGame = cardGameQueryService.getByJoinCode(joinCode);
 
@@ -106,10 +105,9 @@ class CardGameServiceTest extends ServiceTest {
         void 카드를_정상적으로_선택한다() {
             // given
             savePlayingStateCardGame();
-            final String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
 
             // then
             final CardGame cardGame = cardGameQueryService.getByJoinCode(joinCode);
@@ -120,14 +118,13 @@ class CardGameServiceTest extends ServiceTest {
         void 카드_선택_후_게임_상태_메시지가_전송된다() {
             // given
             savePlayingStateCardGame();
-            final String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
+            cardGameService.selectCard(joinCode.getValue(), host.getName().value(), 0);
 
             // then
             verify(messagingTemplate).convertAndSend(
-                    eq("/topic/room/" + joinCodeValue + "/gameState"),
+                    eq("/topic/room/" + joinCode.getValue() + "/gameState"),
                     any(WebSocketResponse.class)
             );
         }
@@ -136,17 +133,16 @@ class CardGameServiceTest extends ServiceTest {
         void 만약_선택된_카드를_고르면_예외를_반환한다() {
             // given
             savePlayingStateCardGame();
-            final String joinCodeValue = joinCode.getValue();
             final List<Player> playerList = players.getPlayers();
 
             // when & then
             // 첫 번째 플레이어가 카드 선택
-            cardGameService.selectCard(joinCodeValue, playerList.get(0).getName().value(), 0);
+            cardGameService.selectCard(joinCode.getValue(), playerList.get(0).getName().value(), 0);
 
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
             final String secondPlayerName = playerList.get(1).getName().value();
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, secondPlayerName, 0)
+                    cardGameService.selectCard(joinCode.getValue(), secondPlayerName, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -154,10 +150,9 @@ class CardGameServiceTest extends ServiceTest {
         void 게임이_플레이_상태가_아니면_예외를_반환한다() {
             // when & then
             final String name = host.getName().value();
-            final String joinCodeValue = joinCode.getValue();
 
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, name, 0)
+                    cardGameService.selectCard(joinCode.getValue(), name, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -165,11 +160,10 @@ class CardGameServiceTest extends ServiceTest {
         void 존재하지_않는_플레이어면_예외를_반환한다() {
             // given
             savePlayingStateCardGame();
-            final String joinCodeValue = joinCode.getValue();
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, "존재하지않는플레이어", 0)
+                    cardGameService.selectCard(joinCode.getValue(), "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -177,12 +171,11 @@ class CardGameServiceTest extends ServiceTest {
         void 잘못된_카드_인덱스면_예외를_반환한다() {
             // given
             savePlayingStateCardGame();
-            final String joinCodeValue = joinCode.getValue();
             final String hostName = host.getName().value();
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, hostName, 999)
+                    cardGameService.selectCard(joinCode.getValue(), hostName, 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
 
