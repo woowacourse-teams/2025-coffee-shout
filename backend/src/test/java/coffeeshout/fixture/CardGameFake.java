@@ -8,8 +8,6 @@ import java.util.List;
 
 public class CardGameFake extends CardGame {
 
-    public CardGameFake() {}
-
     public CardGameFake(List<Player> players, JoinCode joinCode, CardGameDeckGenerator deckGenerator) {
         super(players, joinCode, deckGenerator);
     }

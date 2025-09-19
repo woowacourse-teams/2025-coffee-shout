@@ -8,7 +8,6 @@ import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.MessageResponse;
-import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskExecutors;
@@ -18,7 +17,6 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.service.RoomCommandService;
 import java.util.concurrent.TimeUnit;
-import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +58,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 카드게임을_실행한다()  {
+    void 카드게임을_실행한다() {
         // given
         String joinCodeValue = joinCode.getValue();
         String subscribeUrlFormat = String.format("/topic/room/%s/gameState", joinCodeValue);

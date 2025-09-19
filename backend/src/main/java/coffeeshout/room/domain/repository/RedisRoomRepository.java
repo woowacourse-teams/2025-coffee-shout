@@ -31,7 +31,7 @@ public class RedisRoomRepository implements RoomRepository {
             throw new IllegalStateException("저장된 객체의 타입이 Room이 아닙니다.");
         }
 
-        return Optional.ofNullable((Room) room);
+        return Optional.of((Room) room);
     }
 
     @Override

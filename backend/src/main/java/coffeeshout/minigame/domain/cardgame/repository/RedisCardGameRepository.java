@@ -34,7 +34,7 @@ public class RedisCardGameRepository implements CardGameRepository {
             throw new IllegalStateException("저장된 객체의 타입이 CardGame이 아닙니다.");
         }
 
-        return Optional.ofNullable((CardGame) cardGame);
+        return Optional.of((CardGame) cardGame);
     }
 
     @Override
