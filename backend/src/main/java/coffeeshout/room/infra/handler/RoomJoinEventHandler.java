@@ -2,8 +2,8 @@ package coffeeshout.room.infra.handler;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.event.RoomEventType;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.infra.RoomEventWaitManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

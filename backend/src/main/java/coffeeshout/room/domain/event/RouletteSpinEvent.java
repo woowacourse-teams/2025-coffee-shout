@@ -11,8 +11,8 @@ public record RouletteSpinEvent(
         String hostName,
         Winner winner,
         LocalDateTime timestamp
-) implements BaseEvent {
-    
+) implements RoomBaseEvent {
+
     public static RouletteSpinEvent create(String joinCode, String hostName, Winner winner) {
         return new RouletteSpinEvent(
                 UUID.randomUUID().toString(),

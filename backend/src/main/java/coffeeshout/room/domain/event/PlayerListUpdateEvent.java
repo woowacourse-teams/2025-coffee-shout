@@ -8,8 +8,8 @@ public record PlayerListUpdateEvent(
         RoomEventType eventType,
         String joinCode,
         LocalDateTime timestamp
-) implements BaseEvent {
-    
+) implements RoomBaseEvent {
+
     public static PlayerListUpdateEvent create(String joinCode) {
         return new PlayerListUpdateEvent(
                 UUID.randomUUID().toString(),

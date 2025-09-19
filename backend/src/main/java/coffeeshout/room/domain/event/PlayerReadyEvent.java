@@ -10,8 +10,8 @@ public record PlayerReadyEvent(
         String playerName,
         Boolean isReady,
         LocalDateTime timestamp
-) implements BaseEvent {
-    
+) implements RoomBaseEvent {
+
     public static PlayerReadyEvent create(String joinCode, String playerName, Boolean isReady) {
         return new PlayerReadyEvent(
                 UUID.randomUUID().toString(),

@@ -11,8 +11,8 @@ public record RoomCreateEvent(
         SelectedMenuRequest selectedMenuRequest,
         String joinCode,
         LocalDateTime timestamp
-) implements BaseEvent {
-    
+) implements RoomBaseEvent {
+
     public static RoomCreateEvent create(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
         return new RoomCreateEvent(
                 UUID.randomUUID().toString(),

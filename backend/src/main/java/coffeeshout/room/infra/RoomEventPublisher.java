@@ -1,6 +1,6 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.room.domain.event.BaseEvent;
+import coffeeshout.room.domain.event.RoomBaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,13 +15,13 @@ public class RoomEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic roomEventTopic;
 
-    public <T extends BaseEvent> void publishEvent(T event) {
+    public <T extends RoomBaseEvent> void publishEvent(T event) {
         try {
             redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
-            log.info("이벤트 발행됨: eventType={}, eventId={}", 
+            log.info("이벤트 발행됨: eventType={}, eventId={}",
                     event.getEventType(), event.getEventId());
         } catch (Exception e) {
-            log.error("이벤트 발행 실패: eventType={}, eventId={}", 
+            log.error("이벤트 발행 실패: eventType={}, eventId={}",
                     event.getEventType(), event.getEventId(), e);
             throw new RuntimeException("이벤트 발행 실패", e);
         }

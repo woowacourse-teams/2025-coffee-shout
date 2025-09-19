@@ -1,9 +1,9 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.room.domain.event.BaseEvent;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
+import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -48,8 +48,8 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            final BaseEvent event = deserializeEvent(body, eventType);
-            final RoomEventHandler<BaseEvent> handler = handlerFactory.getHandler(eventType);
+            final RoomBaseEvent event = deserializeEvent(body, eventType);
+            final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
             handler.handle(event);
 
         } catch (Exception e) {
@@ -63,7 +63,7 @@ public class RoomEventSubscriber implements MessageListener {
         return RoomEventType.valueOf(eventTypeStr);
     }
 
-    private BaseEvent deserializeEvent(String body, RoomEventType eventType) throws Exception {
+    private RoomBaseEvent deserializeEvent(String body, RoomEventType eventType) throws Exception {
         return switch (eventType) {
             case ROOM_CREATE -> objectMapper.readValue(body, RoomCreateEvent.class);
             case ROOM_JOIN -> objectMapper.readValue(body, RoomJoinEvent.class);
