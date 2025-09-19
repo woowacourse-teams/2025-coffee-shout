@@ -1,15 +1,18 @@
 package coffeeshout.room.infra.messaging;
 
-import coffeeshout.global.config.properties.RedisStreamProperties;
+import coffeeshout.global.messaging.RedisStreamBroadcastService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -19,13 +22,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRecord<String, String, String>> {
 
-    public static final String BROADCAST = "room:broadcast";
-
+    private final ObjectMapper objectMapper;
     private final RoomService roomService;
+    private final RedisStreamBroadcastService broadcastService;
     private final StreamMessageListenerContainer<String, MapRecord<String, String, String>> listenerContainer;
+    private final StringRedisTemplate stringRedisTemplate;
     private final RoomEventWaitManager roomEventWaitManager;
     private final RoomJoinEventConverter roomJoinEventConverter;
-    private final RedisStreamProperties redisStreamProperties;
+
+    @Value("${spring.application.name:app}")
+    private String applicationName;
+
+    @Value("${server.port:8080}")
+    private String serverPort;
 
     /**
      * StreamMessageListenerContainer에 리스너 등록
@@ -33,14 +42,12 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
     @PostConstruct
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
-        log.info("roomKey : {}", redisStreamProperties.roomKey());
-
         listenerContainer.receive(
-                StreamOffset.fromStart(BROADCAST),
+                StreamOffset.fromStart(RedisStreamBroadcastService.BROADCAST_STREAM),
                 this
         );
 
-        log.info("Registered broadcast stream listener for: {}", redisStreamProperties.roomKey());
+        log.info("Registered broadcast stream listener for: {}", RedisStreamBroadcastService.BROADCAST_STREAM);
     }
 
     /**
@@ -82,11 +89,16 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
         }
     }
 
+
     private Object handleJoinRoomBroadcast(MapRecord<String, String, String> mapRecord) {
         // Converter를 사용해서 플랫 Map에서 RoomJoinEvent 재구성
         RoomJoinEvent roomJoinEvent = roomJoinEventConverter.fromFlatMap(mapRecord.getValue());
 
         return roomService.enterRoom(roomJoinEvent.joinCode(), roomJoinEvent.guestName(),
                 roomJoinEvent.selectedMenuRequest());
+    }
+
+    private String getInstanceId() {
+        return applicationName + "-" + serverPort;
     }
 }

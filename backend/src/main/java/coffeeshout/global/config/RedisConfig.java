@@ -69,4 +69,29 @@ public class RedisConfig {
         stringRedisTemplate.setConnectionFactory(redisConnectionFactory);
         return stringRedisTemplate;
     }
+
+    @Bean
+    public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamMessageListenerContainer(
+            RedisConnectionFactory redisConnectionFactory
+    ) {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(4);
+        taskExecutor.setMaxPoolSize(8);
+        taskExecutor.setQueueCapacity(100);
+        taskExecutor.setThreadNamePrefix("redis-stream-");
+        taskExecutor.initialize();
+
+        StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions
+                .builder()
+                .batchSize(1)
+                .executor(taskExecutor)
+                .pollTimeout(Duration.ofSeconds(1))
+                .build();
+
+        StreamMessageListenerContainer<String, MapRecord<String, String, String>> container =
+                StreamMessageListenerContainer.create(redisConnectionFactory, options);
+
+        container.start();
+        return container;
+    }
 }
