@@ -38,7 +38,7 @@ const MenuSelectionLayout = ({
         {showSelectedMenuCard && (
           <SelectionCard color={menuSelection.color} text={menuSelection.name} />
         )}
-        {children}
+        <S.ChildrenWrapper>{children}</S.ChildrenWrapper>
       </S.Wrapper>
     </>
   );
