@@ -27,9 +27,7 @@ const PrepareOverlay = () => {
           <S.BubbleImage src={chatBubble} />
           <Headline1 color="white">{displayText}</Headline1>
         </S.BubbleTextWrapper>
-        <S.CoffeeWrapper>
-          <S.CoffeeImage src={coffee} />
-        </S.CoffeeWrapper>
+        <S.CoffeeImage src={coffee} />
       </S.Content>
     </S.Backdrop>
   );

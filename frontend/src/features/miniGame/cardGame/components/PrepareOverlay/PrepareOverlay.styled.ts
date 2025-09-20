@@ -30,14 +30,6 @@ export const BubbleImage = styled.img`
   top: -40px;
 `;
 
-export const CoffeeWrapper = styled.div`
-  width: 150px;
-  height: 169px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 export const CoffeeImage = styled.img`
   width: 150px;
   height: 169px;
