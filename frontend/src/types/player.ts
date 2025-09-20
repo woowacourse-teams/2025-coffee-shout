@@ -8,4 +8,5 @@ export type Player = {
   playerType: PlayerType;
   isReady: boolean;
   colorIndex: number;
+  probability: number;
 };
