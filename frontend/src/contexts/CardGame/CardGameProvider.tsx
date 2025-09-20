@@ -34,6 +34,25 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
+  const updateSelectedCardInfo = useCallback(
+    (cardInfoMessages: CardInfo[], round: RoundType, shouldCheckAlreadySelected = false) => {
+      const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+      if (!myCardInfo) return;
+
+      if (shouldCheckAlreadySelected && selectedCardInfo[round].isSelected) return;
+
+      setSelectedCardInfo((prev) => ({
+        ...prev,
+        [round]: {
+          isSelected: true,
+          type: myCardInfo.cardType,
+          value: myCardInfo.value,
+        },
+      }));
+    },
+    [myName, selectedCardInfo]
+  );
+
   const handlePrepare = useCallback((cardInfoMessages: CardInfo[]) => {
     setCurrentCardGameState('PREPARE');
     setCardInfos(cardInfoMessages);
@@ -48,19 +67,9 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         setIsTransition(false);
       }
 
-      const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
-      if (!myCardInfo) return;
-
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        [round]: {
-          isSelected: true,
-          type: myCardInfo.cardType,
-          value: myCardInfo.value,
-        },
-      }));
+      updateSelectedCardInfo(cardInfoMessages, round);
     },
-    [myName]
+    [updateSelectedCardInfo]
   );
 
   const handleScoreBoard = useCallback(
@@ -68,20 +77,9 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
       setCurrentCardGameState('SCORE_BOARD');
       setCardInfos(cardInfoMessages);
 
-      const mySelectedCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
-      if (!mySelectedCardInfo) return;
-      if (selectedCardInfo[round].isSelected) return;
-
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        [round]: {
-          isSelected: true,
-          type: mySelectedCardInfo.cardType,
-          value: mySelectedCardInfo.value,
-        },
-      }));
+      updateSelectedCardInfo(cardInfoMessages, round, true);
     },
-    [myName, selectedCardInfo]
+    [updateSelectedCardInfo]
   );
 
   const handleLoading = useCallback(() => {
