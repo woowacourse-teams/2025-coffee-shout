@@ -1,6 +1,6 @@
 import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import * as S from './Button.styled';
-import { checkIsTouchDevice, isTouchDevice } from '@/utils/checkIsTouchDevice';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import { Size } from '@/types/styles';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
