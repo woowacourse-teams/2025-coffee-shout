@@ -36,11 +36,17 @@ const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: 
           imageUrl={selectedCategory.imageUrl}
         />
         {!selectedMenu && (
-          <S.MenuList>
-            {menus.map((menu) => (
-              <MenuListItem key={menu.id} text={menu.name} onClick={() => handleClickMenu(menu)} />
-            ))}
-          </S.MenuList>
+          <S.MenuListWrapper>
+            <S.MenuList>
+              {menus.map((menu) => (
+                <MenuListItem
+                  key={menu.id}
+                  text={menu.name}
+                  onClick={() => handleClickMenu(menu)}
+                />
+              ))}
+            </S.MenuList>
+          </S.MenuListWrapper>
         )}
         {children}
       </S.Wrapper>
