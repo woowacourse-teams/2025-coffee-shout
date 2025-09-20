@@ -12,10 +12,6 @@ export const Container = styled.div`
 
 export const RouletteWheelWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
   width: 300px;
   height: 364px;
 `;
