@@ -1,19 +1,21 @@
 import { PlayerType } from '@/types/player';
+import { storageManager, STORAGE_KEYS, STORAGE_TYPES } from '@/utils/StorageManager';
 import { PlayerTypeContext } from './PlayerTypeContext';
 import { PropsWithChildren, useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'coffee-shout-player-type' as const;
-
 export const PlayerTypeProvider = ({ children }: PropsWithChildren) => {
   const [playerType, setPlayerType] = useState<PlayerType | null>(() => {
-    return sessionStorage.getItem(STORAGE_KEY) as PlayerType | null;
+    return storageManager.getItem(
+      STORAGE_KEYS.PLAYER_TYPE,
+      STORAGE_TYPES.SESSION
+    ) as PlayerType | null;
   });
 
   useEffect(() => {
     if (playerType) {
-      sessionStorage.setItem(STORAGE_KEY, playerType);
+      storageManager.setItem(STORAGE_KEYS.PLAYER_TYPE, playerType, STORAGE_TYPES.SESSION);
     } else {
-      sessionStorage.removeItem(STORAGE_KEY);
+      storageManager.removeItem(STORAGE_KEYS.PLAYER_TYPE, STORAGE_TYPES.SESSION);
     }
   }, [playerType]);
 
