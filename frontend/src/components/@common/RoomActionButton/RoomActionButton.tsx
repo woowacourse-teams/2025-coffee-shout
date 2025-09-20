@@ -3,7 +3,7 @@ import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
 import * as S from './RoomActionButton.styled';
-import { isTouchDevice } from '@/utils/isTouchDevice';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
@@ -14,22 +14,23 @@ type Props = {
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
   const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
+  const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isTouchDevice()) return;
+    if (isTouchDevice) return;
 
     onClick?.(e);
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice()) return;
+    if (!isTouchDevice) return;
 
     e.preventDefault();
     startTouchPress();
   };
 
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice()) return;
+    if (!isTouchDevice) return;
 
     e.preventDefault();
     onClick?.(e);

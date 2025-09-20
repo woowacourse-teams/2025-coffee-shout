@@ -1,6 +1,6 @@
 import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import * as S from './Button.styled';
-import { isTouchDevice } from '@/utils/isTouchDevice';
+import { checkIsTouchDevice, isTouchDevice } from '@/utils/checkIsTouchDevice';
 import { Size } from '@/types/styles';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
@@ -21,16 +21,17 @@ const Button = ({
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
   const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
+  const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isTouchDevice()) return;
+    if (isTouchDevice) return;
     if (isDisabled) return;
 
     onClick?.(e);
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice()) return;
+    if (!isTouchDevice) return;
     if (isDisabled) return;
 
     e.preventDefault();
@@ -38,7 +39,7 @@ const Button = ({
   };
 
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice()) return;
+    if (!isTouchDevice) return;
     if (isDisabled) return;
 
     e.preventDefault();

@@ -1,4 +1,4 @@
-export const isTouchDevice = (): boolean => {
+export const checkIsTouchDevice = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   const hasTouchEvent = 'ontouchstart' in window;
