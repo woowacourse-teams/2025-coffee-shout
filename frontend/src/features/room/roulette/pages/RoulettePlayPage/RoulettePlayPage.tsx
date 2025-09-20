@@ -14,10 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
-import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { colorList } from '@/constants/color';
-import { api } from '@/apis/rest/api';
-import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
+import useRouletteProbabilities from './hooks/useRouletteProbabilities';
 
 type RouletteWinnerResponse = {
   playerName: string;
@@ -25,25 +22,19 @@ type RouletteWinnerResponse = {
   randomAngle: number;
 };
 
-type ProbabilityResponse = {
-  playerName: string;
-  probability: number;
-};
-
 const RoulettePlayPage = () => {
-  const [randomAngle, setRandomAngle] = useState(0);
   const navigate = useNavigate();
   const { send } = useWebSocket();
   const { playerType } = usePlayerType();
   const { joinCode, myName } = useIdentifier();
-  const { getParticipantColorIndex } = useParticipants();
-  const { probabilityHistory, updateCurrentProbabilities } = useProbabilityHistory();
+  const { probabilityHistory } = useRouletteProbabilities();
 
   // TODO: 나중에 외부 state 로 분리할 것
 
   const [isSpinning, setIsSpinning] = useState(false);
-  const [currentView, setCurrentView] = useState<RouletteView>('roulette');
+  const [randomAngle, setRandomAngle] = useState(0);
   const [winner, setWinner] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<RouletteView>('roulette');
 
   const handleWinnerData = useCallback((data: RouletteWinnerResponse) => {
     setCurrentView('roulette');
@@ -69,18 +60,6 @@ const RoulettePlayPage = () => {
   const handleSpinClick = () => {
     send(`/room/${joinCode}/spin-roulette`, { hostName: myName });
   };
-
-  useEffect(() => {
-    (async () => {
-      const data = await api.get<ProbabilityResponse[]>(`/room/${joinCode}/probabilities`);
-      updateCurrentProbabilities(
-        data.map((probability) => ({
-          ...probability,
-          playerColor: colorList[getParticipantColorIndex(probability.playerName)],
-        }))
-      );
-    })();
-  }, [joinCode, getParticipantColorIndex, updateCurrentProbabilities]);
 
   useEffect(() => {
     // TODO: 당첨자가 나오지 않았을 때, 에러 처리 방식 정하기
