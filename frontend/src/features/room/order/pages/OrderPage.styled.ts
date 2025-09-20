@@ -11,7 +11,7 @@ export const BannerContent = styled.div`
 
 export const Logo = styled.img`
   width: 120px;
-  height: 120px;
+  height: 60px;
 `;
 
 export const ListHeader = styled.div`
