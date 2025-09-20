@@ -34,101 +34,91 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
+  const handlePrepare = useCallback((cardInfoMessages: CardInfo[]) => {
+    setCurrentCardGameState('PREPARE');
+    setCardInfos(cardInfoMessages);
+  }, []);
+
+  const handlePlaying = useCallback(
+    (cardInfoMessages: CardInfo[], round: RoundType) => {
+      setCurrentCardGameState('PLAYING');
+      setCardInfos(cardInfoMessages);
+
+      if (round === 'SECOND') {
+        setIsTransition(false);
+      }
+
+      const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+      if (!myCardInfo) return;
+
+      setSelectedCardInfo((prev) => ({
+        ...prev,
+        [round]: {
+          isSelected: true,
+          type: myCardInfo.cardType,
+          value: myCardInfo.value,
+        },
+      }));
+    },
+    [myName]
+  );
+
+  const handleScoreBoard = useCallback(
+    (cardInfoMessages: CardInfo[], round: RoundType) => {
+      setCurrentCardGameState('SCORE_BOARD');
+      setCardInfos(cardInfoMessages);
+
+      const mySelectedCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
+      if (!mySelectedCardInfo) return;
+      if (selectedCardInfo[round].isSelected) return;
+
+      setSelectedCardInfo((prev) => ({
+        ...prev,
+        [round]: {
+          isSelected: true,
+          type: mySelectedCardInfo.cardType,
+          value: mySelectedCardInfo.value,
+        },
+      }));
+    },
+    [myName, selectedCardInfo]
+  );
+
+  const handleLoading = useCallback(() => {
+    setIsTransition(true);
+    setCurrentRound('SECOND');
+    setCurrentCardGameState('LOADING');
+  }, []);
+
+  const handleGameDone = useCallback(() => {
+    navigate(`/room/${joinCode}/${miniGameType}/result`);
+  }, [navigate, joinCode, miniGameType]);
+
   const handleCardGameState = useCallback(
     (data: CardGameStateResponse) => {
       const { cardGameState, currentRound, cardInfoMessages } = data;
 
-      const isPreparing = cardGameState === 'PREPARE';
-      const isFirstRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'FIRST';
-      const isFirstRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'FIRST';
-      const isSecondRoundLoading = cardGameState === 'LOADING' && currentRound === 'SECOND';
-      const isSecondRoundPlaying = cardGameState === 'PLAYING' && currentRound === 'SECOND';
-      const isSecondRoundScoreBoard = cardGameState === 'SCORE_BOARD' && currentRound === 'SECOND';
-      const isGameDone = cardGameState === 'DONE';
-
-      const handleScoreBoard = () => {
-        setCurrentCardGameState('SCORE_BOARD');
-        setCardInfos(cardInfoMessages);
-
-        const mySelectedCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
-        if (!mySelectedCardInfo) return;
-        if (selectedCardInfo[currentRound].isSelected) return;
-
-        setSelectedCardInfo((prev) => ({
-          ...prev,
-          [currentRound]: {
-            isSelected: true,
-            type: mySelectedCardInfo.cardType,
-            value: mySelectedCardInfo.value,
-          },
-        }));
-      };
-
-      if (isPreparing) {
-        setCurrentCardGameState('PREPARE');
-        setCardInfos(cardInfoMessages);
-        return;
-      }
-
-      if (isFirstRoundPlaying) {
-        setCurrentCardGameState('PLAYING');
-        setCardInfos(cardInfoMessages);
-
-        const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
-        if (!myCardInfo) return;
-
-        setSelectedCardInfo((prev) => ({
-          ...prev,
-          [currentRound]: {
-            isSelected: true,
-            type: myCardInfo.cardType,
-            value: myCardInfo.value,
-          },
-        }));
-        return;
-      }
-
-      if (isFirstRoundScoreBoard) {
-        handleScoreBoard();
-        return;
-      }
-
-      if (isSecondRoundLoading) {
-        setIsTransition(true);
-        setCurrentRound('SECOND');
-        setCurrentCardGameState('LOADING');
-        return;
-      }
-
-      if (isSecondRoundPlaying) {
-        setIsTransition(false);
-        setCardInfos(cardInfoMessages);
-        setCurrentCardGameState('PLAYING');
-        const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
-        if (!myCardInfo) return;
-
-        setSelectedCardInfo((prev) => ({
-          ...prev,
-          [currentRound]: {
-            isSelected: true,
-            type: myCardInfo.cardType,
-            value: myCardInfo.value,
-          },
-        }));
-        return;
-      }
-
-      if (isSecondRoundScoreBoard) {
-        handleScoreBoard();
-        return;
-      }
-
-      if (isGameDone) {
-        navigate(`/room/${joinCode}/${miniGameType}/result`);
-        return;
+      switch (cardGameState) {
+        case 'PREPARE':
+          handlePrepare(cardInfoMessages);
+          break;
+        case 'PLAYING':
+          handlePlaying(cardInfoMessages, currentRound);
+          break;
+        case 'SCORE_BOARD':
+          handleScoreBoard(cardInfoMessages, currentRound);
+          break;
+        case 'LOADING':
+          if (currentRound === 'SECOND') {
+            handleLoading();
+          }
+          break;
+        case 'DONE':
+          handleGameDone();
+          break;
       }
     },
-    [navigate, joinCode, miniGameType, myName, setSelectedCardInfo, selectedCardInfo]
+    [handlePrepare, handlePlaying, handleScoreBoard, handleLoading, handleGameDone]
   );
 
   useWebSocketSubscription(`/room/${joinCode}/gameState`, handleCardGameState);
