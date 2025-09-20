@@ -16,6 +16,8 @@ export const RouletteWheelWrapper = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+  width: 300px;
+  height: 364px;
 `;
 
 export const ProbabilityText = styled.div`
