@@ -1,78 +1,53 @@
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import RouletteIcon from '@/assets/roulette-icon.svg';
-import StatisticsIcon from '@/assets/statistics-icon.svg';
 import Button from '@/components/@common/Button/Button';
-import IconButton from '@/components/@common/IconButton/IconButton';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { RouletteView } from '@/types/roulette';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 import useRouletteProbabilities from './hooks/useRouletteProbabilities';
+import useRoulettePlay from './hooks/useRoulettePlay';
+import { RouletteView } from '@/types/roulette';
+import { useCallback, useState } from 'react';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { PlayerType } from '@/types/player';
+import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
 
-type RouletteWinnerResponse = {
+export type RouletteWinnerResponse = {
   playerName: string;
   colorIndex: number;
   randomAngle: number;
 };
 
 const RoulettePlayPage = () => {
-  const navigate = useNavigate();
-  const { send } = useWebSocket();
+  const { joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
-  const { joinCode, myName } = useIdentifier();
   const { probabilityHistory } = useRouletteProbabilities();
-
-  // TODO: 나중에 외부 state 로 분리할 것
-
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [randomAngle, setRandomAngle] = useState(0);
-  const [winner, setWinner] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
+  const { winner, randomAngle, isSpinning, handleSpinClick, startSpinWithResult } =
+    useRoulettePlay();
 
-  const handleWinnerData = useCallback((data: RouletteWinnerResponse) => {
-    setCurrentView('roulette');
-    setWinner(data.playerName);
-    setRandomAngle(data.randomAngle);
-    setIsSpinning(true);
-  }, []);
+  const handleWinnerData = useCallback(
+    (data: RouletteWinnerResponse) => {
+      setCurrentView('roulette');
+      startSpinWithResult(data);
+    },
+    [startSpinWithResult]
+  );
 
   useWebSocketSubscription<RouletteWinnerResponse>(`/room/${joinCode}/winner`, handleWinnerData);
-
-  const isRouletteView = currentView === 'roulette';
-
-  const getButtonVariant = () => {
-    if (isSpinning) return 'disabled';
-    if (playerType === 'GUEST') return 'loading';
-    return 'primary';
-  };
 
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'statistics' ? 'roulette' : 'statistics'));
   };
 
-  const handleSpinClick = () => {
-    send(`/room/${joinCode}/spin-roulette`, { hostName: myName });
+  const VIEW_COMPONENTS = {
+    roulette: (
+      <RoulettePlaySection isSpinning={isSpinning} winner={winner} randomAngle={randomAngle} />
+    ),
+    statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
   };
-
-  useEffect(() => {
-    // TODO: 당첨자가 나오지 않았을 때, 에러 처리 방식 정하기
-    if (!winner || !winner.trim()) console.warn('당첨자가 추첨되지 않았습니다.');
-
-    if (isSpinning) {
-      const timer = setTimeout(() => {
-        setIsSpinning(false);
-        navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [isSpinning, winner, navigate, joinCode]);
 
   //TODO: 다른 에러 처리방식을 찾아보기
   if (!playerType) return null;
@@ -83,25 +58,14 @@ const RoulettePlayPage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
-          {isRouletteView ? (
-            <RoulettePlaySection
-              isSpinning={isSpinning}
-              winner={winner}
-              randomAngle={randomAngle}
-            />
-          ) : (
-            <ProbabilityList playerProbabilities={probabilityHistory.current} />
-          )}
+          {VIEW_COMPONENTS[currentView]}
           <S.IconButtonWrapper>
-            <IconButton
-              iconSrc={isRouletteView ? StatisticsIcon : RouletteIcon}
-              onClick={handleViewChange}
-            />
+            <RouletteViewToggle currentView={currentView} onViewChange={handleViewChange} />
           </S.IconButtonWrapper>
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={getButtonVariant()} onClick={handleSpinClick}>
+        <Button variant={getButtonVariant(isSpinning, playerType)} onClick={handleSpinClick}>
           룰렛 돌리기
         </Button>
       </Layout.ButtonBar>
@@ -110,3 +74,9 @@ const RoulettePlayPage = () => {
 };
 
 export default RoulettePlayPage;
+
+const getButtonVariant = (isSpinning: boolean, playerType: PlayerType) => {
+  if (isSpinning) return 'disabled';
+  if (playerType === 'GUEST') return 'loading';
+  return 'primary';
+};
