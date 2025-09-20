@@ -7,6 +7,7 @@ type Props = {
   $variant: ButtonVariant;
   $width: string;
   $height: Size;
+  $isTouching: boolean;
 };
 
 export const Container = styled.button<Props>`
@@ -31,19 +32,25 @@ export const Container = styled.button<Props>`
   border-radius: 12px;
   cursor: pointer;
 
-  ${({ $variant, theme }) => {
+  ${({ $variant, theme, $isTouching }) => {
     switch ($variant) {
-      case 'secondary':
+      case 'secondary': {
+        const baseColor = theme.color.gray[50];
+        const activeColor = theme.color.gray[100];
+
         return `
-          background: ${theme.color.gray[50]};
+          background: ${baseColor};
           color: ${theme.color.gray[700]};
+          
+          /* 데스크톱: hover 효과 */
           @media (hover: hover) and (pointer: fine) {
-            &:hover { background: ${theme.color.gray[100]}; }
+            &:hover { background: ${activeColor}; }
           }
-          @media (hover: none) {
-            &:active { background: ${theme.color.gray[100]}; }
-          }
+          
+          /* 터치 디바이스: isTouching 상태로 제어 */
+          ${$isTouching && `background: ${activeColor};`}
         `;
+      }
 
       case 'loading':
         return `
@@ -67,17 +74,23 @@ export const Container = styled.button<Props>`
         `;
 
       case 'primary':
-      default:
+      default: {
+        const baseColor = theme.color.point[400];
+        const activeColor = theme.color.point[500];
+
         return `
-          background: ${theme.color.point[400]};
+          background: ${baseColor};
           color: ${theme.color.white};
+          
+          /* 데스크톱: hover 효과 */
           @media (hover: hover) and (pointer: fine) {
-            &:hover { background: ${theme.color.point[500]}; }
+            &:hover { background: ${activeColor}; }
           }
-          @media (hover: none) {
-            &:active { background: ${theme.color.point[500]}; }
-          }
+          
+          /* 터치 디바이스: isTouching 상태로 제어 */
+            ${$isTouching && `background: ${activeColor};`}
         `;
+      }
     }
   }}
 `;
