@@ -11,16 +11,7 @@ export const BannerContent = styled.div`
 
 export const Logo = styled.img`
   width: 120px;
-`;
-
-export const IconWrapper = styled.div`
-  margin-bottom: 1.5rem;
-
-  svg {
-    width: 4rem;
-    height: 4rem;
-    stroke-width: 1.5;
-  }
+  height: 120px;
 `;
 
 export const ListHeader = styled.div`
