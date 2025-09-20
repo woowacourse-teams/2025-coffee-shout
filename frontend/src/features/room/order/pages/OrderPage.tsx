@@ -39,7 +39,6 @@ const OrderPage = () => {
         <S.BannerContent>
           <S.Logo src={BreadLogoWhiteIcon} />
           <Headline1 color="white">{location.state?.winner}</Headline1>
-          <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
         </S.BannerContent>
       </Layout.Banner>
