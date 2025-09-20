@@ -1,6 +1,6 @@
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
-// import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import Button from '@/components/@common/Button/Button';
 import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
@@ -12,10 +12,12 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
+import { Player } from '@/types/player';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
 type PlayerRank = {
   playerName: string;
@@ -34,9 +36,9 @@ type PlayerScoreResponse = {
 };
 
 const MiniGameResultPage = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
-  // const { send } = useWebSocket();
+  const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { getParticipantColorIndex } = useParticipants();
@@ -45,8 +47,18 @@ const MiniGameResultPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 다음 페이지 ( RoulettePlayPage) 로 넘어가는 웹소켓 신호 필요
-  const handleViewRouletteResult = () => {};
+  // 다음 페이지 (RoulettePlayPage) 로 넘어가는 웹소켓 신호 필요
+  //일단 임시로 participant 관련 웹소켓 응답으로 넘어가게 함
+  const handleParticipant = useCallback(() => {
+    navigate(`/room/${joinCode}/roulette/play`);
+  }, [navigate, joinCode]);
+
+  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
+
+  const handleClickRouletteResultButton = () => {
+    send(`/room/${joinCode}/update-players`);
+  };
+  //여기까지 임시로 추가한 부분
 
   useEffect(() => {
     (async () => {
@@ -117,7 +129,7 @@ const MiniGameResultPage = () => {
       </Layout.Content>
       <Layout.ButtonBar>
         {playerType === 'HOST' ? (
-          <Button variant="primary" onClick={handleViewRouletteResult}>
+          <Button variant="primary" onClick={handleClickRouletteResultButton}>
             룰렛 현황 보러가기
           </Button>
         ) : (
