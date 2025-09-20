@@ -17,7 +17,7 @@ export const Content = styled.div`
   gap: 3rem;
 `;
 
-export const ImageWrapper = styled.div`
+export const BubbleTextWrapper = styled.div`
   position: relative;
   display: flex;
   justify-content: center;
