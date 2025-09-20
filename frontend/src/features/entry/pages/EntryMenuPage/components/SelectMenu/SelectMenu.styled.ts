@@ -10,4 +10,10 @@ export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 100%;
+`;
+
+export const MenuListWrapper = styled.div`
+  height: 100%;
+  overflow-y: auto;
 `;
