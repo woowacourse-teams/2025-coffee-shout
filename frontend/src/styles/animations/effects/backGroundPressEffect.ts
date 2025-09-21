@@ -22,8 +22,10 @@ export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css
 
     transform: scaleX(${isTouching ? 1 : 0});
     opacity: ${isTouching ? 1 : 0};
+    transform-origin: center;
+
     transition:
-      transform 80ms ease-out,
+      ${isTouching ? 'transform 80ms ease-out' : 'none'},
       opacity 80ms ease-out;
   }
 `;
