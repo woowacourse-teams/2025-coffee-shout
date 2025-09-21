@@ -6,16 +6,10 @@ type Props = {
   $isTouching: boolean;
 };
 
-export const CategoryName = styled.span`
-  ${theme.typography.paragraph}
-  display: flex;
-  align-items: start;
-`;
-
 export const Container = styled.button<Props>`
+  position: relative;
   cursor: pointer;
-  border: none;
-  background: none;
+  background-color: ${({ theme }) => theme.color.white};
   width: 100%;
 
   ${({ theme, $isTouching }) =>
@@ -24,4 +18,12 @@ export const Container = styled.button<Props>`
       isTouching: $isTouching,
       enableScale: false,
     })}
+
+  isolation: isolate;
+`;
+
+export const CategoryName = styled.span`
+  ${theme.typography.paragraph}
+  display: flex;
+  align-items: start;
 `;

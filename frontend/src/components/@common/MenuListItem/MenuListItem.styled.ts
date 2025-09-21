@@ -21,4 +21,6 @@ export const Container = styled.button<Props>`
       isTouching: $isTouching,
       enableScale: false,
     })}
+
+  isolation: isolate;
 `;
