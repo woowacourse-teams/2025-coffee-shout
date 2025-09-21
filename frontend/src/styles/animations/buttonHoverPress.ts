@@ -1,17 +1,21 @@
 import { css } from '@emotion/react';
+import { backgroundPressEffect } from './effects/backGroundPressEffect';
+import { scalePressEffect } from './effects/scalePressEffect';
 
 interface ButtonHoverPressProps {
   activeColor: string;
   isTouching?: boolean;
+  enableScale?: boolean;
 }
 
-export const buttonHoverPress = ({ activeColor, isTouching }: ButtonHoverPressProps) => {
+export const buttonHoverPress = ({
+  activeColor,
+  isTouching,
+  enableScale = true,
+}: ButtonHoverPressProps) => {
   console.log('activeColor', activeColor);
-  return css`
-    transition:
-      background-color 0.2s ease-in-out,
-      transform 0.2s ease-in-out;
 
+  return css`
     /* 데스크톱: hover 효과 */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
@@ -20,9 +24,7 @@ export const buttonHoverPress = ({ activeColor, isTouching }: ButtonHoverPressPr
     }
 
     /* 터치 디바이스: isTouching 상태로 제어 */
-    ${isTouching &&
-    ` background-color: ${activeColor};
-      transform: scale(0.98);
-    `}
+    ${backgroundPressEffect({ activeColor, isTouching })}
+    ${enableScale && scalePressEffect({ isTouching, scaleValue: 0.98 })}
   `;
 };
