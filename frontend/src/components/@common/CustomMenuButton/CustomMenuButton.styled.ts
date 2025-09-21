@@ -1,7 +1,12 @@
 import { Z_INDEX } from '@/constants/zIndex';
+import { backgroundPressEffect } from '@/styles/animations/effects/backGroundPressEffect';
 import styled from '@emotion/styled';
 
-export const Container = styled.div`
+type Props = {
+  $isTouching: boolean;
+};
+
+export const Container = styled.div<Props>`
   width: 120px;
   height: 50px;
   background-color: ${({ theme }) => theme.color.point[400]};
@@ -23,6 +28,9 @@ export const Container = styled.div`
   bottom: 20px;
   right: 20px;
   z-index: ${Z_INDEX.CUSTOM_MENU_BUTTON};
+
+  ${({ theme, $isTouching }) =>
+    backgroundPressEffect({ activeColor: theme.color.point[500], isTouching: $isTouching })}
 `;
 
 export const Icon = styled.img`
