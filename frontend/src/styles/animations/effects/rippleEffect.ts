@@ -1,3 +1,4 @@
+import { ANIMATION_DURATION } from '@/constants/animation';
 import { theme } from '@/styles/theme';
 import { css } from '@emotion/react';
 
@@ -20,8 +21,8 @@ export const rippleEffect = (isTouching: boolean) => {
       transform: translate(-50%, -50%) scale(${isTouching ? 1 : 0});
       opacity: ${isTouching ? 1 : 0};
       transition:
-        transform 80ms ease-out,
-        opacity 80ms ease-out;
+        transform ${ANIMATION_DURATION.RIPPLE}ms ease-out,
+        opacity ${ANIMATION_DURATION.RIPPLE}ms ease-out;
     }
   `;
 };

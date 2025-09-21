@@ -1,3 +1,4 @@
+import { ANIMATION_DURATION } from '@/constants/animation';
 import { css } from '@emotion/react';
 
 type Props = {
@@ -25,7 +26,7 @@ export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css
     transform-origin: center;
 
     transition:
-      ${isTouching ? 'transform 80ms ease-out' : 'none'},
-      opacity 80ms ease-out;
+      ${isTouching ? `transform ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out` : 'none'},
+      opacity ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out;
   }
 `;

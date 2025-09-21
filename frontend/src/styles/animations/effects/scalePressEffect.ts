@@ -1,3 +1,4 @@
+import { ANIMATION_DURATION, ANIMATION_SCALE } from '@/constants/animation';
 import { css } from '@emotion/react';
 
 interface ScalePressEffectProps {
@@ -8,8 +9,8 @@ interface ScalePressEffectProps {
 
 export const scalePressEffect = ({
   isTouching,
-  scaleValue = 0.98,
-  duration = 80,
+  scaleValue = ANIMATION_SCALE.SCALE_PRESS,
+  duration = ANIMATION_DURATION.SCALE_PRESS,
 }: ScalePressEffectProps) => {
   return css`
     transform: scale(${isTouching ? scaleValue : 1});
