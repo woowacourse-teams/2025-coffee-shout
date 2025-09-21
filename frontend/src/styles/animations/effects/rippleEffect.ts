@@ -23,8 +23,8 @@ export const rippleEffect = (isTouching: boolean) => {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       background: ${rippleColor};
       transform: scale(0);
       opacity: 0;
