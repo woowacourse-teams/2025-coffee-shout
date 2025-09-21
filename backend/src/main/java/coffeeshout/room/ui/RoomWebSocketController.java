@@ -6,6 +6,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
+import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Roulette;
@@ -15,6 +16,7 @@ import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
+import coffeeshout.room.ui.response.RoomStatusResponse;
 import coffeeshout.room.ui.response.WinnerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
@@ -85,6 +87,22 @@ public class RoomWebSocketController {
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
         final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, message.hostName(),
                 message.miniGameTypes());
+        roomEventPublisher.publishEvent(event);
+    }
+
+    @MessageMapping("/room/{joinCode}/show-roulette")
+    @MessageResponse(
+            path = "/room/{joinCode}/roulette",
+            returnType = RoomStatusResponse.class
+    )
+    @Operation(
+            summary = "룰렛 페이지로 이동",
+            description = """
+                    호스트가 룰렛 페이지로 플레이어 전부를 이동시킵니다.
+                    """
+    )
+    public void broadcastShowRoulette(@DestinationVariable String joinCode) {
+        final RouletteShowEvent event = RouletteShowEvent.create(joinCode);
         roomEventPublisher.publishEvent(event);
     }
 

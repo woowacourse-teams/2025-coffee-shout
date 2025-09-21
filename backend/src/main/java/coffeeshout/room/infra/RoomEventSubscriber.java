@@ -7,6 +7,7 @@ import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.infra.handler.RoomEventHandler;
 import coffeeshout.room.infra.handler.RoomEventHandlerFactory;
@@ -70,6 +71,7 @@ public class RoomEventSubscriber implements MessageListener {
             case PLAYER_LIST_UPDATE -> objectMapper.readValue(body, PlayerListUpdateEvent.class);
             case PLAYER_READY -> objectMapper.readValue(body, PlayerReadyEvent.class);
             case MINI_GAME_SELECT -> objectMapper.readValue(body, MiniGameSelectEvent.class);
+            case ROULETTE_SHOW -> objectMapper.readValue(body, RouletteShowEvent.class);
             case ROULETTE_SPIN -> objectMapper.readValue(body, RouletteSpinEvent.class);
         };
     }

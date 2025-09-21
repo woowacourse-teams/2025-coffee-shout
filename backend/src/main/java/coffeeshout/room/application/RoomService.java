@@ -321,4 +321,10 @@ public class RoomService {
         }
         return menuQueryService.getById(selectedMenuRequest.id());
     }
+
+    public Room showRoulette(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        room.showRoulette();
+        return room;
+    }
 }

@@ -185,6 +185,14 @@ public class Room {
         return roomState == RoomState.READY;
     }
 
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        joinCode.assignQrCodeUrl(qrCodeUrl);
+    }
+
+    public void showRoulette() {
+        this.roomState = RoomState.ROULETTE;
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -224,9 +232,5 @@ public class Room {
         final Player newHost = players.getRandomPlayer();
         newHost.promote();
         this.host = newHost;
-    }
-
-    public void assignQrCodeUrl(String qrCodeUrl) {
-        joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 }
