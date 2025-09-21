@@ -4,7 +4,7 @@ import { scalePressEffect } from './effects/scalePressEffect';
 
 interface ButtonHoverPressProps {
   activeColor: string;
-  isTouching?: boolean;
+  isTouching: boolean;
   enableScale?: boolean;
 }
 
