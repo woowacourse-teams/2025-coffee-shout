@@ -16,7 +16,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
-import { Player } from '@/types/player';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
 type PlayerRank = {
@@ -35,6 +34,11 @@ type PlayerScoreResponse = {
   scores: PlayerScore[];
 };
 
+type ShowRouletteResponse = {
+  joinCode: string;
+  roomState: 'ROULETTE_SHOW';
+};
+
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
@@ -47,18 +51,18 @@ const MiniGameResultPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 다음 페이지 (RoulettePlayPage) 로 넘어가는 웹소켓 신호 필요
-  //일단 임시로 participant 관련 웹소켓 응답으로 넘어가게 함
-  const handleParticipant = useCallback(() => {
+  const handleNavigateToRoulettePlayPage = useCallback(() => {
     navigate(`/room/${joinCode}/roulette/play`);
   }, [navigate, joinCode]);
 
-  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
+  useWebSocketSubscription<ShowRouletteResponse>(
+    `/room/${joinCode}/roulette`,
+    handleNavigateToRoulettePlayPage
+  );
 
   const handleClickRouletteResultButton = () => {
-    send(`/room/${joinCode}/update-players`);
+    send(`/room/${joinCode}/show-roulette`);
   };
-  //여기까지 임시로 추가한 부분
 
   useEffect(() => {
     (async () => {
