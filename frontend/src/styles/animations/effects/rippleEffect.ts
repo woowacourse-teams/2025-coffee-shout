@@ -1,16 +1,5 @@
 import { theme } from '@/styles/theme';
-import { css, keyframes } from '@emotion/react';
-
-const rippleKeyframes = keyframes`
-  from {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0.4;
-  }
-  to {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-`;
+import { css } from '@emotion/react';
 
 export const rippleEffect = (isTouching: boolean) => {
   const rippleColor = theme.color.gray[200];
@@ -23,19 +12,16 @@ export const rippleEffect = (isTouching: boolean) => {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       background: ${rippleColor};
-      transform: scale(0);
-      opacity: 0;
       border-radius: 50%;
-    }
 
-    ${isTouching &&
-    css`
-      &::before {
-        animation: ${rippleKeyframes} 200ms ease-out forwards;
-      }
-    `}
+      transform: translate(-50%, -50%) scale(${isTouching ? 1 : 0});
+      opacity: ${isTouching ? 1 : 0};
+      transition:
+        transform 80ms ease-out,
+        opacity 80ms ease-out;
+    }
   `;
 };

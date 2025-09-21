@@ -1,20 +1,9 @@
-import { css, keyframes } from '@emotion/react';
+import { css } from '@emotion/react';
 
 type Props = {
   activeColor: string;
   isTouching?: boolean;
 };
-
-const rippleKeyframes = keyframes`
-  from {
-    transform: scaleX(0);
-    opacity: 0.4;
-  }
-  to {
-    transform: scaleX(1);
-    opacity: 1;
-  }
-`;
 
 export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css`
   position: relative;
@@ -29,15 +18,12 @@ export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css
     width: 100%;
     height: 100%;
     background: ${activeColor};
-    transform: scaleX(0);
-    opacity: 0;
     border-radius: 12px;
-  }
 
-  ${isTouching &&
-  css`
-    &::before {
-      animation: ${rippleKeyframes} 200ms ease-out forwards;
-    }
-  `}
+    transform: scaleX(${isTouching ? 1 : 0});
+    opacity: ${isTouching ? 1 : 0};
+    transition:
+      transform 80ms ease-out,
+      opacity 80ms ease-out;
+  }
 `;
