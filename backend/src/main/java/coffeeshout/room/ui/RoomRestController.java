@@ -3,7 +3,6 @@ package coffeeshout.room.ui;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.ui.request.RoomCreateRequest;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
@@ -13,6 +12,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,18 +27,35 @@ public class RoomRestController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest request) {
-        final Room room = roomService.createRoom(request.hostName(), request.menuId());
+    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
+        final Room room = roomService.createRoom(request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
 
-    @PostMapping("/enter")
-    public ResponseEntity<RoomEnterResponse> enterRoom(@RequestBody RoomEnterRequest request) {
-        final Room room = roomService.enterRoom(request.joinCode(), request.guestName(), request.menuId());
+    @PostMapping("/{joinCode}")
+    public ResponseEntity<RoomEnterResponse> enterRoom(
+            @PathVariable String joinCode,
+            @RequestBody RoomEnterRequest request
+    ) {
+        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomEnterResponse.from(room));
     }
+
+// 비동기 처리 시 필요
+//    @GetMapping("/{joinCode}/qr-url")
+//    public DeferredResult<ResponseEntity<QrCodeResponse>> getQrCode(@RequestParam String joinCode) {
+//        final DeferredResult<ResponseEntity<QrCodeResponse>> deferredResult = new DeferredResult<>(5000L);
+//
+//        deferredResult.onTimeout(
+//                () -> deferredResult.setErrorResult(
+//                        ResponseEntity.internalServerError()
+//                )
+//        );
+//
+//        return deferredResult;
+//    }
 
     @GetMapping("/check-joinCode")
     public ResponseEntity<JoinCodeExistResponse> checkJoinCode(@RequestParam String joinCode) {

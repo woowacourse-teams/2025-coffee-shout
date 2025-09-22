@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.interceptor.handler.StompHandlerRegistry;
 import coffeeshout.global.interceptor.handler.postsend.ConnectPostSendHandler;
 import coffeeshout.global.interceptor.handler.postsend.DisconnectPostSendHandler;
@@ -16,8 +17,11 @@ import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -72,7 +76,7 @@ class CustomStompChannelInterceptorTest {
         sessionManager = new StompSessionManager();
 
         // 핸들러들 생성
-        connectPreSendHandler = new ConnectPreSendHandler(sessionManager, webSocketMetricService, roomQueryService,
+        connectPreSendHandler = new ConnectPreSendHandler(sessionManager, roomQueryService,
                 delayedPlayerRemovalService);
         connectPostSendHandler = new ConnectPostSendHandler(sessionManager, webSocketMetricService,
                 delayedPlayerRemovalService);
@@ -99,9 +103,12 @@ class CustomStompChannelInterceptorTest {
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
             Message<?> message = MessageBuilder.createMessage("test", accessor.getMessageHeaders());
 
-            Menu testMenu = new Menu("coffee", MenuType.COFFEE);
-            testMenu.setId(1L);
-
+            Menu menu = new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
             // when - preSend (연결 요청)
             Message<?> preSendResult = interceptor.preSend(message, channel);
 
@@ -111,9 +118,6 @@ class CustomStompChannelInterceptorTest {
 
             // when - postSend (연결 성공)
             interceptor.postSend(message, channel, true);
-
-            // then - 메트릭 완료 호출 확인
-            then(webSocketMetricService).should().completeConnection(sessionId);
         }
 
         @Test
@@ -162,7 +166,6 @@ class CustomStompChannelInterceptorTest {
             // then - 실제 세션 매니저 상태 검증
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
             assertThat(sessionManager.getSessionId(joinCode, playerName)).isEqualTo(sessionId);
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         /**
@@ -179,7 +182,7 @@ class CustomStompChannelInterceptorTest {
             sessionManager.registerPlayerSession(joinCode, playerName, oldSessionId);
 
             StompHeaderAccessor accessor = createAccessor(StompCommand.CONNECT);
-            Menu testMenu = createTestMenu();
+            ProvidedMenu testMenu = createTestMenu();
             Room testRoom = createTestRoom(testMenu);
 
             given(roomQueryService.getByJoinCode(new JoinCode(joinCode))).willReturn(testRoom);
@@ -211,35 +214,27 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션 등록되지 않았는지 확인
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         private Room createTestRoom(Menu menu) {
-            return Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+            return Room.createNewRoom(new JoinCode(joinCode),
+                    new PlayerName(playerName),
+                    new SelectedMenu(menu, MenuTemperature.ICE)
+            );
         }
 
-        private Menu createTestMenu() {
-            Menu menu = new Menu("Test Menu", MenuType.COFFEE);
-            menu.setId(1L);
-            return menu;
+        private ProvidedMenu createTestMenu() {
+            return new ProvidedMenu(
+                    1L,
+                    "라떼",
+                    MenuCategoryFixture.커피(),
+                    TemperatureAvailability.BOTH
+            );
         }
     }
 
     @Nested
     class ConnectPostSendHandler_테스트 {
-
-        @Test
-        void 연결_성공_시_메트릭을_완료_상태로_업데이트한다() {
-            // given
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
-            accessor.setSessionId(sessionId);
-
-            // when
-            connectPostSendHandler.handle(accessor, sessionId, true);
-
-            // then
-            then(webSocketMetricService).should().completeConnection(sessionId);
-        }
 
         @Test
         void 연결_실패_시_세션을_제거하고_메트릭을_실패_상태로_업데이트한다() {

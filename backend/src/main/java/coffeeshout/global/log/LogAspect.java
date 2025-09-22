@@ -27,7 +27,7 @@ public class LogAspect {
     )
     public void logRoomCreation(Room room) {
         log.info(NOTIFICATION_MARKER, "JoinCode[{}] 방 생성 완료 - host: {}, createdAt: {}",
-                room.getJoinCode().value(),
+                room.getJoinCode().getValue(),
                 room.getHost().getName().value(),
                 LocalDateTime.now());
     }
@@ -63,7 +63,7 @@ public class LogAspect {
             value = "execution(* coffeeshout.room.domain.repository.RoomRepository.deleteByJoinCode(..)) && args(joinCode)"
     )
     public void logDelayCleanUp(JoinCode joinCode) {
-        log.info("JoinCode[{}] 방 삭제 완료", joinCode.value());
+        log.info("JoinCode[{}] 방 삭제 완료", joinCode.getValue());
     }
 
     @AfterReturning(

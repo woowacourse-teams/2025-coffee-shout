@@ -2,14 +2,14 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import coffeeshout.global.ServiceTest;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
+import coffeeshout.global.ServiceTest;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameResult;
@@ -18,23 +18,22 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class RoomServiceTest {
+class RoomServiceTest extends ServiceTest {
 
     @Autowired
     RoomService roomService;
@@ -42,17 +41,17 @@ class RoomServiceTest {
     @Autowired
     TestDataHelper testDataHelper;
 
-    @SpyBean
+    @MockitoSpyBean
     DelayedRoomRemovalService delayedRoomRemovalService;
 
     @Test
     void 방을_생성한다() {
         // given
         String hostName = "호스트짱";
-        Long menuId = 1L;
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
 
         // when
-        Room room = roomService.createRoom(hostName, menuId);
+        Room room = roomService.createRoom(hostName, selectedMenuRequest);
 
         // then
         assertThat(room).isNotNull();
@@ -68,10 +67,11 @@ class RoomServiceTest {
     void 존재하지_않는_메뉴로_방을_생성하면_예외를_반환한다() {
         // given
         String hostName = "호스트";
-        Long invalidMenuId = 999L;
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(999L, null, MenuTemperature.ICE);
+
 
         // when & then
-        assertThatThrownBy(() -> roomService.createRoom(hostName, invalidMenuId))
+        assertThatThrownBy(() -> roomService.createRoom(hostName, selectedMenuRequest))
                 .isInstanceOf(NotExistElementException.class);
     }
 
@@ -80,18 +80,18 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         String guestName = "게스트";
-        Long hostMenuId = 1L;
-        Long guestMenuId = 2L;
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
 
         // 방 먼저 생성
-        Room createdRoom = roomService.createRoom(hostName, hostMenuId);
-        String joinCode = createdRoom.getJoinCode().value();
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        String joinCode = createdRoom.getJoinCode().getValue();
 
         // when
-        Room room = roomService.enterRoom(joinCode, guestName, guestMenuId);
+        Room room = roomService.enterRoom(joinCode, guestName, guestSelectedMenuRequest);
 
         // then
-        assertThat(room.getJoinCode().value()).isEqualTo(createdRoom.getJoinCode().value());
+        assertThat(room.getJoinCode().getValue()).isEqualTo(createdRoom.getJoinCode().getValue());
         assertThat(room.getPlayers()).hasSize(2);
         assertThat(room.getPlayers().stream().anyMatch(p -> p.getName().value().equals(guestName))).isTrue();
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
@@ -102,10 +102,10 @@ class RoomServiceTest {
         // given
         String invalidJoinCode = "ABCDE";
         String guestName = "게스트";
-        Long menuId = 1L;
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, menuId))
+        assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, hostSelectedMenuRequest))
                 .isInstanceOf(NotExistElementException.class);
     }
 
@@ -114,15 +114,15 @@ class RoomServiceTest {
         // given
         String existingJoinCode = "TEST2";
         String guestName = "더미게스트";
-        Long menuId = 2L;
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
 
         testDataHelper.createDummyRoom(existingJoinCode, "더미호스트");
 
         // when
-        Room room = roomService.enterRoom(existingJoinCode, guestName, menuId);
+        Room room = roomService.enterRoom(existingJoinCode, guestName, hostSelectedMenuRequest);
 
         // then
-        assertThat(room.getJoinCode().value()).isEqualTo(existingJoinCode);
+        assertThat(room.getJoinCode().getValue()).isEqualTo(existingJoinCode);
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
     }
 
@@ -131,12 +131,12 @@ class RoomServiceTest {
         // given
         String existingJoinCode = "TEST2";
         String guestName = "더미게스트";
-        Long menuId = 2L;
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
 
         testDataHelper.createDummyPlayingRoom(existingJoinCode, "더미호스트");
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, menuId))
+        assertThatThrownBy(() -> roomService.enterRoom(existingJoinCode, guestName, hostSelectedMenuRequest))
                 .isInstanceOf(InvalidArgumentException.class);
     }
 
@@ -144,14 +144,14 @@ class RoomServiceTest {
     void 동일한_조인코드로_여러_게스트가_입장_가능() {
         // given
         String hostName = "호스트짱";
-        Long menuId = 1L;
-        Room createdRoom = roomService.createRoom(hostName, menuId);
-        String joinCode = createdRoom.getJoinCode().value();
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        String joinCode = createdRoom.getJoinCode().getValue();
 
         // when
-        roomService.enterRoom(joinCode, "게스트1", 2L);
-        roomService.enterRoom(joinCode, "게스트2", 3L);
-        Room result = roomService.enterRoom(joinCode, "게스트3", 4L);
+        roomService.enterRoom(joinCode, "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(joinCode, "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
+        Room result = roomService.enterRoom(joinCode, "게스트3", new SelectedMenuRequest(4L, null, MenuTemperature.ICE));
 
         // then
         assertThat(result.getPlayers()).hasSize(4);
@@ -163,16 +163,17 @@ class RoomServiceTest {
     void 최대_인원에서_입장을_하면_예외를_반환한다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        String joinCode = createdRoom.getJoinCode().value();
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
+        String joinCode = createdRoom.getJoinCode().getValue();
 
         // 최대 9명까지니까 8명 더 넣어보기
         for (int i = 2; i <= 9; i++) {
-            roomService.enterRoom(joinCode, "게스트" + i, 1L);
+            roomService.enterRoom(joinCode, "게스트" + i, new SelectedMenuRequest(1L, null, MenuTemperature.ICE));
         }
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", 1L))
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트10", new SelectedMenuRequest(1L, null, MenuTemperature.ICE)))
                 .isInstanceOf(InvalidArgumentException.class);
     }
 
@@ -180,12 +181,13 @@ class RoomServiceTest {
     void 중복된_이름으로_입장할_수_없다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        String joinCode = createdRoom.getJoinCode().value();
-        roomService.enterRoom(joinCode, "게스트", 2L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        String joinCode = createdRoom.getJoinCode().getValue();
+        roomService.enterRoom(joinCode, "게스트", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 3L))
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", new SelectedMenuRequest(3L, null, MenuTemperature.ICE)))
                 .isInstanceOf(InvalidArgumentException.class);
     }
 
@@ -193,11 +195,12 @@ class RoomServiceTest {
     void 잘못된_메뉴_ID로_게스트_입장하면_예외가_발생한다() {
         // given
         String hostName = "호스트짱";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        String joinCode = createdRoom.getJoinCode().value();
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        String joinCode = createdRoom.getJoinCode().getValue();
 
         // when & then
-        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", 999L))
+        assertThatThrownBy(() -> roomService.enterRoom(joinCode, "게스트", new SelectedMenuRequest(999L, null, MenuTemperature.ICE)))
                 .isInstanceOf(NotExistElementException.class);
     }
 
@@ -206,11 +209,13 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         String guestName = "게스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when
-        List<Player> players = roomService.getAllPlayers(createdRoom.getJoinCode().value());
+        List<Player> players = roomService.getAllPlayers(createdRoom.getJoinCode().getValue());
 
         // then
         assertThat(players).hasSize(2);
@@ -222,29 +227,30 @@ class RoomServiceTest {
     void 플레이어가_메뉴를_선택한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        Long newMenuId = 2L;
+        SelectedMenuRequest initialSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, initialSelectedMenuRequest);
 
         // when
-        List<Player> players = roomService.selectMenu(createdRoom.getJoinCode().value(), hostName, newMenuId);
+        List<Player> players = roomService.selectMenu(createdRoom.getJoinCode().getValue(), hostName, 1L);
         Player host = players.get(0);
 
         // then
-        assertThat(host.getMenu().getId()).isEqualTo(newMenuId);
+        assertThat(host.getSelectedMenu().menu().getId()).isEqualTo(1L);
     }
 
     @Test
     void 존재하지_않는_플레이어가_메뉴를_선택하면_예외가_발생한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest initialSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, initialSelectedMenuRequest);
         String invalidPlayerName = "없는사람";
         Long newMenuId = 3L;
 
         // when & then
         assertThatThrownBy(
-                () -> roomService.selectMenu(createdRoom.getJoinCode().value(), invalidPlayerName,
-                        newMenuId)).isInstanceOf(IllegalArgumentException.class);
+                () -> roomService.selectMenu(createdRoom.getJoinCode().getValue(), invalidPlayerName,
+                        3L)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -252,11 +258,13 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         String guestName = "게스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when
-        Map<Player, Probability> probabilities = roomService.getProbabilities(createdRoom.getJoinCode().value());
+        Map<Player, Probability> probabilities = roomService.getProbabilities(createdRoom.getJoinCode().getValue());
 
         // then
         assertThat(probabilities).hasSize(2);
@@ -276,10 +284,11 @@ class RoomServiceTest {
     void 미니게임을_선택한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName,
+        List<MiniGameType> selectedMiniGames = roomService.updateMiniGames(createdRoom.getJoinCode().getValue(), hostName,
                 List.of(MiniGameType.CARD_GAME));
 
         // then
@@ -292,12 +301,14 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         String guestName = "게스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when & then
         assertThatThrownBy(
-                () -> roomService.updateMiniGames(createdRoom.getJoinCode().value(),
+                () -> roomService.updateMiniGames(createdRoom.getJoinCode().getValue(),
                         guestName,
                         List.of(MiniGameType.CARD_GAME)))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -308,12 +319,14 @@ class RoomServiceTest {
         // given
         String hostName = "호스트";
         String guestName = "게스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), guestName, 2L);
-        roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName, List.of(MiniGameType.CARD_GAME));
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
+        roomService.updateMiniGames(createdRoom.getJoinCode().getValue(), hostName, List.of(MiniGameType.CARD_GAME));
 
         // when & then
-        assertThatThrownBy(() -> roomService.updateMiniGames(createdRoom.getJoinCode().value(), guestName,
+        assertThatThrownBy(() -> roomService.updateMiniGames(createdRoom.getJoinCode().getValue(), guestName,
                 List.of(MiniGameType.CARD_GAME)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -322,11 +335,12 @@ class RoomServiceTest {
     void 방이_존재하는지_확인한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
 
         // when & then
-        assertThat(roomService.roomExists(joinCode.value())).isTrue();
+        assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
         assertThat(roomService.roomExists("TRASH")).isFalse();
     }
 
@@ -334,28 +348,30 @@ class RoomServiceTest {
     void 중복된_이름의_플레이어가_존재하는지_확인한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
 
         PlayerName guestName = new PlayerName("게스트1");
-        createdRoom.joinGuest(guestName, MenuFixture.아메리카노());
+        createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
-        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), guestName.value())).isTrue();
-        assertThat(roomService.isGuestNameDuplicated(joinCode.value(), "uniqueName")).isFalse();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();
+        assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
     }
 
     @Test
     void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
         ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
 
         // when
-        Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().value(), hostName);
+        Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
 
         // then
         assertThat(winner).isNotNull();
@@ -366,17 +382,18 @@ class RoomServiceTest {
     void 미니게임의_점수를_반환한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
 
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
 
         // when
         Map<Player, MiniGameScore> miniGameScores = roomService.getMiniGameScores(
-                joinCode.value(),
+                joinCode.getValue(),
                 MiniGameType.CARD_GAME
         );
 
@@ -391,16 +408,17 @@ class RoomServiceTest {
     void 미니게임의_순위를_반환한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
 
         List<MiniGameDummy> miniGames = List.of(new MiniGameDummy());
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
 
         // when
-        MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.value(), MiniGameType.CARD_GAME);
+        MiniGameResult miniGameRanks = roomService.getMiniGameRanks(joinCode.getValue(), MiniGameType.CARD_GAME);
 
         // then
         SoftAssertions.assertSoftly(softly -> {
@@ -413,14 +431,15 @@ class RoomServiceTest {
     void 선택된_미니게임의_목록을_반환한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트2", 3L);
-        roomService.updateMiniGames(createdRoom.getJoinCode().value(), hostName, List.of(MiniGameType.CARD_GAME));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2", new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
+        roomService.updateMiniGames(createdRoom.getJoinCode().getValue(), hostName, List.of(MiniGameType.CARD_GAME));
 
         // when
-        List<MiniGameType> selectedMiniGames = roomService.getSelectedMiniGames(joinCode.value());
+        List<MiniGameType> selectedMiniGames = roomService.getSelectedMiniGames(joinCode.getValue());
 
         // then
         SoftAssertions.assertSoftly(softly -> {
@@ -433,38 +452,40 @@ class RoomServiceTest {
     void 플레이어를_제거할_때_플레이어가_없다면_방을_제거한다() {
         // given
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
 
         // when
-        roomService.removePlayer(joinCode.value(), hostName);
+        roomService.removePlayer(joinCode.getValue(), hostName);
 
         // then
-        assertThat(roomService.roomExists(joinCode.value())).isFalse();
+        assertThat(roomService.roomExists(joinCode.getValue())).isFalse();
     }
 
     @Test
     void 플레이어를_제거할_때_플레이어가_있다면_방을_제거하지_않는다() {
         String hostName = "호스트";
-        Room createdRoom = roomService.createRoom(hostName, 1L);
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().value(), "게스트1", 2L);
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1", new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
         // when
-        roomService.removePlayer(joinCode.value(), hostName);
+        roomService.removePlayer(joinCode.getValue(), hostName);
 
         // then
-        assertThat(roomService.roomExists(joinCode.value())).isTrue();
+        assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
     }
 
     @Test
     void 방_생성_시_방_삭제_스케줄러가_호출된다() {
         // given
         String hostName = "호스트";
-        Long menuId = 1L;
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
 
         // when
-        Room room = roomService.createRoom(hostName, menuId);
+        Room room = roomService.createRoom(hostName, selectedMenuRequest);
 
         // then
         verify(delayedRoomRemovalService).scheduleRemoveRoom(room.getJoinCode());

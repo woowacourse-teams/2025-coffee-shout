@@ -6,7 +6,7 @@ import static org.springframework.util.Assert.state;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
@@ -14,13 +14,13 @@ import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
-import coffeeshout.room.domain.roulette.RoulettePicker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -31,34 +31,32 @@ public class Room {
 
     private final JoinCode joinCode;
     private final Players players;
-    private final Roulette roulette;
     private final Queue<Playable> miniGames;
     private final List<Playable> finishedGames;
 
     private Player host;
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, PlayerName hostName, Menu menu) {
+    public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
         this.joinCode = joinCode;
-        this.host = Player.createHost(hostName, menu);
+        this.host = Player.createHost(hostName, selectedMenu);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
         this.finishedGames = new ArrayList<>();
-        this.roulette = new Roulette(new RoulettePicker());
 
         join(host);
     }
 
-    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, Menu menu) {
-        return new Room(joinCode, hostName, menu);
+    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
+        return new Room(joinCode, hostName, selectedMenu);
     }
 
-    public void joinGuest(PlayerName guestName, Menu menu) {
+    public void joinGuest(PlayerName guestName, SelectedMenu selectedMenu) {
         validateRoomReady();
         validateCanJoin();
         validatePlayerNameNotDuplicate(guestName);
-        join(Player.createGuest(guestName, menu));
+        join(Player.createGuest(guestName, selectedMenu));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
@@ -78,7 +76,7 @@ public class Room {
                 players.getPlayerCount(),
                 calculateMiniGameCount()
         );
-        roulette.adjustProbabilities(miniGameResult, probabilityCalculator);
+        players.adjustProbabilities(miniGameResult, probabilityCalculator);
     }
 
     private int calculateMiniGameCount() {
@@ -89,12 +87,13 @@ public class Room {
         return roomState == RoomState.PLAYING;
     }
 
-    public Winner spinRoulette(Player host) {
+    public Winner spinRoulette(Player host, Roulette roulette) {
         isTrue(isHost(host), "호스트만 룰렛을 돌릴 수 있습니다.");
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
         state(isPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
         // TODO 룰렛을 돌리기 전에 모든 게임들을 플레이해야 한다.
-        final Winner winner = roulette.spin();
+
+        final Winner winner = roulette.spin(players);
         roomState = RoomState.DONE;
         return winner;
     }
@@ -112,12 +111,12 @@ public class Room {
     }
 
     private void join(Player player) {
-        final Player joinedPlayer = players.join(player);
-        roulette.join(joinedPlayer);
+        players.join(player);
     }
 
     public Map<Player, Probability> getProbabilities() {
-        return roulette.getProbabilities();
+        return players.getPlayers().stream()
+                .collect(Collectors.toMap(player -> player, Player::getProbability));
     }
 
     public List<Playable> getAllMiniGame() {
@@ -165,7 +164,6 @@ public class Room {
 
     public boolean removePlayer(PlayerName playerName) {
         if (players.existsByName(playerName)) {
-            roulette.removePlayer(playerName);
             players.removePlayer(playerName);
 
             // 호스트가 나간 경우 새로운 호스트 지정
@@ -181,6 +179,10 @@ public class Room {
 
     public boolean isEmpty() {
         return players.isEmpty();
+    }
+
+    public boolean isReadyState() {
+        return roomState == RoomState.READY;
     }
 
     private boolean hasEnoughPlayers() {
@@ -222,5 +224,9 @@ public class Room {
         final Player newHost = players.getRandomPlayer();
         newHost.promote();
         this.host = newHost;
+    }
+
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 }

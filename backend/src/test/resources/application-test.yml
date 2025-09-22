@@ -1,5 +1,19 @@
+spring:
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+  data:
+    redis:
+      ssl:
+        enabled: false
+
 logging:
   level:
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG
     coffeeshout: DEBUG
+
+room:
+  qr:
+    prefix: https://coffee-shout.com/join/

@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.service;
 
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.repository.MenuRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class MenuCommandService {
         this.menuRepository = menuRepository;
     }
 
-    public void save(Menu menu) {
+    public void save(ProvidedMenu menu) {
         menuRepository.save(menu);
     }
 }

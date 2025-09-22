@@ -1,8 +1,10 @@
 package coffeeshout.fixture;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import coffeeshout.global.MessageResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -22,21 +24,9 @@ public class TestStompSession {
         this.objectMapper = objectMapper;
     }
 
-    public <T> MessageCollector<T> subscribe(String subscribeEndpoint, Class<T> payloadClazz) {
-        MessageCollector<T> messageCollector = new MessageCollector<>();
-        session.subscribe(
-                subscribeEndpoint,
-                new MessageCollectorStompFrameHandler<>(messageCollector, payloadClazz, objectMapper)
-        );
-        return messageCollector;
-    }
-
-    public <T> MessageCollector<T> subscribe(String subscribeEndpoint, TypeReference<T> typeRef) {
-        MessageCollector<T> messageCollector = new MessageCollector<>();
-        session.subscribe(
-                subscribeEndpoint,
-                new MessageCollectorStompFrameHandler<>(messageCollector, typeRef, objectMapper)
-        );
+    public MessageCollector subscribe(String subscribeEndPoint) {
+        MessageCollector messageCollector = new MessageCollector();
+        session.subscribe(subscribeEndPoint, new MessageCollectorStompFrameHandler(messageCollector));
         return messageCollector;
     }
 
@@ -44,24 +34,39 @@ public class TestStompSession {
         session.send(String.format(sendEndpoint), bodyMessage);
     }
 
-    public static class MessageCollector<T> {
-        private final BlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    public void send(String sendEndpoint, String jsonString) {
+        try {
+            Object jsonObject = objectMapper.readValue(jsonString, Object.class);
+            session.send(sendEndpoint, jsonObject);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 파싱 실패: " + jsonString, e);
+        }
+    }
 
-        private void add(T message) {
+    public void send(String sendEndpoint) {
+        session.send(sendEndpoint, null);
+    }
+
+    public static class MessageCollector {
+        private final BlockingQueue<String> queue = new LinkedBlockingQueue<>();
+
+        private void add(String message) {
             queue.add(message);
         }
 
-        public T get() {
+        public MessageResponse get() {
             return get(DEFAULT_RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
 
-        public T get(long timeout, TimeUnit unit) {
+        public MessageResponse get(long timeout, TimeUnit unit) {
             try {
-                T message = queue.poll(timeout, unit);
+                long start = System.currentTimeMillis();
+                String message = queue.poll(timeout, unit);
                 if (message == null) {
                     throw new RuntimeException("메시지 수신 대기 시간을 초과했습니다");
                 }
-                return message;
+                long end = System.currentTimeMillis();
+                return new MessageResponse(end - start, message);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -76,55 +81,27 @@ public class TestStompSession {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static class MessageCollectorStompFrameHandler<T> implements StompFrameHandler {
-        private final MessageCollector<T> messageCollector;
-        private final Object typeInfo;
-        private final ObjectMapper objectMapper;
+    private static class MessageCollectorStompFrameHandler implements StompFrameHandler {
+        private final MessageCollector messageCollector;
 
-        public MessageCollectorStompFrameHandler(
-                MessageCollector<T> messageCollector,
-                Class<T> payloadClass,
-                ObjectMapper objectMapper
-        ) {
+        public MessageCollectorStompFrameHandler(MessageCollector messageCollector) {
             this.messageCollector = messageCollector;
-            this.typeInfo = payloadClass;
-            this.objectMapper = objectMapper;
-        }
-
-        public MessageCollectorStompFrameHandler(
-                MessageCollector<T> messageCollector,
-                TypeReference<T> typeRef,
-                ObjectMapper objectMapper
-        ) {
-            this.messageCollector = messageCollector;
-            this.typeInfo = typeRef;
-            this.objectMapper = objectMapper;
         }
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
-            if (typeInfo instanceof Class) {
-                return (Class<?>) typeInfo;
-            } else if (typeInfo instanceof TypeReference) {
-                return ((TypeReference<?>) typeInfo).getType();
-            }
-            throw new IllegalStateException("Unsupported type info: " + typeInfo);
+            return byte[].class;
         }
 
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
             synchronized (messageCollector) {
-                // Always convert using ObjectMapper to ensure proper deserialization of nested objects
-                T convertedPayload;
-                if (typeInfo instanceof Class) {
-                    convertedPayload = objectMapper.convertValue(payload, (Class<T>) typeInfo);
-                } else if (typeInfo instanceof TypeReference) {
-                    convertedPayload = objectMapper.convertValue(payload, (TypeReference<T>) typeInfo);
-                } else {
-                    throw new IllegalStateException("Unsupported type info: " + typeInfo);
+                try {
+                    String jsonString = new String((byte[]) payload, StandardCharsets.UTF_8);
+                    messageCollector.add(jsonString);
+                } catch (Exception e) {
+                    throw new RuntimeException("메시지 변환 실패: " + payload, e);
                 }
-                messageCollector.add(convertedPayload);
             }
         }
     }

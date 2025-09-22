@@ -42,9 +42,21 @@ JVM_OPTS="$JVM_OPTS -XX:+PrintGCDetails"
 JVM_OPTS="$JVM_OPTS -Xloggc:logs/gc.log"
 JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 
+# 환경 프로파일 설정
+SPRING_PROFILE=${ENVIRONMENT:-dev}
+export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
+echo "   🌍 환경 프로파일: $SPRING_PROFILE"
+
+# AWS S3 환경 변수 설정 (CodeDeploy 환경 변수에서 가져옴)
+export S3_BUCKET_NAME="${S3_BUCKET_NAME}"
+export S3_QR_KEY_PREFIX="${S3_QR_KEY_PREFIX:""}"
+echo "   🗂️  S3 Bucket: $S3_BUCKET_NAME"
+echo "   📁 S3 Key Prefix: $S3_QR_KEY_PREFIX"
+
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
 nohup java $JVM_OPTS \
+    -Dspring.profiles.active="$SPRING_PROFILE" \
     -jar app/coffee-shout-backend.jar \
     > logs/application.log 2>&1 &
 

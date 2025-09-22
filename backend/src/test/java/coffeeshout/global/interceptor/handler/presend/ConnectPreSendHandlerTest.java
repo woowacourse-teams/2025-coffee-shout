@@ -3,8 +3,8 @@ package coffeeshout.global.interceptor.handler.presend;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.global.exception.GlobalErrorCode;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.metric.WebSocketMetricService;
@@ -13,8 +13,11 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
+import coffeeshout.room.domain.menu.Menu;
+import coffeeshout.room.domain.menu.MenuTemperature;
+import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.menu.TemperatureAvailability;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +55,6 @@ class ConnectPreSendHandlerTest {
         sessionManager = new StompSessionManager();
         connectPreSendHandler = new ConnectPreSendHandler(
                 sessionManager,
-                webSocketMetricService,
                 roomQueryService,
                 delayedPlayerRemovalService
         );
@@ -80,7 +82,6 @@ class ConnectPreSendHandlerTest {
                     .isEqualTo(joinCode + ":" + playerName);
             assertThat(sessionManager.getSessionId(joinCode, playerName))
                     .isEqualTo(sessionId);
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         @Test
@@ -95,7 +96,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         @Test
@@ -112,7 +112,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         @Test
@@ -129,7 +128,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
     }
 
@@ -154,7 +152,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         @Test
@@ -173,7 +170,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
 
         @Test
@@ -193,36 +189,6 @@ class ConnectPreSendHandlerTest {
 
             // then
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().startConnection(sessionId);
-        }
-    }
-
-    @Nested
-    class 메트릭_처리 {
-
-        @Test
-        void 모든_경우에_메트릭_시작이_호출된다() {
-            // given
-            StompHeaderAccessor accessor = createConnectAccessor();
-
-            // when
-            connectPreSendHandler.handle(accessor, sessionId);
-
-            // then
-            then(webSocketMetricService).should().startConnection(sessionId);
-        }
-
-        @Test
-        void 헤더가_없어도_메트릭_시작이_호출된다() {
-            // given
-            StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
-            accessor.setSessionId(sessionId);
-
-            // when
-            connectPreSendHandler.handle(accessor, sessionId);
-
-            // then
-            then(webSocketMetricService).should().startConnection(sessionId);
         }
     }
 
@@ -256,13 +222,21 @@ class ConnectPreSendHandlerTest {
     }
 
     private Menu createTestMenu() {
-        Menu menu = new Menu("Test Menu", MenuType.COFFEE);
-        menu.setId(1L);
+        Menu menu = new ProvidedMenu(
+                1L,
+                "라떼",
+                MenuCategoryFixture.커피(),
+                TemperatureAvailability.BOTH
+        );
         return menu;
     }
 
     private Room createPlayingRoom(Menu menu) {
-        Room room = Room.createNewRoom(new JoinCode(joinCode), new PlayerName(playerName), menu);
+        Room room = Room.createNewRoom(
+                new JoinCode(joinCode),
+                new PlayerName(playerName),
+                new SelectedMenu(menu, MenuTemperature.ICE)
+        );
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
 
         return room;

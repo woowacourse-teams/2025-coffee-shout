@@ -1,14 +1,14 @@
 package coffeeshout.room.domain.repository;
 
-import coffeeshout.room.domain.player.Menu;
+import coffeeshout.room.domain.menu.ProvidedMenu;
 import java.util.List;
 import java.util.Optional;
 
 public interface MenuRepository {
 
-    Optional<Menu> findById(Long menuId);
+    Optional<ProvidedMenu> findById(Long menuId);
 
-    List<Menu> findAll();
+    List<ProvidedMenu> findAll();
 
-    Menu save(Menu menu);
+    ProvidedMenu save(ProvidedMenu menu);
 }

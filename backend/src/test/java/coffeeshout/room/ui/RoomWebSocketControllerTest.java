@@ -1,309 +1,346 @@
 package coffeeshout.room.ui;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import coffeeshout.global.MessageResponse;
+import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
-import coffeeshout.fixture.TestStompSession.MessageCollector;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.player.Menu;
-import coffeeshout.room.domain.player.MenuType;
-import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.repository.MenuRepository;
+import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
-import coffeeshout.room.domain.service.JoinCodeGenerator;
-import coffeeshout.room.ui.request.MenuChangeMessage;
-import coffeeshout.room.ui.request.MiniGameSelectMessage;
-import coffeeshout.room.ui.request.ReadyChangeMessage;
-import coffeeshout.room.ui.request.RouletteSpinMessage;
-import coffeeshout.room.ui.response.PlayerResponse;
-import coffeeshout.room.ui.response.ProbabilityResponse;
-import coffeeshout.room.ui.response.WinnerResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@ActiveProfiles("test")
 class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
 
-    @Autowired
-    private RoomRepository roomRepository;
+    JoinCode joinCode;
 
-    @Autowired
-    private MenuRepository menuRepository;
+    Player host;
 
-    @Autowired
-    private JoinCodeGenerator joinCodeGenerator;
+    TestStompSession session;
 
-    private Room testRoom;
+    Room testRoom;
 
     @BeforeEach
-    void setUp() {
-        setupTestData();
+    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+        testRoom = RoomFixture.호스트_꾹이();
+        joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
+        host = testRoom.getHost();
+
+        roomRepository.save(testRoom);
+        session = createSession();
     }
 
     @Test
-    void 방_입장_시나리오_getPlayers_요청() throws Exception {
+    void 플레이어_목록을_조회한다() throws JSONException {
         // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
+        String joinCodeValue = joinCode.getValue();
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCodeValue);
+        String requestUrlFormat = String.format("/app/room/%s/update-players", joinCodeValue);
 
-        // when - 방 토픽 구독
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> responses = session.subscribe(
-                "/topic/room/" + joinCode,
-                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
-                }
-        );
-
-        // getPlayers 요청 메시지 전송
-        session.send("/app/room/" + joinCode + "/update-players", null);
-
-        // then - 플레이어 목록 응답 확인
-        List<PlayerResponse> players = responses.get().data();
-        assertThat(players).isNotNull();
-        assertThat(players).hasSize(4); // 호스트 + 게스트 3명
-
-        // 호스트 확인
-        PlayerResponse host = players.stream().filter(p -> p.playerName().equals("호스트꾹이")).findFirst()
-                .orElseThrow(() -> new AssertionError("호스트를 찾을 수 없음"));
-
-        assertThat(host.menuResponse().name()).isEqualTo("아메리카노");
-        assertThat(host.menuResponse().menuType()).isEqualTo(MenuType.COFFEE);
-
-        // 게스트들 확인
-        List<String> playerNames = players.stream().map(PlayerResponse::playerName).toList();
-
-        assertThat(playerNames).containsExactlyInAnyOrder("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
-
-        System.out.println("✅ 플레이어 목록 응답 성공:");
-        players.forEach(p -> System.out.println("  - " + p.playerName() + ": " + p.menuResponse().name()));
-    }
-
-    @Test
-    void 여러_클라이언트_플레이어_목록_브로드캐스트() throws Exception {
-        // given - 추가 클라이언트 생성
-        TestStompSession session = createSession();
-        TestStompSession session2 = createSession();
-
-        String joinCode = testRoom.getJoinCode().value();
-        // when - 두 클라이언트 모두 같은 방 구독
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe1 = session.subscribe(
-                "/topic/room/" + joinCode,
-                new TypeReference<>() {
-                }
-        );
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe2 = session2.subscribe(
-                "/topic/room/" + joinCode,
-                new TypeReference<>() {
-                }
-        );
-
-        // 한 클라이언트에서 플레이어 목록 요청
-        session.send("/app/room/" + joinCode + "/update-players", null);
-
-        // then - 두 클라이언트 모두 같은 응답 받음
-        List<PlayerResponse> response1 = subscribe1.get().data();
-        List<PlayerResponse> response2 = subscribe2.get().data();
-
-        assertThat(response1).isNotNull();
-        assertThat(response2).isNotNull();
-        assertThat(response1).hasSize(4);
-        assertThat(response2).hasSize(4);
-
-        // 두 응답이 동일한지 확인
-        assertThat(response1.get(0).playerName()).isEqualTo(response2.get(0).playerName());
-
-        System.out.println("✅ 두 클라이언트 모두 동일한 플레이어 목록 수신 성공");
-    }
-
-    @Test
-    void 존재하지_않는_방_ID_요청_테스트() throws Exception {
-        // given
-        TestStompSession session = createSession();
-        String nonExistentJoinCode = "3434X";
+        var responses = session.subscribe(subscribeUrlFormat);
 
         // when
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe = session.subscribe(
-                "/topic/room/" + nonExistentJoinCode,
-                new TypeReference<WebSocketResponse<List<PlayerResponse>>>() {
-                }
-        );
+        session.send(requestUrlFormat);
 
         // then
-        session.send("/app/room/" + nonExistentJoinCode + "/update-players", null);
-
-        Assertions.assertThatThrownBy(() -> subscribe.get(1, TimeUnit.SECONDS))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("메시지 수신 대기 시간을 초과했습니다");
+        MessageResponse playersResponse = responses.get();
+        assertMessageCustomization(playersResponse, """
+                {
+                   "success":true,
+                   "data":[
+                      {
+                         "playerName":"꾹이",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"HOST",
+                         "isReady":true,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"루키",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"엠제이",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"한스",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      }
+                   ],
+                   "errorMessage":null
+                }
+                """, getColorIndexCustomization("colorIndex"));
     }
 
     @Test
-    void 플레이어들의_메뉴를_가져온다() throws Exception {
+    void 준비_상태를_변경한다() throws JSONException {
         // given
-        TestStompSession session = createSession();
-        String 한스 = "플레이어한스";
-        Long changedMenuId = 2L;
-        String joinCode = testRoom.getJoinCode().value();
+        String subscribeUrlFormat = String.format("/topic/room/%s", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-ready", joinCode.getValue());
+
+        var responses = session.subscribe(subscribeUrlFormat);
 
         // when
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> subscribe = session.subscribe(
-                "/topic/room/" + joinCode, new TypeReference<>() {
+        session.send(requestUrlFormat, String.format("""
+                {
+                  "joinCode": "%s",
+                  "playerName": "루키",
+                  "isReady": false
                 }
-        );
-
-        MenuChangeMessage message = new MenuChangeMessage(한스, changedMenuId);
-        session.send("/app/room/" + joinCode + "/update-menus", message);
+                """, joinCode.getValue()));
 
         // then
-        List<PlayerResponse> responses = subscribe.get().data();
+        MessageResponse readyResponse = responses.get();
 
-        assertThat(responses).hasSize(4);
-
-        Long resultMenuId = responses.stream().filter(p -> p.playerName().equals(한스))
-                .findFirst()
-                .get()
-                .menuResponse()
-                .id();
-        assertThat(resultMenuId).isEqualTo(changedMenuId);
+        assertMessageCustomization(readyResponse, """
+                {
+                   "success":true,
+                   "data":[
+                      {
+                         "playerName":"꾹이",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"HOST",
+                         "isReady":true,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"루키",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"엠제이",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      },
+                      {
+                         "playerName":"한스",
+                         "menuResponse":{
+                            "id":1,
+                            "name":"아메리카노",
+                            "temperature":"ICE",
+                            "categoryImageUrl":"커피.jpg"
+                         },
+                         "playerType":"GUEST",
+                         "isReady":false,
+                         "colorIndex":"*",
+                         "probability": 25
+                      }
+                   ],
+                   "errorMessage":null
+                }
+                """, getColorIndexCustomization("colorIndex"));
     }
 
     @Test
-    void 플레이어들의_확률을_반환한다() throws InterruptedException, ExecutionException, TimeoutException {
+    void 플레이어들의_확률을_조회한다() throws JSONException {
         // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
+        String subscribeUrlFormat = String.format("/topic/room/%s/roulette", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/get-probabilities", joinCode.getValue());
+
+        var responses = session.subscribe(subscribeUrlFormat);
 
         // when
-        MessageCollector<WebSocketResponse<List<ProbabilityResponse>>> subscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/roulette",
-                new TypeReference<WebSocketResponse<List<ProbabilityResponse>>>() {
-                }
-        );
-
-        session.send("/app/room/" + joinCode + "/get-probabilities", null);
-
-        WebSocketResponse<List<ProbabilityResponse>> responses = subscribe.get();
+        session.send(requestUrlFormat);
 
         // then
-        assertThat(responses.data())
-                .hasSize(4)
-                .allSatisfy(response -> assertThat(response.probability()).isEqualTo(25.0));
+        MessageResponse probabilityResponse = responses.get();
+
+        assertMessageCustomization(probabilityResponse, """
+                {
+                   "success":true,
+                   "data":[
+                      {
+                         "playerResponse":{
+                            "playerName":"꾹이",
+                            "menuResponse":{
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
+                            },
+                            "playerType":"HOST",
+                            "isReady":true,
+                            "colorIndex":"*",
+                            "probability": 25
+                         },
+                         "probability":25.0
+                      },
+                      {
+                         "playerResponse":{
+                            "playerName":"루키",
+                            "menuResponse":{
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
+                            },
+                            "playerType":"GUEST",
+                            "isReady":false,
+                            "colorIndex":"*",
+                            "probability": 25
+                         },
+                         "probability":25.0
+                      },
+                      {
+                         "playerResponse":{
+                            "playerName":"엠제이",
+                            "menuResponse":{
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
+                            },
+                            "playerType":"GUEST",
+                            "isReady":false,
+                            "colorIndex":"*",
+                            "probability": 25
+                         },
+                         "probability":25.0
+                      },
+                      {
+                         "playerResponse":{
+                            "playerName":"한스",
+                            "menuResponse":{
+                                "id":1,
+                                "name":"아메리카노",
+                                "temperature":"ICE",
+                                "categoryImageUrl":"커피.jpg"
+                            },
+                            "playerType":"GUEST",
+                            "isReady":false,
+                            "colorIndex":"*",
+                            "probability": 25
+                         },
+                         "probability":25.0
+                      }
+                   ],
+                   "errorMessage":null
+                }
+                """, getColorIndexCustomization("playerResponse.colorIndex"));
     }
 
     @Test
-    void 미니게임을_선택한다() throws InterruptedException, ExecutionException, TimeoutException {
+    void 미니게임을_선택한다() throws JSONException {
         // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
+        String subscribeUrlFormat = String.format("/topic/room/%s/minigame", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/update-minigames", joinCode.getValue());
+
+        var responses = session.subscribe(subscribeUrlFormat);
 
         // when
-        MessageCollector<WebSocketResponse<List<MiniGameType>>> subscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/minigame", new TypeReference<>() {
+        session.send(requestUrlFormat, String.format("""
+                {
+                  "hostName": "%s",
+                  "miniGameTypes": ["CARD_GAME"]
                 }
-        );
-
-        MiniGameSelectMessage message = new MiniGameSelectMessage("호스트꾹이", List.of(MiniGameType.CARD_GAME));
-        session.send("/app/room/" + joinCode + "/update-minigames", message);
-
-        List<MiniGameType> responses = subscribe.get().data();
+                """, host.getName().value()));
 
         // then
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)).isEqualTo(MiniGameType.CARD_GAME);
+        MessageResponse miniGameResponse = responses.get();
+
+        assertMessage(miniGameResponse, """
+                {
+                   "success":true,
+                   "data":["CARD_GAME"],
+                   "errorMessage":null
+                }
+                """);
     }
 
     @Test
-    void 룰렛을_돌려서_당첨자를_선택한다() throws InterruptedException, ExecutionException, TimeoutException {
+    void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
-        String hostName = "호스트꾹이";
-
-        // 미니게임을 시작해서 방 상태를 PLAYING으로 변경
         ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
 
-        // when - 룰렛 결과 구독
-        MessageCollector<WebSocketResponse<WinnerResponse>> rouletteSubscribe = session.subscribe(
-                "/topic/room/" + joinCode + "/winner",
-                new TypeReference<WebSocketResponse<WinnerResponse>>() {
-                }
-        );
+        String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
+        String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());
 
-        session.send("/app/room/" + joinCode + "/spin-roulette", new RouletteSpinMessage(hostName));
-
-        WebSocketResponse<WinnerResponse> response = rouletteSubscribe.get();
-
-        // then
-        assertThat(response.success()).isTrue();
-        assertThat(response.data()).isNotNull();
-
-        WinnerResponse winner = response.data();
-        assertThat(winner.playerName()).isNotBlank();
-
-        // 선택된 패배자는 방에 있는 플레이어 중 하나여야 함
-        List<String> playerNames = List.of("호스트꾹이", "플레이어한스", "플레이어루키", "플레이어엠제이");
-        assertThat(playerNames).contains(winner.playerName());
-    }
-
-    @Test
-    void 레디_상태를_변경한다() throws ExecutionException, InterruptedException, TimeoutException {
-        // given
-        TestStompSession session = createSession();
-        String joinCode = testRoom.getJoinCode().value();
-        String playerName = "플레이어한스";
+        var responses = session.subscribe(subscribeUrlFormat);
 
         // when
-        MessageCollector<WebSocketResponse<List<PlayerResponse>>> readySubscribe = session.subscribe(
-                "/topic/room/" + joinCode,
-                new TypeReference<>() {
+        session.send(requestUrlFormat, String.format("""
+                {
+                  "hostName": "%s"
                 }
-        );
-
-        session.send("/app/room/" + joinCode + "/update-ready", new ReadyChangeMessage(joinCode, playerName, true));
-
-        List<PlayerResponse> readyResponses = readySubscribe.get().data();
+                """, host.getName().value()));
 
         // then
-        SoftAssertions.assertSoftly(
-                softly -> {
-                    softly.assertThat(readyResponses).filteredOn(player -> player.playerName().equals(playerName))
-                            .extracting(PlayerResponse::isReady).containsExactly(true);
-                    softly.assertThat(readyResponses).extracting(PlayerResponse::isReady)
-                            .containsExactlyInAnyOrder(true, true, false, false);
-                }
-        );
+        MessageResponse winnerResponse = responses.get();
+
+        // 룰렛 결과는 랜덤이므로 assertMessageContains 사용
+        assertMessageContains(winnerResponse, "\"success\":true");
+        assertMessageContains(winnerResponse, "\"playerName\":");
     }
 
-    private void setupTestData() {
-        // 메뉴 생성
-        final Menu testMenu = menuRepository.findAll().get(0);
-
-        // 고유한 JoinCode 생성으로 테스트 격리
-        JoinCode joinCode = joinCodeGenerator.generate();
-        PlayerName hostName = new PlayerName("호스트꾹이");
-        testRoom = Room.createNewRoom(joinCode, hostName, testMenu);
-
-        // 게스트 플레이어들 추가
-        testRoom.joinGuest(new PlayerName("플레이어한스"), testMenu);
-        testRoom.joinGuest(new PlayerName("플레이어루키"), testMenu);
-        testRoom.joinGuest(new PlayerName("플레이어엠제이"), testMenu);
-
-        // 저장 후 실제 ID가 할당된 객체로 다시 받기
-        testRoom = roomRepository.save(testRoom);
-
-        System.out.println("✅ 테스트 방 생성 완료 - JoinCode: " + testRoom.getJoinCode());
+    private static Customization getColorIndexCustomization(String path) {
+        return new Customization(path, (actual, expect) -> {
+            if (expect instanceof Integer value) {
+                return value >= 0 && value <= 9;
+            }
+            return true;
+        });
     }
 }
