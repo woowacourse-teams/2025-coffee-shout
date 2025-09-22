@@ -44,7 +44,6 @@ public class CardGameService implements MiniGameService {
 
         return future.orTimeout(5, TimeUnit.SECONDS)
                 .whenComplete((result, throwable) -> {
-                    miniGameEventWaitManager.cleanup(event.getEventId());
                     if (throwable != null) {
                         log.error("미니게임 시작 비동기 처리 실패: eventId={}, joinCode={}",
                                 event.getEventId(), joinCode, throwable);
@@ -63,7 +62,6 @@ public class CardGameService implements MiniGameService {
 
         return future.orTimeout(5, TimeUnit.SECONDS)
                 .whenComplete((result, throwable) -> {
-                    miniGameEventWaitManager.cleanup(event.getEventId());
                     if (throwable != null) {
                         log.error("카드 선택 비동기 처리 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
                                 event.getEventId(), joinCode, playerName, cardIndex, throwable);

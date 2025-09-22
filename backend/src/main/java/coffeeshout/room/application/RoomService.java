@@ -115,7 +115,6 @@ public class RoomService {
 
         return future.orTimeout(5, TimeUnit.SECONDS)
                 .whenComplete((result, throwable) -> {
-                    roomEventWaitManager.cleanup(eventId);
                     if (throwable != null) {
                         log.error("{} 비동기 처리 실패: eventId={}, {}",
                                 operationName, eventId, logParams, throwable);
