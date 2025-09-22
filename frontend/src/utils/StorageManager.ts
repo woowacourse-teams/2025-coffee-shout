@@ -47,15 +47,19 @@ export class StorageManager {
     }
   }
 
-  public getItem(key: string, type: StorageType): string | null {
+  public getItem(
+    key: string,
+    type: StorageType,
+    defaultValue: string | null = null
+  ): string | null {
     try {
       const storage = this.getStorage(type);
-      if (!storage) return null;
+      if (!storage) return defaultValue;
 
-      return storage.getItem(key);
+      return storage.getItem(key) ?? defaultValue;
     } catch (error) {
       console.error(`값 가져오기 실패 ${type}:`, error);
-      return null;
+      return defaultValue;
     }
   }
 

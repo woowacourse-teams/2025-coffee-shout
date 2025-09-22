@@ -4,13 +4,13 @@ import { IdentifierContext } from './IdentifierContext';
 
 export const IdentifierProvider = ({ children }: PropsWithChildren) => {
   const [joinCode, setJoinCode] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.JOIN_CODE, 'sessionStorage') || '';
+    return storageManager.getItem(STORAGE_KEYS.JOIN_CODE, 'sessionStorage', '') as string;
   });
   const [myName, setMyName] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.MY_NAME, 'sessionStorage') || '';
+    return storageManager.getItem(STORAGE_KEYS.MY_NAME, 'sessionStorage', '') as string;
   });
   const [qrCodeUrl, setQrCodeUrl] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.QR_CODE_URL, 'sessionStorage') || '';
+    return storageManager.getItem(STORAGE_KEYS.QR_CODE_URL, 'sessionStorage', '') as string;
   });
 
   useEffect(() => {
