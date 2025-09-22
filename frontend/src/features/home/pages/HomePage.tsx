@@ -69,7 +69,7 @@ const HomePage = () => {
             <br />
             새로운 방을 만들어보세요
           </Headline3>
-          <S.Logo src={LogoMainIcon} />
+          <S.Logo src={LogoMainIcon} fetchPriority="high" />
         </S.Banner>
       </Layout.Banner>
       <S.ButtonContainer>
