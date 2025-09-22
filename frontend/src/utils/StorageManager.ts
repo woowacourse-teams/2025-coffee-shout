@@ -12,7 +12,7 @@ export const STORAGE_TYPES = {
   SESSION: 'sessionStorage',
 } as const;
 
-export type StorageType = 'localStorage' | 'sessionStorage';
+type StorageType = 'localStorage' | 'sessionStorage';
 
 export class StorageManager {
   private static instance: StorageManager;
