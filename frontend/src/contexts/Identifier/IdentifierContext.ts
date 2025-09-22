@@ -9,6 +9,10 @@ type IdentifierContextType = {
   setMyName: (myName: string) => void;
   clearMyName: () => void;
 
+  qrCodeUrl: string;
+  setQrCodeUrl: (qrCodeUrl: string) => void;
+  clearQrCodeUrl: () => void;
+
   clearIdentifier: () => void;
 };
 

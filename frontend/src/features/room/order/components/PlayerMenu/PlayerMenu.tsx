@@ -10,7 +10,9 @@ const PlayerMenu = () => {
       {participants.map((participant, index) => (
         <S.OrderItem key={index}>
           <Paragraph>{participant.playerName}</Paragraph>
-          <Paragraph>{participant.menuResponse.name}</Paragraph>
+          <Paragraph>
+            {participant.menuResponse.name} {`(${participant.menuResponse.temperature})`}
+          </Paragraph>
         </S.OrderItem>
       ))}
     </S.OrderList>

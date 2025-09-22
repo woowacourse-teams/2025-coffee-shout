@@ -1,26 +1,35 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.button`
+type Props = {
+  $isTouching: boolean;
+};
+
+export const Container = styled.button<Props>`
   width: 40px;
   height: 40px;
   border: none;
   border-radius: 4px;
-  background-color: ${({ theme }) => theme.color.gray[100]};
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background-color: ${({ theme }) => theme.color.gray[200]};
-    }
-  }
-  @media (hover: none) {
-    &:active {
-      background-color: ${({ theme }) => theme.color.gray[200]};
-    }
-  }
+  ${({ theme, $isTouching }) => {
+    const baseColor = theme.color.gray[100];
+    const activeColor = theme.color.gray[200];
+
+    return `
+      background-color: ${baseColor};
+      
+      /* 데스크톱: hover 효과 */
+      @media (hover: hover) and (pointer: fine) {
+        &:hover { background-color: ${activeColor}; }
+      }
+      
+      /* 터치 디바이스: isTouching 상태로 제어 */
+      ${$isTouching && `background-color: ${activeColor};`}
+    `;
+  }}
 `;
 
 export const Icon = styled.img`

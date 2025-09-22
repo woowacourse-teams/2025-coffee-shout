@@ -2,6 +2,7 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import * as S from './MenuCount.styled';
+import { TemperatureOption } from '@/types/menu';
 
 const MenuCount = () => {
   const { participants } = useParticipants();
@@ -9,16 +10,17 @@ const MenuCount = () => {
 
   participants.forEach((participant) => {
     const { menuResponse } = participant;
-    const count = simpleViewMap.get(menuResponse.name) || 0;
-    simpleViewMap.set(menuResponse.name, count + 1);
+    const menuKey = createMenuKey(menuResponse.name, menuResponse.temperature);
+    const count = simpleViewMap.get(menuKey) || 0;
+    simpleViewMap.set(menuKey, count + 1);
   });
 
   return (
     <S.OrderList>
       <S.Divider />
-      {[...simpleViewMap].map(([menuName, count], index) => (
+      {[...simpleViewMap].map(([menuKey, count], index) => (
         <S.OrderItem key={index}>
-          <Paragraph>{menuName}</Paragraph>
+          <Paragraph>{menuKey}</Paragraph>
           <Paragraph>{count}개</Paragraph>
         </S.OrderItem>
       ))}
@@ -31,3 +33,7 @@ const MenuCount = () => {
 };
 
 export default MenuCount;
+
+const createMenuKey = (menuName: string, menuTemperature: TemperatureOption) => {
+  return `${menuName} (${menuTemperature})`;
+};

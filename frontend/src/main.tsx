@@ -8,7 +8,7 @@ import * as Sentry from '@sentry/react';
 
 if (process.env.NODE_ENV === 'production') {
   Sentry.init({
-    dsn: process.env.SENTRY_DSN || '',
+    dsn: process.env.DSN_KEY || '',
     release: process.env.VERSION || '1.0.0',
     environment: process.env.NODE_ENV || 'development',
     sendDefaultPii: true,

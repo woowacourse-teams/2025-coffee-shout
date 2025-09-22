@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 35px;
-  justify-content: center;
+  gap: 28px;
+  padding-top: 8px;
   height: 100%;
 `;

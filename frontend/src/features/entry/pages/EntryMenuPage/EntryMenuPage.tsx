@@ -3,86 +3,133 @@ import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import Headline3 from '@/components/@common/Headline3/Headline3';
-import SelectBox, { Option } from '@/components/@common/SelectBox/SelectBox';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './EntryMenuPage.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import SelectCategory from './components/SelectCategory/SelectCategory';
+import SelectMenu from './components/SelectMenu/SelectMenu';
+import { Category, CategoryWithColor, Menu } from '@/types/menu';
+import { TemperatureOption } from '@/types/menu';
+import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
+import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
+import SelectTemperature from './components/SelectTemperature/SelectTemperature';
+import { categoryColorList, MenuColorMap } from '@/constants/color';
+import * as S from './EntryMenuPage.styled';
 
-// TODO: category 타입 따로 관리 필요 (string이 아니라 유니온 타입으로 지정해서 아이콘 매핑해야함)
-type MenusResponse = {
-  id: number;
-  name: string;
-  category: string;
-}[];
-
-type CreateRoomRequest = {
-  hostName: string;
-  menuId: number;
+type RoomRequest = {
+  playerName: string;
+  menu: {
+    id: number;
+    customName: string | null;
+    temperature: TemperatureOption;
+  };
 };
 
-type CreateRoomResponse = {
+type RoomResponse = {
   joinCode: string;
+  qrCodeUrl: string;
 };
 
-type EnterRoomRequest = {
-  joinCode: string;
-  guestName: string;
-  menuId: number;
-};
+type CategoriesResponse = Category[];
 
-type EnterRoomResponse = {
-  joinCode: string;
-};
+type CurrentView = 'selectCategory' | 'selectMenu' | 'inputCustomMenu' | 'selectTemperature';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { startSocket, isConnected } = useWebSocket();
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode } = useIdentifier();
+  const { joinCode, myName, qrCodeUrl, setJoinCode, setQrCodeUrl } = useIdentifier();
   const { showToast } = useToast();
-  const [selectedValue, setSelectedValue] = useState<Option>({ id: -1, name: '' });
-  const [coffeeOptions, setCoffeeOptions] = useState<Option[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryWithColor | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
+  const [isMenuInputCompleted, setIsMenuInputCompleted] = useState(false);
+  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
+  const [categories, setCategories] = useState<CategoryWithColor[]>([]);
 
   useEffect(() => {
     (async () => {
-      try {
-        setLoading(true);
-
-        const menus = await api.get<MenusResponse>('/menus');
-        const options = menus.map((menu) => ({
-          id: menu.id,
-          name: menu.name,
-        }));
-        setCoffeeOptions(options);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setError(error.message);
-        } else if (error instanceof NetworkError) {
-          setError('네트워크 연결을 확인해주세요');
-        } else {
-          setError('알 수 없는 오류가 발생했습니다');
-        }
-      } finally {
-        setLoading(false);
-      }
+      const data = await api.get<CategoriesResponse>('/menu-categories');
+      setCategories(
+        data.map((category, index) => ({
+          ...category,
+          color: categoryColorList[index % categoryColorList.length],
+        }))
+      );
     })();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
+    if (joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [isConnected, joinCode, navigate]);
+  }, [joinCode, qrCodeUrl, selectedMenu, customMenuName, isConnected, navigate]);
 
-  const handleNavigateToName = () => {
-    navigate('/entry/name');
+  const resetMenuState = () => {
+    setSelectedCategory(null);
+    setSelectedMenu(null);
+    setCustomMenuName(null);
+    setIsMenuInputCompleted(false);
+    setSelectedTemperature('ICE');
+  };
+
+  const handleNavigateToBefore = () => {
+    switch (currentView) {
+      case 'selectCategory':
+        navigate('/entry/name');
+        break;
+      case 'selectMenu':
+        setSelectedMenu(null);
+        setCurrentView('selectCategory');
+        break;
+      case 'inputCustomMenu':
+        setCustomMenuName(null);
+        setCurrentView('selectCategory');
+        break;
+      case 'selectTemperature':
+        resetMenuState();
+        setCurrentView('selectCategory');
+        break;
+      default:
+        navigate('/entry/name');
+        break;
+    }
+  };
+
+  const createRoomRequestBody = (): RoomRequest => {
+    const requestBody = {
+      playerName: myName,
+      menu: {
+        id: selectedMenu ? selectedMenu.id : 0,
+        customName: customMenuName,
+        temperature: selectedTemperature,
+      },
+    };
+    return requestBody;
+  };
+
+  const createUrl = () => {
+    if (playerType === 'HOST') {
+      return `/rooms`;
+    } else {
+      return `/rooms/${joinCode}`;
+    }
+  };
+
+  const handleRoomRequest = async () => {
+    const { joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
+      createUrl(),
+      createRoomRequestBody()
+    );
+    setJoinCode(joinCode);
+    setQrCodeUrl(qrCodeUrl);
+    startSocket(joinCode, myName);
   };
 
   const handleNavigateToLobby = async () => {
@@ -95,8 +142,7 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const menuId = selectedValue.id;
-    if (menuId === -1) {
+    if (!selectedMenu && !customMenuName) {
       showToast({
         type: 'error',
         message: '메뉴를 선택하지 않았습니다.',
@@ -104,32 +150,9 @@ const EntryMenuPage = () => {
       return;
     }
 
-    const handleHost = async () => {
-      const { joinCode } = await api.post<CreateRoomResponse, CreateRoomRequest>('/rooms', {
-        hostName: myName,
-        menuId,
-      });
-      setJoinCode(joinCode);
-      startSocket(joinCode, myName);
-    };
-
-    const handleGuest = async () => {
-      const { joinCode: _joinCode } = await api.post<EnterRoomResponse, EnterRoomRequest>(
-        '/rooms/enter',
-        {
-          joinCode,
-          guestName: myName,
-          menuId,
-        }
-      );
-      setJoinCode(_joinCode);
-      startSocket(_joinCode, myName);
-    };
-
     try {
-      setLoading(true);
-      if (playerType === 'HOST') return await handleHost();
-      if (playerType === 'GUEST') return await handleGuest();
+      // setLoading(true);
+      await handleRoomRequest();
     } catch (error) {
       if (error instanceof ApiError) {
         showToast({
@@ -148,38 +171,109 @@ const EntryMenuPage = () => {
         });
       }
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
-  const isButtonDisabled = selectedValue.name === '' || loading;
-  const isHost = playerType === 'HOST';
+  const handleSetSelectedCategory = (category: CategoryWithColor) => {
+    setSelectedCategory(category);
+    setCurrentView('selectMenu');
+  };
+
+  const handleSetSelectedMenu = (menu: Menu) => {
+    setSelectedMenu(menu);
+    if (menu.temperatureAvailability === 'ICE_ONLY') {
+      setSelectedTemperature('ICE');
+    } else if (menu.temperatureAvailability === 'HOT_ONLY') {
+      setSelectedTemperature('HOT');
+    }
+    setCurrentView('selectTemperature');
+  };
+
+  const handleChangeTemperature = (temperature: TemperatureOption) => {
+    setSelectedTemperature(temperature);
+  };
+
+  const handleNavigateToCustomMenu = () => {
+    resetMenuState();
+    setCurrentView('inputCustomMenu');
+  };
+
+  const handleChangeCustomMenuName = (customMenuName: string) => {
+    setCustomMenuName(customMenuName);
+  };
+
+  const handleClickDoneButton = () => {
+    setIsMenuInputCompleted(true);
+    setCurrentView('selectTemperature');
+  };
+
+  const shouldShowButtonBar = currentView === 'selectTemperature';
+
+  //임시 로딩 컴포넌트
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleNavigateToName} />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToBefore} />} />
       <Layout.Content>
         <S.Container>
-          <Headline3>메뉴를 선택해주세요</Headline3>
-          {loading ? (
-            <div>로딩 중...</div>
-          ) : error ? (
-            <div>{error}</div>
-          ) : (
-            <SelectBox
-              options={coffeeOptions}
-              value={selectedValue.name}
-              onChange={(value: Option) => setSelectedValue(value)}
-              placeholder="메뉴를 선택해주세요"
-            />
+          {currentView === 'selectCategory' && (
+            <SelectCategory categories={categories} onClickCategory={handleSetSelectedCategory} />
           )}
+          {(currentView === 'selectMenu' || currentView === 'selectTemperature') &&
+            selectedCategory && (
+              <SelectMenu
+                onMenuSelect={handleSetSelectedMenu}
+                selectedCategory={selectedCategory}
+                selectedMenu={selectedMenu}
+              >
+                {selectedMenu && (
+                  <SelectTemperature
+                    menuName={selectedMenu.name}
+                    temperatureAvailability={selectedMenu.temperatureAvailability}
+                    selectedTemperature={selectedTemperature}
+                    onChangeTemperature={handleChangeTemperature}
+                    selectionCardColor={MenuColorMap[selectedCategory.color]}
+                  />
+                )}
+              </SelectMenu>
+            )}
+          {(currentView === 'inputCustomMenu' || currentView === 'selectTemperature') &&
+            !selectedMenu && (
+              <InputCustomMenu
+                customMenuName={customMenuName}
+                onChangeCustomMenuName={handleChangeCustomMenuName}
+                onClickDoneButton={handleClickDoneButton}
+                isMenuInputCompleted={isMenuInputCompleted}
+              >
+                {isMenuInputCompleted && (
+                  <SelectTemperature
+                    menuName={customMenuName || ''}
+                    temperatureAvailability={'BOTH'}
+                    selectedTemperature={selectedTemperature}
+                    onChangeTemperature={handleChangeTemperature}
+                  />
+                )}
+              </InputCustomMenu>
+            )}
         </S.Container>
+        {currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature' && (
+          <CustomMenuButton onClick={handleNavigateToCustomMenu} />
+        )}
       </Layout.Content>
-      <Layout.ButtonBar>
-        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToLobby}>
-          {isHost ? '방 만들러 가기' : '방 참가하기'}
-        </Button>
-      </Layout.ButtonBar>
+      {shouldShowButtonBar &&
+        (playerType === 'HOST' ? (
+          <Layout.ButtonBar>
+            <Button onClick={handleNavigateToLobby}>방 만들러 가기</Button>
+          </Layout.ButtonBar>
+        ) : (
+          <Layout.ButtonBar>
+            <Button onClick={handleNavigateToLobby}>방 참가하기</Button>
+          </Layout.ButtonBar>
+        ))}
     </Layout>
   );
 };
