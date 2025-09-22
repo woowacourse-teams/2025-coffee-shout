@@ -1,5 +1,5 @@
 import { Z_INDEX } from '@/constants/zIndex';
-import { backgroundPressEffect } from '@/styles/animations/effects/backGroundPressEffect';
+import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 import styled from '@emotion/styled';
 
 type Props = {
@@ -30,7 +30,7 @@ export const Container = styled.div<Props>`
   z-index: ${Z_INDEX.CUSTOM_MENU_BUTTON};
 
   ${({ theme, $isTouching }) =>
-    backgroundPressEffect({ activeColor: theme.color.point[500], isTouching: $isTouching })}
+    buttonHoverPress({ activeColor: theme.color.point[500], isTouching: $isTouching })}
 `;
 
 export const Icon = styled.img`
