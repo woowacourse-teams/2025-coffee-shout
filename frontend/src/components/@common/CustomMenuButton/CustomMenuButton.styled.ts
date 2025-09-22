@@ -6,7 +6,7 @@ type Props = {
   $isTouching: boolean;
 };
 
-export const Container = styled.div<Props>`
+export const Container = styled.button<Props>`
   width: 120px;
   height: 50px;
   background-color: ${({ theme }) => theme.color.point[400]};

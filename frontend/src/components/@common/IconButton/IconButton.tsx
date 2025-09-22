@@ -26,8 +26,7 @@ const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
     if (!isTouchDevice) return;
     e.preventDefault();
-    onClick(e);
-    endTouchPress();
+    endTouchPress(onClick, e);
   };
 
   return (

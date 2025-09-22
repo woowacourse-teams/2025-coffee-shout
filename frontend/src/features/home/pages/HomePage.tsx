@@ -57,7 +57,9 @@ const HomePage = () => {
 
   const handleClickHostButton = () => {
     setHost();
-    navigate('/entry/name');
+    setTimeout(() => {
+      navigate('/entry/name');
+    }, 120);
   };
 
   return (
