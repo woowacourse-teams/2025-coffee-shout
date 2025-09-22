@@ -43,7 +43,7 @@ JVM_OPTS="$JVM_OPTS -Xloggc:logs/gc.log"
 JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 
 # 환경 프로파일 설정
-SPRING_PROFILE=${ENVIRONMENT:-dev}
+SPRING_PROFILE="prod"
 export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
 echo "   🌍 환경 프로파일: $SPRING_PROFILE"
 
