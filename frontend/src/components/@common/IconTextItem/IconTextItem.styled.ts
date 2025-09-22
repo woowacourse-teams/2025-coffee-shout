@@ -35,14 +35,6 @@ export const TextWrapper = styled.div`
   min-width: 0;
   padding-right: 20px;
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p,
-  span,
   div {
     white-space: nowrap;
     overflow: hidden;

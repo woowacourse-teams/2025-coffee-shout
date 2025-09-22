@@ -1,3 +1,4 @@
+import Paragraph from '../Paragraph/Paragraph';
 import * as S from './MenuListItem.styled';
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
 const MenuListItem = ({ text, onClick }: Props) => {
   return (
     <S.Container onClick={onClick}>
-      <S.Text>{text}</S.Text>
+      <Paragraph>{text}</Paragraph>
     </S.Container>
   );
 };

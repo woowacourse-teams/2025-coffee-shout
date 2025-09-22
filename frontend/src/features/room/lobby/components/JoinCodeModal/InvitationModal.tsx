@@ -8,11 +8,10 @@ import * as S from './InvitationModal.styled';
 
 type props = {
   onClose: () => void;
-  qrCodeUrl: string;
 };
 
-const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
-  const { joinCode } = useIdentifier();
+const InvitationModal = ({ onClose }: props) => {
+  const { joinCode, qrCodeUrl } = useIdentifier();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
 
@@ -37,7 +36,7 @@ const InvitationModal = ({ onClose, qrCodeUrl }: props) => {
       {activeTabIndex === 0 ? (
         <QRSection qrCodeUrl={qrCodeUrl} handleShareLink={handleShareLink} />
       ) : (
-        <CodeSection handleCopy={handleCopy} joinCode={joinCode} />
+        <CodeSection joinCode={joinCode} handleCopy={handleCopy} />
       )}
     </S.Container>
   );
@@ -51,8 +50,8 @@ type QRSectionProps = {
 };
 
 type CodeSectionProps = {
-  handleCopy: () => void;
   joinCode: string;
+  handleCopy: () => void;
 };
 
 const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
@@ -61,7 +60,9 @@ const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
       <S.QRCode>
         <img src={qrCodeUrl} alt="QR Code" />
       </S.QRCode>
-      <S.ShareButton onClick={handleShareLink}>링크 공유하기</S.ShareButton>
+      <S.ShareButton onClick={handleShareLink}>
+        <Paragraph>링크 공유하기</Paragraph>
+      </S.ShareButton>
       <S.Wrapper>
         <Paragraph>QR코드를 스캔하면</Paragraph>
         <Paragraph>바로 게임에 참여할 수 있어요!</Paragraph>
@@ -70,7 +71,7 @@ const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
   );
 };
 
-const CodeSection = ({ handleCopy, joinCode }: CodeSectionProps) => {
+const CodeSection = ({ joinCode, handleCopy }: CodeSectionProps) => {
   return (
     <S.CodeSection>
       <S.Wrapper>

@@ -12,19 +12,15 @@ const __dirname = dirname(__filename);
 const packageJson = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
 const appVersion = packageJson.version;
 
-export default (env, argv) => {
+export default (_, argv) => {
   const mode = argv.mode || 'development';
 
-  // mode 기반 .env 파일 로드 (없으면 기본 .env)
-  dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+  const dotenvEnv = dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+  const mergedEnv = { ...process.env, ...dotenvEnv };
 
-  const mergedEnv = { ...process.env };
-
-  // envKeys 만드는 헬퍼
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
-    'process.env': JSON.stringify(mergedEnv),
     ...Object.fromEntries(
       Object.entries(mergedEnv).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
     ),
