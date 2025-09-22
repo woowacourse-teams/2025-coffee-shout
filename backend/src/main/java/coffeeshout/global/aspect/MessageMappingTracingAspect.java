@@ -36,25 +36,17 @@ public class MessageMappingTracingAspect {
 
         try (Scope scope = span.makeCurrent()) {
             span.addEvent("message.handler.start");
-
             final Object[] args = joinPoint.getArgs();
             for (int i = 0; i < args.length; i++) {
                 if (args[i] != null) {
-                    String paramType = args[i].getClass().getSimpleName();
+                    final String paramType = args[i].getClass().getSimpleName();
                     span.setAttribute("message.param." + i + ".type", paramType);
-
-                    // 민감한 정보는 로깅하지 않도록 필터링
-                    if (!isSensitiveData(args[i])) {
-                        span.setAttribute("message.param." + i + ".value", args[i].toString());
-                    }
                 }
             }
-
             final Object result = joinPoint.proceed();
             span.addEvent("message.handler.success");
             span.setStatus(StatusCode.OK);
             return result;
-
         } catch (Exception e) {
             span.addEvent("message.handler.error");
             span.recordException(e);
@@ -63,13 +55,5 @@ public class MessageMappingTracingAspect {
         } finally {
             span.end();
         }
-    }
-
-    private boolean isSensitiveData(Object param) {
-        if (param == null) return false;
-        String paramString = param.toString().toLowerCase();
-        return paramString.contains("password") ||
-               paramString.contains("token") ||
-               paramString.contains("secret");
     }
 }

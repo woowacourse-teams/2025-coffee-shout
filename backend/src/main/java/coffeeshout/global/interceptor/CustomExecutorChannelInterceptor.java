@@ -1,69 +1,98 @@
 package coffeeshout.global.interceptor;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
 import io.opentelemetry.context.propagation.TextMapPropagator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CustomExecutorChannelInterceptor implements ExecutorChannelInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(CustomExecutorChannelInterceptor.class);
     private final Tracer tracer;
     private final TextMapPropagator propagator;
-    private final TextMapGetter<MessageHeaders> headerGetter;
+    private final TextMapGetter<Map<String, String>> headerGetter;
 
-    public CustomExecutorChannelInterceptor(Tracer tracer) {
+    public CustomExecutorChannelInterceptor(Tracer tracer, TextMapPropagator textMapPropagator) {
         this.tracer = tracer;
-        this.propagator = GlobalOpenTelemetry.getPropagators().getTextMapPropagator();
-        this.headerGetter = new TextMapGetter<MessageHeaders>() {
+        this.propagator = textMapPropagator;
+        this.headerGetter = new TextMapGetter<>() {
             @Override
-            public Iterable<String> keys(MessageHeaders carrier) {
+            public Iterable<String> keys(Map<String, String> carrier) {
                 return carrier.keySet();
             }
 
             @Override
-            public String get(MessageHeaders carrier, String key) {
-                Object value = carrier.get(key);
-                return value != null ? value.toString() : null;
+            public String get(Map<String, String> carrier, String key) {
+                return carrier.get(key);
             }
         };
     }
 
     @Override
     public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
-        // String 헤더들을 추출해서 Context 복원
-        Context parentContext = propagator.extract(Context.current(),
-                message.getHeaders(),
-                headerGetter);
+        Map<String, String> headerMap = new HashMap<>();
+        // 2. STOMP nativeHeaders 파싱 (traceparent, tracestate 등 꺼내기)
+        Object nativeHeaders = message.getHeaders().get("nativeHeaders");
+        if (nativeHeaders instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, List<String>> nh = (Map<String, List<String>>) nativeHeaders;
+            nh.forEach((key, values) -> {
+                if (values != null && !values.isEmpty()) {
+                    headerMap.put(key, values.get(0)); // 첫 번째 값만 사용
+                }
+            });
+        }
 
-        final Span span = generateSpan(parentContext, message);
-        span.addEvent("message.processing.start");
+        // 3. Context 복원
+        Context extractedContext = propagator.extract(Context.current(), headerMap, MAP_GETTER);
 
-        // Span을 메시지 헤더에 저장하여 후처리에서 사용
-        Map<String, Object> mutableHeaders = new HashMap<>(message.getHeaders());
-        mutableHeaders.put("otel.span.instance", span);
+        // 4. 부모 span 꺼내기
+        Span parentSpan = Span.fromContext(extractedContext);
 
-        return MessageBuilder.fromMessage(message)
-                .copyHeaders(mutableHeaders)
-                .build();
+        // 5. Heartbeat 메시지는 span 종료하지 않고 바로 반환
+        if ("HEARTBEAT".equals(headerMap.get("simpMessageType"))) {
+            return message;
+        }
+
+        // 6. 부모 span 유효하면 종료
+        if (parentSpan != null && parentSpan.getSpanContext().isValid()) {
+            log.info("end parent span traceId={}, spanId={}",
+                    parentSpan.getSpanContext().getTraceId(),
+                    parentSpan.getSpanContext().getSpanId());
+            parentSpan.end();
+        }
+
+        return message;
     }
+
+    private static final TextMapGetter<Map<String, String>> MAP_GETTER =
+            new TextMapGetter<>() {
+                @Override
+                public Iterable<String> keys(Map<String, String> carrier) {
+                    return carrier.keySet();
+                }
+
+                @Override
+                public String get(Map<String, String> carrier, String key) {
+                    if (carrier == null) {
+                        return null;
+                    }
+                    return carrier.get(key);
+                }
+            };
 
     @Override
     public void afterMessageHandled(Message<?> message, MessageChannel channel, MessageHandler handler, Exception ex) {
@@ -87,6 +116,7 @@ public class CustomExecutorChannelInterceptor implements ExecutorChannelIntercep
             }
         }
     }
+
     private Span generateSpan(Context parentContext, Message<?> message) {
         String destination = getDestination(message);
         String spanName = "websocket.message.outbound." + destination.replaceAll("/", ".");
