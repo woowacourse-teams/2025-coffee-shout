@@ -134,7 +134,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션이 남아있는지 확인
             assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT");
         }
 
         @Test
@@ -269,7 +269,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션이 남아있는지 확인
             assertThat(sessionManager.hasPlayerKey(sessionId)).isTrue();
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT");
         }
 
         @Test
@@ -285,7 +285,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션이 여전히 존재하는지 확인 (처리되지 않음)
             assertThat(sessionManager.getPlayerKey(sessionId)).isEqualTo(joinCode + ":" + playerName);
-            then(webSocketMetricService).should(never()).recordDisconnection(any(), any(), any(Boolean.class));
+            then(webSocketMetricService).should(never()).recordDisconnection(any(), any());
         }
     }
 
@@ -305,7 +305,7 @@ class CustomStompChannelInterceptorTest {
             errorPreSendHandler.handle(accessor, sessionId);
 
             // then - 세션이 제거되었는지 확인
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error");
         }
 
         @Test
@@ -319,7 +319,7 @@ class CustomStompChannelInterceptorTest {
 
             // then - 세션 상태는 변경되지 않음
             assertThat(sessionManager.hasPlayerKey(sessionId)).isFalse();
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error", false);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "stomp_error");
         }
     }
 

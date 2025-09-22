@@ -31,6 +31,6 @@ public class DisconnectPostSendHandler implements PostSendHandler {
         // DISCONNECT 프레임 수신 로깅만
         log.info("클라이언트 DISCONNECT 프레임 수신: sessionId={}", sessionId);
 
-        webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT, true);
+        webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT);
     }
 }

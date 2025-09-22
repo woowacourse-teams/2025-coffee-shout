@@ -57,7 +57,7 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT");
         }
 
         @Test
@@ -71,7 +71,7 @@ class DisconnectPostSendHandlerTest {
             handler.handle(accessor, sessionId, true);
 
             // then
-            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT", true);
+            then(webSocketMetricService).should().recordDisconnection(sessionId, "CLIENT_DISCONNECT");
         }
     }
 }

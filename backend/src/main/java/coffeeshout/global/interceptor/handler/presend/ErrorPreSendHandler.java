@@ -36,6 +36,6 @@ public class ErrorPreSendHandler implements PreSendHandler {
             delayedPlayerRemovalService.schedulePlayerRemoval(errorPlayerKey, sessionId, "STOMP_ERROR");
         }
 
-        webSocketMetricService.recordDisconnection(sessionId, "stomp_error", false);
+        webSocketMetricService.recordDisconnection(sessionId, "stomp_error");
     }
 }

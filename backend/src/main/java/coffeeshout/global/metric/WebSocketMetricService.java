@@ -66,18 +66,16 @@ public class WebSocketMetricService {
         counter.increment();
     }
 
-    public void recordDisconnection(String sessionId, String reason, boolean isNormal) {
+    public void recordDisconnection(String sessionId, String reason) {
         connectionSamples.remove(sessionId);
 
-        String type = isNormal ? "normal" : "abnormal";
-        String key = "disconnected." + reason + "." + type;
+        String key = "disconnected." + reason;
 
         Counter counter = disconnectedCounters.computeIfAbsent(
                 key, k ->
                         Counter.builder("websocket.connections.disconnected")
                                 .description("웹소켓 연결 해제 건수")
                                 .tag("reason", reason)
-                                .tag("type", type)
                                 .register(meterRegistry)
         );
         counter.increment();
