@@ -21,7 +21,7 @@ export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css
     background: ${activeColor};
     border-radius: 12px;
 
-    transform: scaleX(${isTouching ? 1 : 0});
+    transform: scaleX(${isTouching ? 1.2 : 0});
     opacity: ${isTouching ? 1 : 0};
     transform-origin: center;
 
