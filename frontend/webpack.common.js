@@ -40,7 +40,7 @@ export default (env, argv) => {
     module: {
       rules: [
         { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
-        { test: /\.(png|svg|jpg|jpeg|gif)$/i, type: 'asset/resource' },
+        { test: /\.(png|svg|jpg|jpeg|gif|webp)$/i, type: 'asset/resource' },
         { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
       ],
     },
