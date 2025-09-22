@@ -7,7 +7,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { storageManager, STORAGE_KEYS, STORAGE_TYPES } from '@/utils/StorageManager';
+import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
 import Splash from '../components/Splash/Splash';
@@ -30,11 +30,11 @@ const HomePage = () => {
 
   useEffect(() => {
     const checkFirstVisit = () => {
-      const hasVisited = storageManager.getItem(STORAGE_KEYS.VISITED, STORAGE_TYPES.SESSION);
+      const hasVisited = storageManager.getItem(STORAGE_KEYS.VISITED, 'sessionStorage');
 
       if (!hasVisited) {
         setShowSplash(true);
-        storageManager.setItem(STORAGE_KEYS.VISITED, 'true', STORAGE_TYPES.SESSION);
+        storageManager.setItem(STORAGE_KEYS.VISITED, 'true', 'sessionStorage');
       }
     };
     checkFirstVisit();

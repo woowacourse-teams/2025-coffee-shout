@@ -201,13 +201,13 @@ const LobbyPage = () => {
   }, [joinCode]);
 
   useEffect(() => {
-    const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER);
+    const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');
 
     if (!isFirstTimeUser) {
       openModal(
         <GuideModal
           onClose={() => {
-            storageManager.setItem(STORAGE_KEYS.FIRST_TIME_USER, 'true');
+            storageManager.setItem(STORAGE_KEYS.FIRST_TIME_USER, 'true', 'localStorage');
             closeModal();
           }}
         />,

@@ -1,21 +1,18 @@
 import { PlayerType } from '@/types/player';
-import { storageManager, STORAGE_KEYS, STORAGE_TYPES } from '@/utils/StorageManager';
+import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
 import { PlayerTypeContext } from './PlayerTypeContext';
 import { PropsWithChildren, useEffect, useState } from 'react';
 
 export const PlayerTypeProvider = ({ children }: PropsWithChildren) => {
   const [playerType, setPlayerType] = useState<PlayerType | null>(() => {
-    return storageManager.getItem(
-      STORAGE_KEYS.PLAYER_TYPE,
-      STORAGE_TYPES.SESSION
-    ) as PlayerType | null;
+    return storageManager.getItem(STORAGE_KEYS.PLAYER_TYPE, 'sessionStorage') as PlayerType | null;
   });
 
   useEffect(() => {
     if (playerType) {
-      storageManager.setItem(STORAGE_KEYS.PLAYER_TYPE, playerType, STORAGE_TYPES.SESSION);
+      storageManager.setItem(STORAGE_KEYS.PLAYER_TYPE, playerType, 'sessionStorage');
     } else {
-      storageManager.removeItem(STORAGE_KEYS.PLAYER_TYPE, STORAGE_TYPES.SESSION);
+      storageManager.removeItem(STORAGE_KEYS.PLAYER_TYPE, 'sessionStorage');
     }
   }, [playerType]);
 

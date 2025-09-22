@@ -1,39 +1,39 @@
 import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
-import { storageManager, STORAGE_KEYS, STORAGE_TYPES } from '@/utils/StorageManager';
+import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
 import { IdentifierContext } from './IdentifierContext';
 
 export const IdentifierProvider = ({ children }: PropsWithChildren) => {
   const [joinCode, setJoinCode] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.JOIN_CODE, STORAGE_TYPES.SESSION) || '';
+    return storageManager.getItem(STORAGE_KEYS.JOIN_CODE, 'sessionStorage') || '';
   });
   const [myName, setMyName] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.MY_NAME, STORAGE_TYPES.SESSION) || '';
+    return storageManager.getItem(STORAGE_KEYS.MY_NAME, 'sessionStorage') || '';
   });
   const [qrCodeUrl, setQrCodeUrl] = useState<string>(() => {
-    return storageManager.getItem(STORAGE_KEYS.QR_CODE_URL, STORAGE_TYPES.SESSION) || '';
+    return storageManager.getItem(STORAGE_KEYS.QR_CODE_URL, 'sessionStorage') || '';
   });
 
   useEffect(() => {
     if (joinCode) {
-      storageManager.setItem(STORAGE_KEYS.JOIN_CODE, joinCode, STORAGE_TYPES.SESSION);
+      storageManager.setItem(STORAGE_KEYS.JOIN_CODE, joinCode, 'sessionStorage');
     } else {
-      storageManager.removeItem(STORAGE_KEYS.JOIN_CODE, STORAGE_TYPES.SESSION);
+      storageManager.removeItem(STORAGE_KEYS.JOIN_CODE, 'sessionStorage');
     }
   }, [joinCode]);
 
   useEffect(() => {
     if (myName) {
-      storageManager.setItem(STORAGE_KEYS.MY_NAME, myName, STORAGE_TYPES.SESSION);
+      storageManager.setItem(STORAGE_KEYS.MY_NAME, myName, 'sessionStorage');
     } else {
-      storageManager.removeItem(STORAGE_KEYS.MY_NAME, STORAGE_TYPES.SESSION);
+      storageManager.removeItem(STORAGE_KEYS.MY_NAME, 'sessionStorage');
     }
   }, [myName]);
 
   useEffect(() => {
     if (qrCodeUrl) {
-      storageManager.setItem(STORAGE_KEYS.QR_CODE_URL, qrCodeUrl, STORAGE_TYPES.SESSION);
+      storageManager.setItem(STORAGE_KEYS.QR_CODE_URL, qrCodeUrl, 'sessionStorage');
     } else {
-      storageManager.removeItem(STORAGE_KEYS.QR_CODE_URL, STORAGE_TYPES.SESSION);
+      storageManager.removeItem(STORAGE_KEYS.QR_CODE_URL, 'sessionStorage');
     }
   }, [qrCodeUrl]);
 

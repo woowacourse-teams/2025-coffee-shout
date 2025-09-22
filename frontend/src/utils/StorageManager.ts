@@ -7,12 +7,7 @@ export const STORAGE_KEYS = {
   PLAYER_TYPE: 'coffee-shout-player-type',
 } as const;
 
-export const STORAGE_TYPES = {
-  LOCAL: 'localStorage',
-  SESSION: 'sessionStorage',
-} as const;
-
-type StorageType = (typeof STORAGE_TYPES)[keyof typeof STORAGE_TYPES];
+type StorageType = 'localStorage' | 'sessionStorage';
 
 export class StorageManager {
   private static instance: StorageManager;
@@ -39,7 +34,7 @@ export class StorageManager {
     }
   }
 
-  public setItem(key: string, value: string, type: StorageType = STORAGE_TYPES.LOCAL): boolean {
+  public setItem(key: string, value: string, type: StorageType): boolean {
     try {
       const storage = this.getStorage(type);
       if (!storage) return false;
@@ -52,7 +47,7 @@ export class StorageManager {
     }
   }
 
-  public getItem(key: string, type: StorageType = STORAGE_TYPES.LOCAL): string | null {
+  public getItem(key: string, type: StorageType): string | null {
     try {
       const storage = this.getStorage(type);
       if (!storage) return null;
@@ -64,7 +59,7 @@ export class StorageManager {
     }
   }
 
-  public removeItem(key: string, type: StorageType = STORAGE_TYPES.LOCAL): boolean {
+  public removeItem(key: string, type: StorageType): boolean {
     try {
       const storage = this.getStorage(type);
       if (!storage) return false;
@@ -77,11 +72,11 @@ export class StorageManager {
     }
   }
 
-  public hasItem(key: string, type: StorageType = STORAGE_TYPES.LOCAL): boolean {
+  public hasItem(key: string, type: StorageType): boolean {
     return this.getItem(key, type) !== null;
   }
 
-  public clear(type: StorageType = STORAGE_TYPES.LOCAL): boolean {
+  public clear(type: StorageType): boolean {
     try {
       const storage = this.getStorage(type);
       if (!storage) return false;
@@ -94,7 +89,7 @@ export class StorageManager {
     }
   }
 
-  public setObject<T>(key: string, value: T, type: StorageType = STORAGE_TYPES.LOCAL): boolean {
+  public setObject<T>(key: string, value: T, type: StorageType): boolean {
     try {
       const jsonString = JSON.stringify(value);
       return this.setItem(key, jsonString, type);
@@ -104,7 +99,7 @@ export class StorageManager {
     }
   }
 
-  public getObject<T>(key: string, type: StorageType = STORAGE_TYPES.LOCAL): T | null {
+  public getObject<T>(key: string, type: StorageType): T | null {
     try {
       const jsonString = this.getItem(key, type);
       if (!jsonString) return null;
