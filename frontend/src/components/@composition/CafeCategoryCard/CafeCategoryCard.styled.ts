@@ -14,7 +14,7 @@ export const Container = styled.button<Props>`
 
   ${({ theme, $isTouching }) =>
     buttonHoverPress({
-      activeColor: theme.color.gray[50],
+      activeColor: theme.color.gray[100],
       isTouching: $isTouching,
       enableScale: false,
     })}
