@@ -1,11 +1,11 @@
 import { ANIMATION_DURATION, ANIMATION_SCALE } from '@/constants/animation';
 import { css } from '@emotion/react';
 
-interface ScalePressEffectProps {
+type ScalePressEffectProps = {
   isTouching: boolean;
   scaleValue?: number;
   duration?: number;
-}
+};
 
 export const scalePressEffect = ({
   isTouching,
