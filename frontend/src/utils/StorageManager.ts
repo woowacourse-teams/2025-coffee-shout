@@ -1,6 +1,6 @@
 export const STORAGE_KEYS = {
-  COFFEE_SHOUT_VISITED: 'coffee-shout-visited',
-  COFFEE_SHOUT_FIRST_TIME_USER: 'coffee-shout-first-time-user',
+  VISITED: 'coffee-shout-visited',
+  FIRST_TIME_USER: 'coffee-shout-first-time-user',
   JOIN_CODE: 'coffee-shout-join-code',
   MY_NAME: 'coffee-shout-my-name',
   QR_CODE_URL: 'coffee-shout-qr-code-url',

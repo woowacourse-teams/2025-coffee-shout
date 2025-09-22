@@ -30,14 +30,11 @@ const HomePage = () => {
 
   useEffect(() => {
     const checkFirstVisit = () => {
-      const hasVisited = storageManager.getItem(
-        STORAGE_KEYS.COFFEE_SHOUT_VISITED,
-        STORAGE_TYPES.SESSION
-      );
+      const hasVisited = storageManager.getItem(STORAGE_KEYS.VISITED, STORAGE_TYPES.SESSION);
 
       if (!hasVisited) {
         setShowSplash(true);
-        storageManager.setItem(STORAGE_KEYS.COFFEE_SHOUT_VISITED, 'true', STORAGE_TYPES.SESSION);
+        storageManager.setItem(STORAGE_KEYS.VISITED, 'true', STORAGE_TYPES.SESSION);
       }
     };
     checkFirstVisit();
