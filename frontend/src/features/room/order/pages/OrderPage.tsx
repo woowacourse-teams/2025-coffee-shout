@@ -1,5 +1,5 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
+import BreadLogoWhiteIcon from '@/assets/bread-logo-white.png';
 import DetailIcon from '@/assets/detail-icon.svg';
 import Button from '@/components/@common/Button/Button';
 import Headline1 from '@/components/@common/Headline1/Headline1';
