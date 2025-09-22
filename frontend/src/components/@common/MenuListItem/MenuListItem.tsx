@@ -23,7 +23,7 @@ const MenuListItem = ({ text, onClick }: Props) => {
     if (!isTouchDevice) return;
 
     e.preventDefault();
-    endTouchPress(onClick, e);
+    endTouchPress(() => onClick(e));
   };
 
   return (

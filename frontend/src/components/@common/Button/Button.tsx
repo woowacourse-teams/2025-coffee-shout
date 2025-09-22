@@ -44,7 +44,7 @@ const Button = ({
 
     e.preventDefault();
 
-    endTouchPress(onClick, e);
+    endTouchPress(() => onClick?.(e));
   };
 
   return (

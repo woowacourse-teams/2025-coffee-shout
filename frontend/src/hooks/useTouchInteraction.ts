@@ -1,21 +1,20 @@
-import { TouchEvent, useState } from 'react';
+import { useState, useCallback } from 'react';
+
+const TOUCH_DELAY_MS = 100;
 
 export const useTouchInteraction = () => {
   const [isTouching, setIsTouching] = useState(false);
 
-  const startTouchPress = () => {
+  const startTouchPress = useCallback(() => {
     setIsTouching(true);
-  };
+  }, []);
 
-  const endTouchPress = (
-    callback?: (e: TouchEvent<HTMLButtonElement>) => void,
-    e?: TouchEvent<HTMLButtonElement>
-  ) => {
+  const endTouchPress = useCallback((callback?: () => void) => {
     setTimeout(() => {
       setIsTouching(false);
-      callback?.(e as TouchEvent<HTMLButtonElement>);
-    }, 100);
-  };
+      callback?.();
+    }, TOUCH_DELAY_MS);
+  }, []);
 
   return {
     isTouching,

@@ -33,7 +33,7 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
     if (!isTouchDevice) return;
 
     e.preventDefault();
-    endTouchPress(onClick, e);
+    endTouchPress(() => onClick?.(e));
   };
 
   return (
