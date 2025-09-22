@@ -1,7 +1,6 @@
 package coffeeshout.global.interceptor.handler.presend;
 
 import coffeeshout.global.interceptor.handler.PreSendHandler;
-import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 public class ConnectPreSendHandler implements PreSendHandler {
 
     private final StompSessionManager sessionManager;
-    private final WebSocketMetricService webSocketMetricService;
     private final RoomQueryService roomQueryService;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
@@ -30,16 +28,12 @@ public class ConnectPreSendHandler implements PreSendHandler {
 
     @Override
     public void handle(StompHeaderAccessor accessor, String sessionId) {
-        log.info("WebSocket 연결 시작: sessionId={}", sessionId);
-
         final String joinCode = accessor.getFirstNativeHeader("joinCode");
         final String playerName = accessor.getFirstNativeHeader("playerName");
 
         if (joinCode != null && playerName != null) {
             processPlayerConnection(sessionId, joinCode, playerName);
         }
-
-        webSocketMetricService.startConnection(sessionId);
     }
 
     private void processPlayerConnection(String sessionId, String joinCode, String playerName) {

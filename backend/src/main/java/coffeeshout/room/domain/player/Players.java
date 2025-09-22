@@ -1,5 +1,8 @@
 package coffeeshout.room.domain.player;
 
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.room.domain.roulette.Probability;
+import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,8 +24,22 @@ public class Players {
 
     public Player join(Player player) {
         player.assignColorIndex(colorUsage.pickRandomOne());
+        player.updateProbability(Probability.ZERO);
         this.players.add(player);
+        adjustInitialPlayerProbabilities();
         return getPlayer(player.getName());
+    }
+
+    public void adjustProbabilities(MiniGameResult miniGameResult, ProbabilityCalculator probabilityCalculator) {
+        for (Player player : players) {
+            final int rank = miniGameResult.getPlayerRank(player);
+            final int probabilityChange = probabilityCalculator.calculateProbabilityChange(
+                    rank,
+                    miniGameResult.getTieCountByRank(rank)
+            );
+            final Probability adjustedProbability = player.getProbability().plus(probabilityChange);
+            player.updateProbability(adjustedProbability);
+        }
     }
 
     public boolean hasEnoughPlayers(int minimumGuestCount, int maximumGuestCount) {
@@ -53,6 +70,7 @@ public class Players {
         return players.removeIf(player -> {
             if (player.sameName(playerName)) {
                 colorUsage.release(player.getColorIndex());
+                adjustInitialPlayerProbabilities();
                 return true;
             }
             return false;
@@ -70,5 +88,12 @@ public class Players {
 
     public boolean isEmpty() {
         return players.isEmpty();
+    }
+
+    private void adjustInitialPlayerProbabilities() {
+        final Probability probability = Probability.TOTAL.divide(players.size());
+        for (Player p : players) {
+            p.updateProbability(probability);
+        }
     }
 }

@@ -20,6 +20,8 @@ class SessionDisconnectEventListenerTest {
 
     @Mock
     DelayedPlayerRemovalService delayedPlayerRemovalService;
+    @Mock
+    SubscriptionInfoService subscriptionInfoService;
 
     StompSessionManager sessionManager;
     SessionDisconnectEventListener listener;
@@ -31,7 +33,8 @@ class SessionDisconnectEventListenerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        listener = new SessionDisconnectEventListener(sessionManager, delayedPlayerRemovalService);
+        listener = new SessionDisconnectEventListener(sessionManager, delayedPlayerRemovalService,
+                subscriptionInfoService);
     }
 
     @Nested
