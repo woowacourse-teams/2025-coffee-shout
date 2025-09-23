@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
@@ -31,7 +30,7 @@ export const useRoomManagement = () => {
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const { setQrCodeUrl } = useIdentifier();
 
   const handleRoomRequest = async (
     selectedMenu: Menu | null,
@@ -101,7 +100,6 @@ export const useRoomManagement = () => {
   };
 
   return {
-    qrCodeUrl,
     proceedToRoom,
   };
 };

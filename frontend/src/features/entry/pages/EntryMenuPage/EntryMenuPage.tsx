@@ -27,7 +27,7 @@ import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { isConnected } = useWebSocket();
-  const { joinCode } = useIdentifier();
+  const { joinCode, qrCodeUrl } = useIdentifier();
   const { playerType } = usePlayerType();
 
   const {
@@ -53,7 +53,7 @@ const EntryMenuPage = () => {
   const { categories } = useCategories();
   const { menus, resetMenus } = useMenus(selectedCategory?.id ?? null);
 
-  const { qrCodeUrl, proceedToRoom } = useRoomManagement();
+  const { proceedToRoom } = useRoomManagement();
 
   useEffect(() => {
     if (joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected) {
