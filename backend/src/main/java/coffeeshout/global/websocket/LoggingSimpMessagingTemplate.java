@@ -4,6 +4,7 @@ import coffeeshout.global.trace.SpanRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,9 @@ public class LoggingSimpMessagingTemplate {
         try {
             byte[] serialized = objectMapper.writeValueAsBytes(payload);
             return MessageBuilder.createMessage(serialized, accessor.getMessageHeaders());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("메시지 직렬화 실패", e);
+        } catch (JsonProcessingException exception) {
+            SpanRepository.endSpan(uuid, exception);
+            throw new RuntimeException("메시지 직렬화 실패", exception);
         }
     }
 }
