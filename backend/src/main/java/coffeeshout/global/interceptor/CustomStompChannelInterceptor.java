@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CustomStompChannelInterceptor implements ChannelInterceptor, ExecutorChannelInterceptor {
+public class CustomStompChannelInterceptor implements ChannelInterceptor {
 
     private final StompHandlerRegistry handlerRegistry;
 
