@@ -20,7 +20,7 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     updateCardInfos,
   } = useCardGameState();
 
-  const { selectedCardInfo, setSelectedCardInfo, updateSelectedCardInfo } = useSelectedCard(myName);
+  const { selectedCardInfo, updateSelectedCardInfo } = useSelectedCard(myName);
 
   const { handleCardGameState } = useCardGameHandlers({
     updateCardGameState,
@@ -40,7 +40,6 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
         currentCardGameState,
         cardInfos,
         selectedCardInfo,
-        setSelectedCardInfo,
       }}
     >
       {children}

@@ -37,7 +37,6 @@ export const useSelectedCard = (myName: string) => {
 
   return {
     selectedCardInfo,
-    setSelectedCardInfo,
     updateSelectedCardInfo,
   };
 };
