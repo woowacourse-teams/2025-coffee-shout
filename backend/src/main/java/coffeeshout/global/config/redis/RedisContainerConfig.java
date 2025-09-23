@@ -46,7 +46,7 @@ public class RedisContainerConfig {
     }
 
     @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> selectCardCommandEventStreamMessageListenerContainer(
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> objectRecordStreamMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
                 .builder()

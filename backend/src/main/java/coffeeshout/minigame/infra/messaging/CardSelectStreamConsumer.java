@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CardSelectConsumer implements StreamListener<String, ObjectRecord<String, String>> {
+public class CardSelectStreamConsumer implements StreamListener<String, ObjectRecord<String, String>> {
 
     private final CardGameService cardGameService;
-    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> listenerContainer;
+    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> objectRecordStreamMessageListenerContainer;
     private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
@@ -27,7 +27,7 @@ public class CardSelectConsumer implements StreamListener<String, ObjectRecord<S
     @PostConstruct
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
-        listenerContainer.receive(
+        objectRecordStreamMessageListenerContainer.receive(
                 redisStreamStartStrategy.getStreamOffset(redisStreamProperties.cardGameSelectKey()),
                 this
         );
@@ -38,11 +38,11 @@ public class CardSelectConsumer implements StreamListener<String, ObjectRecord<S
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
         try {
-            String wrapped = message.getValue();
-            String value = objectMapper.readValue(wrapped, String.class);
+            String jsonValue = message.getValue();
+            String value = objectMapper.readValue(jsonValue, String.class);
             SelectCardCommandEvent event = objectMapper.readValue(value, SelectCardCommandEvent.class);
 
-            log.info("Received card select message: id={}, wrapped={}",
+            log.info("Received card select message: id={}, event={}",
                     message.getId(), event);
 
             cardGameService.selectCard(event.joinCode(), event.playerName(), event.cardIndex());

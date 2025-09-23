@@ -1,4 +1,4 @@
-package coffeeshout.room.application.messaging;
+package coffeeshout.room.infra.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -10,7 +10,6 @@ import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
-import coffeeshout.room.infra.messaging.RoomBroadcastStreamProducer;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.support.test.IntegrationTest;
 import java.time.Duration;
@@ -20,13 +19,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-class RoomBroadcastStreamProducerTest {
+class RoomEnterStreamProducerTest {
 
     @Autowired
     RoomRepository roomRepository;
 
     @Autowired
-    RoomBroadcastStreamProducer producer;
+    RoomEnterStreamProducer producer;
 
     private String joinCode;
 
@@ -84,6 +83,26 @@ class RoomBroadcastStreamProducerTest {
                         assertThat(updatedRoom.getPlayers())
                                 .extracting(player -> player.getName().value())
                                 .contains(playerNames);
+                    });
+        }
+
+        @Test
+        void JSON_직렬화_방식으로_메시지_전송이_정상_처리된다() {
+            // given
+            String playerName = "JSON테스트";
+            SelectedMenuRequest menu = new SelectedMenuRequest(5L, "모카라떼", MenuTemperature.ICE);
+
+            // when
+            producer.broadcastEnterRoom(RoomJoinEvent.create(joinCode, playerName, menu));
+
+            // then
+            await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(100))
+                    .untilAsserted(() -> {
+                        Room updatedRoom = roomRepository.findByJoinCode(new JoinCode(joinCode)).orElseThrow();
+                        boolean playerExists = updatedRoom.getPlayers().stream()
+                                .anyMatch(player -> playerName.equals(player.getName().value()));
+
+                        assertThat(playerExists).isTrue();
                     });
         }
     }

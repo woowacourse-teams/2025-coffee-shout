@@ -22,7 +22,7 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.messaging.RoomBroadcastStreamProducer;
+import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class RoomService {
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
-    private final RoomBroadcastStreamProducer roomBroadcastStreamProducer;
+    private final RoomEnterStreamProducer roomEnterStreamProducer;
 
     @Value("${room.event.timeout}")
     private int eventTimeoutSeconds;
@@ -106,7 +106,7 @@ public class RoomService {
 
         return processEventAsync(
                 event.eventId(),
-                () -> roomBroadcastStreamProducer.broadcastEnterRoom(event),
+                () -> roomEnterStreamProducer.broadcastEnterRoom(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)

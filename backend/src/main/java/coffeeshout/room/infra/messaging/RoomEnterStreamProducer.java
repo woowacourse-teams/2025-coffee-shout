@@ -1,7 +1,7 @@
-package coffeeshout.minigame.infra.messaging;
+package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
+import coffeeshout.room.domain.event.RoomJoinEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,21 +14,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CardSelectStreamProducer {
+public class RoomEnterStreamProducer {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
-    public void broadcastCardSelect(SelectCardCommandEvent event) {
-        log.info("Broadcasting card select event: gameId={}, playerKey={}, selectedCard={}",
-                event.eventId(), event.playerName(), event.cardIndex());
+    public void broadcastEnterRoom(RoomJoinEvent event) {
+        log.info("Broadcasting enter room event: joinCode={}, playerName={}",
+                event.joinCode(), event.guestName());
 
         try {
             String eventJson = objectMapper.writeValueAsString(event);
 
             Record<String, String> objectRecord = StreamRecords.newRecord()
-                    .in(redisStreamProperties.cardGameSelectKey())
+                    .in(redisStreamProperties.roomJoinKey())
                     .ofObject(eventJson);
 
             var recordId = redisTemplate.opsForStream().add(
@@ -36,10 +36,10 @@ public class CardSelectStreamProducer {
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
-            log.info("Card select broadcast sent: recordId={}", recordId.getValue());
+            log.info("Enter room broadcast sent: recordId={}", recordId.getValue());
         } catch (Exception e) {
-            log.error("Failed to broadcast card select event", e);
-            throw new RuntimeException("Failed to broadcast card select event", e);
+            log.error("Failed to broadcast enter room event", e);
+            throw new RuntimeException("Failed to broadcast enter room event", e);
         }
     }
 }
