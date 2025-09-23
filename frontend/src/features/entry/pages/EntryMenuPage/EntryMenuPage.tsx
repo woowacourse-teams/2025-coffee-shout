@@ -132,7 +132,7 @@ const EntryMenuPage = () => {
   const shouldShowButtonBar = currentView === 'selectTemperature';
 
   const shouldShowCustomMenuButton =
-    currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature';
+    currentView === 'selectCategory' || currentView === 'selectMenu';
 
   return (
     <Layout>
