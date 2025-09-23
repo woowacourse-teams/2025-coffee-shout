@@ -1,4 +1,5 @@
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -52,6 +53,14 @@ export default (_, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'public/fonts',
+            to: 'fonts',
+          },
+        ],
       }),
       new webpack.DefinePlugin(envKeys),
       sentryWebpackPlugin({
