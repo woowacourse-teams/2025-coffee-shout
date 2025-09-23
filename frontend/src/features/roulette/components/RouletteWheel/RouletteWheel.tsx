@@ -4,6 +4,7 @@ import * as S from './RouletteWheel.styled';
 import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils';
 import RouletteSlice from '../RouletteSlice/RouletteSlice';
+import { memo } from 'react';
 
 type Props =
   | {
@@ -31,7 +32,7 @@ const RouletteWheel = ({
 
   return (
     <S.Container>
-      <S.Pin />
+      <Pin />
       <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
         <svg
           width={WHEEL_CONFIG.SIZE}
@@ -52,3 +53,6 @@ const RouletteWheel = ({
 };
 
 export default RouletteWheel;
+
+const Pin = memo(() => <S.Pin />);
+Pin.displayName = 'Pin';
