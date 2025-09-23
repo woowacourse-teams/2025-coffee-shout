@@ -21,18 +21,16 @@ const SelectTemperature = ({
   selectedTemperature,
   onChangeTemperature,
 }: Props) => {
-  return (
-    <>
-      {temperatureAvailability === 'BOTH' ? (
-        <TemperatureToggle
-          selectedTemperature={selectedTemperature}
-          onChangeTemperature={onChangeTemperature}
-        />
-      ) : (
-        <TemperatureOnly temperature={TEMPERATURE_AVAILABILITY_MAP[temperatureAvailability]} />
-      )}
-    </>
-  );
+  if (temperatureAvailability === 'BOTH') {
+    return (
+      <TemperatureToggle
+        selectedTemperature={selectedTemperature}
+        onChangeTemperature={onChangeTemperature}
+      />
+    );
+  }
+
+  return <TemperatureOnly temperature={TEMPERATURE_AVAILABILITY_MAP[temperatureAvailability]} />;
 };
 
 export default SelectTemperature;
