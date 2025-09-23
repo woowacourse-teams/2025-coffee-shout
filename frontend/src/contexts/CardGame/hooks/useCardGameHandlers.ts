@@ -1,8 +1,9 @@
 import { CardGameState, CardInfo } from '@/types/miniGame/cardGame';
 import { RoundType } from '@/types/miniGame/round';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIdentifier } from '../../Identifier/IdentifierContext';
+import { Action } from '../reducer/cardGameReducer';
 
 type CardGameStateResponse = {
   cardGameState: CardGameState;
@@ -12,10 +13,6 @@ type CardGameStateResponse = {
 };
 
 type CardGameStateHandlers = {
-  updateCardGameState: (state: CardGameState) => void;
-  updateCardInfos: (cardInfoMessages: CardInfo[]) => void;
-  updateCurrentRound: (round: RoundType) => void;
-  updateTransition: (transition: boolean) => void;
   updateSelectedCardInfo: (
     cardInfoMessages: CardInfo[],
     round: RoundType,
@@ -23,58 +20,13 @@ type CardGameStateHandlers = {
   ) => void;
 };
 
-export const useCardGameHandlers = ({
-  updateCardGameState,
-  updateCardInfos,
-  updateCurrentRound,
-  updateTransition,
-  updateSelectedCardInfo,
-}: CardGameStateHandlers) => {
+export const useCardGameHandlers = (
+  dispatch: React.Dispatch<Action>,
+  { updateSelectedCardInfo }: CardGameStateHandlers
+) => {
   const navigate = useNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
-
-  const handlePrepare = useCallback(
-    (cardInfoMessages: CardInfo[]) => {
-      updateCardGameState('PREPARE');
-      updateCardInfos(cardInfoMessages);
-    },
-    [updateCardGameState, updateCardInfos]
-  );
-
-  const handlePlaying = useCallback(
-    (cardInfoMessages: CardInfo[], round: RoundType) => {
-      updateCardGameState('PLAYING');
-      updateCardInfos(cardInfoMessages);
-
-      if (round === 'SECOND') {
-        updateTransition(false);
-      }
-
-      updateSelectedCardInfo(cardInfoMessages, round);
-    },
-    [updateCardGameState, updateCardInfos, updateTransition, updateSelectedCardInfo]
-  );
-
-  const handleScoreBoard = useCallback(
-    (cardInfoMessages: CardInfo[], round: RoundType) => {
-      updateCardGameState('SCORE_BOARD');
-      updateCardInfos(cardInfoMessages);
-
-      updateSelectedCardInfo(cardInfoMessages, round, true);
-    },
-    [updateCardGameState, updateCardInfos, updateSelectedCardInfo]
-  );
-
-  const handleLoading = useCallback(() => {
-    updateTransition(true);
-    updateCurrentRound('SECOND');
-    updateCardGameState('LOADING');
-  }, [updateTransition, updateCurrentRound, updateCardGameState]);
-
-  const handleGameDone = useCallback(() => {
-    navigate(`/room/${joinCode}/${miniGameType}/result`);
-  }, [navigate, joinCode, miniGameType]);
 
   const handleCardGameState = useCallback(
     (data: CardGameStateResponse) => {
@@ -82,25 +34,36 @@ export const useCardGameHandlers = ({
 
       switch (cardGameState) {
         case 'PREPARE':
-          handlePrepare(cardInfoMessages);
+          dispatch({ type: 'PREPARE', payload: { cardInfos: cardInfoMessages } });
           break;
+
         case 'PLAYING':
-          handlePlaying(cardInfoMessages, currentRound);
+          dispatch({
+            type: 'PLAYING',
+            payload: { cardInfos: cardInfoMessages, round: currentRound },
+          });
+          updateSelectedCardInfo(cardInfoMessages, currentRound);
           break;
+
         case 'SCORE_BOARD':
-          handleScoreBoard(cardInfoMessages, currentRound);
+          dispatch({
+            type: 'SCORE_BOARD',
+            payload: { cardInfos: cardInfoMessages, round: currentRound },
+          });
+          updateSelectedCardInfo(cardInfoMessages, currentRound, true);
           break;
+
         case 'LOADING':
-          if (currentRound === 'SECOND') {
-            handleLoading();
-          }
+          dispatch({ type: 'LOADING', payload: { currentRound } });
           break;
+
         case 'DONE':
-          handleGameDone();
+          dispatch({ type: 'DONE' });
+          navigate(`/room/${joinCode}/${miniGameType}/result`);
           break;
       }
     },
-    [handlePrepare, handlePlaying, handleScoreBoard, handleLoading, handleGameDone]
+    [dispatch, updateSelectedCardInfo, navigate, joinCode, miniGameType]
   );
 
   return {

@@ -9,24 +9,12 @@ import { useCardGameHandlers } from './hooks/useCardGameHandlers';
 const CardGameProvider = ({ children }: PropsWithChildren) => {
   const { joinCode, myName } = useIdentifier();
 
-  const {
-    isTransition,
-    currentRound,
-    currentCardGameState,
-    cardInfos,
-    updateTransition,
-    updateCurrentRound,
-    updateCardGameState,
-    updateCardInfos,
-  } = useCardGameState();
+  const { dispatch, isTransition, currentRound, currentCardGameState, cardInfos } =
+    useCardGameState();
 
   const { selectedCardInfo, updateSelectedCardInfo } = useSelectedCard(myName);
 
-  const { handleCardGameState } = useCardGameHandlers({
-    updateCardGameState,
-    updateCardInfos,
-    updateCurrentRound,
-    updateTransition,
+  const { handleCardGameState } = useCardGameHandlers(dispatch, {
     updateSelectedCardInfo,
   });
 

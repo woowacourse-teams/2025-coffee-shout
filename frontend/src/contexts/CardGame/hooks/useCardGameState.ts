@@ -1,37 +1,14 @@
-import { CardGameState, CardInfo } from '@/types/miniGame/cardGame';
-import { RoundType } from '@/types/miniGame/round';
-import { useState } from 'react';
+import { useReducer } from 'react';
+import { cardGameReducer, initialState } from '../reducer/cardGameReducer';
 
 export const useCardGameState = () => {
-  const [isTransition, setIsTransition] = useState<boolean>(false);
-  const [currentRound, setCurrentRound] = useState<RoundType>('FIRST');
-  const [currentCardGameState, setCurrentCardGameState] = useState<CardGameState>('READY');
-  const [cardInfos, setCardInfos] = useState<CardInfo[]>([]);
-
-  const updateCardGameState = (state: CardGameState) => {
-    setCurrentCardGameState(state);
-  };
-
-  const updateCardInfos = (cardInfoMessages: CardInfo[]) => {
-    setCardInfos(cardInfoMessages);
-  };
-
-  const updateCurrentRound = (round: RoundType) => {
-    setCurrentRound(round);
-  };
-
-  const updateTransition = (transition: boolean) => {
-    setIsTransition(transition);
-  };
+  const [state, dispatch] = useReducer(cardGameReducer, initialState);
 
   return {
-    isTransition,
-    currentRound,
-    currentCardGameState,
-    cardInfos,
-    updateCardGameState,
-    updateCardInfos,
-    updateCurrentRound,
-    updateTransition,
+    dispatch,
+    isTransition: state.isTransition,
+    currentRound: state.currentRound,
+    currentCardGameState: state.currentCardGameState,
+    cardInfos: state.cardInfos,
   };
 };
