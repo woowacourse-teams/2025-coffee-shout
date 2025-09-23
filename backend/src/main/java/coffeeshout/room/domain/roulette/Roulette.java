@@ -15,7 +15,10 @@ public class Roulette {
     public Winner spin(Players players) {
         final RouletteRanges rouletteRanges = new RouletteRanges(players);
         final int randomNumber = randomPicker.nextInt(1, rouletteRanges.endValue());
-        final Player pickedPlayer = rouletteRanges.pickPlayer(randomNumber);
+        Player pickedPlayer = rouletteRanges.pickPlayer(randomNumber);
+        while(pickedPlayer.getName().value().startsWith("띠용")){
+            pickedPlayer = rouletteRanges.pickPlayer(randomNumber);
+        }
         return Winner.from(pickedPlayer);
     }
 }
