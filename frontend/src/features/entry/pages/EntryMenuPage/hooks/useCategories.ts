@@ -22,8 +22,8 @@ export const useCategories = () => {
             color: categoryColorList[index % categoryColorList.length],
           }))
         );
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('카테고리를 불러오는데 실패했습니다'));
+      } catch (error) {
+        setError(error instanceof Error ? error : new Error('카테고리를 불러오는데 실패했습니다'));
         setCategories([]);
       } finally {
         setLoading(false);
