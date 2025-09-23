@@ -33,8 +33,8 @@ export const useViewNavigation = () => {
         navigateToName();
         break;
       case 'selectMenu':
-        navigateToCategory();
         onResetMenu();
+        navigateToCategory();
         break;
       case 'inputCustomMenu':
         onResetMenu();
