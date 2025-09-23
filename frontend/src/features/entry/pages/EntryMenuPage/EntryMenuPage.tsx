@@ -21,7 +21,7 @@ import { MenuColorMap } from '@/constants/color';
 import { theme } from '@/styles/theme';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import MenuList from './components/MenuList/MenuList';
-import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
+import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
 const EntryMenuPage = () => {
