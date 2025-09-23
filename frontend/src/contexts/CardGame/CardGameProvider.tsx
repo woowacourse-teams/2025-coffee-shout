@@ -14,10 +14,10 @@ const CardGameProvider = ({ children }: PropsWithChildren) => {
     currentRound,
     currentCardGameState,
     cardInfos,
+    updateTransition,
+    updateCurrentRound,
     updateCardGameState,
     updateCardInfos,
-    updateCurrentRound,
-    updateTransition,
   } = useCardGameState();
 
   const { selectedCardInfo, setSelectedCardInfo, updateSelectedCardInfo } = useSelectedCard(myName);
