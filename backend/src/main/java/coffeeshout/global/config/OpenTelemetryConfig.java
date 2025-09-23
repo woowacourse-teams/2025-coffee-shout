@@ -5,10 +5,8 @@ import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
-import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
@@ -27,19 +25,19 @@ public class OpenTelemetryConfig {
         this.environment = environment;
     }
 
-    @Value("${otlp.exporter.otlp.endpoint}")
+    @Value("${otel.exporter.otlp.endpoint}")
     private String otlpEndpoint;
 
-    @Bean
-    public OpenTelemetry openTelemetry() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        String profile = activeProfiles.length > 0 ? activeProfiles[0] : "default";
+    @Bean(destroyMethod = "close")
+    public OpenTelemetrySdk openTelemetry() {
+        final String[] activeProfiles = environment.getActiveProfiles();
+        final String profile = activeProfiles.length > 0 ? activeProfiles[0] : "default";
 
         final Resource resource = Resource.getDefault()
                 .merge(Resource.builder()
                         .put("service.name", "coffeeshout-service")
                         .put("service.version", "1.0.0")
-                        .put("service.environment", profile)
+                        .put("deployment.environment", profile)
                         .build());
 
         final SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
@@ -51,20 +49,11 @@ public class OpenTelemetryConfig {
                 .setResource(resource)
                 .build();
 
-        final SdkMeterProvider meterProvider = SdkMeterProvider.builder()
-                .setResource(resource)
-                .build();
 
         return OpenTelemetrySdk.builder()
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .setTracerProvider(tracerProvider)
-                .setMeterProvider(meterProvider)
                 .build();
-    }
-
-    @Bean
-    public TextMapPropagator textMapPropagator(OpenTelemetry openTelemetry) {
-        return openTelemetry.getPropagators().getTextMapPropagator();
     }
 
     @Bean

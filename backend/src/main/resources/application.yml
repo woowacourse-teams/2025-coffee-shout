@@ -23,19 +23,20 @@ room:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
 
-otlp:
+otel:
   exporter:
     otlp:
-      endpoint: http://43.202.22.216/tempo
-  tracing:
-    endpoint: http://43.202.22.216/tempo/v1/traces
+      endpoint: ${TAMPO_URL}
+
 tracing:
   sampling:
-    probability: 1.0
+    probability: ${TRACE_SAMPLING_PROBABILITY}
+
 endpoints:
   web:
     exposure:
       include: health,info,metrics,prometheus,traces
+
 endpoint:
   health:
     show-details: always

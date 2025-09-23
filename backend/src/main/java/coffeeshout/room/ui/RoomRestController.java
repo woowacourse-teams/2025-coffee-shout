@@ -8,9 +8,6 @@ import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,25 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController {
 
     private final RoomService roomService;
-    private final Tracer tracer;
 
     @PostMapping
-    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request)
-            throws InterruptedException {
-
-        Span controllerSpan = tracer.spanBuilder("user.get.controller").startSpan();
-
-        try (Scope scope = controllerSpan.makeCurrent()) {
-            Span validationSpan = tracer.spanBuilder("user.validation").startSpan();
-
-                validationSpan.addEvent("event start");
-                Thread.sleep(1000);
-                validationSpan.addEvent("event finish");
-                validationSpan.end();
-
-        } finally {
-            controllerSpan.end();
-        }
+    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
         final Room room = roomService.createRoom(request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));
@@ -101,7 +82,7 @@ public class RoomRestController {
     }
 
     @GetMapping("/minigames/selected")
-    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode){
+    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
         List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
