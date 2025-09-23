@@ -11,37 +11,37 @@ menus:
 
   - id: 3
     name: "카페라떼"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 4
     name: "바닐라라떼"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 5
     name: "헤이즐넛라떼"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 6
     name: "돌체라떼"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 7
     name: "카푸치노"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 8
     name: "카페모카"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 9
     name: "카라멜마끼아또"
-    categoryId: 2
+    categoryId: 1
     temperatureAvailability: "BOTH"
 
   - id: 10
