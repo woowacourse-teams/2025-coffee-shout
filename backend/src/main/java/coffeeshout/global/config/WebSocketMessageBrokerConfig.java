@@ -51,12 +51,22 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(channelInterceptor);
+        registration.interceptors(channelInterceptor)
+                .taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(12)
+                .queueCapacity(200)
+                .keepAliveSeconds(60);
     }
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(generateTraceableChannel());
+        registration.interceptors(generateTraceableChannel())
+                .taskExecutor()
+                .corePoolSize(9)
+                .maxPoolSize(18)
+                .queueCapacity(500)
+                .keepAliveSeconds(30);
     }
 
     private static ExecutorChannelInterceptor generateTraceableChannel() {

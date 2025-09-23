@@ -15,7 +15,7 @@ public class DelayRemovalSchedulerConfig {
 
     @Bean(name = "delayRemovalScheduler")
     @Profile("!test")
-    public TaskScheduler delayRemovalTaskScheduler() {
+    public TaskScheduler delayRemovalScheduler() {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         // 스레드 풀 크기 (동시 실행되는 스케줄 작업 수에 따라 조정)
@@ -29,7 +29,7 @@ public class DelayRemovalSchedulerConfig {
 
         // 에러 핸들러 (스케줄 실행 중 예외 로깅)
         scheduler.setErrorHandler(t ->
-                log.error("스케줄 실행 중 예외가 발생했습니다.")
+                log.error("스케줄 실행 중 예외가 발생했습니다.", t)
         );
 
         // 종료 시 현재 실행 중인 작업 완료 대기
