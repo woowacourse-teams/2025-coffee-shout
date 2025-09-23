@@ -76,8 +76,10 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 if (SimpMessageType.HEARTBEAT.equals(message.getHeaders().get("simpMessageType"))) {
                     return;
                 }
-                final UUID uuid = (UUID) message.getHeaders().get("otelSpan");
-                SpanRepository.endSpan(uuid, exception);
+                final Object uuidObj = message.getHeaders().get("otelSpan");
+                if (uuidObj instanceof UUID) {
+                    SpanRepository.endSpan((UUID) uuidObj, exception);
+                }
             }
         };
     }

@@ -4,7 +4,6 @@ import coffeeshout.global.trace.SpanRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
