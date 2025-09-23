@@ -46,7 +46,7 @@ export const useRoomManagement = () => {
     startSocket(_joinCode, myName);
   };
 
-  const validateMenuSelection = (selectedMenu: Menu | null, customMenuName: string | null) => {
+  const isMenuSelectionValid = (selectedMenu: Menu | null, customMenuName: string | null) => {
     if (!selectedMenu && !customMenuName) {
       showToast({
         type: 'error',
@@ -57,7 +57,7 @@ export const useRoomManagement = () => {
     return true;
   };
 
-  const validatePlayerName = () => {
+  const isPlayerNameValid = () => {
     if (!myName) {
       showToast({
         type: 'error',
@@ -74,8 +74,8 @@ export const useRoomManagement = () => {
     customMenuName: string | null,
     selectedTemperature: TemperatureOption
   ) => {
-    if (!validatePlayerName()) return;
-    if (!validateMenuSelection(selectedMenu, customMenuName)) return;
+    if (!isPlayerNameValid()) return;
+    if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
     try {
       await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
