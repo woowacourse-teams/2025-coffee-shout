@@ -3,7 +3,6 @@ package coffeeshout.minigame.infra.handler;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
-import coffeeshout.minigame.infra.MiniGameEventWaitManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class SelectCardCommandEventHandler implements MiniGameEventHandler<SelectCardCommandEvent> {
 
     private final CardGameService cardGameService;
-    private final MiniGameEventWaitManager miniGameEventWaitManager;
 
     @Override
     public void handle(SelectCardCommandEvent event) {
@@ -24,15 +22,12 @@ public class SelectCardCommandEventHandler implements MiniGameEventHandler<Selec
 
             cardGameService.selectCardInternal(event.joinCode(), event.playerName(), event.cardIndex());
 
-            miniGameEventWaitManager.notifySuccess(event.getEventId(), null);
-
             log.info("카드 선택 이벤트 처리 완료: eventId={}, joinCode={}", 
                     event.getEventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("카드 선택 이벤트 처리 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}", 
                     event.getEventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
-            miniGameEventWaitManager.notifyFailure(event.getEventId(), e);
         }
     }
 

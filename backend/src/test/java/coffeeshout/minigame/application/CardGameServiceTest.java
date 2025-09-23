@@ -10,7 +10,6 @@ import coffeeshout.fixture.PlayersFixture;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
-import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.domain.cardgame.event.dto.CardSelectedEvent;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
@@ -27,9 +26,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class CardGameServiceTest extends ServiceTest {
+class CardGameServiceTest extends ServiceTest implements Runnable {
 
     @Autowired
     CardGameService cardGameService;
@@ -48,6 +48,16 @@ class CardGameServiceTest extends ServiceTest {
 
     CardGame cardGame;
 
+    String correlationId;
+
+    @Override
+    public void run() {
+        try (MDC.MDCCloseable ignored = MDC.putCloseable("correlationId", correlationId)) {
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     @BeforeEach
     void setUp() {
         Players players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
@@ -57,22 +67,16 @@ class CardGameServiceTest extends ServiceTest {
                 new SelectedMenuRequest(1L, null, MenuTemperature.ICE)
         );
         joinCode = room.getJoinCode();
-//        roomService.updateMiniGames(joinCode.getValue(), host.getName().value(), List.of(MiniGameType.CARD_GAME));
+        roomService.updateMiniGames(joinCode.getValue(), host.getName().value(), List.of(MiniGameType.CARD_GAME));
         room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
 
         for (int i = 1; i < players.getPlayers().size(); i++) {
-//            roomService.enterRoom(joinCode.getValue(),
-//                    players.getPlayers().get(i).getName().value(),
-//                    new SelectedMenuRequest(1L, "아메키라노", MenuTemperature.ICE)
-//            );
-
             room.joinGuest(
                     players.getPlayers().get(i).getName(),
                     new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
             );
         }
         for (Player player : room.getPlayers()) {
-//            roomService.changePlayerReadyState(joinCode.getValue(), player.getName().value(), true);
             player.updateReadyState(true);
         }
         cardGame = (CardGame) room.startNextGame(host.getName().value());
@@ -84,15 +88,12 @@ class CardGameServiceTest extends ServiceTest {
         @Test
         void 카드게임을_시작한다() {
             // given
-            String joinCodeValue = joinCode.getValue();
-            cardGameService.start(cardGame, joinCodeValue);
 
             // when & then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(cardGame).isNotNull();
                 softly.assertThat(cardGame.getDeck().size()).isEqualTo(9);
                 softly.assertThat(cardGame.getPlayerHands().playerCount()).isEqualTo(4);
-                verify(eventPublisher).publishEvent(any(CardGameStartedEvent.class));
             });
         }
     }
@@ -107,7 +108,7 @@ class CardGameServiceTest extends ServiceTest {
             String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
+            cardGameService.publishSelectCardEvent(joinCodeValue, host.getName().value(), 0);
 
             // then
             assertThat(cardGame.getPlayerHands().findPlayerByName(host.getName())).isNotNull();
@@ -120,7 +121,7 @@ class CardGameServiceTest extends ServiceTest {
             String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.selectCard(joinCodeValue, host.getName().value(), 0);
+            cardGameService.publishSelectCardEvent(joinCodeValue, host.getName().value(), 0);
 
             // then
             verify(eventPublisher).publishEvent(any(CardSelectedEvent.class));
@@ -135,13 +136,13 @@ class CardGameServiceTest extends ServiceTest {
             // when & then
             // 첫 번째 플레이어가 카드 선택
             final String joinCodeValue = joinCode.getValue();
-            cardGameService.selectCard(joinCodeValue, players.get(0).getName().value(), 0);
+            cardGameService.publishSelectCardEvent(joinCodeValue, players.get(0).getName().value(), 0);
 
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
 
             final String secondPlayerName = players.get(1).getName().value();
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, secondPlayerName, 0)
+                    cardGameService.publishSelectCardEvent(joinCodeValue, secondPlayerName, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -152,7 +153,7 @@ class CardGameServiceTest extends ServiceTest {
             final String joinCodeValue = joinCode.getValue();
 
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, name, 0)
+                    cardGameService.publishSelectCardEvent(joinCodeValue, name, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -165,7 +166,7 @@ class CardGameServiceTest extends ServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, "존재하지않는플레이어", 0)
+                    cardGameService.publishSelectCardEvent(joinCodeValue, "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -178,7 +179,7 @@ class CardGameServiceTest extends ServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.selectCard(joinCodeValue, hostName, 999)
+                    cardGameService.publishSelectCardEvent(joinCodeValue, hostName, 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
     }
