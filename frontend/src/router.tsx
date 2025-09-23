@@ -4,7 +4,9 @@ import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
 import { lazy } from 'react';
 
-const LobbyPage = lazy(() => import('./features/room/lobby/pages/LobbyPage'));
+const LobbyPage = lazy(
+  /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')
+);
 const MiniGamePlayPage = lazy(
   () =>
     import(
@@ -23,8 +25,12 @@ const MiniGameResultPage = lazy(
       /*webpackChunkName: "miniGameResultPage"*/ './features/miniGame/pages/MiniGameResultPage/MiniGameResultPage'
     )
 );
-const NotFoundPage = lazy(() => import('./features/notFound/pages/NotFoundPage'));
-const OrderPage = lazy(() => import('./features/room/order/pages/OrderPage'));
+const NotFoundPage = lazy(
+  /*webpackChunkName: "notFoundPage"*/ () => import('./features/notFound/pages/NotFoundPage')
+);
+const OrderPage = lazy(
+  /*webpackChunkName: "orderPage"*/ () => import('./features/room/order/pages/OrderPage')
+);
 const RoulettePlayPage = lazy(
   () =>
     import(
