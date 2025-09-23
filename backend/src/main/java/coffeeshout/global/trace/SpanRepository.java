@@ -27,12 +27,12 @@ public class SpanRepository {
             return;
         }
         final Span span = get(uuid);
+        remove(uuid);
         if (exception != null) {
             span.recordException(exception);
             span.setStatus(StatusCode.ERROR);
             return;
         }
         span.end();
-        remove(uuid);
     }
 }
