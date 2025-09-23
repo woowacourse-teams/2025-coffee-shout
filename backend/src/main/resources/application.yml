@@ -26,9 +26,9 @@ room:
 otlp:
   exporter:
     otlp:
-      iendpoint: http://localhost:4318
+      endpoint: http://43.202.22.216/tempo
   tracing:
-    endpoint: http://localhost:4318/v1/traces
+    endpoint: http://43.202.22.216/tempo/v1/traces
 tracing:
   sampling:
     probability: 1.0

@@ -15,18 +15,31 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 
 @Configuration
 public class OpenTelemetryConfig {
 
-    @Value("${otel.exporter.otlp.endpoint:http://localhost:4318}")
+    private final Environment environment;
+
+    public OpenTelemetryConfig(Environment environment) {
+        this.environment = environment;
+    }
+
+    @Value("${otlp.exporter.otlp.endpoint}")
     private String otlpEndpoint;
 
     @Bean
     public OpenTelemetry openTelemetry() {
+        String[] activeProfiles = environment.getActiveProfiles();
+        String profile = activeProfiles.length > 0 ? activeProfiles[0] : "default";
+
         final Resource resource = Resource.getDefault()
                 .merge(Resource.builder()
+                        .put("service.name", "coffeeshout-service")
+                        .put("service.version", "1.0.0")
+                        .put("service.environment", profile)
                         .build());
 
         final SdkTracerProvider tracerProvider = SdkTracerProvider.builder()

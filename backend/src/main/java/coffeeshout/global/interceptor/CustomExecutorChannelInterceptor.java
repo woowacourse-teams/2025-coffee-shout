@@ -74,6 +74,7 @@ public class CustomExecutorChannelInterceptor implements ExecutorChannelIntercep
                     parentSpan.getSpanContext().getSpanId());
             parentSpan.end();
         }
+        headerMap.remove("nativeHeaders");
 
         return message;
     }
