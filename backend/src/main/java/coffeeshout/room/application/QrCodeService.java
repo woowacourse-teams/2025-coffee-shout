@@ -6,6 +6,7 @@ import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,6 +36,7 @@ public class QrCodeService {
                 .register(meterRegistry);
     }
 
+    @WithSpan("qrcode.generation")
     public String getQrCodeUrl(String contents) {
         try {
             byte[] qrCodeImage = generateQrCode(contents);
