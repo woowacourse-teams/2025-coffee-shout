@@ -26,11 +26,11 @@ room:
 otel:
   exporter:
     otlp:
-      endpoint: ${TAMPO_URL:http://localhost:4318}
+      endpoint: ${TAMPO_URL}
 
 tracing:
   sampling:
-    probability: ${TRACE_SAMPLING_PROBABILITY:1.0}
+    probability: ${TRACE_SAMPLING_PROBABILITY}
 
 endpoints:
   web:

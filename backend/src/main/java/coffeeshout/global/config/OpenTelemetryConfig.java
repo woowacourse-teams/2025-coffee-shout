@@ -10,6 +10,7 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,9 @@ public class OpenTelemetryConfig {
     @Value("${otel.exporter.otlp.endpoint}")
     private String otlpEndpoint;
 
+    @Value("${tracing.sampling.probability}")
+    private double probability;
+
     @Bean(destroyMethod = "close")
     public OpenTelemetrySdk openTelemetry() {
         final String[] activeProfiles = environment.getActiveProfiles();
@@ -41,6 +45,7 @@ public class OpenTelemetryConfig {
                         .build());
 
         final SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+                .setSampler(Sampler.traceIdRatioBased(probability))
                 .addSpanProcessor(BatchSpanProcessor.builder(
                                 OtlpHttpSpanExporter.builder()
                                         .setEndpoint(otlpEndpoint + "/v1/traces")
@@ -48,7 +53,6 @@ public class OpenTelemetryConfig {
                         .build())
                 .setResource(resource)
                 .build();
-
 
         return OpenTelemetrySdk.builder()
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
