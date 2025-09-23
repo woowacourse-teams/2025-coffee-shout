@@ -121,7 +121,7 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
             String joinCodeValue = joinCode.getValue();
 
             // when
-            cardGameService.publishSelectCardEvent(joinCodeValue, host.getName().value(), 0);
+            cardGameService.selectCardInternal(joinCodeValue, host.getName().value(), 0);
 
             // then
             verify(eventPublisher).publishEvent(any(CardSelectedEvent.class));
@@ -136,13 +136,13 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
             // when & then
             // 첫 번째 플레이어가 카드 선택
             final String joinCodeValue = joinCode.getValue();
-            cardGameService.publishSelectCardEvent(joinCodeValue, players.get(0).getName().value(), 0);
+            cardGameService.selectCardInternal(joinCodeValue, players.get(0).getName().value(), 0);
 
             // 두 번째 플레이어가 같은 카드 선택 시도 - 예외 발생해야 함
 
             final String secondPlayerName = players.get(1).getName().value();
             assertThatThrownBy(() ->
-                    cardGameService.publishSelectCardEvent(joinCodeValue, secondPlayerName, 0)
+                    cardGameService.selectCardInternal(joinCodeValue, secondPlayerName, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -153,7 +153,7 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
             final String joinCodeValue = joinCode.getValue();
 
             assertThatThrownBy(() ->
-                    cardGameService.publishSelectCardEvent(joinCodeValue, name, 0)
+                    cardGameService.selectCardInternal(joinCodeValue, name, 0)
             ).isInstanceOf(IllegalStateException.class);
         }
 
@@ -166,7 +166,7 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.publishSelectCardEvent(joinCodeValue, "존재하지않는플레이어", 0)
+                    cardGameService.selectCardInternal(joinCodeValue, "존재하지않는플레이어", 0)
             ).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -179,7 +179,7 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
 
             // when & then
             assertThatThrownBy(() ->
-                    cardGameService.publishSelectCardEvent(joinCodeValue, hostName, 999)
+                    cardGameService.selectCardInternal(joinCodeValue, hostName, 999)
             ).isInstanceOf(IndexOutOfBoundsException.class);
         }
     }
