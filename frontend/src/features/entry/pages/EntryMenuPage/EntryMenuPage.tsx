@@ -56,7 +56,9 @@ const EntryMenuPage = () => {
   const { proceedToRoom } = useRoomManagement();
 
   useEffect(() => {
-    if (joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected) {
+    const isReadyToNavigateLobby =
+      joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected;
+    if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
   }, [joinCode, qrCodeUrl, selectedMenu, customMenuName, isConnected, navigate]);
