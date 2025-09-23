@@ -34,11 +34,11 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
         listenerContainer.receive(
-                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomKey()),
+                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomJoinKey()),
                 this
         );
 
-        log.info("Registered broadcast stream listener for: {}", redisStreamProperties.roomKey());
+        log.info("Registered broadcast stream listener for: {}", redisStreamProperties.roomJoinKey());
     }
 
     /**
@@ -49,13 +49,13 @@ public class RoomBroadcastStreamConsumer implements StreamListener<String, MapRe
         try {
             log.info("Received broadcast message: id={}, value={}",
                     mapRecord.getId(), mapRecord.getValue());
-            processBroadcastRecordV2(mapRecord);
+            processBroadcastRecord(mapRecord);
         } catch (Exception e) {
             log.error("Failed to process broadcast message", e);
         }
     }
 
-    private void processBroadcastRecordV2(MapRecord<String, String, String> mapRecord) {
+    private void processBroadcastRecord(MapRecord<String, String, String> mapRecord) {
         Map<String, String> messageValue = mapRecord.getValue();
 
         // 기존 다른 메시지 타입들 처리 (UPDATE_ROOM_STATE, SYNC_ROOM_DATA 등)

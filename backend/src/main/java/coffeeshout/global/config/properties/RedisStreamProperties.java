@@ -8,7 +8,8 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "spring.data.redis.stream")
 public record RedisStreamProperties(
-        @NotBlank String roomKey,
+        @NotBlank String roomJoinKey,
+        @NotBlank String cardGameSelectKey,
         @Positive int maxLength
 ) {
 }

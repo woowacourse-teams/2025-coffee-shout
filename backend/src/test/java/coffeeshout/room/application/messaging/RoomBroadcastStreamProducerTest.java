@@ -15,13 +15,11 @@ import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.support.test.IntegrationTest;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-@DisplayName("RoomBroadcastStreamProducer 통합 테스트")
 class RoomBroadcastStreamProducerTest {
 
     @Autowired
@@ -40,12 +38,10 @@ class RoomBroadcastStreamProducerTest {
     }
 
     @Nested
-    @DisplayName("실제 비즈니스 로직 테스트")
-    class BusinessLogicTest {
+    class 실제_비즈니스_로직_테스트 {
 
         @Test
-        @DisplayName("플레이어 입장 처리 시 실제 Room 엔티티가 올바르게 업데이트된다")
-        void enterRoomProcessing_UpdatesRoomEntityCorrectly() {
+        void 플레이어_입장_처리_시_실제_Room_엔티티가_올바르게_업데이트된다() {
             // given
             String playerName = "인원 추가";
             SelectedMenuRequest menu = new SelectedMenuRequest(4L, "바닐라라떼", MenuTemperature.ICE);
@@ -67,8 +63,7 @@ class RoomBroadcastStreamProducerTest {
         }
 
         @Test
-        @DisplayName("여러 플레이어가 동시에 입장해도 모두 올바르게 처리된다")
-        void multiplePlayersEntering_ProcessedCorrectly() {
+        void 여러_플레이어가_동시에_입장해도_모두_올바르게_처리된다() {
             // given
             String[] playerNames = {"플레이어1", "플레이어2", "플레이어3"};
             SelectedMenuRequest[] menus = {

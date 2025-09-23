@@ -14,8 +14,9 @@ spring:
         enabled: true
       host: localhost
       stream:
-        room-key: room:broadcast
-        max-length: 1000
+        room-join-key: room:broadcast
+        card-game-select-key: cardGame:select:broadcast
+        max-length: 100
 
 room:
   removalDelay: 1h

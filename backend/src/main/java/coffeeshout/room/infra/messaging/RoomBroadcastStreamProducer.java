@@ -28,7 +28,7 @@ public class RoomBroadcastStreamProducer {
             Map<String, String> flatMap = roomJoinEventConverter.toFlatMap(event);
 
             RecordId recordId = stringRedisTemplate.opsForStream().add(
-                    redisStreamProperties.roomKey(),
+                    redisStreamProperties.roomJoinKey(),
                     flatMap,
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
