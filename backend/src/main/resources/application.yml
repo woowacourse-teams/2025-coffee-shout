@@ -45,7 +45,6 @@ logging:
   level:
     root: info
     io.opentelemetry.exporter.logging.LoggingSpanExporter: DEBUG
-    io.opentelemetry: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
 
