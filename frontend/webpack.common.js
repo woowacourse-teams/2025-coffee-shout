@@ -5,6 +5,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import WebpackBundleAnalyzer from 'webpack-bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -59,6 +60,11 @@ export default (_, argv) => {
         project: '2025-coffee-shout',
         release: appVersion,
         sourcemaps: { disable: mode !== 'production' },
+      }),
+      new WebpackBundleAnalyzer.BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: true,
+        reportFilename: 'bundle-report.html',
       }),
     ],
     devServer: {
