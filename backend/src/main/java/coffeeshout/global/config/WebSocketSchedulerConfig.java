@@ -2,7 +2,6 @@ package coffeeshout.global.config;
 
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
-import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +14,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @RequiredArgsConstructor
 @Slf4j
 public class WebSocketSchedulerConfig {
-
-    private final ObservationRegistry observationRegistry;
 
     @Bean
     @Primary

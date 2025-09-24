@@ -1,5 +1,6 @@
 package coffeeshout.room.application;
 
+import coffeeshout.global.metric.GameDurationMetricService;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -39,6 +40,7 @@ public class RoomService {
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
     private final DelayedRoomRemovalService delayedRoomRemovalService;
+    private final GameDurationMetricService gameDurationMetricService;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -48,6 +50,7 @@ public class RoomService {
             QrCodeService qrCodeService,
             JoinCodeGenerator joinCodeGenerator,
             DelayedRoomRemovalService delayedRoomRemovalService,
+            GameDurationMetricService gameDurationMetricService,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -56,6 +59,7 @@ public class RoomService {
         this.qrCodeService = qrCodeService;
         this.joinCodeGenerator = joinCodeGenerator;
         this.delayedRoomRemovalService = delayedRoomRemovalService;
+        this.gameDurationMetricService = gameDurationMetricService;
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
@@ -143,7 +147,10 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final Player host = room.findPlayer(new PlayerName(hostName));
 
-        return room.spinRoulette(host, new Roulette(new RoulettePicker()));
+        final Winner winner = room.spinRoulette(host, new Roulette(new RoulettePicker()));
+        gameDurationMetricService.stopGameTimer(joinCode);
+
+        return winner;
     }
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
