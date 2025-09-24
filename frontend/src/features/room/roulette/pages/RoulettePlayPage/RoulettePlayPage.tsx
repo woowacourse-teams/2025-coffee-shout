@@ -7,18 +7,12 @@ import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePl
 import * as S from './RoulettePlayPage.styled';
 import useRouletteProbabilities from './hooks/useRouletteProbabilities';
 import useRoulettePlay from './hooks/useRoulettePlay';
-import { RouletteView } from '@/types/roulette';
+import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
 import { useCallback, useState } from 'react';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { PlayerType } from '@/types/player';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
-
-export type RouletteWinnerResponse = {
-  playerName: string;
-  colorIndex: number;
-  randomAngle: number;
-};
 
 const RoulettePlayPage = () => {
   const { joinCode } = useIdentifier();

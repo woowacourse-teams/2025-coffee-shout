@@ -19,3 +19,9 @@ export type RouletteSector = {
   endAngle: number;
   playerColor: ColorList;
 };
+
+export type RouletteWinnerResponse = {
+  playerName: string;
+  colorIndex: number;
+  randomAngle: number;
+};

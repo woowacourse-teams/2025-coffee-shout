@@ -1,8 +1,8 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { RouletteWinnerResponse } from '@/types/roulette';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RouletteWinnerResponse } from '../RoulettePlayPage';
 
 const useRoulettePlay = () => {
   const { joinCode, myName } = useIdentifier();
