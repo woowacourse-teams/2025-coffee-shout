@@ -10,6 +10,12 @@ export const Container = styled.div`
   justify-content: center;
 `;
 
+export const RouletteWheelWrapper = styled.div`
+  display: flex;
+  width: 300px;
+  height: 364px;
+`;
+
 export const ProbabilityText = styled.div`
   text-align: center;
   padding-bottom: 2rem;
