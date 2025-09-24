@@ -46,6 +46,7 @@ export default (_, argv) => {
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       alias: { '@': path.resolve(__dirname, 'src') },
+      conditionNames: ['import', 'module', 'browser', 'default'],
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -69,6 +70,9 @@ export default (_, argv) => {
       historyApiFallback: true,
     },
     optimization: {
+      usedExports: true,
+      sideEffects: false,
+
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
