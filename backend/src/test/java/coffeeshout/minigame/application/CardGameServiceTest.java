@@ -26,10 +26,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class CardGameServiceTest extends ServiceTest implements Runnable {
+class CardGameServiceTest extends ServiceTest {
 
     @Autowired
     CardGameService cardGameService;
@@ -47,16 +46,6 @@ class CardGameServiceTest extends ServiceTest implements Runnable {
     Room room;
 
     CardGame cardGame;
-
-    String correlationId;
-
-    @Override
-    public void run() {
-        try (MDC.MDCCloseable ignored = MDC.putCloseable("correlationId", correlationId)) {
-        } catch (Exception e) {
-            throw e;
-        }
-    }
 
     @BeforeEach
     void setUp() {
