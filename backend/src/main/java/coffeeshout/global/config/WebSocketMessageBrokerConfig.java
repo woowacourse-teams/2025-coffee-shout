@@ -1,7 +1,6 @@
 package coffeeshout.global.config;
 
 
-import coffeeshout.global.interceptor.CustomStompChannelInterceptor;
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,18 +17,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TaskScheduler taskScheduler;
-    private final CustomStompChannelInterceptor stompChannelInterceptor;
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
             @Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
-            CustomStompChannelInterceptor stompChannelInterceptor,
             WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
             WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
     ) {
         this.taskScheduler = taskScheduler;
-        this.stompChannelInterceptor = stompChannelInterceptor;
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
         this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
@@ -52,7 +48,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketInboundMetricInterceptor, stompChannelInterceptor)
+        registration.interceptors(webSocketInboundMetricInterceptor)
                 .taskExecutor()
                 .corePoolSize(4)
                 .maxPoolSize(12)
