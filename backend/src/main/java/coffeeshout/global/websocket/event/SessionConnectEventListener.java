@@ -6,8 +6,6 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -41,11 +39,6 @@ public class SessionConnectEventListener {
         }
         
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-        if (sessionAttributes == null) {
-            accessor.setSessionAttributes(new ConcurrentHashMap<>());
-        }
-
         final String joinCode = accessor.getFirstNativeHeader(JOIN_CODE);
         final String playerName = accessor.getFirstNativeHeader(PLAYER_NAME);
 
@@ -62,7 +55,6 @@ public class SessionConnectEventListener {
         accessor.getSessionAttributes().put(JOIN_CODE, joinCode);
         accessor.getSessionAttributes().put(PLAYER_NAME, playerName);
 
-
         webSocketMetricService.startConnection(sessionId);
     }
 
@@ -70,11 +62,6 @@ public class SessionConnectEventListener {
     public void handleSessionConnected(SessionConnectedEvent event) {
         final String sessionId = event.getMessage().getHeaders().get(SIMP_SESSION_ID, String.class);
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        if (accessor.getSessionAttributes() == null) {
-            log.warn("SessionConnectedEvent 세션 속성 누락: sessionId={}", sessionId);
-            webSocketMetricService.failConnection(sessionId, MISSING_HEADERS);
-        }
 
         String joinCode = (String) accessor.getSessionAttributes().get(JOIN_CODE);
         String playerName = (String) accessor.getSessionAttributes().get(PLAYER_NAME);
