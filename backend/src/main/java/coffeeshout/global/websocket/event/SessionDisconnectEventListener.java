@@ -1,5 +1,6 @@
 package coffeeshout.global.websocket.event;
 
+import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.global.websocket.SubscriptionInfoService;
@@ -15,9 +16,12 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @RequiredArgsConstructor
 public class SessionDisconnectEventListener {
 
+    private static final String CLIENT_DISCONNECT = "CLIENT_DISCONNECT";
+
     private final StompSessionManager sessionManager;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
     private final SubscriptionInfoService subscriptionInfoService;
+    private final WebSocketMetricService webSocketMetricService;
 
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
@@ -44,5 +48,7 @@ public class SessionDisconnectEventListener {
             // 지연 삭제 스케줄링
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, "SESSION_DISCONNECT");
         }
+
+        webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT);
     }
 }
