@@ -91,6 +91,7 @@ public class WebSocketMetricService {
                                 .register(meterRegistry)
         );
         counter.increment();
+        currentConnections.decrementAndGet();
     }
 
     // 평균 연결 수립 시간 조회
