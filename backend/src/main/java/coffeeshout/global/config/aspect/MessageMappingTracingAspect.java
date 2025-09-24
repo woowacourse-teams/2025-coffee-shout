@@ -32,6 +32,9 @@ public class MessageMappingTracingAspect {
                     try {
                         return joinPoint.proceed();
                     } catch (Throwable e) {
+                        if (e instanceof RuntimeException) {
+                            throw (RuntimeException) e;
+                        }
                         throw new RuntimeException(e);
                     }
                 });
