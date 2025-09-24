@@ -3,11 +3,10 @@ package coffeeshout.global.config;
 
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -16,25 +15,27 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final TaskScheduler taskScheduler;
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
-            TaskScheduler taskScheduler,
             WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
             WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
     ) {
-        this.taskScheduler = taskScheduler;
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
         this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
+        ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
+        heartbeatScheduler.setPoolSize(1);
+        heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
+        heartbeatScheduler.initialize();
+
         config.enableSimpleBroker("/topic/", "/queue/")
                 .setHeartbeatValue(new long[]{4000, 4000})
-                .setTaskScheduler(taskScheduler);
+                .setTaskScheduler(heartbeatScheduler);
 
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -62,7 +63,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .taskExecutor()
                 .corePoolSize(9)
                 .maxPoolSize(18)
-                .queueCapacity(Integer.MAX_VALUE)
+                .queueCapacity(500)
                 .keepAliveSeconds(60);
     }
 }
