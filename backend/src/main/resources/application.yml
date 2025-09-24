@@ -41,7 +41,7 @@ management:
   tracing:
     enabled: true
     sampling:
-      probability: 1.0
+      probability: ${TRACE_SAMPLING_PROBABILITY}
   otlp:
     tracing:
       endpoint: ${TEMPO_URL}
