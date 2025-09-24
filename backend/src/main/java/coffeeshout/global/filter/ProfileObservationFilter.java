@@ -1,4 +1,4 @@
-package coffeeshout.global.trace;
+package coffeeshout.global.filter;
 
 import io.micrometer.common.KeyValue;
 import io.micrometer.observation.Observation;
@@ -12,7 +12,8 @@ public class ProfileObservationFilter implements ObservationFilter {
     private final String profile;
 
     public ProfileObservationFilter(Environment env) {
-        this.profile = String.join(",", env.getActiveProfiles());
+        final String[] activeProfiles = env.getActiveProfiles();
+        this.profile = activeProfiles.length == 0 ? "undefined" : String.join(",", activeProfiles);
     }
 
     @Override
