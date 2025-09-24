@@ -52,7 +52,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompChannelInterceptor, webSocketInboundMetricInterceptor);
+        registration.interceptors(webSocketInboundMetricInterceptor, stompChannelInterceptor);
     }
 
     @Override
