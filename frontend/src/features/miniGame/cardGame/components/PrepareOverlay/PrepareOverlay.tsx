@@ -23,10 +23,10 @@ const PrepareOverlay = () => {
   return (
     <S.Backdrop>
       <S.Content>
-        <S.ImageWrapper>
+        <S.BubbleTextWrapper>
           <S.BubbleImage src={chatBubble} />
           <Headline1 color="white">{displayText}</Headline1>
-        </S.ImageWrapper>
+        </S.BubbleTextWrapper>
         <S.CoffeeImage src={coffee} />
       </S.Content>
     </S.Backdrop>
