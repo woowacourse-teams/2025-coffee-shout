@@ -21,7 +21,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
-            @Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
+            TaskScheduler taskScheduler,
             WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
             WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
     ) {
