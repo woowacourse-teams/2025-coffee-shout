@@ -22,13 +22,13 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 @Component
 public class SessionConnectEventListener {
 
+    // 연결 대기 중인 세션 정보 저장
+    private static final ConcurrentHashMap<String, SessionInfo> pendingConnections = new ConcurrentHashMap<>();
+
     private final WebSocketMetricService webSocketMetricService;
     private final StompSessionManager sessionManager;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
     private final RoomQueryService roomQueryService;
-
-    // 연결 대기 중인 세션 정보 저장
-    private final ConcurrentHashMap<String, SessionInfo> pendingConnections;
     private final TaskScheduler cleanupExecutor;
 
     public SessionConnectEventListener(
@@ -42,7 +42,6 @@ public class SessionConnectEventListener {
         this.sessionManager = sessionManager;
         this.delayedPlayerRemovalService = delayedPlayerRemovalService;
         this.roomQueryService = roomQueryService;
-        this.pendingConnections = new ConcurrentHashMap<>();
         this.cleanupExecutor = cleanupExecutor;
     }
 
@@ -72,7 +71,6 @@ public class SessionConnectEventListener {
         // 헤더 정보 저장 (연결 완료 시 사용)
         if (joinCode == null || playerName == null) {
             log.warn("헤더 정보 누락: sessionId={}, joinCode={}, playerName={}", sessionId, joinCode, playerName);
-            webSocketMetricService.startConnection(sessionId);
             return;
         }
 
