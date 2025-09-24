@@ -1,8 +1,11 @@
 package coffeeshout.global.config;
 
 
+import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
+import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -14,9 +17,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TaskScheduler taskScheduler;
+    private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
+    private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
-    public WebSocketMessageBrokerConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler) {
+    public WebSocketMessageBrokerConfig(
+            @Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
+            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
+            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
+    ) {
         this.taskScheduler = taskScheduler;
+        this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
+        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
     @Override
