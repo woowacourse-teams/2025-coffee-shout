@@ -24,10 +24,13 @@ public class MessageMappingTracingAspect {
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final Method method = signature.getMethod();
 
-        final String spanName = "websocket:" + method.getName();
+        final String className = method.getDeclaringClass().getSimpleName();
+        String methodName = method.getName();
+        final String spanName = String.format("websocket: %s.%s", className, methodName);
 
         return Observation.createNotStarted(spanName, observationRegistry)
-                .lowCardinalityKeyValue("method.name", method.getName())
+                .lowCardinalityKeyValue("method.name", methodName)
+                .lowCardinalityKeyValue("class.name", className)
                 .observe(() -> {
                     try {
                         return joinPoint.proceed();
