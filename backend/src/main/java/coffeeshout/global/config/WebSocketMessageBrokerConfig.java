@@ -34,4 +34,23 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketInboundMetricInterceptor, stompChannelInterceptor)
+                .taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(12)
+                .queueCapacity(200)
+                .keepAliveSeconds(60);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketOutboundMetricInterceptor)
+                .taskExecutor()
+                .corePoolSize(9)
+                .maxPoolSize(18)
+                .keepAliveSeconds(30);
+    }
 }
