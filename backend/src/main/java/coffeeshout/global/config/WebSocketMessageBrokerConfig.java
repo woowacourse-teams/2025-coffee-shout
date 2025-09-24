@@ -61,9 +61,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureClientOutboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketOutboundMetricInterceptor)
                 .taskExecutor()
-                .corePoolSize(32)
-                .maxPoolSize(128)
-                .queueCapacity(8192)
+                .corePoolSize(4)
+                .maxPoolSize(4)
+                .queueCapacity(Integer.MAX_VALUE)
                 .keepAliveSeconds(60);
     }
 }
