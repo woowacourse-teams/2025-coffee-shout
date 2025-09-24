@@ -22,7 +22,7 @@ public class Players {
         this.colorUsage = new ColorUsage();
     }
 
-    public Player join(Player player) {
+    public synchronized Player join(Player player) {
         player.assignColorIndex(colorUsage.pickRandomOne());
         player.updateProbability(Probability.ZERO);
         this.players.add(player);
@@ -66,7 +66,7 @@ public class Players {
                 .allMatch(Player::getIsReady);
     }
 
-    public boolean removePlayer(PlayerName playerName) {
+    public synchronized boolean removePlayer(PlayerName playerName) {
         return players.removeIf(player -> {
             if (player.sameName(playerName)) {
                 colorUsage.release(player.getColorIndex());

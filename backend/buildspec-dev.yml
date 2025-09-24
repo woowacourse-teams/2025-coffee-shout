@@ -37,7 +37,7 @@ phases:
       - chmod +x ../scripts/*.sh
 
       # appspec 복사
-      - cp appspec.yml ../appspec.yml
+      - cp appspec-dev.yml ../appspec.yml
   post_build:
     commands:
       - echo "Build completed on $(date)"
