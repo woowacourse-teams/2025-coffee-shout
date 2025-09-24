@@ -23,7 +23,6 @@ public class WebSocketSchedulerConfig {
     public TaskScheduler applicationTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(4);
-        scheduler.setPoolSize(8);
         scheduler.setThreadNamePrefix("app-scheduler-");
         scheduler.initialize();
         return scheduler;
