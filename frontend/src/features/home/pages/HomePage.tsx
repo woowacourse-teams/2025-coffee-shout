@@ -7,10 +7,11 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
 import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -29,16 +30,11 @@ const HomePage = () => {
 
   useEffect(() => {
     const checkFirstVisit = () => {
-      try {
-        const hasVisited = sessionStorage.getItem('coffee-shout-visited');
+      const hasVisited = storageManager.getItem(STORAGE_KEYS.VISITED, 'sessionStorage');
 
-        if (!hasVisited) {
-          setShowSplash(true);
-          sessionStorage.setItem('coffee-shout-visited', 'true');
-        }
-      } catch (error) {
-        console.error('sessionStorage 오류 : ', error);
+      if (!hasVisited) {
         setShowSplash(true);
+        storageManager.setItem(STORAGE_KEYS.VISITED, 'true', 'sessionStorage');
       }
     };
     checkFirstVisit();
