@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import MiniGameTransition from './MiniGameTransition';
-import CardsStackIcon from '@/assets/card-stack-icon.svg';
+import CardIcon from '@/assets/card-icon.svg';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
@@ -18,7 +18,7 @@ type Story = StoryObj<typeof MiniGameTransition>;
 export const Default: Story = {
   args: {
     currentRound: 'SECOND',
-    children: <img src={CardsStackIcon} alt="cards" />,
+    children: <img src={CardIcon} alt="cards" />,
   },
   render: (args) => (
     <RootContainer>
@@ -30,7 +30,7 @@ export const Default: Story = {
 export const Animated: Story = {
   args: {
     currentRound: 'SECOND',
-    children: <img src={CardsStackIcon} alt="cards" />,
+    children: <img src={CardIcon} alt="cards" />,
   },
   render: (args) => (
     <AnimatedContainer>
