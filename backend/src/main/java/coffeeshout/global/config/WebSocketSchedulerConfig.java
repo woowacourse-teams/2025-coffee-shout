@@ -20,10 +20,10 @@ public class WebSocketSchedulerConfig {
 
     @Bean
     @Primary
-    public TaskScheduler customMessageBrokerTaskScheduler() {
+    public TaskScheduler applicationTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(4);
-        scheduler.setThreadNamePrefix("default-scheduler-");
+        scheduler.setThreadNamePrefix("app-scheduler-");
         scheduler.initialize();
         return scheduler;
     }
