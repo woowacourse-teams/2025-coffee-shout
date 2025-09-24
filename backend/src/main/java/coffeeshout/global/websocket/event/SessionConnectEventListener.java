@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -33,6 +34,7 @@ public class SessionConnectEventListener {
     private final ScheduledExecutorService cleanupExecutor = Executors.newScheduledThreadPool(1);
 
     // 세션 정보 저장용 내부 클래스
+    @Getter
     private static class SessionInfo {
         private final String joinCode;
         private final String playerName;
@@ -44,17 +46,6 @@ public class SessionConnectEventListener {
             this.timestamp = System.currentTimeMillis();
         }
 
-        public String getJoinCode() {
-            return joinCode;
-        }
-
-        public String getPlayerName() {
-            return playerName;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
     }
 
     @EventListener
