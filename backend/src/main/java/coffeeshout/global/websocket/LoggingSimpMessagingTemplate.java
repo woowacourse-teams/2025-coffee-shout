@@ -3,8 +3,8 @@ package coffeeshout.global.websocket;
 import coffeeshout.global.trace.SpanRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.observation.annotation.Observed;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,13 @@ public class LoggingSimpMessagingTemplate {
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
 
-    @WithSpan("websocket.message.send")
+    @Observed(
+            name = "websocket.send",              // 메트릭/스팬 이름
+            contextualName = "websocket.send",    // 스팬 이름
+            lowCardinalityKeyValues = {           // 스팬/메트릭 태그
+                    "component", "messaging"
+            }
+    )
     public void convertAndSend(String destination, Object payload) {
         final Message<?> message = generateTraceableMessage(payload);
         messagingTemplate.send(destination, message);

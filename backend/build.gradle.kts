@@ -51,8 +51,9 @@ dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.10.0")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.49.0")
+    implementation("io.micrometer:micrometer-observation")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 }
 
 tasks.withType<Test> {
