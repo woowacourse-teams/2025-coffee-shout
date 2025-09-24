@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
+import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.application.RoomService;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     @Mock
     private RoomService roomService;
 
+    @Mock
+    private SessionEventPublisher sessionEventPublisher;
+
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
     private StompSessionManager stompSessionManager;
@@ -45,7 +49,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         stompSessionManager = new StompSessionManager();
 
         delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
-                stompSessionManager, roomService);
+                sessionEventPublisher, roomService);
     }
 
     @Nested
@@ -55,7 +59,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         void 지연시간_후_실제로_PlayerDisconnectionService가_호출된다() {
             // given
             given(roomService.isReadyState("ABC23")).willReturn(true);
-            
+
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
@@ -96,7 +100,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             String player1 = "ABC23:김철수";
             String player2 = "DEF56:박영희";
             String player3 = "GHI89:이민수";
-            
+
             given(roomService.isReadyState("ABC23")).willReturn(true);
             given(roomService.isReadyState("DEF56")).willReturn(true);
             given(roomService.isReadyState("GHI89")).willReturn(true);
@@ -126,7 +130,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         void 실행_완료된_태스크는_맵에서_자동_제거된다() {
             // given
             given(roomService.isReadyState("ABC23")).willReturn(true);
-            
+
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
@@ -165,9 +169,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
         public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
                                                PlayerDisconnectionService playerDisconnectionService,
-                                               StompSessionManager stompSessionManager,
+                                               SessionEventPublisher sessionEventPublisher,
                                                RoomService roomService) {
-            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomService);
+            super(taskScheduler, playerDisconnectionService, sessionEventPublisher, roomService);
         }
 
         // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능

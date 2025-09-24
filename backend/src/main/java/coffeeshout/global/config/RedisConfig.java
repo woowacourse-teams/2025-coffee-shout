@@ -81,4 +81,9 @@ public class RedisConfig {
     public ChannelTopic playerEventTopic() {
         return new ChannelTopic("player.events");
     }
+
+    @Bean
+    public ChannelTopic sessionEventTopic() {
+        return new ChannelTopic("session.events");
+    }
 }
