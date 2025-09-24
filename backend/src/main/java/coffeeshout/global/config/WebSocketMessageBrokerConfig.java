@@ -52,48 +52,21 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(channelInterceptor)
+        registration.interceptors(webSocketInboundMetricInterceptor, stompChannelInterceptor)
                 .taskExecutor()
                 .corePoolSize(4)
                 .maxPoolSize(12)
                 .queueCapacity(200)
                 .keepAliveSeconds(60);
-        registration.interceptors(webSocketInboundMetricInterceptor, stompChannelInterceptor);
     }
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketOutboundMetricInterceptor);
-        registration.interceptors(generateTraceableChannel())
+        registration.interceptors(webSocketOutboundMetricInterceptor)
                 .taskExecutor()
                 .corePoolSize(9)
                 .maxPoolSize(18)
                 .queueCapacity(500)
                 .keepAliveSeconds(30);
-    }
-
-    private static ExecutorChannelInterceptor generateTraceableChannel() {
-        return new ExecutorChannelInterceptor() {
-            @Override
-            public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
-                return message;
-            }
-
-            @Override
-            public void afterMessageHandled(
-                    Message<?> message,
-                    MessageChannel channel,
-                    MessageHandler handler,
-                    Exception exception
-            ) {
-                if (SimpMessageType.HEARTBEAT.equals(message.getHeaders().get("simpMessageType"))) {
-                    return;
-                }
-                final Object uuidObj = message.getHeaders().get("otelSpan");
-                if (uuidObj instanceof UUID) {
-                    SpanRepository.endSpan((UUID) uuidObj, exception);
-                }
-            }
-        };
     }
 }
