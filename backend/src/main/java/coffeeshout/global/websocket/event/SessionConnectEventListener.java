@@ -6,22 +6,20 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SessionConnectEventListener {
 
     private final WebSocketMetricService webSocketMetricService;
@@ -30,8 +28,23 @@ public class SessionConnectEventListener {
     private final RoomQueryService roomQueryService;
 
     // 연결 대기 중인 세션 정보 저장
-    private final ConcurrentHashMap<String, SessionInfo> pendingConnections = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService cleanupExecutor = Executors.newScheduledThreadPool(1);
+    private final ConcurrentHashMap<String, SessionInfo> pendingConnections;
+    private final TaskScheduler cleanupExecutor;
+
+    public SessionConnectEventListener(
+            WebSocketMetricService webSocketMetricService,
+            StompSessionManager sessionManager,
+            DelayedPlayerRemovalService delayedPlayerRemovalService,
+            RoomQueryService roomQueryService,
+            @Qualifier("delayRemovalScheduler") TaskScheduler cleanupExecutor
+    ) {
+        this.webSocketMetricService = webSocketMetricService;
+        this.sessionManager = sessionManager;
+        this.delayedPlayerRemovalService = delayedPlayerRemovalService;
+        this.roomQueryService = roomQueryService;
+        this.pendingConnections = new ConcurrentHashMap<>();
+        this.cleanupExecutor = cleanupExecutor;
+    }
 
     // 세션 정보 저장용 내부 클래스
     @Getter
@@ -45,7 +58,6 @@ public class SessionConnectEventListener {
             this.playerName = playerName;
             this.timestamp = System.currentTimeMillis();
         }
-
     }
 
     @EventListener
@@ -72,7 +84,7 @@ public class SessionConnectEventListener {
                 log.warn("연결 대기 세션 타임아웃 정리: sessionId={}, joinCode={}, playerName={}",
                         sessionId, removed.getJoinCode(), removed.getPlayerName());
             }
-        }, 10, TimeUnit.SECONDS);
+        }, Instant.now().plusSeconds(3));
 
         webSocketMetricService.startConnection(sessionId);
     }
