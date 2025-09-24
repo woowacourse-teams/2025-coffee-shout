@@ -54,6 +54,7 @@ dependencies {
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("io.micrometer:context-propagation")
 }
 
 tasks.withType<Test> {

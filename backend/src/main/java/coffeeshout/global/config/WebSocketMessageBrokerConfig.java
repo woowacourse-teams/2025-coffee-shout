@@ -2,8 +2,6 @@ package coffeeshout.global.config;
 
 
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
-import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,16 +16,13 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private final TaskScheduler taskScheduler;
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
-    private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
             TaskScheduler taskScheduler,
-            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
-            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
+            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor
     ) {
         this.taskScheduler = taskScheduler;
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
-        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
     @Override
@@ -58,7 +53,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketOutboundMetricInterceptor)
+        registration.interceptors()
                 .taskExecutor()
                 .corePoolSize(9)
                 .maxPoolSize(18)

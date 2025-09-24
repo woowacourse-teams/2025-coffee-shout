@@ -6,6 +6,8 @@ import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.annotation.Observed;
 import io.micrometer.tracing.annotation.NewSpan;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +39,7 @@ public class QrCodeService {
                 .register(meterRegistry);
     }
 
-    @Observed(
-            name = "qrcode.generation",
-            contextualName = "qrcode.generation",
-            lowCardinalityKeyValues = {"operation", "generate"}
-    )
+    @Observed(name = "qrcode.generation")
     public String getQrCodeUrl(String contents) {
         try {
             byte[] qrCodeImage = generateQrCode(contents);
