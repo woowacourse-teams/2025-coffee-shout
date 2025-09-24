@@ -6,6 +6,10 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -23,7 +27,36 @@ public class SessionConnectEventListener {
     private final StompSessionManager sessionManager;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
     private final RoomQueryService roomQueryService;
-    
+
+    // 연결 대기 중인 세션 정보 저장
+    private final ConcurrentHashMap<String, SessionInfo> pendingConnections = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService cleanupExecutor = Executors.newScheduledThreadPool(1);
+
+    // 세션 정보 저장용 내부 클래스
+    private static class SessionInfo {
+        private final String joinCode;
+        private final String playerName;
+        private final long timestamp;
+
+        public SessionInfo(String joinCode, String playerName) {
+            this.joinCode = joinCode;
+            this.playerName = playerName;
+            this.timestamp = System.currentTimeMillis();
+        }
+
+        public String getJoinCode() {
+            return joinCode;
+        }
+
+        public String getPlayerName() {
+            return playerName;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+    }
+
     @EventListener
     public void handleSessionConnect(SessionConnectEvent event) {
         final String sessionId = event.getMessage().getHeaders().get("simpSessionId", String.class);
@@ -33,19 +66,43 @@ public class SessionConnectEventListener {
 
         log.info("웹소켓 연결 시작: sessionId={}, joinCode={}, playerName={}", sessionId, joinCode, playerName);
 
+        // 헤더 정보 저장 (연결 완료 시 사용)
+        if (joinCode == null || playerName == null) {
+            log.warn("헤더 정보 누락: sessionId={}, joinCode={}, playerName={}", sessionId, joinCode, playerName);
+            webSocketMetricService.startConnection(sessionId);
+            return;
+        }
+
+        pendingConnections.put(sessionId, new SessionInfo(joinCode, playerName));
+        // 10초 후 자동 정리 (메모리 누수 방지)
+        cleanupExecutor.schedule(() -> {
+            SessionInfo removed = pendingConnections.remove(sessionId);
+            if (removed != null) {
+                log.warn("연결 대기 세션 타임아웃 정리: sessionId={}, joinCode={}, playerName={}",
+                        sessionId, removed.getJoinCode(), removed.getPlayerName());
+            }
+        }, 10, TimeUnit.SECONDS);
+
         webSocketMetricService.startConnection(sessionId);
     }
 
     @EventListener
     public void handleSessionConnected(SessionConnectedEvent event) {
         final String sessionId = event.getMessage().getHeaders().get("simpSessionId", String.class);
-        final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        final String joinCode = accessor.getFirstNativeHeader("joinCode");
-        final String playerName = accessor.getFirstNativeHeader("playerName");
 
-        if (joinCode != null && playerName != null) {
-            processPlayerConnection(sessionId, joinCode, playerName);
+        // 저장된 헤더 정보 가져오기
+        final SessionInfo sessionInfo = pendingConnections.remove(sessionId);
+
+        if (sessionInfo == null) {
+            log.warn("저장된 세션 정보 없음: sessionId={}", sessionId);
+            return;
         }
+
+        final String joinCode = sessionInfo.getJoinCode();
+        final String playerName = sessionInfo.getPlayerName();
+        log.info("저장된 정보에서 가져옴: joinCode={}, playerName={}", joinCode, playerName);
+
+        processPlayerConnection(sessionId, joinCode, playerName);
 
         final String playerInfo = String.format(", joinCode=%s, playerName=%s", joinCode, playerName);
         log.info("웹소켓 연결 완료: sessionId={}{}", sessionId, playerInfo);
