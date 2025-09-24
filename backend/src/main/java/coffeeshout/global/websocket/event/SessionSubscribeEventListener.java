@@ -25,18 +25,6 @@ public class SessionSubscribeEventListener {
         final String destination = accessor.getDestination();
         final String subscriptionId = accessor.getSubscriptionId();
 
-        // 플레이어 정보 가져오기 (있으면)
-        String playerInfo = "";
-        if (sessionManager.hasPlayerKey(sessionId)) {
-            final String playerKey = sessionManager.getPlayerKey(sessionId);
-            final String joinCode = sessionManager.extractJoinCode(playerKey);
-            final String playerName = sessionManager.extractPlayerName(playerKey);
-            playerInfo = String.format(", joinCode=%s, playerName=%s", joinCode, playerName);
-        }
-
-        log.info("구독 시작: sessionId={}, destination={}, subscriptionId={}{}",
-                sessionId, destination, subscriptionId, playerInfo);
-
         // 구독 정보 추가
         subscriptionInfoService.addSubscription(sessionId, destination, subscriptionId);
 
@@ -50,15 +38,6 @@ public class SessionSubscribeEventListener {
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         final String subscriptionId = accessor.getSubscriptionId();
 
-//        // 플레이어 정보 가져오기 (있으면)
-//        String playerInfo = "";
-//        if (sessionManager.hasPlayerKey(sessionId)) {
-//            final String playerKey = sessionManager.getPlayerKey(sessionId);
-//            final String joinCode = sessionManager.extractJoinCode(playerKey);
-//            final String playerName = sessionManager.extractPlayerName(playerKey);
-//            playerInfo = String.format(", joinCode=%s, playerName=%s", joinCode, playerName);
-//        }
-//
         // 구독 정보 제거 - subscriptionId로 정확한 destination 찾아서 제거
         subscriptionInfoService.removeSubscriptionById(sessionId, subscriptionId);
     }
