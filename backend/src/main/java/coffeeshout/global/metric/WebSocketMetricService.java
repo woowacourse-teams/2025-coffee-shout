@@ -107,10 +107,14 @@ public class WebSocketMetricService {
     }
 
     public void incrementInboundMessage() {
-        inboundMessageCounter.increment();
+        if (inboundMessageCounter != null) {
+            inboundMessageCounter.increment();
+        }
     }
 
     public void incrementOutboundMessage() {
-        outboundMessageCounter.increment();
+        if (outboundMessageCounter != null) {
+            outboundMessageCounter.increment();
+        }
     }
 }
