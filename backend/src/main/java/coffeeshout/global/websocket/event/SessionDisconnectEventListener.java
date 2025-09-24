@@ -40,17 +40,14 @@ public class SessionDisconnectEventListener {
             return;
         }
 
-        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!! 야 감지시작했다! {}", sessionManager.hasPlayerKey(sessionId));
         // 플레이어 세션인지 확인
         if (sessionManager.hasPlayerKey(sessionId)) {
-            log.info("이 놈 감지됐다!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             final String playerKey = sessionManager.getPlayerKey(sessionId);
             log.info("플레이어 세션 해제 감지: playerKey={}, sessionId={}", playerKey, sessionId);
 
             // 지연 삭제 스케줄링
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, "SESSION_DISCONNECT");
         }
-        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 감지 끝났다.");
 
         webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT);
     }
