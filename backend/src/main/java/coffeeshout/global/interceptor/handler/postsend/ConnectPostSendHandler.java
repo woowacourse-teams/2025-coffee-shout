@@ -1,7 +1,6 @@
 package coffeeshout.global.interceptor.handler.postsend;
 
 import coffeeshout.global.interceptor.handler.PostSendHandler;
-import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 public class ConnectPostSendHandler implements PostSendHandler {
 
     private final StompSessionManager sessionManager;
-    private final WebSocketMetricService webSocketMetricService;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     @Override
@@ -39,7 +37,5 @@ public class ConnectPostSendHandler implements PostSendHandler {
             sessionManager.removeSession(sessionId);
             delayedPlayerRemovalService.schedulePlayerRemoval(failedPlayerKey, sessionId, "CONNECTION_FAILED");
         }
-
-        webSocketMetricService.failConnection(sessionId, "connection_response_failed");
     }
 }

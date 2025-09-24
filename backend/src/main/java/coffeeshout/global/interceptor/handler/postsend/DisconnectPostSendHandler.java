@@ -1,7 +1,6 @@
 package coffeeshout.global.interceptor.handler.postsend;
 
 import coffeeshout.global.interceptor.handler.PostSendHandler;
-import coffeeshout.global.metric.WebSocketMetricService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -12,10 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DisconnectPostSendHandler implements PostSendHandler {
-
-    private static final String CLIENT_DISCONNECT = "CLIENT_DISCONNECT";
-
-    private final WebSocketMetricService webSocketMetricService;
 
     @Override
     public StompCommand getCommand() {
@@ -30,7 +25,5 @@ public class DisconnectPostSendHandler implements PostSendHandler {
 
         // DISCONNECT 프레임 수신 로깅만
         log.info("클라이언트 DISCONNECT 프레임 수신: sessionId={}", sessionId);
-
-        webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT);
     }
 }
