@@ -66,7 +66,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .taskExecutor()
                 .corePoolSize(9)
                 .maxPoolSize(18)
-                .queueCapacity(500)
                 .keepAliveSeconds(30);
     }
 }
