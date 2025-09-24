@@ -45,9 +45,15 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @RequestBody RoomEnterRequest request
     ) {
-        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.menu());
-
-        return ResponseEntity.ok(RoomEnterResponse.from(room));
+        return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
+                .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
+                .exceptionally(throwable -> {
+                    final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
+                    if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    }
+                    throw new RuntimeException("방 참가 실패", cause);
+                });
     }
 
     @GetMapping("/check-joinCode")
