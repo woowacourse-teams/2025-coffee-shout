@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,8 @@ public class WebSocketOutboundMetricInterceptor implements ExecutorChannelInterc
             MessageHandler handler,
             Exception exception
     ) {
-        if (SimpMessageType.HEARTBEAT.equals(message.getHeaders().get("simpMessageType"))) {
+        final var type = SimpMessageHeaderAccessor.getMessageType(message.getHeaders());
+        if (SimpMessageType.HEARTBEAT.equals(type)) {
             return;
         }
 
