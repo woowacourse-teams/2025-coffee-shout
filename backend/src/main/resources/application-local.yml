@@ -13,6 +13,14 @@ spring:
       ssl:
         enabled: false
 
+otel:
+  exporter:
+    otlp:
+      endpoint: http://localhost:4318
+
+tracing:
+  sampling:
+    probability: 1.0
 
 room:
   qr:

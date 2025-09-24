@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.Timer.Sample;
+import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -18,22 +19,33 @@ public class WebSocketMetricService {
 
     private final MeterRegistry meterRegistry;
     private final AtomicLong currentConnections = new AtomicLong(0);
-    private final Timer connectionEstablishmentTimer;
     private final Map<String, Sample> connectionSamples = new ConcurrentHashMap<>();
-
     // Counter 캐싱용
     private final Map<String, Counter> failedCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> disconnectedCounters = new ConcurrentHashMap<>();
 
+    private Timer connectionEstablishmentTimer;
+    private Counter inboundMessageCounter;
+    private Counter outboundMessageCounter;
+
     public WebSocketMetricService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
+    }
 
+    @PostConstruct
+    public void initializeMetrics() {
         Gauge.builder("websocket.connections.current", currentConnections, AtomicLong::get)
                 .description("현재 웹소켓 연결 개수")
                 .register(meterRegistry);
 
         this.connectionEstablishmentTimer = Timer.builder("websocket.connection.establishment.time")
                 .description("웹소켓 연결 수립 시간")
+                .register(meterRegistry);
+        this.inboundMessageCounter = Counter.builder("websocket.messages.inbound.total")
+                .description("인바운드 메시지 총 개수")
+                .register(meterRegistry);
+        this.outboundMessageCounter = Counter.builder("websocket.messages.outbound.total")
+                .description("아웃바운드 메시지 총 개수")
                 .register(meterRegistry);
     }
 
@@ -90,5 +102,17 @@ public class WebSocketMetricService {
     // 현재 연결 수 조회
     public long getCurrentConnections() {
         return currentConnections.get();
+    }
+
+    public void incrementInboundMessage() {
+        if (inboundMessageCounter != null) {
+            inboundMessageCounter.increment();
+        }
+    }
+
+    public void incrementOutboundMessage() {
+        if (outboundMessageCounter != null) {
+            outboundMessageCounter.increment();
+        }
     }
 }

@@ -82,7 +82,7 @@ public class RoomRestController {
     }
 
     @GetMapping("/minigames/selected")
-    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode){
+    public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
         List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
