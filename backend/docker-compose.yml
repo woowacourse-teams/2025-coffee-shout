@@ -9,3 +9,4 @@ services:
       - type: tmpfs
         target: /data
     command: valkey-server --appendonly yes
+

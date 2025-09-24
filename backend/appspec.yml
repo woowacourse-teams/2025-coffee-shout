@@ -48,7 +48,7 @@ hooks:
 
   # 애플리케이션 시작 전 검증
   ApplicationStart:
-    - location: scripts/application_start-dev.sh
+    - location: scripts/application_start.sh
       timeout: 600
       runas: ubuntu
 

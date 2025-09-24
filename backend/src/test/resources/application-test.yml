@@ -17,12 +17,3 @@ logging:
 room:
   qr:
     prefix: https://coffee-shout.com/join/
-
-otel:
-  exporter:
-    otlp:
-      endpoint: http://localhost:4813
-
-tracing:
-  sampling:
-    probability: 1.0

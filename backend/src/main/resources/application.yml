@@ -23,31 +23,9 @@ room:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
 
-otel:
-  exporter:
-    otlp:
-      endpoint: ${TAMPO_URL}
-
-tracing:
-  sampling:
-    probability: ${TRACE_SAMPLING_PROBABILITY}
-
-endpoints:
-  web:
-    exposure:
-      include: health,info,metrics,prometheus,traces
-
-endpoint:
-  health:
-    show-details: always
-
 logging:
   level:
     root: info
-    io.opentelemetry.exporter.logging.LoggingSpanExporter: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
-
 
 management:
   endpoint:
