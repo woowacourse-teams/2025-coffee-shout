@@ -1,8 +1,9 @@
 package coffeeshout.global.websocket.event;
 
 import coffeeshout.global.metric.WebSocketMetricService;
-import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.StompSessionManager;
+import coffeeshout.global.websocket.event.player.PlayerReconnectedEvent;
+import coffeeshout.global.websocket.infra.PlayerEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -22,7 +23,7 @@ public class SessionConnectEventListener {
 
     private final WebSocketMetricService webSocketMetricService;
     private final StompSessionManager sessionManager;
-    private final DelayedPlayerRemovalService delayedPlayerRemovalService;
+    private final PlayerEventPublisher playerEventPublisher;
     private final RoomQueryService roomQueryService;
 
     @EventListener
@@ -83,9 +84,10 @@ public class SessionConnectEventListener {
         // 새 세션으로 등록
         sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
 
-        // 기존 지연 삭제 취소
+        // 플레이어 재연결 이벤트 발행
         final String playerKey = sessionManager.createPlayerKey(joinCode, playerName);
-        delayedPlayerRemovalService.cancelScheduledRemoval(playerKey);
+        final PlayerReconnectedEvent playerReconnectedEvent = PlayerReconnectedEvent.create(playerKey, sessionId);
+        playerEventPublisher.publishEvent(playerReconnectedEvent);
 
         // 재연결 처리
         handlePlayerReconnection(joinCode, playerName, sessionId);

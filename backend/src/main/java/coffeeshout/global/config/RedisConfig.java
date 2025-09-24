@@ -76,4 +76,9 @@ public class RedisConfig {
     public ChannelTopic miniGameEventTopic() {
         return new ChannelTopic("minigame.events");
     }
+
+    @Bean
+    public ChannelTopic playerEventTopic() {
+        return new ChannelTopic("player.events");
+    }
 }
