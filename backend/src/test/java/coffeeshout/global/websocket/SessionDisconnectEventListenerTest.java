@@ -3,6 +3,7 @@ package coffeeshout.global.websocket;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.event.SessionDisconnectEventListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +23,8 @@ class SessionDisconnectEventListenerTest {
     DelayedPlayerRemovalService delayedPlayerRemovalService;
     @Mock
     SubscriptionInfoService subscriptionInfoService;
+    @Mock
+    WebSocketMetricService metricService;
 
     StompSessionManager sessionManager;
     SessionDisconnectEventListener listener;
@@ -34,7 +37,7 @@ class SessionDisconnectEventListenerTest {
     void setUp() {
         sessionManager = new StompSessionManager();
         listener = new SessionDisconnectEventListener(sessionManager, delayedPlayerRemovalService,
-                subscriptionInfoService);
+                subscriptionInfoService, metricService);
     }
 
     @Nested
