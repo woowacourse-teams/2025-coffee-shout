@@ -6,6 +6,7 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
@@ -16,24 +17,13 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SessionConnectEventListener {
 
     private final WebSocketMetricService webSocketMetricService;
     private final StompSessionManager sessionManager;
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
     private final RoomQueryService roomQueryService;
-
-    public SessionConnectEventListener(
-            WebSocketMetricService webSocketMetricService,
-            StompSessionManager sessionManager,
-            DelayedPlayerRemovalService delayedPlayerRemovalService,
-            RoomQueryService roomQueryService
-    ) {
-        this.webSocketMetricService = webSocketMetricService;
-        this.sessionManager = sessionManager;
-        this.delayedPlayerRemovalService = delayedPlayerRemovalService;
-        this.roomQueryService = roomQueryService;
-    }
 
     @EventListener
     public void handleSessionConnect(SessionConnectEvent event) {
@@ -45,10 +35,10 @@ public class SessionConnectEventListener {
     @EventListener
     public void handleSessionConnected(SessionConnectedEvent event) {
         final String sessionId = event.getMessage().getHeaders().get("simpSessionId", String.class);
-        
+
         // simpConnectMessage에서 원래 CONNECT 메시지 가져오기
         final Message<?> connectMessage = (Message<?>) event.getMessage().getHeaders().get("simpConnectMessage");
-        
+
         if (connectMessage == null) {
             log.warn("simpConnectMessage가 없음: sessionId={}", sessionId);
             return;
