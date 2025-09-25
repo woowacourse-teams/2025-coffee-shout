@@ -68,7 +68,7 @@ public class CardGame implements Playable {
 
     public void startPlay() {
         // 시드 기반 셔플로 모든 인스턴스에서 동일한 카드 순서
-        java.util.Random random = new java.util.Random(seed + 1000); // 덱 생성과 구별하기 위해 오프셋 추가
+        final Random random = new Random(seed + 1000); // 덱 생성과 구별하기 위해 오프셋 추가
         deck.shuffle(random);
         this.state = CardGameState.PLAYING;
     }
