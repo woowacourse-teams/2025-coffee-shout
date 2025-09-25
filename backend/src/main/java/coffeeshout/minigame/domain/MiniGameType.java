@@ -3,6 +3,7 @@ package coffeeshout.minigame.domain;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.Playable;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -14,7 +15,8 @@ public enum MiniGameType {
     public Playable createMiniGame(String joinCode) {
         switch (this) {
             case CARD_GAME:
-                long seed = joinCode.hashCode();
+                Objects.requireNonNull(joinCode, "joinCode must not be null");
+                final long seed = Integer.toUnsignedLong(joinCode.hashCode());
                 return new CardGame(new CardGameRandomDeckGenerator(), seed);
         }
 
