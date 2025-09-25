@@ -2,10 +2,13 @@ package coffeeshout.global.config;
 
 
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
-import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -15,15 +18,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final TaskScheduler taskScheduler;
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
-    private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
-            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
-            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
+            TaskScheduler taskScheduler,
+            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor
     ) {
+        this.taskScheduler = taskScheduler;
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
-        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
     @Override
@@ -59,11 +62,17 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketOutboundMetricInterceptor)
-                .taskExecutor()
-                .corePoolSize(64)
-                .maxPoolSize(128)
-                .queueCapacity(16384)
-                .keepAliveSeconds(60);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setThreadNamePrefix("app-executor-");
+        executor.setTaskDecorator(runnable -> {
+            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
+            return snapshot.wrap(runnable);
+        });
+        executor.setCorePoolSize(64);
+        executor.setMaxPoolSize(64);
+        executor.setQueueCapacity(16384);
+        executor.setKeepAliveSeconds(60);
+        executor.initialize();
+        registration.taskExecutor(executor);
     }
 }
