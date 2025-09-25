@@ -9,10 +9,17 @@ const ProbabilityHistoryProvider = ({ children }: PropsWithChildren) => {
   });
 
   const updateCurrentProbabilities = useCallback((probabilities: PlayerProbability[]) => {
-    setProbabilityHistoryState((prev) => ({
-      prev: prev.current,
-      current: probabilities,
-    }));
+    setProbabilityHistoryState((prev) => {
+      const isEqual = areProbabilitiesEqual(prev.current, probabilities);
+      if (isEqual) {
+        return prev;
+      }
+
+      return {
+        prev: prev.current,
+        current: probabilities,
+      };
+    });
   }, []);
 
   const clearProbabilityHistory = useCallback(() => {
@@ -36,3 +43,22 @@ const ProbabilityHistoryProvider = ({ children }: PropsWithChildren) => {
 };
 
 export default ProbabilityHistoryProvider;
+
+const areProbabilitiesEqual = (arr1: PlayerProbability[], arr2: PlayerProbability[]): boolean => {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  if (arr1.length === 0) {
+    return true;
+  }
+
+  return arr1.every((item1, index) => {
+    const item2 = arr2[index];
+    return (
+      item1.playerName === item2.playerName &&
+      item1.probability === item2.probability &&
+      item1.playerColor === item2.playerColor
+    );
+  });
+};
