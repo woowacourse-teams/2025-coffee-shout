@@ -17,8 +17,6 @@ const ProbabilitiesText = ({ isProbabilitiesLoading }: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
   const { myName } = useIdentifier();
 
-  if (isProbabilitiesLoading) return null;
-
   const myCurrentProbability = getMyCurrentProbability(probabilityHistory, myName);
 
   const myProbabilityChange = getMyProbabilityChange(probabilityHistory, myName);
