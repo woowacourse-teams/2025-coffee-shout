@@ -27,6 +27,7 @@ public class MiniGameEventSubscriber implements MessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic miniGameEventTopic;
 
+    @SuppressWarnings("unchecked")
     public MiniGameEventSubscriber(
             List<MiniGameEventHandler<?>> handlers,
             ObjectMapper objectMapper,

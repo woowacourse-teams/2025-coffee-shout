@@ -2,8 +2,10 @@ package coffeeshout.minigame.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.global.message.RedisStreamStartStrategy;
-import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
+import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.player.PlayerName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CardSelectStreamConsumer implements StreamListener<String, ObjectRecord<String, String>> {
 
-    private final CardGameService cardGameService;
+    private final CardGameCommandService cardGameCommandService;
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> objectRecordStreamMessageListenerContainer;
     private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
@@ -45,7 +47,10 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
             log.info("Received card select message: id={}, event={}",
                     message.getId(), event);
 
-            cardGameService.selectCard(event.joinCode(), event.playerName(), event.cardIndex());
+            JoinCode joinCode = new JoinCode(event.joinCode());
+            PlayerName playerName = new PlayerName(event.playerName());
+
+            cardGameCommandService.selectCard(joinCode, playerName, event.cardIndex());
         } catch (Exception e) {
             log.error("Failed to process card select message: {}", message, e);
         }

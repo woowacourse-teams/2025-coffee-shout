@@ -3,13 +3,12 @@ package coffeeshout.minigame.application;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
-import coffeeshout.minigame.domain.cardgame.event.dto.CardSelectedEvent;
+import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.infra.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class CardGameService implements MiniGameService {
 
     private final RoomQueryService roomQueryService;
+    private final CardGameCommandService cardGameCommandService;
     private final ApplicationEventPublisher eventPublisher;
     private final MiniGameEventPublisher miniGameEventPublisher;
 
@@ -51,11 +51,7 @@ public class CardGameService implements MiniGameService {
     }
 
     public void selectCardInternal(String joinCode, String playerName, Integer cardIndex) {
-        final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final CardGame cardGame = getCardGame(roomJoinCode);
-        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
-        cardGame.selectCard(player, cardIndex);
-        eventPublisher.publishEvent(new CardSelectedEvent(roomJoinCode, cardGame));
+        cardGameCommandService.selectCard(new JoinCode(joinCode), new PlayerName(playerName), cardIndex);
     }
 
     private CardGame getCardGame(JoinCode joinCode) {
