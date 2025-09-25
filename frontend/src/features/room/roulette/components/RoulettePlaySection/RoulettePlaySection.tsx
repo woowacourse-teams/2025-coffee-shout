@@ -3,7 +3,6 @@ import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/Probability
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
 import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
-import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import ProbabilitiesText from '../ProbabilitiesText/ProbabilitiesText';
 
 type Props = {
@@ -33,11 +32,11 @@ const RoulettePlaySection = ({
   return (
     <S.Container>
       <S.RouletteWheelWrapper>
-        {isProbabilitiesLoading ? (
-          <RouletteWheel playerProbabilities={probabilityHistory.current} />
-        ) : (
-          <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
-        )}
+        <AnimatedRouletteWheel
+          finalRotation={finalRotation}
+          isSpinning={isSpinning}
+          startAnimation={!isProbabilitiesLoading}
+        />
       </S.RouletteWheelWrapper>
       <ProbabilitiesText isProbabilitiesLoading={isProbabilitiesLoading} />
     </S.Container>
