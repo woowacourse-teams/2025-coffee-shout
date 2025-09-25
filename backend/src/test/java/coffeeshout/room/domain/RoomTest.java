@@ -170,7 +170,7 @@ class RoomTest {
         room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
-        ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
+        ReflectionTestUtils.setField(room, "roomState", RoomState.ROULETTE);
         Player host = room.findPlayer(호스트_한스);
 
         Winner winner = room.spinRoulette(host, roulette);

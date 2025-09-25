@@ -1,15 +1,22 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.ui.request.MenuChangeMessage;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.MiniGameSelectEvent;
+import coffeeshout.room.domain.event.PlayerListUpdateEvent;
+import coffeeshout.room.domain.event.PlayerReadyEvent;
+import coffeeshout.room.domain.event.RouletteShowEvent;
+import coffeeshout.room.domain.event.RouletteSpinEvent;
+import coffeeshout.room.domain.player.Winner;
+import coffeeshout.room.domain.roulette.Roulette;
+import coffeeshout.room.domain.roulette.RoulettePicker;
+import coffeeshout.room.infra.RoomEventPublisher;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
-import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.RoomStatusResponse;
 import coffeeshout.room.ui.response.WinnerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
@@ -23,7 +30,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final RoomEventPublisher roomEventPublisher;
     private final RoomService roomService;
 
     @MessageMapping("/room/{joinCode}/update-players")
@@ -40,37 +47,8 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
-        final List<PlayerResponse> responses = roomService.getAllPlayers(joinCode)
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
-    }
-
-    @MessageMapping("/room/{joinCode}/update-menus")
-    @MessageResponse(
-            path = "/room/{joinCode}",
-            returnType = List.class,
-            genericType = PlayerResponse.class
-    )
-    @Operation(
-            summary = "플레이어 메뉴 선택 업데이트 및 브로드캐스트",
-            description = """
-                    플레이어의 메뉴 선택을 업데이트하고 변경된 플레이어 목록을 브로드캐스트합니다.
-                    특정 플레이어가 메뉴를 선택하면 해당 정보를 저장하고 모든 참가자에게 업데이트된 상태를 전달합니다.
-                    """
-    )
-    public void broadcastMenus(@DestinationVariable String joinCode, MenuChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.selectMenu(joinCode, message.playerName(),
-                        message.menuId())
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
+        final PlayerListUpdateEvent event = PlayerListUpdateEvent.create(joinCode);
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-ready")
@@ -88,39 +66,8 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
-        final List<PlayerResponse> responses = roomService.changePlayerReadyState(
-                        joinCode,
-                        message.playerName(),
-                        message.isReady()
-                )
-                .stream()
-                .map(PlayerResponse::from)
-                .toList();
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode,
-                WebSocketResponse.success(responses));
-    }
-
-    @MessageMapping("/room/{joinCode}/get-probabilities")
-    @MessageResponse(
-            path = "/room/{joinCode}/roulette",
-            returnType = List.class,
-            genericType = ProbabilityResponse.class
-    )
-    @Operation(
-            summary = "룰렛 확률 정보 조회 및 브로드캐스트",
-            description = """
-                    룰렛 게임의 확률 정보를 조회하고 모든 참가자에게 브로드캐스트합니다.
-                    각 플레이어별 당첨 확률을 계산하여 룰렛 채널을 통해 실시간으로 전달합니다.
-                    """
-    )
-    public void broadcastProbabilities(@DestinationVariable String joinCode) {
-        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode).entrySet()
-                .stream()
-                .map(ProbabilityResponse::from)
-                .toList();
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/roulette",
-                WebSocketResponse.success(responses));
+        final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, message.playerName(), message.isReady());
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")
@@ -138,11 +85,25 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final List<MiniGameType> responses = roomService.updateMiniGames(joinCode, message.hostName(),
+        final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, message.hostName(),
                 message.miniGameTypes());
+        roomEventPublisher.publishEvent(event);
+    }
 
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/minigame",
-                WebSocketResponse.success(responses));
+    @MessageMapping("/room/{joinCode}/show-roulette")
+    @MessageResponse(
+            path = "/room/{joinCode}/roulette",
+            returnType = RoomStatusResponse.class
+    )
+    @Operation(
+            summary = "룰렛 페이지로 이동",
+            description = """
+                    호스트가 룰렛 페이지로 플레이어 전부를 이동시킵니다.
+                    """
+    )
+    public void broadcastShowRoulette(@DestinationVariable String joinCode) {
+        final RouletteShowEvent event = RouletteShowEvent.create(joinCode);
+        roomEventPublisher.publishEvent(event);
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
@@ -157,9 +118,9 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
-        final WinnerResponse winner = WinnerResponse.from(roomService.spinRoulette(joinCode, message.hostName()));
-
-        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
-                WebSocketResponse.success(winner));
+        final Room room = roomService.getRoomByJoinCode(joinCode);
+        final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
+        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, message.hostName(), winner);
+        roomEventPublisher.publishEvent(event);
     }
 }

@@ -32,6 +32,9 @@ room:
 logging:
   level:
     root: info
+    io.opentelemetry.exporter.logging.LoggingSpanExporter: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
 
 management:
   endpoint:
@@ -40,7 +43,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,prometheus"
+        include: "health,info,metrics,prometheus,tracing"
+  tracing:
+    enabled: true
+    sampling:
+      probability: ${TRACE_SAMPLING_PROBABILITY}
+  otlp:
+    tracing:
+      endpoint: ${TEMPO_URL}
   metrics:
     enable:
       tomcat: true

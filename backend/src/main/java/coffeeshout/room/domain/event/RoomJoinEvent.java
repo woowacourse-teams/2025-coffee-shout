@@ -1,7 +1,7 @@
 package coffeeshout.room.domain.event;
 
 import coffeeshout.room.ui.request.SelectedMenuRequest;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record RoomJoinEvent(
@@ -10,8 +10,9 @@ public record RoomJoinEvent(
         String joinCode,
         String guestName,
         SelectedMenuRequest selectedMenuRequest,
-        Instant timestamp
-) {
+        LocalDateTime timestamp
+) implements RoomBaseEvent {
+
     public static RoomJoinEvent create(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         return new RoomJoinEvent(
                 UUID.randomUUID().toString(),
@@ -19,7 +20,22 @@ public record RoomJoinEvent(
                 joinCode,
                 guestName,
                 selectedMenuRequest,
-                Instant.now()
+                LocalDateTime.now()
         );
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
+    }
+
+    @Override
+    public RoomEventType getEventType() {
+        return eventType;
+    }
+
+    @Override
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }

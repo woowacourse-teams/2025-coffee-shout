@@ -1,9 +1,9 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.MessageResponse;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
+import coffeeshout.global.MessageResponse;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
@@ -195,94 +195,6 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     }
 
     @Test
-    void 플레이어들의_확률을_조회한다() throws JSONException {
-        // given
-        String subscribeUrlFormat = String.format("/topic/room/%s/roulette", joinCode.getValue());
-        String requestUrlFormat = String.format("/app/room/%s/get-probabilities", joinCode.getValue());
-
-        var responses = session.subscribe(subscribeUrlFormat);
-
-        // when
-        session.send(requestUrlFormat);
-
-        // then
-        MessageResponse probabilityResponse = responses.get();
-
-        assertMessageCustomization(probabilityResponse, """
-                {
-                   "success":true,
-                   "data":[
-                      {
-                         "playerResponse":{
-                            "playerName":"꾹이",
-                            "menuResponse":{
-                                "id":1,
-                                "name":"아메리카노",
-                                "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
-                            },
-                            "playerType":"HOST",
-                            "isReady":true,
-                            "colorIndex":"*",
-                            "probability": 25
-                         },
-                         "probability":25.0
-                      },
-                      {
-                         "playerResponse":{
-                            "playerName":"루키",
-                            "menuResponse":{
-                                "id":1,
-                                "name":"아메리카노",
-                                "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
-                            },
-                            "playerType":"GUEST",
-                            "isReady":false,
-                            "colorIndex":"*",
-                            "probability": 25
-                         },
-                         "probability":25.0
-                      },
-                      {
-                         "playerResponse":{
-                            "playerName":"엠제이",
-                            "menuResponse":{
-                                "id":1,
-                                "name":"아메리카노",
-                                "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
-                            },
-                            "playerType":"GUEST",
-                            "isReady":false,
-                            "colorIndex":"*",
-                            "probability": 25
-                         },
-                         "probability":25.0
-                      },
-                      {
-                         "playerResponse":{
-                            "playerName":"한스",
-                            "menuResponse":{
-                                "id":1,
-                                "name":"아메리카노",
-                                "temperature":"ICE",
-                                "categoryImageUrl":"커피.jpg"
-                            },
-                            "playerType":"GUEST",
-                            "isReady":false,
-                            "colorIndex":"*",
-                            "probability": 25
-                         },
-                         "probability":25.0
-                      }
-                   ],
-                   "errorMessage":null
-                }
-                """, getColorIndexCustomization("playerResponse.colorIndex"));
-    }
-
-    @Test
     void 미니게임을_선택한다() throws JSONException {
         // given
         String subscribeUrlFormat = String.format("/topic/room/%s/minigame", joinCode.getValue());
@@ -313,7 +225,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
-        ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
+        ReflectionTestUtils.setField(testRoom, "roomState", RoomState.ROULETTE);
 
         String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
         String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());

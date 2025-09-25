@@ -1,8 +1,8 @@
 package coffeeshout.minigame.application;
 
-import coffeeshout.room.domain.Playable;
-
 public interface MiniGameService {
 
-    void start(Playable playable, String joinCode);
+    void publishStartEvent(String joinCode, String hostName);
+
+    void publishSelectCardEvent(String joinCode, String playerName, Integer cardIndex);
 }

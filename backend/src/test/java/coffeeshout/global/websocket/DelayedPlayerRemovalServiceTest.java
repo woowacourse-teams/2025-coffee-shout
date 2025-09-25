@@ -28,10 +28,10 @@ class DelayedPlayerRemovalServiceTest {
     private PlayerDisconnectionService playerDisconnectionService;
 
     @Mock
-    private StompSessionManager sessionManager;
+    private RoomService roomService;
 
     @Mock
-    private RoomService roomService;
+    private StompSessionManager sessionManager;
 
     @Mock
     @SuppressWarnings("rawtypes")
@@ -79,7 +79,6 @@ class DelayedPlayerRemovalServiceTest {
             // then
             then(taskScheduler).should(never()).schedule(any(Runnable.class), any(Instant.class));
             then(playerDisconnectionService).should(never()).cancelReady(any());
-            then(sessionManager).should(never()).removeSession(any());
         }
 
         @Test

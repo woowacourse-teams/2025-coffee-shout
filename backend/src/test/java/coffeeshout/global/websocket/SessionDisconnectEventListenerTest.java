@@ -1,9 +1,12 @@
 package coffeeshout.global.websocket;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.event.SessionDisconnectEventListener;
+import coffeeshout.global.websocket.infra.PlayerEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,9 +22,11 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 class SessionDisconnectEventListenerTest {
 
     @Mock
-    DelayedPlayerRemovalService delayedPlayerRemovalService;
+    PlayerEventPublisher playerEventPublisher;
     @Mock
     SubscriptionInfoService subscriptionInfoService;
+    @Mock
+    WebSocketMetricService metricService;
 
     StompSessionManager sessionManager;
     SessionDisconnectEventListener listener;
@@ -33,8 +38,8 @@ class SessionDisconnectEventListenerTest {
     @BeforeEach
     void setUp() {
         sessionManager = new StompSessionManager();
-        listener = new SessionDisconnectEventListener(sessionManager, delayedPlayerRemovalService,
-                subscriptionInfoService);
+        listener = new SessionDisconnectEventListener(sessionManager, playerEventPublisher,
+                subscriptionInfoService, metricService);
     }
 
     @Nested
@@ -49,7 +54,7 @@ class SessionDisconnectEventListenerTest {
             listener.handleSessionDisconnectEvent(event);
 
             // then
-            verifyNoInteractions(delayedPlayerRemovalService);
+            verifyNoInteractions(playerEventPublisher);
         }
 
         @Test
@@ -63,8 +68,8 @@ class SessionDisconnectEventListenerTest {
             listener.handleSessionDisconnectEvent(event);
 
             // then
-            then(delayedPlayerRemovalService).should()
-                    .schedulePlayerRemoval(expectedPlayerKey, sessionId, "SESSION_DISCONNECT");
+            then(playerEventPublisher).should()
+                    .publishEvent(any());
         }
 
         @Test
@@ -79,7 +84,7 @@ class SessionDisconnectEventListenerTest {
             listener.handleSessionDisconnectEvent(event);
 
             // then
-            verifyNoInteractions(delayedPlayerRemovalService);
+            verifyNoInteractions(playerEventPublisher);
         }
     }
 

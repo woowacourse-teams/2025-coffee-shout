@@ -10,6 +10,8 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -20,19 +22,22 @@ public class RedisConfig {
 
     private final RedisProperties redisProperties;
 
+    public RedisConfig(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = 
-            new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
-        
-        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
-            LettuceClientConfiguration.builder();
-        
+        final RedisStandaloneConfiguration redisStandaloneConfiguration =
+                new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
+
+        final LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig =
+                LettuceClientConfiguration.builder();
+
         if (redisProperties.ssl().enabled()) {
             clientConfig.useSsl();
         }
-        
+
         return new LettuceConnectionFactory(redisStandaloneConfiguration, clientConfig.build());
     }
 
@@ -41,7 +46,7 @@ public class RedisConfig {
             RedisConnectionFactory redisConnectionFactory,
             ObjectMapper objectMapper
     ) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         // 문자열 키 직렬화
@@ -59,9 +64,29 @@ public class RedisConfig {
     }
 
     @Bean
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
-        stringRedisTemplate.setConnectionFactory(redisConnectionFactory);
-        return stringRedisTemplate;
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        return container;
+    }
+
+    @Bean
+    public ChannelTopic roomEventTopic() {
+        return new ChannelTopic("room.events");
+    }
+
+    @Bean
+    public ChannelTopic miniGameEventTopic() {
+        return new ChannelTopic("minigame.events");
+    }
+
+    @Bean
+    public ChannelTopic playerEventTopic() {
+        return new ChannelTopic("player.events");
+    }
+
+    @Bean
+    public ChannelTopic sessionEventTopic() {
+        return new ChannelTopic("session.events");
     }
 }
