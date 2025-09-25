@@ -2,10 +2,13 @@ package coffeeshout.global.config;
 
 
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -35,7 +38,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
         config.enableSimpleBroker("/topic/", "/queue/")
                 .setHeartbeatValue(new long[]{4000, 4000})
-                .setTaskScheduler(taskScheduler);
+                .setTaskScheduler(heartbeatScheduler);
 
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -59,8 +62,14 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors()
-                .taskExecutor()
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setThreadNamePrefix("app-executor-");
+        executor.setTaskDecorator(runnable -> {
+            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
+            return snapshot.wrap(runnable);
+        });
+        executor.initialize();
+        registration.taskExecutor(executor)
                 .corePoolSize(64)
                 .maxPoolSize(128)
                 .queueCapacity(16384)
