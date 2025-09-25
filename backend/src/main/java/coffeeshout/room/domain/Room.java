@@ -90,9 +90,7 @@ public class Room {
     public Winner spinRoulette(Player host, Roulette roulette) {
         isTrue(isHost(host), "호스트만 룰렛을 돌릴 수 있습니다.");
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
-        state(isPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        // TODO 룰렛을 돌리기 전에 모든 게임들을 플레이해야 한다.
-
+        state(roomState == RoomState.ROULETTE, "게임이 끝나야만 룰렛을 돌릴 수 있습니다.");
         final Winner winner = roulette.spin(players);
         roomState = RoomState.DONE;
         return winner;
