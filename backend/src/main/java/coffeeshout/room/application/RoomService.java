@@ -105,10 +105,6 @@ public class RoomService {
             SelectedMenuRequest selectedMenuRequest
     ) {
         final ColorUsage colorUsage = roomColorUsages.get(joinCode);
-        if (colorUsage == null) {
-            return CompletableFuture.failedFuture(new IllegalArgumentException("방의 ColorUsage를 찾을 수 없습니다."));
-        }
-
         final int guestColorIndex = colorUsage.pickRandomOne();
         final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest, guestColorIndex);
 
