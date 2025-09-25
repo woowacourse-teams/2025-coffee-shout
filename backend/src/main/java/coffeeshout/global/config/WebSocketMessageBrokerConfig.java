@@ -18,14 +18,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final TaskScheduler taskScheduler;
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
-            TaskScheduler taskScheduler,
             WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor
     ) {
-        this.taskScheduler = taskScheduler;
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
     }
 
