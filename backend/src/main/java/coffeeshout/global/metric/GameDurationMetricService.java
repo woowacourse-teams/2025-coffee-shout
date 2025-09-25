@@ -52,36 +52,4 @@ public class GameDurationMetricService {
             log.warn("게임 시작 샘플을 찾을 수 없음: joinCode={}", joinCode);
         }
     }
-
-    /**
-     * 게임이 중단된 경우 타이머 정리
-     */
-    public void cancelGameTimer(String roomId) {
-        Sample sample = gameStartSamples.remove(roomId);
-        if (sample != null) {
-            log.debug("게임 타이머 취소: roomId={}", roomId);
-        }
-    }
-
-    /**
-     * 평균 게임 시간 조회 (초 단위)
-     */
-    public double getAverageGameDurationSeconds() {
-        long count = gameDurationTimer.count();
-        return count > 0 ? gameDurationTimer.totalTime(TimeUnit.SECONDS) / count : 0;
-    }
-
-    /**
-     * 최대 게임 시간 조회 (초 단위)
-     */
-    public double getMaxGameDurationSeconds() {
-        return gameDurationTimer.max(TimeUnit.SECONDS);
-    }
-
-    /**
-     * 총 게임 횟수 조회
-     */
-    public long getTotalGameCount() {
-        return gameDurationTimer.count();
-    }
 }
