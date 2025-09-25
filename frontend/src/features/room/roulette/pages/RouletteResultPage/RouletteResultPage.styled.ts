@@ -11,5 +11,6 @@ export const Container = styled.div`
 
 export const Logo = styled.img`
   width: 120px;
-  height: 60px;
+  height: 120px;
+  object-fit: contain;
 `;
