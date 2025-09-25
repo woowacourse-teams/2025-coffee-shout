@@ -1,5 +1,5 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
+import BreadLogoWhiteIcon from '@/assets/logo/bread-logo-white.png';
 import DetailIcon from '@/assets/detail-icon.svg';
 import Button from '@/components/@common/Button/Button';
 import Headline1 from '@/components/@common/Headline1/Headline1';
@@ -39,7 +39,6 @@ const OrderPage = () => {
         <S.BannerContent>
           <S.Logo src={BreadLogoWhiteIcon} />
           <Headline1 color="white">{location.state?.winner}</Headline1>
-          <br />
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
         </S.BannerContent>
       </Layout.Banner>

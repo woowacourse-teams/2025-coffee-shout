@@ -1,20 +1,51 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
-import {
-  EntryMenuPage,
-  EntryNamePage,
-  HomePage,
-  LobbyPage,
-  MiniGamePlayPage,
-  MiniGameReadyPage,
-  MiniGameResultPage,
-  NotFoundPage,
-  OrderPage,
-  RoulettePlayPage,
-  RouletteResultPage,
-  QRJoinPage,
-} from './pages';
+import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
+import { lazy } from 'react';
+
+const LobbyPage = lazy(
+  /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')
+);
+const MiniGamePlayPage = lazy(
+  () =>
+    import(
+      /*webpackChunkName: "miniGamePlayPage"*/ './features/miniGame/pages/MiniGamePlayPage/MiniGamePlayPage'
+    )
+);
+const MiniGameReadyPage = lazy(
+  () =>
+    import(
+      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReady/MiniGameReadyPage'
+    )
+);
+const MiniGameResultPage = lazy(
+  () =>
+    import(
+      /*webpackChunkName: "miniGameResultPage"*/ './features/miniGame/pages/MiniGameResultPage/MiniGameResultPage'
+    )
+);
+const NotFoundPage = lazy(
+  /*webpackChunkName: "notFoundPage"*/ () => import('./features/notFound/pages/NotFoundPage')
+);
+const OrderPage = lazy(
+  /*webpackChunkName: "orderPage"*/ () => import('./features/room/order/pages/OrderPage')
+);
+const RoulettePlayPage = lazy(
+  () =>
+    import(
+      /*webpackChunkName: "roulettePlayPage"*/ './features/room/roulette/pages/RoulettePlayPage/RoulettePlayPage'
+    )
+);
+const RouletteResultPage = lazy(
+  () =>
+    import(
+      /*webpackChunkName: "rouletteResultPage"*/ './features/room/roulette/pages/RouletteResultPage/RouletteResultPage'
+    )
+);
+const QRJoinPage = lazy(
+  () => import(/*webpackChunkName: "qrJoinPage"*/ './features/join/pages/QRJoinPage')
+);
 
 const router = createBrowserRouter([
   {

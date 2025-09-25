@@ -1,7 +1,7 @@
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import * as S from './PrepareOverlay.styled';
 import chatBubble from '@/assets/chat_bubble.svg';
-import coffee from '@/assets/coffee-white.svg';
+import coffee from '@/assets/logo/coffee-white.png';
 import { useEffect, useState } from 'react';
 
 const PREPARE_TEXT = {
@@ -23,10 +23,10 @@ const PrepareOverlay = () => {
   return (
     <S.Backdrop>
       <S.Content>
-        <S.ImageWrapper>
+        <S.BubbleTextWrapper>
           <S.BubbleImage src={chatBubble} />
           <Headline1 color="white">{displayText}</Headline1>
-        </S.ImageWrapper>
+        </S.BubbleTextWrapper>
         <S.CoffeeImage src={coffee} />
       </S.Content>
     </S.Backdrop>
