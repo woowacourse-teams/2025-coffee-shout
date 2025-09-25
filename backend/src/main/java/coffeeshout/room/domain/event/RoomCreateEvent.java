@@ -10,16 +10,18 @@ public record RoomCreateEvent(
         String hostName,
         SelectedMenuRequest selectedMenuRequest,
         String joinCode,
+        int hostColorIndex,
         LocalDateTime timestamp
 ) implements RoomBaseEvent {
 
-    public static RoomCreateEvent create(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
+    public static RoomCreateEvent create(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode, int hostColorIndex) {
         return new RoomCreateEvent(
                 UUID.randomUUID().toString(),
                 RoomEventType.ROOM_CREATE,
                 hostName,
                 selectedMenuRequest,
                 joinCode,
+                hostColorIndex,
                 LocalDateTime.now()
         );
     }

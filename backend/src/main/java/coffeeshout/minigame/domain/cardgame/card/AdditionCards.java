@@ -22,6 +22,7 @@ import static org.springframework.util.Assert.isTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class AdditionCards {
 
@@ -48,9 +49,10 @@ public class AdditionCards {
         this.cards.add(MINUS_40);
     }
 
-    public List<Card> pickCards(int count) {
+    public List<Card> pickCards(int count, Random random) {
         isTrue(count <= cards.size(), "최대 사용 가능한 카드 수를 초과했습니다. size = " + cards.size());
-        Collections.shuffle(cards);
-        return cards.subList(0, count);
+        List<Card> shuffledCards = new ArrayList<>(cards);
+        Collections.shuffle(shuffledCards, random);
+        return shuffledCards.subList(0, count);
     }
 }

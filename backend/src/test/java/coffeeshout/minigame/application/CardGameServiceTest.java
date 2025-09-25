@@ -57,12 +57,13 @@ class CardGameServiceTest extends ServiceTest {
         );
         joinCode = room.getJoinCode();
         roomService.updateMiniGames(joinCode.getValue(), host.getName().value(), List.of(MiniGameType.CARD_GAME));
-        room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame());
+        room.addMiniGame(host.getName(), MiniGameType.CARD_GAME.createMiniGame(joinCode.getValue()));
 
         for (int i = 1; i < players.getPlayers().size(); i++) {
             room.joinGuest(
                     players.getPlayers().get(i).getName(),
-                    new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
+                    new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE),
+                    i
             );
         }
         for (Player player : room.getPlayers()) {
