@@ -28,12 +28,4 @@ public class WebSocketSchedulerConfig {
         scheduler.initialize();
         return scheduler;
     }
-//    @Bean(name = "webSocketHeartBeatScheduler")
-//    public TaskScheduler heartBeatMessageBrokerTaskScheduler() {
-//        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-//        scheduler.setPoolSize(1);
-//        scheduler.setThreadNamePrefix("wss-heartbeat-thread-");
-//        scheduler.initialize();
-//        return scheduler;
-//    }
 }
