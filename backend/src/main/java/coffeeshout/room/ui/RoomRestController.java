@@ -73,7 +73,7 @@ public class RoomRestController {
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
 
-    @GetMapping("/probabilities")
+    @GetMapping("/{joinCode}/probabilities")
     public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@RequestParam String joinCode) {
         final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode);
 
