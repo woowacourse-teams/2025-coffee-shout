@@ -1,4 +1,4 @@
-package coffeeshout.room.infra;
+package coffeeshout.room.infra.messaging;
 
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import lombok.RequiredArgsConstructor;

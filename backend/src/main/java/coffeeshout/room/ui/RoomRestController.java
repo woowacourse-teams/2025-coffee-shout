@@ -36,8 +36,8 @@ public class RoomRestController {
                 .thenApply(room -> ResponseEntity.ok(RoomCreateResponse.from(room)))
                 .exceptionally(throwable -> {
                     final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
-                    if (cause instanceof RuntimeException) {
-                        throw (RuntimeException) cause;
+                    if (cause instanceof RuntimeException runtimeException) {
+                        throw runtimeException;
                     }
                     throw new RuntimeException("방 생성 실패", cause);
                 });

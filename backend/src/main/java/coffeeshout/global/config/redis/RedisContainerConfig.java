@@ -15,19 +15,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class RedisContainerConfig {
 
     @Bean
-    public ThreadPoolTaskExecutor redisStreamTaskExecutor() {
-        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
-        ex.setCorePoolSize(4);
-        ex.setMaxPoolSize(8);
-        ex.setQueueCapacity(100);
-        ex.setThreadNamePrefix("redis-stream-");
-        ex.setWaitForTasksToCompleteOnShutdown(true);
-        ex.setAwaitTerminationSeconds(10);
-        ex.initialize();
-        return ex;
-    }
-
-    @Bean
     public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory) {
         StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions
@@ -61,5 +48,17 @@ public class RedisContainerConfig {
 
         container.start();
         return container;
+    }
+
+    private ThreadPoolTaskExecutor redisStreamTaskExecutor() {
+        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
+        ex.setCorePoolSize(4);
+        ex.setMaxPoolSize(8);
+        ex.setQueueCapacity(100);
+        ex.setThreadNamePrefix("redis-stream-");
+        ex.setWaitForTasksToCompleteOnShutdown(true);
+        ex.setAwaitTerminationSeconds(10);
+        ex.initialize();
+        return ex;
     }
 }

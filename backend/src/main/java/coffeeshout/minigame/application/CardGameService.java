@@ -2,11 +2,12 @@ package coffeeshout.minigame.application;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
-import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
-import coffeeshout.minigame.infra.MiniGameEventPublisher;
+import coffeeshout.minigame.infra.messaging.CardSelectStreamProducer;
+import coffeeshout.minigame.infra.messaging.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.PlayerName;
@@ -25,6 +26,7 @@ public class CardGameService implements MiniGameService {
     private final CardGameCommandService cardGameCommandService;
     private final ApplicationEventPublisher eventPublisher;
     private final MiniGameEventPublisher miniGameEventPublisher;
+    private final CardSelectStreamProducer cardSelectStreamProducer;
 
     @Override
     public void publishStartEvent(String joinCode, String hostName) {
@@ -37,7 +39,7 @@ public class CardGameService implements MiniGameService {
     @Override
     public void publishSelectCardEvent(String joinCode, String playerName, Integer cardIndex) {
         final SelectCardCommandEvent event = SelectCardCommandEvent.create(joinCode, playerName, cardIndex);
-        miniGameEventPublisher.publishEvent(event);
+        cardSelectStreamProducer.broadcastCardSelect(event);
         log.info("카드 선택 이벤트 발행: joinCode={}, playerName={}, cardIndex={}, eventId={}",
                 joinCode, playerName, cardIndex, event.getEventId());
     }

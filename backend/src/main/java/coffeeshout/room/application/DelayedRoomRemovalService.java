@@ -41,7 +41,6 @@ public class DelayedRoomRemovalService {
         taskScheduler.schedule(() -> executeRoomRemoval(joinCode), Instant.now().plus(removeDuration));
     }
 
-
     private void executeRoomRemoval(JoinCode joinCode) {
         try {
             roomCommandService.delete(joinCode);

@@ -12,7 +12,7 @@ public record SelectCardCommandEvent(
         String joinCode,
         String playerName,
         Integer cardIndex
-) implements MiniGameBaseEvent {
+) implements MiniGameBaseEvent, coffeeshout.minigame.domain.event.MiniGameBaseEvent {
 
     public static SelectCardCommandEvent create(String joinCode, String playerName, Integer cardIndex) {
         final String eventId = UUID.randomUUID().toString();

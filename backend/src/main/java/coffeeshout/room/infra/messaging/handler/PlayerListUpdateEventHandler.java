@@ -1,9 +1,9 @@
-package coffeeshout.room.infra.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.domain.event.PlayerReadyEvent;
+import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.ui.response.PlayerResponse;
@@ -15,22 +15,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlayerReadyEventHandler implements RoomEventHandler<PlayerReadyEvent> {
+public class PlayerListUpdateEventHandler implements RoomEventHandler<PlayerListUpdateEvent> {
 
     private final RoomService roomService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(PlayerReadyEvent event) {
+    public void handle(PlayerListUpdateEvent event) {
         try {
-            log.info("플레이어 ready 이벤트 수신: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.joinCode(), event.playerName(), event.isReady());
+            log.info("플레이어 목록 업데이트 이벤트 수신: eventId={}, joinCode={}",
+                    event.getEventId(), event.joinCode());
 
-            final List<Player> players = roomService.changePlayerReadyStateInternal(
-                    event.joinCode(),
-                    event.playerName(),
-                    event.isReady()
-            );
+            final List<Player> players = roomService.getPlayersInternal(event.joinCode());
             final List<PlayerResponse> responses = players.stream()
                     .map(PlayerResponse::from)
                     .toList();
@@ -38,16 +34,16 @@ public class PlayerReadyEventHandler implements RoomEventHandler<PlayerReadyEven
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(),
                     WebSocketResponse.success(responses));
 
-            log.info("플레이어 ready 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.joinCode(), event.playerName(), event.isReady());
+            log.info("플레이어 목록 업데이트 이벤트 처리 완료: eventId={}, joinCode={}",
+                    event.getEventId(), event.joinCode());
 
         } catch (Exception e) {
-            log.error("플레이어 ready 이벤트 처리 실패", e);
+            log.error("플레이어 목록 업데이트 이벤트 처리 실패", e);
         }
     }
 
     @Override
     public RoomEventType getSupportedEventType() {
-        return RoomEventType.PLAYER_READY;
+        return RoomEventType.PLAYER_LIST_UPDATE;
     }
 }

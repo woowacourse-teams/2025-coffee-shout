@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -58,10 +59,15 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest request = new RoomEnterRequest("테스트유저", menuRequest);
 
-            // when & then
-            String response = mockMvc.perform(post("/rooms")
+            // when & then - 비동기 테스트
+            MvcResult result = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String response = mockMvc.perform(asyncDispatch(result))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.joinCode").exists())
                     .andExpect(jsonPath("$.qrCodeUrl").exists())
@@ -81,9 +87,14 @@ class RoomRestControllerTest {
             RoomEnterRequest request = new RoomEnterRequest(null, menuRequest);
 
             // when & then
-            mockMvc.perform(post("/rooms")
+            MvcResult result = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            mockMvc.perform(asyncDispatch(result))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -129,9 +140,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest hostMenuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest createRequest = new RoomEnterRequest("호스트", hostMenuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -193,9 +209,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -226,9 +247,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -277,9 +303,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest request = new RoomEnterRequest("테스트유저", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -327,9 +358,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest request = new RoomEnterRequest("호스트", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -359,9 +395,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest request = new RoomEnterRequest("호스트", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult createResult = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(createResult))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
@@ -403,8 +444,8 @@ class RoomRestControllerTest {
             List<MiniGameType> miniGameTypes = objectMapper.readValue(response,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, MiniGameType.class));
 
-            assertThat(miniGameTypes).isNotEmpty();
-            assertThat(miniGameTypes).contains(MiniGameType.CARD_GAME);
+            assertThat(miniGameTypes).isNotEmpty()
+                    .contains(MiniGameType.CARD_GAME);
         }
 
         @Test
@@ -413,9 +454,14 @@ class RoomRestControllerTest {
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest request = new RoomEnterRequest("호스트", menuRequest);
 
-            String createResponse = mockMvc.perform(post("/rooms")
+            MvcResult result = mockMvc.perform(post("/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
+
+            String createResponse = mockMvc.perform(asyncDispatch(result))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
