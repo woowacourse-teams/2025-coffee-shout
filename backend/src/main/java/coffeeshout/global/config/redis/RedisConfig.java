@@ -1,4 +1,4 @@
-package coffeeshout.global.config;
+package coffeeshout.global.config.redis;
 
 import coffeeshout.global.config.properties.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;

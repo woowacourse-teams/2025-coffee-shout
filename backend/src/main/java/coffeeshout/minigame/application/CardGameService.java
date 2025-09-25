@@ -6,7 +6,7 @@ import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.domain.cardgame.service.CardGameCommandService;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
-import coffeeshout.minigame.infra.MiniGameEventPublisher;
+import coffeeshout.minigame.infra.messaging.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.PlayerName;

@@ -22,7 +22,7 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.RoomEventPublisher;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
@@ -112,6 +112,18 @@ public class RoomService {
 
     // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
 
+    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
+        try {
+            return createRoomAsync(hostName, selectedMenuRequest).join();
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("방 생성 실패", cause);
+        }
+    }
+
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
         return changePlayerReadyStateInternal(joinCode, playerName, isReady);
     }
@@ -154,7 +166,6 @@ public class RoomService {
 
         return roomCommandService.save(room);
     }
-
 
     private void assignQrCodeUrl(Room room) {
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
@@ -270,6 +281,11 @@ public class RoomService {
         return isRemoved;
     }
 
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
+
     private void scheduleRemoveRoom(JoinCode joinCode) {
         try {
             delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
@@ -278,9 +294,9 @@ public class RoomService {
         }
     }
 
-    public boolean isReadyState(String joinCode) {
+    public Room showRoulette(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.showRoulette();
-        return room.isReadyState();
+        return room;
     }
 }

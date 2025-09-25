@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
