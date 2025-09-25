@@ -5,7 +5,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.application.RoomService;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -29,9 +28,6 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     @Mock
     private RoomService roomService;
 
-    @Mock
-    private SessionEventPublisher sessionEventPublisher;
-
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
     private StompSessionManager stompSessionManager;
@@ -49,7 +45,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         stompSessionManager = new StompSessionManager();
 
         delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
-                sessionEventPublisher, roomService);
+                stompSessionManager, roomService);
     }
 
     @Nested
@@ -169,9 +165,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
 
         public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
                                                PlayerDisconnectionService playerDisconnectionService,
-                                               SessionEventPublisher sessionEventPublisher,
+                                               StompSessionManager stompSessionManager,
                                                RoomService roomService) {
-            super(taskScheduler, playerDisconnectionService, sessionEventPublisher, roomService);
+            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomService);
         }
 
         // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능

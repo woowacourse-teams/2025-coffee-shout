@@ -1,7 +1,5 @@
 package coffeeshout.global.websocket;
 
-import coffeeshout.global.websocket.event.session.SessionRemovedEvent;
-import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.application.RoomService;
 import java.time.Duration;
 import java.time.Instant;
@@ -20,21 +18,21 @@ public class DelayedPlayerRemovalService {
 
     private final TaskScheduler taskScheduler;
     private final PlayerDisconnectionService playerDisconnectionService;
-    private final SessionEventPublisher sessionEventPublisher;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks;
     private final RoomService roomService;
+    private final StompSessionManager stompSessionManager;
 
     public DelayedPlayerRemovalService(
             @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
             PlayerDisconnectionService playerDisconnectionService,
-            SessionEventPublisher sessionEventPublisher,
+            StompSessionManager stompSessionManager,
             RoomService roomService
     ) {
         this.taskScheduler = taskScheduler;
         this.playerDisconnectionService = playerDisconnectionService;
-        this.sessionEventPublisher = sessionEventPublisher;
         this.scheduledTasks = new ConcurrentHashMap<>();
         this.roomService = roomService;
+        this.stompSessionManager = stompSessionManager;
     }
 
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
@@ -53,9 +51,7 @@ public class DelayedPlayerRemovalService {
         final ScheduledFuture<?> future = taskScheduler.schedule(
                 () -> {
                     executePlayerRemoval(playerKey, sessionId, reason);
-                    // 세션 제거 이벤트 발행 (모든 인스턴스가 동시에 처리)
-                    final SessionRemovedEvent event = SessionRemovedEvent.create(sessionId);
-                    sessionEventPublisher.publishEvent(event);
+                    stompSessionManager.removeSessionInternal(sessionId);
                 },
                 Instant.now().plus(REMOVAL_DELAY)
         );

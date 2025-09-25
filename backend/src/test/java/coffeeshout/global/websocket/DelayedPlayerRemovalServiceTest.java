@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.application.RoomService;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
@@ -32,7 +31,7 @@ class DelayedPlayerRemovalServiceTest {
     private RoomService roomService;
 
     @Mock
-    private SessionEventPublisher sessionEventPublisher;
+    private StompSessionManager sessionManager;
 
     @Mock
     @SuppressWarnings("rawtypes")
@@ -47,7 +46,7 @@ class DelayedPlayerRemovalServiceTest {
     @BeforeEach
     void setUp() {
         delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
-                sessionEventPublisher, roomService);
+                sessionManager, roomService);
     }
 
     @Nested
