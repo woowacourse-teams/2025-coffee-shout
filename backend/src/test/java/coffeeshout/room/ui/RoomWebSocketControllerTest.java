@@ -225,7 +225,7 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     @Test
     void 룰렛을_돌려서_당첨자를_선택한다() {
         // given
-        ReflectionTestUtils.setField(testRoom, "roomState", RoomState.PLAYING);
+        ReflectionTestUtils.setField(testRoom, "roomState", RoomState.ROULETTE);
 
         String subscribeUrlFormat = String.format("/topic/room/%s/winner", joinCode.getValue());
         String requestUrlFormat = String.format("/app/room/%s/spin-roulette", joinCode.getValue());

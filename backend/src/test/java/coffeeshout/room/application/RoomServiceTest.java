@@ -375,7 +375,7 @@ class RoomServiceTest extends ServiceTest {
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
                 new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.PLAYING);
+        ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.ROULETTE);
 
         // when
         Winner winner = roomService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
