@@ -17,7 +17,7 @@ class AdditionCardsTest {
         AdditionCards additionCards = new AdditionCards();
 
         // when
-        List<Card> pickedCards = additionCards.pickCards(count);
+        List<Card> pickedCards = additionCards.pickCards(count, new java.util.Random(1234L));
 
         // then
         assertThat(pickedCards).hasSize(count);
@@ -31,7 +31,7 @@ class AdditionCardsTest {
         int count = 20;
 
         // when & then
-        assertThatThrownBy(() -> additionCards.pickCards(count))
+        assertThatThrownBy(() -> additionCards.pickCards(count, new java.util.Random(1234L)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("최대 사용 가능한 카드 수를 초과했습니다.");
 

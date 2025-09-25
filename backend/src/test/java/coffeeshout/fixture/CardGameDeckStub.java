@@ -10,7 +10,7 @@ import java.util.List;
 public final class CardGameDeckStub implements CardGameDeckGenerator {
 
     @Override
-    public Deck generate(int additionCardCount, int multiplierCardCount) {
+    public Deck generate(int additionCardCount, int multiplierCardCount, long seed) {
         List<Card> additionCards = List.of(
                 new AdditionCard(40),
                 new AdditionCard(30),
