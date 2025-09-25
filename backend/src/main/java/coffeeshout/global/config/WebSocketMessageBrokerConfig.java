@@ -2,12 +2,12 @@ package coffeeshout.global.config;
 
 
 import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
+import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -19,11 +19,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
+    private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
 
     public WebSocketMessageBrokerConfig(
-            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor
+            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
+            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
     ) {
         this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
+        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
     @Override
@@ -59,6 +62,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketOutboundMetricInterceptor);
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("outbound-");
         executor.setTaskDecorator(runnable -> {
