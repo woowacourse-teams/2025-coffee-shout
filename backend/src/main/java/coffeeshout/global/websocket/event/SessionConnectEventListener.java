@@ -67,10 +67,10 @@ public class SessionConnectEventListener {
             final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
             // 게임 중이면 연결 거부
-            if (room.isPlayingState()) {
-                log.info("게임 중인 방 연결 거부: joinCode={}, playerName={}", joinCode, playerName);
-                return;
-            }
+//            if (room.isPlayingState()) {
+//                log.info("게임 중인 방 연결 거부: joinCode={}, playerName={}", joinCode, playerName);
+//                return;
+//            }
 
             // 세션 등록 이벤트 발행 (모든 인스턴스가 동시에 처리)
             publishSessionRegisteredEvent(sessionId, joinCode, playerName);
