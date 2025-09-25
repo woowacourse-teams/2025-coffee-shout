@@ -32,7 +32,7 @@ const useRouletteProbabilities = () => {
         setIsLoading(false);
       }
     })();
-  }, []);
+  }, [updateCurrentProbabilities, getParticipantColorIndex, joinCode]);
 
   return {
     isLoading,
