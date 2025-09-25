@@ -14,7 +14,8 @@ public class SelectCardCommandHandler implements MiniGameCommandHandler<SelectCa
 
     @Override
     public void handle(String joinCode, SelectCardCommand command) {
-        cardGameService.selectCard(joinCode, command.playerName(), command.cardIndex());
+        // 바로 이벤트 발행만 함 - 모든 인스턴스가 동시에 처리하게 함
+        cardGameService.publishSelectCardEvent(joinCode, command.playerName(), command.cardIndex());
     }
 
     @Override

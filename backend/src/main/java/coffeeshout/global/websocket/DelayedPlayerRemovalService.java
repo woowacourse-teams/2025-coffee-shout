@@ -18,9 +18,9 @@ public class DelayedPlayerRemovalService {
 
     private final TaskScheduler taskScheduler;
     private final PlayerDisconnectionService playerDisconnectionService;
-    private final StompSessionManager stompSessionManager;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks;
     private final RoomService roomService;
+    private final StompSessionManager stompSessionManager;
 
     public DelayedPlayerRemovalService(
             @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
@@ -30,9 +30,9 @@ public class DelayedPlayerRemovalService {
     ) {
         this.taskScheduler = taskScheduler;
         this.playerDisconnectionService = playerDisconnectionService;
-        this.stompSessionManager = stompSessionManager;
         this.scheduledTasks = new ConcurrentHashMap<>();
         this.roomService = roomService;
+        this.stompSessionManager = stompSessionManager;
     }
 
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
@@ -51,7 +51,7 @@ public class DelayedPlayerRemovalService {
         final ScheduledFuture<?> future = taskScheduler.schedule(
                 () -> {
                     executePlayerRemoval(playerKey, sessionId, reason);
-                    stompSessionManager.removeSession(sessionId);
+                    stompSessionManager.removeSessionInternal(sessionId);
                 },
                 Instant.now().plus(REMOVAL_DELAY)
         );

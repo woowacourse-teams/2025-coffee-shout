@@ -2,13 +2,14 @@ package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
+import coffeeshout.room.ui.response.ProbabilityResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,35 +28,33 @@ public class RoomRestController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
-        final Room room = roomService.createRoom(request.playerName(), request.menu());
-
-        return ResponseEntity.ok(RoomCreateResponse.from(room));
+    public CompletableFuture<ResponseEntity<RoomCreateResponse>> createRoom(@RequestBody RoomEnterRequest request) {
+        return roomService.createRoomAsync(request.playerName(), request.menu())
+                .thenApply(room -> ResponseEntity.ok(RoomCreateResponse.from(room)))
+                .exceptionally(throwable -> {
+                    final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
+                    if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    }
+                    throw new RuntimeException("방 생성 실패", cause);
+                });
     }
 
     @PostMapping("/{joinCode}")
-    public ResponseEntity<RoomEnterResponse> enterRoom(
+    public CompletableFuture<ResponseEntity<RoomEnterResponse>> enterRoom(
             @PathVariable String joinCode,
             @RequestBody RoomEnterRequest request
     ) {
-        final Room room = roomService.enterRoom(joinCode, request.playerName(), request.menu());
-
-        return ResponseEntity.ok(RoomEnterResponse.from(room));
+        return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
+                .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
+                .exceptionally(throwable -> {
+                    final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
+                    if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    }
+                    throw new RuntimeException("방 참가 실패", cause);
+                });
     }
-
-// 비동기 처리 시 필요
-//    @GetMapping("/{joinCode}/qr-url")
-//    public DeferredResult<ResponseEntity<QrCodeResponse>> getQrCode(@RequestParam String joinCode) {
-//        final DeferredResult<ResponseEntity<QrCodeResponse>> deferredResult = new DeferredResult<>(5000L);
-//
-//        deferredResult.onTimeout(
-//                () -> deferredResult.setErrorResult(
-//                        ResponseEntity.internalServerError()
-//                )
-//        );
-//
-//        return deferredResult;
-//    }
 
     @GetMapping("/check-joinCode")
     public ResponseEntity<JoinCodeExistResponse> checkJoinCode(@RequestParam String joinCode) {
@@ -74,6 +73,13 @@ public class RoomRestController {
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
 
+    @GetMapping("/{joinCode}/probabilities")
+    public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@PathVariable String joinCode) {
+        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode);
+
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/minigames")
     public ResponseEntity<List<MiniGameType>> getMiniGames() {
         final List<MiniGameType> responses = roomService.getAllMiniGames();
@@ -83,7 +89,7 @@ public class RoomRestController {
 
     @GetMapping("/minigames/selected")
     public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
-        List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
+        final List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
     }
