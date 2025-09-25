@@ -15,15 +15,12 @@ public class Players {
     private static final Random RANDOM = new Random();
 
     private final List<Player> players;
-    private final ColorUsage colorUsage;
 
     public Players() {
         this.players = Collections.synchronizedList(new ArrayList<>());
-        this.colorUsage = new ColorUsage();
     }
 
     public synchronized Player join(Player player) {
-        player.assignColorIndex(colorUsage.pickRandomOne());
         player.updateProbability(Probability.ZERO);
         this.players.add(player);
         adjustInitialPlayerProbabilities();
@@ -69,7 +66,6 @@ public class Players {
     public synchronized boolean removePlayer(PlayerName playerName) {
         return players.removeIf(player -> {
             if (player.sameName(playerName)) {
-                colorUsage.release(player.getColorIndex());
                 adjustInitialPlayerProbabilities();
                 return true;
             }

@@ -3,6 +3,7 @@ package coffeeshout.room.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
@@ -19,9 +20,11 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
+import coffeeshout.room.domain.player.ColorUsage;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
+import coffeeshout.room.domain.repository.MemoryColorUsage;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
@@ -42,6 +45,9 @@ class RoomServiceTest extends ServiceTest {
 
     @MockitoSpyBean
     DelayedRoomRemovalService delayedRoomRemovalService;
+
+    @MockitoSpyBean
+    MemoryColorUsage memoryColorUsage;
 
     @Test
     void 방을_생성한다() {
@@ -102,7 +108,10 @@ class RoomServiceTest extends ServiceTest {
         String guestName = "게스트";
         SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
 
-        // when & then
+        // when
+        when(memoryColorUsage.get(invalidJoinCode)).thenReturn(new ColorUsage());
+
+        // then
         assertThatThrownBy(() -> roomService.enterRoom(invalidJoinCode, guestName, hostSelectedMenuRequest))
                 .isInstanceOf(NotExistElementException.class);
     }
@@ -358,7 +367,7 @@ class RoomServiceTest extends ServiceTest {
         JoinCode joinCode = createdRoom.getJoinCode();
 
         PlayerName guestName = new PlayerName("게스트1");
-        createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
+        createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE), 1);
 
         // when & then
         assertThat(roomService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();

@@ -26,7 +26,8 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             final Room room = roomService.createRoomInternal(
                     event.hostName(),
                     event.selectedMenuRequest(),
-                    event.joinCode()
+                    event.joinCode(),
+                    event.hostColorIndex()
             );
 
             roomEventWaitManager.notifySuccess(event.getEventId(), room);
