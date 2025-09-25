@@ -33,6 +33,10 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureMessageBroker(MessageBrokerRegistry config) {
         ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
         heartbeatScheduler.setPoolSize(1);
+        heartbeatScheduler.setTaskDecorator(runnable -> {
+            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
+            return snapshot.wrap(runnable);
+        });
         heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
         heartbeatScheduler.initialize();
 
