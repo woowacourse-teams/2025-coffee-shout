@@ -74,7 +74,7 @@ public class RoomRestController {
     }
 
     @GetMapping("/{joinCode}/probabilities")
-    public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@RequestParam String joinCode) {
+    public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@PathVariable String joinCode) {
         final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode);
 
         return ResponseEntity.ok(responses);
