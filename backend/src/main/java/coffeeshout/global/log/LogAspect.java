@@ -3,7 +3,8 @@ package coffeeshout.global.log;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.Winner;
+import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +51,13 @@ public class LogAspect {
 
     @AfterReturning(
             value = "execution(* coffeeshout.room.application.RoomService.spinRoulette(..)) && args(joinCode, hostName)",
-            returning = "player",
-            argNames = "joinCode,hostName,player"
+            returning = "winner",
+            argNames = "joinCode,hostName,winner"
     )
-    public void logSpinRoulette(String joinCode, String hostName, Player player) {
+    public void logSpinRoulette(String joinCode, String hostName, Winner winner) {
         log.info(NOTIFICATION_MARKER, "JoinCode[{}] 룰렛 추첨 완료 - 당첨자: {}",
                 joinCode,
-                player.getName().value());
+                winner.name().value());
     }
 
     @After(
@@ -67,15 +68,16 @@ public class LogAspect {
     }
 
     @AfterReturning(
-            value = "execution(* coffeeshout.room.application.RoomService.enterRoom(..)) && args(joinCode, guestName, menuId)",
+            value = "execution(* coffeeshout.room.application.RoomService.enterRoom(..)) && args(joinCode, guestName, selectedMenuRequest)",
             returning = "room",
-            argNames = "joinCode,guestName,menuId,room"
+            argNames = "joinCode,guestName,selectedMenuRequest,room"
     )
-    public void logEnterRoom(String joinCode, String guestName, Long menuId, Room room) {
+    public void logEnterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest, Room room) {
         final List<String> playerNames = room.getPlayers().stream()
                 .map(player -> player.getName().value())
                 .toList();
-        log.info("JoinCode[{}] 게스트 입장 - 게스트 이름: {}, 메뉴 ID: {}, 현재 참여자 목록: {}", joinCode, guestName, menuId,
+        log.info("JoinCode[{}] 게스트 입장 - 게스트 이름: {}, 메뉴 ID: {}, 현재 참여자 목록: {}", joinCode, guestName,
+                selectedMenuRequest.id(),
                 playerNames);
     }
 

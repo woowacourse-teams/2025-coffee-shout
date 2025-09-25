@@ -60,7 +60,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setThreadNamePrefix("app-executor-");
+        executor.setThreadNamePrefix("outbound-");
         executor.setTaskDecorator(runnable -> {
             final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
             return snapshot.wrap(runnable);
