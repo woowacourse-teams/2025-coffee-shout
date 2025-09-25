@@ -17,7 +17,7 @@ const useRouletteProbabilities = () => {
 
   useEffect(() => {
     (async () => {
-      const data = await api.get<ProbabilityResponse[]>(`/room/${joinCode}/probabilities`);
+      const data = await api.get<ProbabilityResponse[]>(`/rooms/${joinCode}/probabilities`);
       updateCurrentProbabilities(
         data.map((probability) => ({
           ...probability,
