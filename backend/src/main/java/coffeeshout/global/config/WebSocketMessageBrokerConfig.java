@@ -69,9 +69,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
             final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
             return snapshot.wrap(runnable);
         });
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(Integer.MAX_VALUE);
+        executor.setCorePoolSize(9);
+        executor.setMaxPoolSize(32);
+        executor.setQueueCapacity(8192);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         registration.taskExecutor(executor);
