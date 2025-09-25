@@ -8,7 +8,6 @@ import io.micrometer.core.instrument.Timer.Sample;
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,10 +22,15 @@ public class WebSocketMetricService {
     // Counter 캐싱용
     private final Map<String, Counter> failedCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> disconnectedCounters = new ConcurrentHashMap<>();
+    // 메시지 처리 시간 측정용
+    private final Map<String, Sample> inboundMessageSamples = new ConcurrentHashMap<>();
+    private final Map<String, Sample> outboundMessageSamples = new ConcurrentHashMap<>();
 
     private Timer connectionEstablishmentTimer;
     private Counter inboundMessageCounter;
     private Counter outboundMessageCounter;
+    private Timer inboundMessageTimer;
+    private Timer outboundMessageTimer;
 
     public WebSocketMetricService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -46,6 +50,12 @@ public class WebSocketMetricService {
                 .register(meterRegistry);
         this.outboundMessageCounter = Counter.builder("websocket.messages.outbound.total")
                 .description("아웃바운드 메시지 총 개수")
+                .register(meterRegistry);
+        this.inboundMessageTimer = Timer.builder("websocket.message.inbound.time")
+                .description("웹소켓 inbound 메시지 처리 시간")
+                .register(meterRegistry);
+        this.outboundMessageTimer = Timer.builder("websocket.message.outbound.time")
+                .description("웹소켓 outbound 메시지 처리 시간")
                 .register(meterRegistry);
     }
 
@@ -93,17 +103,6 @@ public class WebSocketMetricService {
         counter.increment();
     }
 
-    // 평균 연결 수립 시간 조회
-    public double getAverageConnectionTime() {
-        long count = connectionEstablishmentTimer.count();
-        return count > 0 ? connectionEstablishmentTimer.totalTime(TimeUnit.MILLISECONDS) / count : 0;
-    }
-
-    // 현재 연결 수 조회
-    public long getCurrentConnections() {
-        return currentConnections.get();
-    }
-
     public void incrementInboundMessage() {
         if (inboundMessageCounter != null) {
             inboundMessageCounter.increment();
@@ -113,6 +112,30 @@ public class WebSocketMetricService {
     public void incrementOutboundMessage() {
         if (outboundMessageCounter != null) {
             outboundMessageCounter.increment();
+        }
+    }
+
+    public void startInboundMessageTimer(String messageId) {
+        Sample sample = Timer.start(meterRegistry);
+        inboundMessageSamples.put(messageId, sample);
+    }
+
+    public void stopInboundMessageTimer(String messageId) {
+        Sample sample = inboundMessageSamples.remove(messageId);
+        if (sample != null) {
+            sample.stop(inboundMessageTimer);
+        }
+    }
+
+    public void startOutboundMessageTimer(String messageId) {
+        Sample sample = Timer.start(meterRegistry);
+        outboundMessageSamples.put(messageId, sample);
+    }
+
+    public void stopOutboundMessageTimer(String messageId) {
+        Sample sample = outboundMessageSamples.remove(messageId);
+        if (sample != null) {
+            sample.stop(outboundMessageTimer);
         }
     }
 }

@@ -1,6 +1,7 @@
 package coffeeshout.global.interceptor;
 
 import coffeeshout.global.metric.WebSocketMetricService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -33,12 +34,43 @@ public class WebSocketInboundMetricInterceptor implements ChannelInterceptor {
             return message;
         }
 
+        final StompCommand command = (StompCommand) commandObj;
+
+        if (command == StompCommand.SEND || command == StompCommand.SUBSCRIBE) {
+            String messageId = UUID.randomUUID().toString();
+            accessor.setHeader("messageId", messageId);
+
+            try {
+                webSocketMetricService.startInboundMessageTimer(messageId);
+            } catch (Exception e) {
+                log.warn("WebSocket 비즈니스 로직 처리 시간 측정 시작 중 에러", e);
+            }
+        }
+
         try {
             webSocketMetricService.incrementInboundMessage();
         } catch (Exception e) {
-            log.error("WebSocket 인바운드 메트릭 수집 중 에러", e);
+            log.warn("WebSocket 인바운드 메트릭 수집 중 에러", e);
         }
 
         return message;
+    }
+
+    @Override
+    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+        final StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+        if (accessor == null) {
+            return;
+        }
+
+        String messageId = (String) accessor.getHeader("messageId");
+        if (messageId != null) {
+            try {
+                webSocketMetricService.stopInboundMessageTimer(messageId);
+            } catch (Exception e) {
+                log.warn("WebSocket 비즈니스 로직 처리 시간 측정 완료 중 에러", e);
+            }
+        }
     }
 }
