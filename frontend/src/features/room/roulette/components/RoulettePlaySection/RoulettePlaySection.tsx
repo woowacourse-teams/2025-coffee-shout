@@ -5,6 +5,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
 import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
+import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 
 type Props = {
   isSpinning: boolean;
@@ -46,7 +47,11 @@ const RoulettePlaySection = ({
   return (
     <S.Container>
       <S.RouletteWheelWrapper>
-        <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+        {isProbabilitiesLoading ? (
+          <RouletteWheel playerProbabilities={probabilityHistory.current} />
+        ) : (
+          <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+        )}
       </S.RouletteWheelWrapper>
       <S.ProbabilityText $isProbabilitiesLoading={isProbabilitiesLoading}>
         <Headline4>
