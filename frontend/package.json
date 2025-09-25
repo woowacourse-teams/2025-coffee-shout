@@ -21,6 +21,12 @@
     "test:jest": "jest --passWithNoTests --config jest.config.cjs",
     "test:cypress": "cypress open"
   },
+  "sideEffects": [
+    "*.css",
+    "*.scss",
+    "./src/styles/**/*",
+    "./src/assets/**/*"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
