@@ -39,6 +39,6 @@ public class SessionSubscribeEventListener {
         final String subscriptionId = accessor.getSubscriptionId();
 
         // 구독 정보 제거 - subscriptionId로 정확한 destination 찾아서 제거
-        subscriptionInfoService.removeSubscriptionById(sessionId, subscriptionId);
+        subscriptionInfoService.removeSubscription(sessionId, subscriptionId);
     }
 }

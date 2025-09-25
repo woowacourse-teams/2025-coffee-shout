@@ -12,7 +12,7 @@ public class SubscriptionInfoService {
 
     // destination별 구독자 수를 직접 관리
     private final ConcurrentMap<String, Set<String>> subscriptions = new ConcurrentHashMap<>();
-    
+
     // subscriptionId -> destination 매핑 관리
     private final ConcurrentMap<String, String> subscriptionToDestination = new ConcurrentHashMap<>();
 
@@ -41,17 +41,18 @@ public class SubscriptionInfoService {
                 sessionId, destination, getSubscriberCount(destination));
     }
 
-    /**
-     * subscriptionId로 구독 제거
-     */
-    public void removeSubscriptionById(String sessionId, String subscriptionId) {
-        String destination = subscriptionToDestination.remove(subscriptionId);
-        if (destination != null) {
-            removeSubscription(sessionId, destination);
-        } else {
-            log.warn("subscriptionId에 해당하는 destination을 찾을 수 없음: subscriptionId={}", subscriptionId);
-        }
-    }
+//    /**
+//     * subscriptionId로 구독 제거
+//     */
+//    public void removeSubscriptionById(String sessionId, String subscriptionId) {
+//        String destination = subscriptionToDestination.remove(subscriptionId);
+//        if (destination != null) {
+//            removeSubscription(sessionId, destination);
+//        } else {
+//            log.warn("subscriptionId에 해당하는 destination을 찾을 수 없음: subscriptionId={}", subscriptionId);
+//        }
+//    }
+
     /**
      * 세션의 모든 구독 제거
      */
@@ -62,7 +63,7 @@ public class SubscriptionInfoService {
             Set<String> sessions = subscriptions.get(destination);
             return sessions != null && sessions.contains(sessionId);
         });
-        
+
         // destination별 구독에서 세션 제거
         subscriptions.entrySet().removeIf(entry -> {
             entry.getValue().remove(sessionId);
