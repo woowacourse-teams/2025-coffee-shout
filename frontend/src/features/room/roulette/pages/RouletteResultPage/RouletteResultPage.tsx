@@ -1,4 +1,4 @@
-import BreadLogoWhiteIcon from '@/assets/bread-logo-white.svg';
+import BreadLogoWhiteIcon from '@/assets/logo/bread-logo-white.png';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
