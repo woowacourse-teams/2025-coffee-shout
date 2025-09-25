@@ -232,7 +232,7 @@ public class RoomService {
         room.clearMiniGames();
 
         miniGameTypes.forEach(miniGameType -> {
-            final Playable miniGame = miniGameType.createMiniGame();
+            final Playable miniGame = miniGameType.createMiniGame(joinCode);
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
