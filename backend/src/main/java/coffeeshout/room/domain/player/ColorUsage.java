@@ -1,10 +1,10 @@
 package coffeeshout.room.domain.player;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ColorUsage {
 
@@ -14,7 +14,7 @@ public class ColorUsage {
     private final Map<Integer, Boolean> colors;
 
     public ColorUsage() {
-        this.colors = new HashMap<>(); // 이렇게 해야 수정 가능
+        this.colors = new ConcurrentHashMap<>(); // 이렇게 해야 수정 가능
         for (int i = 0; i < COLOR_MAX_COUNT; i++) {
             colors.put(i, false);
         }
