@@ -13,23 +13,23 @@ import { Suspense } from 'react';
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <IdentifierProvider>
-          <ParticipantsProvider>
-            <WebSocketProvider>
-              <PlayerTypeProvider>
-                <ProbabilityHistoryProvider>
-                  <ToastProvider>
-                    <ModalProvider>
+      <IdentifierProvider>
+        <ParticipantsProvider>
+          <WebSocketProvider>
+            <PlayerTypeProvider>
+              <ProbabilityHistoryProvider>
+                <ToastProvider>
+                  <ModalProvider>
+                    <Suspense fallback={<div>Loading...</div>}>
                       <Outlet />
-                    </ModalProvider>
-                  </ToastProvider>
-                </ProbabilityHistoryProvider>
-              </PlayerTypeProvider>
-            </WebSocketProvider>
-          </ParticipantsProvider>
-        </IdentifierProvider>
-      </Suspense>
+                    </Suspense>
+                  </ModalProvider>
+                </ToastProvider>
+              </ProbabilityHistoryProvider>
+            </PlayerTypeProvider>
+          </WebSocketProvider>
+        </ParticipantsProvider>
+      </IdentifierProvider>
     </ThemeProvider>
   );
 };
