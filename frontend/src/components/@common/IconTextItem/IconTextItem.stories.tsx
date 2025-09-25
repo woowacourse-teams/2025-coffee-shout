@@ -3,7 +3,7 @@ import { colorList } from '@/constants/color';
 import IconTextItem from './IconTextItem';
 import PlayerIcon from '../../@composition/PlayerIcon/PlayerIcon';
 import CircleIcon from '../CircleIcon/CircleIcon';
-import CoffeeIcon from '@/assets/coffee.svg';
+import AdeIcon from '@/assets/ade.svg';
 
 const meta: Meta<typeof IconTextItem> = {
   title: 'Common/IconTextItem',
@@ -58,7 +58,7 @@ export const PlayerCardWithChildren: Story = {
 
 export const CafeCategory: Story = {
   args: {
-    iconContent: <CircleIcon color={colorList[1]} imageUrl={CoffeeIcon} iconAlt="check" />,
+    iconContent: <CircleIcon color={colorList[1]} imageUrl={AdeIcon} iconAlt="ade" />,
     textContent: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>커피</h4>

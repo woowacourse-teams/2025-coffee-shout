@@ -1,7 +1,8 @@
-import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
+import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
 import * as S from './Button.styled';
-import { isTouchDevice } from '@/utils/isTouchDevice';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import { Size } from '@/types/styles';
+import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
   onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
@@ -19,32 +20,44 @@ const Button = ({
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
-  const isTouch = isTouchDevice();
+  const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
+  const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isTouch) return;
+    if (isTouchDevice) return;
     if (isDisabled) return;
 
     onClick?.(e);
   };
 
+  const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
+    if (!isTouchDevice) return;
+    if (isDisabled) return;
+
+    e.preventDefault();
+    startTouchPress();
+  };
+
   const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouch) return;
+    if (!isTouchDevice) return;
     if (isDisabled) return;
 
     e.preventDefault();
 
     onClick?.(e);
+    endTouchPress();
   };
 
   return (
     <S.Container
       type="button"
       $variant={variant}
+      $isTouching={isTouching}
       $width={width}
       $height={height}
       disabled={isDisabled}
       onClick={handleClick}
+      onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       {...rest}
     >

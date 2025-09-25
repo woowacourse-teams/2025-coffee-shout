@@ -17,6 +17,7 @@ import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
@@ -180,13 +181,13 @@ const LobbyPage = () => {
   }, [joinCode]);
 
   useEffect(() => {
-    const hasSeenGuide = localStorage.getItem('coffee-shout-first-time-user');
+    const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');
 
-    if (!hasSeenGuide) {
+    if (!isFirstTimeUser) {
       openModal(
         <GuideModal
           onClose={() => {
-            localStorage.setItem('coffee-shout-first-time-user', 'true');
+            storageManager.setItem(STORAGE_KEYS.FIRST_TIME_USER, 'true', 'localStorage');
             closeModal();
           }}
         />,
