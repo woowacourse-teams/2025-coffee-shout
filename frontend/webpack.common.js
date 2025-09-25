@@ -39,7 +39,20 @@ export default (_, argv) => {
     module: {
       rules: [
         { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
-        { test: /\.(png|svg|jpg|jpeg|gif)$/i, type: 'asset/resource' },
+        {
+          test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: (pathData) => {
+              // assets/logo 폴더의 이미지들은 해시값 없이 원본 이름 유지
+              if (pathData.filename.includes('assets/logo/')) {
+                return 'logo/[name][ext]';
+              }
+              // 다른 이미지들은 기존처럼 해시값 포함
+              return '[name].[contenthash][ext]';
+            },
+          },
+        },
         { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
       ],
     },
