@@ -37,9 +37,9 @@ public class Room {
     private Player host;
     private RoomState roomState;
 
-    public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
+    public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu, int hostColorIndex) {
         this.joinCode = joinCode;
-        this.host = Player.createHost(hostName, selectedMenu);
+        this.host = Player.createHost(hostName, selectedMenu, hostColorIndex);
         this.players = new Players();
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
@@ -48,15 +48,15 @@ public class Room {
         join(host);
     }
 
-    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
-        return new Room(joinCode, hostName, selectedMenu);
+    public static Room createNewRoom(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu, int hostColorIndex) {
+        return new Room(joinCode, hostName, selectedMenu, hostColorIndex);
     }
 
-    public void joinGuest(PlayerName guestName, SelectedMenu selectedMenu) {
+    public void joinGuest(PlayerName guestName, SelectedMenu selectedMenu, int guestColorIndex) {
         validateRoomReady();
         validateCanJoin();
         validatePlayerNameNotDuplicate(guestName);
-        join(Player.createGuest(guestName, selectedMenu));
+        join(Player.createGuest(guestName, selectedMenu, guestColorIndex));
     }
 
     public void addMiniGame(PlayerName hostName, Playable miniGame) {
