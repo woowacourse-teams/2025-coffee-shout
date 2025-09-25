@@ -3,7 +3,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { colorList } from '@/constants/color';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 type ProbabilityResponse = {
   playerName: string;
@@ -13,22 +13,29 @@ type ProbabilityResponse = {
 const useRouletteProbabilities = () => {
   const { joinCode } = useIdentifier();
   const { getParticipantColorIndex } = useParticipants();
-  const { probabilityHistory, updateCurrentProbabilities } = useProbabilityHistory();
+  const { updateCurrentProbabilities } = useProbabilityHistory();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const data = await api.get<ProbabilityResponse[]>(`/rooms/${joinCode}/probabilities`);
-      updateCurrentProbabilities(
-        data.map((probability) => ({
-          ...probability,
-          playerColor: colorList[getParticipantColorIndex(probability.playerName)],
-        }))
-      );
+      try {
+        const data = await api.get<ProbabilityResponse[]>(`/rooms/${joinCode}/probabilities`);
+        updateCurrentProbabilities(
+          data.map((probability) => ({
+            ...probability,
+            playerColor: colorList[getParticipantColorIndex(probability.playerName)],
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, [joinCode, getParticipantColorIndex, updateCurrentProbabilities]);
 
   return {
-    probabilityHistory,
+    isLoading,
   };
 };
 

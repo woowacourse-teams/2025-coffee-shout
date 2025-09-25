@@ -13,14 +13,17 @@ import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSub
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { PlayerType } from '@/types/player';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
 const RoulettePlayPage = () => {
   const { joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
-  const { probabilityHistory } = useRouletteProbabilities();
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const { winner, randomAngle, isSpinning, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
+  const { probabilityHistory } = useProbabilityHistory();
+
+  const { isLoading: isProbabilitiesLoading } = useRouletteProbabilities();
 
   const handleWinnerData = useCallback(
     (data: RouletteWinnerResponse) => {
@@ -38,7 +41,12 @@ const RoulettePlayPage = () => {
 
   const VIEW_COMPONENTS = {
     roulette: (
-      <RoulettePlaySection isSpinning={isSpinning} winner={winner} randomAngle={randomAngle} />
+      <RoulettePlaySection
+        isSpinning={isSpinning}
+        winner={winner}
+        randomAngle={randomAngle}
+        isProbabilitiesLoading={isProbabilitiesLoading}
+      />
     ),
     statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
   };
