@@ -8,14 +8,22 @@
     />
     <title>커피빵 ☕️</title>
     <link
-      rel="stylesheet"
+      rel="preload"
       as="style"
       crossorigin
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+      />
+    </noscript>
     <link
       rel="preload"
-      href="https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/PartialSansKR-Regular.woff2"
+      href="/fonts/PartialSansKR-Subset.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -31,14 +39,13 @@
     <style>
       @font-face {
         font-family: 'PartialSansKR-Regular';
-        src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/PartialSansKR-Regular.woff2')
-          format('woff2');
+        src: url('/fonts/PartialSansKR-Subset.woff2') format('woff2');
         font-weight: normal;
         font-style: normal;
         font-display: swap;
       }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2150P8R4FF"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2150P8R4FF" />
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {

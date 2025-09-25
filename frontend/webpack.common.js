@@ -1,10 +1,12 @@
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import WebpackBundleAnalyzer from 'webpack-bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,6 +67,14 @@ export default (_, argv) => {
         template: './public/index.html',
         favicon: './public/favicon.ico',
       }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'public/fonts',
+            to: 'fonts',
+          },
+        ],
+      }),
       new webpack.DefinePlugin(envKeys),
       sentryWebpackPlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -72,6 +82,11 @@ export default (_, argv) => {
         project: '2025-coffee-shout',
         release: appVersion,
         sourcemaps: { disable: mode !== 'production' },
+      }),
+      new WebpackBundleAnalyzer.BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: true,
+        reportFilename: 'bundle-report.html',
       }),
     ],
     devServer: {
