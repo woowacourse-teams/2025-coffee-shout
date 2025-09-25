@@ -1,7 +1,6 @@
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import Button from '@/components/@common/Button/Button';
 import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
@@ -11,14 +10,13 @@ import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
-import { Probability } from '@/types/roulette';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
 type PlayerRank = {
   playerName: string;
@@ -36,6 +34,11 @@ type PlayerScoreResponse = {
   scores: PlayerScore[];
 };
 
+type ShowRouletteResponse = {
+  joinCode: string;
+  roomState: 'ROULETTE_SHOW';
+};
+
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
@@ -43,36 +46,22 @@ const MiniGameResultPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { getParticipantColorIndex } = useParticipants();
-  const { updateCurrentProbabilities } = useProbabilityHistory();
   const [ranks, setRanks] = useState<PlayerRank[] | null>(null);
   const [scores, setScores] = useState<PlayerScore[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePlayerProbabilitiesData = useCallback(
-    (data: Probability[]) => {
-      const playerProbabilitiesData = data.map((item) => ({
-        playerName: item.playerResponse.playerName,
-        probability: item.probability,
-        playerColor: colorList[item.playerResponse.colorIndex],
-      }));
+  const handleNavigateToRoulettePlayPage = useCallback(() => {
+    navigate(`/room/${joinCode}/roulette/play`);
+  }, [navigate, joinCode]);
 
-      updateCurrentProbabilities(playerProbabilitiesData);
-
-      if (joinCode) {
-        navigate(`/room/${joinCode}/roulette/play`);
-      }
-    },
-    [joinCode, navigate, updateCurrentProbabilities]
-  );
-
-  useWebSocketSubscription<Probability[]>(
+  useWebSocketSubscription<ShowRouletteResponse>(
     `/room/${joinCode}/roulette`,
-    handlePlayerProbabilitiesData
+    handleNavigateToRoulettePlayPage
   );
 
-  const handleViewRouletteResult = () => {
-    send(`/room/${joinCode}/get-probabilities`);
+  const handleClickRouletteResultButton = () => {
+    send(`/room/${joinCode}/show-roulette`);
   };
 
   useEffect(() => {
@@ -144,7 +133,7 @@ const MiniGameResultPage = () => {
       </Layout.Content>
       <Layout.ButtonBar>
         {playerType === 'HOST' ? (
-          <Button variant="primary" onClick={handleViewRouletteResult}>
+          <Button variant="primary" onClick={handleClickRouletteResultButton}>
             룰렛 현황 보러가기
           </Button>
         ) : (
