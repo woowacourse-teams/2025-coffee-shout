@@ -14,6 +14,7 @@ import coffeeshout.room.domain.player.PlayerName;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -24,14 +25,16 @@ public class CardGame implements Playable {
     private static final int MULTIPLIER_CARD_COUNT = 2;
 
     private final Deck deck;
+    private final long seed;
     private PlayerHands playerHands;
     private CardGameRound round;
     private CardGameState state;
 
-    public CardGame(@NonNull CardGameDeckGenerator deckGenerator) {
+    public CardGame(@NonNull CardGameDeckGenerator deckGenerator, long seed) {
         this.round = CardGameRound.READY;
         this.state = CardGameState.READY;
-        this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT);
+        this.seed = seed;
+        this.deck = deckGenerator.generate(ADDITION_CARD_COUNT, MULTIPLIER_CARD_COUNT, seed);
     }
 
     @Override
@@ -64,7 +67,9 @@ public class CardGame implements Playable {
     }
 
     public void startPlay() {
-        deck.shuffle();
+        // 시드 기반 셔플로 모든 인스턴스에서 동일한 카드 순서
+        java.util.Random random = new java.util.Random(seed + 1000); // 덱 생성과 구별하기 위해 오프셋 추가
+        deck.shuffle(random);
         this.state = CardGameState.PLAYING;
     }
 
@@ -87,8 +92,11 @@ public class CardGame implements Playable {
 
     public void assignRandomCardsToUnselectedPlayers() {
         final List<Player> unselectedPlayers = playerHands.getUnselectedPlayers(round);
+        // 라운드 정보를 포함한 시드로 일관된 랜덤 생성
+        Random random = new Random(seed + round.ordinal());
+
         for (Player player : unselectedPlayers) {
-            Card card = deck.pickRandom();
+            Card card = deck.pickRandom(random);
             playerHands.put(player, card);
         }
     }

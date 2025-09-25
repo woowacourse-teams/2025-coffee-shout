@@ -11,10 +11,11 @@ public enum MiniGameType {
     CARD_GAME,
     ;
 
-    public Playable createMiniGame() {
+    public Playable createMiniGame(String joinCode) {
         switch (this) {
             case CARD_GAME:
-                return new CardGame(new CardGameRandomDeckGenerator());
+                long seed = joinCode.hashCode();
+                return new CardGame(new CardGameRandomDeckGenerator(), seed);
         }
 
         throw new IllegalArgumentException("선택한 게임이 존재하지 않습니다.");
