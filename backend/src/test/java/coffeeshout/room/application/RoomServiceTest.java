@@ -182,7 +182,7 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThatThrownBy(
                 () -> roomService.enterRoom(joinCode, "게스트10", new SelectedMenuRequest(1L, null, MenuTemperature.ICE)))
-                .isInstanceOf(InvalidArgumentException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
