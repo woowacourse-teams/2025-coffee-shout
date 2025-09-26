@@ -3,7 +3,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { colorList } from '@/constants/color';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type ProbabilityResponse = {
   playerName: string;
@@ -16,9 +16,19 @@ const useRouletteProbabilities = () => {
   const { updateCurrentProbabilities } = useProbabilityHistory();
   const [isLoading, setIsLoading] = useState(true);
 
+  const isFirst = useRef<boolean>(false);
+
   useEffect(() => {
     (async () => {
       try {
+        //개발모드일때 1번만 실행하도록 조건 추가
+        if (process.env.NODE_ENV === 'development') {
+          if (isFirst.current) {
+            return;
+          }
+          isFirst.current = true;
+        }
+
         const data = await api.get<ProbabilityResponse[]>(`/rooms/${joinCode}/probabilities`);
         updateCurrentProbabilities(
           data.map((probability) => ({
