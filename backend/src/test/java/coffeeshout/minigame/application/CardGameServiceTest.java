@@ -62,8 +62,7 @@ class CardGameServiceTest extends ServiceTest {
         for (int i = 1; i < players.getPlayers().size(); i++) {
             room.joinGuest(
                     players.getPlayers().get(i).getName(),
-                    new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE),
-                    i
+                    new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
             );
         }
         for (Player player : room.getPlayers()) {

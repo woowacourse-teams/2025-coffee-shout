@@ -26,7 +26,7 @@ class PlayerHandsTest {
 
     @BeforeEach
     void setUp() {
-        players = new Players();
+        players = new Players("ABC23");
         players.join(PlayerFixture.호스트꾹이());
         players.join(PlayerFixture.호스트루키());
         players.join(PlayerFixture.호스트한스());

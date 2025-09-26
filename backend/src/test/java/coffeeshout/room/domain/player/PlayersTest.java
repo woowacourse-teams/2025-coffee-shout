@@ -16,7 +16,7 @@ class PlayersTest {
     @Test
     void 순위를_기반으로_확률을_조정한다() {
         // given
-        final Players players = new Players();
+        final Players players = new Players("ABC23");
         Player 한스 = PlayerFixture.호스트한스();
         Player 루키 = PlayerFixture.게스트루키();
         Player 꾹이 = PlayerFixture.게스트꾹이();
@@ -49,7 +49,7 @@ class PlayersTest {
         @Test
         void _3명_중_2등_동점자_2명() {
             // given
-            final Players players = new Players();
+            final Players players = new Players("ABC23");
             Player 한스 = PlayerFixture.호스트한스();
             Player 루키 = PlayerFixture.게스트루키();
             Player 꾹이 = PlayerFixture.게스트꾹이();
@@ -80,7 +80,7 @@ class PlayersTest {
         @Test
         void _4명_중_2등_동점자_2명() {
             // given
-            final Players players = new Players();
+            final Players players = new Players("ABC23");
             Player 한스 = PlayerFixture.호스트한스();
             Player 루키 = PlayerFixture.게스트루키();
             Player 꾹이 = PlayerFixture.게스트꾹이();
@@ -120,7 +120,7 @@ class PlayersTest {
         @Test
         void _4명_중_3등_동점자_2명() {
             // given
-            final Players players = new Players();
+            final Players players = new Players("ABC23");
             Player 한스 = PlayerFixture.호스트한스();
             Player 루키 = PlayerFixture.게스트루키();
             Player 꾹이 = PlayerFixture.게스트꾹이();
@@ -153,7 +153,7 @@ class PlayersTest {
         @Test
         void _4명_중_2등_동점자_3명() {
             // given
-            Players players = new Players();
+            Players players = new Players("ABC23");
             Player 한스 = PlayerFixture.호스트한스();
             Player 루키 = PlayerFixture.게스트루키();
             Player 꾹이 = PlayerFixture.게스트꾹이();
@@ -193,7 +193,7 @@ class PlayersTest {
             Player 엠제이 = PlayerFixture.게스트엠제이();
             Player 호스트유령 = PlayerFixture.호스트유령();
 
-            Players players = new Players();
+            Players players = new Players("ABC23");
 
             players.join(한스);
             players.join(루키);

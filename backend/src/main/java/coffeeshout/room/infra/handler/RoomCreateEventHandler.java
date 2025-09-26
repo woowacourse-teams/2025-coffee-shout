@@ -26,13 +26,12 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             final Room room = roomService.createRoomInternal(
                     event.hostName(),
                     event.selectedMenuRequest(),
-                    event.joinCode(),
-                    event.hostColorIndex()
+                    event.joinCode()
             );
 
             roomEventWaitManager.notifySuccess(event.getEventId(), room);
 
-            log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}", 
+            log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}",
                     event.getEventId(), event.joinCode());
 
         } catch (Exception e) {

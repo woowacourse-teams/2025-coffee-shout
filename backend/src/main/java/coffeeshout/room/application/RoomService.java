@@ -12,12 +12,10 @@ import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
-import coffeeshout.room.domain.player.ColorUsage;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.domain.repository.MemoryColorUsage;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
@@ -51,7 +49,6 @@ public class RoomService {
     private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final String defaultCategoryImage;
-    private final MemoryColorUsage roomColorUsages;
 
     public RoomService(
             RoomQueryService roomQueryService,
@@ -62,8 +59,7 @@ public class RoomService {
             DelayedRoomRemovalService delayedRoomRemovalService,
             RoomEventPublisher roomEventPublisher,
             RoomEventWaitManager roomEventWaitManager,
-            @Value("${menu-category.default-image}") String defaultCategoryImage,
-            MemoryColorUsage roomColorUsages
+            @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
         this.roomCommandService = roomCommandService;
@@ -74,27 +70,20 @@ public class RoomService {
         this.roomEventPublisher = roomEventPublisher;
         this.roomEventWaitManager = roomEventWaitManager;
         this.defaultCategoryImage = defaultCategoryImage;
-        this.roomColorUsages = roomColorUsages;
     }
 
     // === 비동기 메서드들 (REST Controller용) ===
 
     public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
-        final ColorUsage colorUsage = new ColorUsage();
-        final int hostColorIndex = colorUsage.pickRandomOne();
 
-        // 방별 ColorUsage 저장
-        roomColorUsages.put(joinCode.getValue(), colorUsage);
-
-        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue(),
-                hostColorIndex);
+        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
                 event.getEventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 생성",
-                String.format("joinCode=%s, hostColorIndex=%d", joinCode.getValue(), hostColorIndex),
+                String.format("joinCode=%s", joinCode.getValue()),
                 room -> String.format("joinCode=%s", room.getJoinCode().getValue())
         );
     }
@@ -104,15 +93,13 @@ public class RoomService {
             String guestName,
             SelectedMenuRequest selectedMenuRequest
     ) {
-        final ColorUsage colorUsage = roomColorUsages.get(joinCode);
-        final int guestColorIndex = colorUsage.pickRandomOne();
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest, guestColorIndex);
+        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
                 event.getEventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 참가",
-                String.format("joinCode=%s, guestName=%s, guestColorIndex=%d", joinCode, guestName, guestColorIndex),
+                String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
         );
     }
@@ -185,15 +172,17 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue,
-                                   int hostColorIndex) {
+    public Room createRoomInternal(
+            String hostName,
+            SelectedMenuRequest selectedMenuRequest,
+            String joinCodeValue
+    ) {
         final JoinCode joinCode = new JoinCode(joinCodeValue);
         final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = Room.createNewRoom(
                 joinCode,
                 new PlayerName(hostName),
-                new SelectedMenu(menu, selectedMenuRequest.temperature()),
-                hostColorIndex
+                new SelectedMenu(menu, selectedMenuRequest.temperature())
         );
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
         room.assignQrCodeUrl(qrCodeUrl);
@@ -202,13 +191,15 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-    public Room enterRoomInternal(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest,
-                                  int guestColorIndex) {
+    public Room enterRoomInternal(
+            String joinCode,
+            String guestName,
+            SelectedMenuRequest selectedMenuRequest
+    ) {
         final Menu menu = convertMenu(selectedMenuRequest);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
 
-        room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()),
-                guestColorIndex);
+        room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
 
         return roomCommandService.save(room);
     }
@@ -310,26 +301,12 @@ public class RoomService {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
 
-        // 제거할 플레이어의 colorIndex 가져오기
-        final Player playerToRemove = room.findPlayer(new PlayerName(playerName));
-        final Integer colorIndexToRelease = playerToRemove.getColorIndex();
-
         final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-
-        // ColorUsage에서 색상 해제
-        if (isRemoved && colorIndexToRelease != null) {
-            final ColorUsage colorUsage = roomColorUsages.get(joinCode);
-            if (colorUsage != null) {
-                colorUsage.release(colorIndexToRelease);
-            }
-        }
 
         if (!room.isEmpty()) {
             return isRemoved;
         }
 
-        // 방이 비어있으면 ColorUsage도 정리
-        roomColorUsages.remove(joinCode);
         roomCommandService.delete(code);
         return isRemoved;
     }

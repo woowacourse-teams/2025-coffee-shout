@@ -8,13 +8,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ColorUsage {
 
-    private static final Random random = new Random();
     private static final int COLOR_MAX_COUNT = 9;
 
+    private final Random random;
     private final Map<Integer, Boolean> colors;
 
-    public ColorUsage() {
-        this.colors = new ConcurrentHashMap<>(); // 이렇게 해야 수정 가능
+    public ColorUsage(String joinCode) {
+        this.random = new Random(joinCode.hashCode());
+        this.colors = new ConcurrentHashMap<>();
         for (int i = 0; i < COLOR_MAX_COUNT; i++) {
             colors.put(i, false);
         }
