@@ -15,20 +15,19 @@ public class Player {
     private Integer colorIndex;
     private Probability probability;
 
-    private Player(PlayerName name, SelectedMenu selectedMenu, Boolean isReady, PlayerType playerType, Integer colorIndex) {
+    private Player(PlayerName name, SelectedMenu selectedMenu, Boolean isReady, PlayerType playerType) {
         this.name = name;
         this.playerType = playerType;
         this.selectedMenu = selectedMenu;
         this.isReady = isReady;
-        this.colorIndex = colorIndex;
     }
 
-    public static Player createHost(PlayerName name, SelectedMenu selectedMenu, int colorIndex) {
-        return new Player(name, selectedMenu, true, PlayerType.HOST, colorIndex);
+    public static Player createHost(PlayerName name, SelectedMenu selectedMenu) {
+        return new Player(name, selectedMenu, true, PlayerType.HOST);
     }
 
-    public static Player createGuest(PlayerName name, SelectedMenu selectedMenu, int colorIndex) {
-        return new Player(name, selectedMenu, false, PlayerType.GUEST, colorIndex);
+    public static Player createGuest(PlayerName name, SelectedMenu selectedMenu) {
+        return new Player(name, selectedMenu, false, PlayerType.GUEST);
     }
 
     public void selectMenu(SelectedMenu selectedMenu) {
@@ -50,6 +49,10 @@ public class Player {
     public void promote() {
         this.playerType = PlayerType.HOST;
         this.isReady = true;
+    }
+
+    public void assignColorIndex(int colorIndex) {
+        this.colorIndex = colorIndex;
     }
 
     @Override

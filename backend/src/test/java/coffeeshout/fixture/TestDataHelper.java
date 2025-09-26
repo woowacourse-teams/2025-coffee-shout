@@ -6,9 +6,7 @@ import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
-import coffeeshout.room.domain.player.ColorUsage;
 import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.repository.MemoryColorUsage;
 import coffeeshout.room.domain.repository.MenuRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,26 +20,19 @@ public class TestDataHelper {
     private RoomRepository roomRepository;
 
     @Autowired
-    private MemoryColorUsage memoryColorUsage;
-
-    @Autowired
     private MenuRepository menuRepository;
 
     public Room createDummyRoom(String joinCode, String hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        ColorUsage colorUsage = new ColorUsage();
         Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName),
-                new SelectedMenu(menu, MenuTemperature.ICE), colorUsage.pickRandomOne());
-        memoryColorUsage.put(room.getJoinCode().getValue(), colorUsage);
+                new SelectedMenu(menu, MenuTemperature.ICE));
         return roomRepository.save(room);
     }
 
     public Room createDummyPlayingRoom(String joinCode, String hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        ColorUsage colorUsage = new ColorUsage();
         Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName),
-                new SelectedMenu(menu, MenuTemperature.ICE), colorUsage.pickRandomOne());
-        memoryColorUsage.put(room.getJoinCode().getValue(), colorUsage);
+                new SelectedMenu(menu, MenuTemperature.ICE));
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         return roomRepository.save(room);
     }
