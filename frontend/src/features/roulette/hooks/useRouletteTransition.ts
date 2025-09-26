@@ -17,6 +17,11 @@ export const useRouletteTransition = (
   const requestRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
+  const prevRef = useRef<PlayerProbability[]>([]);
+  const currentRef = useRef<PlayerProbability[]>([]);
+  prevRef.current = prev || [];
+  currentRef.current = current || [];
+
   const startAnimationTransition = useCallback(() => {
     if (!prev || !current || prev.length === 0 || current.length === 0) {
       setAnimatedSectors([]);
@@ -30,7 +35,7 @@ export const useRouletteTransition = (
       const rawT = Math.min(elapsed / ANIMATION_DURATION, 1);
       const progress = easeOutCubic(rawT);
 
-      const next = interpolateAngles({ from: prev, to: current, progress });
+      const next = interpolateAngles({ from: prevRef.current, to: currentRef.current, progress });
       setAnimatedSectors(next);
 
       if (rawT < 1) {
@@ -54,7 +59,6 @@ export const useRouletteTransition = (
     startTimeRef.current = null;
   }, []);
 
-  //animatedSectors의 초기값을 current로 설정하는 함수
   const setToCurrent = useCallback(() => {
     setAnimatedSectors(convertProbabilitiesToAngles(current || []));
   }, [current]);

@@ -19,12 +19,14 @@ export const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimatio
   } = useRouletteTransition(probabilityHistory.prev, probabilityHistory.current);
 
   useEffect(() => {
+    setToCurrent();
+  }, [setToCurrent]);
+
+  useEffect(() => {
     if (startAnimation) {
       startAnimationTransition();
-    } else {
-      setToCurrent();
     }
-  }, [startAnimation, startAnimationTransition, setToCurrent]);
+  }, [startAnimation, startAnimationTransition]);
 
   if (!animatedSectors) return null;
 
