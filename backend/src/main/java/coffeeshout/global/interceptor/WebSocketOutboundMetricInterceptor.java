@@ -22,7 +22,7 @@ public class WebSocketOutboundMetricInterceptor implements ExecutorChannelInterc
     private final WebSocketMetricService webSocketMetricService;
 
     @Override
-    public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
         final var type = SimpMessageHeaderAccessor.getMessageType(message.getHeaders());
         if (SimpMessageType.HEARTBEAT.equals(type)) {
             return message;
