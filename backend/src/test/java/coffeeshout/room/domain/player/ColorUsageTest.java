@@ -16,7 +16,7 @@ class ColorUsageTest {
 
     @BeforeEach
     void setUp() {
-        colorUsage = new ColorUsage();
+        colorUsage = new ColorUsage("ABC23");
     }
 
     @Test

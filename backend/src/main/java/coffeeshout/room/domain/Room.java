@@ -40,7 +40,7 @@ public class Room {
     public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
         this.joinCode = joinCode;
         this.host = Player.createHost(hostName, selectedMenu);
-        this.players = new Players();
+        this.players = new Players(joinCode.getValue());
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
         this.finishedGames = new ArrayList<>();
