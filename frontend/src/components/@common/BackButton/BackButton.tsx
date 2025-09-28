@@ -8,14 +8,14 @@ type Props = {
 } & ComponentProps<'button'>;
 
 const BackButton = ({ onClick, ...rest }: Props) => {
-  const { isTouching, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
 
   return (
     <S.Container
       onClick={onClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      $isTouching={isTouching}
+      $touchState={touchState}
       {...rest}
     >
       <img src={BackIcon} alt="뒤로가기" />

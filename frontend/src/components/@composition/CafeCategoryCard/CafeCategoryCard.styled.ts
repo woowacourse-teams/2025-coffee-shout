@@ -3,7 +3,7 @@ import { theme } from '@/styles/theme';
 import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 
 type Props = {
-  $isTouching: boolean;
+  $touchState: 'idle' | 'pressing' | 'releasing';
 };
 
 export const Container = styled.button<Props>`
@@ -12,10 +12,10 @@ export const Container = styled.button<Props>`
   background-color: ${({ theme }) => theme.color.white};
   width: 100%;
 
-  ${({ theme, $isTouching }) =>
+  ${({ theme, $touchState }) =>
     buttonHoverPress({
       activeColor: theme.color.gray[100],
-      isTouching: $isTouching,
+      touchState: $touchState,
       enableScale: false,
     })}
 

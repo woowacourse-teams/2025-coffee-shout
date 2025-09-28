@@ -13,7 +13,7 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const { isTouching, handleTouchStart, handleTouchEnd } = useTouchInteraction({
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
     onClick: onClick || (() => {}),
   });
   const isTouchDevice = checkIsTouchDevice();
@@ -29,7 +29,7 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      $isTouching={isTouching}
+      $touchState={touchState}
       {...rest}
     >
       <Headline3>{title}</Headline3>

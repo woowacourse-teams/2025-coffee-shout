@@ -1,32 +1,60 @@
 import { ANIMATION_DURATION } from '@/constants/animation';
 import { css } from '@emotion/react';
 
+type TouchState = 'idle' | 'pressing' | 'releasing';
+
 type Props = {
   activeColor: string;
-  isTouching?: boolean;
+  touchState: TouchState;
 };
 
-export const backgroundPressEffect = ({ activeColor, isTouching }: Props) => css`
-  position: relative;
-  overflow: hidden;
+export const backgroundPressEffect = ({ activeColor, touchState }: Props) => {
+  const getScaleX = () => {
+    switch (touchState) {
+      case 'pressing':
+        return 1.2;
+      case 'releasing':
+        return 1;
+      default:
+        return 0;
+    }
+  };
 
-  &::before {
-    z-index: -1;
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: ${activeColor};
-    border-radius: 12px;
+  const getOpacity = () => {
+    switch (touchState) {
+      case 'pressing':
+        return 1;
+      case 'releasing':
+        return 0.5; // 릴리즈 시 투명도 감소
+      default:
+        return 0;
+    }
+  };
 
-    transform: scaleX(${isTouching ? 1.2 : 0});
-    opacity: ${isTouching ? 1 : 0};
-    transform-origin: center;
+  const shouldAnimate = touchState !== 'idle';
 
-    transition:
-      ${isTouching ? `transform ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out` : 'none'},
-      opacity ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out;
-  }
-`;
+  return css`
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      z-index: -1;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: ${activeColor};
+      border-radius: 12px;
+
+      transform: scaleX(${getScaleX()});
+      opacity: ${getOpacity()};
+      transform-origin: center;
+
+      transition:
+        ${shouldAnimate ? `transform ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out` : 'none'},
+        opacity ${ANIMATION_DURATION.BACKGROUND_PRESS}ms ease-out;
+    }
+  `;
+};

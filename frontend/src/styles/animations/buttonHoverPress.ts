@@ -2,15 +2,17 @@ import { css } from '@emotion/react';
 import { backgroundPressEffect } from './effects/backGroundPressEffect';
 import { scalePressEffect } from './effects/scalePressEffect';
 
+type TouchState = 'idle' | 'pressing' | 'releasing';
+
 interface ButtonHoverPressProps {
   activeColor: string;
-  isTouching: boolean;
+  touchState: TouchState;
   enableScale?: boolean;
 }
 
 export const buttonHoverPress = ({
   activeColor,
-  isTouching,
+  touchState,
   enableScale = true,
 }: ButtonHoverPressProps) => {
   console.log('activeColor', activeColor);
@@ -23,8 +25,8 @@ export const buttonHoverPress = ({
       }
     }
 
-    /* 터치 디바이스: isTouching 상태로 제어 */
-    ${backgroundPressEffect({ activeColor, isTouching })}
-    ${enableScale && scalePressEffect({ isTouching, scaleValue: 0.98 })}
+    /* 터치 디바이스: touchState 상태로 제어 */
+    ${backgroundPressEffect({ activeColor, touchState })}
+    ${enableScale && scalePressEffect({ touchState, scaleValue: 0.98 })}
   `;
 };

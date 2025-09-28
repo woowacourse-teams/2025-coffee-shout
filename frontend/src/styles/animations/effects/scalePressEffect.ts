@@ -1,19 +1,30 @@
 import { ANIMATION_DURATION, ANIMATION_SCALE } from '@/constants/animation';
 import { css } from '@emotion/react';
 
+type TouchState = 'idle' | 'pressing' | 'releasing';
+
 type ScalePressEffectProps = {
-  isTouching: boolean;
+  touchState: TouchState;
   scaleValue?: number;
   duration?: number;
 };
 
 export const scalePressEffect = ({
-  isTouching,
+  touchState,
   scaleValue = ANIMATION_SCALE.SCALE_PRESS,
   duration = ANIMATION_DURATION.SCALE_PRESS,
 }: ScalePressEffectProps) => {
+  const getScale = () => {
+    switch (touchState) {
+      case 'pressing':
+        return scaleValue;
+      default:
+        return 1;
+    }
+  };
+
   return css`
-    transform: scale(${isTouching ? scaleValue : 1});
+    transform: scale(${getScale()});
     transition: transform ${duration}ms ease-out;
   `;
 };

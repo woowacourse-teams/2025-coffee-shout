@@ -3,13 +3,15 @@ import { useState, useCallback, TouchEvent, MouseEvent } from 'react';
 
 const TOUCH_DELAY_MS = 100;
 
+type TouchState = 'idle' | 'pressing' | 'releasing';
+
 type UseTouchTransitionProps = {
   onClick: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;
   isDisabled?: boolean;
 };
 
 export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTransitionProps) => {
-  const [isTouching, setIsTouching] = useState(false);
+  const [touchState, setTouchState] = useState<TouchState>('idle');
   const isTouchDevice = checkIsTouchDevice();
 
   const handleTouchStart = useCallback(
@@ -18,7 +20,7 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
       if (isDisabled) return;
 
       e.preventDefault();
-      setIsTouching(true);
+      setTouchState('pressing');
     },
     [isTouchDevice, isDisabled]
   );
@@ -29,8 +31,9 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
       if (isDisabled) return;
 
       e.preventDefault();
+      setTouchState('releasing');
       setTimeout(() => {
-        setIsTouching(false);
+        setTouchState('idle');
         onClick(e);
       }, TOUCH_DELAY_MS);
     },
@@ -38,7 +41,7 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
   );
 
   return {
-    isTouching,
+    touchState,
     handleTouchStart,
     handleTouchEnd,
   };

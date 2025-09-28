@@ -2,7 +2,7 @@ import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 import styled from '@emotion/styled';
 
 type Props = {
-  $isTouching: boolean;
+  $touchState: 'idle' | 'pressing' | 'releasing';
 };
 
 export const Container = styled.button<Props>`
@@ -16,8 +16,11 @@ export const Container = styled.button<Props>`
   cursor: pointer;
   background-color: ${({ theme }) => theme.color.gray[100]};
 
-  ${({ theme, $isTouching }) =>
-    buttonHoverPress({ activeColor: theme.color.gray[200], isTouching: $isTouching })}
+  ${({ theme, $touchState }) =>
+    buttonHoverPress({
+      activeColor: theme.color.gray[200],
+      touchState: $touchState,
+    })}
 `;
 
 export const Icon = styled.img`

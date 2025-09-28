@@ -12,12 +12,12 @@ type Props = {
 };
 
 const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color }: Props) => {
-  const { isTouching, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
 
   return (
     <S.Container
       onClick={onClick}
-      $isTouching={isTouching}
+      $touchState={touchState}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

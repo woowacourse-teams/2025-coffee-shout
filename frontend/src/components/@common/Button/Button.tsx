@@ -20,7 +20,7 @@ const Button = ({
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
-  const { isTouching, handleTouchStart, handleTouchEnd } = useTouchInteraction({
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
     onClick: onClick || (() => {}),
     isDisabled,
   });
@@ -37,7 +37,7 @@ const Button = ({
     <S.Container
       type="button"
       $variant={variant}
-      $isTouching={isTouching}
+      $touchState={touchState}
       $width={width}
       $height={height}
       disabled={isDisabled}

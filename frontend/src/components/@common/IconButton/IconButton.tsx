@@ -9,7 +9,7 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
-  const { isTouching, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
   const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -22,7 +22,7 @@ const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      $isTouching={isTouching}
+      $touchState={touchState}
       {...rest}
     >
       <S.Icon src={iconSrc} alt={'icon-button'} />

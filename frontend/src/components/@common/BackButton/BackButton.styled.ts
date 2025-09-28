@@ -2,7 +2,7 @@ import { rippleEffect } from '@/styles/animations/effects/rippleEffect';
 import styled from '@emotion/styled';
 
 type Props = {
-  $isTouching: boolean;
+  $touchState: 'idle' | 'pressing' | 'releasing';
 };
 
 export const Container = styled.button<Props>`
@@ -13,5 +13,5 @@ export const Container = styled.button<Props>`
   display: flex;
   align-items: center;
   justify-content: start;
-  ${({ $isTouching }) => rippleEffect($isTouching)}
+  ${({ $touchState }) => rippleEffect($touchState)}
 `;

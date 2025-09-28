@@ -10,7 +10,7 @@ type Props = {
   $variant: ButtonVariant;
   $width: string;
   $height: Size;
-  $isTouching: boolean;
+  $touchState: 'idle' | 'pressing' | 'releasing';
 };
 
 export const Container = styled.button<Props>`
@@ -35,12 +35,15 @@ export const Container = styled.button<Props>`
   border-radius: 12px;
   cursor: pointer;
 
-  ${({ $variant, theme, $isTouching }) => {
+  ${({ $variant, theme, $touchState }) => {
     switch ($variant) {
       case 'secondary': {
         const baseColor = theme.color.gray[50];
         const activeColor = theme.color.gray[100];
-        const hoverPressStyles = buttonHoverPress({ activeColor, isTouching: $isTouching });
+        const hoverPressStyles = buttonHoverPress({
+          activeColor,
+          touchState: $touchState,
+        });
 
         return css`
           background: ${baseColor};
@@ -74,7 +77,10 @@ export const Container = styled.button<Props>`
       default: {
         const baseColor = theme.color.point[400];
         const activeColor = theme.color.point[500];
-        const hoverPressStyles = buttonHoverPress({ activeColor, isTouching: $isTouching });
+        const hoverPressStyles = buttonHoverPress({
+          activeColor,
+          touchState: $touchState,
+        });
 
         return css`
           background: ${baseColor};
