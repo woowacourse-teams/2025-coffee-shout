@@ -5,11 +5,13 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
 import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
+import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 
 type Props = {
   isSpinning: boolean;
   winner: string | null;
   randomAngle: number;
+  isProbabilitiesLoading: boolean;
 };
 
 const formatPercent = new Intl.NumberFormat('ko-KR', {
@@ -17,7 +19,12 @@ const formatPercent = new Intl.NumberFormat('ko-KR', {
   maximumFractionDigits: 2,
 });
 
-const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
+const RoulettePlaySection = ({
+  isSpinning,
+  winner,
+  randomAngle,
+  isProbabilitiesLoading,
+}: Props) => {
   const { myName } = useIdentifier();
   const { probabilityHistory } = useProbabilityHistory();
 
@@ -40,9 +47,13 @@ const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
   return (
     <S.Container>
       <S.RouletteWheelWrapper>
-        <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+        {isProbabilitiesLoading ? (
+          <RouletteWheel playerProbabilities={probabilityHistory.current} />
+        ) : (
+          <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+        )}
       </S.RouletteWheelWrapper>
-      <S.ProbabilityText>
+      <S.ProbabilityText $isProbabilitiesLoading={isProbabilitiesLoading}>
         <Headline4>
           현재 확률 : {myCurrentProbability + '%'} {'('}
           <S.ProbabilityChange isPositive={myProbabilityChange >= 0}>

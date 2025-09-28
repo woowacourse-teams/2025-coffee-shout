@@ -8,6 +8,7 @@ import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvid
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
+import { Suspense } from 'react';
 
 const App = () => {
   return (
@@ -19,7 +20,9 @@ const App = () => {
               <ProbabilityHistoryProvider>
                 <ToastProvider>
                   <ModalProvider>
-                    <Outlet />
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <Outlet />
+                    </Suspense>
                   </ModalProvider>
                 </ToastProvider>
               </ProbabilityHistoryProvider>

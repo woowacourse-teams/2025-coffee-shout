@@ -4,11 +4,11 @@ import GuideContent from './GuideContent/GuideContent';
 import Pagination from './Pagination/Pagination';
 import Layout from '@/layouts/Layout';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import Guide1 from '@/assets/guide1.png';
-import Guide2 from '@/assets/guide2.png';
-import Guide3 from '@/assets/guide3.png';
-import Guide4 from '@/assets/guide4.png';
-import Guide5 from '@/assets/guide5.png';
+import Guide1 from '@/assets/guide1.webp';
+import Guide2 from '@/assets/guide2.webp';
+import Guide3 from '@/assets/guide3.webp';
+import Guide4 from '@/assets/guide4.webp';
+import Guide5 from '@/assets/guide5.webp';
 
 type Props = {
   onClose: () => void;

@@ -1,4 +1,4 @@
-import LogoSplashIcon from '@/assets/logo-splash.svg';
+import LogoSplashIcon from '@/assets/logo/coffee-white.png';
 import Layout from '@/layouts/Layout';
 import { useEffect } from 'react';
 import * as S from './Splash.styled';

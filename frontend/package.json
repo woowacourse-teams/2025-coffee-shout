@@ -7,6 +7,10 @@
   "scripts": {
     "dev": "webpack serve --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
+    "build:dev": "webpack --config webpack.dev.js",
+    "build:prod": "webpack --config webpack.prod.js",
+    "preview:dev": "npm run build:dev && npx serve -s dist -p 5000",
+    "preview:prod": "npm run build:prod && npx serve -s dist -p 5001",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
@@ -17,6 +21,12 @@
     "test:jest": "jest --passWithNoTests --config jest.config.cjs",
     "test:cypress": "cypress open"
   },
+  "sideEffects": [
+    "*.css",
+    "*.scss",
+    "./src/styles/**/*",
+    "./src/assets/**/*"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -40,6 +50,7 @@
     "@types/sockjs-client": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
+    "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
     "cypress": "^14.5.1",
     "dotenv": "^17.2.0",
@@ -75,6 +86,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.0",
-    "sockjs-client": "^1.6.1"
+    "sockjs-client": "^1.6.1",
+    "webpack-bundle-analyzer": "^4.10.0"
   }
 }

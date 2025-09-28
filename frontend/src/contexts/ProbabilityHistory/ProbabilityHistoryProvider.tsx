@@ -3,20 +3,20 @@ import { ProbabilityHistory, PlayerProbability } from '@/types/roulette';
 import { ProbabilityHistoryContext } from './ProbabilityHistoryContext';
 
 const ProbabilityHistoryProvider = ({ children }: PropsWithChildren) => {
-  const [probabilityHistory, setProbabilityHistory] = useState<ProbabilityHistory>({
+  const [probabilityHistoryState, setProbabilityHistoryState] = useState<ProbabilityHistory>({
     prev: [],
     current: [],
   });
 
   const updateCurrentProbabilities = useCallback((probabilities: PlayerProbability[]) => {
-    setProbabilityHistory((prev) => ({
+    setProbabilityHistoryState((prev) => ({
       prev: prev.current,
       current: probabilities,
     }));
   }, []);
 
   const clearProbabilityHistory = useCallback(() => {
-    setProbabilityHistory({
+    setProbabilityHistoryState({
       prev: [],
       current: [],
     });
@@ -25,7 +25,7 @@ const ProbabilityHistoryProvider = ({ children }: PropsWithChildren) => {
   return (
     <ProbabilityHistoryContext.Provider
       value={{
-        probabilityHistory,
+        probabilityHistory: probabilityHistoryState,
         updateCurrentProbabilities,
         clearProbabilityHistory,
       }}
