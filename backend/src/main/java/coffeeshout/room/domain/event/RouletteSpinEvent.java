@@ -1,41 +1,25 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.global.event.BaseEvent;
 import coffeeshout.room.domain.player.Winner;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import lombok.Getter;
 
-public record RouletteSpinEvent(
-        String eventId,
-        RoomEventType eventType,
-        String joinCode,
-        String hostName,
-        Winner winner,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+@Getter
+public class RouletteSpinEvent extends BaseEvent implements RoomBaseEvent {
+    private final RoomEventType eventType;
+    private final String joinCode;
+    private final String hostName;
+    private final Winner winner;
 
-    public static RouletteSpinEvent create(String joinCode, String hostName, Winner winner) {
-        return new RouletteSpinEvent(
-                UUID.randomUUID().toString(),
-                RoomEventType.ROULETTE_SPIN,
-                joinCode,
-                hostName,
-                winner,
-                LocalDateTime.now()
-        );
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public RouletteSpinEvent(String joinCode, String hostName, Winner winner) {
+        this.eventType = RoomEventType.ROULETTE_SPIN;
+        this.joinCode = joinCode;
+        this.hostName = hostName;
+        this.winner = winner;
     }
 
     @Override
     public RoomEventType getEventType() {
         return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
     }
 }

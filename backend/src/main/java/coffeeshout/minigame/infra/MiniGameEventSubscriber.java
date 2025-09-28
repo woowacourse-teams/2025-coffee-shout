@@ -1,5 +1,7 @@
 package coffeeshout.minigame.infra;
 
+import coffeeshout.global.config.trace.TracerProvider;
+import coffeeshout.global.event.BaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
@@ -26,12 +28,14 @@ public class MiniGameEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic miniGameEventTopic;
+    private final TracerProvider tracerProvider;
 
     public MiniGameEventSubscriber(
             List<MiniGameEventHandler<?>> handlers,
             ObjectMapper objectMapper,
             RedisMessageListenerContainer redisMessageListenerContainer,
-            ChannelTopic miniGameEventTopic
+            ChannelTopic miniGameEventTopic,
+            TracerProvider tracerProvider
     ) {
         this.handlers = handlers.stream()
                 .collect(Collectors.toMap(
@@ -41,6 +45,7 @@ public class MiniGameEventSubscriber implements MessageListener {
         this.objectMapper = objectMapper;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.miniGameEventTopic = miniGameEventTopic;
+        this.tracerProvider = tracerProvider;
     }
 
     @PostConstruct
@@ -62,7 +67,8 @@ public class MiniGameEventSubscriber implements MessageListener {
 
             final MiniGameBaseEvent event = deserializeEvent(body, eventType);
             final MiniGameEventHandler<MiniGameBaseEvent> handler = handlers.get(eventType);
-            handler.handle(event);
+            final BaseEvent baseEvent = (BaseEvent) event;
+            tracerProvider.executeWithTraceContext(baseEvent.getTraceId(), baseEvent.getSpanId(), () -> handler.handle(event), event.getEventType().name());
 
         } catch (Exception e) {
             log.error("미니게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);

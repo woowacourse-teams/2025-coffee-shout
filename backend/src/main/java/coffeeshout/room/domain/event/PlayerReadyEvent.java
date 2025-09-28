@@ -1,40 +1,24 @@
 package coffeeshout.room.domain.event;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import coffeeshout.global.event.BaseEvent;
+import lombok.Getter;
 
-public record PlayerReadyEvent(
-        String eventId,
-        RoomEventType eventType,
-        String joinCode,
-        String playerName,
-        Boolean isReady,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+@Getter
+public class PlayerReadyEvent extends BaseEvent implements RoomBaseEvent {
+    private final RoomEventType eventType;
+    private final String joinCode;
+    private final String playerName;
+    private final Boolean isReady;
 
-    public static PlayerReadyEvent create(String joinCode, String playerName, Boolean isReady) {
-        return new PlayerReadyEvent(
-                UUID.randomUUID().toString(),
-                RoomEventType.PLAYER_READY,
-                joinCode,
-                playerName,
-                isReady,
-                LocalDateTime.now()
-        );
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public PlayerReadyEvent(String joinCode, String playerName, Boolean isReady) {
+        this.eventType = RoomEventType.PLAYER_READY;
+        this.joinCode = joinCode;
+        this.playerName = playerName;
+        this.isReady = isReady;
     }
 
     @Override
     public RoomEventType getEventType() {
         return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
     }
 }

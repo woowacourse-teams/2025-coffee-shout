@@ -1,43 +1,27 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.global.event.BaseEvent;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import lombok.Getter;
 
-public record RoomCreateEvent(
-        String eventId,
-        RoomEventType eventType,
-        String hostName,
-        SelectedMenuRequest selectedMenuRequest,
-        String joinCode,
-        int hostColorIndex,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+@Getter
+public class RoomCreateEvent extends BaseEvent implements RoomBaseEvent {
+    private final RoomEventType eventType;
+    private final String hostName;
+    private final SelectedMenuRequest selectedMenuRequest;
+    private final String joinCode;
+    private final int hostColorIndex;
 
-    public static RoomCreateEvent create(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode, int hostColorIndex) {
-        return new RoomCreateEvent(
-                UUID.randomUUID().toString(),
-                RoomEventType.ROOM_CREATE,
-                hostName,
-                selectedMenuRequest,
-                joinCode,
-                hostColorIndex,
-                LocalDateTime.now()
-        );
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public RoomCreateEvent(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode, int hostColorIndex) {
+        this.eventType = RoomEventType.ROOM_CREATE;
+        this.hostName = hostName;
+        this.selectedMenuRequest = selectedMenuRequest;
+        this.joinCode = joinCode;
+        this.hostColorIndex = hostColorIndex;
     }
 
     @Override
     public RoomEventType getEventType() {
         return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
     }
 }

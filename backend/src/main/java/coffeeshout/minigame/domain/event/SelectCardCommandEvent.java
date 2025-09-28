@@ -1,32 +1,21 @@
 package coffeeshout.minigame.domain.event;
 
+import coffeeshout.global.event.BaseEvent;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import lombok.Getter;
 
-public record SelectCardCommandEvent(
-        String eventId,
-        MiniGameEventType eventType,
-        LocalDateTime createdAt,
-        String joinCode,
-        String playerName,
-        Integer cardIndex
-) implements MiniGameBaseEvent {
+@Getter
+public class SelectCardCommandEvent extends BaseEvent implements MiniGameBaseEvent {
+    private final MiniGameEventType eventType;
+    private final String joinCode;
+    private final String playerName;
+    private final Integer cardIndex;
 
-    public static SelectCardCommandEvent create(String joinCode, String playerName, Integer cardIndex) {
-        final String eventId = UUID.randomUUID().toString();
-        return new SelectCardCommandEvent(
-                eventId,
-                MiniGameEventType.SELECT_CARD_COMMAND,
-                LocalDateTime.now(),
-                joinCode,
-                playerName,
-                cardIndex
-        );
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public SelectCardCommandEvent(String joinCode, String playerName, Integer cardIndex) {
+        this.eventType = MiniGameEventType.SELECT_CARD_COMMAND;
+        this.joinCode = joinCode;
+        this.playerName = playerName;
+        this.cardIndex = cardIndex;
     }
 
     @Override
@@ -36,6 +25,6 @@ public record SelectCardCommandEvent(
 
     @Override
     public LocalDateTime getCreatedAt() {
-        return createdAt;
+        return getTimestamp();
     }
 }

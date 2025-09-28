@@ -87,7 +87,7 @@ public class RoomService {
         // 방별 ColorUsage 저장
         roomColorUsages.put(joinCode.getValue(), colorUsage);
 
-        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue(),
+        final RoomCreateEvent event = new RoomCreateEvent(hostName, selectedMenuRequest, joinCode.getValue(),
                 hostColorIndex);
 
         return processEventAsync(
@@ -106,7 +106,7 @@ public class RoomService {
     ) {
         final ColorUsage colorUsage = roomColorUsages.get(joinCode);
         final int guestColorIndex = colorUsage.pickRandomOne();
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest, guestColorIndex);
+        final RoomJoinEvent event = new RoomJoinEvent(joinCode, guestName, selectedMenuRequest, guestColorIndex);
 
         return processEventAsync(
                 event.getEventId(),

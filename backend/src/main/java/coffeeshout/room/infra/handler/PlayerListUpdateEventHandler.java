@@ -24,18 +24,18 @@ public class PlayerListUpdateEventHandler implements RoomEventHandler<PlayerList
     public void handle(PlayerListUpdateEvent event) {
         try {
             log.info("플레이어 목록 업데이트 이벤트 수신: eventId={}, joinCode={}",
-                    event.getEventId(), event.joinCode());
+                    event.getEventId(), event.getJoinCode());
 
-            final List<Player> players = roomService.getPlayersInternal(event.joinCode());
+            final List<Player> players = roomService.getPlayersInternal(event.getJoinCode());
             final List<PlayerResponse> responses = players.stream()
                     .map(PlayerResponse::from)
                     .toList();
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(),
+            messagingTemplate.convertAndSend("/topic/room/" + event.getJoinCode(),
                     WebSocketResponse.success(responses));
 
             log.info("플레이어 목록 업데이트 이벤트 처리 완료: eventId={}, joinCode={}",
-                    event.getEventId(), event.joinCode());
+                    event.getEventId(), event.getJoinCode());
 
         } catch (Exception e) {
             log.error("플레이어 목록 업데이트 이벤트 처리 실패", e);

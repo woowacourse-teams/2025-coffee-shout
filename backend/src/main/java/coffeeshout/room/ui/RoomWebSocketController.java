@@ -47,7 +47,7 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
-        final PlayerListUpdateEvent event = PlayerListUpdateEvent.create(joinCode);
+        final PlayerListUpdateEvent event = new PlayerListUpdateEvent(joinCode);
         roomEventPublisher.publishEvent(event);
     }
 
@@ -66,7 +66,7 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
-        final PlayerReadyEvent event = PlayerReadyEvent.create(joinCode, message.playerName(), message.isReady());
+        final PlayerReadyEvent event = new PlayerReadyEvent(joinCode, message.playerName(), message.isReady());
         roomEventPublisher.publishEvent(event);
     }
 
@@ -85,7 +85,7 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastMiniGames(@DestinationVariable String joinCode, MiniGameSelectMessage message) {
-        final MiniGameSelectEvent event = MiniGameSelectEvent.create(joinCode, message.hostName(),
+        final MiniGameSelectEvent event = new MiniGameSelectEvent(joinCode, message.hostName(),
                 message.miniGameTypes());
         roomEventPublisher.publishEvent(event);
     }
@@ -102,7 +102,7 @@ public class RoomWebSocketController {
                     """
     )
     public void broadcastShowRoulette(@DestinationVariable String joinCode) {
-        final RouletteShowEvent event = RouletteShowEvent.create(joinCode);
+        final RouletteShowEvent event = new RouletteShowEvent(joinCode);
         roomEventPublisher.publishEvent(event);
     }
 
@@ -120,7 +120,7 @@ public class RoomWebSocketController {
     public void broadcastRouletteSpin(@DestinationVariable String joinCode, RouletteSpinMessage message) {
         final Room room = roomService.getRoomByJoinCode(joinCode);
         final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
-        final RouletteSpinEvent event = RouletteSpinEvent.create(joinCode, message.hostName(), winner);
+        final RouletteSpinEvent event = new RouletteSpinEvent(joinCode, message.hostName(), winner);
         roomEventPublisher.publishEvent(event);
     }
 }

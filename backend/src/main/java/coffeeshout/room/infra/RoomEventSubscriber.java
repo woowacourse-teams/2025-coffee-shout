@@ -1,5 +1,9 @@
 package coffeeshout.room.infra;
 
+import coffeeshout.global.config.trace.ObservationRegistryProvider;
+import coffeeshout.global.config.trace.TraceContextProvider;
+import coffeeshout.global.config.trace.TracerProvider;
+import coffeeshout.global.event.BaseEvent;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
@@ -13,7 +17,14 @@ import coffeeshout.room.infra.handler.RoomEventHandler;
 import coffeeshout.room.infra.handler.RoomEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.TraceContext;
+import io.micrometer.tracing.Tracer;
+import io.micrometer.tracing.handler.TracingObservationHandler.TracingContext;
 import jakarta.annotation.PostConstruct;
+import java.awt.desktop.PrintFilesEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -31,6 +42,7 @@ public class RoomEventSubscriber implements MessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
     private final RoomEventHandlerFactory handlerFactory;
+    private final TracerProvider tracerProvider;
 
     @PostConstruct
     public void subscribe() {
@@ -51,7 +63,8 @@ public class RoomEventSubscriber implements MessageListener {
 
             final RoomBaseEvent event = deserializeEvent(body, eventType);
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
-            handler.handle(event);
+            final BaseEvent baseEvent = (BaseEvent) event;
+            tracerProvider.executeWithTraceContext(baseEvent.getTraceId(), baseEvent.getSpanId(), () -> handler.handle(event), event.getEventType().name());
 
         } catch (Exception e) {
             log.error("이벤트 처리 실패: message={}", new String(message.getBody()), e);
