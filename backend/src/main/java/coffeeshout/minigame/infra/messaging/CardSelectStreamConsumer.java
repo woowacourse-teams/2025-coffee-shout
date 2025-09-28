@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class CardSelectStreamConsumer implements StreamListener<String, ObjectRecord<String, String>> {
 
     private final CardGameCommandService cardGameCommandService;
-    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> objectRecordStreamMessageListenerContainer;
+    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> orderedStreamMessageListenerContainer;
     private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
@@ -29,7 +29,7 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
     @PostConstruct
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
-        objectRecordStreamMessageListenerContainer.receive(
+        orderedStreamMessageListenerContainer.receive(
                 redisStreamStartStrategy.getStreamOffset(redisStreamProperties.cardGameSelectKey()),
                 this
         );
