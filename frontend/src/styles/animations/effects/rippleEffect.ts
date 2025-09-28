@@ -38,8 +38,8 @@ export const rippleEffect = (touchState: TouchState) => {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       background: ${rippleColor};
       border-radius: 50%;
 
