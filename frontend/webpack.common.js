@@ -1,10 +1,12 @@
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import WebpackBundleAnalyzer from 'webpack-bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,18 +41,40 @@ export default (_, argv) => {
     module: {
       rules: [
         { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
-        { test: /\.(png|svg|jpg|jpeg|gif)$/i, type: 'asset/resource' },
+        {
+          test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: (pathData) => {
+              // assets/logo 폴더의 이미지들은 해시값 없이 원본 이름 유지
+              if (pathData.filename.includes('assets/logo/')) {
+                return 'logo/[name][ext]';
+              }
+              // 다른 이미지들은 기존처럼 해시값 포함
+              return '[name].[contenthash][ext]';
+            },
+          },
+        },
         { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
       ],
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       alias: { '@': path.resolve(__dirname, 'src') },
+      conditionNames: ['import', 'module', 'browser', 'default'],
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'public/fonts',
+            to: 'fonts',
+          },
+        ],
       }),
       new webpack.DefinePlugin(envKeys),
       sentryWebpackPlugin({
@@ -60,6 +84,11 @@ export default (_, argv) => {
         release: appVersion,
         sourcemaps: { disable: mode !== 'production' },
       }),
+      new WebpackBundleAnalyzer.BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: true,
+        reportFilename: 'bundle-report.html',
+      }),
     ],
     devServer: {
       compress: true,
@@ -67,6 +96,21 @@ export default (_, argv) => {
       hot: true,
       open: true,
       historyApiFallback: true,
+    },
+    optimization: {
+      usedExports: true,
+      sideEffects: false,
+
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
     },
   };
 };
