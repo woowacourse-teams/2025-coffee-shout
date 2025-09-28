@@ -18,12 +18,24 @@ type BallData = {
 
 const TestPage = () => {
   const [isConnected, setIsConnected] = useState(false);
-  const [ballDataList, setBallDataList] = useState<BallData[]>([]);
+  const [ballDataList, setBallDataList] = useState<BallData[]>([
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+    { x: 0, y: 0, width: 60, height: 60 },
+  ]);
   const [displayBallDataList, setDisplayBallDataList] = useState<BallData[]>([]);
-  const [backgroundOffset, setBackgroundOffset] = useState({ x: 0, y: 0 });
   const [imageWidth, setImageWidth] = useState(1000); // 기본값
   const stompClientRef = useRef<Client | null>(null);
   const animationRef = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pixelsPerSecond = 300; // 배경 이동 속도 (픽셀/초) - 3배 증가
+  const backgroundPositionRef = useRef(0); // 배경 위치 추적
 
   const handleBallMessage = (message: Message) => {
     const dataList: BallData[] = JSON.parse(message.body);
@@ -31,21 +43,66 @@ const TestPage = () => {
     setBallDataList(dataList);
   };
 
+  // 배경 애니메이션 (독립적으로 실행)
   useEffect(() => {
-    const animate = () => {
-      setDisplayBallDataList(ballDataList);
-      animationRef.current = requestAnimationFrame(animate);
+    let lastTimestamp = performance.now();
+
+    const animateBackground = (timestamp: number) => {
+      const delta = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      // 시간 기반 배경 이동 (픽셀/초 단위로 속도 계산)
+      backgroundPositionRef.current -= (pixelsPerSecond * delta) / 1000;
+
+      // 배경 위치가 너무 커지면 반복 범위 내에서 순환
+      if (backgroundPositionRef.current < -imageWidth) {
+        backgroundPositionRef.current += imageWidth;
+      }
+
+      // React 상태 대신 DOM 직접 조작
+      if (containerRef.current) {
+        containerRef.current.style.backgroundPosition = `${backgroundPositionRef.current}px 0px`;
+      }
+
+      animationRef.current = requestAnimationFrame(animateBackground);
     };
 
-    if (ballDataList.length > 0) {
-      animationRef.current = requestAnimationFrame(animate);
-    }
+    animationRef.current = requestAnimationFrame(animateBackground);
 
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
+  }, [pixelsPerSecond, imageWidth]);
+
+  // 플레이어 위치 계산 (ballDataList 변경 시에만)
+  useEffect(() => {
+    if (ballDataList.length > 0) {
+      const adjustedBallDataList = ballDataList.map((ball, index) => {
+        if (ballDataList.length > 5 && ballDataList[5]) {
+          const centerBall = ballDataList[5]; // index 5가 기준점 (주인공)
+          const screenCenter = { x: 200, y: window.innerHeight / 2 }; // 화면 중앙 좌표
+
+          // index 5 기준으로 각 플레이어의 상대적 위치 계산
+          const relativeX = ball.x - centerBall.x; // x축 상대적 거리
+          const verticalOffset = (index - 5) * 80; // y축은 index 5 기준으로 80px 간격
+
+          // 최종 화면 좌표 계산 (화면 범위 제한 제거)
+          const finalX = screenCenter.x + relativeX; // 자연스럽게 화면 밖으로 나갈 수 있도록
+          const finalY = screenCenter.y + verticalOffset; // 화면 중앙 + 세로 오프셋
+
+          return {
+            ...ball,
+            x: finalX,
+            y: finalY,
+          };
+        }
+        return ball;
+      });
+
+      setDisplayBallDataList(adjustedBallDataList);
+    }
   }, [ballDataList]);
 
   // 이미지 크기 측정
@@ -56,18 +113,6 @@ const TestPage = () => {
     };
     img.src = nightSkyImage;
   }, []);
-
-  useEffect(() => {
-    // 첫 번째 ball의 위치를 기준으로 배경 오프셋 계산 (x축만, 무한 반복)
-    if (ballDataList.length > 0) {
-      const firstBall = ballDataList[0];
-      const offsetX = -((firstBall.x - 200) % imageWidth);
-      setBackgroundOffset({
-        x: offsetX,
-        y: 0, // y축 이동 없음
-      });
-    }
-  }, [ballDataList, imageWidth]);
 
   const connect = () => {
     const socket = new SockJS('http://43.203.253.24:8080/ws');
@@ -92,7 +137,7 @@ const TestPage = () => {
     <Layout color="gray-100">
       <Layout.TopBar center={<Headline4>Test</Headline4>} />
       <Layout.Content>
-        <Container offsetX={backgroundOffset.x} offsetY={backgroundOffset.y}>
+        <Container ref={containerRef}>
           <ButtonContainer>
             <Button
               onClick={connect}
@@ -115,30 +160,22 @@ const TestPage = () => {
               Disconnect
             </Button>
           </ButtonContainer>
-          <div
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '60px',
-            }}
-          >
-            {displayBallDataList.map((ball, index) => (
-              <div
-                key={index}
-                style={{
-                  width: ball.width,
-                  height: ball.height,
-                }}
-              >
-                <PlayerIcon color={colorList[index % colorList.length]} />
-              </div>
-            ))}
-          </div>
+          {displayBallDataList.map((ball, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                left: ball.x - ball.width / 2,
+                top: ball.y - ball.height / 2,
+                width: '50px',
+                height: '50px',
+                animation: 'rotate 300ms linear infinite',
+                transformOrigin: 'center center', // 회전 중심을 중앙으로 설정
+              }}
+            >
+              <PlayerIcon color={colorList[index % colorList.length]} />
+            </div>
+          ))}
         </Container>
       </Layout.Content>
     </Layout>
@@ -147,16 +184,23 @@ const TestPage = () => {
 
 export default TestPage;
 
-const Container = styled.div<{ offsetX: number; offsetY: number }>`
+const Container = styled.div`
   position: relative;
   background-image: url(${nightSkyImage});
   background-size: auto 100%;
-  background-position: ${({ offsetX, offsetY }) => `${offsetX}px ${offsetY}px`};
   background-repeat: repeat-x;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  transition: background-position 0.05s linear;
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
 const ButtonContainer = styled.div`
