@@ -9,20 +9,16 @@ import { useNavigate } from 'react-router-dom';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
-import { useMenuSelection } from './hooks/useMenuSelection';
-import { useCustomMenu } from './hooks/useCustomMenu';
+import { useMenuFlow } from './hooks/useMenuFlow';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
 import { useCategories } from './hooks/useCategories';
 import { useMenus } from './hooks/useMenus';
 import * as S from './EntryMenuPage.styled';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
-import { MenuColorMap } from '@/constants/color';
-import { theme } from '@/styles/theme';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import MenuList from './components/MenuList/MenuList';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
-import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
@@ -34,13 +30,16 @@ const EntryMenuPage = () => {
     selectedCategory,
     selectedMenu,
     selectedTemperature,
+    customMenuName,
+    categorySelection,
+    menuSelection,
     selectCategory,
     selectMenu,
     selectTemperature,
-    resetMenuSelection,
-  } = useMenuSelection();
-
-  const { customMenuName, setCustomMenuName, completeMenuInput, resetCustomMenu } = useCustomMenu();
+    setCustomMenuName,
+    completeMenuInput,
+    resetAll,
+  } = useMenuFlow();
 
   const {
     currentView,
@@ -64,8 +63,7 @@ const EntryMenuPage = () => {
   }, [joinCode, qrCodeUrl, selectedMenu, customMenuName, isConnected, navigate]);
 
   const resetMenuState = () => {
-    resetMenuSelection();
-    resetCustomMenu();
+    resetAll();
     resetMenus();
   };
 
@@ -118,17 +116,6 @@ const EntryMenuPage = () => {
         onClickDoneButton={handleCustomMenuDone}
       />
     ),
-  };
-
-  const categorySelection = {
-    color: selectedCategory?.color ?? theme.color.point[200],
-    name: selectedCategory?.name ?? '직접입력',
-    imageUrl: selectedCategory?.imageUrl ?? CustomMenuIcon,
-  };
-
-  const menuSelection = {
-    color: MenuColorMap[selectedCategory?.color ?? theme.color.point[200]],
-    name: selectedMenu?.name ?? customMenuName ?? '',
   };
 
   const shouldShowButtonBar = currentView === 'selectTemperature';

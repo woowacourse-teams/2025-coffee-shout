@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CategoryWithColor, Menu, TemperatureOption } from '@/types/menu';
 
-export const useMenuSelection = () => {
+export const useMenuState = () => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithColor | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
