@@ -16,7 +16,7 @@ class RouletteRangesTest {
         Player player1 = PlayerFixture.호스트한스();
         Player player2 = PlayerFixture.호스트꾹이();
 
-        Players players = new Players() {{
+        Players players = new Players("ABC23") {{
             join(player1);
             join(player2);
         }};
@@ -40,7 +40,7 @@ class RouletteRangesTest {
         // given
         Player player1 = PlayerFixture.호스트엠제이();
 
-        Players players = new Players() {{
+        Players players = new Players("ABC23") {{
             join(player1);
         }};
 
@@ -54,7 +54,7 @@ class RouletteRangesTest {
     @Test
     void 값이_없을_경우_endValue는_0을_반환한다() {
         // given
-        Players players = new Players();
+        Players players = new Players("ABC23");
         RouletteRanges rouletteRanges = new RouletteRanges(players);
 
         // when
@@ -70,7 +70,7 @@ class RouletteRangesTest {
         Player player1 = PlayerFixture.호스트한스();
         Player player2 = PlayerFixture.호스트꾹이();
 
-        Players players = new Players() {{
+        Players players = new Players("ABC23") {{
             join(player1);
             join(player2);
         }};

@@ -38,10 +38,6 @@ public class Player {
         return Objects.equals(name, playerName);
     }
 
-    public void assignColorIndex(int colorIndex) {
-        this.colorIndex = colorIndex;
-    }
-
     public void updateReadyState(Boolean isReady) {
         this.isReady = isReady;
     }
@@ -53,6 +49,10 @@ public class Player {
     public void promote() {
         this.playerType = PlayerType.HOST;
         this.isReady = true;
+    }
+
+    public void assignColorIndex(int colorIndex) {
+        this.colorIndex = colorIndex;
     }
 
     @Override

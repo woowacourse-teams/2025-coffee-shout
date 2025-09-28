@@ -17,7 +17,7 @@ class CardGameRandomDeckGeneratorTest {
         int multiplierCardCount = 3;
 
         final CardGameDeckGenerator cardGameDeck = new CardGameRandomDeckGenerator();
-        Deck deck = cardGameDeck.generate(additionCardCount, multiplierCardCount);
+        Deck deck = cardGameDeck.generate(additionCardCount, multiplierCardCount, 1234L);
 
         // when & then
         assertThat(deck.size()).isEqualTo(9);

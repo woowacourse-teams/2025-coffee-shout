@@ -144,7 +144,11 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    public Room createRoomInternal(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCodeValue) {
+    public Room createRoomInternal(
+            String hostName,
+            SelectedMenuRequest selectedMenuRequest,
+            String joinCodeValue
+    ) {
         final JoinCode joinCode = new JoinCode(joinCodeValue);
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
         final Room room = Room.createNewRoom(
@@ -195,7 +199,7 @@ public class RoomService {
         room.clearMiniGames();
 
         miniGameTypes.forEach(miniGameType -> {
-            final Playable miniGame = miniGameType.createMiniGame();
+            final Playable miniGame = miniGameType.createMiniGame(joinCode);
             room.addMiniGame(new PlayerName(hostName), miniGame);
         });
 
@@ -274,10 +278,11 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(code);
         final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
 
-        if (room.isEmpty()) {
-            roomCommandService.delete(code);
+        if (!room.isEmpty()) {
+            return isRemoved;
         }
 
+        roomCommandService.delete(code);
         return isRemoved;
     }
 

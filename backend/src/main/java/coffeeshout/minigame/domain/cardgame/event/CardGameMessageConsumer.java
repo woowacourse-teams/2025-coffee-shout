@@ -1,5 +1,6 @@
 package coffeeshout.minigame.domain.cardgame.event;
 
+import coffeeshout.global.metric.GameDurationMetricService;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.CardGameTaskType;
@@ -25,15 +26,18 @@ public class CardGameMessageConsumer {
     private final TaskScheduler taskScheduler;
     private final ApplicationEventPublisher publisher;
     private final RoomQueryService roomQueryService;
+    private final GameDurationMetricService gameDurationMetricService;
 
     public CardGameMessageConsumer(
             @Qualifier("miniGameTaskScheduler") TaskScheduler taskScheduler,
             ApplicationEventPublisher publisher,
-            RoomQueryService roomQueryService
+            RoomQueryService roomQueryService,
+            GameDurationMetricService gameDurationMetricService
     ) {
         this.taskScheduler = taskScheduler;
         this.publisher = publisher;
         this.roomQueryService = roomQueryService;
+        this.gameDurationMetricService = gameDurationMetricService;
     }
 
     @EventListener
@@ -43,6 +47,7 @@ public class CardGameMessageConsumer {
         final CardGame cardGame = getCardGame(room);
         final CardGameTaskType currentTask = CardGameTaskType.valueOf(cardGameStateChangeMessage.currentTaskName());
         if (currentTask.isLastTask()) {
+            gameDurationMetricService.stopGameTimer(joinCode.getValue());
             return;
         }
         final CardGameTaskType nextTask = currentTask.nextTask();
@@ -67,6 +72,7 @@ public class CardGameMessageConsumer {
                 publisher
         );
         taskScheduler.schedule(runnable, Instant.now());
+        gameDurationMetricService.startGameTimer(joinCode.getValue());
     }
 
     private CardGame getCardGame(Room room) {

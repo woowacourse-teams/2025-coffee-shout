@@ -17,9 +17,9 @@ public class Players {
     private final List<Player> players;
     private final ColorUsage colorUsage;
 
-    public Players() {
+    public Players(String joinCode) {
         this.players = Collections.synchronizedList(new ArrayList<>());
-        this.colorUsage = new ColorUsage();
+        this.colorUsage = new ColorUsage(joinCode);
     }
 
     public synchronized Player join(Player player) {
