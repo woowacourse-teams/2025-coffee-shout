@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export const useCustomMenu = () => {
-  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
+  const [customMenuName, setCustomMenuName] = useState<string>('');
   const [isCustomMenuInputCompleted, setIsCustomMenuInputCompleted] = useState(false);
 
   const completeMenuInput = () => {
@@ -9,7 +9,7 @@ export const useCustomMenu = () => {
   };
 
   const resetCustomMenu = () => {
-    setCustomMenuName(null);
+    setCustomMenuName('');
     setIsCustomMenuInputCompleted(false);
   };
 

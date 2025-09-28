@@ -28,6 +28,8 @@ export const useMenuFlow = () => {
     name: selectedMenu?.name ?? customMenuName ?? '',
   };
 
+  const temperatureAvailability = selectedMenu?.temperatureAvailability ?? 'BOTH';
+
   const resetAll = () => {
     resetMenuSelection();
     resetCustomMenu();
@@ -43,6 +45,7 @@ export const useMenuFlow = () => {
     // 가공된 객체들
     categorySelection,
     menuSelection,
+    temperatureAvailability,
 
     // 액션들
     selectCategory,

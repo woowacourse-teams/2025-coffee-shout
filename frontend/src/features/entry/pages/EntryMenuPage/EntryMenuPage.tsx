@@ -33,6 +33,7 @@ const EntryMenuPage = () => {
     customMenuName,
     categorySelection,
     menuSelection,
+    temperatureAvailability,
     selectCategory,
     selectMenu,
     selectTemperature,
@@ -103,7 +104,7 @@ const EntryMenuPage = () => {
     selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
     selectTemperature: (
       <SelectTemperature
-        temperatureAvailability={selectedMenu?.temperatureAvailability ?? 'BOTH'}
+        temperatureAvailability={temperatureAvailability}
         selectedTemperature={selectedTemperature}
         onChangeTemperature={selectTemperature}
       />
@@ -111,7 +112,7 @@ const EntryMenuPage = () => {
     inputCustomMenu: (
       <CustomMenuInput
         placeholder="메뉴를 입력해주세요"
-        value={customMenuName || ''}
+        value={customMenuName}
         onChange={handleChangeCustomMenuInput}
         onClickDoneButton={handleCustomMenuDone}
       />
