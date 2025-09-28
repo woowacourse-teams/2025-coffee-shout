@@ -18,16 +18,16 @@ public class TestController {
     record Data(int x, int y, int width, int height) {
     }
 
-    private final List<Integer> locations = new ArrayList<>() {{
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
-        this.add(0);
+    private final List<Double> locations = new ArrayList<>() {{
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
+        this.add(0d);
     }};
 
     final int startX = 0;
@@ -45,12 +45,13 @@ public class TestController {
 
     private List<Data> generate() {
         final List<Data> ret = new ArrayList<>();
-        for (int i = 0; i < locations.size(); ++i) {
-            int delta = i * 3 + 1;
-            int location = locations.get(i);
-            int nextLocation = location + delta >= endX ?startX : location + delta;
-            locations.set(i, nextLocation);
-            ret.add(new Data(nextLocation, i * 50, 30, 30));
+        double step = 0.138;
+        for (int i = 1; i <= locations.size(); ++i) {
+            double delta = step * i;
+            double location = locations.get(i - 1);
+            double nextLocation = location + delta >= endX ?startX : location + delta;
+            locations.set(i - 1, nextLocation);
+            ret.add(new Data((int) nextLocation, i * 50, 30, 30));
         }
         return ret;
     }
