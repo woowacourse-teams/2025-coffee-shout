@@ -15,6 +15,7 @@ import {
   QRJoinPage,
 } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
+import TestPage from './pages/TestPage';
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
+      },
+      {
+        path: 'test',
+        element: <TestPage />,
       },
     ],
   },
