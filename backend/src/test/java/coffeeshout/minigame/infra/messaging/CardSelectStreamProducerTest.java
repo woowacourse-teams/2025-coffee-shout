@@ -3,10 +3,11 @@ package coffeeshout.minigame.infra.messaging;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-import coffeeshout.fixture.CardGameDeckStub;
+import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.minigame.domain.cardgame.CardGame;
+import coffeeshout.minigame.domain.cardgame.card.CardGameRandomDeckGenerator;
 import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -44,7 +45,7 @@ class CardSelectStreamProducerTest {
         Player host = room.getHost();
 
         // 카드 게임을 start 상태로 전환한다.
-        CardGame cardGame = new CardGame(new CardGameDeckStub());
+        CardGame cardGame = new CardGameFake(new CardGameRandomDeckGenerator());
         cardGame.startPlay();
 
         room.addMiniGame(host.getName(), cardGame);
