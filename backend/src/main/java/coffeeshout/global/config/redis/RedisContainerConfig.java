@@ -1,7 +1,6 @@
 package coffeeshout.global.config.redis;
 
 import java.time.Duration;
-import java.util.concurrent.ExecutorService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -33,14 +32,13 @@ public class RedisContainerConfig {
         return container;
     }
 
-
     @Bean
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> orderedStreamMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
                 .builder()
                 .batchSize(10)
-                .executor(singleThreadExecutor())
+                .executor(orderedThreadExecutor())
                 .pollTimeout(Duration.ofSeconds(2))
                 .targetType(String.class)
                 .build();
@@ -52,7 +50,6 @@ public class RedisContainerConfig {
         return container;
     }
 
-    // 순서 보장이 불필요한 Container (기타 스트림들)
     @Bean
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> concurrentStreamMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory) {
@@ -71,32 +68,32 @@ public class RedisContainerConfig {
         return container;
     }
 
-    // 단일 스레드 Executor (순서 보장용)
-    @Bean
-    public ExecutorService singleThreadExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    private ThreadPoolTaskExecutor orderedThreadExecutor() {
+        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("redis-ordered-");
-        executor.initialize();
+        ex.setCorePoolSize(2); // 한 개가 아닌 두 개가 필요로 함. 하나는 폴링 작업, 하나는 메시지 처리를 담당하게 됨
+        ex.setMaxPoolSize(2);
+        ex.setQueueCapacity(100);
+        ex.setThreadNamePrefix("redis-ordered-");
+        ex.setWaitForTasksToCompleteOnShutdown(true);
+        ex.setAwaitTerminationSeconds(10);
+        ex.initialize();
 
-        return executor.getThreadPoolExecutor();
+        return ex;
     }
 
-    // 멀티 스레드 Executor (병렬 처리용)
-    @Bean
-    public ExecutorService multiThreadExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    private ThreadPoolTaskExecutor multiThreadExecutor() {
+        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("redis-concurrent-");
-        executor.initialize();
+        ex.setCorePoolSize(4);
+        ex.setMaxPoolSize(8);
+        ex.setQueueCapacity(100);
+        ex.setThreadNamePrefix("redis-concurrent-");
+        ex.setWaitForTasksToCompleteOnShutdown(true);
+        ex.setAwaitTerminationSeconds(10);
+        ex.initialize();
 
-        return executor.getThreadPoolExecutor();
+        return ex;
     }
 
     private ThreadPoolTaskExecutor redisStreamTaskExecutor() {
