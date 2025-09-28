@@ -27,18 +27,13 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
 
   const {
-    selectedCategory,
-    selectedMenu,
-    selectedTemperature,
-    customMenuName,
+    category,
+    menu,
+    temperature,
+    customMenu,
     categorySelection,
     menuSelection,
     temperatureAvailability,
-    selectCategory,
-    selectMenu,
-    selectTemperature,
-    setCustomMenuName,
-    completeMenuInput,
     resetAll,
   } = useMenuFlow();
 
@@ -51,30 +46,30 @@ const EntryMenuPage = () => {
   } = useViewNavigation();
 
   const { categories } = useCategories();
-  const { menus, resetMenus } = useMenus(selectedCategory?.id ?? null);
+  const { menus, resetMenus } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom } = useRoomManagement();
 
   useEffect(() => {
     const isReadyToNavigateLobby =
-      joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected;
+      joinCode && qrCodeUrl && (menu.value || customMenu.value) && isConnected;
     if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [joinCode, qrCodeUrl, selectedMenu, customMenuName, isConnected, navigate]);
+  }, [joinCode, qrCodeUrl, menu, customMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetAll();
     resetMenus();
   };
 
-  const handleCategorySelect = (category: CategoryWithColor) => {
-    selectCategory(category);
+  const handleCategorySelect = (categoryItem: CategoryWithColor) => {
+    category.set(categoryItem);
     navigateToMenu();
   };
 
-  const handleMenuSelect = (menu: Menu) => {
-    selectMenu(menu);
+  const handleMenuSelect = (menuItem: Menu) => {
+    menu.set(menuItem);
     navigateToTemperature();
   };
 
@@ -88,16 +83,16 @@ const EntryMenuPage = () => {
   };
 
   const handleCustomMenuDone = () => {
-    completeMenuInput();
+    customMenu.complete();
     navigateToTemperature();
   };
 
   const handleProceedToRoom = () => {
-    proceedToRoom(selectedMenu, customMenuName, selectedTemperature);
+    proceedToRoom(menu.value, customMenu.value, temperature.value);
   };
 
   const handleChangeCustomMenuInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setCustomMenuName(e.target.value);
+    customMenu.set(e.target.value);
   };
 
   const viewChildren = {
@@ -105,14 +100,14 @@ const EntryMenuPage = () => {
     selectTemperature: (
       <SelectTemperature
         temperatureAvailability={temperatureAvailability}
-        selectedTemperature={selectedTemperature}
-        onChangeTemperature={selectTemperature}
+        selectedTemperature={temperature.value}
+        onChangeTemperature={temperature.set}
       />
     ),
     inputCustomMenu: (
       <CustomMenuInput
         placeholder="메뉴를 입력해주세요"
-        value={customMenuName}
+        value={customMenu.value}
         onChange={handleChangeCustomMenuInput}
         onClickDoneButton={handleCustomMenuDone}
       />

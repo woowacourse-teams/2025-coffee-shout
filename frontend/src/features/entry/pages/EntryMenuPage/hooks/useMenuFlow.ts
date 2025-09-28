@@ -36,23 +36,27 @@ export const useMenuFlow = () => {
   };
 
   return {
-    // 원시 상태들
-    selectedCategory,
-    selectedMenu,
-    selectedTemperature,
-    customMenuName,
-
-    // 가공된 객체들
+    // 상태와 액션을 객체로 그룹핑
+    category: {
+      value: selectedCategory,
+      set: selectCategory,
+    },
+    menu: {
+      value: selectedMenu,
+      set: selectMenu,
+    },
+    temperature: {
+      value: selectedTemperature,
+      set: selectTemperature,
+    },
+    customMenu: {
+      value: customMenuName,
+      set: setCustomMenuName,
+      complete: completeMenuInput,
+    },
     categorySelection,
     menuSelection,
     temperatureAvailability,
-
-    // 액션들
-    selectCategory,
-    selectMenu,
-    selectTemperature,
-    setCustomMenuName,
-    completeMenuInput,
     resetAll,
   };
 };
