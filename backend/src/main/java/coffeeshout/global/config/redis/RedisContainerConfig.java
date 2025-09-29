@@ -1,6 +1,7 @@
 package coffeeshout.global.config.redis;
 
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -51,11 +52,11 @@ public class RedisContainerConfig {
     }
 
     private StreamMessageListenerContainer<String, ObjectRecord<String, String>> getListenerContainer(
-            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+            RedisConnectionFactory redisConnectionFactory, Executor executor) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
                 .builder()
                 .batchSize(10) // 한 번에 처리할 메시지 수
-                .executor(threadPoolTaskExecutor) // 쓰레드 설정
+                .executor(executor) // 쓰레드 설정
                 .pollTimeout(Duration.ofSeconds(2)) // 폴링 주기
                 .targetType(String.class)
                 .build();
