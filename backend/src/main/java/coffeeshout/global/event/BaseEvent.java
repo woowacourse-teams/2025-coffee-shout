@@ -1,14 +1,11 @@
 package coffeeshout.global.event;
 
 import coffeeshout.global.config.trace.ObservationRegistryProvider;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.handler.TracingObservationHandler.TracingContext;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Redis publish를 위한 이벤트들의 기본 클래스 tracing 정보(traceId, spanId)를 포함하여 분산 추적 지원
