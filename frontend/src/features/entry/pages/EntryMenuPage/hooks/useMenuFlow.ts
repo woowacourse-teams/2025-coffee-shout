@@ -36,7 +36,6 @@ export const useMenuFlow = () => {
   };
 
   return {
-    // 상태와 액션을 객체로 그룹핑
     category: {
       value: selectedCategory,
       set: selectCategory,
