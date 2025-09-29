@@ -14,8 +14,6 @@ export const buttonHoverPress = ({
   touchState,
   enableScale = true,
 }: ButtonHoverPressProps) => {
-  console.log('activeColor', activeColor);
-
   return css`
     /* 데스크톱: hover 효과 */
     @media (hover: hover) and (pointer: fine) {
