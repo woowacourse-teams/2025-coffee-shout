@@ -3,8 +3,8 @@ import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import * as S from './SelectMenu.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import { CategoryWithColor, Menu } from '@/types/menu';
-import { useEffect, useState, PropsWithChildren } from 'react';
-import { api } from '@/apis/rest/api';
+import { PropsWithChildren } from 'react';
+import useFetch from '@/apis/rest/useFetch';
 
 type Props = {
   onMenuSelect: (menu: Menu) => void;
@@ -13,14 +13,9 @@ type Props = {
 } & PropsWithChildren;
 
 const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: Props) => {
-  const [menus, setMenus] = useState<Menu[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategory.id}/menus`);
-      setMenus(menus);
-    })();
-  }, [selectedCategory]);
+  const { data: menus } = useFetch<Menu[]>({
+    endpoint: `/menu-categories/${selectedCategory.id}/menus`,
+  });
 
   const handleClickMenu = (menu: Menu) => {
     onMenuSelect(menu);
@@ -38,7 +33,7 @@ const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: 
         {!selectedMenu && (
           <S.MenuListWrapper>
             <S.MenuList>
-              {menus.map((menu) => (
+              {menus?.map((menu) => (
                 <MenuListItem
                   key={menu.id}
                   text={menu.name}

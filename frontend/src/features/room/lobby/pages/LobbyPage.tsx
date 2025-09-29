@@ -1,4 +1,4 @@
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
@@ -28,6 +28,7 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import LocalErrorBoundary from '@/apis/error/LocalErrorBoundary.tsx';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -66,6 +67,14 @@ const LobbyPage = () => {
     },
     [setParticipants, myName, setPlayerType, updateCurrentProbabilities]
   );
+
+  useFetch<MiniGameType[]>({
+    endpoint: `/rooms/minigames/selected?joinCode=${joinCode}`,
+    enabled: !!joinCode,
+    onSuccess: (data) => {
+      setSelectedMiniGames(data);
+    },
+  });
 
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
@@ -170,17 +179,6 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (joinCode) {
-        const _selectedMiniGames = await api.get<MiniGameType[]>(
-          `/rooms/minigames/selected?joinCode=${joinCode}`
-        );
-        setSelectedMiniGames(_selectedMiniGames);
-      }
-    })();
-  }, [joinCode]);
-
-  useEffect(() => {
     const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');
 
     if (!isFirstTimeUser) {
@@ -202,10 +200,12 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <MiniGameSection
-        selectedMiniGames={selectedMiniGames}
-        handleMiniGameClick={handleMiniGameClick}
-      />
+      <LocalErrorBoundary fallback={<div>미니게임 섹션에서 오류가 발생했습니다.</div>}>
+        <MiniGameSection
+          selectedMiniGames={selectedMiniGames}
+          handleMiniGameClick={handleMiniGameClick}
+        />
+      </LocalErrorBoundary>
     ),
   };
 

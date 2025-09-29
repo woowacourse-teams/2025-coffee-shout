@@ -1,4 +1,3 @@
-import { api } from '@/apis/rest/api';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
@@ -11,7 +10,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import useToast from '@/components/@common/Toast/useToast';
-import { ApiError } from '@/apis/rest/error';
+import useLazyFetch from '@/apis/rest/useLazyFetch';
 
 const MAX_NAME_LENGTH = 10;
 
@@ -26,32 +25,23 @@ const EntryNamePage = () => {
   const { playerType } = usePlayerType();
   const { showToast } = useToast();
 
+  const { execute: checkGuestName } = useLazyFetch<PlayerNameCheckResponse>({
+    endpoint: `/rooms/check-guestName`,
+  });
+
   const handleNavigateToHome = () => {
     navigate('/');
   };
 
   const handleNavigateToMenu = async () => {
     if (playerType === 'GUEST') {
-      try {
-        const { exist } = await api.get<PlayerNameCheckResponse>(
-          `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`
-        );
+      const response = await checkGuestName({ joinCode, guestName: name });
 
-        if (exist) {
-          showToast({
-            type: 'error',
-            message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
-          });
-          return;
-        }
-      } catch (error) {
-        if (error instanceof ApiError) {
-          showToast({
-            type: 'error',
-            message: error.message,
-          });
-        }
-
+      if (response?.exist) {
+        showToast({
+          type: 'error',
+          message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
+        });
         return;
       }
     }

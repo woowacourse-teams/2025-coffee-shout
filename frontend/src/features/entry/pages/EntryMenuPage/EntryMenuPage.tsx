@@ -1,12 +1,12 @@
-import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
@@ -18,6 +18,7 @@ import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import { categoryColorList, MenuColorMap } from '@/constants/color';
 import * as S from './EntryMenuPage.styled';
+import { api } from '@/apis/rest/api';
 
 type RoomRequest = {
   playerName: string;
@@ -48,22 +49,19 @@ const EntryMenuPage = () => {
   const [customMenuName, setCustomMenuName] = useState<string | null>(null);
   const [isMenuInputCompleted, setIsMenuInputCompleted] = useState(false);
   const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
-  const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
-  const [categories, setCategories] = useState<CategoryWithColor[]>([]);
 
-  useEffect(() => {
-    (async () => {
-      const data = await api.get<CategoriesResponse>('/menu-categories');
-      setCategories(
-        data.map((category, index) => ({
-          ...category,
-          color: categoryColorList[index % categoryColorList.length],
-        }))
-      );
-    })();
-    setLoading(false);
-  }, []);
+  const { data: categoriesData, loading } = useFetch<CategoriesResponse>({
+    endpoint: '/menu-categories',
+  });
+
+  const categories: CategoryWithColor[] = useMemo(() => {
+    if (!categoriesData) return [];
+    return categoriesData.map((category, index) => ({
+      ...category,
+      color: categoryColorList[index % categoryColorList.length],
+    }));
+  }, [categoriesData]);
 
   useEffect(() => {
     if (joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected) {
@@ -170,8 +168,6 @@ const EntryMenuPage = () => {
           message: '알 수 없는 오류가 발생했습니다.',
         });
       }
-    } finally {
-      // setLoading(false);
     }
   };
 
