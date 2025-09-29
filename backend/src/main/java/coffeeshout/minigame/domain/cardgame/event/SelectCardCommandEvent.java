@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain.cardgame.event;
 
-import coffeeshout.minigame.domain.MiniGameBaseEvent;
+import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,7 +12,7 @@ public record SelectCardCommandEvent(
         String joinCode,
         String playerName,
         Integer cardIndex
-) implements MiniGameBaseEvent, coffeeshout.minigame.domain.event.MiniGameBaseEvent {
+) implements MiniGameBaseEvent {
 
     public static SelectCardCommandEvent create(String joinCode, String playerName, Integer cardIndex) {
         final String eventId = UUID.randomUUID().toString();
