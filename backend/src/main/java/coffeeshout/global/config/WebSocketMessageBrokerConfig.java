@@ -7,8 +7,7 @@ import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -20,31 +19,18 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
-    private static final Logger log = LoggerFactory.getLogger(WebSocketMessageBrokerConfig.class);
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
     private final ObservationRegistry observationRegistry;
-
-    public WebSocketMessageBrokerConfig(
-            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
-            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor,
-            ObservationRegistry observationRegistry
-    ) {
-        this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
-        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
-        this.observationRegistry = observationRegistry;
-    }
+    private final ContextSnapshotFactory snapshotFactory;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
         heartbeatScheduler.setPoolSize(1);
-        heartbeatScheduler.setTaskDecorator(runnable -> {
-            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
-            return snapshot.wrap(runnable);
-        });
         heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
         heartbeatScheduler.initialize();
 
@@ -78,22 +64,15 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("outbound-");
         executor.setTaskDecorator(runnable -> {
-            // 현재 스레드(메인)의 micrometer context 캡처
-            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
-
-            // 비동기 실행용 Runnable 래핑
+            final ContextSnapshot snapshot = snapshotFactory.captureAll();
             return snapshot.wrap(() -> {
-                // snapshot.wrap()이 parent context를 복원한 상태
                 final Observation parent = observationRegistry.getCurrentObservation();
-
                 if (parent != null) {
-                    // 부모 span이 있을 때만 자식 span 생성
                     Observation.createNotStarted("websocket.outbound", observationRegistry)
                             .parentObservation(parent)
                             .lowCardinalityKeyValue("thread", Thread.currentThread().getName())
                             .observeChecked(runnable::run);
                 } else {
-                    // 부모가 없으면 그냥 실행
                     runnable.run();
                 }
             });
