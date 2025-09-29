@@ -1,8 +1,7 @@
 import { css } from '@emotion/react';
+import { TouchState } from '@/types/touchState';
 import { backgroundPressEffect } from './effects/backGroundPressEffect';
 import { scalePressEffect } from './effects/scalePressEffect';
-
-type TouchState = 'idle' | 'pressing' | 'releasing';
 
 interface ButtonHoverPressProps {
   activeColor: string;

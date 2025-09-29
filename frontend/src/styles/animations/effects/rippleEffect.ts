@@ -1,8 +1,7 @@
 import { ANIMATION_DURATION } from '@/constants/animation';
+import { TouchState } from '@/types/touchState';
 import { theme } from '@/styles/theme';
 import { css } from '@emotion/react';
-
-type TouchState = 'idle' | 'pressing' | 'releasing';
 
 export const rippleEffect = (touchState: TouchState) => {
   const rippleColor = theme.color.gray[200];

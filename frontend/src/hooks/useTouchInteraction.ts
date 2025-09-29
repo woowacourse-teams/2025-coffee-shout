@@ -1,9 +1,8 @@
 import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
+import { TouchState } from '@/types/touchState';
 import { useState, useCallback, TouchEvent, MouseEvent } from 'react';
 
 const TOUCH_DELAY_MS = 100;
-
-type TouchState = 'idle' | 'pressing' | 'releasing';
 
 type UseTouchTransitionProps = {
   onClick: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;

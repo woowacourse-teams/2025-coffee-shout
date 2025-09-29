@@ -1,7 +1,6 @@
 import { ANIMATION_DURATION } from '@/constants/animation';
+import { TouchState } from '@/types/touchState';
 import { css } from '@emotion/react';
-
-type TouchState = 'idle' | 'pressing' | 'releasing';
 
 type Props = {
   activeColor: string;
