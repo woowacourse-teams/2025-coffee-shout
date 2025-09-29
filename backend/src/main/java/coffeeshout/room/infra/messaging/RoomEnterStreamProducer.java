@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomEnterStreamProducer {
 
-    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
@@ -36,12 +36,12 @@ public class RoomEnterStreamProducer {
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
-            log.info("Enter room broadcast sent: recordId={}", recordId.getValue());
+            log.info("Enter room broadcast sent: recordId={}", recordId);
         } catch (JsonProcessingException e){
-            log.error("직렬화 중 예외가 발생했습니다. eventId = {}",event.eventId(), e);
+            log.error("직렬화 중 예외가 발생했습니다. event = {}, ", event, e);
             throw new RuntimeException("RoomJoinEvent 직렬화 실패", e);
         } catch (Exception e) {
-            log.error("Failed to broadcast enter room event", e);
+            log.error("Failed to broadcast enter room event. event = {}", event, e);
             throw new RuntimeException("Failed to broadcast enter room event", e);
         }
     }

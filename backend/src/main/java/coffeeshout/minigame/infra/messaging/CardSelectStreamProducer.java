@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,12 +17,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CardSelectStreamProducer {
 
-    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
     public void broadcastCardSelect(SelectCardCommandEvent event) {
-        log.info("Broadcasting card select event: gameId={}, playerKey={}, selectedCard={}",
+        log.info("Broadcasting card select event: eventId={}, playerName={}, selectedCard={}",
                 event.eventId(), event.playerName(), event.cardIndex());
 
         try {
@@ -37,10 +37,10 @@ public class CardSelectStreamProducer {
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
-            log.info("Card select broadcast sent: recordId={}", recordId.getValue());
+            log.info("Card select broadcast sent: recordId={}", recordId);
         } catch (JsonProcessingException e) {
             log.error("직렬화 중 예외가 발생했습니다. eventId = {}", event.eventId(), e);
-            throw new RuntimeException("RoomJoinEvent 직렬화 실패", e);
+            throw new RuntimeException("SelectCardCommandEvent 직렬화 실패", e);
         } catch (Exception e) {
             log.error("Failed to broadcast card select event", e);
             throw new RuntimeException("Failed to broadcast card select event", e);

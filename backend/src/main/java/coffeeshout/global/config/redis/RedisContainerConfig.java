@@ -5,9 +5,7 @@ import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -15,37 +13,19 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class RedisContainerConfig {
 
-    @Bean
-    public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamMessageListenerContainer(
-            RedisConnectionFactory redisConnectionFactory) {
-        StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions
-                .builder()
-                .batchSize(10)
-                .executor(redisStreamTaskExecutor())
-                .pollTimeout(Duration.ofSeconds(2))
-                .serializer(new StringRedisSerializer())
-                .build();
-
-        StreamMessageListenerContainer<String, MapRecord<String, String, String>> container = StreamMessageListenerContainer.create(
-                redisConnectionFactory, options);
-
-        container.start();
-        return container;
-    }
-
-    @Bean
+    @Bean(destroyMethod = "stop")
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer(
             RedisConnectionFactory redisConnectionFactory) {
         return getListenerContainer(redisConnectionFactory, roomEnterThreadExecutor());
     }
 
-    @Bean
+    @Bean(destroyMethod = "stop")
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer(
             RedisConnectionFactory redisConnectionFactory) {
         return getListenerContainer(redisConnectionFactory, cardSelectThreadExecutor());
     }
 
-    @Bean
+    @Bean(destroyMethod = "stop")
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> concurrentStreamMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory) {
         return getListenerContainer(redisConnectionFactory, redisStreamTaskExecutor());
