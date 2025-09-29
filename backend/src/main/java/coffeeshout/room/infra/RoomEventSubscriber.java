@@ -56,8 +56,7 @@ public class RoomEventSubscriber implements MessageListener {
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
             final BaseEvent baseEvent = (BaseEvent) event;
             tracerProvider.executeWithTraceContext(
-                    baseEvent.getTraceId(),
-                    baseEvent.getSpanId(),
+                    baseEvent.getTraceInfo(),
                     () -> handler.handle(event),
                     event.getEventType().name()
             );
