@@ -9,6 +9,8 @@ type Props = {
   startAnimation: boolean;
 };
 
+const ANIMATION_DURATION = 500;
+
 export const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimation }: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
 
@@ -23,7 +25,7 @@ export const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimatio
       setToPrev();
       setTimeout(() => {
         startAnimationTransition();
-      }, 500);
+      }, ANIMATION_DURATION);
     }
   }, [startAnimation, startAnimationTransition, setToPrev]);
 
