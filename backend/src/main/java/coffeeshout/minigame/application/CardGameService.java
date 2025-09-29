@@ -1,5 +1,6 @@
 package coffeeshout.minigame.application;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
@@ -9,12 +10,16 @@ import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.infra.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.infra.persistance.MiniGameEntity;
+import coffeeshout.room.infra.persistance.MiniGameJpaRepository;
 import coffeeshout.room.infra.persistance.PlayerEntity;
 import coffeeshout.room.infra.persistance.PlayerJpaRepository;
+import coffeeshout.room.infra.persistance.RoomEntity;
 import coffeeshout.room.infra.persistance.RoomJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +36,7 @@ public class CardGameService implements MiniGameService {
     private final MiniGameEventPublisher miniGameEventPublisher;
     private final RoomJpaRepository roomJpaRepository;
     private final PlayerJpaRepository playerJpaRepository;
+    private final MiniGameJpaRepository miniGameJpaRepository;
 
     @Override
     public void publishStartEvent(String joinCode, String hostName) {
@@ -55,7 +61,7 @@ public class CardGameService implements MiniGameService {
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         final CardGame cardGame = getCardGame(roomJoinCode);
 
-        updateRoomEntity(joinCode, room);
+        updateRoomEntity(room);
 
         eventPublisher.publishEvent(new CardGameStartedEvent(roomJoinCode, cardGame));
     }
@@ -73,18 +79,26 @@ public class CardGameService implements MiniGameService {
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 
-    private void updateRoomEntity(String joinCode, Room room) {
+    private void updateRoomEntity(Room room) {
         // RoomEntity 찾아서 PlayerEntity들 저장
-        roomJpaRepository.findByJoinCode(joinCode).ifPresent(roomEntity -> {
-            roomEntity.updateRoomStatus(RoomState.PLAYING);
-            room.getPlayers().forEach(player -> {
-                final PlayerEntity playerEntity = new PlayerEntity(
-                        roomEntity,
-                        player.getName().value(),
-                        player.getPlayerType()
-                );
-                playerJpaRepository.save(playerEntity);
-            });
+        final RoomEntity roomEntity = getRoomEntity(room.getJoinCode().getValue());
+        roomEntity.updateRoomStatus(RoomState.PLAYING);
+
+        final MiniGameEntity miniGameEntity = new MiniGameEntity(roomEntity, MiniGameType.CARD_GAME);
+        miniGameJpaRepository.save(miniGameEntity);
+
+        room.getPlayers().forEach(player -> {
+            final PlayerEntity playerEntity = new PlayerEntity(
+                    roomEntity,
+                    player.getName().value(),
+                    player.getPlayerType()
+            );
+            playerJpaRepository.save(playerEntity);
         });
+    }
+
+    private RoomEntity getRoomEntity(String joinCode) {
+        return roomJpaRepository.findByJoinCode(joinCode)
+                .orElseThrow(() -> new InvalidArgumentException(RoomErrorCode.ROOM_NOT_FOUND, joinCode));
     }
 }
