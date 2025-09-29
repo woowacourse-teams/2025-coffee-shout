@@ -5,7 +5,8 @@ import java.util.Random;
 public record Winner(
         PlayerName name,
         Integer colorIndex,
-        Integer randomAngle
+        Integer randomAngle,
+        Integer probability
 ) {
 
     private static final Random RANDOM = new Random();
@@ -15,7 +16,8 @@ public record Winner(
         return new Winner(
                 player.getName(),
                 player.getColorIndex(),
-                RANDOM.nextInt(PIE_SEGMENT)
+                RANDOM.nextInt(PIE_SEGMENT),
+                player.getProbability().value()
         );
     }
 }
