@@ -11,8 +11,13 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.infra.persistance.MiniGameJpaRepository;
+import coffeeshout.room.infra.persistance.PlayerJpaRepository;
+import coffeeshout.room.infra.persistance.RoomEntity;
+import coffeeshout.room.infra.persistance.RoomJpaRepository;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.Customization;
@@ -29,15 +34,32 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     CardGame cardGame;
 
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+    void setUp(@Autowired RoomRepository roomRepository,
+               @Autowired RoomJpaRepository roomJpaRepository) throws Exception {
         joinCode = new JoinCode("A4B2C");
         Room room = RoomFixture.호스트_꾹이();
         room.getPlayers().forEach(player -> player.updateReadyState(true));
         host = room.getHost();
         cardGame = new CardGameFake(new CardGameDeckStub());
         room.addMiniGame(host.getName(), cardGame);
+
+        // MemoryRepository에 저장
         roomRepository.save(room);
+
+        // DB에 RoomEntity 저장 (Redis 이벤트 핸들러가 DB에서 조회하므로 필요)
+        RoomEntity roomEntity = new RoomEntity(joinCode.getValue());
+        roomJpaRepository.save(roomEntity);
+
         session = createSession();
+    }
+
+    @AfterEach
+    void tearDown(@Autowired RoomJpaRepository roomJpaRepository,
+                  @Autowired MiniGameJpaRepository miniGameJpaRepository,
+                  @Autowired PlayerJpaRepository playerJpaRepository) {
+        playerJpaRepository.deleteAll();
+        miniGameJpaRepository.deleteAll();
+        roomJpaRepository.deleteAll();
     }
 
     @Test
