@@ -28,7 +28,6 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
-import LocalErrorBoundary from '@/apis/error/LocalErrorBoundary.tsx';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -200,12 +199,10 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <LocalErrorBoundary fallback={<div>미니게임 섹션에서 오류가 발생했습니다.</div>}>
-        <MiniGameSection
-          selectedMiniGames={selectedMiniGames}
-          handleMiniGameClick={handleMiniGameClick}
-        />
-      </LocalErrorBoundary>
+      <MiniGameSection
+        selectedMiniGames={selectedMiniGames}
+        handleMiniGameClick={handleMiniGameClick}
+      />
     ),
   };
 
