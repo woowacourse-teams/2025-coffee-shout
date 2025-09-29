@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { api } from './api';
 
 type UseLazyFetchOptions<T> = {
@@ -21,6 +21,9 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+
   const execute = useCallback(
     async (params?: Record<string, string | number | boolean>) => {
       try {
@@ -28,17 +31,17 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
         setError(null);
         const result = await api.get<T>(endpoint, { params: params || {} });
         setData(result);
-        onSuccess?.(result);
+        onSuccessRef.current?.(result);
         return result;
       } catch (err) {
         setError(err as Error);
-        onError?.(err as Error);
+        onErrorRef.current?.(err as Error);
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [endpoint, onSuccess, onError]
+    [endpoint]
   );
 
   return { data, loading, error, execute };
