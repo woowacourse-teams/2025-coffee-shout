@@ -15,12 +15,16 @@ public class TracerProvider {
     private final Tracer tracer;
 
     public void executeWithTraceContext(String traceId, String spanId, Runnable task, String name) {
-        TraceContext context = tracer.traceContextBuilder()
+        if (traceId == null || spanId == null) {
+            task.run();
+            return;
+        }
+        final TraceContext context = tracer.traceContextBuilder()
                 .traceId(traceId)
                 .spanId(spanId)
                 .sampled(true)
                 .build();
-        Span span = tracer.spanBuilder()
+        final Span span = tracer.spanBuilder()
                 .name(name)
                 .setParent(context)
                 .start();

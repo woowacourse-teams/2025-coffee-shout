@@ -55,7 +55,12 @@ public class RoomEventSubscriber implements MessageListener {
             final RoomBaseEvent event = deserializeEvent(body, eventType);
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
             final BaseEvent baseEvent = (BaseEvent) event;
-            tracerProvider.executeWithTraceContext(baseEvent.getTraceId(), baseEvent.getSpanId(), () -> handler.handle(event), event.getEventType().name());
+            tracerProvider.executeWithTraceContext(
+                    baseEvent.getTraceId(),
+                    baseEvent.getSpanId(),
+                    () -> handler.handle(event),
+                    event.getEventType().name()
+            );
 
         } catch (Exception e) {
             log.error("이벤트 처리 실패: message={}", new String(message.getBody()), e);

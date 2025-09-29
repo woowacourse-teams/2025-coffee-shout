@@ -68,7 +68,12 @@ public class MiniGameEventSubscriber implements MessageListener {
             final MiniGameBaseEvent event = deserializeEvent(body, eventType);
             final MiniGameEventHandler<MiniGameBaseEvent> handler = handlers.get(eventType);
             final BaseEvent baseEvent = (BaseEvent) event;
-            tracerProvider.executeWithTraceContext(baseEvent.getTraceId(), baseEvent.getSpanId(), () -> handler.handle(event), event.getEventType().name());
+            tracerProvider.executeWithTraceContext(
+                    baseEvent.getTraceId(),
+                    baseEvent.getSpanId(),
+                    () -> handler.handle(event),
+                    event.getEventType().name()
+            );
 
         } catch (Exception e) {
             log.error("미니게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);
