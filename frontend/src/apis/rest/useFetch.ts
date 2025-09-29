@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from './api';
 
 type UseFetchOptions<T> = {
   endpoint: string;
-  params?: Record<string, string | number | boolean | null | undefined>;
   enabled?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
@@ -17,24 +16,11 @@ type UseFetchReturn<T> = {
 };
 
 const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
-  const { endpoint, params, enabled = true, onSuccess, onError } = options;
+  const { endpoint, enabled = true, onSuccess, onError } = options;
 
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-
-  const stableParams = useMemo(() => {
-    if (!params) return {};
-
-    const filteredParams: Record<string, string | number | boolean> = {};
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        filteredParams[key] = value;
-      }
-    });
-
-    return filteredParams;
-  }, [params]);
 
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
@@ -45,7 +31,7 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     try {
       setLoading(true);
       setError(null);
-      const result = await api.get<T>(endpoint, { params: stableParams });
+      const result = await api.get<T>(endpoint);
       setData(result);
       onSuccessRef.current?.(result);
     } catch (err) {
@@ -54,7 +40,7 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     } finally {
       setLoading(false);
     }
-  }, [endpoint, stableParams, enabled]);
+  }, [endpoint, enabled]);
 
   useEffect(() => {
     if (enabled) {

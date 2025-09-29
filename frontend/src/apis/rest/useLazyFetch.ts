@@ -11,7 +11,7 @@ type UseLazyFetchReturn<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  execute: (params?: Record<string, string | number | boolean>) => Promise<T | null>;
+  execute: () => Promise<T | null>;
 };
 
 const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T> => {
@@ -24,25 +24,22 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
 
-  const execute = useCallback(
-    async (params?: Record<string, string | number | boolean>) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.get<T>(endpoint, { params: params || {} });
-        setData(result);
-        onSuccessRef.current?.(result);
-        return result;
-      } catch (err) {
-        setError(err as Error);
-        onErrorRef.current?.(err as Error);
-        return null;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [endpoint]
-  );
+  const execute = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await api.get<T>(endpoint);
+      setData(result);
+      onSuccessRef.current?.(result);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      onErrorRef.current?.(err as Error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint]);
 
   return { data, loading, error, execute };
 };
