@@ -26,7 +26,7 @@ const EntryNamePage = () => {
   const { showToast } = useToast();
 
   const { execute: checkGuestName } = useLazyFetch<PlayerNameCheckResponse>({
-    endpoint: `/rooms/check-guestName`,
+    endpoint: `/rooms/check-guestName?joinCode=${joinCode}`,
   });
 
   const handleNavigateToHome = () => {
@@ -35,7 +35,7 @@ const EntryNamePage = () => {
 
   const handleNavigateToMenu = async () => {
     if (playerType === 'GUEST') {
-      const response = await checkGuestName({ joinCode, guestName: name });
+      const response = await checkGuestName();
 
       if (response?.exist) {
         showToast({

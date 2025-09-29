@@ -16,7 +16,7 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
   const navigate = useNavigate();
 
   const { execute: checkRoomExists } = useLazyFetch<{ exist: boolean }>({
-    endpoint: `/rooms/check-joinCode`,
+    endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
     onError: (error) => {
       console.error('방 존재 여부 체크 실패:', error);
       navigateToHome('방 존재 여부 체크 실패');
@@ -48,7 +48,7 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
     }
 
     // 방 존재 여부 체크
-    const response = await checkRoomExists({ joinCode });
+    const response = await checkRoomExists();
 
     if (!response?.exist) {
       navigateToHome('방이 존재하지 않음');

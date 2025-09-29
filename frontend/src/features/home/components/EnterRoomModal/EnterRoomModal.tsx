@@ -20,7 +20,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
   const { joinCode, setJoinCode } = useIdentifier();
 
   const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({
-    endpoint: `/rooms/check-joinCode`,
+    endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
     onSuccess: (data) => {
       if (!data.exist) {
         alert('참여코드가 유효한 방이 존재하지 않습니다.');
@@ -43,7 +43,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       return;
     }
 
-    checkJoinCode({ joinCode });
+    checkJoinCode();
   };
 
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
