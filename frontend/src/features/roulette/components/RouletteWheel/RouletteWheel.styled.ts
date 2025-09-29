@@ -49,7 +49,7 @@ export const Pin = styled.div`
   border-top: 30px solid ${({ theme }) => theme.color.gray[500]};
   border-radius: 4px;
   position: absolute;
-  top: 30px;
+  top: -5px;
   left: 50%;
   transform: translateX(-50%);
   z-index: ${Z_INDEX.ROULETTE_PIN};

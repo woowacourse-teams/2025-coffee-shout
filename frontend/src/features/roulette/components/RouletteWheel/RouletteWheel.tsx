@@ -32,8 +32,8 @@ const RouletteWheel = ({
 
   return (
     <S.Container>
-      <Pin />
       <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
+        <Pin />
         <svg
           width={WHEEL_CONFIG.SIZE}
           height={WHEEL_CONFIG.SIZE}
