@@ -40,6 +40,7 @@ public class CardSelectStreamProducer {
             log.info("Card select broadcast sent: recordId={}", recordId.getValue());
         } catch (JsonProcessingException e) {
             log.error("직렬화 중 예외가 발생했습니다. eventId = {}", event.eventId(), e);
+            throw new RuntimeException("RoomJoinEvent 직렬화 실패", e);
         } catch (Exception e) {
             log.error("Failed to broadcast card select event", e);
             throw new RuntimeException("Failed to broadcast card select event", e);

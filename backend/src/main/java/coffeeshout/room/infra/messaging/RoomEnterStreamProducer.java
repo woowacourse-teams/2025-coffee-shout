@@ -4,7 +4,6 @@ import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
@@ -40,6 +39,7 @@ public class RoomEnterStreamProducer {
             log.info("Enter room broadcast sent: recordId={}", recordId.getValue());
         } catch (JsonProcessingException e){
             log.error("직렬화 중 예외가 발생했습니다. eventId = {}",event.eventId(), e);
+            throw new RuntimeException("RoomJoinEvent 직렬화 실패", e);
         } catch (Exception e) {
             log.error("Failed to broadcast enter room event", e);
             throw new RuntimeException("Failed to broadcast enter room event", e);
