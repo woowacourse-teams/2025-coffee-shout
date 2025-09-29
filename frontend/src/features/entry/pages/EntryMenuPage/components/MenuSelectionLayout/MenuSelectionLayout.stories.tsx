@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import MenuSelectionLayout from './MenuSelectionLayout';
-import CoffeeIcon from '@/assets/coffee.svg';
+import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
 const meta: Meta<typeof MenuSelectionLayout> = {
   title: 'Features/Entry/MenuSelectionLayout',
@@ -26,7 +26,7 @@ export const Default: Story = {
     categorySelection: {
       color: '#ffb2b2',
       name: '아메리카노',
-      imageUrl: CoffeeIcon,
+      imageUrl: CustomMenuIcon,
     },
     menuSelection: {
       color: '#b2d8ff',
@@ -41,7 +41,7 @@ export const WithSelectedMenu: Story = {
     categorySelection: {
       color: '#ffb2b2',
       name: '아메리카노',
-      imageUrl: CoffeeIcon,
+      imageUrl: CustomMenuIcon,
     },
     menuSelection: {
       color: '#b2d8ff',
@@ -56,7 +56,7 @@ export const WithChildren: Story = {
     categorySelection: {
       color: '#ffb2b2',
       name: '아메리카노',
-      imageUrl: CoffeeIcon,
+      imageUrl: CustomMenuIcon,
     },
     menuSelection: {
       color: '#b2d8ff',
