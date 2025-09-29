@@ -10,9 +10,17 @@ type Props = {
   onClose: () => void;
   title?: string;
   showCloseButton?: boolean;
+  closeOnBackdropClick?: boolean;
 } & PropsWithChildren;
 
-const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Props) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  title,
+  showCloseButton = true,
+  closeOnBackdropClick = true,
+}: Props) => {
   useEscapeKey({ onEscape: onClose, enabled: isOpen });
 
   const id = useId();
@@ -23,13 +31,19 @@ const Modal = ({ isOpen, onClose, children, title, showCloseButton = true }: Pro
 
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
+  const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (closeOnBackdropClick && e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   const shouldRenderHeader = title || showCloseButton;
 
   return (
     <Portal containerId="modal-root">
-      <S.Backdrop onClick={onClose} role="presentation">
+      <S.Backdrop onClick={handleBackdropClick} role="presentation">
         <S.Container
           ref={containerRef}
           onClick={stopPropagation}
