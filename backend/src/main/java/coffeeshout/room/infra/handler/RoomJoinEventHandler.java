@@ -26,8 +26,7 @@ public class RoomJoinEventHandler implements RoomEventHandler<RoomJoinEvent> {
             final Room room = roomService.enterRoomInternal(
                     event.getJoinCode(),
                     event.getGuestName(),
-                    event.getSelectedMenuRequest(),
-                    event.getGuestColorIndex()
+                    event.getSelectedMenuRequest()
             );
 
             roomEventWaitManager.notifySuccess(event.getEventId(), room);

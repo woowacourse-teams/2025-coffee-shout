@@ -1,7 +1,5 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.global.config.trace.ObservationRegistryProvider;
-import coffeeshout.global.config.trace.TraceContextProvider;
 import coffeeshout.global.config.trace.TracerProvider;
 import coffeeshout.global.event.BaseEvent;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
@@ -17,14 +15,7 @@ import coffeeshout.room.infra.handler.RoomEventHandler;
 import coffeeshout.room.infra.handler.RoomEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.TraceContext;
-import io.micrometer.tracing.Tracer;
-import io.micrometer.tracing.handler.TracingObservationHandler.TracingContext;
 import jakarta.annotation.PostConstruct;
-import java.awt.desktop.PrintFilesEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;

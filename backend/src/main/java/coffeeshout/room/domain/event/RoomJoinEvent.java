@@ -10,14 +10,12 @@ public class RoomJoinEvent extends BaseEvent implements RoomBaseEvent {
     private final String joinCode;
     private final String guestName;
     private final SelectedMenuRequest selectedMenuRequest;
-    private final int guestColorIndex;
 
-    public RoomJoinEvent(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest, int guestColorIndex) {
+    public RoomJoinEvent(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         this.eventType = RoomEventType.ROOM_JOIN;
         this.joinCode = joinCode;
         this.guestName = guestName;
         this.selectedMenuRequest = selectedMenuRequest;
-        this.guestColorIndex = guestColorIndex;
     }
 
     @Override
