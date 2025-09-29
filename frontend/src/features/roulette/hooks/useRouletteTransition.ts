@@ -59,14 +59,14 @@ export const useRouletteTransition = (
     startTimeRef.current = null;
   }, []);
 
-  const setToCurrent = useCallback(() => {
-    setAnimatedSectors(convertProbabilitiesToAngles(current || []));
-  }, [current]);
+  const setToPrev = useCallback(() => {
+    setAnimatedSectors(convertProbabilitiesToAngles(prev || []));
+  }, [prev]);
 
   return {
     animatedSectors,
     startAnimation: startAnimationTransition,
     stopAnimation,
-    setToCurrent,
+    setToPrev,
   };
 };

@@ -15,18 +15,17 @@ export const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimatio
   const {
     animatedSectors,
     startAnimation: startAnimationTransition,
-    setToCurrent,
+    setToPrev,
   } = useRouletteTransition(probabilityHistory.prev, probabilityHistory.current);
 
   useEffect(() => {
-    setToCurrent();
-  }, [setToCurrent]);
-
-  useEffect(() => {
     if (startAnimation) {
-      startAnimationTransition();
+      setToPrev();
+      setTimeout(() => {
+        startAnimationTransition();
+      }, 500);
     }
-  }, [startAnimation, startAnimationTransition]);
+  }, [startAnimation, startAnimationTransition, setToPrev]);
 
   if (!animatedSectors) return null;
 
