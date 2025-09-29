@@ -1,6 +1,5 @@
 package coffeeshout.minigame.application;
 
-import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.domain.cardgame.event.dto.CardGameStartedEvent;
@@ -10,7 +9,6 @@ import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.infra.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -99,6 +97,6 @@ public class CardGameService implements MiniGameService {
 
     private RoomEntity getRoomEntity(String joinCode) {
         return roomJpaRepository.findByJoinCode(joinCode)
-                .orElseThrow(() -> new InvalidArgumentException(RoomErrorCode.ROOM_NOT_FOUND, joinCode));
+                .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다: " + joinCode));
     }
 }

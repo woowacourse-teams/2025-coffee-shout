@@ -20,7 +20,7 @@ public enum RoomErrorCode implements ErrorCode {
     QR_CODE_GENERATION_FAILED("QR 코드 생성에 실패했습니다."),
     QR_CODE_UPLOAD_FAILED("QR 코드 업로드에 실패했습니다."),
     QR_CODE_URL_SIGNING_FAILED("QR 코드 URL 생성에 실패했습니다."),
-    ROOM_NOT_FOUND("방이 존재하지 않습니다.");
+    ;
 
     private final String message;
 
