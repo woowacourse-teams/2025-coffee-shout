@@ -3,6 +3,7 @@ import App from './App';
 import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
 import { lazy } from 'react';
+import RacingGamePage from './features/miniGame/racingGame/RacingGamePage';
 
 const LobbyPage = lazy(
   /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
+      },
+      {
+        path: 'racing',
+        element: <RacingGamePage />,
       },
     ],
   },
