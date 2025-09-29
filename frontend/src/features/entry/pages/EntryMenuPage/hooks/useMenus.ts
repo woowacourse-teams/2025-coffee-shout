@@ -19,8 +19,8 @@ export const useMenus = (selectedCategoryId: number | null) => {
         setError(null);
         const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategoryId}/menus`);
         setMenus(menus);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('메뉴를 불러오는데 실패했습니다'));
+      } catch (error) {
+        setError(error instanceof Error ? error : new Error('메뉴를 불러오는데 실패했습니다'));
         setMenus([]);
       } finally {
         setLoading(false);
