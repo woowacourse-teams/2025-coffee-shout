@@ -26,7 +26,7 @@ const EntryNamePage = () => {
   const { showToast } = useToast();
 
   const { execute: checkGuestName } = useLazyFetch<PlayerNameCheckResponse>({
-    endpoint: `/rooms/check-guestName?joinCode=${joinCode}`,
+    endpoint: `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`,
   });
 
   const handleNavigateToHome = () => {
