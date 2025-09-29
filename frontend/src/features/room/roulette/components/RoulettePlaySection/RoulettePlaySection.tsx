@@ -5,6 +5,7 @@ import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
 import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
 import ProbabilitiesText from '../ProbabilitiesText/ProbabilitiesText';
 import RouletteWheelBack from '@/features/roulette/components/RouletteWheelBack/RouletteWheelBack';
+import Flip from '@/components/@common/Flip/Flip';
 
 type Props = {
   isSpinning: boolean;
@@ -33,20 +34,17 @@ const RoulettePlaySection = ({
   return (
     <S.Container>
       <S.RouletteWheelWrapper>
-        <S.FlipWheelWrapper>
-          <S.Flipper flipped={!isProbabilitiesLoading}>
-            <S.Front>
-              <AnimatedRouletteWheel
-                finalRotation={finalRotation}
-                isSpinning={isSpinning}
-                startAnimation={!isProbabilitiesLoading}
-              />
-            </S.Front>
-            <S.Back>
-              <RouletteWheelBack />
-            </S.Back>
-          </S.Flipper>
-        </S.FlipWheelWrapper>
+        <Flip
+          flipped={!isProbabilitiesLoading}
+          front={
+            <AnimatedRouletteWheel
+              finalRotation={finalRotation}
+              isSpinning={isSpinning}
+              startAnimation={!isProbabilitiesLoading}
+            />
+          }
+          back={<RouletteWheelBack />}
+        />
       </S.RouletteWheelWrapper>
       <ProbabilitiesText isProbabilitiesLoading={isProbabilitiesLoading} />
     </S.Container>
