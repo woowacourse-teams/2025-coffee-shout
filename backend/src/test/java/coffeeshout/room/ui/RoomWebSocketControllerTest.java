@@ -9,7 +9,14 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.infra.persistance.MiniGameJpaRepository;
+import coffeeshout.room.infra.persistance.PlayerEntity;
+import coffeeshout.room.infra.persistance.PlayerJpaRepository;
+import coffeeshout.room.infra.persistance.RoomEntity;
+import coffeeshout.room.infra.persistance.RoomJpaRepository;
+import coffeeshout.room.infra.persistance.RouletteResultJpaRepository;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.Customization;
@@ -27,13 +34,43 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     Room testRoom;
 
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+    void setUp(@Autowired RoomRepository roomRepository,
+               @Autowired RoomJpaRepository roomJpaRepository,
+               @Autowired PlayerJpaRepository playerJpaRepository) throws Exception {
         testRoom = RoomFixture.호스트_꾹이();
         joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
         host = testRoom.getHost();
 
+        // MemoryRepository에 저장
         roomRepository.save(testRoom);
+
+        // DB에 RoomEntity 저장 (Redis 이벤트 핸들러가 DB에서 조회하므로 필요)
+        RoomEntity roomEntity = new RoomEntity(joinCode.getValue());
+        roomJpaRepository.save(roomEntity);
+
+        // DB에 PlayerEntity들 저장 (룰렛 결과 저장 시 필요)
+        testRoom.getPlayers().forEach(player -> {
+            PlayerEntity playerEntity = new PlayerEntity(
+                    roomEntity,
+                    player.getName().value(),
+                    player.getPlayerType()
+            );
+            playerJpaRepository.save(playerEntity);
+        });
+
         session = createSession();
+    }
+
+    @AfterEach
+    void tearDown(@Autowired RoomJpaRepository roomJpaRepository,
+                  @Autowired MiniGameJpaRepository miniGameJpaRepository,
+                  @Autowired PlayerJpaRepository playerJpaRepository,
+                  @Autowired RouletteResultJpaRepository rouletteResultJpaRepository) {
+        // 외래키 제약조건 때문에 최하위 자식부터 삭제
+        rouletteResultJpaRepository.deleteAll();  // RouletteResult가 Player와 Room 참조
+        playerJpaRepository.deleteAll();           // Player가 Room 참조
+        miniGameJpaRepository.deleteAll();         // MiniGame이 Room 참조
+        roomJpaRepository.deleteAll();             // Room (최상위 부모)
     }
 
     @Test
