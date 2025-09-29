@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api';
 
 type UseFetchOptions<T> = {
@@ -36,6 +36,9 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     return filteredParams;
   }, [params]);
 
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+
   const fetchData = useCallback(async () => {
     if (!enabled) return;
 
@@ -44,14 +47,14 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
       setError(null);
       const result = await api.get<T>(endpoint, { params: stableParams });
       setData(result);
-      onSuccess?.(result);
+      onSuccessRef.current?.(result);
     } catch (err) {
       setError(err as Error);
-      onError?.(err as Error);
+      onErrorRef.current?.(err as Error);
     } finally {
       setLoading(false);
     }
-  }, [endpoint, stableParams, enabled, onSuccess, onError]);
+  }, [endpoint, stableParams, enabled]);
 
   useEffect(() => {
     if (enabled) {
