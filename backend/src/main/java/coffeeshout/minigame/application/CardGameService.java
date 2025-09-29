@@ -9,6 +9,7 @@ import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.infra.MiniGameEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
@@ -54,17 +55,7 @@ public class CardGameService implements MiniGameService {
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         final CardGame cardGame = getCardGame(roomJoinCode);
 
-        // RoomEntity 찾아서 PlayerEntity들 저장
-        roomJpaRepository.findByJoinCode(joinCode).ifPresent(roomEntity -> {
-            room.getPlayers().forEach(player -> {
-                final PlayerEntity playerEntity = new PlayerEntity(
-                        roomEntity,
-                        player.getName().value(),
-                        player.getPlayerType()
-                );
-                playerJpaRepository.save(playerEntity);
-            });
-        });
+        updateRoomEntity(joinCode, room);
 
         eventPublisher.publishEvent(new CardGameStartedEvent(roomJoinCode, cardGame));
     }
@@ -80,5 +71,20 @@ public class CardGameService implements MiniGameService {
     private CardGame getCardGame(JoinCode joinCode) {
         final Room room = roomQueryService.getByJoinCode(joinCode);
         return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
+    }
+
+    private void updateRoomEntity(String joinCode, Room room) {
+        // RoomEntity 찾아서 PlayerEntity들 저장
+        roomJpaRepository.findByJoinCode(joinCode).ifPresent(roomEntity -> {
+            roomEntity.updateRoomStatus(RoomState.PLAYING);
+            room.getPlayers().forEach(player -> {
+                final PlayerEntity playerEntity = new PlayerEntity(
+                        roomEntity,
+                        player.getName().value(),
+                        player.getPlayerType()
+                );
+                playerJpaRepository.save(playerEntity);
+            });
+        });
     }
 }

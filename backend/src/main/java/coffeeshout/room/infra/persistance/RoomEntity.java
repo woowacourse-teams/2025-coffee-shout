@@ -1,7 +1,10 @@
 package coffeeshout.room.infra.persistance;
 
+import coffeeshout.room.domain.RoomState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +27,10 @@ public class RoomEntity {
     @Column(nullable = false, length = 5)
     private String joinCode;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private RoomState roomStatus;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -31,7 +38,12 @@ public class RoomEntity {
 
     public RoomEntity(String joinCode) {
         this.joinCode = joinCode;
+        this.roomStatus = RoomState.READY;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateRoomStatus(RoomState roomStatus) {
+        this.roomStatus = roomStatus;
     }
 
     public void finish() {
