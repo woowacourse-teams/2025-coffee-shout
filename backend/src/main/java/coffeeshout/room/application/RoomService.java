@@ -24,6 +24,8 @@ import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.RoomEventPublisher;
 import coffeeshout.room.infra.RoomEventWaitManager;
+import coffeeshout.room.infra.persistance.RoomEntity;
+import coffeeshout.room.infra.persistance.RoomJpaRepository;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.Arrays;
@@ -48,6 +50,7 @@ public class RoomService {
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
+    private final RoomJpaRepository roomJpaRepository;
     private final String defaultCategoryImage;
 
     public RoomService(
@@ -59,6 +62,7 @@ public class RoomService {
             DelayedRoomRemovalService delayedRoomRemovalService,
             RoomEventPublisher roomEventPublisher,
             RoomEventWaitManager roomEventWaitManager,
+            RoomJpaRepository roomJpaRepository,
             @Value("${menu-category.default-image}") String defaultCategoryImage
     ) {
         this.roomQueryService = roomQueryService;
@@ -69,6 +73,7 @@ public class RoomService {
         this.delayedRoomRemovalService = delayedRoomRemovalService;
         this.roomEventPublisher = roomEventPublisher;
         this.roomEventWaitManager = roomEventWaitManager;
+        this.roomJpaRepository = roomJpaRepository;
         this.defaultCategoryImage = defaultCategoryImage;
     }
 
@@ -187,6 +192,9 @@ public class RoomService {
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
         room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
+
+        final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
+        roomJpaRepository.save(roomEntity);
 
         return roomCommandService.save(room);
     }
