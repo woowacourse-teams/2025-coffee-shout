@@ -15,7 +15,6 @@ public class TracerProvider {
     private final Tracer tracer;
 
     public void executeWithTraceContext(String traceId, String spanId, Runnable task, String name) {
-        log.info("sub {} {}", traceId, spanId);
         TraceContext context = tracer.traceContextBuilder()
                 .traceId(traceId)
                 .spanId(spanId)
@@ -25,7 +24,6 @@ public class TracerProvider {
                 .name(name)
                 .setParent(context)
                 .start();
-        log.info("span {}", span.context().traceId());
         try (Tracer.SpanInScope spanInScope = tracer.withSpan(span)) {
             task.run();
         } finally {
