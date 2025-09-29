@@ -27,6 +27,7 @@ import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +55,8 @@ public class RoomService {
     private final MenuCommandService menuCommandService;
     private final RoomEnterStreamProducer roomEnterStreamProducer;
 
-    @Value("${room.event.timeout}")
-    private int eventTimeoutSeconds;
+    @Value("${room.event.timeout:PT5S}")
+    private Duration eventTimeout;
 
     // === 비동기 메서드들 (REST Controller용) ===
 
@@ -98,7 +99,7 @@ public class RoomService {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
         eventPublisher.run();
 
-        return future.orTimeout(eventTimeoutSeconds, TimeUnit.SECONDS)
+        return future.orTimeout(eventTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete((result, throwable) -> {
                     if (throwable != null) {
                         log.error("{} 비동기 처리 실패: eventId={}, {}",
@@ -117,8 +118,8 @@ public class RoomService {
             return createRoomAsync(hostName, selectedMenuRequest).join();
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
             }
             throw new RuntimeException("방 생성 실패", cause);
         }
@@ -276,13 +277,11 @@ public class RoomService {
     public boolean removePlayer(String joinCode, String playerName) {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
-        final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
 
-        if (!room.isEmpty()) {
-            return isRemoved;
+        boolean isRemoved = room.removePlayer(new PlayerName(playerName));
+        if (room.isEmpty()) {
+            roomCommandService.delete(code);
         }
-
-        roomCommandService.delete(code);
         return isRemoved;
     }
 

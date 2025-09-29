@@ -41,8 +41,7 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
     public void onMessage(ObjectRecord<String, String> message) {
         try {
             String jsonValue = message.getValue();
-            String value = objectMapper.readValue(jsonValue, String.class);
-            SelectCardCommandEvent event = objectMapper.readValue(value, SelectCardCommandEvent.class);
+            SelectCardCommandEvent event = objectMapper.readValue(jsonValue, SelectCardCommandEvent.class);
 
             log.info("Received card select message: id={}, event={}",
                     message.getId(), event);

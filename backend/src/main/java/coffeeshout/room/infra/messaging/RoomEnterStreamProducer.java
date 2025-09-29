@@ -2,7 +2,9 @@ package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomEnterStreamProducer {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
@@ -26,17 +28,18 @@ public class RoomEnterStreamProducer {
 
         try {
             String eventJson = objectMapper.writeValueAsString(event);
-
             Record<String, String> objectRecord = StreamRecords.newRecord()
                     .in(redisStreamProperties.roomJoinKey())
                     .ofObject(eventJson);
 
-            var recordId = redisTemplate.opsForStream().add(
+            var recordId = stringRedisTemplate.opsForStream().add(
                     objectRecord,
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
             log.info("Enter room broadcast sent: recordId={}", recordId.getValue());
+        } catch (JsonProcessingException e){
+            log.error("직렬화 중 예외가 발생했습니다. eventId = {}",event.eventId(), e);
         } catch (Exception e) {
             log.error("Failed to broadcast enter room event", e);
             throw new RuntimeException("Failed to broadcast enter room event", e);

@@ -43,6 +43,7 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
         log.info("Received room enter message: id={}, event={}",
                 message.getId(), event);
         try {
+            event = parseEvent(message);
             Room room = roomService.enterRoom(event.joinCode(), event.guestName(), event.selectedMenuRequest());
             roomEventWaitManager.notifySuccess(event.eventId(), room);
         } catch (Exception e) {
@@ -53,8 +54,7 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
 
     private RoomJoinEvent parseEvent(ObjectRecord<String, String> message) {
         try {
-            String jsonValue = message.getValue();
-            String value = objectMapper.readValue(jsonValue, String.class);
+            String value = message.getValue();
             return objectMapper.readValue(value, RoomJoinEvent.class);
         } catch (JsonProcessingException e) {
             log.error("RoomJoinEvent 파싱 실패: message={}", message, e);

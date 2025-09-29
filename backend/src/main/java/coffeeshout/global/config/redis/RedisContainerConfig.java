@@ -16,11 +16,11 @@ public class RedisContainerConfig {
 
     @Bean
     public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamMessageListenerContainer(
-            RedisConnectionFactory redisConnectionFactory) {
+            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor redisStreamTaskExecutor) {
         StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions
                 .builder()
                 .batchSize(10)
-                .executor(redisStreamTaskExecutor())
+                .executor(redisStreamTaskExecutor)
                 .pollTimeout(Duration.ofSeconds(2))
                 .serializer(new StringRedisSerializer())
                 .build();
@@ -34,11 +34,28 @@ public class RedisContainerConfig {
 
     @Bean
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer(
-            RedisConnectionFactory redisConnectionFactory) {
+            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor roomEnterThreadExecutor) {
+        return getListenerContainer(redisConnectionFactory, roomEnterThreadExecutor);
+    }
+
+    @Bean
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer(
+            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor cardSelectThreadExecutor) {
+        return getListenerContainer(redisConnectionFactory, cardSelectThreadExecutor);
+    }
+
+    @Bean
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> concurrentStreamMessageListenerContainer(
+            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor redisStreamTaskExecutor) {
+        return getListenerContainer(redisConnectionFactory, redisStreamTaskExecutor);
+    }
+
+    private StreamMessageListenerContainer<String, ObjectRecord<String, String>> getListenerContainer(
+            RedisConnectionFactory redisConnectionFactory, ThreadPoolTaskExecutor threadPoolTaskExecutor) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
                 .builder()
                 .batchSize(10) // 한 번에 처리할 메시지 수
-                .executor(roomEnterThreadExecutor()) // 쓰레드 설정
+                .executor(threadPoolTaskExecutor) // 쓰레드 설정
                 .pollTimeout(Duration.ofSeconds(2)) // 폴링 주기
                 .targetType(String.class)
                 .build();
@@ -51,42 +68,7 @@ public class RedisContainerConfig {
     }
 
     @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer(
-            RedisConnectionFactory redisConnectionFactory) {
-        StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
-                .builder()
-                .batchSize(10)
-                .executor(cardSelectThreadExecutor())
-                .pollTimeout(Duration.ofSeconds(2))
-                .targetType(String.class)
-                .build();
-
-        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer.create(
-                redisConnectionFactory, options);
-
-        container.start();
-        return container;
-    }
-
-    @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> concurrentStreamMessageListenerContainer(
-            RedisConnectionFactory redisConnectionFactory) {
-        StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
-                .builder()
-                .batchSize(10)
-                .executor(multiThreadExecutor())
-                .pollTimeout(Duration.ofSeconds(2))
-                .targetType(String.class)
-                .build();
-
-        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer.create(
-                redisConnectionFactory, options);
-
-        container.start();
-        return container;
-    }
-
-    private ThreadPoolTaskExecutor roomEnterThreadExecutor() {
+    public ThreadPoolTaskExecutor roomEnterThreadExecutor() {
         ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
         ex.setCorePoolSize(1); // 순서 보장을 위해 단일 스레드
@@ -100,7 +82,8 @@ public class RedisContainerConfig {
         return ex;
     }
 
-    private ThreadPoolTaskExecutor cardSelectThreadExecutor() {
+    @Bean
+    public ThreadPoolTaskExecutor cardSelectThreadExecutor() {
         ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
         ex.setCorePoolSize(1); // 순서 보장을 위해 단일 스레드
@@ -114,21 +97,8 @@ public class RedisContainerConfig {
         return ex;
     }
 
-    private ThreadPoolTaskExecutor multiThreadExecutor() {
-        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
-
-        ex.setCorePoolSize(4);
-        ex.setMaxPoolSize(8);
-        ex.setQueueCapacity(100);
-        ex.setThreadNamePrefix("redis-concurrent-");
-        ex.setWaitForTasksToCompleteOnShutdown(true);
-        ex.setAwaitTerminationSeconds(10);
-        ex.initialize();
-
-        return ex;
-    }
-
-    private ThreadPoolTaskExecutor redisStreamTaskExecutor() {
+    @Bean
+    public ThreadPoolTaskExecutor redisStreamTaskExecutor() {
         ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
         ex.setCorePoolSize(4);

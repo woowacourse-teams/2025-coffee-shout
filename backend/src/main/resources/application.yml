@@ -27,7 +27,7 @@ room:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
   event:
-    timeout: 5
+    timeout: 5s
 
 logging:
   level:

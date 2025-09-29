@@ -2,6 +2,7 @@ package coffeeshout.minigame.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CardSelectStreamProducer {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
@@ -25,18 +26,20 @@ public class CardSelectStreamProducer {
                 event.eventId(), event.playerName(), event.cardIndex());
 
         try {
-            String eventJson = objectMapper.writeValueAsString(event);
+            String value = objectMapper.writeValueAsString(event);
 
-            Record<String, String> objectRecord = StreamRecords.newRecord()
+            Record<String, Object> objectRecord = StreamRecords.newRecord()
                     .in(redisStreamProperties.cardGameSelectKey())
-                    .ofObject(eventJson);
+                    .ofObject(value);
 
-            var recordId = redisTemplate.opsForStream().add(
+            var recordId = stringRedisTemplate.opsForStream().add(
                     objectRecord,
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
             log.info("Card select broadcast sent: recordId={}", recordId.getValue());
+        } catch (JsonProcessingException e) {
+            log.error("직렬화 중 예외가 발생했습니다. eventId = {}", event.eventId(), e);
         } catch (Exception e) {
             log.error("Failed to broadcast card select event", e);
             throw new RuntimeException("Failed to broadcast card select event", e);

@@ -10,6 +10,7 @@ import coffeeshout.global.exception.custom.StorageServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -134,6 +135,12 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
+
+        final String errorMessage = exception.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining(", "));
+
         return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
             @Override
             public String getCode() {
@@ -142,7 +149,7 @@ public class RestExceptionHandler {
 
             @Override
             public String getMessage() {
-                return "요청 파라미터가 유효하지 않습니다.";
+                return errorMessage.isBlank() ? "요청 파라미터가 유효하지 않습니다." : errorMessage;
             }
         });
     }
