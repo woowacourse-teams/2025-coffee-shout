@@ -33,12 +33,30 @@ public class RedisContainerConfig {
     }
 
     @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> orderedStreamMessageListenerContainer(
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer(
+            RedisConnectionFactory redisConnectionFactory) {
+        StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
+                .builder()
+                .batchSize(10) // 한 번에 처리할 메시지 수
+                .executor(roomEnterThreadExecutor()) // 쓰레드 설정
+                .pollTimeout(Duration.ofSeconds(2)) // 폴링 주기
+                .targetType(String.class)
+                .build();
+
+        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer.create(
+                redisConnectionFactory, options);
+
+        container.start();
+        return container;
+    }
+
+    @Bean
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer(
             RedisConnectionFactory redisConnectionFactory) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = StreamMessageListenerContainerOptions
                 .builder()
                 .batchSize(10)
-                .executor(orderedThreadExecutor())
+                .executor(cardSelectThreadExecutor())
                 .pollTimeout(Duration.ofSeconds(2))
                 .targetType(String.class)
                 .build();
@@ -68,13 +86,27 @@ public class RedisContainerConfig {
         return container;
     }
 
-    private ThreadPoolTaskExecutor orderedThreadExecutor() {
+    private ThreadPoolTaskExecutor roomEnterThreadExecutor() {
         ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
 
-        ex.setCorePoolSize(2); // 한 개가 아닌 두 개가 필요로 함. 하나는 폴링 작업, 하나는 메시지 처리를 담당하게 됨
-        ex.setMaxPoolSize(2);
+        ex.setCorePoolSize(1); // 순서 보장을 위해 단일 스레드
+        ex.setMaxPoolSize(1);
         ex.setQueueCapacity(100);
-        ex.setThreadNamePrefix("redis-ordered-");
+        ex.setThreadNamePrefix("redis-room-enter-");
+        ex.setWaitForTasksToCompleteOnShutdown(true);
+        ex.setAwaitTerminationSeconds(10);
+        ex.initialize();
+
+        return ex;
+    }
+
+    private ThreadPoolTaskExecutor cardSelectThreadExecutor() {
+        ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
+
+        ex.setCorePoolSize(1); // 순서 보장을 위해 단일 스레드
+        ex.setMaxPoolSize(1);
+        ex.setQueueCapacity(100);
+        ex.setThreadNamePrefix("redis-card-select-");
         ex.setWaitForTasksToCompleteOnShutdown(true);
         ex.setAwaitTerminationSeconds(10);
         ex.initialize();

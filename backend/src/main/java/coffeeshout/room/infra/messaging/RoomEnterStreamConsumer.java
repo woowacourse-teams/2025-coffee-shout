@@ -22,14 +22,14 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
 
     private final RoomService roomService;
     private final RoomEventWaitManager roomEventWaitManager;
-    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> orderedStreamMessageListenerContainer;
+    private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer;
     private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
     @PostConstruct
     public void registerListener() {
-        orderedStreamMessageListenerContainer.receive(
+        roomEnterStreamContainer.receive(
                 redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomJoinKey()),
                 this
         );
