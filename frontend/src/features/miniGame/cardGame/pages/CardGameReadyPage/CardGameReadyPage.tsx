@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import Slide from '../components/Slide/Slide';
+import Slide from '../../components/Slide/Slide';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './CardGameReadyPage.styled';

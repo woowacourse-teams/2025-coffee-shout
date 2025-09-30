@@ -1,4 +1,4 @@
-import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPage';
+import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPage/CardGamePlayPage';
 import { MiniGameType } from '@/types/miniGame/common';
 import { JSX } from 'react';
 import { useParams } from 'react-router-dom';

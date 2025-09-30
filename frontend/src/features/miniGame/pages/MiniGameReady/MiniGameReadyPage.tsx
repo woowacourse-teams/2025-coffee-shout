@@ -1,7 +1,7 @@
 import { MiniGameType } from '@/types/miniGame/common';
 import { JSX } from 'react';
 import { useParams } from 'react-router-dom';
-import CardGameReadyPage from '../../cardGame/pages/CardGameReadyPage';
+import CardGameReadyPage from '../../cardGame/pages/CardGameReadyPage/CardGameReadyPage';
 
 const MINI_GAME_READY_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
   CARD_GAME: CardGameReadyPage,
