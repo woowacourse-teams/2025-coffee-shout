@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-type FlipperProps = {
+type Props = {
   flipped: boolean;
 };
 
@@ -11,7 +11,7 @@ export const FlipWrapper = styled.div`
   height: 100%;
 `;
 
-export const Flipper = styled.div<FlipperProps>`
+export const Flipper = styled.div<Props>`
   position: absolute;
   width: 100%;
   height: 100%;
