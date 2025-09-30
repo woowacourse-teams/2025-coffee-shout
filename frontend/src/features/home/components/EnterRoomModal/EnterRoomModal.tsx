@@ -30,9 +30,9 @@ const EnterRoomModal = ({ onClose }: Props) => {
       navigate(`/entry/name`);
       onClose();
     },
-    onError: (err) => {
+    onError: (error) => {
       // 추후 에러 바운더리에서 처리
-      alert(err.message);
+      alert(error.message);
       setJoinCode('');
     },
   });
