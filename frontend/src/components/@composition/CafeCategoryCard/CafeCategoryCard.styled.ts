@@ -19,8 +19,6 @@ export const Container = styled.button<Props>`
       touchState: $touchState,
       enableScale: false,
     })}
-
-  isolation: isolate;
 `;
 
 export const CategoryName = styled.span`

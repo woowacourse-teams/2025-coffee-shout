@@ -22,6 +22,4 @@ export const Container = styled.button<Props>`
       touchState: $touchState,
       enableScale: false,
     })}
-
-  isolation: isolate;
 `;

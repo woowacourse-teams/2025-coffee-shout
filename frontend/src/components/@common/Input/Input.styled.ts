@@ -57,6 +57,5 @@ export const ClearButton = styled.button<ClearButtonProps>`
   visibility: ${({ $hasValue }) => ($hasValue ? 'visible' : 'hidden')};
 
   position: relative;
-  isolation: isolate;
   ${({ $touchState }) => rippleEffect($touchState)}
 `;

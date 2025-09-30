@@ -8,7 +8,6 @@ type Props = {
 
 export const Container = styled.button<Props>`
   position: relative;
-  isolation: isolate;
   cursor: pointer;
   width: 16px;
   height: 16px;
