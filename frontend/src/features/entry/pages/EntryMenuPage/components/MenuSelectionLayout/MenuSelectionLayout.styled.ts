@@ -11,3 +11,10 @@ export const ChildrenWrapper = styled.div`
   flex: 1;
   overflow-y: auto;
 `;
+
+export const MenuListEmpty = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;

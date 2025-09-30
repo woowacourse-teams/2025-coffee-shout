@@ -1,4 +1,4 @@
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
@@ -66,6 +66,14 @@ const LobbyPage = () => {
     },
     [setParticipants, myName, setPlayerType, updateCurrentProbabilities]
   );
+
+  useFetch<MiniGameType[]>({
+    endpoint: `/rooms/minigames/selected?joinCode=${joinCode}`,
+    enabled: !!joinCode,
+    onSuccess: (data) => {
+      setSelectedMiniGames(data);
+    },
+  });
 
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
@@ -168,17 +176,6 @@ const LobbyPage = () => {
 
     return <GameReadyButton isReady={isReady} onClick={handleGameReadyButtonClick} />;
   };
-
-  useEffect(() => {
-    (async () => {
-      if (joinCode) {
-        const _selectedMiniGames = await api.get<MiniGameType[]>(
-          `/rooms/minigames/selected?joinCode=${joinCode}`
-        );
-        setSelectedMiniGames(_selectedMiniGames);
-      }
-    })();
-  }, [joinCode]);
 
   useEffect(() => {
     const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');

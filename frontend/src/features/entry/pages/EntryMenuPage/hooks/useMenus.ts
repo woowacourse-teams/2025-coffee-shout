@@ -1,38 +1,19 @@
-import { useState, useEffect } from 'react';
 import { Menu } from '@/types/menu';
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
+
+type MenusResponse = Menu[];
 
 export const useMenus = (selectedCategoryId: number | null) => {
-  const [menus, setMenus] = useState<Menu[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    data: menusData,
+    loading,
+    error,
+  } = useFetch<MenusResponse>({
+    endpoint: `/menu-categories/${selectedCategoryId}/menus`,
+    enabled: !!selectedCategoryId,
+  });
 
-  useEffect(() => {
-    if (!selectedCategoryId) {
-      setMenus([]);
-      return;
-    }
+  const menus = menusData ?? [];
 
-    const fetchMenus = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const menus = await api.get<Menu[]>(`/menu-categories/${selectedCategoryId}/menus`);
-        setMenus(menus);
-      } catch (error) {
-        setError(error instanceof Error ? error : new Error('메뉴를 불러오는데 실패했습니다'));
-        setMenus([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMenus();
-  }, [selectedCategoryId]);
-
-  const resetMenus = () => {
-    setMenus([]);
-  };
-
-  return { menus, loading, error, resetMenus };
+  return { menus, loading, error };
 };

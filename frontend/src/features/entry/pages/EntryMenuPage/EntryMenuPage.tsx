@@ -46,7 +46,7 @@ const EntryMenuPage = () => {
   } = useViewNavigation();
 
   const { categories } = useCategories();
-  const { menus, resetMenus } = useMenus(category.value?.id ?? null);
+  const { menus } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom } = useRoomManagement();
 
@@ -60,7 +60,6 @@ const EntryMenuPage = () => {
 
   const resetMenuState = () => {
     resetAll();
-    resetMenus();
   };
 
   const handleCategorySelect = (categoryItem: CategoryWithColor) => {
