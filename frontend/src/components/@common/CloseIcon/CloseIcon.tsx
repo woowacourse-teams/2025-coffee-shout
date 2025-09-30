@@ -17,6 +17,7 @@ const CloseIcon = ({ stroke, strokeWidth = 2, ...rest }: Props) => {
       viewBox="0 0 19 19"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="close-icon"
       {...rest}
     >
       <path
