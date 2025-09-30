@@ -6,4 +6,5 @@ export const Z_INDEX = {
   BACKDROP: 990,
   MODAL: 999,
   TOAST: 1000,
+  RIPPLE_Effect: -1,
 } as const;
