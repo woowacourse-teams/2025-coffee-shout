@@ -1,16 +1,40 @@
+import { useCardGame } from '@/contexts/CardGame/CardGameContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
-import { JSX } from 'react';
-import { useParams } from 'react-router-dom';
-import CardGameReadyPage from '../../cardGame/pages/CardGameReadyPage/CardGameReadyPage';
-
-const MINI_GAME_READY_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
-  CARD_GAME: CardGameReadyPage,
-} as const;
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import GameIntroSlide from '../../components/GameIntroSlide/GameIntroSlide';
+import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
+import * as S from './MiniGameReadyPage.styled';
 
 const MiniGameReadyPage = () => {
+  const navigate = useNavigate();
+  const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
+  const { currentCardGameState } = useCardGame();
 
-  if (!miniGameType || !(miniGameType in MINI_GAME_READY_COMPONENTS)) {
+  const isValidGameType = miniGameType && miniGameType in GAME_SLIDE_CONFIGS;
+  const gameType = miniGameType as MiniGameType;
+  const slideConfig = isValidGameType ? getGameSlideConfig(gameType) : null;
+
+  const slideData = useMemo(
+    () =>
+      slideConfig?.map((slide) => ({
+        ...slide,
+        image: <S.SlideImage src={slide.imageSrc} />,
+      })) || [],
+    [slideConfig]
+  );
+
+  useEffect(() => {
+    if (!joinCode || !gameType) return;
+    if (currentCardGameState === 'PREPARE') {
+      navigate(`/room/${joinCode}/${gameType}/play`);
+    }
+  }, [currentCardGameState, joinCode, gameType, navigate]);
+
+  if (!isValidGameType) {
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
@@ -19,9 +43,20 @@ const MiniGameReadyPage = () => {
     );
   }
 
-  const ReadyComponent = MINI_GAME_READY_COMPONENTS[miniGameType as MiniGameType];
-
-  return <ReadyComponent />;
+  return (
+    <Layout color="point-400">
+      <Layout.Content>
+        {slideData.map((slide, index) => (
+          <GameIntroSlide
+            key={index}
+            textLines={slide.textLines}
+            image={slide.image}
+            className={slide.className}
+          />
+        ))}
+      </Layout.Content>
+    </Layout>
+  );
 };
 
 export default MiniGameReadyPage;
