@@ -2,6 +2,7 @@ import { ANIMATION_DURATION } from '@/constants/animation';
 import { TouchState } from '@/types/touchState';
 import { theme } from '@/styles/theme';
 import { css } from '@emotion/react';
+import { Z_INDEX } from '@/constants/zIndex';
 
 type Props = {
   touchState: TouchState;
@@ -37,7 +38,7 @@ export const rippleEffect = ({ touchState, diameter = '30px' }: Props) => {
     isolation: isolate;
 
     &::before {
-      z-index: -1;
+      z-index: ${Z_INDEX.RIPPLE_Effect};
       content: '';
       position: absolute;
       top: 50%;
