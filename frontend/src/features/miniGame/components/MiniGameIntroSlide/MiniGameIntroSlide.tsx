@@ -1,5 +1,5 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
-import * as S from './GameIntroSlide.styled';
+import * as S from './MiniGameIntroSlide.styled';
 
 type Props = {
   textLines: readonly string[];
@@ -7,7 +7,7 @@ type Props = {
   className: string;
 };
 
-const GameIntroSlide = ({ textLines, imageSrc, className }: Props) => {
+const MiniGameIntroSlide = ({ textLines, imageSrc, className }: Props) => {
   return (
     <S.Container className={className}>
       <S.TextWrapper>
@@ -24,4 +24,4 @@ const GameIntroSlide = ({ textLines, imageSrc, className }: Props) => {
   );
 };
 
-export default GameIntroSlide;
+export default MiniGameIntroSlide;

@@ -4,7 +4,7 @@ import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import GameIntroSlide from '../../components/GameIntroSlide/GameIntroSlide';
+import MiniGameIntroSlide from '../../components/MiniGameIntroSlide/MiniGameIntroSlide';
 import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
 
 const MiniGameReadyPage = () => {
@@ -38,7 +38,7 @@ const MiniGameReadyPage = () => {
     <Layout color="point-400">
       <Layout.Content>
         {slideConfig.map((slide, index) => (
-          <GameIntroSlide
+          <MiniGameIntroSlide
             key={index}
             textLines={slide.textLines}
             imageSrc={slide.imageSrc}
