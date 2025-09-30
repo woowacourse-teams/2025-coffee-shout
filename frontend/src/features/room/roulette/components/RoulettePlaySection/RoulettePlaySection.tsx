@@ -35,7 +35,9 @@ const RoulettePlaySection = ({
 
   useEffect(() => {
     if (!isProbabilitiesLoading) {
-      setIsFlipped(true);
+      requestAnimationFrame(() => {
+        setIsFlipped(true);
+      });
     }
   }, [isProbabilitiesLoading]);
 
