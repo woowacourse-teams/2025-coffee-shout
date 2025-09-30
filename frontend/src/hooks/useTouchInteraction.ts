@@ -26,8 +26,7 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
 
   const handleTouchEnd = useCallback(
     (e: TouchEvent<HTMLButtonElement>) => {
-      if (!isTouchDevice) return;
-      if (isDisabled) return;
+      if (!isTouchDevice || isDisabled) return;
 
       e.preventDefault();
       setTouchState('releasing');
