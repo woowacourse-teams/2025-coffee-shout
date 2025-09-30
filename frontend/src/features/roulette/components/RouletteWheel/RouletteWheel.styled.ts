@@ -7,6 +7,8 @@ type WrapperProps = {
 };
 
 export const Container = styled.div`
+  width: 300px;
+  height: 300px;
   position: relative;
 `;
 
@@ -15,7 +17,6 @@ export const Wrapper = styled.div<WrapperProps>`
   height: 300px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.color.point[100]};
-  margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;

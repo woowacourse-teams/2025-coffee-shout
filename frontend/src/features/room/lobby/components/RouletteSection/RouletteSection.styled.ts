@@ -11,3 +11,11 @@ export const IconButtonWrapper = styled.div`
   top: 0.3rem;
   right: 0.3rem;
 `;
+
+export const RouletteWheelWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  padding-top: 6rem;
+`;

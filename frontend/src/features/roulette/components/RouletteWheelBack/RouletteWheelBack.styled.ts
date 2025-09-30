@@ -9,7 +9,6 @@ export const Wrapper = styled.div`
   height: 300px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.color.point[100]};
-  margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
