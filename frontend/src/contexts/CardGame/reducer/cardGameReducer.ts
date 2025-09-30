@@ -12,7 +12,7 @@ export type Action =
   | { type: 'PREPARE'; payload: { cardInfos: CardInfo[] } }
   | { type: 'PLAYING'; payload: { cardInfos: CardInfo[]; round: RoundType } }
   | { type: 'SCORE_BOARD'; payload: { cardInfos: CardInfo[]; round: RoundType } }
-  | { type: 'LOADING'; payload: { currentRound: RoundType } }
+  | { type: 'LOADING'; payload: { round: RoundType } }
   | { type: 'DONE' };
 
 export const initialState: State = {
@@ -49,11 +49,11 @@ export const cardGameReducer = (state: State, action: Action): State => {
       };
 
     case 'LOADING':
-      if (action.payload.currentRound === 'SECOND') {
+      if (action.payload.round === 'SECOND') {
         return {
           ...state,
           currentCardGameState: 'LOADING',
-          currentRound: 'SECOND',
+          currentRound: action.payload.round,
           isTransition: true,
         };
       }

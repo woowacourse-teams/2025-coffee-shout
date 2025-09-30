@@ -54,7 +54,7 @@ export const useCardGameHandlers = (
           break;
 
         case 'LOADING':
-          dispatch({ type: 'LOADING', payload: { currentRound } });
+          dispatch({ type: 'LOADING', payload: { round: currentRound } });
           break;
 
         case 'DONE':
