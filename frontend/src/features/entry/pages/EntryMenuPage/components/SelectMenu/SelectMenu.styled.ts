@@ -17,3 +17,10 @@ export const MenuListWrapper = styled.div`
   height: 100%;
   overflow-y: auto;
 `;
+
+export const MenuListEmpty = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;

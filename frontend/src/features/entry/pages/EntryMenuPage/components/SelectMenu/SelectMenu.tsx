@@ -13,7 +13,7 @@ type Props = {
 } & PropsWithChildren;
 
 const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: Props) => {
-  const { data: menus } = useFetch<Menu[]>({
+  const { data: menus = [] } = useFetch<Menu[]>({
     endpoint: `/menu-categories/${selectedCategory.id}/menus`,
   });
 
@@ -33,13 +33,17 @@ const SelectMenu = ({ onMenuSelect, selectedCategory, selectedMenu, children }: 
         {!selectedMenu && (
           <S.MenuListWrapper>
             <S.MenuList>
-              {menus?.map((menu) => (
-                <MenuListItem
-                  key={menu.id}
-                  text={menu.name}
-                  onClick={() => handleClickMenu(menu)}
-                />
-              ))}
+              {menus.length === 0 ? (
+                <S.MenuListEmpty>메뉴 정보가 없습니다.</S.MenuListEmpty>
+              ) : (
+                menus.map((menu) => (
+                  <MenuListItem
+                    key={menu.id}
+                    text={menu.name}
+                    onClick={() => handleClickMenu(menu)}
+                  />
+                ))
+              )}
             </S.MenuList>
           </S.MenuListWrapper>
         )}
