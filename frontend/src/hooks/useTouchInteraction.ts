@@ -5,7 +5,7 @@ import { useState, useCallback, TouchEvent, MouseEvent } from 'react';
 const TOUCH_DELAY_MS = 100;
 
 type UseTouchTransitionProps = {
-  onClick: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;
   isDisabled?: boolean;
 };
 
@@ -33,7 +33,7 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
       setTouchState('releasing');
       setTimeout(() => {
         setTouchState('idle');
-        onClick(e);
+        onClick?.(e);
       }, TOUCH_DELAY_MS);
     },
     [isTouchDevice, isDisabled, onClick]

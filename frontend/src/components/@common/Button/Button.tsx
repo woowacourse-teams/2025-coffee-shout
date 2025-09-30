@@ -21,7 +21,7 @@ const Button = ({
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick: onClick || (() => {}),
+    onClick,
     isDisabled,
   });
   const isTouchDevice = checkIsTouchDevice();

@@ -14,7 +14,7 @@ type Props = {
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick: onClick || (() => {}),
+    onClick,
   });
   const isTouchDevice = checkIsTouchDevice();
 
