@@ -8,7 +8,7 @@ type UseLazyFetchOptions<T> = {
 };
 
 type UseLazyFetchReturn<T> = {
-  data: T | null;
+  data: T | undefined;
   loading: boolean;
   error: Error | null;
   execute: () => Promise<T>;
@@ -17,7 +17,7 @@ type UseLazyFetchReturn<T> = {
 const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T> => {
   const { endpoint, onSuccess, onError } = options;
 
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<T | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 

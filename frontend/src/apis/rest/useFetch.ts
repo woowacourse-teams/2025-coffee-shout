@@ -9,7 +9,7 @@ type UseFetchOptions<T> = {
 };
 
 type UseFetchReturn<T> = {
-  data: T | null;
+  data: T | undefined;
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
@@ -18,7 +18,7 @@ type UseFetchReturn<T> = {
 const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
   const { endpoint, enabled = true, onSuccess, onError } = options;
 
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<T | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
