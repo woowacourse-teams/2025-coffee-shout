@@ -1,7 +1,8 @@
-package coffeeshout.global.config;
+package coffeeshout.global.config.redis;
 
 import coffeeshout.global.config.properties.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,13 +16,10 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-
-    public RedisConfig(RedisProperties redisProperties) {
-        this.redisProperties = redisProperties;
-    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

@@ -11,7 +11,7 @@ import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
-import coffeeshout.room.infra.RoomEventPublisher;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;

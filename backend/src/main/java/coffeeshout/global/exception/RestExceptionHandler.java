@@ -8,10 +8,13 @@ import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -97,6 +100,58 @@ public class RestExceptionHandler {
                                                        HttpServletRequest request) {
         logError(exception, request);
         return getProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, exception, exception.getErrorCode());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+    ) {
+        logWarning(exception, request);
+
+        String errorMessage = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .reduce((msg1, msg2) -> msg1 + ", " + msg2)
+                .orElse("유효하지 않은 요청입니다.");
+
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
+            @Override
+            public String getCode() {
+                return "VALIDATION_ERROR";
+            }
+
+            @Override
+            public String getMessage() {
+                return errorMessage;
+            }
+        });
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ProblemDetail handleConstraintViolationException(
+            ConstraintViolationException exception,
+            HttpServletRequest request
+    ) {
+        logWarning(exception, request);
+
+        final String errorMessage = exception.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining(", "));
+
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
+            @Override
+            public String getCode() {
+                return "CONSTRAINT_VIOLATION";
+            }
+
+            @Override
+            public String getMessage() {
+                return errorMessage.isBlank() ? "요청 파라미터가 유효하지 않습니다." : errorMessage;
+            }
+        });
     }
 
     private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {

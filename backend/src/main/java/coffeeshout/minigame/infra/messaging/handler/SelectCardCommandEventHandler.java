@@ -1,8 +1,8 @@
-package coffeeshout.minigame.infra.handler;
+package coffeeshout.minigame.infra.messaging.handler;
 
 import coffeeshout.minigame.application.CardGameService;
+import coffeeshout.minigame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
-import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

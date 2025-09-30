@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.handler;
+package coffeeshout.minigame.infra.messaging.handler;
 
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
