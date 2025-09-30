@@ -1,14 +1,14 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
-import * as S from './Slide.styled';
 import { ComponentProps, ReactElement } from 'react';
+import * as S from './GameIntroSlide.styled';
 
 type Props = {
-  textLines: string[];
+  textLines: readonly string[];
   image: ReactElement<ComponentProps<'img'>>;
   className: string;
 };
 
-const Slide = ({ textLines, image, className }: Props) => {
+const GameIntroSlide = ({ textLines, image, className }: Props) => {
   return (
     <S.Container className={className}>
       <S.TextWrapper>
@@ -23,4 +23,4 @@ const Slide = ({ textLines, image, className }: Props) => {
   );
 };
 
-export default Slide;
+export default GameIntroSlide;
