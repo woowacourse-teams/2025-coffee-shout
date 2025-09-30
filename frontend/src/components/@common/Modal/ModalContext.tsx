@@ -4,6 +4,7 @@ import Modal from './Modal';
 type Options = {
   title?: string;
   showCloseButton?: boolean;
+  closeOnBackdropClick?: boolean;
 };
 
 type ModalContextType = {
@@ -35,6 +36,7 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
         onClose={closeModal}
         title={options.title}
         showCloseButton={options.showCloseButton}
+        closeOnBackdropClick={options.closeOnBackdropClick}
       >
         {content}
       </Modal>
