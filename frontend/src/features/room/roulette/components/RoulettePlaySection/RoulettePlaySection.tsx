@@ -36,14 +36,14 @@ const RoulettePlaySection = ({
       <S.RouletteWheelWrapper>
         <Flip
           flipped={!isProbabilitiesLoading}
-          front={
+          initialView={<RouletteWheelBack />}
+          flippedView={
             <AnimatedRouletteWheel
               finalRotation={finalRotation}
               isSpinning={isSpinning}
               startAnimation={!isProbabilitiesLoading}
             />
           }
-          back={<RouletteWheelBack />}
         />
       </S.RouletteWheelWrapper>
       <ProbabilitiesText isProbabilitiesLoading={isProbabilitiesLoading} />

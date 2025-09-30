@@ -30,7 +30,7 @@ type Story = StoryObj<typeof Flip>;
 export const Default: Story = {
   args: {
     flipped: false,
-    front: (
+    initialView: (
       <div
         style={{
           width: '100%',
@@ -47,7 +47,7 @@ export const Default: Story = {
         앞면
       </div>
     ),
-    back: (
+    flippedView: (
       <div
         style={{
           width: '100%',

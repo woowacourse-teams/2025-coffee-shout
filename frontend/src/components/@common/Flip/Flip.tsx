@@ -3,16 +3,16 @@ import * as S from './Flip.styled';
 
 type Props = {
   flipped: boolean;
-  front: ReactNode;
-  back: ReactNode;
+  initialView: ReactNode;
+  flippedView: ReactNode;
 };
 
-const Flip = ({ flipped, front, back }: Props) => {
+const Flip = ({ flipped, initialView, flippedView }: Props) => {
   return (
     <S.FlipWrapper>
       <S.Flipper flipped={flipped}>
-        <S.Front>{front}</S.Front>
-        <S.Back>{back}</S.Back>
+        <S.InitialView>{initialView}</S.InitialView>
+        <S.FlippedView>{flippedView}</S.FlippedView>
       </S.Flipper>
     </S.FlipWrapper>
   );

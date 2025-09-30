@@ -21,18 +21,18 @@ export const Flipper = styled.div<Props>`
   transform: ${({ flipped }) => (flipped ? 'rotateY(180deg)' : 'rotateY(0deg)')};
 `;
 
-export const Front = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  transform: rotateY(180deg);
-`;
-
-export const Back = styled.div`
+export const InitialView = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
   transform: rotateY(0deg);
+`;
+
+export const FlippedView = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
 `;
