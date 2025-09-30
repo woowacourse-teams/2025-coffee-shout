@@ -2,6 +2,7 @@ package coffeeshout.room.domain.event;
 
 import coffeeshout.global.event.BaseEvent;
 import coffeeshout.minigame.domain.MiniGameType;
+import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
 
@@ -20,7 +21,17 @@ public class MiniGameSelectEvent extends BaseEvent implements RoomBaseEvent {
     }
 
     @Override
+    public Instant getTimeStamp() {
+        return timestamp;
+    }
+
+    @Override
     public RoomEventType getEventType() {
         return eventType;
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
     }
 }

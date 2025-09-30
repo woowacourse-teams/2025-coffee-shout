@@ -13,13 +13,13 @@ import lombok.extern.slf4j.Slf4j;
  * Redis publish를 위한 이벤트들의 기본 클래스
  * tracing 정보(traceId, spanId)를 포함하여 분산 추적 지원
  */
-@Getter
 @Slf4j
+@Getter
 public abstract class BaseEvent {
 
-    protected final String eventId;
-    protected final TraceInfo traceInfo;
-    protected final Instant timestamp;
+    public final String eventId;
+    public final TraceInfo traceInfo;
+    public final Instant timestamp;
 
     protected BaseEvent() {
         this.eventId = UUID.randomUUID().toString();
@@ -40,5 +40,17 @@ public abstract class BaseEvent {
             log.debug("Trace context 없음: {}", e.toString());
             return new TraceInfo("", "");
         }
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
     }
 }

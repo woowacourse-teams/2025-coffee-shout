@@ -1,7 +1,7 @@
 package coffeeshout.minigame.domain.event;
 
 import coffeeshout.global.event.BaseEvent;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Getter;
 
 @Getter
@@ -24,7 +24,12 @@ public class SelectCardCommandEvent extends BaseEvent implements MiniGameBaseEve
     }
 
     @Override
-    public LocalDateTime getCreatedAt() {
-        return getTimestamp();
+    public Instant getCreatedAt() {
+        return timestamp;
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
     }
 }

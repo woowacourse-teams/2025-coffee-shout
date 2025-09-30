@@ -1,6 +1,7 @@
 package coffeeshout.room.domain.event;
 
 import coffeeshout.global.event.BaseEvent;
+import java.time.Instant;
 import lombok.Getter;
 
 @Getter
@@ -18,7 +19,17 @@ public class PlayerReadyEvent extends BaseEvent implements RoomBaseEvent {
     }
 
     @Override
+    public Instant getTimeStamp() {
+        return timestamp;
+    }
+
+    @Override
     public RoomEventType getEventType() {
         return eventType;
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
     }
 }

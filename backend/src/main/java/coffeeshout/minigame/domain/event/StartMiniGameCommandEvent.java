@@ -1,7 +1,7 @@
 package coffeeshout.minigame.domain.event;
 
 import coffeeshout.global.event.BaseEvent;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Getter;
 
 @Getter
@@ -22,7 +22,12 @@ public class StartMiniGameCommandEvent extends BaseEvent implements MiniGameBase
     }
 
     @Override
-    public LocalDateTime getCreatedAt() {
-        return getTimestamp();
+    public Instant getCreatedAt() {
+        return timestamp;
+    }
+
+    @Override
+    public String getEventId() {
+        return eventId;
     }
 }

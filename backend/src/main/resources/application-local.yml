@@ -30,7 +30,7 @@ management:
     tracing:
       endpoint: http://localhost:4318/v1/traces
       export:
-        enabled: false
+        enabled: true
   metrics:
     enable:
       tomcat: true

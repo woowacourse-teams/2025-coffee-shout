@@ -1,11 +1,11 @@
 package coffeeshout.minigame.domain.event;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public interface MiniGameBaseEvent {
     String getEventId();
 
     MiniGameEventType getEventType();
 
-    LocalDateTime getCreatedAt();
+    Instant getCreatedAt();
 }
