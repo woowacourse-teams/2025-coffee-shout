@@ -190,6 +190,7 @@ const LobbyPage = () => {
         />,
         {
           showCloseButton: false,
+          closeOnBackdropClick: false,
         }
       );
     }

@@ -1,6 +1,12 @@
+import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
-export const Container = styled.button`
+interface Props {
+  $touchState: TouchState;
+}
+
+export const Container = styled.button<Props>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -9,4 +15,11 @@ export const Container = styled.button`
   padding-left: 16px;
   background: none;
   cursor: pointer;
+
+  ${({ theme, $touchState }) =>
+    buttonHoverPress({
+      activeColor: theme.color.gray[100],
+      touchState: $touchState,
+      enableScale: false,
+    })}
 `;

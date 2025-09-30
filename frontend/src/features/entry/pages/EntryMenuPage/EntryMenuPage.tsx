@@ -1,273 +1,151 @@
-import { ApiError, NetworkError } from '@/apis/rest/error';
-import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useToast from '@/components/@common/Toast/useToast';
 import SelectCategory from './components/SelectCategory/SelectCategory';
-import SelectMenu from './components/SelectMenu/SelectMenu';
-import { Category, CategoryWithColor, Menu } from '@/types/menu';
-import { TemperatureOption } from '@/types/menu';
+import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
-import InputCustomMenu from './components/InputCustomMenu/InputCustomMenu';
-import SelectTemperature from './components/SelectTemperature/SelectTemperature';
-import { categoryColorList, MenuColorMap } from '@/constants/color';
+import { useMenuFlow } from './hooks/useMenuFlow';
+import { useRoomManagement } from './hooks/useRoomManagement';
+import { useViewNavigation } from './hooks/useViewNavigation';
+import { useCategories } from './hooks/useCategories';
+import { useMenus } from './hooks/useMenus';
 import * as S from './EntryMenuPage.styled';
-import { api } from '@/apis/rest/api';
-
-type RoomRequest = {
-  playerName: string;
-  menu: {
-    id: number;
-    customName: string | null;
-    temperature: TemperatureOption;
-  };
-};
-
-type RoomResponse = {
-  joinCode: string;
-  qrCodeUrl: string;
-};
-
-type CategoriesResponse = Category[];
-
-type CurrentView = 'selectCategory' | 'selectMenu' | 'inputCustomMenu' | 'selectTemperature';
+import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
+import SelectTemperature from './components/SelectTemperature/SelectTemperature';
+import MenuList from './components/MenuList/MenuList';
+import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
-  const { startSocket, isConnected } = useWebSocket();
+  const { isConnected } = useWebSocket();
+  const { joinCode, qrCodeUrl } = useIdentifier();
   const { playerType } = usePlayerType();
-  const { joinCode, myName, qrCodeUrl, setJoinCode, setQrCodeUrl } = useIdentifier();
-  const { showToast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState<CategoryWithColor | null>(null);
-  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-  const [customMenuName, setCustomMenuName] = useState<string | null>(null);
-  const [isMenuInputCompleted, setIsMenuInputCompleted] = useState(false);
-  const [selectedTemperature, setSelectedTemperature] = useState<TemperatureOption>('ICE');
-  const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
 
-  const { data: categoriesData, loading } = useFetch<CategoriesResponse>({
-    endpoint: '/menu-categories',
-  });
+  const {
+    category,
+    menu,
+    temperature,
+    customMenu,
+    categorySelection,
+    menuSelection,
+    temperatureAvailability,
+    resetAll,
+  } = useMenuFlow();
 
-  const categories: CategoryWithColor[] = useMemo(() => {
-    if (!categoriesData) return [];
-    return categoriesData.map((category, index) => ({
-      ...category,
-      color: categoryColorList[index % categoryColorList.length],
-    }));
-  }, [categoriesData]);
+  const {
+    currentView,
+    navigateToMenu,
+    navigateToTemperature,
+    navigateToCustomMenu,
+    handleNavigateToBefore,
+  } = useViewNavigation();
+
+  const { categories } = useCategories();
+  const { menus, resetMenus } = useMenus(category.value?.id ?? null);
+
+  const { proceedToRoom } = useRoomManagement();
 
   useEffect(() => {
-    if (joinCode && qrCodeUrl && (selectedMenu || customMenuName) && isConnected) {
+    const isReadyToNavigateLobby =
+      joinCode && qrCodeUrl && (menu.value || customMenu.value) && isConnected;
+    if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [joinCode, qrCodeUrl, selectedMenu, customMenuName, isConnected, navigate]);
+  }, [joinCode, qrCodeUrl, menu, customMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
-    setSelectedCategory(null);
-    setSelectedMenu(null);
-    setCustomMenuName(null);
-    setIsMenuInputCompleted(false);
-    setSelectedTemperature('ICE');
+    resetAll();
+    resetMenus();
   };
 
-  const handleNavigateToBefore = () => {
-    switch (currentView) {
-      case 'selectCategory':
-        navigate('/entry/name');
-        break;
-      case 'selectMenu':
-        setSelectedMenu(null);
-        setCurrentView('selectCategory');
-        break;
-      case 'inputCustomMenu':
-        setCustomMenuName(null);
-        setCurrentView('selectCategory');
-        break;
-      case 'selectTemperature':
-        resetMenuState();
-        setCurrentView('selectCategory');
-        break;
-      default:
-        navigate('/entry/name');
-        break;
-    }
+  const handleCategorySelect = (categoryItem: CategoryWithColor) => {
+    category.set(categoryItem);
+    navigateToMenu();
   };
 
-  const createRoomRequestBody = (): RoomRequest => {
-    const requestBody = {
-      playerName: myName,
-      menu: {
-        id: selectedMenu ? selectedMenu.id : 0,
-        customName: customMenuName,
-        temperature: selectedTemperature,
-      },
-    };
-    return requestBody;
+  const handleMenuSelect = (menuItem: Menu) => {
+    menu.set(menuItem);
+    navigateToTemperature();
   };
 
-  const createUrl = () => {
-    if (playerType === 'HOST') {
-      return `/rooms`;
-    } else {
-      return `/rooms/${joinCode}`;
-    }
+  const handleGoBack = () => {
+    handleNavigateToBefore(resetMenuState);
   };
 
-  const handleRoomRequest = async () => {
-    const { joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-      createUrl(),
-      createRoomRequestBody()
-    );
-    setJoinCode(joinCode);
-    setQrCodeUrl(qrCodeUrl);
-    startSocket(joinCode, myName);
-  };
-
-  const handleNavigateToLobby = async () => {
-    if (!myName) {
-      showToast({
-        type: 'error',
-        message: '닉네임을 다시 입력해주세요.',
-      });
-      navigate(-1);
-      return;
-    }
-
-    if (!selectedMenu && !customMenuName) {
-      showToast({
-        type: 'error',
-        message: '메뉴를 선택하지 않았습니다.',
-      });
-      return;
-    }
-
-    try {
-      // setLoading(true);
-      await handleRoomRequest();
-    } catch (error) {
-      if (error instanceof ApiError) {
-        showToast({
-          type: 'error',
-          message: '방 생성/참가에 실패했습니다.',
-        });
-      } else if (error instanceof NetworkError) {
-        showToast({
-          type: 'error',
-          message: '네트워크 연결을 확인해주세요.',
-        });
-      } else {
-        showToast({
-          type: 'error',
-          message: '알 수 없는 오류가 발생했습니다.',
-        });
-      }
-    }
-  };
-
-  const handleSetSelectedCategory = (category: CategoryWithColor) => {
-    setSelectedCategory(category);
-    setCurrentView('selectMenu');
-  };
-
-  const handleSetSelectedMenu = (menu: Menu) => {
-    setSelectedMenu(menu);
-    if (menu.temperatureAvailability === 'ICE_ONLY') {
-      setSelectedTemperature('ICE');
-    } else if (menu.temperatureAvailability === 'HOT_ONLY') {
-      setSelectedTemperature('HOT');
-    }
-    setCurrentView('selectTemperature');
-  };
-
-  const handleChangeTemperature = (temperature: TemperatureOption) => {
-    setSelectedTemperature(temperature);
-  };
-
-  const handleNavigateToCustomMenu = () => {
+  const handleCustomMenuClick = () => {
     resetMenuState();
-    setCurrentView('inputCustomMenu');
+    navigateToCustomMenu();
   };
 
-  const handleChangeCustomMenuName = (customMenuName: string) => {
-    setCustomMenuName(customMenuName);
+  const handleCustomMenuDone = () => {
+    customMenu.complete();
+    navigateToTemperature();
   };
 
-  const handleClickDoneButton = () => {
-    setIsMenuInputCompleted(true);
-    setCurrentView('selectTemperature');
+  const handleProceedToRoom = () => {
+    proceedToRoom(menu.value, customMenu.value, temperature.value);
+  };
+
+  const handleChangeCustomMenuInput = (e: ChangeEvent<HTMLInputElement>) => {
+    customMenu.set(e.target.value);
+  };
+
+  const viewChildren = {
+    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectTemperature: (
+      <SelectTemperature
+        temperatureAvailability={temperatureAvailability}
+        selectedTemperature={temperature.value}
+        onChangeTemperature={temperature.set}
+      />
+    ),
+    inputCustomMenu: (
+      <CustomMenuInput
+        placeholder="메뉴를 입력해주세요"
+        value={customMenu.value}
+        onChange={handleChangeCustomMenuInput}
+        onClickDoneButton={handleCustomMenuDone}
+      />
+    ),
   };
 
   const shouldShowButtonBar = currentView === 'selectTemperature';
 
-  //임시 로딩 컴포넌트
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const shouldShowCustomMenuButton =
+    currentView === 'selectCategory' || currentView === 'selectMenu';
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleNavigateToBefore} />} />
+      <Layout.TopBar left={<BackButton onClick={handleGoBack} />} />
       <Layout.Content>
         <S.Container>
-          {currentView === 'selectCategory' && (
-            <SelectCategory categories={categories} onClickCategory={handleSetSelectedCategory} />
+          {currentView === 'selectCategory' ? (
+            <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
+          ) : (
+            <MenuSelectionLayout
+              categorySelection={categorySelection}
+              menuSelection={menuSelection}
+              showSelectedMenuCard={currentView === 'selectTemperature'}
+            >
+              {viewChildren[currentView]}
+            </MenuSelectionLayout>
           )}
-          {(currentView === 'selectMenu' || currentView === 'selectTemperature') &&
-            selectedCategory && (
-              <SelectMenu
-                onMenuSelect={handleSetSelectedMenu}
-                selectedCategory={selectedCategory}
-                selectedMenu={selectedMenu}
-              >
-                {selectedMenu && (
-                  <SelectTemperature
-                    menuName={selectedMenu.name}
-                    temperatureAvailability={selectedMenu.temperatureAvailability}
-                    selectedTemperature={selectedTemperature}
-                    onChangeTemperature={handleChangeTemperature}
-                    selectionCardColor={MenuColorMap[selectedCategory.color]}
-                  />
-                )}
-              </SelectMenu>
-            )}
-          {(currentView === 'inputCustomMenu' || currentView === 'selectTemperature') &&
-            !selectedMenu && (
-              <InputCustomMenu
-                customMenuName={customMenuName}
-                onChangeCustomMenuName={handleChangeCustomMenuName}
-                onClickDoneButton={handleClickDoneButton}
-                isMenuInputCompleted={isMenuInputCompleted}
-              >
-                {isMenuInputCompleted && (
-                  <SelectTemperature
-                    menuName={customMenuName || ''}
-                    temperatureAvailability={'BOTH'}
-                    selectedTemperature={selectedTemperature}
-                    onChangeTemperature={handleChangeTemperature}
-                  />
-                )}
-              </InputCustomMenu>
-            )}
         </S.Container>
-        {currentView !== 'inputCustomMenu' && currentView !== 'selectTemperature' && (
-          <CustomMenuButton onClick={handleNavigateToCustomMenu} />
-        )}
+        {shouldShowCustomMenuButton && <CustomMenuButton onClick={handleCustomMenuClick} />}
       </Layout.Content>
       {shouldShowButtonBar &&
         (playerType === 'HOST' ? (
           <Layout.ButtonBar>
-            <Button onClick={handleNavigateToLobby}>방 만들러 가기</Button>
+            <Button onClick={handleProceedToRoom}>방 만들러 가기</Button>
           </Layout.ButtonBar>
         ) : (
           <Layout.ButtonBar>
-            <Button onClick={handleNavigateToLobby}>방 참가하기</Button>
+            <Button onClick={handleProceedToRoom}>방 참가하기</Button>
           </Layout.ButtonBar>
         ))}
     </Layout>

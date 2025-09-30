@@ -1,15 +1,25 @@
 import BackIcon from '@/assets/back-icon.svg';
-import { ComponentProps } from 'react';
+import { useTouchInteraction } from '@/hooks/useTouchInteraction';
+import { ComponentProps, MouseEvent, TouchEvent } from 'react';
+import * as S from './BackButton.styled';
 
 type Props = {
-  onClick: () => void;
+  onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
 } & ComponentProps<'button'>;
 
 const BackButton = ({ onClick, ...rest }: Props) => {
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+
   return (
-    <button onClick={onClick} {...rest}>
+    <S.Container
+      onClick={onClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      $touchState={touchState}
+      {...rest}
+    >
       <img src={BackIcon} alt="뒤로가기" />
-    </button>
+    </S.Container>
   );
 };
 

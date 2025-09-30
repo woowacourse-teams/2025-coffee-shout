@@ -1,7 +1,13 @@
 import { Z_INDEX } from '@/constants/zIndex';
+import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
-export const Container = styled.div`
+type Props = {
+  $touchState: TouchState;
+};
+
+export const Container = styled.button<Props>`
   width: 120px;
   height: 50px;
   background-color: ${({ theme }) => theme.color.point[400]};
@@ -23,6 +29,12 @@ export const Container = styled.div`
   bottom: 20px;
   right: 20px;
   z-index: ${Z_INDEX.CUSTOM_MENU_BUTTON};
+
+  ${({ theme, $touchState }) =>
+    buttonHoverPress({
+      activeColor: theme.color.point[500],
+      touchState: $touchState,
+    })}
 `;
 
 export const Icon = styled.img`
