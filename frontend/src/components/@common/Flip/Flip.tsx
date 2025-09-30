@@ -1,10 +1,10 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import * as S from './Flip.styled';
 
 type Props = {
   flipped: boolean;
-  front: React.ReactNode;
-  back: React.ReactNode;
+  front: ReactNode;
+  back: ReactNode;
 };
 
 const Flip = ({ flipped, front, back }: Props) => {
