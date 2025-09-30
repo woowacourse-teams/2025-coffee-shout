@@ -22,28 +22,31 @@ public class CardSelectStreamProducer {
     private final ObjectMapper objectMapper;
 
     public void broadcastCardSelect(SelectCardCommandEvent event) {
-        log.info("Broadcasting card select event: eventId={}, playerName={}, selectedCard={}",
-                event.eventId(), event.playerName(), event.cardIndex());
+        log.info("카드 선택 이벤트 발송 시작: eventId={}, joinCode={}, playerName={}, cardIndex={}",
+                event.eventId(), event.joinCode(), event.playerName(), event.cardIndex());
 
         try {
-            String value = objectMapper.writeValueAsString(event);
+            final String value = objectMapper.writeValueAsString(event);
 
-            Record<String, Object> objectRecord = StreamRecords.newRecord()
+            final Record<String, Object> objectRecord = StreamRecords.newRecord()
                     .in(redisStreamProperties.cardGameSelectKey())
                     .ofObject(value);
 
-            var recordId = stringRedisTemplate.opsForStream().add(
+            final var recordId = stringRedisTemplate.opsForStream().add(
                     objectRecord,
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
-            log.info("Card select broadcast sent: recordId={}", recordId);
+            log.info("카드 선택 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
+                    event.eventId(), recordId, redisStreamProperties.cardGameSelectKey());
         } catch (JsonProcessingException e) {
-            log.error("직렬화 중 예외가 발생했습니다. eventId = {}", event.eventId(), e);
-            throw new RuntimeException("SelectCardCommandEvent 직렬화 실패", e);
+            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}, error={}",
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e.getMessage(), e);
+            throw new RuntimeException("SelectCardCommandEvent 직렬화 실패: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Failed to broadcast card select event", e);
-            throw new RuntimeException("Failed to broadcast card select event", e);
+            log.error("카드 선택 이벤트 발송 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}, error={}",
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e.getMessage(), e);
+            throw new RuntimeException("카드 선택 이벤트 발송 실패: " + e.getMessage(), e);
         }
     }
 }

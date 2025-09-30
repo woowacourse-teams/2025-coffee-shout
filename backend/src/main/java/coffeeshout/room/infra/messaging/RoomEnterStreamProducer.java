@@ -22,27 +22,30 @@ public class RoomEnterStreamProducer {
     private final ObjectMapper objectMapper;
 
     public void broadcastEnterRoom(RoomJoinEvent event) {
-        log.info("Broadcasting enter room event: joinCode={}, playerName={}",
-                event.joinCode(), event.guestName());
+        log.info("방 입장 이벤트 발송 시작: eventId={}, joinCode={}, guestName={}",
+                event.eventId(), event.joinCode(), event.guestName());
 
         try {
-            String eventJson = objectMapper.writeValueAsString(event);
-            Record<String, String> objectRecord = StreamRecords.newRecord()
+            final String eventJson = objectMapper.writeValueAsString(event);
+            final Record<String, String> objectRecord = StreamRecords.newRecord()
                     .in(redisStreamProperties.roomJoinKey())
                     .ofObject(eventJson);
 
-            var recordId = stringRedisTemplate.opsForStream().add(
+            final var recordId = stringRedisTemplate.opsForStream().add(
                     objectRecord,
                     XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
             );
 
-            log.info("Enter room broadcast sent: recordId={}", recordId);
+            log.info("방 입장 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
+                    event.eventId(), recordId, redisStreamProperties.roomJoinKey());
         } catch (JsonProcessingException e){
-            log.error("직렬화 중 예외가 발생했습니다. event = {}, ", event, e);
-            throw new RuntimeException("RoomJoinEvent 직렬화 실패", e);
+            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, guestName={}, error={}",
+                    event.eventId(), event.joinCode(), event.guestName(), e.getMessage(), e);
+            throw new RuntimeException("RoomJoinEvent 직렬화 실패: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Failed to broadcast enter room event. event = {}", event, e);
-            throw new RuntimeException("Failed to broadcast enter room event", e);
+            log.error("방 입장 이벤트 발송 실패: eventId={}, joinCode={}, guestName={}, error={}",
+                    event.eventId(), event.joinCode(), event.guestName(), e.getMessage(), e);
+            throw new RuntimeException("방 입장 이벤트 발송 실패: " + e.getMessage(), e);
         }
     }
 }

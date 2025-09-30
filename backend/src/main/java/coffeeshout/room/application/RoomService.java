@@ -163,22 +163,20 @@ public class RoomService {
         return roomCommandService.save(room);
     }
 
-    public Room enterRoomInternal(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-
-        room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
-
-        return roomCommandService.save(room);
-    }
-
     private void assignQrCodeUrl(Room room) {
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
         room.assignQrCodeUrl(qrCodeUrl);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        return roomCommandService.joinGuest(joinCode, guestName, selectedMenuRequest);
+        Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
+
+        return roomCommandService.joinGuest(
+                new JoinCode(joinCode),
+                new PlayerName(guestName),
+                menu,
+                selectedMenuRequest.temperature()
+        );
     }
 
     public List<Player> changePlayerReadyStateInternal(String joinCode, String playerName, Boolean isReady) {

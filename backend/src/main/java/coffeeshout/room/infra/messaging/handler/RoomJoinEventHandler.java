@@ -23,7 +23,7 @@ public class RoomJoinEventHandler implements RoomEventHandler<RoomJoinEvent> {
             log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
                     event.getEventId(), event.joinCode(), event.guestName());
 
-            final Room room = roomService.enterRoomInternal(
+            final Room room = roomService.enterRoom(
                     event.joinCode(),
                     event.guestName(),
                     event.selectedMenuRequest()
