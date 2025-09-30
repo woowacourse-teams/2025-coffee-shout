@@ -11,7 +11,7 @@ type Props = {
 
 const ANIMATION_DURATION = 500;
 
-export const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimation }: Props) => {
+const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimation }: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
 
   const {

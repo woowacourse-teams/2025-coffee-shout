@@ -2,7 +2,7 @@ import * as S from './RoulettePlaySection.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
-import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
+import AnimatedRouletteWheel from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
 import ProbabilitiesText from '../ProbabilitiesText/ProbabilitiesText';
 import RouletteWheelBack from '@/features/roulette/components/RouletteWheelBack/RouletteWheelBack';
 import Flip from '@/components/@common/Flip/Flip';
