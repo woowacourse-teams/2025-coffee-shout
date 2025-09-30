@@ -1,14 +1,13 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
-import { ComponentProps, ReactElement } from 'react';
 import * as S from './GameIntroSlide.styled';
 
 type Props = {
   textLines: readonly string[];
-  image: ReactElement<ComponentProps<'img'>>;
+  imageSrc: string;
   className: string;
 };
 
-const GameIntroSlide = ({ textLines, image, className }: Props) => {
+const GameIntroSlide = ({ textLines, imageSrc, className }: Props) => {
   return (
     <S.Container className={className}>
       <S.TextWrapper>
@@ -18,7 +17,9 @@ const GameIntroSlide = ({ textLines, image, className }: Props) => {
           </Headline2>
         ))}
       </S.TextWrapper>
-      <S.ImageWrapper>{image}</S.ImageWrapper>
+      <S.ImageWrapper>
+        <S.Image src={imageSrc} />
+      </S.ImageWrapper>
     </S.Container>
   );
 };

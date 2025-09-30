@@ -2,11 +2,10 @@ import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import GameIntroSlide from '../../components/GameIntroSlide/GameIntroSlide';
 import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
-import * as S from './MiniGameReadyPage.styled';
 
 const MiniGameReadyPage = () => {
   const navigate = useNavigate();
@@ -16,16 +15,8 @@ const MiniGameReadyPage = () => {
 
   const isValidGameType = miniGameType && miniGameType in GAME_SLIDE_CONFIGS;
   const gameType = miniGameType as MiniGameType;
-  const slideConfig = isValidGameType ? getGameSlideConfig(gameType) : null;
-
-  const slideData = useMemo(
-    () =>
-      slideConfig?.map((slide) => ({
-        ...slide,
-        image: <S.SlideImage src={slide.imageSrc} />,
-      })) || [],
-    [slideConfig]
-  );
+  // TODO: slideConfig가 존재하지 않으면 MiniGameReadyPage를 건너뛰게 하기
+  const slideConfig = isValidGameType ? getGameSlideConfig(gameType) : [];
 
   useEffect(() => {
     if (!joinCode || !gameType) return;
@@ -46,11 +37,11 @@ const MiniGameReadyPage = () => {
   return (
     <Layout color="point-400">
       <Layout.Content>
-        {slideData.map((slide, index) => (
+        {slideConfig.map((slide, index) => (
           <GameIntroSlide
             key={index}
             textLines={slide.textLines}
-            image={slide.image}
+            imageSrc={slide.imageSrc}
             className={slide.className}
           />
         ))}
