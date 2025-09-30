@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 type ProbabilityTextProps = { $isProbabilitiesLoading: boolean };
-type ProbabilityChangeProps = { isPositive: boolean };
+type ProbabilityChangeProps = { $isPositive: boolean };
 
 export const ProbabilityText = styled.div<ProbabilityTextProps>`
   text-align: center;
@@ -11,6 +11,6 @@ export const ProbabilityText = styled.div<ProbabilityTextProps>`
 `;
 
 export const ProbabilityChange = styled.span<ProbabilityChangeProps>`
-  color: ${({ isPositive }) => (isPositive ? '#FF0000' : '#0066FF')};
+  color: ${({ $isPositive }) => ($isPositive ? '#FF0000' : '#0066FF')};
   font-weight: bold;
 `;

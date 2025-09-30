@@ -25,7 +25,7 @@ const ProbabilitiesText = ({ isProbabilitiesLoading }: Props) => {
     <S.ProbabilityText $isProbabilitiesLoading={isProbabilitiesLoading}>
       <Headline4>
         현재 확률 : {myCurrentProbability + '%'} {'('}
-        <S.ProbabilityChange isPositive={myProbabilityChange >= 0}>
+        <S.ProbabilityChange $isPositive={myProbabilityChange >= 0}>
           {(myProbabilityChange >= 0 ? '+' : '') + formatPercent.format(myProbabilityChange) + '%'}
         </S.ProbabilityChange>
         {')'}
