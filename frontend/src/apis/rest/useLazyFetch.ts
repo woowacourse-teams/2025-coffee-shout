@@ -32,9 +32,9 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
       setData(result);
       onSuccessRef.current?.(result);
       return result;
-    } catch (err) {
-      setError(err as Error);
-      onErrorRef.current?.(err as Error);
+    } catch (error) {
+      setError(error as Error);
+      onErrorRef.current?.(error as Error);
       return null;
     } finally {
       setLoading(false);

@@ -34,9 +34,9 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
       const result = await api.get<T>(endpoint);
       setData(result);
       onSuccessRef.current?.(result);
-    } catch (err) {
-      setError(err as Error);
-      onErrorRef.current?.(err as Error);
+    } catch (error) {
+      setError(error as Error);
+      onErrorRef.current?.(error as Error);
     } finally {
       setLoading(false);
     }
