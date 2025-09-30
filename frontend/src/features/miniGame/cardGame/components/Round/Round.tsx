@@ -1,15 +1,11 @@
-import Description from '@/components/@common/Description/Description';
-import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline4 from '@/components/@common/Headline4/Headline4';
-import { colorList } from '@/constants/color';
 import Layout from '@/layouts/Layout';
-import { Card, CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
-import CardBack from '../CardBack/CardBack';
-import CardFront from '../CardFront/CardFront';
-import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
-import CircularProgress from '../CircularProgress/CircularProgress';
-import { ROUND_MAP, RoundType } from '@/types/miniGame/round';
+import { CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
+import { RoundType } from '@/types/miniGame/round';
+import GameCardGrid from './GameCardGrid';
+import PlayerCardDisplay from './PlayerCardDisplay';
 import * as S from './Round.styled';
+import RoundHeader from './RoundHeader';
 
 type Props = {
   round: RoundType;
@@ -30,74 +26,21 @@ const Round = ({
   isTimerActive,
   cardInfos,
 }: Props) => {
-  const { getParticipantColorIndex } = useParticipants();
-
   return (
     <Layout>
       <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
       <Layout.Content>
-        <S.TitleContainer>
-          <S.TitleWrapper>
-            <Headline2>Round {ROUND_MAP[round]}</Headline2>
-            <Description>카드를 골라주세요!</Description>
-          </S.TitleWrapper>
-          <S.CircularProgressWrapper>
-            <CircularProgress
-              current={currentTime}
-              total={roundTotalTime}
-              isActive={isTimerActive}
-            />
-          </S.CircularProgressWrapper>
-        </S.TitleContainer>
+        <RoundHeader
+          round={round}
+          currentTime={currentTime}
+          roundTotalTime={roundTotalTime}
+          isTimerActive={isTimerActive}
+        />
         <S.MyCardContainer>
-          {selectedCardInfo['FIRST'].isSelected ? (
-            <CardFront
-              size="medium"
-              card={
-                {
-                  type: selectedCardInfo['FIRST'].type,
-                  value: selectedCardInfo['FIRST'].value,
-                } as Card
-              }
-            />
-          ) : (
-            <CardBack size="medium" disabled={true} />
-          )}
-          {selectedCardInfo['SECOND'].isSelected ? (
-            <CardFront
-              size="medium"
-              card={
-                {
-                  type: selectedCardInfo['SECOND'].type,
-                  value: selectedCardInfo['SECOND'].value,
-                } as Card
-              }
-            />
-          ) : (
-            <CardBack size="medium" disabled={true} />
-          )}
+          <PlayerCardDisplay selectedCardInfo={selectedCardInfo} />
         </S.MyCardContainer>
         <S.CardContainer>
-          {cardInfos.map((cardInfo, index) => {
-            let playerColor = null;
-            if (cardInfo.playerName !== null) {
-              playerColor = colorList[getParticipantColorIndex(cardInfo.playerName)];
-            }
-
-            return cardInfo.selected ? (
-              <CardFront
-                card={
-                  {
-                    type: cardInfo.cardType,
-                    value: cardInfo.value,
-                  } as Card
-                }
-                playerColor={playerColor}
-              />
-            ) : (
-              <CardBack key={index} onClick={() => onClickCard(index)} />
-            );
-          })}
+          <GameCardGrid cardInfos={cardInfos} onClickCard={onClickCard} />
         </S.CardContainer>
       </Layout.Content>
     </Layout>
