@@ -1,7 +1,7 @@
 package coffeeshout.global.websocket.event.player;
 
-import coffeeshout.global.event.TraceInfo;
-import coffeeshout.global.event.TraceInfoExtractor;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
 import java.time.LocalDateTime;
 import java.util.UUID;

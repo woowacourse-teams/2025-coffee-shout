@@ -1,6 +1,6 @@
 package coffeeshout.global.websocket.event.player;
 
-import coffeeshout.global.event.TraceInfo;
+import coffeeshout.global.trace.TraceInfo;
 import java.time.LocalDateTime;
 
 public interface PlayerBaseEvent {

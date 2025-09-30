@@ -1,7 +1,7 @@
 package coffeeshout.room.domain.event;
 
-import coffeeshout.global.event.TraceInfo;
-import coffeeshout.global.event.TraceInfoExtractor;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.time.Instant;

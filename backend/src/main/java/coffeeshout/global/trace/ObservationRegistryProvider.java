@@ -1,4 +1,4 @@
-package coffeeshout.global.config.trace;
+package coffeeshout.global.trace;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package coffeeshout.minigame.infra;
 
-import coffeeshout.global.config.trace.TracerProvider;
+import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;

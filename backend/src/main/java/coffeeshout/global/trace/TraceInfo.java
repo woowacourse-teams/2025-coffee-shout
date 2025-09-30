@@ -1,4 +1,4 @@
-package coffeeshout.global.event;
+package coffeeshout.global.trace;
 
 public record TraceInfo(String traceId, String spanId) {
 

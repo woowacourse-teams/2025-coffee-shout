@@ -1,6 +1,6 @@
 package coffeeshout.room.infra;
 
-import coffeeshout.global.config.trace.TracerProvider;
+import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;

@@ -1,6 +1,5 @@
-package coffeeshout.global.config.trace;
+package coffeeshout.global.trace;
 
-import coffeeshout.global.event.TraceInfo;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
