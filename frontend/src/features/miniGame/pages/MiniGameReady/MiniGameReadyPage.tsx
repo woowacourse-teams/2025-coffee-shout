@@ -5,7 +5,6 @@ import CardGameReadyPage from '../../cardGame/pages/CardGameReadyPage/CardGameRe
 
 const MINI_GAME_READY_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
   CARD_GAME: CardGameReadyPage,
-  // '31_GAME': Random31GamePlayPage,
 } as const;
 
 const MiniGameReadyPage = () => {

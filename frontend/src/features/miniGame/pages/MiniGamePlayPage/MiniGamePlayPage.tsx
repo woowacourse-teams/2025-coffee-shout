@@ -5,14 +5,12 @@ import { useParams } from 'react-router-dom';
 
 const MINI_GAME_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
   CARD_GAME: CardGamePlayPage,
-  // '31_GAME': Random31GamePlayPage,
 } as const;
 
 const MiniGamePlayPage = () => {
   const { miniGameType } = useParams();
 
   if (!miniGameType || !(miniGameType in MINI_GAME_COMPONENTS)) {
-    // TODO: 에러 화면 추후 수정 필요
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
