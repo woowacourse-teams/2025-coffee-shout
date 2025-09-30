@@ -1,8 +1,9 @@
 import { rippleEffect } from '@/styles/animations/effects/rippleEffect';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
 type Props = {
-  $touchState: 'idle' | 'pressing' | 'releasing';
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`

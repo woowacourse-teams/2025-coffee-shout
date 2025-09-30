@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
 import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+import { TouchState } from '@/types/touchState';
 
 type Props = {
-  $touchState: 'idle' | 'pressing' | 'releasing';
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`

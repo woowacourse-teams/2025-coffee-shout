@@ -1,6 +1,7 @@
 import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 
 import { Size } from '@/types/styles';
+import { TouchState } from '@/types/touchState';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
@@ -10,7 +11,7 @@ type Props = {
   $variant: ButtonVariant;
   $width: string;
   $height: Size;
-  $touchState: 'idle' | 'pressing' | 'releasing';
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`

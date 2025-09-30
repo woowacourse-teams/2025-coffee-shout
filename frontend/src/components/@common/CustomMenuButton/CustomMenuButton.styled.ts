@@ -1,9 +1,10 @@
 import { Z_INDEX } from '@/constants/zIndex';
 import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
 type Props = {
-  $touchState: 'idle' | 'pressing' | 'releasing';
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`
