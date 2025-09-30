@@ -31,10 +31,9 @@ const Modal = ({
 
   const stopPropagation = (e: MouseEvent<HTMLDivElement>) => e.stopPropagation();
 
-  const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (closeOnBackdropClick && e.target === e.currentTarget) {
-      onClose();
-    }
+  const handleBackdropClick = () => {
+    if (!closeOnBackdropClick) return;
+    onClose();
   };
 
   if (!isOpen) return null;
