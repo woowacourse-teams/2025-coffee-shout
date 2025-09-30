@@ -12,7 +12,7 @@ const meta: Meta<typeof Flip> = {
   argTypes: {
     flipped: {
       control: { type: 'boolean' },
-      description: '플립 상태 (true: 뒤면, false: 앞면)',
+      description: '플립 상태 (true: 뒷면, false: 앞면)',
     },
   },
   decorators: [
@@ -61,7 +61,7 @@ export const Default: Story = {
           fontWeight: 'bold',
         }}
       >
-        뒤면
+        뒷면
       </div>
     ),
   },
