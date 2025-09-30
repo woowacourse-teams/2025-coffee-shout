@@ -29,7 +29,7 @@ export const rippleEffect = (touchState: TouchState) => {
   };
 
   return css`
-    position: relative;
+    isolation: isolate;
 
     &::before {
       z-index: -1;

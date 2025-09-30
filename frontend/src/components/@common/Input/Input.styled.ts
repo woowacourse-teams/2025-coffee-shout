@@ -1,8 +1,10 @@
 import { DESIGN_TOKENS } from '@/constants/design';
+import { rippleEffect } from '@/styles/animations/effects/rippleEffect';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
 type ContainerProps = { $height: string; $hasValue: boolean };
-type ClearButtonProps = { $hasValue: boolean };
+type ClearButtonProps = { $hasValue: boolean; $touchState: TouchState };
 
 export const Container = styled.div<ContainerProps>`
   display: flex;
@@ -53,4 +55,8 @@ export const ClearButton = styled.button<ClearButtonProps>`
   outline: none;
   cursor: pointer;
   visibility: ${({ $hasValue }) => ($hasValue ? 'visible' : 'hidden')};
+
+  position: relative;
+  isolation: isolate;
+  ${({ $touchState }) => rippleEffect($touchState)}
 `;

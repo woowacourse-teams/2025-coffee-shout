@@ -1,4 +1,10 @@
+import { rippleEffect } from '@/styles/animations/effects/rippleEffect';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
+
+type CloseButtonProps = {
+  $touchState: TouchState;
+};
 
 export const Container = styled.div`
   display: flex;
@@ -10,7 +16,7 @@ export const Container = styled.div`
   padding-bottom: 16px;
 `;
 
-export const CloseButton = styled.button`
+export const CloseButton = styled.button<CloseButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,4 +29,6 @@ export const CloseButton = styled.button`
   position: absolute;
   right: 0;
   top: 0;
+
+  ${({ $touchState }) => rippleEffect($touchState)}
 `;

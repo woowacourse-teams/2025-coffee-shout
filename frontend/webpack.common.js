@@ -86,7 +86,7 @@ export default (_, argv) => {
       }),
       new WebpackBundleAnalyzer.BundleAnalyzerPlugin({
         analyzerMode: 'static',
-        openAnalyzer: true,
+        openAnalyzer: false,
         reportFilename: 'bundle-report.html',
       }),
     ],
