@@ -1,5 +1,4 @@
-import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
+import useFetch from '@/apis/rest/useFetch';
 import CardIcon from '@/assets/card-icon.svg';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
@@ -9,7 +8,6 @@ import {
   MINI_GAME_NAME_MAP,
   MiniGameType,
 } from '@/types/miniGame/common';
-import { useEffect, useState } from 'react';
 import * as S from './MiniGameSection.styled';
 
 type Props = {
@@ -18,39 +16,23 @@ type Props = {
 };
 
 export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Props) => {
-  const [miniGames, setMiniGames] = useState<MiniGameType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { playerType } = usePlayerType();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const _miniGames = await api.get<MiniGameType[]>('/rooms/minigames');
-        setMiniGames(_miniGames);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setError(error.message);
-        } else if (error instanceof NetworkError) {
-          setError('네트워크 연결을 확인해주세요');
-        } else {
-          setError('알 수 없는 오류가 발생했습니다');
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const {
+    data: miniGames,
+    loading,
+    error,
+  } = useFetch<MiniGameType[]>({
+    endpoint: '/rooms/minigames',
+  });
 
   if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error}</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <>
       <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
       <S.Wrapper>
-        {miniGames.map((miniGame) => (
+        {miniGames?.map((miniGame) => (
           <GameActionButton
             key={miniGame}
             isSelected={selectedMiniGames.includes(miniGame)}

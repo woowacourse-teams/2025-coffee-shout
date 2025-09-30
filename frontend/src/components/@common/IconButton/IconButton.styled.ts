@@ -1,7 +1,9 @@
+import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
 type Props = {
-  $isTouching: boolean;
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`
@@ -13,23 +15,13 @@ export const Container = styled.button<Props>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  background-color: ${({ theme }) => theme.color.gray[100]};
 
-  ${({ theme, $isTouching }) => {
-    const baseColor = theme.color.gray[100];
-    const activeColor = theme.color.gray[200];
-
-    return `
-      background-color: ${baseColor};
-      
-      /* 데스크톱: hover 효과 */
-      @media (hover: hover) and (pointer: fine) {
-        &:hover { background-color: ${activeColor}; }
-      }
-      
-      /* 터치 디바이스: isTouching 상태로 제어 */
-      ${$isTouching && `background-color: ${activeColor};`}
-    `;
-  }}
+  ${({ theme, $touchState }) =>
+    buttonHoverPress({
+      activeColor: theme.color.gray[200],
+      touchState: $touchState,
+    })}
 `;
 
 export const Icon = styled.img`

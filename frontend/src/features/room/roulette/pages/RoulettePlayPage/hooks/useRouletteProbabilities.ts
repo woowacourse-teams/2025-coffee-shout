@@ -1,9 +1,8 @@
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import { colorList } from '@/constants/color';
-import { useEffect, useRef, useState } from 'react';
 
 type ProbabilityResponse = {
   playerName: string;
@@ -14,34 +13,19 @@ const useRouletteProbabilities = () => {
   const { joinCode } = useIdentifier();
   const { getParticipantColorIndex } = useParticipants();
   const { updateCurrentProbabilities } = useProbabilityHistory();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const isFirst = useRef<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (process.env.NODE_ENV === 'development') {
-          if (isFirst.current) {
-            return;
-          }
-          isFirst.current = true;
-        }
-
-        const data = await api.get<ProbabilityResponse[]>(`/rooms/${joinCode}/probabilities`);
-        updateCurrentProbabilities(
-          data.map((probability) => ({
-            ...probability,
-            playerColor: colorList[getParticipantColorIndex(probability.playerName)],
-          }))
-        );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [updateCurrentProbabilities, getParticipantColorIndex, joinCode]);
+  const { loading: isLoading } = useFetch<ProbabilityResponse[]>({
+    endpoint: `/rooms/${joinCode}/probabilities`,
+    enabled: !!joinCode,
+    onSuccess: (data) => {
+      updateCurrentProbabilities(
+        data.map((probability) => ({
+          ...probability,
+          playerColor: colorList[getParticipantColorIndex(probability.playerName)],
+        }))
+      );
+    },
+  });
 
   return {
     isLoading,

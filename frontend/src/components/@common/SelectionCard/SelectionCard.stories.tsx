@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import SelectionCard from './SelectionCard';
-import AdeIcon from '@/assets/ade.svg';
+import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
 const meta: Meta<typeof SelectionCard> = {
   title: 'Common/SelectionCard',
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof SelectionCard>;
 export const Default: Story = {
   args: {
     color: '#ffb2b2',
-    imageUrl: AdeIcon,
+    imageUrl: CustomMenuIcon,
     text: 'SelectionCard',
   },
 };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import CustomMenuInput from './CustomMenuIntput';
+import CustomMenuInput from './CustomMenuInput';
 
 const meta: Meta<typeof CustomMenuInput> = {
   title: 'Common/CustomMenuInput',

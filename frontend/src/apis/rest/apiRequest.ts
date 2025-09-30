@@ -9,7 +9,6 @@ export type ApiRequestOptions<TData> = {
   method?: Method;
   headers?: Record<string, string>;
   body?: TData;
-  params?: Record<string, string | number | boolean | null | undefined>;
   retry?: {
     count: number;
     delay: number;
@@ -26,29 +25,9 @@ export const apiRequest = async <T, TData>(
   url: string,
   options: ApiRequestOptions<TData> = {}
 ): Promise<T> => {
-  const {
-    method = 'GET',
-    headers = {},
-    body = null,
-    params = null,
-    retry = { count: 0, delay: 1000 },
-  } = options;
+  const { method = 'GET', headers = {}, body = null, retry = { count: 0, delay: 1000 } } = options;
 
   let requestUrl = API_URL + url;
-
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) {
-        searchParams.append(key, String(value));
-      }
-    });
-
-    const queryString = searchParams.toString();
-    if (queryString) {
-      requestUrl += (url.includes('?') ? '&' : '?') + queryString;
-    }
-  }
 
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
