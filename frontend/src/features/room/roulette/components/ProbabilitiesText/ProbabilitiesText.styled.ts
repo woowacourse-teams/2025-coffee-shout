@@ -11,6 +11,6 @@ export const ProbabilityText = styled.div<ProbabilityTextProps>`
 `;
 
 export const ProbabilityChange = styled.span<ProbabilityChangeProps>`
-  color: ${({ $isPositive }) => ($isPositive ? '#FF0000' : '#0066FF')};
+  color: ${({ $isPositive, theme }) => ($isPositive ? theme.color.red : theme.color.blue)};
   font-weight: bold;
 `;
