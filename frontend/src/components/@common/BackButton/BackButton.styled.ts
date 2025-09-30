@@ -14,5 +14,5 @@ export const Container = styled.button<Props>`
   display: flex;
   align-items: center;
   justify-content: start;
-  ${({ $touchState }) => rippleEffect($touchState)}
+  ${({ $touchState }) => rippleEffect({ touchState: $touchState })}
 `;

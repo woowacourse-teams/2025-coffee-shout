@@ -3,7 +3,12 @@ import { TouchState } from '@/types/touchState';
 import { theme } from '@/styles/theme';
 import { css } from '@emotion/react';
 
-export const rippleEffect = (touchState: TouchState) => {
+type Props = {
+  touchState: TouchState;
+  diameter?: string;
+};
+
+export const rippleEffect = ({ touchState, diameter = '30px' }: Props) => {
   const rippleColor = theme.color.gray[200];
 
   const getRippleScale = () => {
@@ -37,8 +42,8 @@ export const rippleEffect = (touchState: TouchState) => {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 30px;
-      height: 30px;
+      width: ${diameter};
+      height: ${diameter};
       background: ${rippleColor};
       border-radius: 50%;
 

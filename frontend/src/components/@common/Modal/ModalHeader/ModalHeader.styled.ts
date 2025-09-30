@@ -30,5 +30,5 @@ export const CloseButton = styled.button<CloseButtonProps>`
   right: 0;
   top: 0;
 
-  ${({ $touchState }) => rippleEffect($touchState)}
+  ${({ $touchState }) => rippleEffect({ touchState: $touchState })}
 `;
