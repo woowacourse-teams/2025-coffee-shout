@@ -1,7 +1,7 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
+import RoundTransition from '@/features/miniGame/components/RoundTransition/RoundTransition';
 import { useEffect, useRef, useState } from 'react';
 import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 import Round from '../components/Round/Round';
@@ -62,7 +62,7 @@ const CardGamePlayPage = () => {
   }, [currentRound, currentCardGameState]);
 
   if (isTransition) {
-    return <MiniGameTransition currentRound={currentRound} />;
+    return <RoundTransition currentRound={currentRound} />;
   }
 
   return (

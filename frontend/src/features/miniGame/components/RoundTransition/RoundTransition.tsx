@@ -3,13 +3,13 @@ import Headline1 from '@/components/@common/Headline1/Headline1';
 import Layout from '@/layouts/Layout';
 import { ROUND_MAP, RoundType } from '@/types/miniGame/round';
 import { PropsWithChildren } from 'react';
-import * as S from './MiniGameTransition.styled';
+import * as S from './RoundTransition.styled';
 
 type Props = {
   currentRound: RoundType;
 } & PropsWithChildren;
 
-const MiniGameTransition = ({ currentRound, children }: Props) => {
+const RoundTransition = ({ currentRound, children }: Props) => {
   return (
     <Layout color="point-400">
       <S.Container>
@@ -25,4 +25,4 @@ const MiniGameTransition = ({ currentRound, children }: Props) => {
   );
 };
 
-export default MiniGameTransition;
+export default RoundTransition;
