@@ -21,7 +21,6 @@ const useRouletteProbabilities = () => {
   useEffect(() => {
     (async () => {
       try {
-        //개발모드일때 1번만 실행하도록 조건 추가
         if (process.env.NODE_ENV === 'development') {
           if (isFirst.current) {
             return;
