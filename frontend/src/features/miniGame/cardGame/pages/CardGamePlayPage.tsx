@@ -3,8 +3,8 @@ import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
 import { useEffect, useRef, useState } from 'react';
-import PrepareOverlay from '../../../components/PrepareOverlay/PrepareOverlay';
-import Round from '../../components/Round/Round';
+import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
+import Round from '../components/Round/Round';
 
 const ROUND_TOTAL_TIME = 10;
 

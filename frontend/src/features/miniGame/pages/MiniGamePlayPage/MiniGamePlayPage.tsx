@@ -1,4 +1,4 @@
-import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPage/CardGamePlayPage';
+import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPage';
 import { MiniGameType } from '@/types/miniGame/common';
 import { JSX } from 'react';
 import { useParams } from 'react-router-dom';
@@ -11,6 +11,10 @@ const MiniGamePlayPage = () => {
   const { miniGameType } = useParams();
 
   if (!miniGameType || !(miniGameType in MINI_GAME_COMPONENTS)) {
+    /**
+     * TODO: NotFoundPage 스타일과 동일하게 가져갈 것
+     * TODO: 홈으로 돌아가기 버튼 추가
+     */
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
