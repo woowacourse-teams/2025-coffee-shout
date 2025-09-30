@@ -41,16 +41,4 @@ public abstract class BaseEvent {
             return new TraceInfo("", "");
         }
     }
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public TraceInfo getTraceInfo() {
-        return traceInfo;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
 }
