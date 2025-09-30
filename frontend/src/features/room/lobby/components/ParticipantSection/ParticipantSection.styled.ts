@@ -11,7 +11,6 @@ export const BottomGap = styled.div`
 `;
 
 export const Menu = styled.img`
-  cursor: pointer;
   width: 50px;
 `;
 
