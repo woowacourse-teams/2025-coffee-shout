@@ -18,16 +18,16 @@ public class SelectCardCommandEventHandler implements MiniGameEventHandler<Selec
     public void handle(SelectCardCommandEvent event) {
         try {
             log.info("카드 선택 이벤트 수신: eventId={}, joinCode={}, playerName={}, cardIndex={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getCardIndex());
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex());
 
-            cardGameService.selectCardInternal(event.getJoinCode(), event.getPlayerName(), event.getCardIndex());
+            cardGameService.selectCardInternal(event.joinCode(), event.playerName(), event.cardIndex());
 
             log.info("카드 선택 이벤트 처리 완료: eventId={}, joinCode={}",
-                    event.getEventId(), event.getJoinCode());
+                    event.eventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("카드 선택 이벤트 처리 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getCardIndex(), e);
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
         }
     }
 

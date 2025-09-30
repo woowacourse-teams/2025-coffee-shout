@@ -1,7 +1,7 @@
 package coffeeshout.room.infra;
 
 import coffeeshout.global.config.trace.TracerProvider;
-import coffeeshout.global.event.BaseEvent;
+import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
@@ -54,12 +54,15 @@ public class RoomEventSubscriber implements MessageListener {
 
             final RoomBaseEvent event = deserializeEvent(body, eventType);
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
-            final BaseEvent baseEvent = (BaseEvent) event;
-            tracerProvider.executeWithTraceContext(
-                    baseEvent.getTraceInfo(),
-                    () -> handler.handle(event),
-                    event.getEventType().name()
-            );
+            if (event instanceof Traceable traceable) {
+                tracerProvider.executeWithTraceContext(
+                        traceable.getTraceInfo(),
+                        () -> handler.handle(event),
+                        event.eventType().name()
+                );
+                return;
+            }
+            handler.handle(event);
 
         } catch (Exception e) {
             log.error("이벤트 처리 실패: message={}", new String(message.getBody()), e);

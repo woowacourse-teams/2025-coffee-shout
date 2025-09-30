@@ -20,19 +20,4 @@ public record SessionRegisteredEvent(
                 LocalDateTime.now()
         );
     }
-
-    @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public SessionEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
 }

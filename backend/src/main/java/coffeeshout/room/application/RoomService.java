@@ -80,7 +80,7 @@ public class RoomService {
         final RoomCreateEvent event = new RoomCreateEvent(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 생성",
                 String.format("joinCode=%s", joinCode.getValue()),
@@ -96,7 +96,7 @@ public class RoomService {
         final RoomJoinEvent event = new RoomJoinEvent(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),

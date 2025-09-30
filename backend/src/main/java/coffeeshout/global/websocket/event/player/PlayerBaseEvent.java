@@ -1,11 +1,14 @@
 package coffeeshout.global.websocket.event.player;
 
+import coffeeshout.global.event.TraceInfo;
 import java.time.LocalDateTime;
 
 public interface PlayerBaseEvent {
-    String getEventId();
-    
-    PlayerEventType getEventType();
-    
-    LocalDateTime getTimestamp();
+    String eventId();
+
+    TraceInfo traceInfo();
+
+    LocalDateTime timestamp();
+
+    PlayerEventType eventType();
 }

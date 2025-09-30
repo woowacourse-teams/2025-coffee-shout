@@ -1,7 +1,6 @@
 package coffeeshout.minigame.infra;
 
 import coffeeshout.global.config.trace.TracerProvider;
-import coffeeshout.global.event.BaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
@@ -67,11 +66,10 @@ public class MiniGameEventSubscriber implements MessageListener {
 
             final MiniGameBaseEvent event = deserializeEvent(body, eventType);
             final MiniGameEventHandler<MiniGameBaseEvent> handler = handlers.get(eventType);
-            final BaseEvent baseEvent = (BaseEvent) event;
             tracerProvider.executeWithTraceContext(
-                    baseEvent.getTraceInfo(),
+                    event.traceInfo(),
                     () -> handler.handle(event),
-                    event.getEventType().name()
+                    event.eventType().name()
             );
 
         } catch (Exception e) {

@@ -21,22 +21,22 @@ public class RoomJoinEventHandler implements RoomEventHandler<RoomJoinEvent> {
     public void handle(RoomJoinEvent event) {
         try {
             log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+                    event.eventId(), event.joinCode(), event.guestName());
 
             final Room room = roomService.enterRoomInternal(
-                    event.getJoinCode(),
-                    event.getGuestName(),
-                    event.getSelectedMenuRequest()
+                    event.joinCode(),
+                    event.guestName(),
+                    event.selectedMenuRequest()
             );
 
-            roomEventWaitManager.notifySuccess(event.getEventId(), room);
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
 
             log.info("방 참가 이벤트 처리 완료: eventId={}, joinCode={}, guestName={}",
-                    event.getEventId(), event.getJoinCode(), event.getGuestName());
+                    event.eventId(), event.joinCode(), event.guestName());
 
         } catch (Exception e) {
             log.error("방 참가 이벤트 처리 실패", e);
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 

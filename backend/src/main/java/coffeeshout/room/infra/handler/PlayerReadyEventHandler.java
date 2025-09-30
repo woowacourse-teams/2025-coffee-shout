@@ -24,22 +24,22 @@ public class PlayerReadyEventHandler implements RoomEventHandler<PlayerReadyEven
     public void handle(PlayerReadyEvent event) {
         try {
             log.info("플레이어 ready 이벤트 수신: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
 
             final List<Player> players = roomService.changePlayerReadyStateInternal(
-                    event.getJoinCode(),
-                    event.getPlayerName(),
-                    event.getIsReady()
+                    event.joinCode(),
+                    event.playerName(),
+                    event.isReady()
             );
             final List<PlayerResponse> responses = players.stream()
                     .map(PlayerResponse::from)
                     .toList();
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.getJoinCode(),
+            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(),
                     WebSocketResponse.success(responses));
 
             log.info("플레이어 ready 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}, isReady={}",
-                    event.getEventId(), event.getJoinCode(), event.getPlayerName(), event.getIsReady());
+                    event.eventId(), event.joinCode(), event.playerName(), event.isReady());
 
         } catch (Exception e) {
             log.error("플레이어 ready 이벤트 처리 실패", e);

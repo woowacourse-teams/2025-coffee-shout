@@ -4,9 +4,9 @@ import java.time.Instant;
 
 public interface RoomBaseEvent {
 
-    String getEventId();
+    String eventId();
 
-    RoomEventType getEventType();
+    Instant timestamp();
 
-    Instant getTimeStamp();
+    RoomEventType eventType();
 }

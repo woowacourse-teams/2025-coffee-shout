@@ -1,11 +1,14 @@
 package coffeeshout.minigame.domain.event;
 
+import coffeeshout.global.event.TraceInfo;
 import java.time.Instant;
 
 public interface MiniGameBaseEvent {
-    String getEventId();
+    String eventId();
 
-    MiniGameEventType getEventType();
+    TraceInfo traceInfo();
 
-    Instant getCreatedAt();
+    Instant timestamp();
+
+    MiniGameEventType eventType();
 }

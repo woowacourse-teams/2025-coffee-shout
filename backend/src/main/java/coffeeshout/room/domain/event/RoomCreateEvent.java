@@ -1,36 +1,36 @@
 package coffeeshout.room.domain.event;
 
-import coffeeshout.global.event.BaseEvent;
+import coffeeshout.global.event.TraceInfo;
+import coffeeshout.global.event.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.time.Instant;
-import lombok.Getter;
+import java.util.UUID;
 
-@Getter
-public class RoomCreateEvent extends BaseEvent implements RoomBaseEvent {
-    private final RoomEventType eventType;
-    private final String hostName;
-    private final SelectedMenuRequest selectedMenuRequest;
-    private final String joinCode;
+public record RoomCreateEvent(
+        String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
+        RoomEventType eventType,
+        String hostName,
+        SelectedMenuRequest selectedMenuRequest,
+        String joinCode
+) implements RoomBaseEvent, Traceable {
 
     public RoomCreateEvent(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
-        this.eventType = RoomEventType.ROOM_CREATE;
-        this.hostName = hostName;
-        this.selectedMenuRequest = selectedMenuRequest;
-        this.joinCode = joinCode;
+        this(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
+                RoomEventType.ROOM_CREATE,
+                hostName,
+                selectedMenuRequest,
+                joinCode
+        );
     }
 
     @Override
-    public Instant getTimeStamp() {
-        return timestamp;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

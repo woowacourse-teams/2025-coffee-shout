@@ -1,35 +1,35 @@
 package coffeeshout.room.domain.event;
 
-import coffeeshout.global.event.BaseEvent;
+import coffeeshout.global.event.TraceInfo;
+import coffeeshout.global.event.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
 import java.time.Instant;
-import lombok.Getter;
+import java.util.UUID;
 
-@Getter
-public class PlayerReadyEvent extends BaseEvent implements RoomBaseEvent {
-    private final RoomEventType eventType;
-    private final String joinCode;
-    private final String playerName;
-    private final Boolean isReady;
+public record PlayerReadyEvent(
+        String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
+        RoomEventType eventType,
+        String joinCode,
+        String playerName,
+        Boolean isReady
+) implements RoomBaseEvent, Traceable {
 
     public PlayerReadyEvent(String joinCode, String playerName, Boolean isReady) {
-        this.eventType = RoomEventType.PLAYER_READY;
-        this.joinCode = joinCode;
-        this.playerName = playerName;
-        this.isReady = isReady;
+        this(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
+                RoomEventType.PLAYER_READY,
+                joinCode,
+                playerName,
+                isReady
+        );
     }
 
     @Override
-    public Instant getTimeStamp() {
-        return timestamp;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

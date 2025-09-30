@@ -23,19 +23,19 @@ public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSele
     public void handle(MiniGameSelectEvent event) {
         try {
             log.info("미니게임 선택 이벤트 수신: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
-                    event.getEventId(), event.getJoinCode(), event.getHostName(), event.getMiniGameTypes());
+                    event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
 
             final List<MiniGameType> selectedMiniGames = roomService.updateMiniGamesInternal(
-                    event.getJoinCode(),
-                    event.getHostName(),
-                    event.getMiniGameTypes()
+                    event.joinCode(),
+                    event.hostName(),
+                    event.miniGameTypes()
             );
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.getJoinCode() + "/minigame",
+            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
                     WebSocketResponse.success(selectedMiniGames));
 
             log.info("미니게임 선택 이벤트 처리 완료: eventId={}, joinCode={}, selectedCount={}",
-                    event.getEventId(), event.getJoinCode(), selectedMiniGames.size());
+                    event.eventId(), event.joinCode(), selectedMiniGames.size());
 
         } catch (Exception e) {
             log.error("미니게임 선택 이벤트 처리 실패", e);

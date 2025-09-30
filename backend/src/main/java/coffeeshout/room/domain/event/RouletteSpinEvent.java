@@ -1,36 +1,36 @@
 package coffeeshout.room.domain.event;
 
-import coffeeshout.global.event.BaseEvent;
+import coffeeshout.global.event.TraceInfo;
+import coffeeshout.global.event.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.domain.player.Winner;
 import java.time.Instant;
-import lombok.Getter;
+import java.util.UUID;
 
-@Getter
-public class RouletteSpinEvent extends BaseEvent implements RoomBaseEvent {
-    private final RoomEventType eventType;
-    private final String joinCode;
-    private final String hostName;
-    private final Winner winner;
+public record RouletteSpinEvent(
+        String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
+        RoomEventType eventType,
+        String joinCode,
+        String hostName,
+        Winner winner
+) implements RoomBaseEvent, Traceable {
 
     public RouletteSpinEvent(String joinCode, String hostName, Winner winner) {
-        this.eventType = RoomEventType.ROULETTE_SPIN;
-        this.joinCode = joinCode;
-        this.hostName = hostName;
-        this.winner = winner;
+        this(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
+                RoomEventType.ROULETTE_SPIN,
+                joinCode,
+                hostName,
+                winner
+        );
     }
 
     @Override
-    public Instant getTimeStamp() {
-        return timestamp;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public String getEventId() {
-        return eventId;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }
