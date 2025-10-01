@@ -1,5 +1,6 @@
-package coffeeshout.room.infra.persistance;
+package coffeeshout.minigame.infra.persistance;
 
+import coffeeshout.room.infra.persistance.PlayerEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

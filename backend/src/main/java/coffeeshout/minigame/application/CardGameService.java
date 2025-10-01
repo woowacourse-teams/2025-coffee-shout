@@ -7,14 +7,14 @@ import coffeeshout.minigame.domain.cardgame.event.dto.CardSelectedEvent;
 import coffeeshout.minigame.domain.event.SelectCardCommandEvent;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.infra.MiniGameEventPublisher;
+import coffeeshout.minigame.infra.persistance.MiniGameEntity;
+import coffeeshout.minigame.infra.persistance.MiniGameJpaRepository;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.persistance.MiniGameEntity;
-import coffeeshout.room.infra.persistance.MiniGameJpaRepository;
 import coffeeshout.room.infra.persistance.PlayerEntity;
 import coffeeshout.room.infra.persistance.PlayerJpaRepository;
 import coffeeshout.room.infra.persistance.RoomEntity;
@@ -64,7 +64,7 @@ public class CardGameService implements MiniGameService {
     public void saveGameEntities(String joinCode) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
-        
+
         // RoomEntity 찾아서 PlayerEntity들 저장
         final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.PLAYING);

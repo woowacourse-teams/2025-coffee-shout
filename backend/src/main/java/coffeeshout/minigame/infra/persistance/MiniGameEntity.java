@@ -1,6 +1,7 @@
-package coffeeshout.room.infra.persistance;
+package coffeeshout.minigame.infra.persistance;
 
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.infra.persistance.RoomEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
