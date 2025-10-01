@@ -57,10 +57,9 @@ public class RoomService {
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
 
-    // === 비동기 메서드들 (REST Controller용) ===
-
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
+
         // QR 코드 생성
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(joinCode.getValue());
 
@@ -82,6 +81,8 @@ public class RoomService {
         // 해당 방 정보 수신
         return roomQueryService.getByJoinCode(joinCode);
     }
+
+    // === 비동기 메서드들 (REST Controller용) ===
 
     public CompletableFuture<Room> enterRoomAsync(
             String joinCode,

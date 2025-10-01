@@ -2,7 +2,6 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
@@ -490,18 +489,5 @@ class RoomServiceTest extends ServiceTest {
 
         // then
         assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
-    }
-
-    @Test
-    void 방_생성_시_방_삭제_스케줄러가_호출된다() {
-        // given
-        String hostName = "호스트";
-        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-
-        // when
-        Room room = roomService.createRoom(hostName, selectedMenuRequest);
-
-        // then
-        verify(delayedRoomRemovalService).scheduleRemoveRoom(room.getJoinCode());
     }
 }

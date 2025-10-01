@@ -41,7 +41,7 @@ public class RoomCommandService {
     public void createRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature,
                            String qrCodeUrl) {
         if (roomRepository.existsByJoinCode(joinCode)) {
-            log.info("JoinCode[{}] 방 생성 실패 - 이미 존재하는 방", joinCode);
+            log.warn("JoinCode[{}] 방 생성 실패 - 이미 존재하는 방", joinCode);
             return;
         }
 
