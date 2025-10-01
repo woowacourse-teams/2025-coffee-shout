@@ -1,8 +1,8 @@
 package coffeeshout.room.application;
 
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameScore;
-import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.MiniGameResult;
+import coffeeshout.minigame.cardgame.domain.MiniGameScore;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;

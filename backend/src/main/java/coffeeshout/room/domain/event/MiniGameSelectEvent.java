@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.event;
 
-import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

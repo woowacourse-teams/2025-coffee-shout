@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;

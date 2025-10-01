@@ -1,10 +1,10 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.domain.cardgame.card.AdditionCard;
-import coffeeshout.minigame.domain.cardgame.card.Card;
-import coffeeshout.minigame.domain.cardgame.card.CardGameDeckGenerator;
-import coffeeshout.minigame.domain.cardgame.card.Deck;
-import coffeeshout.minigame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.cardgame.domain.cardgame.card.AdditionCard;
+import coffeeshout.minigame.cardgame.domain.cardgame.card.Card;
+import coffeeshout.minigame.cardgame.domain.cardgame.card.CardGameDeckGenerator;
+import coffeeshout.minigame.cardgame.domain.cardgame.card.Deck;
+import coffeeshout.minigame.cardgame.domain.cardgame.card.MultiplierCard;
 import java.util.List;
 
 public final class CardGameDeckStub implements CardGameDeckGenerator {
