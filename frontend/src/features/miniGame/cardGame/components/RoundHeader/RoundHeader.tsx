@@ -2,7 +2,7 @@ import Description from '@/components/@common/Description/Description';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import { ROUND_MAP, RoundType } from '@/types/miniGame/round';
 import CircularProgress from '../CircularProgress/CircularProgress';
-import * as S from './Round.styled';
+import * as S from './RoundHeader.styled';
 
 type Props = {
   round: RoundType;

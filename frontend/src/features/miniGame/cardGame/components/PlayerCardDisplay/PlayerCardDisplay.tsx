@@ -1,6 +1,7 @@
 import { Card, SelectedCardInfo } from '@/types/miniGame/cardGame';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
+import * as S from './PlayerCardDisplay.styled';
 
 type Props = {
   selectedCardInfo: SelectedCardInfo;
@@ -28,10 +29,10 @@ const PlayerCardDisplay = ({ selectedCardInfo }: Props) => {
   };
 
   return (
-    <>
+    <S.Container>
       {renderPlayerCard('FIRST')}
       {renderPlayerCard('SECOND')}
-    </>
+    </S.Container>
   );
 };
 

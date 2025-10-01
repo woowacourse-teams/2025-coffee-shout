@@ -3,13 +3,14 @@ import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { Card, CardInfo } from '@/types/miniGame/cardGame';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
+import * as S from './GameCardGrid.styled';
 
 type Props = {
   cardInfos: CardInfo[];
-  onClickCard: (cardIndex: number) => void;
+  onCardClick: (cardIndex: number) => void;
 };
 
-const GameCardGrid = ({ cardInfos, onClickCard }: Props) => {
+const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
   const { getParticipantColorIndex } = useParticipants();
 
   const renderCard = (cardInfo: CardInfo, index: number) => {
@@ -32,10 +33,10 @@ const GameCardGrid = ({ cardInfos, onClickCard }: Props) => {
       );
     }
 
-    return <CardBack key={index} onClick={() => onClickCard(index)} />;
+    return <CardBack key={index} onClick={() => onCardClick(index)} />;
   };
 
-  return <>{cardInfos.map(renderCard)}</>;
+  return <S.Container>{cardInfos.map(renderCard)}</S.Container>;
 };
 
 export default GameCardGrid;
