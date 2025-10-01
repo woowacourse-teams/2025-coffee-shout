@@ -27,6 +27,7 @@ export const RankList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 `;
 
 export const RankItem = styled.div<{ $rank: number; $isMe: boolean }>`
@@ -37,7 +38,19 @@ export const RankItem = styled.div<{ $rank: number; $isMe: boolean }>`
   background-color: ${({ $isMe }) => ($isMe ? 'rgba(76, 175, 80, 0.15)' : 'rgba(0, 0, 0, 0.03)')};
   border: 2px solid ${({ $isMe }) => ($isMe ? '#4caf50' : 'transparent')};
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   &:hover {
     background-color: ${({ $isMe }) => ($isMe ? 'rgba(76, 175, 80, 0.25)' : 'rgba(0, 0, 0, 0.08)')};

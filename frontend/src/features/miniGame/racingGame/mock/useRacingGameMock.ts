@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type RacingGameState = 'READY' | 'PLAYING' | 'FINISH';
 
@@ -15,15 +15,15 @@ type RacingGameData = {
 };
 
 const INITIAL_PLAYERS = [
-  { playerName: '홍길동', speed: 30 },
-  { playerName: '김철수', speed: 50 },
-  { playerName: '이순신', speed: 30 },
-  { playerName: '박영희', speed: 20 },
+  { playerName: '홍길동', speed: 40 },
+  { playerName: '김철수', speed: 40 },
+  { playerName: '이순신', speed: 40 },
+  { playerName: '박영희', speed: 40 },
   { playerName: '정민수', speed: 40 },
-  { playerName: '최지영', speed: 60 },
-  { playerName: '강동원', speed: 30 },
-  { playerName: '윤서연', speed: 30 },
-  { playerName: '임태현', speed: 80 },
+  { playerName: '최지영', speed: 40 },
+  { playerName: '강동원', speed: 40 },
+  { playerName: '윤서연', speed: 40 },
+  { playerName: '임태현', speed: 40 },
 ];
 
 const DISTANCE_END = 1000;
@@ -33,6 +33,8 @@ const FINISH_DURATION_MS = 2000;
 const DECELERATION_START_DISTANCE = DISTANCE_END; // 1000부터 감속 시작
 const SPEED_REDUCTION_RATE = 0.92; // 매 프레임마다 속도의 92%로 감속
 const SPEED_INCREASE_RATE = 2; // 매 프레임마다 속도의 200%로 가속 (빠른 가속)
+const SPEED_VARIATION_RATE = 0.8; // 속도 변동 폭 (±80%)
+const SPEED_VARIATION_INTERVAL = 30; // 30프레임(3초)마다 속도 변동
 
 export const useRacingGameMock = () => {
   const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
@@ -47,6 +49,7 @@ export const useRacingGameMock = () => {
       speed: 0,
     })),
   });
+  const frameCountRef = useRef(0);
 
   // READY 상태에서 PLAYING으로 전환
   useEffect(() => {
@@ -99,10 +102,14 @@ export const useRacingGameMock = () => {
   // PLAYING 상태에서 위치 업데이트 및 완주 확인
   useEffect(() => {
     if (racingGameState !== 'PLAYING') {
+      frameCountRef.current = 0;
       return;
     }
 
     const interval = setInterval(() => {
+      frameCountRef.current += 1;
+      const shouldUpdateSpeed = frameCountRef.current % SPEED_VARIATION_INTERVAL === 0;
+
       setRacingGameData((prevData) => {
         const updatedPlayers = prevData.players.map((player) => {
           const initialPlayer = INITIAL_PLAYERS.find((p) => p.playerName === player.playerName);
@@ -122,7 +129,13 @@ export const useRacingGameMock = () => {
             // 목표 속도에 도달하지 않았으면 서서히 가속
             const baseSpeed = player.speed === 0 ? 0.5 : player.speed;
             newSpeed = Math.min(baseSpeed * SPEED_INCREASE_RATE, targetSpeed);
+          } else if (shouldUpdateSpeed) {
+            // 1초마다 목표 속도 기준 랜덤 변동 적용 (추월 가능)
+            const variation = (Math.random() - 0.5) * 2 * SPEED_VARIATION_RATE;
+            const speedWithVariation = targetSpeed * (1 + variation);
+            newSpeed = Math.max(speedWithVariation, targetSpeed * 0.2); // 최소 20%는 유지
           }
+          // shouldUpdateSpeed가 false면 기존 speed 유지
 
           const newX = player.x + newSpeed / 10;
 

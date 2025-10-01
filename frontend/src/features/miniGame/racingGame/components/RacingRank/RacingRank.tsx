@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import * as S from './RacingRank.styled';
 
 interface Player {
@@ -11,8 +12,13 @@ interface RacingRankProps {
 }
 
 const RacingRank = ({ players, myName }: RacingRankProps) => {
-  const sortedPlayers = [...players].sort((a, b) => b.x - a.x);
-  const topThree = sortedPlayers.slice(0, 3);
+  const sortedPlayers = useMemo(() => {
+    return [...players].sort((a, b) => b.x - a.x);
+  }, [players]);
+
+  const topThree = useMemo(() => {
+    return sortedPlayers.slice(0, 3);
+  }, [sortedPlayers]);
 
   return (
     <S.Container>
