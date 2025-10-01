@@ -8,6 +8,7 @@ import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.MessageResponse;
 import coffeeshout.minigame.domain.cardgame.CardGame;
 import coffeeshout.minigame.infra.persistance.MiniGameJpaRepository;
+import coffeeshout.minigame.infra.persistance.MiniGameResultJpaRepository;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
@@ -56,7 +57,9 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @AfterEach
     void tearDown(@Autowired RoomJpaRepository roomJpaRepository,
                   @Autowired MiniGameJpaRepository miniGameJpaRepository,
+                  @Autowired MiniGameResultJpaRepository miniGameResultJpaRepository,
                   @Autowired PlayerJpaRepository playerJpaRepository) {
+        miniGameResultJpaRepository.deleteAll();
         playerJpaRepository.deleteAll();
         miniGameJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
