@@ -28,10 +28,9 @@ public class RedisJoinCodeRepository implements JoinCodeRepository {
     }
 
     @Override
-    public JoinCode save(JoinCode joinCode) {
+    public void save(JoinCode joinCode) {
         final String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
         // value는 간단히 "1"로 저장 (존재 여부만 확인하면 되므로)
         redisTemplate.opsForValue().set(key, "1", ttl);
-        return joinCode;
     }
 }
