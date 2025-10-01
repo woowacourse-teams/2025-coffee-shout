@@ -1,34 +1,31 @@
 import { useMemo } from 'react';
+import Description from '@/components/@common/Description/Description';
 import * as S from './RacingRank.styled';
 
-interface Player {
+type Player = {
   playerName: string;
   x: number;
-}
+};
 
-interface RacingRankProps {
+type Props = {
   players: Player[];
   myName: string;
-}
+};
 
-const RacingRank = ({ players, myName }: RacingRankProps) => {
+const RacingRank = ({ players, myName }: Props) => {
   const sortedPlayers = useMemo(() => {
     return [...players].sort((a, b) => b.x - a.x);
   }, [players]);
 
-  const topThree = useMemo(() => {
-    return sortedPlayers.slice(0, 3);
-  }, [sortedPlayers]);
-
   return (
     <S.Container>
       <S.RankList>
-        {topThree.map((player, index) => {
+        {sortedPlayers.map((player, index) => {
           const isMe = player.playerName === myName;
           return (
-            <S.RankItem key={player.playerName} $rank={index + 1} $isMe={isMe}>
-              <S.RankNumber $rank={index + 1}>{index + 1}</S.RankNumber>
-              <S.PlayerName $isMe={isMe}>{player.playerName}</S.PlayerName>
+            <S.RankItem key={player.playerName}>
+              <Description color={isMe ? 'point-500' : 'white'}>{index + 1}</Description>
+              <Description color={isMe ? 'point-500' : 'white'}>{player.playerName}</Description>
             </S.RankItem>
           );
         })}
