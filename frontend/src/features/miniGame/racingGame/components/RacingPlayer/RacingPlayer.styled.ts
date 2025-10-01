@@ -9,15 +9,6 @@ export const Player = styled.div<{ $isMe: boolean; $x: number; $myX: number }>`
   transition: transform 0.3s ease-in-out;
 `;
 
-export const RotatingWrapper = styled.div<{ $speed: number }>`
-  animation: spin ${({ $speed }) => 10 / $speed}s linear infinite;
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+export const RotatingWrapper = styled.div`
+  will-change: transform;
 `;

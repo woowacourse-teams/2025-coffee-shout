@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { LAYOUT_PADDING } from '@/constants/padding';
 import skyImage from '@/assets/sky.png';
 
-export const Container = styled.div<{ $speed: number }>`
+export const Container = styled.div`
   width: 100%;
   height: 100%;
   padding: ${LAYOUT_PADDING} 0;
@@ -12,16 +12,7 @@ export const Container = styled.div<{ $speed: number }>`
   background-repeat: repeat-x;
   display: flex;
   flex-direction: column;
-  animation: moveBackground ${({ $speed }) => 40 / $speed}s linear infinite;
-
-  @keyframes moveBackground {
-    from {
-      background-position: 0% center;
-    }
-    to {
-      background-position: 100% center;
-    }
-  }
+  will-change: background-position;
 `;
 
 export const HeadlineWrapper = styled.div`

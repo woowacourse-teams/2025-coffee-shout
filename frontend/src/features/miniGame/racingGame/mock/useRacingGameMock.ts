@@ -32,6 +32,7 @@ const READY_DURATION_MS = 2000;
 const FINISH_DURATION_MS = 2000;
 const DECELERATION_START_DISTANCE = DISTANCE_END * 0.9; // 900부터 감속 시작
 const SPEED_REDUCTION_RATE = 0.92; // 매 프레임마다 속도의 92%로 감속
+const SPEED_INCREASE_RATE = 1.08; // 매 프레임마다 속도의 108%로 가속
 
 export const useRacingGameMock = () => {
   const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
@@ -91,18 +92,8 @@ export const useRacingGameMock = () => {
           speed: 0,
         })),
       });
-    } else if (racingGameState === 'PLAYING') {
-      setRacingGameData((prevData) => ({
-        ...prevData,
-        players: prevData.players.map((player) => {
-          const initialPlayer = INITIAL_PLAYERS.find((p) => p.playerName === player.playerName);
-          return {
-            ...player,
-            speed: initialPlayer?.speed ?? 0,
-          };
-        }),
-      }));
     }
+    // PLAYING 상태로 전환 시 speed는 0에서 시작 (서서히 증가)
   }, [racingGameState]);
 
   // PLAYING 상태에서 위치 업데이트 및 완주 확인
@@ -114,6 +105,9 @@ export const useRacingGameMock = () => {
     const interval = setInterval(() => {
       setRacingGameData((prevData) => {
         const updatedPlayers = prevData.players.map((player) => {
+          const initialPlayer = INITIAL_PLAYERS.find((p) => p.playerName === player.playerName);
+          const targetSpeed = initialPlayer?.speed ?? 0;
+
           const newX = Math.min(player.x + player.speed / 10, DISTANCE_END);
           const hasReachedEnd = newX >= DISTANCE_END;
           const isNearEnd = newX >= DECELERATION_START_DISTANCE;
@@ -126,6 +120,10 @@ export const useRacingGameMock = () => {
           } else if (isNearEnd) {
             // 감속 구간에서 서서히 속도 감소
             newSpeed = player.speed * SPEED_REDUCTION_RATE;
+          } else if (player.speed < targetSpeed) {
+            // 목표 속도에 도달하지 않았으면 서서히 가속
+            const baseSpeed = player.speed === 0 ? 0.5 : player.speed;
+            newSpeed = Math.min(baseSpeed * SPEED_INCREASE_RATE, targetSpeed);
           }
 
           return {
