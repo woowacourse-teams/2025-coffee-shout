@@ -18,6 +18,7 @@ public class JoinCodeGenerator {
                 .limit(100) // 안전망
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("입장 코드 생성이 실패했습니다."));
-        return joinCodeRepository.save(joinCode);
+        joinCodeRepository.save(joinCode);
+        return joinCode;
     }
 }
