@@ -29,22 +29,20 @@ const CardGamePlayPage = () => {
   };
 
   return (
-    <>
-      <Layout>
-        <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
-        <Layout.Content>
-          <RoundHeader
-            round={currentRound}
-            currentTime={currentTime}
-            roundTotalTime={roundTotalTime}
-            isTimerActive={isTimerActive}
-          />
-          <PlayerCardDisplay selectedCardInfo={selectedCardInfo} />
-          <GameCardGrid cardInfos={cardInfos} onCardClick={onCardClick} />
-        </Layout.Content>
-      </Layout>
+    <Layout>
+      <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
+      <Layout.Content>
+        <RoundHeader
+          round={currentRound}
+          currentTime={currentTime}
+          roundTotalTime={roundTotalTime}
+          isTimerActive={isTimerActive}
+        />
+        <PlayerCardDisplay selectedCardInfo={selectedCardInfo} />
+        <GameCardGrid cardInfos={cardInfos} onCardClick={onCardClick} />
+      </Layout.Content>
       {showPrepareOverlay && <PrepareOverlay />}
-    </>
+    </Layout>
   );
 };
 
