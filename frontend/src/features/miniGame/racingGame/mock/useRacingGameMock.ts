@@ -15,24 +15,24 @@ type RacingGameData = {
 };
 
 const INITIAL_PLAYERS = [
-  { playerName: '홍길동', speed: 10 },
-  { playerName: '김철수', speed: 10 },
-  { playerName: '이순신', speed: 20 },
+  { playerName: '홍길동', speed: 30 },
+  { playerName: '김철수', speed: 50 },
+  { playerName: '이순신', speed: 30 },
   { playerName: '박영희', speed: 20 },
   { playerName: '정민수', speed: 40 },
   { playerName: '최지영', speed: 60 },
   { playerName: '강동원', speed: 30 },
-  { playerName: '윤서연', speed: 10 },
-  { playerName: '임태현', speed: 10 },
+  { playerName: '윤서연', speed: 30 },
+  { playerName: '임태현', speed: 80 },
 ];
 
 const DISTANCE_END = 1000;
 const UPDATE_INTERVAL_MS = 100;
 const READY_DURATION_MS = 2000;
 const FINISH_DURATION_MS = 2000;
-const DECELERATION_START_DISTANCE = DISTANCE_END * 0.9; // 900부터 감속 시작
+const DECELERATION_START_DISTANCE = DISTANCE_END; // 1000부터 감속 시작
 const SPEED_REDUCTION_RATE = 0.92; // 매 프레임마다 속도의 92%로 감속
-const SPEED_INCREASE_RATE = 1.08; // 매 프레임마다 속도의 108%로 가속
+const SPEED_INCREASE_RATE = 2; // 매 프레임마다 속도의 200%로 가속 (빠른 가속)
 
 export const useRacingGameMock = () => {
   const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
@@ -108,23 +108,23 @@ export const useRacingGameMock = () => {
           const initialPlayer = INITIAL_PLAYERS.find((p) => p.playerName === player.playerName);
           const targetSpeed = initialPlayer?.speed ?? 0;
 
-          const newX = Math.min(player.x + player.speed / 10, DISTANCE_END);
-          const hasReachedEnd = newX >= DISTANCE_END;
-          const isNearEnd = newX >= DECELERATION_START_DISTANCE;
-
           let newSpeed = player.speed;
+          const isInDecelerationZone = player.x >= DECELERATION_START_DISTANCE;
 
-          if (hasReachedEnd) {
-            // 결승선 도달 시 속도 0
-            newSpeed = 0;
-          } else if (isNearEnd) {
-            // 감속 구간에서 서서히 속도 감소
+          if (isInDecelerationZone) {
+            // 감속 구간(x >= 1000)에서 서서히 속도 감소
             newSpeed = player.speed * SPEED_REDUCTION_RATE;
+            // 속도가 매우 작아지면 0으로 설정
+            if (newSpeed < 0.1) {
+              newSpeed = 0;
+            }
           } else if (player.speed < targetSpeed) {
             // 목표 속도에 도달하지 않았으면 서서히 가속
             const baseSpeed = player.speed === 0 ? 0.5 : player.speed;
             newSpeed = Math.min(baseSpeed * SPEED_INCREASE_RATE, targetSpeed);
           }
+
+          const newX = player.x + newSpeed / 10;
 
           return {
             ...player,
@@ -133,8 +133,8 @@ export const useRacingGameMock = () => {
           };
         });
 
-        // 모든 플레이어가 결승선에 도달했는지 확인
-        const allPlayersFinished = updatedPlayers.every((player) => player.x >= DISTANCE_END);
+        // 모든 플레이어가 멈췄는지 확인 (속도가 0)
+        const allPlayersFinished = updatedPlayers.every((player) => player.speed === 0);
 
         if (allPlayersFinished) {
           setRacingGameState('FINISH');

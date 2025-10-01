@@ -1,9 +1,11 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import RacingPlayer from './components/RacingPlayer/RacingPlayer';
+import RacingLine from './components/RacingLine/RacingLine';
 import * as S from './RacingGamePage.styled';
 import PrepareOverlay from '../cardGame/components/PrepareOverlay/PrepareOverlay';
 import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
 import Finish from './components/Finish/Finish';
+import Goal from './components/Goal/Goal';
 import { useEffect, useRef } from 'react';
 // import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
@@ -17,6 +19,7 @@ const RacingGamePage = () => {
   const myPlayer = racingGameData.players.find((player) => player.playerName === myName);
   const myX = myPlayer?.x ?? 0;
   const mySpeed = myPlayer?.speed ?? 0;
+  const hasReachedGoal = myX >= racingGameData.distance.end;
 
   // 배경 애니메이션
   useEffect(() => {
@@ -54,12 +57,17 @@ const RacingGamePage = () => {
     <>
       {racingGameState === 'READY' && <PrepareOverlay />}
       {racingGameState === 'FINISH' && <Finish />}
+      {hasReachedGoal && <Goal />}
       <S.Container ref={containerRef}>
         <S.HeadlineWrapper>
           <Headline4>레이싱 게임</Headline4>
         </S.HeadlineWrapper>
         <S.ContentWrapper>
           <S.PlayersWrapper>
+            {/* 출발선 */}
+            <RacingLine x={0} myX={myX} />
+            {/* 도착선 */}
+            <RacingLine x={1000} myX={myX} />
             {racingGameData.players.map((player, index) => (
               <RacingPlayer
                 key={player.playerName}

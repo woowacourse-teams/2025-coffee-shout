@@ -7,6 +7,7 @@ export const Player = styled.div<{ $isMe: boolean; $x: number; $myX: number }>`
     return `translateX(${relativeX}px)`;
   }};
   transition: transform 0.3s ease-in-out;
+  z-index: 10;
 `;
 
 export const RotatingWrapper = styled.div`
