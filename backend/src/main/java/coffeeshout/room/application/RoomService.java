@@ -8,7 +8,6 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -19,27 +18,32 @@ import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.roulette.Roulette;
 import coffeeshout.room.domain.roulette.RoulettePicker;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
+import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.RoomEventPublisher;
-import coffeeshout.room.infra.RoomEventWaitManager;
+import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
+import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistance.RoomEntity;
 import coffeeshout.room.infra.persistance.RoomJpaRepository;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class RoomService {
 
     private final RoomQueryService roomQueryService;
@@ -50,42 +54,22 @@ public class RoomService {
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
+    private final MenuCommandService menuCommandService;
+    private final RoomEnterStreamProducer roomEnterStreamProducer;
     private final RoomJpaRepository roomJpaRepository;
-    private final String defaultCategoryImage;
 
-    public RoomService(
-            RoomQueryService roomQueryService,
-            RoomCommandService roomCommandService,
-            MenuQueryService menuQueryService,
-            QrCodeService qrCodeService,
-            JoinCodeGenerator joinCodeGenerator,
-            DelayedRoomRemovalService delayedRoomRemovalService,
-            RoomEventPublisher roomEventPublisher,
-            RoomEventWaitManager roomEventWaitManager,
-            RoomJpaRepository roomJpaRepository,
-            @Value("${menu-category.default-image}") String defaultCategoryImage
-    ) {
-        this.roomQueryService = roomQueryService;
-        this.roomCommandService = roomCommandService;
-        this.menuQueryService = menuQueryService;
-        this.qrCodeService = qrCodeService;
-        this.joinCodeGenerator = joinCodeGenerator;
-        this.delayedRoomRemovalService = delayedRoomRemovalService;
-        this.roomEventPublisher = roomEventPublisher;
-        this.roomEventWaitManager = roomEventWaitManager;
-        this.roomJpaRepository = roomJpaRepository;
-        this.defaultCategoryImage = defaultCategoryImage;
-    }
+    @Value("${room.event.timeout:PT5S}")
+    private Duration eventTimeout;
 
     // === 비동기 메서드들 (REST Controller용) ===
 
     public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
 
-        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
+        final RoomCreateEvent event = new RoomCreateEvent(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 생성",
                 String.format("joinCode=%s", joinCode.getValue()),
@@ -98,11 +82,11 @@ public class RoomService {
             String guestName,
             SelectedMenuRequest selectedMenuRequest
     ) {
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+        final RoomJoinEvent event = new RoomJoinEvent(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
-                event.getEventId(),
-                () -> roomEventPublisher.publishEvent(event),
+                event.eventId(),
+                () -> roomEnterStreamProducer.broadcastEnterRoom(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
@@ -119,7 +103,7 @@ public class RoomService {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
         eventPublisher.run();
 
-        return future.orTimeout(5, TimeUnit.SECONDS)
+        return future.orTimeout(eventTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete((result, throwable) -> {
                     if (throwable != null) {
                         log.error("{} 비동기 처리 실패: eventId={}, {}",
@@ -138,22 +122,10 @@ public class RoomService {
             return createRoomAsync(hostName, selectedMenuRequest).join();
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
             }
             throw new RuntimeException("방 생성 실패", cause);
-        }
-    }
-
-    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
-        try {
-            return enterRoomAsync(joinCode, guestName, selectedMenuRequest).join();
-        } catch (Exception e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException("방 참가 실패", cause);
         }
     }
 
@@ -163,10 +135,10 @@ public class RoomService {
 
     public Winner spinRoulette(String joinCode, String hostName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
-    }
+        Player host = room.findPlayer(new PlayerName(hostName));
 
-    // === Internal 메서드들 (Redis 리스너용) ===
+        return room.spinRoulette(host, new Roulette(new RoulettePicker()));
+    }
 
     public Room getRoomByJoinCode(String joinCode) {
         return roomQueryService.getByJoinCode(new JoinCode(joinCode));
@@ -183,14 +155,13 @@ public class RoomService {
             String joinCodeValue
     ) {
         final JoinCode joinCode = new JoinCode(joinCodeValue);
-        final Menu menu = convertMenu(selectedMenuRequest);
+        final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
         final Room room = Room.createNewRoom(
                 joinCode,
                 new PlayerName(hostName),
                 new SelectedMenu(menu, selectedMenuRequest.temperature())
         );
-        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
-        room.assignQrCodeUrl(qrCodeUrl);
+        assignQrCodeUrl(room);
         scheduleRemoveRoom(joinCode);
 
         return roomCommandService.save(room);
@@ -201,17 +172,20 @@ public class RoomService {
         roomJpaRepository.save(roomEntity);
     }
 
-    public Room enterRoomInternal(
-            String joinCode,
-            String guestName,
-            SelectedMenuRequest selectedMenuRequest
-    ) {
-        final Menu menu = convertMenu(selectedMenuRequest);
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+    private void assignQrCodeUrl(Room room) {
+        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
+        room.assignQrCodeUrl(qrCodeUrl);
+    }
 
-        room.joinGuest(new PlayerName(guestName), new SelectedMenu(menu, selectedMenuRequest.temperature()));
+    public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
+        Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
-        return roomCommandService.save(room);
+        return roomCommandService.joinGuest(
+                new JoinCode(joinCode),
+                new PlayerName(guestName),
+                menu,
+                selectedMenuRequest.temperature()
+        );
     }
 
     public List<Player> changePlayerReadyStateInternal(String joinCode, String playerName, Boolean isReady) {
@@ -311,13 +285,10 @@ public class RoomService {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
 
-        final boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-
-        if (!room.isEmpty()) {
-            return isRemoved;
+        boolean isRemoved = room.removePlayer(new PlayerName(playerName));
+        if (room.isEmpty()) {
+            roomCommandService.delete(code);
         }
-
-        roomCommandService.delete(code);
         return isRemoved;
     }
 
@@ -332,13 +303,6 @@ public class RoomService {
         } catch (Exception e) {
             log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
         }
-    }
-
-    private Menu convertMenu(SelectedMenuRequest selectedMenuRequest) {
-        if (selectedMenuRequest.id() == 0) {
-            return new CustomMenu(selectedMenuRequest.customName(), defaultCategoryImage);
-        }
-        return menuQueryService.getById(selectedMenuRequest.id());
     }
 
     public Room showRoulette(String joinCode) {

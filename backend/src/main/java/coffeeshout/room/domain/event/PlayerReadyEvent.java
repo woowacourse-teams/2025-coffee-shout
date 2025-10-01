@@ -1,40 +1,35 @@
 package coffeeshout.room.domain.event;
 
-import java.time.LocalDateTime;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
+import java.time.Instant;
 import java.util.UUID;
 
 public record PlayerReadyEvent(
         String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
         RoomEventType eventType,
         String joinCode,
         String playerName,
-        Boolean isReady,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+        Boolean isReady
+) implements RoomBaseEvent, Traceable {
 
-    public static PlayerReadyEvent create(String joinCode, String playerName, Boolean isReady) {
-        return new PlayerReadyEvent(
+    public PlayerReadyEvent(String joinCode, String playerName, Boolean isReady) {
+        this(
                 UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
                 RoomEventType.PLAYER_READY,
                 joinCode,
                 playerName,
-                isReady,
-                LocalDateTime.now()
+                isReady
         );
     }
 
     @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

@@ -1,10 +1,8 @@
 package coffeeshout.fixture;
 
 import coffeeshout.room.domain.menu.Menu;
-import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class MenuFixture {
 

@@ -5,6 +5,9 @@ import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -16,18 +19,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
-
-    public WebSocketMessageBrokerConfig(
-            WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor,
-            WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor
-    ) {
-        this.webSocketInboundMetricInterceptor = webSocketInboundMetricInterceptor;
-        this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
-    }
+    private final ObservationRegistry observationRegistry;
+    private final ContextSnapshotFactory snapshotFactory;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -66,8 +64,18 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("outbound-");
         executor.setTaskDecorator(runnable -> {
-            final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
-            return snapshot.wrap(runnable);
+            final ContextSnapshot snapshot = snapshotFactory.captureAll();
+            return snapshot.wrap(() -> {
+                final Observation parent = observationRegistry.getCurrentObservation();
+                if (parent != null) {
+                    Observation.createNotStarted("websocket.outbound", observationRegistry)
+                            .parentObservation(parent)
+                            .lowCardinalityKeyValue("thread", Thread.currentThread().getName())
+                            .observeChecked(runnable::run);
+                } else {
+                    runnable.run();
+                }
+            });
         });
         executor.setCorePoolSize(18);
         executor.setMaxPoolSize(64);

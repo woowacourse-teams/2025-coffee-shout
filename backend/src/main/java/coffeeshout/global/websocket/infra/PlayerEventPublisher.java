@@ -19,10 +19,10 @@ public class PlayerEventPublisher {
         try {
             redisTemplate.convertAndSend(playerEventTopic.getTopic(), event);
             log.info("플레이어 이벤트 발행됨: eventType={}, eventId={}",
-                    event.getEventType(), event.getEventId());
+                    event.eventType(), event.eventId());
         } catch (Exception e) {
             log.error("플레이어 이벤트 발행 실패: eventType={}, eventId={}",
-                    event.getEventType(), event.getEventId(), e);
+                    event.eventType(), event.eventId(), e);
             throw new RuntimeException("플레이어 이벤트 발행 실패", e);
         }
     }

@@ -1,5 +1,9 @@
 package coffeeshout.room.ui;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.global.config.IntegrationTestConfig;
@@ -7,6 +11,8 @@ import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.repository.MenuCategoryRepository;
 import coffeeshout.room.domain.repository.MenuRepository;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,12 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")

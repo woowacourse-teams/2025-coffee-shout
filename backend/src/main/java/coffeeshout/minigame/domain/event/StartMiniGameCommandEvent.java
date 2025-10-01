@@ -1,39 +1,33 @@
 package coffeeshout.minigame.domain.event;
 
-import java.time.LocalDateTime;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
+import java.time.Instant;
 import java.util.UUID;
 
 public record StartMiniGameCommandEvent(
         String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
         MiniGameEventType eventType,
-        LocalDateTime createdAt,
         String joinCode,
         String hostName
-) implements MiniGameBaseEvent {
+) implements MiniGameBaseEvent, Traceable {
 
-    public static StartMiniGameCommandEvent create(String joinCode, String hostName) {
-        final String eventId = UUID.randomUUID().toString();
-        return new StartMiniGameCommandEvent(
-                eventId,
+    public StartMiniGameCommandEvent(String joinCode, String hostName) {
+        this(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
                 MiniGameEventType.START_MINIGAME_COMMAND,
-                LocalDateTime.now(),
                 joinCode,
                 hostName
         );
     }
 
     @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public MiniGameEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }
