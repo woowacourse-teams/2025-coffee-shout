@@ -7,6 +7,8 @@ type WrapperProps = {
 };
 
 export const Container = styled.div`
+  width: 300px;
+  height: 300px;
   position: relative;
 `;
 
@@ -15,7 +17,6 @@ export const Wrapper = styled.div<WrapperProps>`
   height: 300px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.color.point[100]};
-  margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,7 +50,7 @@ export const Pin = styled.div`
   border-top: 30px solid ${({ theme }) => theme.color.gray[500]};
   border-radius: 4px;
   position: absolute;
-  top: 30px;
+  top: -5px;
   left: 50%;
   transform: translateX(-50%);
   z-index: ${Z_INDEX.ROULETTE_PIN};
