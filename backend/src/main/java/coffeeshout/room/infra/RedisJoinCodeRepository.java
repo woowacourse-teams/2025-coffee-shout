@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class RedisJoinCodeRepository implements JoinCodeRepository {
 
-    private static final String JOIN_CODE_SET_KEY = "room:joinCodes";
+    private static final String JOIN_CODE_KEY_PREFIX = "room:joinCode:";
 
     @Value("${room.removalDelay}")
     private Duration ttl;
@@ -21,15 +21,16 @@ public class RedisJoinCodeRepository implements JoinCodeRepository {
 
     @Override
     public boolean existsByJoinCode(JoinCode joinCode) {
-        Boolean isMember = redisTemplate.opsForSet().isMember(JOIN_CODE_SET_KEY, joinCode.getValue());
+        final String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
 
         // null이 발생할 수 있으므로 다음과 같이 처리해야함
-        return Boolean.TRUE.equals(isMember);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
     @Override
     public void save(JoinCode joinCode) {
-        redisTemplate.opsForSet().add(JOIN_CODE_SET_KEY, joinCode.getValue());
-        redisTemplate.expire(JOIN_CODE_SET_KEY, ttl);
+        final String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
+        // value는 간단히 "1"로 저장 (존재 여부만 확인하면 되므로)
+        redisTemplate.opsForValue().set(key, "1", ttl);
     }
 }

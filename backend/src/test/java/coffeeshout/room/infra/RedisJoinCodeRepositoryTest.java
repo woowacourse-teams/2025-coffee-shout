@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
-    private static final String JOIN_CODE_SET_KEY = "room:joinCodes";
+    private static final String JOIN_CODE_KEY_PREFIX = "room:joinCode:";
 
     JoinCode joinCode;
 
@@ -31,21 +32,24 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
         joinCode = joinCodeGenerator.generate();
     }
 
-
     @AfterEach
     void tearDown() {
-        // 각 테스트 후 Redis 데이터 정리
-        redisTemplate.delete(JOIN_CODE_SET_KEY);
+        // 각 테스트 후 Redis 데이터 정리 - 패턴 매칭으로 모든 조인코드 키 삭제
+        Set<String> keys = redisTemplate.keys(JOIN_CODE_KEY_PREFIX + "*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 
     @Test
     void 조인코드를_저장한다() {
-        // given & then
+        // given & when
         redisJoinCodeRepository.save(joinCode);
 
         // then
-        Boolean isMember = redisTemplate.opsForSet().isMember(JOIN_CODE_SET_KEY, joinCode.getValue());
-        assertThat(isMember).isTrue();
+        String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
+        Boolean hasKey = redisTemplate.hasKey(key);
+        assertThat(hasKey).isTrue();
     }
 
     @Test
@@ -62,8 +66,7 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
 
     @Test
     void 저장되지_않은_조인코드는_존재하지_않는다() {
-        // given & then
-
+        // given & when
         boolean exists = redisJoinCodeRepository.existsByJoinCode(joinCode);
 
         // then
@@ -71,23 +74,11 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
     }
 
     @Test
-    void 중복된_조인코드를_저장해도_Set에는_하나만_존재한다() {
-        // given & then
-        redisJoinCodeRepository.save(joinCode);
-        redisJoinCodeRepository.save(joinCode);
-        redisJoinCodeRepository.save(joinCode);
-
-        // then
-        Long size = redisTemplate.opsForSet().size(JOIN_CODE_SET_KEY);
-        assertThat(size).isEqualTo(1);
-    }
-
-    @Test
     void 여러_조인코드를_저장할_수_있다() {
         // given
-        JoinCode joinCode1 = new JoinCode("TEST4");
-        JoinCode joinCode2 = new JoinCode("TEST5");
-        JoinCode joinCode3 = new JoinCode("TEST6");
+        JoinCode joinCode1 = joinCodeGenerator.generate();
+        JoinCode joinCode2 = joinCodeGenerator.generate();
+        JoinCode joinCode3 = joinCodeGenerator.generate();
 
         // when
         redisJoinCodeRepository.save(joinCode1);
@@ -99,17 +90,39 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
         assertThat(redisJoinCodeRepository.existsByJoinCode(joinCode2)).isTrue();
         assertThat(redisJoinCodeRepository.existsByJoinCode(joinCode3)).isTrue();
 
-        Long size = redisTemplate.opsForSet().size(JOIN_CODE_SET_KEY);
-        assertThat(size).isEqualTo(3);
+        Set<String> keys = redisTemplate.keys(JOIN_CODE_KEY_PREFIX + "*");
+        assertThat(keys).hasSize(3);
+    }
+
+    @Test
+    void 각_조인코드마다_개별_TTL이_설정된다() {
+        // given
+        JoinCode joinCode1 = joinCodeGenerator.generate();
+        JoinCode joinCode2 = joinCodeGenerator.generate();
+
+        // when
+        redisJoinCodeRepository.save(joinCode1);
+        redisJoinCodeRepository.save(joinCode2);
+
+        // then - 각 키마다 TTL이 설정되어 있어야 함
+        String key1 = JOIN_CODE_KEY_PREFIX + joinCode1.getValue();
+        String key2 = JOIN_CODE_KEY_PREFIX + joinCode2.getValue();
+
+        Long ttl1 = redisTemplate.getExpire(key1);
+        Long ttl2 = redisTemplate.getExpire(key2);
+
+        assertThat(ttl1).isNotNull().isGreaterThan(0);
+        assertThat(ttl2).isNotNull().isGreaterThan(0);
     }
 
     @Test
     void 저장_시_TTL이_설정된다() {
-        // given & then
+        // given & when
         redisJoinCodeRepository.save(joinCode);
 
         // then
-        Long ttl = redisTemplate.getExpire(JOIN_CODE_SET_KEY);
+        String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
+        Long ttl = redisTemplate.getExpire(key);
         assertThat(ttl).isNotNull()
                 .isGreaterThan(0);
     }
