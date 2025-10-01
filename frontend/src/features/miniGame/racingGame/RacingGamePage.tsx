@@ -6,7 +6,7 @@ import PrepareOverlay from '../cardGame/components/PrepareOverlay/PrepareOverlay
 import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
 import Finish from './components/Finish/Finish';
 import Goal from './components/Goal/Goal';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
 const myName = '정민수';
@@ -15,11 +15,25 @@ const RacingGamePage = () => {
   const { racingGameState, racingGameData } = useRacingGameMock();
   const containerRef = useRef<HTMLDivElement>(null);
   const backgroundPositionRef = useRef(0);
+  const [showGoal, setShowGoal] = useState(false);
 
   const myPlayer = racingGameData.players.find((player) => player.playerName === myName);
   const myX = myPlayer?.x ?? 0;
   const mySpeed = myPlayer?.speed ?? 0;
-  const hasReachedGoal = myX >= racingGameData.distance.end;
+
+  // Goal 도달 감지 및 1초 표시
+  useEffect(() => {
+    const hasReachedGoal = myX >= racingGameData.distance.end;
+
+    if (hasReachedGoal && !showGoal) {
+      setShowGoal(true);
+      const timer = setTimeout(() => {
+        setShowGoal(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [myX, racingGameData.distance.end, showGoal]);
 
   // 배경 애니메이션
   useEffect(() => {
@@ -57,7 +71,7 @@ const RacingGamePage = () => {
     <>
       {racingGameState === 'READY' && <PrepareOverlay />}
       {racingGameState === 'FINISH' && <Finish />}
-      {hasReachedGoal && <Goal />}
+      {showGoal && <Goal />}
       <S.Container ref={containerRef}>
         <S.HeadlineWrapper>
           <Headline4>레이싱 게임</Headline4>
