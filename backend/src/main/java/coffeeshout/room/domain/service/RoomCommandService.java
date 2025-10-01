@@ -52,9 +52,10 @@ public class RoomCommandService {
         final Room room = Room.createNewRoom(joinCode, hostName, new SelectedMenu(menu, menuTemperature));
         room.assignQrCodeUrl(qrCodeUrl);
 
+        Room saved = save(room);
         // 방 생성 후 조인코드 저장
         joinCodeRepository.save(joinCode);
 
-        return save(room);
+        return saved;
     }
 }
