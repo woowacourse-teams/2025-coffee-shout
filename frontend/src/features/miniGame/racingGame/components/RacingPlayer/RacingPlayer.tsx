@@ -1,8 +1,8 @@
-import React from 'react';
 import PlayerIcon from '@/components/@composition/PlayerIcon/PlayerIcon';
 import { colorList } from '@/constants/color';
-import { Player, RotatingWrapper } from './RacingPlayer.styled';
 import { useRotationAnimation } from '../../hooks/useRotationAnimation';
+import Description from '@/components/@common/Description/Description';
+import * as S from './RacingPlayer.styled';
 
 type Props = {
   playerName: string;
@@ -13,15 +13,19 @@ type Props = {
   colorIndex: number;
 };
 
-const RacingPlayer = ({ x, speed, isMe, myX, colorIndex }: Props) => {
+const RacingPlayer = ({ x, speed, isMe, myX, colorIndex, playerName }: Props) => {
   const rotatingRef = useRotationAnimation({ speed });
 
   return (
-    <Player $isMe={isMe} $x={x} $myX={myX}>
-      <RotatingWrapper ref={rotatingRef}>
+    <S.Player $isMe={isMe} $x={x} $myX={myX}>
+      <S.PlayerName>
+        <Description color={isMe ? 'point-500' : 'white'}>{playerName}</Description>
+      </S.PlayerName>
+
+      <S.RotatingWrapper ref={rotatingRef}>
         <PlayerIcon color={colorList[colorIndex % colorList.length]} />
-      </RotatingWrapper>
-    </Player>
+      </S.RotatingWrapper>
+    </S.Player>
   );
 };
 

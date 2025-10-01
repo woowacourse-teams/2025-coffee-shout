@@ -17,8 +17,8 @@ type RacingGameData = {
 const INITIAL_PLAYERS = [
   { playerName: '홍길동', speed: 40 },
   { playerName: '김철수', speed: 40 },
-  { playerName: 'eigf', speed: 40 },
-  { playerName: 'welrkj', speed: 40 },
+  { playerName: '망고맛아이스티한잔', speed: 40 },
+  { playerName: 'welrkjgfhh', speed: 40 },
   { playerName: '정민수', speed: 40 },
   { playerName: '최지영', speed: 40 },
   { playerName: '강동원', speed: 40 },
