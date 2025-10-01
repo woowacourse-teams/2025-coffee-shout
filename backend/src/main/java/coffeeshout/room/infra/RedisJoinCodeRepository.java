@@ -20,17 +20,10 @@ public class RedisJoinCodeRepository implements JoinCodeRepository {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public boolean existsByJoinCode(JoinCode joinCode) {
+    public boolean save(JoinCode joinCode) {
         final String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
-
-        // null이 발생할 수 있으므로 다음과 같이 처리해야함
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-    }
-
-    @Override
-    public void save(JoinCode joinCode) {
-        final String key = JOIN_CODE_KEY_PREFIX + joinCode.getValue();
-        // value는 간단히 "1"로 저장 (존재 여부만 확인하면 되므로)
-        redisTemplate.opsForValue().set(key, "1", ttl);
+        // SETNX 명령어로 원자적으로 저장 (키가 없을 때만 저장)
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(key, "1", ttl);
+        return Boolean.TRUE.equals(success);
     }
 }
