@@ -1,13 +1,14 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import RacingPlayer from './components/RacingPlayer/RacingPlayer';
 import RacingLine from './components/RacingLine/RacingLine';
-import RacingProgressBar from './components/RacingProgressBar/RacingProgressBar';
+// import RacingProgressBar from './components/RacingProgressBar/RacingProgressBar';
 import * as S from './RacingGamePage.styled';
 import PrepareOverlay from '../cardGame/components/PrepareOverlay/PrepareOverlay';
 import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
 import Finish from './components/Finish/Finish';
 import Goal from './components/Goal/Goal';
 import { useEffect, useRef, useState } from 'react';
+import RacingRank from './components/RacingRank/RacingRank';
 // import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
 const myName = '정민수';
@@ -92,11 +93,12 @@ const RacingGamePage = () => {
         <S.HeadlineWrapper>
           <Headline4>레이싱 게임</Headline4>
         </S.HeadlineWrapper>
-        <RacingProgressBar
+        <RacingRank players={racingGameData.players} myName={myName} />
+        {/* <RacingProgressBar
           myName={myName}
           endDistance={racingGameData.distance.end}
           players={racingGameData.players}
-        />
+        /> */}
         <S.ContentWrapper>
           <S.PlayersWrapper>
             {/* 출발선 */}
