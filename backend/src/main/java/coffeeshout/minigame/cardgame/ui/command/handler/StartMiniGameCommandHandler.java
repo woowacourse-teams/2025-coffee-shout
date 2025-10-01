@@ -1,30 +1,26 @@
 package coffeeshout.minigame.cardgame.ui.command.handler;
 
-import coffeeshout.minigame.cardgame.application.CardGameService;
-import coffeeshout.minigame.cardgame.application.MiniGameService;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
+import coffeeshout.minigame.cardgame.infra.messaging.MiniGameEventPublisher;
 import coffeeshout.minigame.cardgame.ui.command.MiniGameCommandHandler;
 import coffeeshout.minigame.cardgame.ui.request.command.StartMiniGameCommand;
-import java.util.EnumMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class StartMiniGameCommandHandler implements MiniGameCommandHandler<StartMiniGameCommand> {
 
-    private final Map<MiniGameType, MiniGameService> services;
-
-    @Autowired
-    public StartMiniGameCommandHandler(CardGameService cardGameService) {
-        services = new EnumMap<>(MiniGameType.class);
-        services.put(MiniGameType.CARD_GAME, cardGameService);
-    }
+    private final MiniGameEventPublisher miniGameEventPublisher;
 
     @Override
     public void handle(String joinCode, StartMiniGameCommand command) {
-        // 바로 이벤트 발행만 함 - 모든 인스턴스가 동시에 처리하게 함
-        services.get(MiniGameType.CARD_GAME).publishStartEvent(joinCode, command.hostName());
+        final StartMiniGameCommandEvent event = StartMiniGameCommandEvent.create(joinCode, command.hostName());
+        miniGameEventPublisher.publishEvent(event);
+        log.info("미니게임 시작 이벤트 발행: joinCode={}, hostName={}, eventId={}",
+                joinCode, command.hostName(), event.getEventId());
     }
 
     @Override
