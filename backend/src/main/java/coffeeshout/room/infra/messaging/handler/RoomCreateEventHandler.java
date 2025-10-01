@@ -21,7 +21,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     public void handle(RoomCreateEvent event) {
         try {
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
-                    event.getEventId(), event.hostName(), event.joinCode());
+                    event.eventId(), event.hostName(), event.joinCode());
 
             final Room room = roomService.createRoomInternal(
                     event.hostName(),
@@ -29,14 +29,14 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
                     event.joinCode()
             );
 
-            roomEventWaitManager.notifySuccess(event.getEventId(), room);
+            roomEventWaitManager.notifySuccess(event.eventId(), room);
 
             log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}",
-                    event.getEventId(), event.joinCode());
+                    event.eventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
-            roomEventWaitManager.notifyFailure(event.getEventId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         }
     }
 

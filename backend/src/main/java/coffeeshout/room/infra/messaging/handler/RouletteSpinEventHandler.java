@@ -21,7 +21,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
     public void handle(RouletteSpinEvent event) {
         try {
             log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
-                    event.getEventId(), event.joinCode(), event.hostName());
+                    event.eventId(), event.joinCode(), event.hostName());
 
             final Winner winner = event.winner();
             final WinnerResponse response = WinnerResponse.from(winner);
@@ -30,7 +30,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
                     WebSocketResponse.success(response));
 
             log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
-                    event.getEventId(), event.joinCode(), winner.name().value());
+                    event.eventId(), event.joinCode(), winner.name().value());
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);

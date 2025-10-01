@@ -8,6 +8,7 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
+import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -62,10 +63,11 @@ public class RoomService {
 
     public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
-        final RoomCreateEvent event = RoomCreateEvent.create(hostName, selectedMenuRequest, joinCode.getValue());
+
+        final RoomCreateEvent event = new RoomCreateEvent(hostName, selectedMenuRequest, joinCode.getValue());
 
         return processEventAsync(
-                event.getEventId(),
+                event.eventId(),
                 () -> roomEventPublisher.publishEvent(event),
                 "방 생성",
                 String.format("joinCode=%s", joinCode.getValue()),
@@ -78,7 +80,7 @@ public class RoomService {
             String guestName,
             SelectedMenuRequest selectedMenuRequest
     ) {
-        final RoomJoinEvent event = RoomJoinEvent.create(joinCode, guestName, selectedMenuRequest);
+        final RoomJoinEvent event = new RoomJoinEvent(joinCode, guestName, selectedMenuRequest);
 
         return processEventAsync(
                 event.eventId(),

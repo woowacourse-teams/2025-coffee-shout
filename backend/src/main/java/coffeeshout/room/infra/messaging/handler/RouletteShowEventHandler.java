@@ -22,7 +22,7 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
     @Override
     public void handle(RouletteShowEvent event) {
         try {
-            log.info("룰렛 전환 이벤트 수신: eventId={}, joinCode={}", event.getEventId(), event.joinCode());
+            log.info("룰렛 전환 이벤트 수신: eventId={}, joinCode={}", event.eventId(), event.joinCode());
 
             final Room room = roomService.showRoulette(event.joinCode());
             final RoomStatusResponse response = RoomStatusResponse.of(room.getJoinCode(), room.getRoomState());

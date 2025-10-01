@@ -1,36 +1,31 @@
 package coffeeshout.room.domain.event;
 
-import java.time.LocalDateTime;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
+import java.time.Instant;
 import java.util.UUID;
 
 public record PlayerListUpdateEvent(
         String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
         RoomEventType eventType,
-        String joinCode,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+        String joinCode
+) implements RoomBaseEvent, Traceable {
 
-    public static PlayerListUpdateEvent create(String joinCode) {
-        return new PlayerListUpdateEvent(
+    public PlayerListUpdateEvent(String joinCode) {
+        this(
                 UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
                 RoomEventType.PLAYER_LIST_UPDATE,
-                joinCode,
-                LocalDateTime.now()
+                joinCode
         );
     }
 
     @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

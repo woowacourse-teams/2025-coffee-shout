@@ -30,18 +30,18 @@ public class CardGameService implements MiniGameService {
 
     @Override
     public void publishStartEvent(String joinCode, String hostName) {
-        final StartMiniGameCommandEvent event = StartMiniGameCommandEvent.create(joinCode, hostName);
+        final StartMiniGameCommandEvent event = new StartMiniGameCommandEvent(joinCode, hostName);
         miniGameEventPublisher.publishEvent(event);
         log.info("미니게임 시작 이벤트 발행: joinCode={}, hostName={}, eventId={}",
-                joinCode, hostName, event.getEventId());
+                joinCode, hostName, event.eventId());
     }
 
     @Override
     public void publishSelectCardEvent(String joinCode, String playerName, Integer cardIndex) {
-        final SelectCardCommandEvent event = SelectCardCommandEvent.create(joinCode, playerName, cardIndex);
+        final SelectCardCommandEvent event = new SelectCardCommandEvent(joinCode, playerName, cardIndex);
         cardSelectStreamProducer.broadcastCardSelect(event);
         log.info("카드 선택 이벤트 발행: joinCode={}, playerName={}, cardIndex={}, eventId={}",
-                joinCode, playerName, cardIndex, event.getEventId());
+                joinCode, playerName, cardIndex, event.eventId());
     }
 
     // === Internal 메서드들 (Redis 리스너용) ===
