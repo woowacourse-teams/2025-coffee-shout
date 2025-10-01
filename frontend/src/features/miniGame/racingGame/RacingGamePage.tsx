@@ -16,24 +16,39 @@ const RacingGamePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const backgroundPositionRef = useRef(0);
   const [showGoal, setShowGoal] = useState(false);
+  const hasShownGoalRef = useRef(false);
+  const goalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const myPlayer = racingGameData.players.find((player) => player.playerName === myName);
   const myX = myPlayer?.x ?? 0;
   const mySpeed = myPlayer?.speed ?? 0;
 
+  // READY 상태에서 Goal 표시 여부 리셋
+  useEffect(() => {
+    if (racingGameState === 'READY') {
+      hasShownGoalRef.current = false;
+      setShowGoal(false);
+      if (goalTimerRef.current) {
+        clearTimeout(goalTimerRef.current);
+        goalTimerRef.current = null;
+      }
+    }
+  }, [racingGameState]);
+
   // Goal 도달 감지 및 1초 표시
   useEffect(() => {
     const hasReachedGoal = myX >= racingGameData.distance.end;
 
-    if (hasReachedGoal && !showGoal) {
+    if (hasReachedGoal && !hasShownGoalRef.current && !goalTimerRef.current) {
+      hasShownGoalRef.current = true;
       setShowGoal(true);
-      const timer = setTimeout(() => {
-        setShowGoal(false);
-      }, 1000);
 
-      return () => clearTimeout(timer);
+      goalTimerRef.current = setTimeout(() => {
+        setShowGoal(false);
+        goalTimerRef.current = null;
+      }, 1000);
     }
-  }, [myX, racingGameData.distance.end, showGoal]);
+  }, [myX, racingGameData.distance.end]);
 
   // 배경 애니메이션
   useEffect(() => {
