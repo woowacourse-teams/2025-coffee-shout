@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
@@ -77,26 +76,7 @@ export const useRoomManagement = () => {
     if (!isPlayerNameValid()) return;
     if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
-    try {
-      await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        showToast({
-          type: 'error',
-          message: '방 생성/참가에 실패했습니다.',
-        });
-      } else if (error instanceof NetworkError) {
-        showToast({
-          type: 'error',
-          message: '네트워크 연결을 확인해주세요.',
-        });
-      } else {
-        showToast({
-          type: 'error',
-          message: '알 수 없는 오류가 발생했습니다.',
-        });
-      }
-    }
+    await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
   };
 
   return {
