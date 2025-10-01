@@ -1,49 +1,39 @@
 import * as S from './RacingProgressBar.styled';
-import { colorList } from '@/constants/color';
+import { usePlayerProgressData } from '../../hooks/usePlayerProgressData';
 
-interface Player {
+type Player = {
   playerName: string;
   x: number;
-}
+};
 
-interface RacingProgressBarProps {
+type Props = {
   myName: string;
   endDistance: number;
   players: Player[];
-}
+};
 
-const RacingProgressBar = ({ myName, endDistance, players }: RacingProgressBarProps) => {
+const RacingProgressBar = ({ myName, endDistance, players }: Props) => {
+  const playerProgressData = usePlayerProgressData({ players, endDistance, myName });
+
   return (
     <S.Container>
       <S.ProgressTrack>
-        {players.map((player, index) => {
-          const progress = Math.min((player.x / endDistance) * 100, 100);
-          const isMe = player.playerName === myName;
-          const color = colorList[index % colorList.length];
-
-          return (
-            <S.ProgressFill
-              key={`fill-${player.playerName}`}
-              $progress={progress}
-              $color={color}
-              $isMe={isMe}
-            />
-          );
-        })}
-        {players.map((player, index) => {
-          const progress = Math.min((player.x / endDistance) * 100, 100);
-          const isMe = player.playerName === myName;
-          const color = colorList[index % colorList.length];
-
-          return (
-            <S.ProgressMarker
-              key={player.playerName}
-              $progress={progress}
-              $color={color}
-              $isMe={isMe}
-            />
-          );
-        })}
+        {playerProgressData.map(({ player, progress, color, isMe }) => (
+          <S.ProgressFill
+            key={`fill-${player.playerName}`}
+            $progress={progress}
+            $color={color}
+            $isMe={isMe}
+          />
+        ))}
+        {playerProgressData.map(({ player, progress, color, isMe }) => (
+          <S.ProgressMarker
+            key={player.playerName}
+            $progress={progress}
+            $color={color}
+            $isMe={isMe}
+          />
+        ))}
       </S.ProgressTrack>
     </S.Container>
   );
