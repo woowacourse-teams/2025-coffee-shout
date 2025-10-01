@@ -2,6 +2,7 @@ package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.menu.Menu;
@@ -32,7 +33,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
             final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
-            roomCommandService.createRoom(
+            Room room = roomCommandService.createRoom(
                     new JoinCode(joinCode),
                     new PlayerName(event.hostName()),
                     menu,
@@ -40,8 +41,12 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
                     event.qrCodeUrl()
             );
 
-            log.info("방 생성 이벤트 처리 완료: eventId={}, joinCode={}",
-                    event.eventId(), joinCode);
+            log.info("방 생성 이벤트 처리 완료: eventId={}, hostName={}, joinCode={}, qrCodeUrl={}",
+                    event.eventId(),
+                    room.getHost().getName(),
+                    room.getJoinCode().getValue(),
+                    room.getJoinCode().getQrCodeUrl()
+            );
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
         } catch (Exception e) {
