@@ -2,7 +2,7 @@
 type Player = {
   playerName: string;
   speed: number;
-  x?: number;
+  x: number;
 };
 
 // 상수 정의

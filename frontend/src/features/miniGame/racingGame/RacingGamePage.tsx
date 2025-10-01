@@ -11,16 +11,19 @@ import RacingProgressBar from './components/RacingProgressBar/RacingProgressBar'
 import { useGoalDisplay } from './hooks/useGoalDisplay';
 import { useBackgroundAnimation } from './hooks/useBackgroundAnimation';
 import { usePlayerData } from './hooks/usePlayerData';
+import { getVisiblePlayers } from './utils/getVisiblePlayers';
 // import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
-const myName = '정민수';
+const myName = '김철수';
 
 const RacingGamePage = () => {
   const { racingGameState, racingGameData } = useRacingGameMock();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
+
   const { myX, mySpeed } = usePlayerData({
-    players: racingGameData.players,
+    players: visiblePlayers,
     myName,
   });
 
@@ -64,7 +67,7 @@ const RacingGamePage = () => {
             <RacingLine x={0} myX={myX} />
             {/* 도착선 */}
             <RacingLine x={1000} myX={myX} />
-            {racingGameData.players.map((player, index) => (
+            {visiblePlayers.map((player, index) => (
               <RacingPlayer
                 key={player.playerName}
                 playerName={player.playerName}
