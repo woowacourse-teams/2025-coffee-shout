@@ -24,7 +24,10 @@ const RacingRank = ({ players, myName }: Props) => {
           const isMe = player.playerName === myName;
           return (
             <S.RankItem key={player.playerName}>
-              <Description color={isMe ? 'point-500' : 'white'}>{index + 1}</Description>
+              <S.RankNumber>
+                <Description color={isMe ? 'point-500' : 'white'}>{index + 1}</Description>
+              </S.RankNumber>
+
               <Description color={isMe ? 'point-500' : 'white'}>{player.playerName}</Description>
             </S.RankItem>
           );

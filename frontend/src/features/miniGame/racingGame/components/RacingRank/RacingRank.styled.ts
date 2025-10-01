@@ -13,6 +13,13 @@ export const RankList = styled.div`
   flex-direction: column;
 `;
 
+export const RankNumber = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: auto;
+`;
 export const RankItem = styled.div`
   display: flex;
   align-items: center;
