@@ -37,4 +37,19 @@ public class RoomCommandService {
 
         return save(room);
     }
+
+    public void createRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature,
+                           String qrCodeUrl) {
+        if (roomRepository.existsByJoinCode(joinCode)) {
+            log.info("JoinCode[{}] 방 생성 실패 - 이미 존재하는 방", joinCode);
+            return;
+        }
+
+        log.info("JoinCode[{}] 방 생성 - 호스트 이름: {}, 메뉴 정보: {}, 온도 : {} ", joinCode, hostName, menu, menuTemperature);
+
+        final Room room = Room.createNewRoom(joinCode, hostName, new SelectedMenu(menu, menuTemperature));
+        room.assignQrCodeUrl(qrCodeUrl);
+
+        save(room);
+    }
 }

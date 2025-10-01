@@ -8,7 +8,6 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import coffeeshout.room.domain.menu.CustomMenu;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -50,7 +49,6 @@ public class RoomService {
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
-    private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
@@ -61,18 +59,28 @@ public class RoomService {
 
     // === 비동기 메서드들 (REST Controller용) ===
 
-    public CompletableFuture<Room> createRoomAsync(String hostName, SelectedMenuRequest selectedMenuRequest) {
+    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
+        // QR 코드 생성
+        final String qrCodeUrl = qrCodeService.getQrCodeUrl(joinCode.getValue());
 
-        final RoomCreateEvent event = new RoomCreateEvent(hostName, selectedMenuRequest, joinCode.getValue());
+        // 방 생성
+        Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
+        roomCommandService.createRoom(joinCode, new PlayerName(hostName),
+                menu, selectedMenuRequest.temperature(), qrCodeUrl);
 
-        return processEventAsync(
-                event.eventId(),
-                () -> roomEventPublisher.publishEvent(event),
-                "방 생성",
-                String.format("joinCode=%s", joinCode.getValue()),
-                room -> String.format("joinCode=%s", room.getJoinCode().getValue())
+        // 방 생성 후 이벤트 전달
+        final RoomCreateEvent event = new RoomCreateEvent(
+                hostName,
+                selectedMenuRequest,
+                joinCode.getValue(),
+                qrCodeUrl
         );
+
+        roomEventPublisher.publishEvent(event);
+
+        // 해당 방 정보 수신
+        return roomQueryService.getByJoinCode(joinCode);
     }
 
     public CompletableFuture<Room> enterRoomAsync(
@@ -113,20 +121,6 @@ public class RoomService {
                 });
     }
 
-    // === 기존 동기 메서드들 (테스트용 + 하위 호환성) ===
-
-    public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
-        try {
-            return createRoomAsync(hostName, selectedMenuRequest).join();
-        } catch (Exception e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException runtimeException) {
-                throw runtimeException;
-            }
-            throw new RuntimeException("방 생성 실패", cause);
-        }
-    }
-
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
         return changePlayerReadyStateInternal(joinCode, playerName, isReady);
     }
@@ -145,29 +139,6 @@ public class RoomService {
     public List<Player> getPlayersInternal(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.getPlayers();
-    }
-
-    public Room createRoomInternal(
-            String hostName,
-            SelectedMenuRequest selectedMenuRequest,
-            String joinCodeValue
-    ) {
-        final JoinCode joinCode = new JoinCode(joinCodeValue);
-        final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
-        final Room room = Room.createNewRoom(
-                joinCode,
-                new PlayerName(hostName),
-                new SelectedMenu(menu, selectedMenuRequest.temperature())
-        );
-        assignQrCodeUrl(room);
-        scheduleRemoveRoom(joinCode);
-
-        return roomCommandService.save(room);
-    }
-
-    private void assignQrCodeUrl(Room room) {
-        final String qrCodeUrl = qrCodeService.getQrCodeUrl(room.getJoinCode().getValue());
-        room.assignQrCodeUrl(qrCodeUrl);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
@@ -288,14 +259,6 @@ public class RoomService {
     public boolean isReadyState(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.isReadyState();
-    }
-
-    private void scheduleRemoveRoom(JoinCode joinCode) {
-        try {
-            delayedRoomRemovalService.scheduleRemoveRoom(joinCode);
-        } catch (Exception e) {
-            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
-        }
     }
 
     public Room showRoulette(String joinCode) {
