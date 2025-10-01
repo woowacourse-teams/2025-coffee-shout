@@ -49,6 +49,7 @@ const RacingGamePage = () => {
       }, 1000);
     }
   }, [myX, racingGameData.distance.end]);
+  }, [myX, racingGameData.distance.end]);
 
   // 배경 애니메이션
   useEffect(() => {
