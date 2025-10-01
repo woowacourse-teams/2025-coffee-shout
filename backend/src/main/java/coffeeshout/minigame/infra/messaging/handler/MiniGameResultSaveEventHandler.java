@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.handler;
+package coffeeshout.minigame.infra.messaging.handler;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
@@ -45,8 +45,8 @@ public class MiniGameResultSaveEventHandler {
 
     private void tryDbSaveResult(CardGameStateChangedEvent event) {
         final String joinCode = event.room().getJoinCode().getValue();
-        final String lockKey = "minigame:result:lock:" + joinCode;
-        final String doneKey = "minigame:result:done:" + joinCode;
+        final String lockKey = "minigame:result:lock:" + event.eventId();
+        final String doneKey = "minigame:result:done:" + event.eventId();
 
         if (isAlreadyProcessed(doneKey, joinCode)) {
             return;
