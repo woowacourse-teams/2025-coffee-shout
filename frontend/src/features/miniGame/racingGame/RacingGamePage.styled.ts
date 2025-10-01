@@ -1,11 +1,9 @@
 import styled from '@emotion/styled';
-import { LAYOUT_PADDING } from '@/constants/padding';
 import skyImage from '@/assets/sky.png';
 
 export const Container = styled.div`
   width: 100%;
   height: 100%;
-  padding: ${LAYOUT_PADDING} 0;
   background-image: url(${skyImage});
   background-size: cover;
   background-position: center;
@@ -13,14 +11,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   will-change: background-position;
-`;
-
-export const HeadlineWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 2.6rem;
 `;
 
 export const ContentWrapper = styled.div`

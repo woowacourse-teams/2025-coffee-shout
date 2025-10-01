@@ -1,4 +1,3 @@
-import Headline4 from '@/components/@common/Headline4/Headline4';
 import RacingPlayer from './components/RacingPlayer/RacingPlayer';
 import RacingLine from './components/RacingLine/RacingLine';
 import * as S from './RacingGamePage.styled';
@@ -53,9 +52,6 @@ const RacingGamePage = () => {
       {racingGameState === 'FINISH' && <Finish />}
       {showGoal && <Goal />}
       <S.Container ref={containerRef}>
-        <S.HeadlineWrapper>
-          <Headline4>레이싱 게임</Headline4>
-        </S.HeadlineWrapper>
         <RacingRank players={racingGameData.players} myName={myName} />
         <RacingProgressBar
           myName={myName}
