@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.persistance;
+package coffeeshout.minigame.infra.persistence;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.infra.persistance.RoomEntity;

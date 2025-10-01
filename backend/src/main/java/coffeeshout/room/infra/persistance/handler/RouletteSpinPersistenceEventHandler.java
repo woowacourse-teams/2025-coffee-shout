@@ -88,6 +88,7 @@ public class RouletteSpinPersistenceEventHandler {
     private void saveRouletteResult(String joinCode, Winner winner) {
         final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.DONE);
+        roomEntity.finish();
 
         final PlayerEntity playerEntity = getPlayerEntity(roomEntity, winner.name().value());
 

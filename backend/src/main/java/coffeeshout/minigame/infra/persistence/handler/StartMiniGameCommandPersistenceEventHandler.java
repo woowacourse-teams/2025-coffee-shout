@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.persistance.handler;
+package coffeeshout.minigame.infra.persistence.handler;
 
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;

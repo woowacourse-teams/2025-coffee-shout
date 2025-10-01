@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.persistance;
+package coffeeshout.minigame.infra.persistence;
 
 import org.springframework.data.repository.Repository;
 
