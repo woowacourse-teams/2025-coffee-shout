@@ -16,10 +16,11 @@ const HALF_COUNT = 3; // 위/아래 각각 3명
  * @param myIndex 내 플레이어의 인덱스
  * @returns 잘린 플레이어 배열 (내가 중앙)
  */
-export const getVisiblePlayers = (players: Player[], myIndex: number): Player[] => {
+export const getVisiblePlayers = (players: Player[], myName: string): Player[] => {
   if (players.length === 0) return [];
 
   const totalPlayers = players.length;
+  const myIndex = players.findIndex((player) => player.playerName === myName);
 
   // 플레이어가 7명 이하면 원본 배열 길이 유지하되 내가 중앙에 오도록 정렬
   if (totalPlayers <= VISIBLE_PLAYER_COUNT) {
