@@ -4,8 +4,8 @@ import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
-import java.time.Duration;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -51,12 +51,10 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
         final String doneKey = "event:done:" + event.eventId();
 
         if (isAlreadyProcessed(doneKey, event.eventId())) {
-            roomEventWaitManager.notifySuccess(event.eventId(), room);
             return;
         }
 
         if (!acquireLock(lockKey, event.eventId())) {
-            roomEventWaitManager.notifySuccess(event.eventId(), room);
             return;
         }
 
