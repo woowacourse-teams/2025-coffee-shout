@@ -5,13 +5,13 @@ const FILL_TRANSITION_DURATION = '0.3s';
 export const Container = styled.div`
   width: 100%;
   position: relative;
-  padding: 1.5rem 1rem;
+  padding: 1.8rem 1rem;
 `;
 
 export const ProgressTrack = styled.div`
   position: relative;
   width: 100%;
-  height: 20px;
+  height: 15px;
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   overflow: visible;
@@ -37,8 +37,8 @@ export const ProgressMarker = styled.div<{ $progress: number; $color: string; $i
   left: ${({ $progress }) => $progress}%;
   top: -20px;
   transform: translateX(-50%);
-  width: ${({ $isMe }) => ($isMe ? '24px' : '20px')};
-  height: ${({ $isMe }) => ($isMe ? '24px' : '20px')};
+  width: ${({ $isMe }) => ($isMe ? '20px' : '16px')};
+  height: ${({ $isMe }) => ($isMe ? '20px' : '16px')};
   background-color: ${({ $color }) => $color};
   border: 2px solid ${({ $isMe }) => ($isMe ? '#fff' : 'transparent')};
   border-radius: 50%;
