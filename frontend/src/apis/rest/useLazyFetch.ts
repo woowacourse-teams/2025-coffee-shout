@@ -11,7 +11,7 @@ type UseLazyFetchReturn<T> = {
   data: T | undefined;
   loading: boolean;
   error: Error | null;
-  execute: () => Promise<T>;
+  execute: () => Promise<T | undefined>;
 };
 
 const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T> => {
@@ -35,7 +35,6 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
     } catch (error) {
       setError(error as Error);
       onErrorRef.current?.(error as Error);
-      throw error;
     } finally {
       setLoading(false);
     }

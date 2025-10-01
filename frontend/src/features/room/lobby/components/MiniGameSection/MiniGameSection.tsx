@@ -26,7 +26,7 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
   });
 
   if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error.message}</div>;
+  if (error) throw error;
 
   return (
     <>
