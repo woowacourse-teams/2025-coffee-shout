@@ -1,6 +1,7 @@
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import RacingPlayer from './components/RacingPlayer/RacingPlayer';
 import RacingLine from './components/RacingLine/RacingLine';
+import RacingProgressBar from './components/RacingProgressBar/RacingProgressBar';
 import * as S from './RacingGamePage.styled';
 import PrepareOverlay from '../cardGame/components/PrepareOverlay/PrepareOverlay';
 import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
@@ -49,7 +50,6 @@ const RacingGamePage = () => {
       }, 1000);
     }
   }, [myX, racingGameData.distance.end]);
-  }, [myX, racingGameData.distance.end]);
 
   // 배경 애니메이션
   useEffect(() => {
@@ -92,6 +92,11 @@ const RacingGamePage = () => {
         <S.HeadlineWrapper>
           <Headline4>레이싱 게임</Headline4>
         </S.HeadlineWrapper>
+        <RacingProgressBar
+          myName={myName}
+          endDistance={racingGameData.distance.end}
+          players={racingGameData.players}
+        />
         <S.ContentWrapper>
           <S.PlayersWrapper>
             {/* 출발선 */}
