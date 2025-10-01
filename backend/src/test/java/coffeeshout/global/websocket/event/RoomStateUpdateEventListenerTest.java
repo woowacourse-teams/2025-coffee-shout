@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
-import coffeeshout.room.infra.RoomEventPublisher;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

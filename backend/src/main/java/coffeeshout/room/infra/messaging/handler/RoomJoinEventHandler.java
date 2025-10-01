@@ -1,10 +1,10 @@
-package coffeeshout.room.infra.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import coffeeshout.room.infra.RoomEventWaitManager;
+import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class RoomJoinEventHandler implements RoomEventHandler<RoomJoinEvent> {
             log.info("방 참가 이벤트 수신: eventId={}, joinCode={}, guestName={}",
                     event.eventId(), event.joinCode(), event.guestName());
 
-            final Room room = roomService.enterRoomInternal(
+            final Room room = roomService.enterRoom(
                     event.joinCode(),
                     event.guestName(),
                     event.selectedMenuRequest()

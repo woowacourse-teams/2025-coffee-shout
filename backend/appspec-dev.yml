@@ -38,7 +38,7 @@ hooks:
   BeforeInstall:
     - location: scripts/before_install.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
 
   # 파일 복사 후 설정 작업
   AfterInstall:

@@ -1,5 +1,8 @@
-package coffeeshout.minigame.domain.event;
+package coffeeshout.minigame.domain.cardgame.event;
 
+import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
+import coffeeshout.minigame.domain.event.MiniGameEventType;
+import java.time.LocalDateTime;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;

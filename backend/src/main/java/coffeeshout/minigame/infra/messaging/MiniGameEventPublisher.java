@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra;
+package coffeeshout.minigame.infra.messaging;
 
 import coffeeshout.minigame.domain.event.MiniGameBaseEvent;
 import lombok.RequiredArgsConstructor;

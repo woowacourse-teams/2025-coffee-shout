@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JoinCodeGenerator {
 
+    // TODO Redis Repository 필요 분산 환경에서 하나만 처리되도록 해야함
     private final RoomRepository roomRepository;
 
     public JoinCode generate() {

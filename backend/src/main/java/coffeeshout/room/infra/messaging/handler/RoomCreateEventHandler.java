@@ -1,10 +1,10 @@
-package coffeeshout.room.infra.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
-import coffeeshout.room.infra.RoomEventWaitManager;
+import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

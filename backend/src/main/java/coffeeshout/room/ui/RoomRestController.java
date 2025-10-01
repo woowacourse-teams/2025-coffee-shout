@@ -8,9 +8,11 @@ import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
@@ -33,8 +36,8 @@ public class RoomRestController {
                 .thenApply(room -> ResponseEntity.ok(RoomCreateResponse.from(room)))
                 .exceptionally(throwable -> {
                     final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
-                    if (cause instanceof RuntimeException) {
-                        throw (RuntimeException) cause;
+                    if (cause instanceof RuntimeException runtimeException) {
+                        throw runtimeException;
                     }
                     throw new RuntimeException("방 생성 실패", cause);
                 });
@@ -43,14 +46,15 @@ public class RoomRestController {
     @PostMapping("/{joinCode}")
     public CompletableFuture<ResponseEntity<RoomEnterResponse>> enterRoom(
             @PathVariable String joinCode,
-            @RequestBody RoomEnterRequest request
+            @Valid @RequestBody RoomEnterRequest request
     ) {
         return roomService.enterRoomAsync(joinCode, request.playerName(), request.menu())
                 .thenApply(room -> ResponseEntity.ok(RoomEnterResponse.from(room)))
                 .exceptionally(throwable -> {
+                    // 원래 예외 추출
                     final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
-                    if (cause instanceof RuntimeException) {
-                        throw (RuntimeException) cause;
+                    if (cause instanceof RuntimeException runtimeException) {
+                        throw runtimeException;
                     }
                     throw new RuntimeException("방 참가 실패", cause);
                 });

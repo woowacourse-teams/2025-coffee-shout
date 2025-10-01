@@ -1,4 +1,4 @@
-package coffeeshout.room.infra;
+package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.trace.Traceable;
@@ -11,8 +11,8 @@ import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
-import coffeeshout.room.infra.handler.RoomEventHandler;
-import coffeeshout.room.infra.handler.RoomEventHandlerFactory;
+import coffeeshout.room.infra.messaging.handler.RoomEventHandler;
+import coffeeshout.room.infra.messaging.handler.RoomEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;

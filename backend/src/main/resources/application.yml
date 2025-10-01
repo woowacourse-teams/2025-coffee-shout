@@ -13,6 +13,10 @@ spring:
       ssl:
         enabled: true
       host: localhost
+      stream:
+        room-join-key: room:broadcast
+        card-game-select-key: cardGame:select:broadcast
+        max-length: 100
 
 room:
   removalDelay: 1h
@@ -22,6 +26,8 @@ room:
     presignedUrl:
       expirationHours: 1
     s3-key-prefix: ${S3_QR_KEY_PREFIX}
+  event:
+    timeout: 5s
 
 logging:
   level:
