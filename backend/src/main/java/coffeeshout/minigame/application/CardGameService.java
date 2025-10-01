@@ -56,30 +56,17 @@ public class CardGameService implements MiniGameService {
 
     public void startInternal(String joinCode, String hostName) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         final CardGame cardGame = getCardGame(roomJoinCode);
-
-        updateRoomEntity(room);
 
         eventPublisher.publishEvent(new CardGameStartedEvent(roomJoinCode, cardGame));
     }
 
-    public void selectCardInternal(String joinCode, String playerName, Integer cardIndex) {
+    public void saveGameEntities(String joinCode) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final CardGame cardGame = getCardGame(roomJoinCode);
-        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
-        cardGame.selectCard(player, cardIndex);
-        eventPublisher.publishEvent(new CardSelectedEvent(roomJoinCode, cardGame));
-    }
-
-    private CardGame getCardGame(JoinCode joinCode) {
-        final Room room = roomQueryService.getByJoinCode(joinCode);
-        return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
-    }
-
-    private void updateRoomEntity(Room room) {
+        final Room room = roomQueryService.getByJoinCode(roomJoinCode);
+        
         // RoomEntity 찾아서 PlayerEntity들 저장
-        final RoomEntity roomEntity = getRoomEntity(room.getJoinCode().getValue());
+        final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.PLAYING);
 
         final MiniGameEntity miniGameEntity = new MiniGameEntity(roomEntity, MiniGameType.CARD_GAME);
@@ -93,6 +80,19 @@ public class CardGameService implements MiniGameService {
             );
             playerJpaRepository.save(playerEntity);
         });
+    }
+
+    public void selectCardInternal(String joinCode, String playerName, Integer cardIndex) {
+        final JoinCode roomJoinCode = new JoinCode(joinCode);
+        final CardGame cardGame = getCardGame(roomJoinCode);
+        final Player player = cardGame.findPlayerByName(new PlayerName(playerName));
+        cardGame.selectCard(player, cardIndex);
+        eventPublisher.publishEvent(new CardSelectedEvent(roomJoinCode, cardGame));
+    }
+
+    private CardGame getCardGame(JoinCode joinCode) {
+        final Room room = roomQueryService.getByJoinCode(joinCode);
+        return (CardGame) room.findMiniGame(MiniGameType.CARD_GAME);
     }
 
     private RoomEntity getRoomEntity(String joinCode) {

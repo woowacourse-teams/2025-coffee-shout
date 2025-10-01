@@ -193,10 +193,12 @@ public class RoomService {
         room.assignQrCodeUrl(qrCodeUrl);
         scheduleRemoveRoom(joinCode);
 
+        return roomCommandService.save(room);
+    }
+
+    public void saveRoomEntity(String joinCodeValue) {
         final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
         roomJpaRepository.save(roomEntity);
-
-        return roomCommandService.save(room);
     }
 
     public Room enterRoomInternal(

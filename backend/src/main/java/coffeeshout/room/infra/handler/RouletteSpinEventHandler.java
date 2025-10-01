@@ -13,8 +13,10 @@ import coffeeshout.room.infra.persistance.RoomJpaRepository;
 import coffeeshout.room.infra.persistance.RouletteResultEntity;
 import coffeeshout.room.infra.persistance.RouletteResultJpaRepository;
 import coffeeshout.room.ui.response.WinnerResponse;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -26,6 +28,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
     private final RoomJpaRepository roomJpaRepository;
     private final PlayerJpaRepository playerJpaRepository;
     private final RouletteResultJpaRepository rouletteResultJpaRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void handle(RouletteSpinEvent event) {
@@ -34,24 +37,76 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
                     event.getEventId(), event.joinCode(), event.hostName());
 
             final Winner winner = event.winner();
-            final WinnerResponse response = WinnerResponse.from(winner);
-
-            saveRouletteResult(event.joinCode(), winner);
-
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/winner",
-                    WebSocketResponse.success(response));
-
-            log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
-                    event.getEventId(), event.joinCode(), winner.name().value());
+            
+            broadcastWinner(event.joinCode(), winner);
+            
+            tryDbSave(event, winner);
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);
         }
     }
 
-    @Override
-    public RoomEventType getSupportedEventType() {
-        return RoomEventType.ROULETTE_SPIN;
+    private void broadcastWinner(String joinCode, Winner winner) {
+        final WinnerResponse response = WinnerResponse.from(winner);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
+                WebSocketResponse.success(response));
+    }
+
+    private void tryDbSave(RouletteSpinEvent event, Winner winner) {
+        final String lockKey = "event:lock:" + event.getEventId();
+        final String doneKey = "event:done:" + event.getEventId();
+
+        if (isAlreadyProcessed(doneKey, event.getEventId())) {
+            return;
+        }
+
+        if (!acquireLock(lockKey, event.getEventId())) {
+            return;
+        }
+
+        try {
+            saveToDatabase(event, winner, doneKey);
+        } finally {
+            releaseLock(lockKey);
+        }
+    }
+
+    private boolean isAlreadyProcessed(String doneKey, String eventId) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(doneKey))) {
+            log.debug("이미 처리된 이벤트 (DB 저장 스킵): eventId={}", eventId);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean acquireLock(String lockKey, String eventId) {
+        final Boolean acquired = redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "locked", Duration.ofSeconds(5));
+
+        if (!Boolean.TRUE.equals(acquired)) {
+            log.debug("다른 인스턴스가 DB 저장 중: eventId={}", eventId);
+            return false;
+        }
+        return true;
+    }
+
+    private void saveToDatabase(RouletteSpinEvent event, Winner winner, String doneKey) {
+        if (isAlreadyProcessed(doneKey, event.getEventId())) {
+            return;
+        }
+
+        saveRouletteResult(event.joinCode(), winner);
+
+        redisTemplate.opsForValue()
+                .set(doneKey, "done", Duration.ofMinutes(10));
+
+        log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
+                event.getEventId(), event.joinCode(), winner.name().value());
+    }
+
+    private void releaseLock(String lockKey) {
+        redisTemplate.delete(lockKey);
     }
 
     private void saveRouletteResult(String joinCode, Winner winner) {
@@ -60,7 +115,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
 
         final PlayerEntity playerEntity = getPlayerEntity(roomEntity, winner.name().value());
 
-        RouletteResultEntity rouletteResult = new RouletteResultEntity(
+        final RouletteResultEntity rouletteResult = new RouletteResultEntity(
                 roomEntity,
                 playerEntity,
                 winner.probability()
@@ -79,5 +134,10 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
     private PlayerEntity getPlayerEntity(RoomEntity roomEntity, String playerName) {
         return playerJpaRepository.findByRoomSessionAndPlayerName(roomEntity, playerName)
                 .orElseThrow(() -> new IllegalArgumentException("PlayerEntity를 찾을 수 없습니다: " + playerName));
+    }
+
+    @Override
+    public RoomEventType getSupportedEventType() {
+        return RoomEventType.ROULETTE_SPIN;
     }
 }
