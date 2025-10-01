@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
 const meta = {
-  title: 'composition/RoundTransition',
+  title: 'Features/MiniGame/CardGame/RoundTransition',
   component: RoundTransition,
 
   tags: ['autodocs'],

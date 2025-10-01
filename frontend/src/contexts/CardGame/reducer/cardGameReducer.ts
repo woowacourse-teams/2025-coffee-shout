@@ -1,18 +1,17 @@
-import { CardGameState, CardInfo } from '@/types/miniGame/cardGame';
-import { RoundType } from '@/types/miniGame/round';
+import { CardGameRound, CardGameState, CardInfo } from '@/types/miniGame/cardGame';
 
 export type State = {
   isTransition: boolean;
-  currentRound: RoundType;
+  currentRound: CardGameRound;
   currentCardGameState: CardGameState;
   cardInfos: CardInfo[];
 };
 
 export type Action =
   | { type: 'PREPARE'; payload: { cardInfos: CardInfo[] } }
-  | { type: 'PLAYING'; payload: { cardInfos: CardInfo[]; round: RoundType } }
-  | { type: 'SCORE_BOARD'; payload: { cardInfos: CardInfo[]; round: RoundType } }
-  | { type: 'LOADING'; payload: { round: RoundType } }
+  | { type: 'PLAYING'; payload: { cardInfos: CardInfo[]; round: CardGameRound } }
+  | { type: 'SCORE_BOARD'; payload: { cardInfos: CardInfo[]; round: CardGameRound } }
+  | { type: 'LOADING'; payload: { round: CardGameRound } }
   | { type: 'DONE' };
 
 export const initialState: State = {

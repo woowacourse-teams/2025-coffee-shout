@@ -2,7 +2,7 @@ import Headline4 from '@/components/@common/Headline4/Headline4';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import PrepareOverlay from '@/features/miniGame/components/PrepareOverlay/PrepareOverlay';
 import Layout from '@/layouts/Layout';
-import RoundTransition from '../../components/RoundTransition/RoundTransition';
+import RoundTransition from '../components/RoundTransition/RoundTransition';
 import GameCardGrid from '../components/GameCardGrid/GameCardGrid';
 import PlayerCardDisplay from '../components/PlayerCardDisplay/PlayerCardDisplay';
 import RoundHeader from '../components/RoundHeader/RoundHeader';

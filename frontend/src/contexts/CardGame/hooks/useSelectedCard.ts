@@ -1,5 +1,4 @@
-import { CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
-import { RoundType } from '@/types/miniGame/round';
+import { CardGameRound, CardInfo, SelectedCardInfo } from '@/types/miniGame/cardGame';
 import { useCallback, useState } from 'react';
 
 export const useSelectedCard = (myName: string) => {
@@ -17,7 +16,7 @@ export const useSelectedCard = (myName: string) => {
   });
 
   const updateSelectedCardInfo = useCallback(
-    (cardInfoMessages: CardInfo[], round: RoundType, shouldCheckAlreadySelected = false) => {
+    (cardInfoMessages: CardInfo[], round: CardGameRound, shouldCheckAlreadySelected = false) => {
       const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
       if (!myCardInfo) return;
 
