@@ -64,8 +64,8 @@ public class RoomService {
         final String qrCodeUrl = qrCodeService.getQrCodeUrl(joinCode.getValue());
 
         // 방 생성
-        Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
-        roomCommandService.createRoom(joinCode, new PlayerName(hostName),
+        final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
+        final Room room = roomCommandService.createRoom(joinCode, new PlayerName(hostName),
                 menu, selectedMenuRequest.temperature(), qrCodeUrl);
 
         // 방 생성 후 이벤트 전달
@@ -79,7 +79,7 @@ public class RoomService {
         roomEventPublisher.publishEvent(event);
 
         // 해당 방 정보 수신
-        return roomQueryService.getByJoinCode(joinCode);
+        return room;
     }
 
     // === 비동기 메서드들 (REST Controller용) ===

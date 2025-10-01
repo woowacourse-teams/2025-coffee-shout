@@ -42,10 +42,10 @@ class RoomCommandServiceTest extends ServiceTest {
             String qrCodeUrl = "https://example.com/qr";
 
             // when
-            roomCommandService.createRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT, qrCodeUrl);
+            Room room = roomCommandService.createRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT,
+                    qrCodeUrl);
 
             // then
-            Room room = roomQueryService.getByJoinCode(joinCode);
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(room.getJoinCode()).isEqualTo(joinCode);
                 softly.assertThat(room.getPlayers()).hasSize(1);

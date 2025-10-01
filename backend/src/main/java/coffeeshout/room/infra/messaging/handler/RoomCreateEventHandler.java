@@ -29,8 +29,8 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
                     event.eventId(), event.hostName(), joinCode);
 
-            SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
-            Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
+            final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
+            final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
             roomCommandService.createRoom(
                     new JoinCode(joinCode),
