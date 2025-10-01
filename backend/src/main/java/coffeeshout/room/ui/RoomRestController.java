@@ -32,7 +32,7 @@ public class RoomRestController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomEnterRequest request) {
+    public ResponseEntity<RoomCreateResponse> createRoom(@Valid @RequestBody RoomEnterRequest request) {
         Room room = roomService.createRoom(request.playerName(), request.menu());
 
         return ResponseEntity.ok(RoomCreateResponse.from(room));

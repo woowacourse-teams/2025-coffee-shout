@@ -6,6 +6,7 @@ import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.repository.JoinCodeRepository;
 import coffeeshout.room.domain.repository.RoomRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RoomCommandService {
 
+    private final JoinCodeRepository joinCodeRepository;
     private final RoomRepository roomRepository;
     private final RoomQueryService roomQueryService;
 
@@ -49,6 +51,9 @@ public class RoomCommandService {
 
         final Room room = Room.createNewRoom(joinCode, hostName, new SelectedMenu(menu, menuTemperature));
         room.assignQrCodeUrl(qrCodeUrl);
+
+        // 방 생성 후 조인코드 저장
+        joinCodeRepository.save(joinCode);
 
         return save(room);
     }

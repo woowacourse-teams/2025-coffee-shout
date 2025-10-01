@@ -111,4 +111,27 @@ class RoomCreateEventHandlerTest extends ServiceTest {
         Room room = roomQueryService.getByJoinCode(joinCode);
         assertThat(room.getPlayers().get(0).getSelectedMenu().menu().getName()).isEqualTo(customMenuName);
     }
+
+    @Test
+    void 동일_joinCode로_이벤트가_중복_발행되어도_방은_한_번만_생성된다() {
+        // given
+        String hostName = "호스트";
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.HOT);
+        String qrCodeUrl = "https://example.com/qr";
+
+        RoomCreateEvent event = new RoomCreateEvent(
+                hostName,
+                selectedMenuRequest,
+                joinCode.getValue(),
+                qrCodeUrl
+        );
+
+        // when
+        roomCreateEventHandler.handle(event);
+        roomCreateEventHandler.handle(event); // 중복 호출
+
+        // then
+        Room room = roomQueryService.getByJoinCode(joinCode);
+        assertThat(room.getPlayers()).hasSize(1); // 호스트 한 명만 존재
+    }
 }
