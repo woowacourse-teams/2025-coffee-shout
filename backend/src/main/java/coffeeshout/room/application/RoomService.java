@@ -65,7 +65,7 @@ public class RoomService {
 
         // 방 생성
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
-        final Room room = roomCommandService.createRoom(joinCode, new PlayerName(hostName),
+        final Room room = roomCommandService.saveIfAbsentRoom(joinCode, new PlayerName(hostName),
                 menu, selectedMenuRequest.temperature(), qrCodeUrl);
 
         // 방 생성 후 이벤트 전달

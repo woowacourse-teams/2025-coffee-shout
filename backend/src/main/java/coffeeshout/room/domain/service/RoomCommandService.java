@@ -2,7 +2,6 @@ package coffeeshout.room.domain.service;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.exception.RoomDuplicationException;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -39,11 +38,11 @@ public class RoomCommandService {
         return save(room);
     }
 
-    public Room createRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature,
-                           String qrCodeUrl) throws RoomDuplicationException {
+    public Room saveIfAbsentRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature,
+                                 String qrCodeUrl) {
         if (roomRepository.existsByJoinCode(joinCode)) {
             log.warn("JoinCode[{}] 방 생성 실패 - 이미 존재하는 방", joinCode);
-            throw new RoomDuplicationException("이미 존재하는 방입니다.");
+            return roomQueryService.getByJoinCode(joinCode);
         }
 
         log.info("JoinCode[{}] 방 생성 - 호스트 이름: {}, 메뉴 정보: {}, 온도 : {} ", joinCode, hostName, menu, menuTemperature);
