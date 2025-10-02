@@ -1,4 +1,4 @@
-import { Card, SelectedCardInfo } from '@/types/miniGame/cardGame';
+import { Card, CardGameRound, SelectedCardInfo } from '@/types/miniGame/cardGame';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import * as S from './PlayerCardDisplay.styled';
@@ -8,7 +8,7 @@ type Props = {
 };
 
 const PlayerCardDisplay = ({ selectedCardInfo }: Props) => {
-  const renderPlayerCard = (round: 'FIRST' | 'SECOND') => {
+  const renderPlayerCard = (round: CardGameRound) => {
     const cardInfo = selectedCardInfo[round];
 
     if (cardInfo.isSelected) {
