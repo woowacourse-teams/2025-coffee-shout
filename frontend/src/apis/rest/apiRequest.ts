@@ -1,9 +1,9 @@
-import { ApiError, NetworkError } from './error';
+import { ApiError, ErrorDisplayMode, NetworkError } from './error';
 import { reportApiError } from '@/apis/utils/reportSentryError';
 
 const API_URL = process.env.API_URL;
 
-type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type ApiRequestOptions<TData> = {
   method?: Method;
@@ -13,6 +13,7 @@ export type ApiRequestOptions<TData> = {
     count: number;
     delay: number;
   };
+  displayMode?: ErrorDisplayMode;
 };
 
 export type ApiConfig = {
@@ -25,7 +26,13 @@ export const apiRequest = async <T, TData>(
   url: string,
   options: ApiRequestOptions<TData> = {}
 ): Promise<T> => {
-  const { method = 'GET', headers = {}, body = null, retry = { count: 0, delay: 1000 } } = options;
+  const {
+    method = 'GET',
+    headers = {},
+    body = null,
+    retry = { count: 0, delay: 1000 },
+    displayMode,
+  } = options;
 
   let requestUrl = API_URL + url;
 
@@ -68,7 +75,9 @@ export const apiRequest = async <T, TData>(
           console.warn('응답 메시지 파싱 실패', parseError);
         }
 
-        const apiError = new ApiError(response.status, errorMessage, errorData);
+        // 지정된 display가 있으면 지정된 모드를, 없으면 get일 때는 fallback, 나머지는 toast
+        const display = displayMode || (method === 'GET' ? 'fallback' : 'toast');
+        const apiError = new ApiError(response.status, errorMessage, errorData, display, method);
         reportApiError(apiError);
         throw apiError;
       }
@@ -88,7 +97,7 @@ export const apiRequest = async <T, TData>(
 
       if (error instanceof TypeError) {
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-          const networkError = new NetworkError('네트워크 연결에 실패했습니다');
+          const networkError = new NetworkError(error.message);
           reportApiError(networkError);
           throw networkError;
         }
