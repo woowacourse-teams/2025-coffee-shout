@@ -27,8 +27,7 @@ public class TapCommandEventHandler implements RacingGameEventHandler<TapCommand
             racingGameCommandService.processTap(
                     event.joinCode(),
                     event.playerName(),
-                    event.tapCount(),
-                    event.timestamp()
+                    event.tapCount()
             );
 
         } catch (Exception e) {

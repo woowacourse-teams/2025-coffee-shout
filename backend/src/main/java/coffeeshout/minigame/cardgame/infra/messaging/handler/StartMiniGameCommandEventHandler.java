@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
-import coffeeshout.minigame.cardgame.application.MiniGameCommandService;
+import coffeeshout.minigame.cardgame.application.CardGameService;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<StartMiniGameCommandEvent> {
 
-    private final MiniGameCommandService miniGameCommandService;
+    private final CardGameService cardGameService;
 
     @Override
     public void handle(StartMiniGameCommandEvent event) {
@@ -24,7 +24,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
             log.info("미니게임 시작 이벤트 수신: eventId={}, joinCode={}, hostName={}",
                     event.getEventId(), event.joinCode(), event.hostName());
 
-            miniGameCommandService.startGame(event.joinCode(), event.hostName());
+            cardGameService.startInternal(event.joinCode(), event.hostName());
 
             log.info("미니게임 시작 이벤트 처리 완료: eventId={}, joinCode={}",
                     event.getEventId(), event.joinCode());

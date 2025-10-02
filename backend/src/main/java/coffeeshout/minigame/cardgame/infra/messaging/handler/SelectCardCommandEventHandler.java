@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
-import coffeeshout.minigame.cardgame.application.MiniGameCommandService;
+import coffeeshout.minigame.cardgame.application.CardGameService;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelectCardCommandEventHandler implements MiniGameEventHandler<SelectCardCommandEvent> {
 
-    private final MiniGameCommandService miniGameCommandService;
+    private final CardGameService cardGameService;
 
     @Override
     public void handle(SelectCardCommandEvent event) {
@@ -24,7 +24,7 @@ public class SelectCardCommandEventHandler implements MiniGameEventHandler<Selec
             log.debug("카드 선택 이벤트 수신: eventId={}, joinCode={}, playerName={}, cardIndex={}",
                     event.getEventId(), event.joinCode(), event.playerName(), event.cardIndex());
 
-            miniGameCommandService.selectCard(event.joinCode(), event.playerName(), event.cardIndex());
+            cardGameService.selectCardInternal(event.joinCode(), event.playerName(), event.cardIndex());
 
             log.debug("카드 선택 이벤트 처리 완료: eventId={}, joinCode={}",
                     event.getEventId(), event.joinCode());

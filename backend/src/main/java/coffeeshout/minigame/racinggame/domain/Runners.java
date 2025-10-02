@@ -4,10 +4,12 @@ import coffeeshout.room.domain.player.Player;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class Runners {
 
@@ -18,43 +20,42 @@ public class Runners {
         players.forEach(player -> runners.add(new Runner(player)));
     }
 
-    public void adjustSpeed(Player player, int tapCount, Instant timestamp) {
-        Runner runner = findRunnerByPlayer(player);
-        runner.adjustSpeed(tapCount, timestamp);
+    public void adjustSpeed(Player player, int tapCount) {
+        final Runner runner = findRunnerByPlayer(player);
+        runner.adjustSpeed(tapCount);
     }
 
     public void moveAll() {
         runners.forEach(Runner::move);
     }
 
-    public Optional<Player> findWinner() {
+
+    public Optional<Runner> findWinner() {
         return runners.stream()
                 .filter(Runner::isFinished)
-                .map(Runner::getPlayer)
-                .findFirst();
+                .max(Comparator.comparing(Runner::getFinishTime));
     }
 
     public boolean hasWinner() {
         return findWinner().isPresent();
     }
 
-    public List<Player> getRanking() {
+    public List<Runner> getRanking() {
         return runners.stream()
                 .filter(Runner::isFinished)
-                .sorted((r1, r2) -> r1.getFinishTime().compareTo(r2.getFinishTime()))
-                .map(Runner::getPlayer)
+                .sorted(Comparator.comparing(Runner::getFinishTime))
                 .toList();
     }
 
-    public Map<Player, Integer> getPositions() {
-        Map<Player, Integer> positions = new LinkedHashMap<>();
-        runners.forEach(runner -> positions.put(runner.getPlayer(), runner.getPosition()));
+    public Map<Runner, Integer> getPositions() {
+        Map<Runner, Integer> positions = new LinkedHashMap<>();
+        runners.forEach(runner -> positions.put(runner, runner.getPosition()));
         return positions;
     }
 
-    public Map<Player, Integer> getSpeeds() {
-        Map<Player, Integer> speeds = new LinkedHashMap<>();
-        runners.forEach(runner -> speeds.put(runner.getPlayer(), runner.getSpeed()));
+    public Map<Runner, Integer> getSpeeds() {
+        Map<Runner, Integer> speeds = new LinkedHashMap<>();
+        runners.forEach(runner -> speeds.put(runner, runner.getSpeed()));
         return speeds;
     }
 
@@ -67,5 +68,9 @@ public class Runners {
                 .filter(runner -> runner.getPlayer().equals(player))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 플레이어의 러너를 찾을 수 없습니다."));
+    }
+
+    public Stream<Runner> stream() {
+        return runners.stream();
     }
 }

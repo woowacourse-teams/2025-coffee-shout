@@ -5,22 +5,33 @@ import coffeeshout.minigame.cardgame.domain.MiniGameScore;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.Getter;
+import org.springframework.scheduling.TaskScheduler;
 
 @Getter
 public class RacingGame implements Playable {
 
-    private static final long MOVE_INTERVAL_MILLIS = 100L;
+    public static final int INITIAL_SPEED = 5;
+    public static final int MIN_SPEED = 1;
+    public static final int MAX_SPEED = 10;
+    public static final int FINISH_LINE = 1000;
+    public static final int START_LINE = 0;
+    public static final double CLICKS_PER_SECOND_THRESHOLD = 10.0;
+
+    public static final long MOVE_INTERVAL_MILLIS = 100L;
 
     private Runners runners;
     private RacingGameState state;
-    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> autoMoveFuture;
 
     public RacingGame() {
         this.state = RacingGameState.READY;
@@ -30,36 +41,32 @@ public class RacingGame implements Playable {
     public void startGame(List<Player> players) {
         this.runners = new Runners(players);
         this.state = RacingGameState.PLAYING;
-        startAutoMove();
     }
 
-    private void startAutoMove() {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                if (state == RacingGameState.PLAYING) {
-                    runners.moveAll();
-                    if (runners.isAllFinished()) {
-                        stopAutoMove();
-                        this.state = RacingGameState.FINISHED;
-                    }
-                }
-            } catch (Exception e) {
-                // 예외 발생 시 스케줄러 중단
-                stopAutoMove();
-            }
-        }, MOVE_INTERVAL_MILLIS, MOVE_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
+    public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
+        this.autoMoveFuture = autoMoveFuture;
     }
 
-    private void stopAutoMove() {
-        if (scheduler != null && !scheduler.isShutdown()) {
-            scheduler.shutdown();
+    public void moveAll() {
+        runners.moveAll();
+        if (runners.isAllFinished()) {
+            this.state = RacingGameState.FINISHED;
         }
     }
 
-    public void adjustSpeed(Player player, int tapCount, Instant timestamp) {
+    public boolean isStarted() {
+        return state == RacingGameState.PLAYING;
+    }
+
+    public void stopAutoMove() {
+        if (autoMoveFuture != null && !autoMoveFuture.isDone()) {
+            autoMoveFuture.cancel(true);
+        }
+    }
+
+    public void adjustSpeed(Player player, int tapCount) {
         validatePlaying();
-        runners.adjustSpeed(player, tapCount, timestamp);
+        runners.adjustSpeed(player, tapCount);
     }
 
     private void validatePlaying() {
@@ -75,11 +82,12 @@ public class RacingGame implements Playable {
 
     @Override
     public Map<Player, MiniGameScore> getScores() {
-        Map<Player, Integer> positions = runners.getPositions();
-        return positions.entrySet().stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> new MiniGameScore(entry.getValue())
+        final List<Runner> positions = runners.getRanking();
+
+        return positions.stream()
+                .collect(Collectors.toMap(
+                        Runner::getPlayer,
+                        entry -> new RacingGameScore(entry.getFinishTime())
                 ));
     }
 
@@ -89,16 +97,17 @@ public class RacingGame implements Playable {
     }
 
     public List<Player> getRanking() {
-        return runners.getRanking();
+        return runners.getRanking().stream().map(Runner::getPlayer).toList();
     }
 
-    public Map<Player, Integer> getPositions() {
+    public Map<Runner, Integer> getPositions() {
         return runners.getPositions();
     }
 
-    public Map<Player, Integer> getSpeeds() {
+    public Map<Runner, Integer> getSpeeds() {
         return runners.getSpeeds();
     }
+
 
     public boolean isFinished() {
         return state == RacingGameState.FINISHED;
