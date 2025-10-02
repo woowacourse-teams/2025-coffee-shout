@@ -3,12 +3,12 @@ import CardGameDescription2 from '@/assets/card_game_desc2.svg';
 import { MiniGameType } from '@/types/miniGame/common';
 
 type SlideConfig = {
-  textLines: readonly string[];
+  textLines: string[];
   imageSrc: string;
   className: string;
 };
 
-const CARD_GAME_SLIDES: readonly SlideConfig[] = [
+const CARD_GAME_SLIDES: SlideConfig[] = [
   {
     textLines: ['각 라운드마다', '카드 1장을 선택하세요'],
     imageSrc: CardGameDescription1,
@@ -21,10 +21,10 @@ const CARD_GAME_SLIDES: readonly SlideConfig[] = [
   },
 ] as const;
 
-export const GAME_SLIDE_CONFIGS: Record<MiniGameType, readonly SlideConfig[]> = {
+export const GAME_SLIDE_CONFIGS: Record<MiniGameType, SlideConfig[]> = {
   CARD_GAME: CARD_GAME_SLIDES,
 } as const;
 
-export const getGameSlideConfig = (gameType: MiniGameType): readonly SlideConfig[] => {
+export const getGameSlideConfig = (gameType: MiniGameType): SlideConfig[] => {
   return GAME_SLIDE_CONFIGS[gameType];
 };

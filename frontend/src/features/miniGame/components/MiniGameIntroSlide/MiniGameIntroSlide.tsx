@@ -2,7 +2,7 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import * as S from './MiniGameIntroSlide.styled';
 
 type Props = {
-  textLines: readonly string[];
+  textLines: string[];
   imageSrc: string;
   className: string;
 };
