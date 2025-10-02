@@ -15,10 +15,6 @@ const CardGamePlayPage = () => {
   const { selectCard } = useCardGameActions();
   const { currentTime, isTimerActive, roundTotalTime } = useCardGameTimer();
 
-  if (isTransition) {
-    return <RoundTransition currentRound={currentRound} />;
-  }
-
   const showPrepareOverlay = currentCardGameState === 'PREPARE';
   const isCardClickDisabled =
     currentCardGameState === 'PREPARE' || currentCardGameState === 'SCORE_BOARD';
@@ -27,6 +23,10 @@ const CardGamePlayPage = () => {
     if (isCardClickDisabled) return;
     selectCard(cardIndex);
   };
+
+  if (isTransition) {
+    return <RoundTransition currentRound={currentRound} />;
+  }
 
   return (
     <Layout>
