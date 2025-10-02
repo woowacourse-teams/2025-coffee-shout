@@ -33,7 +33,7 @@ public class MiniGameResultEntity {
     @JoinColumn(name = "player_id", nullable = false)
     private PlayerEntity player;
 
-    @Column(nullable = false)
+    @Column(name = "player_rank", nullable = false)
     private Integer rank;
 
     @Column
