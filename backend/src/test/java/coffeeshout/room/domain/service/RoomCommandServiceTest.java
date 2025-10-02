@@ -1,11 +1,13 @@
 package coffeeshout.room.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.exception.RoomDuplicationException;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.player.PlayerName;
 import org.assertj.core.api.SoftAssertions;
@@ -58,21 +60,18 @@ class RoomCommandServiceTest extends ServiceTest {
         }
 
         @Test
-        void 이미_존재하는_조인코드로_방을_생성하면_저장하지_않는다() {
+        void 이미_존재하는_조인코드로_방을_생성하면_예외가_발생한다() {
             // given
             PlayerName hostName1 = new PlayerName("호스트1");
             PlayerName hostName2 = new PlayerName("호스트2");
 
-            // when
             roomCommandService.createRoom(joinCode, hostName1, MenuFixture.아메리카노(), MenuTemperature.HOT, "qr1");
-            roomCommandService.createRoom(joinCode, hostName2, MenuFixture.라떼(), MenuTemperature.ICE, "qr2");
 
-            // then
-            Room room = roomQueryService.getByJoinCode(joinCode);
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(room.getPlayers()).hasSize(1);
-                softly.assertThat(room.getPlayers().get(0).getName()).isEqualTo(hostName1);
-            });
+            // when & then
+            assertThatThrownBy(() ->
+                    roomCommandService.createRoom(joinCode, hostName2, MenuFixture.라떼(), MenuTemperature.ICE, "qr2"))
+                    .isInstanceOf(RoomDuplicationException.class)
+                    .hasMessage("이미 존재하는 방입니다.");
         }
     }
 

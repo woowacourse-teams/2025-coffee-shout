@@ -5,6 +5,7 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
+import coffeeshout.room.domain.exception.RoomDuplicationException;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.MenuCommandService;
@@ -25,8 +26,9 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
 
     @Override
     public void handle(RoomCreateEvent event) {
+        String joinCode = event.joinCode();
+
         try {
-            String joinCode = event.joinCode();
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
                     event.eventId(), event.hostName(), joinCode);
 
@@ -47,6 +49,11 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
                     room.getJoinCode().getValue(),
                     room.getJoinCode().getQrCodeUrl()
             );
+
+            delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
+        } catch (RoomDuplicationException e) {
+            log.warn("이미 존재하는 방 생성 이벤트 무시: eventId={}, joinCode={}",
+                    event.eventId(), event.joinCode());
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
         } catch (Exception e) {

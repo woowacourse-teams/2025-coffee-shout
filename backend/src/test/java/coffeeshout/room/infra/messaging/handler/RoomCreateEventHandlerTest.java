@@ -113,7 +113,7 @@ class RoomCreateEventHandlerTest extends ServiceTest {
     }
 
     @Test
-    void 동일_joinCode로_이벤트가_중복_발행되어도_방은_한_번만_생성된다() {
+    void 동일_joinCode로_이벤트가_중복_발행되어도_방은_한_번만_생성되고_스케줄러는_두_번_호출된다() {
         // given
         String hostName = "호스트";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.HOT);
@@ -132,6 +132,9 @@ class RoomCreateEventHandlerTest extends ServiceTest {
 
         // then
         Room room = roomQueryService.getByJoinCode(joinCode);
-        assertThat(room.getPlayers()).hasSize(1); // 호스트 한 명만 존재
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(room.getPlayers()).hasSize(1); // 호스트 한 명만 존재
+        });
+        verify(delayedRoomRemovalService, org.mockito.Mockito.times(2)).scheduleRemoveRoom(joinCode);
     }
 }
