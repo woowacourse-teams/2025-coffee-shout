@@ -9,6 +9,7 @@ import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
 import { Suspense } from 'react';
+import GlobalErrorBoundary from './apis/error/GlobalErrorBoundary';
 
 const App = () => {
   return (
@@ -20,9 +21,11 @@ const App = () => {
               <ProbabilityHistoryProvider>
                 <ToastProvider>
                   <ModalProvider>
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Outlet />
-                    </Suspense>
+                    <GlobalErrorBoundary>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Outlet />
+                      </Suspense>
+                    </GlobalErrorBoundary>
                   </ModalProvider>
                 </ToastProvider>
               </ProbabilityHistoryProvider>
