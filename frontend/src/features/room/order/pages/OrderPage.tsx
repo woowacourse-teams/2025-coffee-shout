@@ -31,6 +31,7 @@ const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { stopSocket, isConnected } = useWebSocket();
+  const winner = location.state?.winner ?? '알 수 없는 사용자';
 
   const [viewMode, setViewMode] = useState<ViewMode>('simple');
   const { title, buttonText, ViewComponent } = VIEW_MODE_CONFIG[viewMode];
@@ -54,7 +55,7 @@ const OrderPage = () => {
       <Layout.Banner>
         <S.BannerContent>
           <S.Logo src={BreadLogoWhiteIcon} />
-          <Headline1 color="white">{location.state?.winner}</Headline1>
+          <Headline1 color="white">{winner}</Headline1>
           <Headline3 color="white">님이 당첨되었습니다!</Headline3>
         </S.BannerContent>
       </Layout.Banner>
