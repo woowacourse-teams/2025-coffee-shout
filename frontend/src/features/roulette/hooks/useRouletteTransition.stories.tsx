@@ -15,12 +15,13 @@ const RouletteTransitionDemo = ({
   const [current, setCurrent] = useState<PlayerProbability[] | null>(targetData);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const animatedSectors = useRouletteTransition(prev, current);
+  const { animatedSectors, startAnimation } = useRouletteTransition(prev, current);
 
   const handleStartAnimation = () => {
     setPrev(current);
     setCurrent(targetData);
     setIsAnimating(true);
+    startAnimation(); // 명시적으로 애니메이션 시작
 
     // 애니메이션 완료 후 상태 리셋
     setTimeout(() => {

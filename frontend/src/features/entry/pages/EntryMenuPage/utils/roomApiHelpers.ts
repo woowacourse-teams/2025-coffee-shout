@@ -2,7 +2,7 @@ import { Menu, TemperatureOption } from '@/types/menu';
 import { PlayerType } from '@/types/player';
 import { RoomRequest } from '../hooks/useRoomManagement';
 
-const JOIN_CODE_LENGTH = 5;
+const JOIN_CODE_LENGTH = 4;
 
 export const createRoomRequestBody = (
   playerName: string,

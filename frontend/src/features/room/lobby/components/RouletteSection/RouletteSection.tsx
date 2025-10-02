@@ -34,6 +34,10 @@ const renderContent = (currentView: RouletteView, playerProbabilities: PlayerPro
       return <ProbabilityList playerProbabilities={playerProbabilities} />;
     case 'roulette':
     default:
-      return <RouletteWheel playerProbabilities={playerProbabilities} />;
+      return (
+        <S.RouletteWheelWrapper>
+          <RouletteWheel playerProbabilities={playerProbabilities} />
+        </S.RouletteWheelWrapper>
+      );
   }
 };
