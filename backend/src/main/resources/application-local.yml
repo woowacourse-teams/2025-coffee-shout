@@ -7,12 +7,33 @@ spring:
     compose:
       enabled: true
       file: docker-compose.yml
+      lifecycle-management: start_and_stop
   data:
     redis:
       host: localhost
       ssl:
         enabled: false
 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus,tracing"
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+      export:
+        enabled: true
+  metrics:
+    enable:
+      tomcat: true
 
 room:
   qr:

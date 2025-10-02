@@ -12,8 +12,8 @@ import lombok.NonNull;
 @Getter
 public final class JoinCode {
 
-    private static final String CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    private static final int CODE_LENGTH = 5;
+    private static final String CHARSET = "ABCDFGHJKLMNPQRSTUVWXYZ346789";
+    private static final int CODE_LENGTH = 4;
 
     private final String value;
     private String qrCodeUrl;

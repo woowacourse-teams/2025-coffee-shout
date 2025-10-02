@@ -40,7 +40,7 @@ public class Room {
     public Room(JoinCode joinCode, PlayerName hostName, SelectedMenu selectedMenu) {
         this.joinCode = joinCode;
         this.host = Player.createHost(hostName, selectedMenu);
-        this.players = new Players();
+        this.players = new Players(joinCode.getValue());
         this.roomState = RoomState.READY;
         this.miniGames = new LinkedList<>();
         this.finishedGames = new ArrayList<>();
@@ -90,9 +90,7 @@ public class Room {
     public Winner spinRoulette(Player host, Roulette roulette) {
         isTrue(isHost(host), "호스트만 룰렛을 돌릴 수 있습니다.");
         state(hasEnoughPlayers(), "룰렛은 2~9명의 플레이어가 참여해야 시작할 수 있습니다.");
-        state(isPlayingState(), "게임 중일때만 룰렛을 돌릴 수 있습니다.");
-        // TODO 룰렛을 돌리기 전에 모든 게임들을 플레이해야 한다.
-
+        state(roomState == RoomState.ROULETTE, "게임이 끝나야만 룰렛을 돌릴 수 있습니다.");
         final Winner winner = roulette.spin(players);
         roomState = RoomState.DONE;
         return winner;
@@ -185,6 +183,14 @@ public class Room {
         return roomState == RoomState.READY;
     }
 
+    public void assignQrCodeUrl(String qrCodeUrl) {
+        joinCode.assignQrCodeUrl(qrCodeUrl);
+    }
+
+    public void showRoulette() {
+        this.roomState = RoomState.ROULETTE;
+    }
+
     private boolean hasEnoughPlayers() {
         return players.hasEnoughPlayers(MINIMUM_GUEST_COUNT, MAXIMUM_GUEST_COUNT);
     }
@@ -224,9 +230,5 @@ public class Room {
         final Player newHost = players.getRandomPlayer();
         newHost.promote();
         this.host = newHost;
-    }
-
-    public void assignQrCodeUrl(String qrCodeUrl) {
-        joinCode.assignQrCodeUrl(qrCodeUrl);
     }
 }

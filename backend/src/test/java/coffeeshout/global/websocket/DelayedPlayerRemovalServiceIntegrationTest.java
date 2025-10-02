@@ -55,7 +55,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         void 지연시간_후_실제로_PlayerDisconnectionService가_호출된다() {
             // given
             given(roomService.isReadyState("ABC23")).willReturn(true);
-            
+
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
@@ -96,7 +96,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             String player1 = "ABC23:김철수";
             String player2 = "DEF56:박영희";
             String player3 = "GHI89:이민수";
-            
+
             given(roomService.isReadyState("ABC23")).willReturn(true);
             given(roomService.isReadyState("DEF56")).willReturn(true);
             given(roomService.isReadyState("GHI89")).willReturn(true);
@@ -126,7 +126,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         void 실행_완료된_태스크는_맵에서_자동_제거된다() {
             // given
             given(roomService.isReadyState("ABC23")).willReturn(true);
-            
+
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 

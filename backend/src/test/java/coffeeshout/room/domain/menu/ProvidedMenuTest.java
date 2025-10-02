@@ -1,10 +1,10 @@
 package coffeeshout.room.domain.menu;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import coffeeshout.fixture.MenuCategoryFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ProvidedMenuTest {
 

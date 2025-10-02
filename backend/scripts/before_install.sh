@@ -21,4 +21,7 @@ fi
 sudo mkdir -p /opt/coffee-shout/{app,scripts,logs}
 sudo chown -R ubuntu:ubuntu /opt/coffee-shout
 
+# 기존 JAR 파일 삭제 (새 인스턴스 대응)
+sudo rm -f /opt/coffee-shout/app/coffee-shout-backend.jar
+
 echo "=== [BEFORE_INSTALL] 완료 ==="

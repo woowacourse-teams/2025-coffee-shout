@@ -22,17 +22,26 @@ public class TestDataHelper {
     @Autowired
     private MenuRepository menuRepository;
 
-    public Room createDummyRoom(String joinCode, String hostName) {
+    public Room createDummyRoom(JoinCode joinCode, PlayerName hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName), new SelectedMenu(menu, MenuTemperature.ICE));
+        Room room = new Room(joinCode, hostName, new SelectedMenu(menu, MenuTemperature.ICE));
         return roomRepository.save(room);
     }
 
-    public Room createDummyPlayingRoom(String joinCode, String hostName) {
+    public Room createDummyPlayingRoom(JoinCode joinCode, PlayerName hostName) {
         Menu menu = menuRepository.findById(1L).orElseThrow();
-        Room room = new Room(new JoinCode(joinCode), new PlayerName(hostName), new SelectedMenu(menu, MenuTemperature.ICE));
+        Room room = new Room(joinCode, hostName,
+                new SelectedMenu(menu, MenuTemperature.ICE));
         ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
         return roomRepository.save(room);
+    }
+
+    public Room createDummyRoom(String joinCode, String hostName) {
+        return createDummyRoom(new JoinCode(joinCode), new PlayerName(hostName));
+    }
+
+    public Room createDummyPlayingRoom(String joinCode, String hostName) {
+        return createDummyPlayingRoom(new JoinCode(joinCode), new PlayerName(hostName));
     }
 }
 

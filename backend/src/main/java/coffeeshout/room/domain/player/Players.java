@@ -17,12 +17,12 @@ public class Players {
     private final List<Player> players;
     private final ColorUsage colorUsage;
 
-    public Players() {
+    public Players(String joinCode) {
         this.players = Collections.synchronizedList(new ArrayList<>());
-        this.colorUsage = new ColorUsage();
+        this.colorUsage = new ColorUsage(joinCode);
     }
 
-    public Player join(Player player) {
+    public synchronized Player join(Player player) {
         player.assignColorIndex(colorUsage.pickRandomOne());
         player.updateProbability(Probability.ZERO);
         this.players.add(player);
@@ -66,7 +66,7 @@ public class Players {
                 .allMatch(Player::getIsReady);
     }
 
-    public boolean removePlayer(PlayerName playerName) {
+    public synchronized boolean removePlayer(PlayerName playerName) {
         return players.removeIf(player -> {
             if (player.sameName(playerName)) {
                 colorUsage.release(player.getColorIndex());

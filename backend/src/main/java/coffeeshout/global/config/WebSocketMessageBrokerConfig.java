@@ -1,34 +1,42 @@
 package coffeeshout.global.config;
 
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
+import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final TaskScheduler taskScheduler;
-    private final ChannelInterceptor channelInterceptor;
-
-    public WebSocketMessageBrokerConfig(@Qualifier("webSocketHeartBeatScheduler") TaskScheduler taskScheduler,
-                                        ChannelInterceptor channelInterceptor) {
-        this.taskScheduler = taskScheduler;
-        this.channelInterceptor = channelInterceptor;
-    }
+    private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
+    private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
+    private final ObservationRegistry observationRegistry;
+    private final ContextSnapshotFactory snapshotFactory;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
+        ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
+        heartbeatScheduler.setPoolSize(1);
+        heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
+        heartbeatScheduler.initialize();
+
         config.enableSimpleBroker("/topic/", "/queue/")
                 .setHeartbeatValue(new long[]{4000, 4000})
-                .setTaskScheduler(taskScheduler);
+                .setTaskScheduler(heartbeatScheduler);
 
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -42,6 +50,38 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(channelInterceptor);
+        registration.interceptors(webSocketInboundMetricInterceptor)
+                .taskExecutor()
+                .corePoolSize(8)
+                .maxPoolSize(16)
+                .queueCapacity(8192)
+                .keepAliveSeconds(60);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketOutboundMetricInterceptor);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setThreadNamePrefix("outbound-");
+        executor.setTaskDecorator(runnable -> {
+            final ContextSnapshot snapshot = snapshotFactory.captureAll();
+            return snapshot.wrap(() -> {
+                final Observation parent = observationRegistry.getCurrentObservation();
+                if (parent != null) {
+                    Observation.createNotStarted("websocket.outbound", observationRegistry)
+                            .parentObservation(parent)
+                            .lowCardinalityKeyValue("thread", Thread.currentThread().getName())
+                            .observeChecked(runnable::run);
+                } else {
+                    runnable.run();
+                }
+            });
+        });
+        executor.setCorePoolSize(18);
+        executor.setMaxPoolSize(64);
+        executor.setQueueCapacity(8192);
+        executor.setKeepAliveSeconds(60);
+        executor.initialize();
+        registration.taskExecutor(executor);
     }
 }

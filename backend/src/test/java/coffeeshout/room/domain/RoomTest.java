@@ -24,7 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 class RoomTest {
 
-    private final JoinCode joinCode = new JoinCode("ABCDF");
+    private final JoinCode joinCode = new JoinCode("ABCD");
     private final Roulette roulette = RouletteFixture.고정_끝값_반환();
     private final PlayerName 호스트_한스 = new PlayerName("한스");
     private final PlayerName 게스트_루키 = new PlayerName("루키");
@@ -142,7 +142,7 @@ class RoomTest {
     @Test
     void 미니게임을_제거한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator(), 1234L);
         room.addMiniGame(호스트_한스, cardGame);
 
         // when
@@ -170,7 +170,7 @@ class RoomTest {
         room.joinGuest(게스트_루키, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
-        ReflectionTestUtils.setField(room, "roomState", RoomState.PLAYING);
+        ReflectionTestUtils.setField(room, "roomState", RoomState.ROULETTE);
         Player host = room.findPlayer(호스트_한스);
 
         Winner winner = room.spinRoulette(host, roulette);
@@ -243,7 +243,7 @@ class RoomTest {
     @Test
     void 호스트가_아니면_미니게임을_제거할_수_없다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator(), 1234L);
         room.addMiniGame(호스트_한스, cardGame);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
@@ -255,7 +255,7 @@ class RoomTest {
     @Test
     void 미니게임을_시작한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator(), 1234L);
         room.addMiniGame(호스트_한스, cardGame);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
@@ -272,7 +272,7 @@ class RoomTest {
     @Test
     void 게임_시작_시_모든_플레이어가_레디_상태가_아니면_예외가_발생한다() {
         // given
-        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator());
+        CardGame cardGame = new CardGame(new CardGameRandomDeckGenerator(), 1234L);
         room.addMiniGame(호스트_한스, cardGame);
         room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
         Player host = room.getHost();
