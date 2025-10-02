@@ -1,5 +1,7 @@
 package coffeeshout.global.lock;
 
+import java.lang.reflect.Method;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,14 +16,10 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-import java.time.Duration;
-
 /**
  * Redis 분산 락 AOP
- * 
- * @RedisLock 어노테이션이 붙은 메서드 실행 전에 락을 획득하고,
- * 실행 후 락을 해제함
+ *
+ * @RedisLock 어노테이션이 붙은 메서드 실행 전에 락을 획득하고, 실행 후 락을 해제함
  */
 @Slf4j
 @Aspect
@@ -92,7 +90,7 @@ public class RedisLockAspect {
     }
 
     private boolean isAlreadyProcessed(String doneKey) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(doneKey));
+        return redisTemplate.hasKey(doneKey);
     }
 
     private boolean acquireLock(String lockKey, long leaseTime) {
