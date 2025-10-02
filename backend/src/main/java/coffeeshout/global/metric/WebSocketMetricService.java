@@ -44,6 +44,7 @@ public class WebSocketMetricService {
 
         this.connectionEstablishmentTimer = Timer.builder("websocket.connection.establishment.time")
                 .description("웹소켓 연결 수립 시간")
+		.publishPercentileHistogram()
                 .register(meterRegistry);
         this.inboundMessageCounter = Counter.builder("websocket.messages.inbound.total")
                 .description("인바운드 메시지 총 개수")
@@ -53,9 +54,11 @@ public class WebSocketMetricService {
                 .register(meterRegistry);
         this.inboundMessageTimer = Timer.builder("websocket.message.inbound.time")
                 .description("웹소켓 inbound 메시지 처리 시간")
+		.publishPercentileHistogram()
                 .register(meterRegistry);
         this.outboundMessageTimer = Timer.builder("websocket.message.outbound.time")
                 .description("웹소켓 outbound 메시지 처리 시간")
+		.publishPercentileHistogram()
                 .register(meterRegistry);
     }
 
