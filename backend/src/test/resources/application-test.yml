@@ -11,6 +11,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: false
+  flyway:
+    enabled: false
   cloud:
     aws:
       region:
