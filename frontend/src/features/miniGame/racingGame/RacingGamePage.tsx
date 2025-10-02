@@ -11,16 +11,20 @@ import RacingProgressBar from './components/RacingProgressBar/RacingProgressBar'
 import { useGoalDisplay } from './hooks/useGoalDisplay';
 import { useBackgroundAnimation } from './hooks/useBackgroundAnimation';
 import { usePlayerData } from './hooks/usePlayerData';
+import { getVisiblePlayers } from './utils/getVisiblePlayers';
+import RacingGameOverlay from './components/RacingGameOverlay/RacingGameOverlay';
 // import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 
-const myName = '정민수';
+const myName = '김철수';
 
 const RacingGamePage = () => {
   const { racingGameState, racingGameData } = useRacingGameMock();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
+
   const { myX, mySpeed } = usePlayerData({
-    players: racingGameData.players,
+    players: visiblePlayers,
     myName,
   });
 
@@ -51,33 +55,35 @@ const RacingGamePage = () => {
       {racingGameState === 'READY' && <PrepareOverlay />}
       {racingGameState === 'FINISH' && <Finish />}
       {showGoal && <Goal />}
-      <S.Container ref={containerRef}>
-        <RacingRank players={racingGameData.players} myName={myName} />
-        <RacingProgressBar
-          myName={myName}
-          endDistance={racingGameData.distance.end}
-          players={racingGameData.players}
-        />
-        <S.ContentWrapper>
-          <S.PlayersWrapper>
-            {/* 출발선 */}
-            <RacingLine x={0} myX={myX} />
-            {/* 도착선 */}
-            <RacingLine x={1000} myX={myX} />
-            {racingGameData.players.map((player, index) => (
-              <RacingPlayer
-                key={player.playerName}
-                playerName={player.playerName}
-                x={player.x}
-                speed={player.speed}
-                isMe={player.playerName === myName}
-                myX={myX}
-                colorIndex={index}
-              />
-            ))}
-          </S.PlayersWrapper>
-        </S.ContentWrapper>
-      </S.Container>
+      <RacingGameOverlay>
+        <S.Container ref={containerRef}>
+          <RacingRank players={racingGameData.players} myName={myName} />
+          <RacingProgressBar
+            myName={myName}
+            endDistance={racingGameData.distance.end}
+            players={racingGameData.players}
+          />
+          <S.ContentWrapper>
+            <S.PlayersWrapper>
+              {/* 출발선 */}
+              <RacingLine x={0} myX={myX} />
+              {/* 도착선 */}
+              <RacingLine x={1000} myX={myX} />
+              {visiblePlayers.map((player, index) => (
+                <RacingPlayer
+                  key={player.playerName}
+                  playerName={player.playerName}
+                  x={player.x}
+                  speed={player.speed}
+                  isMe={player.playerName === myName}
+                  myX={myX}
+                  colorIndex={index}
+                />
+              ))}
+            </S.PlayersWrapper>
+          </S.ContentWrapper>
+        </S.Container>
+      </RacingGameOverlay>
     </>
   );
 };

@@ -15,6 +15,8 @@ export const useBackgroundAnimation = ({ containerRef, mySpeed }: Props) => {
     let lastTime = performance.now();
 
     const update = (time: number) => {
+      //delta : 현재 프레임과 이전 프레임의 시간 차이
+      //일정한 속도로 애니메이션을 진행하기 위해 필요
       const delta = (time - lastTime) / 1000; // 초 단위
       lastTime = time;
 
