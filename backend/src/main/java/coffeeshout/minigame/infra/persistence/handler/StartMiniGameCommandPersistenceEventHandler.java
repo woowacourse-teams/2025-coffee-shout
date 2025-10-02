@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -18,6 +19,7 @@ public class StartMiniGameCommandPersistenceEventHandler {
     private final RedisTemplate<String, String> redisTemplate;
 
     @EventListener
+    @Transactional
     public void handle(StartMiniGameCommandEvent event) {
         final String lockKey = "event:lock:" + event.eventId();
         final String doneKey = "event:done:" + event.eventId();

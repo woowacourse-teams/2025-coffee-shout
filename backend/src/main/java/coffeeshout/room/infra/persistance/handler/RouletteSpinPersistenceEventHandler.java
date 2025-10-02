@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -27,6 +28,7 @@ public class RouletteSpinPersistenceEventHandler {
     private final RedisTemplate<String, String> redisTemplate;
 
     @EventListener
+    @Transactional
     void handle(RouletteSpinEvent event) {
         final Winner winner = event.winner();
 

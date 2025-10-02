@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -35,6 +36,7 @@ public class MiniGameResultSaveEventHandler {
     private final RedisTemplate<String, String> redisTemplate;
 
     @EventListener
+    @Transactional
     public void handle(CardGameStateChangedEvent event) {
         if (event.currentTask() != CardGameTaskType.GAME_FINISH_STATE) {
             return;
