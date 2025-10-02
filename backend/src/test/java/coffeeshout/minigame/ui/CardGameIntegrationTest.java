@@ -54,17 +54,6 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
         session = createSession();
     }
 
-    @AfterEach
-    void tearDown(@Autowired RoomJpaRepository roomJpaRepository,
-                  @Autowired MiniGameJpaRepository miniGameJpaRepository,
-                  @Autowired MiniGameResultJpaRepository miniGameResultJpaRepository,
-                  @Autowired PlayerJpaRepository playerJpaRepository) {
-        miniGameResultJpaRepository.deleteAll();
-        playerJpaRepository.deleteAll();
-        miniGameJpaRepository.deleteAll();
-        roomJpaRepository.deleteAll();
-    }
-
     @Test
     void 카드게임을_실행한다() throws JSONException {
         // given

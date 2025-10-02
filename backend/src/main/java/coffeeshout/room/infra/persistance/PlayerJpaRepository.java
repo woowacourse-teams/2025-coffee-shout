@@ -7,6 +7,4 @@ public interface PlayerJpaRepository extends Repository<PlayerEntity, Long> {
     PlayerEntity save(PlayerEntity playerEntity);
     
     Optional<PlayerEntity> findByRoomSessionAndPlayerName(RoomEntity roomSession, String playerName);
-    
-    void deleteAll();
 }

@@ -13,6 +13,4 @@ public interface MiniGameJpaRepository extends Repository<MiniGameEntity, Long> 
     List<MiniGameEntity> findByRoomSession(RoomEntity roomSession);
 
     Optional<MiniGameEntity> findByRoomSessionAndMiniGameType(RoomEntity roomSession, MiniGameType miniGameType);
-
-    void deleteAll();
 }

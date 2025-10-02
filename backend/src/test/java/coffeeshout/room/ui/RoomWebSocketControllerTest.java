@@ -61,18 +61,6 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
         session = createSession();
     }
 
-    @AfterEach
-    void tearDown(@Autowired RoomJpaRepository roomJpaRepository,
-                  @Autowired MiniGameJpaRepository miniGameJpaRepository,
-                  @Autowired PlayerJpaRepository playerJpaRepository,
-                  @Autowired RouletteResultJpaRepository rouletteResultJpaRepository) {
-        // 외래키 제약조건 때문에 최하위 자식부터 삭제
-        rouletteResultJpaRepository.deleteAll();  // RouletteResult가 Player와 Room 참조
-        playerJpaRepository.deleteAll();           // Player가 Room 참조
-        miniGameJpaRepository.deleteAll();         // MiniGame이 Room 참조
-        roomJpaRepository.deleteAll();             // Room (최상위 부모)
-    }
-
     @Test
     void 플레이어_목록을_조회한다() throws JSONException {
         // given
