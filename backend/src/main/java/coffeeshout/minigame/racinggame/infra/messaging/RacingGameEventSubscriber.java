@@ -32,11 +32,10 @@ public class RacingGameEventSubscriber implements MessageListener {
             RedisMessageListenerContainer redisMessageListenerContainer,
             ChannelTopic racingGameEventTopic
     ) {
-        this.handlers = handlers.stream()
-                .collect(Collectors.toMap(
-                        RacingGameEventHandler::getSupportedEventType,
-                        handler -> handler
-                ));
+        this.handlers = handlers.stream().collect(Collectors.toMap(
+                RacingGameEventHandler::getSupportedEventType,
+                handler -> handler
+        ));
         this.objectMapper = objectMapper;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.racingGameEventTopic = racingGameEventTopic;

@@ -9,8 +9,7 @@ import coffeeshout.global.ServiceTest;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
-import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
-import coffeeshout.room.domain.JoinCode;
+import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
@@ -73,7 +72,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         assertThat(startedGame.isStarted()).isTrue();
         assertThat(startedGame.isFinished()).isFalse();
         verify(taskScheduler).scheduleAtFixedRate(any(Runnable.class), any());
-        verify(eventPublisher).publishEvent(any(RaceStarted.class));
+        verify(eventPublisher).publishEvent(any(RaceStartedEvent.class));
     }
 
     @Test

@@ -2,6 +2,7 @@ package coffeeshout.room.ui;
 
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
@@ -31,16 +32,10 @@ public class RoomRestController {
     private final RoomService roomService;
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<RoomCreateResponse>> createRoom(@RequestBody RoomEnterRequest request) {
-        return roomService.createRoomAsync(request.playerName(), request.menu())
-                .thenApply(room -> ResponseEntity.ok(RoomCreateResponse.from(room)))
-                .exceptionally(throwable -> {
-                    final Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
-                    if (cause instanceof RuntimeException runtimeException) {
-                        throw runtimeException;
-                    }
-                    throw new RuntimeException("방 생성 실패", cause);
-                });
+    public ResponseEntity<RoomCreateResponse> createRoom(@Valid @RequestBody RoomEnterRequest request) {
+        final Room room = roomService.createRoom(request.playerName(), request.menu());
+
+        return ResponseEntity.ok(RoomCreateResponse.from(room));
     }
 
     @PostMapping("/{joinCode}")

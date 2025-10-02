@@ -3,23 +3,28 @@ package coffeeshout.minigame.cardgame.domain.cardgame.event;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
 import java.time.LocalDateTime;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
+import java.time.Instant;
 import java.util.UUID;
 
 public record SelectCardCommandEvent(
         String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
         MiniGameEventType eventType,
-        LocalDateTime createdAt,
         String joinCode,
         String playerName,
         Integer cardIndex
-) implements MiniGameBaseEvent {
+) implements MiniGameBaseEvent, Traceable {
 
-    public static SelectCardCommandEvent create(String joinCode, String playerName, Integer cardIndex) {
-        final String eventId = UUID.randomUUID().toString();
-        return new SelectCardCommandEvent(
-                eventId,
+    public SelectCardCommandEvent(String joinCode, String playerName, Integer cardIndex) {
+        this(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
                 MiniGameEventType.SELECT_CARD_COMMAND,
-                LocalDateTime.now(),
                 joinCode,
                 playerName,
                 cardIndex
@@ -27,17 +32,7 @@ public record SelectCardCommandEvent(
     }
 
     @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public MiniGameEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

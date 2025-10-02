@@ -17,7 +17,7 @@ public class SelectCardCommandHandler implements MiniGameCommandHandler<SelectCa
 
     @Override
     public void handle(String joinCode, SelectCardCommand command) {
-        final SelectCardCommandEvent event = SelectCardCommandEvent.create(joinCode, command.playerName(), command.cardIndex());
+        final SelectCardCommandEvent event = new SelectCardCommandEvent(joinCode, command.playerName(), command.cardIndex());
         cardSelectStreamProducer.broadcastCardSelect(event);
         log.info("카드 선택 이벤트 발행: joinCode={}, playerName={}, cardIndex={}, eventId={}",
                 joinCode, command.playerName(), command.cardIndex(), event.eventId());

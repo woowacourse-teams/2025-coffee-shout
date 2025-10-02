@@ -19,10 +19,10 @@ public class SessionEventPublisher {
         try {
             redisTemplate.convertAndSend(sessionEventTopic.getTopic(), event);
             log.info("세션 이벤트 발행됨: eventType={}, eventId={}",
-                    event.getEventType(), event.getEventId());
+                    event.eventType(), event.eventId());
         } catch (Exception e) {
             log.error("세션 이벤트 발행 실패: eventType={}, eventId={}",
-                    event.getEventType(), event.getEventId(), e);
+                    event.eventType(), event.eventId(), e);
             throw new RuntimeException("세션 이벤트 발행 실패", e);
         }
     }

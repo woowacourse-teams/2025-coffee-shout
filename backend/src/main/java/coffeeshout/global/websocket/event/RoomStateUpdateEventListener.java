@@ -35,7 +35,7 @@ public class RoomStateUpdateEventListener {
     }
 
     private void sendPlayerStatus(String joinCode) {
-        final PlayerListUpdateEvent event = PlayerListUpdateEvent.create(joinCode);
+        final PlayerListUpdateEvent event = new PlayerListUpdateEvent(joinCode);
         roomEventPublisher.publishEvent(event);
     }
 }

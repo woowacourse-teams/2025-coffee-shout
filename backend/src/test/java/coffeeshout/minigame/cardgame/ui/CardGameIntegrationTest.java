@@ -11,6 +11,8 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,14 +31,22 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     CardGame cardGame;
 
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
-        joinCode = new JoinCode("A4B2C");
+    void setUp(@Autowired RoomRepository roomRepository,
+               @Autowired RoomJpaRepository roomJpaRepository) throws Exception {
+        joinCode = new JoinCode("A4BX");
         Room room = RoomFixture.호스트_꾹이();
         room.getPlayers().forEach(player -> player.updateReadyState(true));
         host = room.getHost();
         cardGame = new CardGameFake(new CardGameDeckStub());
         room.addMiniGame(host.getName(), cardGame);
+
+        // MemoryRepository에 저장
         roomRepository.save(room);
+
+        // DB에 RoomEntity 저장 (Redis 이벤트 핸들러가 DB에서 조회하므로 필요)
+        RoomEntity roomEntity = new RoomEntity(joinCode.getValue());
+        roomJpaRepository.save(roomEntity);
+
         session = createSession();
     }
 

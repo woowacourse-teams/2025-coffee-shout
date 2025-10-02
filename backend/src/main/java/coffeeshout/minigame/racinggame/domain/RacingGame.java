@@ -5,6 +5,7 @@ import coffeeshout.minigame.cardgame.domain.MiniGameScore;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -77,9 +78,9 @@ public class RacingGame implements Playable {
     public Map<Player, MiniGameScore> getScores() {
         final List<Runner> ranking = runners.getRanking();
 
-        final Map<Player, MiniGameScore> scores = new java.util.LinkedHashMap<>();
+        final Map<Player, MiniGameScore> scores = new LinkedHashMap<>();
         for (int i = 0; i < ranking.size(); i++) {
-            scores.put(ranking.get(i).getPlayer(), new RacingGameScore(i + 1)); // 1등부터 시작
+            scores.put(ranking.get(i).getPlayer(), new RacingGameScore(i + 1));
         }
         return scores;
     }
@@ -100,7 +101,6 @@ public class RacingGame implements Playable {
     public Map<Runner, Integer> getSpeeds() {
         return runners.getSpeeds();
     }
-
 
     public boolean isFinished() {
         return state == RacingGameState.FINISHED;

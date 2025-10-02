@@ -47,6 +47,12 @@ SPRING_PROFILE="dev"
 export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
 echo "   🌍 환경 프로파일: $SPRING_PROFILE"
 
+# DB 연결 설정
+export SPRING_DATASOURCE_URL="jdbc:mysql://10.0.0.106:3306/coffee_shout"
+export SPRING_DATASOURCE_USERNAME="ec2_user"
+export SPRING_DATASOURCE_PASSWORD="coffee-shout_123"
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"
+
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
 nohup java $JVM_OPTS \

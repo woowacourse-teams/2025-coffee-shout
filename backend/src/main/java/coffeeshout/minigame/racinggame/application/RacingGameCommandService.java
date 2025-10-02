@@ -2,9 +2,9 @@ package coffeeshout.minigame.racinggame.application;
 
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
-import coffeeshout.minigame.racinggame.domain.event.RaceFinished;
-import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
-import coffeeshout.minigame.racinggame.domain.event.RunnersMoved;
+import coffeeshout.minigame.racinggame.domain.event.RaceFinishedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RunnersMovedEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;
@@ -40,10 +40,11 @@ public class RacingGameCommandService {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         room.startNextGame(hostName);
+
         final RacingGame racingGame = getRacingGame(room);
         startAutoMove(racingGame, joinCode);
 
-        eventPublisher.publishEvent(RaceStarted.of(racingGame, joinCode));
+        eventPublisher.publishEvent(RaceStartedEvent.of(racingGame, joinCode));
         log.info("레이싱 게임 시작 완료: joinCode={}", joinCode);
     }
 
@@ -73,13 +74,11 @@ public class RacingGameCommandService {
             }
 
             racingGame.moveAll();
+            publishRunnersMoved(racingGame, joinCode);
 
             if (racingGame.isFinished()) {
                 handleRaceFinished(racingGame, joinCode);
-                return;
             }
-
-            publishRunnersMoved(racingGame, joinCode);
         } catch (Exception e) {
             handleAutoMoveError(racingGame, e);
         }
@@ -87,12 +86,12 @@ public class RacingGameCommandService {
 
     private void handleRaceFinished(RacingGame racingGame, String joinCode) {
         racingGame.stopAutoMove();
-        eventPublisher.publishEvent(RaceFinished.of(racingGame, joinCode));
+        eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode));
         log.info("레이싱 게임 종료: joinCode={}", joinCode);
     }
 
     private void publishRunnersMoved(RacingGame racingGame, String joinCode) {
-        eventPublisher.publishEvent(RunnersMoved.from(racingGame, joinCode));
+        eventPublisher.publishEvent(RunnersMovedEvent.from(racingGame, joinCode));
     }
 
     private void handleAutoMoveError(RacingGame racingGame, Exception e) {

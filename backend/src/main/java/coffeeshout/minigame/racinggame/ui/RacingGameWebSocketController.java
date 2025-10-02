@@ -1,7 +1,7 @@
 package coffeeshout.minigame.racinggame.ui;
 
 import coffeeshout.minigame.racinggame.application.RacingGameService;
-import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
+import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
 import coffeeshout.minigame.racinggame.ui.request.StartRacingGameCommand;
 import coffeeshout.minigame.racinggame.ui.request.TapCommand;
 import generator.annotaions.MessageResponse;
@@ -26,21 +26,21 @@ public class RacingGameWebSocketController {
             description = "레이싱 게임을 시작하는 웹소켓 요청입니다. 호스트만 요청할 수 있습니다."
     )
     @MessageResponse(
-            path = "/topic/room/%s/racing-game/state",
-            returnType = RaceStarted.class
+            path = "/topic/room/{joinCode}/racing-game/state",
+            returnType = RaceStartedEvent.class
     )
     public void startGame(@DestinationVariable String joinCode, @Payload StartRacingGameCommand command) {
         racingGameService.startGame(joinCode, command.hostName());
     }
 
-    @MessageMapping("/room/{joinCode}/racinggame/tap")
+    @MessageMapping("/room/{joinCode}/racing-game/tap")
     @Operation(
             summary = "레이싱 게임 탭",
             description = "레이싱 게임에서 플레이어가 화면을 탭하는 웹소켓 요청입니다."
     )
     @MessageResponse(
-            path = "/topic/room/%s/racing-game/state",
-            returnType = RaceStarted.class
+            path = "/topic/room/{joinCode}/racing-game/state",
+            returnType = RaceStartedEvent.class
     )
     public void tap(@DestinationVariable String joinCode, @Payload TapCommand command) {
         racingGameService.tap(joinCode, command.playerName(), command.tapCount());

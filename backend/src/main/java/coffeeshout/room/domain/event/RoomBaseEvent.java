@@ -1,11 +1,12 @@
 package coffeeshout.room.domain.event;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public interface RoomBaseEvent {
-    String getEventId();
 
-    RoomEventType getEventType();
+    String eventId();
 
-    LocalDateTime getTimestamp();
+    Instant timestamp();
+
+    RoomEventType eventType();
 }

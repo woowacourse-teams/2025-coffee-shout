@@ -34,6 +34,8 @@ class DelayedRoomRemovalServiceTest {
 
     DelayedRoomRemovalService delayedRoomRemovalService;
 
+    JoinCode joinCode;
+
     @BeforeEach
     void setUp() {
         Duration removalDelay = Duration.ofMillis(100);
@@ -43,6 +45,8 @@ class DelayedRoomRemovalServiceTest {
                 removalDelay,
                 roomCommandService
         );
+
+        joinCode = new JoinCode("ABCD");
     }
 
     @Nested
@@ -51,7 +55,6 @@ class DelayedRoomRemovalServiceTest {
         @Test
         @SuppressWarnings("unchecked")
         void 정상적으로_지연_삭제를_스케줄링한다() {
-            JoinCode joinCode = new JoinCode("ABCDE");
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
 
@@ -63,8 +66,8 @@ class DelayedRoomRemovalServiceTest {
         @Test
         @SuppressWarnings("unchecked")
         void 서로_다른_방은_독립적으로_스케줄링된다() {
-            JoinCode joinCode1 = new JoinCode("ABCDE");
-            JoinCode joinCode2 = new JoinCode("FGHKJ");
+            JoinCode joinCode1 = new JoinCode("ABCD");
+            JoinCode joinCode2 = new JoinCode("FGHK");
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
 
@@ -81,7 +84,6 @@ class DelayedRoomRemovalServiceTest {
         @Test
         @SuppressWarnings("unchecked")
         void RoomCommandService가_정상_호출된다() {
-            JoinCode joinCode = new JoinCode("ABCDE");
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willAnswer(invocation -> {
                         Runnable task = invocation.getArgument(0);
@@ -97,7 +99,6 @@ class DelayedRoomRemovalServiceTest {
         @Test
         @SuppressWarnings("unchecked")
         void RoomCommandService에서_예외_발생해도_안전하게_처리한다() {
-            JoinCode joinCode = new JoinCode("ABCDE");
             willThrow(new RuntimeException("방 삭제 실패"))
                     .given(roomCommandService)
                     .delete(any(JoinCode.class));

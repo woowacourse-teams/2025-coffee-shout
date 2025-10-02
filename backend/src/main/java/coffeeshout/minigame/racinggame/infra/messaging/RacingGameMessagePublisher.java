@@ -5,9 +5,9 @@ import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
 import coffeeshout.minigame.racinggame.domain.dto.RacingGameRunnersStateResponse;
 import coffeeshout.minigame.racinggame.domain.dto.RacingGameStateResponse;
-import coffeeshout.minigame.racinggame.domain.event.RaceFinished;
-import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
-import coffeeshout.minigame.racinggame.domain.event.RunnersMoved;
+import coffeeshout.minigame.racinggame.domain.event.RaceFinishedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RunnersMovedEvent;
 import generator.annotaions.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -27,11 +27,11 @@ public class RacingGameMessagePublisher {
             returnType = WebSocketResponse.class,
             genericType = RacingGameRunnersStateResponse.class
     )
-    public void publishRunnersPosition(RunnersMoved runnersMoved) {
+    public void publishRunnersPosition(RunnersMovedEvent runnersMovedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
-                String.format(RACING_GAME_PLAYERS_POSITION_DESTINATION_FORMAT, runnersMoved.joinCode()),
+                String.format(RACING_GAME_PLAYERS_POSITION_DESTINATION_FORMAT, runnersMovedEvent.joinCode()),
                 WebSocketResponse.success(new RacingGameRunnersStateResponse(
-                        runnersMoved.racingRange(), runnersMoved.runnerPositions()
+                        runnersMovedEvent.racingRange(), runnersMovedEvent.runnerPositions()
                 ))
         );
     }
@@ -42,10 +42,10 @@ public class RacingGameMessagePublisher {
             returnType = WebSocketResponse.class,
             genericType = RacingGameState.class
     )
-    public void publishRacingGameStart(RaceStarted raceStarted) {
+    public void publishRacingGameStart(RaceStartedEvent raceStartedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
-                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceStarted.joinCode()),
-                WebSocketResponse.success(new RacingGameStateResponse(raceStarted.state()))
+                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceStartedEvent.joinCode()),
+                WebSocketResponse.success(new RacingGameStateResponse(raceStartedEvent.state()))
         );
     }
 
@@ -55,10 +55,10 @@ public class RacingGameMessagePublisher {
             returnType = WebSocketResponse.class,
             genericType = RacingGameState.class
     )
-    public void publishRacingGameFinish(RaceFinished raceFinished) {
+    public void publishRacingGameFinish(RaceFinishedEvent raceFinishedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
-                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceFinished.joinCode()),
-                WebSocketResponse.success(new RacingGameStateResponse(raceFinished.state()))
+                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceFinishedEvent.joinCode()),
+                WebSocketResponse.success(new RacingGameStateResponse(raceFinishedEvent.state()))
         );
     }
 }

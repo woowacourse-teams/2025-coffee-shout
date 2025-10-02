@@ -1,42 +1,37 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public record MiniGameSelectEvent(
         String eventId,
+        TraceInfo traceInfo,
+        Instant timestamp,
         RoomEventType eventType,
         String joinCode,
         String hostName,
-        List<MiniGameType> miniGameTypes,
-        LocalDateTime timestamp
-) implements RoomBaseEvent {
+        List<MiniGameType> miniGameTypes
+) implements RoomBaseEvent, Traceable {
 
-    public static MiniGameSelectEvent create(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        return new MiniGameSelectEvent(
+    public MiniGameSelectEvent(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
+        this(
                 UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                Instant.now(),
                 RoomEventType.MINI_GAME_SELECT,
                 joinCode,
                 hostName,
-                miniGameTypes,
-                LocalDateTime.now()
+                miniGameTypes
         );
     }
 
     @Override
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public RoomEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 }

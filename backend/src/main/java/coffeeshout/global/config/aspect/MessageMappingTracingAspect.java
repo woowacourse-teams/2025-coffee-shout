@@ -26,7 +26,7 @@ public class MessageMappingTracingAspect {
 
         final String className = method.getDeclaringClass().getSimpleName();
         String methodName = method.getName();
-        final String spanName = String.format("websocket: %s.%s", className, methodName);
+        final String spanName = String.format("websocket: %s", methodName);
 
         return Observation.createNotStarted(spanName, observationRegistry)
                 .lowCardinalityKeyValue("method.name", methodName)

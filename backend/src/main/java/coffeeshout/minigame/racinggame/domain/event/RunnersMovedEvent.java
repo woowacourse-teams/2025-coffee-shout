@@ -5,9 +5,9 @@ import coffeeshout.minigame.racinggame.domain.dto.RacingRange;
 import coffeeshout.minigame.racinggame.domain.dto.RunnerPosition;
 import java.util.List;
 
-public record RunnersMoved(String joinCode, RacingRange racingRange, List<RunnerPosition> runnerPositions) {
+public record RunnersMovedEvent(String joinCode, RacingRange racingRange, List<RunnerPosition> runnerPositions) {
 
-    public static RunnersMoved from(RacingGame racingGame, String joinCode) {
+    public static RunnersMovedEvent from(RacingGame racingGame, String joinCode) {
         final RacingRange distance = new RacingRange(RacingGame.START_LINE, RacingGame.FINISH_LINE);
         final List<RunnerPosition> positions = racingGame.getRunners().stream()
                 .map(runner -> new RunnerPosition(
@@ -15,6 +15,6 @@ public record RunnersMoved(String joinCode, RacingRange racingRange, List<Runner
                         runner.getPosition(),
                         runner.getSpeed()
                 )).toList();
-        return new RunnersMoved(joinCode, distance, positions);
+        return new RunnersMovedEvent(joinCode, distance, positions);
     }
 }

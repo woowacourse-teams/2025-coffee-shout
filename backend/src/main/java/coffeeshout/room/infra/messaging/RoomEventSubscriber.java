@@ -1,5 +1,7 @@
 package coffeeshout.room.infra.messaging;
 
+import coffeeshout.global.trace.TracerProvider;
+import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
@@ -31,6 +33,7 @@ public class RoomEventSubscriber implements MessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
     private final RoomEventHandlerFactory handlerFactory;
+    private final TracerProvider tracerProvider;
 
     @PostConstruct
     public void subscribe() {
@@ -51,6 +54,14 @@ public class RoomEventSubscriber implements MessageListener {
 
             final RoomBaseEvent event = deserializeEvent(body, eventType);
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
+            if (event instanceof Traceable traceable) {
+                tracerProvider.executeWithTraceContext(
+                        traceable.getTraceInfo(),
+                        () -> handler.handle(event),
+                        event.eventType().name()
+                );
+                return;
+            }
             handler.handle(event);
 
         } catch (Exception e) {

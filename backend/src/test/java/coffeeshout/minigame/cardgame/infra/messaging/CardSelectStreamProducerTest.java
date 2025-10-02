@@ -72,7 +72,7 @@ class CardSelectStreamProducerTest {
             // given
             String playerName = "꾹이";
             Integer cardIndex = 0;
-            SelectCardCommandEvent event = SelectCardCommandEvent.create(
+            SelectCardCommandEvent event = new SelectCardCommandEvent(
                     joinCode.getValue(), playerName, cardIndex);
 
             // when
@@ -94,7 +94,7 @@ class CardSelectStreamProducerTest {
 
             // when
             for (int i = 0; i < playerNames.length; i++) {
-                SelectCardCommandEvent event = SelectCardCommandEvent.create(
+                SelectCardCommandEvent event = new SelectCardCommandEvent(
                         joinCode.getValue(), playerNames[i], cardIndexes[i]);
                 cardSelectStreamProducer.broadcastCardSelect(event);
             }

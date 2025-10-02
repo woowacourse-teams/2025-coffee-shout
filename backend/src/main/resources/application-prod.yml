@@ -2,6 +2,12 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 room:
   qr:

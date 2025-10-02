@@ -17,10 +17,10 @@ public class StartMiniGameCommandHandler implements MiniGameCommandHandler<Start
 
     @Override
     public void handle(String joinCode, StartMiniGameCommand command) {
-        final StartMiniGameCommandEvent event = StartMiniGameCommandEvent.create(joinCode, command.hostName());
+        final StartMiniGameCommandEvent event = new StartMiniGameCommandEvent(joinCode, command.hostName());
         miniGameEventPublisher.publishEvent(event);
         log.info("미니게임 시작 이벤트 발행: joinCode={}, hostName={}, eventId={}",
-                joinCode, command.hostName(), event.getEventId());
+                joinCode, command.hostName(), event.eventId());
     }
 
     @Override

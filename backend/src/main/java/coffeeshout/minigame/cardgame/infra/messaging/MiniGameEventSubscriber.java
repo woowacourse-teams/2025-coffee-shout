@@ -1,5 +1,6 @@
 package coffeeshout.minigame.cardgame.infra.messaging;
 
+import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameBaseEvent;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
@@ -26,13 +27,15 @@ public class MiniGameEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic miniGameEventTopic;
+    private final TracerProvider tracerProvider;
 
     @SuppressWarnings("unchecked")
     public MiniGameEventSubscriber(
             List<MiniGameEventHandler<?>> handlers,
             ObjectMapper objectMapper,
             RedisMessageListenerContainer redisMessageListenerContainer,
-            ChannelTopic miniGameEventTopic
+            ChannelTopic miniGameEventTopic,
+            TracerProvider tracerProvider
     ) {
         this.handlers = handlers.stream()
                 .collect(Collectors.toMap(
@@ -42,6 +45,7 @@ public class MiniGameEventSubscriber implements MessageListener {
         this.objectMapper = objectMapper;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.miniGameEventTopic = miniGameEventTopic;
+        this.tracerProvider = tracerProvider;
     }
 
     @PostConstruct
@@ -63,7 +67,11 @@ public class MiniGameEventSubscriber implements MessageListener {
 
             final MiniGameBaseEvent event = deserializeEvent(body, eventType);
             final MiniGameEventHandler<MiniGameBaseEvent> handler = handlers.get(eventType);
-            handler.handle(event);
+            tracerProvider.executeWithTraceContext(
+                    event.traceInfo(),
+                    () -> handler.handle(event),
+                    event.eventType().name()
+            );
 
         } catch (Exception e) {
             log.error("미니게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);
