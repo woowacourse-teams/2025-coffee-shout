@@ -99,7 +99,7 @@ class RacingGameTest {
         }
 
         // then
-        assertThat(racingGame.getState()).isEqualTo(RacingGameState.FINISHED);
+        assertThat(racingGame.getState()).isEqualTo(RacingGameState.DONE);
         assertThat(racingGame.isFinished()).isTrue();
     }
 

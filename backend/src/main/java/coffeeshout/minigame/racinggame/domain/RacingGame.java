@@ -44,7 +44,7 @@ public class RacingGame implements Playable {
     public void moveAll() {
         runners.moveAll();
         if (runners.isAllFinished()) {
-            this.state = RacingGameState.FINISHED;
+            this.state = RacingGameState.DONE;
         }
     }
 
@@ -103,6 +103,6 @@ public class RacingGame implements Playable {
     }
 
     public boolean isFinished() {
-        return state == RacingGameState.FINISHED;
+        return state == RacingGameState.DONE;
     }
 }
