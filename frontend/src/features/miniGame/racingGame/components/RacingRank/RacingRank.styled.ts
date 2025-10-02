@@ -2,10 +2,10 @@ import styled from '@emotion/styled';
 
 export const Container = styled.div`
   position: absolute;
-  top: 70px;
   left: 20px;
-  min-width: 160px;
   z-index: 200;
+  top: 4rem;
+  left: 1rem;
 `;
 
 export const RankList = styled.div`
@@ -20,9 +20,13 @@ export const RankNumber = styled.div`
   width: 1rem;
   height: auto;
 `;
+
 export const RankItem = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
+  width: fit-content;
+  min-width: max-content;
+  background: linear-gradient(to right, rgba(19, 8, 8, 0.56) 0%, rgba(46, 35, 35, 0.19) 100%);
+  padding: 2px;
 `;

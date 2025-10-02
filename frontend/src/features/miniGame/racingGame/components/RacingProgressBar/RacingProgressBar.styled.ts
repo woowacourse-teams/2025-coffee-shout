@@ -5,7 +5,7 @@ const FILL_TRANSITION_DURATION = '0.3s';
 export const Container = styled.div`
   width: 100%;
   position: relative;
-  padding: 1.8rem 1rem;
+  padding: 1.8rem 1rem 0 1rem;
 `;
 
 export const ProgressTrack = styled.div`
