@@ -26,7 +26,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
 
     @Override
     public void handle(RoomCreateEvent event) {
-        String joinCode = event.joinCode();
+        final String joinCode = event.joinCode();
 
         try {
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
@@ -35,7 +35,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
             final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
-            Room room = roomCommandService.createRoom(
+            final Room room = roomCommandService.createRoom(
                     new JoinCode(joinCode),
                     new PlayerName(event.hostName()),
                     menu,

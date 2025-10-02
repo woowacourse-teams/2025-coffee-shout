@@ -17,9 +17,9 @@ public class JoinCodeGenerator {
 
     public JoinCode generate() {
         for (int attempt = 0; attempt < MAX_RETRY_COUNT; attempt++) {
-            JoinCode joinCode = JoinCode.generate();
+            final JoinCode joinCode = JoinCode.generate();
 
-            boolean saved = joinCodeRepository.save(joinCode);
+            final boolean saved = joinCodeRepository.save(joinCode);
 
             if (saved) {
                 log.debug("JoinCode 생성 성공: {} (시도 횟수: {})", joinCode.getValue(), attempt + 1);
