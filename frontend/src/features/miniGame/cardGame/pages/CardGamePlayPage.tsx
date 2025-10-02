@@ -1,84 +1,48 @@
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import MiniGameTransition from '@/features/miniGame/components/MiniGameTransition/MiniGameTransition';
-import { useEffect, useRef, useState } from 'react';
-import PrepareOverlay from '../components/PrepareOverlay/PrepareOverlay';
-import Round from '../components/Round/Round';
-
-const ROUND_TOTAL_TIME = 10;
+import PrepareOverlay from '@/features/miniGame/components/PrepareOverlay/PrepareOverlay';
+import Layout from '@/layouts/Layout';
+import RoundTransition from '../components/RoundTransition/RoundTransition';
+import GameCardGrid from '../components/GameCardGrid/GameCardGrid';
+import PlayerCardDisplay from '../components/PlayerCardDisplay/PlayerCardDisplay';
+import RoundHeader from '../components/RoundHeader/RoundHeader';
+import { useCardGameActions } from '../hooks/useCardGameActions';
+import { useCardGameTimer } from '../hooks/useCardGameTimer';
 
 const CardGamePlayPage = () => {
-  const { myName, joinCode } = useIdentifier();
-  const { isTransition, currentRound, currentCardGameState, cardInfos, selectedCardInfo } =
+  const { isTransition, currentRound, currentCardGameState, selectedCardInfo, cardInfos } =
     useCardGame();
-  const [currentTime, setCurrentTime] = useState(ROUND_TOTAL_TIME);
-  const [isTimerActive, setIsTimerActive] = useState(false);
-  const { send } = useWebSocket();
+  const { selectCard } = useCardGameActions();
+  const { currentTime, isTimerActive, roundTotalTime } = useCardGameTimer();
 
-  const isTimerReset = useRef(false);
+  const showPrepareOverlay = currentCardGameState === 'PREPARE';
+  const isCardClickDisabled =
+    currentCardGameState === 'PREPARE' || currentCardGameState === 'SCORE_BOARD';
 
-  const handleCardClick = (cardIndex: number) => {
-    if (selectedCardInfo[currentRound].isSelected) {
-      return;
-    }
-
-    send(`/room/${joinCode}/minigame/command`, {
-      commandType: 'SELECT_CARD',
-      commandRequest: {
-        playerName: myName,
-        cardIndex,
-      },
-    });
+  const onCardClick = (cardIndex: number) => {
+    if (isCardClickDisabled) return;
+    selectCard(cardIndex);
   };
 
-  useEffect(() => {
-    if (isTimerActive && currentTime > 0) {
-      const timer = setTimeout(() => setCurrentTime((prev) => prev - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentTime, isTimerActive]);
-
-  useEffect(() => {
-    if (currentCardGameState === 'PREPARE') {
-      setCurrentTime(ROUND_TOTAL_TIME);
-      return;
-    }
-
-    if (currentCardGameState === 'PLAYING') {
-      if (currentRound === 'FIRST') {
-        setCurrentTime(ROUND_TOTAL_TIME);
-        setIsTimerActive(true);
-        isTimerReset.current = false;
-        return;
-      }
-
-      if (currentRound === 'SECOND' && !isTimerReset.current) {
-        setCurrentTime(ROUND_TOTAL_TIME);
-        setIsTimerActive(true);
-        isTimerReset.current = true;
-      }
-    }
-  }, [currentRound, currentCardGameState]);
-
   if (isTransition) {
-    return <MiniGameTransition currentRound={currentRound} />;
+    return <RoundTransition currentRound={currentRound} />;
   }
 
   return (
-    <>
-      {currentCardGameState === 'PREPARE' && <PrepareOverlay />}
-      <Round
-        key={currentRound}
-        round={currentRound}
-        roundTotalTime={ROUND_TOTAL_TIME}
-        onClickCard={handleCardClick}
-        selectedCardInfo={selectedCardInfo}
-        currentTime={currentTime}
-        isTimerActive={isTimerActive}
-        cardInfos={cardInfos}
-      />
-    </>
+    <Layout>
+      <Layout.TopBar center={<Headline4>랜덤카드 게임</Headline4>} />
+      <Layout.Content>
+        <RoundHeader
+          round={currentRound}
+          currentTime={currentTime}
+          roundTotalTime={roundTotalTime}
+          isTimerActive={isTimerActive}
+        />
+        <PlayerCardDisplay selectedCardInfo={selectedCardInfo} />
+        <GameCardGrid cardInfos={cardInfos} onCardClick={onCardClick} />
+      </Layout.Content>
+      {showPrepareOverlay && <PrepareOverlay />}
+    </Layout>
   );
 };
 

@@ -16,7 +16,7 @@ const MiniGamePlayPage = lazy(
 const MiniGameReadyPage = lazy(
   () =>
     import(
-      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReady/MiniGameReadyPage'
+      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReadyPage/MiniGameReadyPage'
     )
 );
 const MiniGameResultPage = lazy(

@@ -1,5 +1,3 @@
-import { RoundType } from './round';
-
 /**
  * 카드 게임 타입
  */
@@ -35,10 +33,17 @@ export type CardInfo = {
 };
 
 export type SelectedCardInfo = Record<
-  RoundType,
+  CardGameRound,
   {
     isSelected: boolean;
     type: CardType | null;
     value: CardValue | null;
   }
 >;
+
+export const CARD_GAME_ROUND_MAP = {
+  FIRST: 1,
+  SECOND: 2,
+} as const;
+
+export type CardGameRound = keyof typeof CARD_GAME_ROUND_MAP;
