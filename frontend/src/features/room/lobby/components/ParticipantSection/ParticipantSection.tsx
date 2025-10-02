@@ -1,11 +1,9 @@
 import Divider from '@/components/@common/Divider/Divider';
-import useModal from '@/components/@common/Modal/useModal';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import MenuModifyModal from '@/features/room/lobby/components/MenuModifyModal/MenuModifyModal';
 import { Player } from '@/types/player';
 import * as S from './ParticipantSection.styled';
 
@@ -15,16 +13,8 @@ type Props = { participants: Player[] };
 
 export const ParticipantSection = ({ participants }: Props) => {
   const { myName } = useIdentifier();
-  const { openModal, closeModal } = useModal();
 
   const mySelect = participants.filter((participant) => participant.playerName === myName)[0];
-
-  const handleModifyMenu = () => {
-    openModal(<MenuModifyModal myMenu={mySelect.menuResponse.name} onClose={closeModal} />, {
-      title: '음료 변경',
-      showCloseButton: true,
-    });
-  };
 
   const filteredParticipants = participants.filter(
     (participant) => participant.playerName !== myName
@@ -51,7 +41,7 @@ export const ParticipantSection = ({ participants }: Props) => {
         isReady={mySelect.isReady}
         playerType={mySelect.playerType}
       >
-        <S.Menu src={mySelect.menuResponse.categoryImageUrl} onClick={handleModifyMenu} />
+        <S.Menu src={mySelect.menuResponse.categoryImageUrl} />
       </PlayerCard>
       <Divider />
       <S.ScrollableWrapper>

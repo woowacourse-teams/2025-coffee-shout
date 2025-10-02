@@ -1,4 +1,4 @@
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
@@ -15,7 +15,6 @@ import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/Probability
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
-import { PlayerProbability, Probability } from '@/types/roulette';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
@@ -40,7 +39,7 @@ const LobbyPage = () => {
   const { openModal, closeModal } = useModal();
   const { showToast } = useToast();
   const { playerType, setPlayerType } = usePlayerType();
-  const { updateCurrentProbabilities } = useProbabilityHistory();
+  const { probabilityHistory, updateCurrentProbabilities } = useProbabilityHistory();
   const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
@@ -56,30 +55,29 @@ const LobbyPage = () => {
       if (currentPlayer) {
         setPlayerType(currentPlayer.playerType);
       }
+
+      updateCurrentProbabilities(
+        data.map((player) => ({
+          playerName: player.playerName,
+          probability: player.probability,
+          playerColor: colorList[player.colorIndex],
+        }))
+      );
     },
-    [setParticipants, myName, setPlayerType]
+    [setParticipants, myName, setPlayerType, updateCurrentProbabilities]
   );
 
-  // TODO: 나중에 외부 state 로 분리할 것
-  const [playerProbabilities, setPlayerProbabilities] = useState<PlayerProbability[]>([]);
+  useFetch<MiniGameType[]>({
+    endpoint: `/rooms/minigames/selected?joinCode=${joinCode}`,
+    enabled: !!joinCode,
+    onSuccess: (data) => {
+      setSelectedMiniGames(data);
+    },
+  });
 
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
   }, []);
-
-  const handlePlayerProbabilitiesData = useCallback(
-    (data: Probability[]) => {
-      const parsedData = data.map((item) => ({
-        playerName: item.playerResponse.playerName,
-        probability: item.probability,
-        playerColor: colorList[item.playerResponse.colorIndex],
-      }));
-
-      setPlayerProbabilities(parsedData);
-      updateCurrentProbabilities(parsedData);
-    },
-    [updateCurrentProbabilities]
-  );
 
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
@@ -92,10 +90,6 @@ const LobbyPage = () => {
 
   useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
-  useWebSocketSubscription<Probability[]>(
-    `/room/${joinCode}/roulette`,
-    handlePlayerProbabilitiesData
-  );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   useEffect(() => {
@@ -184,23 +178,6 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (joinCode && isConnected) {
-      send(`/room/${joinCode}/get-probabilities`);
-    }
-  }, [playerType, joinCode, send, isConnected]);
-
-  useEffect(() => {
-    (async () => {
-      if (joinCode) {
-        const _selectedMiniGames = await api.get<MiniGameType[]>(
-          `/rooms/minigames/selected?joinCode=${joinCode}`
-        );
-        setSelectedMiniGames(_selectedMiniGames);
-      }
-    })();
-  }, [joinCode]);
-
-  useEffect(() => {
     const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');
 
     if (!isFirstTimeUser) {
@@ -213,6 +190,7 @@ const LobbyPage = () => {
         />,
         {
           showCloseButton: false,
+          closeOnBackdropClick: false,
         }
       );
     }
@@ -220,7 +198,7 @@ const LobbyPage = () => {
 
   const SECTIONS: SectionComponents = {
     참가자: <ParticipantSection participants={participants} />,
-    룰렛: <RouletteSection playerProbabilities={playerProbabilities} />,
+    룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
       <MiniGameSection
         selectedMiniGames={selectedMiniGames}

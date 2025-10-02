@@ -1,0 +1,9 @@
+export const ANIMATION_DURATION = {
+  RIPPLE: 100,
+  BACKGROUND_PRESS: 100,
+  SCALE_PRESS: 100,
+};
+
+export const ANIMATION_SCALE = {
+  SCALE_PRESS: 0.98,
+};

@@ -24,8 +24,8 @@ const color = {
     950: '#030712',
   },
 
-  red: '#FF4242',
-  blue: '#236ED8',
+  red: '#FF0000',
+  blue: '#0066FF',
   white: '#FFFFFF',
   black: '#000000',
 } as const;

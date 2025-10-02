@@ -1,32 +1,28 @@
-import Headline4 from '@/components/@common/Headline4/Headline4';
 import * as S from './RoulettePlaySection.styled';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { convertProbabilitiesToAngles } from '@/features/roulette/utils/convertProbabilitiesToAngles';
 import { calculateFinalRotation } from '../../utils/calculateFinalRotation';
-import { AnimatedRouletteWheel } from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
+import AnimatedRouletteWheel from '../AnimatedRouletteWheel/AnimatedRouletteWheel';
+import ProbabilitiesText from '../ProbabilitiesText/ProbabilitiesText';
+import RouletteWheelBack from '@/features/roulette/components/RouletteWheelBack/RouletteWheelBack';
+import Flip from '@/components/@common/Flip/Flip';
+import { useEffect, useState } from 'react';
 
 type Props = {
   isSpinning: boolean;
   winner: string | null;
   randomAngle: number;
+  isProbabilitiesLoading: boolean;
 };
 
-const formatPercent = new Intl.NumberFormat('ko-KR', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
-  const { myName } = useIdentifier();
+const RoulettePlaySection = ({
+  isSpinning,
+  winner,
+  randomAngle,
+  isProbabilitiesLoading,
+}: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
-
-  const myPrevProbability =
-    probabilityHistory.prev.find((player) => player.playerName === myName)?.probability ?? 0;
-  const myCurrentProbability =
-    probabilityHistory.current.find((player) => player.playerName === myName)?.probability ?? 0;
-
-  const myProbabilityChange = myCurrentProbability - myPrevProbability;
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const shouldComputeFinalRotation = isSpinning && winner;
   const finalRotation = shouldComputeFinalRotation
@@ -37,22 +33,30 @@ const RoulettePlaySection = ({ isSpinning, winner, randomAngle }: Props) => {
       })
     : 0;
 
+  useEffect(() => {
+    if (!isProbabilitiesLoading) {
+      requestAnimationFrame(() => {
+        setIsFlipped(true);
+      });
+    }
+  }, [isProbabilitiesLoading]);
+
   return (
     <S.Container>
       <S.RouletteWheelWrapper>
-        <AnimatedRouletteWheel finalRotation={finalRotation} isSpinning={isSpinning} />
+        <Flip
+          flipped={isFlipped}
+          initialView={<RouletteWheelBack />}
+          flippedView={
+            <AnimatedRouletteWheel
+              finalRotation={finalRotation}
+              isSpinning={isSpinning}
+              startAnimation={isFlipped}
+            />
+          }
+        />
       </S.RouletteWheelWrapper>
-      <S.ProbabilityText>
-        <Headline4>
-          현재 확률 : {myCurrentProbability + '%'} {'('}
-          <S.ProbabilityChange isPositive={myProbabilityChange >= 0}>
-            {(myProbabilityChange >= 0 ? '+' : '') +
-              formatPercent.format(myProbabilityChange) +
-              '%'}
-          </S.ProbabilityChange>
-          {')'}
-        </Headline4>
-      </S.ProbabilityText>
+      <ProbabilitiesText isProbabilitiesLoading={isProbabilitiesLoading} />
     </S.Container>
   );
 };

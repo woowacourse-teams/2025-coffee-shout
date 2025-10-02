@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
 
-type Props = { isPositive: boolean };
-
 export const Container = styled.div`
   display: flex;
   flex: 1;
@@ -14,14 +12,4 @@ export const RouletteWheelWrapper = styled.div`
   display: flex;
   width: 300px;
   height: 364px;
-`;
-
-export const ProbabilityText = styled.div`
-  text-align: center;
-  padding-bottom: 2rem;
-`;
-
-export const ProbabilityChange = styled.span<Props>`
-  color: ${({ isPositive }) => (isPositive ? '#FF0000' : '#0066FF')};
-  font-weight: bold;
 `;
