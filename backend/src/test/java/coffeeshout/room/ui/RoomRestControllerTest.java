@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("RoomRestController 통합 테스트")
 class RoomRestControllerTest {
 
-    private static final String INVALID_JOIN_CODE = "XXXXX";
+    private static final String INVALID_JOIN_CODE = "XXXX";
 
     @Autowired
     MockMvc mockMvc;

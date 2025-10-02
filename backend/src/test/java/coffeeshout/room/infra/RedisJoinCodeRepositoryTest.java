@@ -27,7 +27,7 @@ class RedisJoinCodeRepositoryTest extends ServiceTest {
 
     private static final String JOIN_CODE_KEY_PREFIX = "room:joinCode:";
 
-    JoinCode joinCode = new JoinCode("ABCDE");
+    JoinCode joinCode = new JoinCode("ABCD");
 
     @AfterEach
     void tearDown() {

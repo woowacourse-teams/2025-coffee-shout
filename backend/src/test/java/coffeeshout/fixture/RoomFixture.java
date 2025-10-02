@@ -13,7 +13,7 @@ public final class RoomFixture {
 
     public static Room 호스트_꾹이() {
         final Room room = new Room(
-                new JoinCode("A4B2C"),
+                new JoinCode("A4BX"),
                 PlayerFixture.호스트꾹이().getName(),
                 new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)
         );
