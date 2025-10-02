@@ -35,10 +35,14 @@ public class DelayedRoomRemovalService {
     }
 
     public void scheduleRemoveRoom(JoinCode joinCode) {
-        log.info("방 지연 삭제 스케줄링: joinCode={}, delay={}초",
-                joinCode.getValue(), removeDuration.getSeconds());
+        try {
+            log.info("방 지연 삭제 스케줄링: joinCode={}, delay={}초",
+                    joinCode.getValue(), removeDuration.getSeconds());
 
-        taskScheduler.schedule(() -> executeRoomRemoval(joinCode), Instant.now().plus(removeDuration));
+            taskScheduler.schedule(() -> executeRoomRemoval(joinCode), Instant.now().plus(removeDuration));
+        } catch (Exception e) {
+            log.error("방 제거 스케줄링 실패: joinCode={}", joinCode.getValue(), e);
+        }
     }
 
     private void executeRoomRemoval(JoinCode joinCode) {

@@ -14,10 +14,14 @@ public record RoomCreateEvent(
         RoomEventType eventType,
         String hostName,
         SelectedMenuRequest selectedMenuRequest,
-        String joinCode
+        String joinCode,
+        String qrCodeUrl
 ) implements RoomBaseEvent, Traceable {
 
-    public RoomCreateEvent(String hostName, SelectedMenuRequest selectedMenuRequest, String joinCode) {
+    public RoomCreateEvent(String hostName,
+                           SelectedMenuRequest selectedMenuRequest,
+                           String joinCode,
+                           String qrCodeUrl) {
         this(
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
@@ -25,7 +29,8 @@ public record RoomCreateEvent(
                 RoomEventType.ROOM_CREATE,
                 hostName,
                 selectedMenuRequest,
-                joinCode
+                joinCode,
+                qrCodeUrl
         );
     }
 
