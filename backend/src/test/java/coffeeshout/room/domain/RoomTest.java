@@ -24,7 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 class RoomTest {
 
-    private final JoinCode joinCode = new JoinCode("ABCDF");
+    private final JoinCode joinCode = new JoinCode("ABCD");
     private final Roulette roulette = RouletteFixture.고정_끝값_반환();
     private final PlayerName 호스트_한스 = new PlayerName("한스");
     private final PlayerName 게스트_루키 = new PlayerName("루키");

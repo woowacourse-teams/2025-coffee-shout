@@ -33,7 +33,7 @@ class CardGameIntegrationTest extends WebSocketIntegrationTestSupport {
     @BeforeEach
     void setUp(@Autowired RoomRepository roomRepository,
                @Autowired RoomJpaRepository roomJpaRepository) throws Exception {
-        joinCode = new JoinCode("A4B2C");
+        joinCode = new JoinCode("A4BX");
         Room room = RoomFixture.호스트_꾹이();
         room.getPlayers().forEach(player -> player.updateReadyState(true));
         host = room.getHost();
