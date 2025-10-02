@@ -50,6 +50,8 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     }
   }, [enabled, fetchData]);
 
+  if (error) throw error;
+
   return { data, loading, error, refetch: fetchData };
 };
 

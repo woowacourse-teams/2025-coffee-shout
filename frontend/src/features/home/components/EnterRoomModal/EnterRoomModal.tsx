@@ -19,7 +19,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
 
-  const { execute: checkJoinCode, error } = useLazyFetch<JoinCodeCheckResponse>({
+  const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({
     endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
     onError: () => {
       setJoinCode('');
@@ -45,8 +45,6 @@ const EnterRoomModal = ({ onClose }: Props) => {
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setJoinCode(e.target.value.toUpperCase());
   };
-
-  if (error) throw error;
 
   return (
     <S.Container>

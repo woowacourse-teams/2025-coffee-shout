@@ -40,6 +40,8 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
     }
   }, [endpoint]);
 
+  if (error) throw error;
+
   return { data, loading, error, execute };
 };
 
