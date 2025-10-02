@@ -1,18 +1,11 @@
 package coffeeshout.minigame.racinggame.ui;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.racinggame.application.RacingGameService;
-import coffeeshout.minigame.racinggame.domain.event.RacingGameStarted;
-import coffeeshout.minigame.racinggame.domain.event.StartRacingGameCommandEvent;
-import coffeeshout.minigame.racinggame.domain.event.TapCommandEvent;
-import coffeeshout.minigame.racinggame.infra.messaging.RacingGameEventPublisher;
+import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
 import coffeeshout.minigame.racinggame.ui.request.StartRacingGameCommand;
 import coffeeshout.minigame.racinggame.ui.request.TapCommand;
-import coffeeshout.room.ui.response.PlayerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
-import java.time.Instant;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -34,7 +27,7 @@ public class RacingGameWebSocketController {
     )
     @MessageResponse(
             path = "/topic/room/%s/racing-game/state",
-            returnType = RacingGameStarted.class
+            returnType = RaceStarted.class
     )
     public void startGame(@DestinationVariable String joinCode, @Payload StartRacingGameCommand command) {
         racingGameService.startGame(joinCode, command.hostName());
@@ -47,7 +40,7 @@ public class RacingGameWebSocketController {
     )
     @MessageResponse(
             path = "/topic/room/%s/racing-game/state",
-            returnType = RacingGameStarted.class
+            returnType = RaceStarted.class
     )
     public void tap(@DestinationVariable String joinCode, @Payload TapCommand command) {
         racingGameService.tap(joinCode, command.playerName(), command.tapCount());

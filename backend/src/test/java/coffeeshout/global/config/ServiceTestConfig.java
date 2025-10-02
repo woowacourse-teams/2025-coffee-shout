@@ -23,6 +23,11 @@ public class ServiceTestConfig {
         return new ShutDownTestScheduler();
     }
 
+    @Bean(name = "racingGameScheduler")
+    public TaskScheduler testRacingGameScheduler() {
+        return Mockito.mock(TaskScheduler.class);
+    }
+
     @Bean
     @Primary
     public SimpMessagingTemplate mockMessagingTemplate() {

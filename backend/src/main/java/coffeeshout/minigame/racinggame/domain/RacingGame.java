@@ -5,22 +5,15 @@ import coffeeshout.minigame.cardgame.domain.MiniGameScore;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.Getter;
-import org.springframework.scheduling.TaskScheduler;
 
 @Getter
 public class RacingGame implements Playable {
 
-    public static final int INITIAL_SPEED = 5;
+    public static final int INITIAL_SPEED = 1;
     public static final int MIN_SPEED = 1;
     public static final int MAX_SPEED = 10;
     public static final int FINISH_LINE = 1000;
@@ -82,13 +75,13 @@ public class RacingGame implements Playable {
 
     @Override
     public Map<Player, MiniGameScore> getScores() {
-        final List<Runner> positions = runners.getRanking();
+        final List<Runner> ranking = runners.getRanking();
 
-        return positions.stream()
-                .collect(Collectors.toMap(
-                        Runner::getPlayer,
-                        entry -> new RacingGameScore(entry.getFinishTime())
-                ));
+        final Map<Player, MiniGameScore> scores = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < ranking.size(); i++) {
+            scores.put(ranking.get(i).getPlayer(), new RacingGameScore(i + 1)); // 1등부터 시작
+        }
+        return scores;
     }
 
     @Override

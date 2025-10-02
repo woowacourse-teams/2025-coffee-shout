@@ -2,7 +2,8 @@ package coffeeshout.minigame.racinggame.application;
 
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
-import coffeeshout.minigame.racinggame.domain.event.RacingGameStarted;
+import coffeeshout.minigame.racinggame.domain.event.RaceFinished;
+import coffeeshout.minigame.racinggame.domain.event.RaceStarted;
 import coffeeshout.minigame.racinggame.domain.event.RunnersMoved;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -11,7 +12,6 @@ import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
 import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,9 +41,9 @@ public class RacingGameCommandService {
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
         room.startNextGame(hostName);
         final RacingGame racingGame = getRacingGame(room);
-        startAutoMove(racingGame);
+        startAutoMove(racingGame, joinCode);
 
-        eventPublisher.publishEvent(new RacingGameStarted(racingGame.getState().name()));
+        eventPublisher.publishEvent(RaceStarted.of(racingGame, joinCode));
         log.info("레이싱 게임 시작 완료: joinCode={}", joinCode);
     }
 
@@ -56,22 +56,48 @@ public class RacingGameCommandService {
         log.debug("탭 처리 완료: joinCode={}, playerName={}, tapCount={}", joinCode, playerName, tapCount);
     }
 
-    public void startAutoMove(RacingGame racingGame) {
-        final ScheduledFuture<?> autoMoveFuture = taskScheduler.scheduleAtFixedRate(() -> {
-            try {
-                if (racingGame.isStarted()) {
-                    racingGame.moveAll();
-                    if (racingGame.isFinished()) {
-                        racingGame.stopAutoMove();
-                        return;
-                    }
-                    eventPublisher.publishEvent(RunnersMoved.from(racingGame));
-                }
-            } catch (Exception e) {
-                racingGame.stopAutoMove();
-            }
-        }, Duration.ofMillis(RacingGame.MOVE_INTERVAL_MILLIS));
+    private void startAutoMove(RacingGame racingGame, String joinCode) {
+        final ScheduledFuture<?> autoMoveFuture = scheduleAutoMoveTask(racingGame, joinCode);
         racingGame.startAutoMove(autoMoveFuture);
+    }
+
+    private ScheduledFuture<?> scheduleAutoMoveTask(RacingGame racingGame, String joinCode) {
+        return taskScheduler.scheduleAtFixedRate(() -> executeAutoMove(racingGame, joinCode),
+                Duration.ofMillis(RacingGame.MOVE_INTERVAL_MILLIS));
+    }
+
+    private void executeAutoMove(RacingGame racingGame, String joinCode) {
+        try {
+            if (!racingGame.isStarted()) {
+                return;
+            }
+
+            racingGame.moveAll();
+
+            if (racingGame.isFinished()) {
+                handleRaceFinished(racingGame, joinCode);
+                return;
+            }
+
+            publishRunnersMoved(racingGame, joinCode);
+        } catch (Exception e) {
+            handleAutoMoveError(racingGame, e);
+        }
+    }
+
+    private void handleRaceFinished(RacingGame racingGame, String joinCode) {
+        racingGame.stopAutoMove();
+        eventPublisher.publishEvent(RaceFinished.of(racingGame, joinCode));
+        log.info("레이싱 게임 종료: joinCode={}", joinCode);
+    }
+
+    private void publishRunnersMoved(RacingGame racingGame, String joinCode) {
+        eventPublisher.publishEvent(RunnersMoved.from(racingGame, joinCode));
+    }
+
+    private void handleAutoMoveError(RacingGame racingGame, Exception e) {
+        log.error("자동 이동 중 오류 발생", e);
+        racingGame.stopAutoMove();
     }
 
     private RacingGame getRacingGame(Room room) {

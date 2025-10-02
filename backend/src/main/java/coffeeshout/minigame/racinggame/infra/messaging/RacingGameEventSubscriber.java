@@ -26,7 +26,6 @@ public class RacingGameEventSubscriber implements MessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic racingGameEventTopic;
 
-    @SuppressWarnings("unchecked")
     public RacingGameEventSubscriber(
             List<RacingGameEventHandler<?>> handlers,
             ObjectMapper objectMapper,

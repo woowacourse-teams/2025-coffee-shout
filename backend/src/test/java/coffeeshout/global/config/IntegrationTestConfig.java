@@ -20,4 +20,9 @@ public class IntegrationTestConfig {
     public TaskScheduler testIntegrationDelayRemovalScheduler() {
         return new ShutDownTestScheduler();
     }
+
+    @Bean(name = "racingGameScheduler")
+    public TaskScheduler testIntegrationRacingGameScheduler() {
+        return new TestTaskScheduler();
+    }
 }
