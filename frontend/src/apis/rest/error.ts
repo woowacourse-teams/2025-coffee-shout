@@ -20,10 +20,12 @@ export class ApiError extends Error {
 }
 
 export class NetworkError extends Error {
-  displayMode: ErrorDisplayMode = 'fallback';
-
-  constructor(public message: string) {
+  constructor(
+    public message: string,
+    public displayMode: ErrorDisplayMode = 'fallback'
+  ) {
     super(message);
     this.name = 'NetworkError';
+    this.displayMode = displayMode;
   }
 }

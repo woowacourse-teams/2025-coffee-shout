@@ -29,7 +29,9 @@ class LocalErrorBoundary extends Component<Props, State> {
     }
 
     if (error instanceof NetworkError) {
-      return { error: error as NetworkError };
+      if (error.displayMode === 'fallback') {
+        return { error: error as NetworkError };
+      }
     }
 
     throw error;

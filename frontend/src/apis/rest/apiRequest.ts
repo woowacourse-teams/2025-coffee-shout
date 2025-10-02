@@ -97,7 +97,7 @@ export const apiRequest = async <T, TData>(
 
       if (error instanceof TypeError) {
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-          const networkError = new NetworkError(error.message);
+          const networkError = new NetworkError(error.message, displayMode);
           reportApiError(networkError);
           throw networkError;
         }
