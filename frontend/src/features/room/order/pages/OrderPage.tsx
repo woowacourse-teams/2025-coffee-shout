@@ -12,11 +12,28 @@ import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
 import * as S from './OrderPage.styled';
 
+type ViewMode = 'simple' | 'detail';
+
+const VIEW_MODE_CONFIG = {
+  simple: {
+    title: '주문 리스트',
+    buttonText: '상세 보기',
+    ViewComponent: MenuCount,
+  },
+  detail: {
+    title: '주문 리스트 상세',
+    buttonText: '요약 보기',
+    ViewComponent: PlayerMenu,
+  },
+} as const;
+
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { stopSocket, isConnected } = useWebSocket();
-  const [viewMode, setViewMode] = useState<'simple' | 'detail'>('simple');
+
+  const [viewMode, setViewMode] = useState<ViewMode>('simple');
+  const { title, buttonText, ViewComponent } = VIEW_MODE_CONFIG[viewMode];
 
   const handleToggle = () => {
     setViewMode((prev) => (prev === 'simple' ? 'detail' : 'simple'));
@@ -43,13 +60,10 @@ const OrderPage = () => {
       </Layout.Banner>
       <Layout.Content>
         <S.ListHeader>
-          <Headline2>주문 리스트 {viewMode === 'detail' ? '상세' : ''}</Headline2>
-          <TextButton
-            text={viewMode === 'detail' ? '요약 보기' : '상세 보기'}
-            onClick={handleToggle}
-          />
+          <Headline2>{title}</Headline2>
+          <TextButton text={buttonText} onClick={handleToggle} />
         </S.ListHeader>
-        {viewMode === 'simple' ? <MenuCount /> : <PlayerMenu />}
+        <ViewComponent />
       </Layout.Content>
       <Layout.ButtonBar>
         <Button variant="primary" onClick={handleClickGoMain}>
