@@ -24,20 +24,19 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
             log.info("미니게임 시작 이벤트 수신: eventId={}, joinCode={}, hostName={}",
                     event.eventId(), event.joinCode(), event.hostName());
 
-            // Room 상태 먼저 변경
-            final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-            room.startNextGame(event.hostName());
-
-            // 카드게임 시작
-            cardGameService.startInternal(event.joinCode(), event.hostName());
-
-            log.info("미니게임 시작 이벤트 처리 완료: eventId={}, joinCode={}",
-                    event.eventId(), event.joinCode());
+            updateRoomStateAndStartGame(event);
 
         } catch (Exception e) {
             log.error("미니게임 시작 이벤트 처리 실패: eventId={}, joinCode={}",
                     event.eventId(), event.joinCode(), e);
         }
+    }
+
+    private void updateRoomStateAndStartGame(StartMiniGameCommandEvent event) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
+        room.startNextGame(event.hostName());
+
+        cardGameService.startInternal(event.joinCode(), event.hostName());
     }
 
     @Override

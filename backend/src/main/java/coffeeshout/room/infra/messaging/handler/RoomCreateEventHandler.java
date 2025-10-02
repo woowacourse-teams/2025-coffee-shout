@@ -1,5 +1,7 @@
 package coffeeshout.room.infra.messaging.handler;
 
+import coffeeshout.global.lock.RedisLock;
+import coffeeshout.room.application.RoomService;
 import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -22,6 +24,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
+    private final RoomService roomService;
 
     @Override
     public void handle(RoomCreateEvent event) {
@@ -50,9 +53,25 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             );
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
+
+            tryDbSave(event);
+
         } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
         }
+    }
+
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
+    private void tryDbSave(RoomCreateEvent event) {
+        roomService.saveRoomEntity(event.joinCode());
+        log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
+                event.eventId(), event.joinCode());
     }
 
     @Override

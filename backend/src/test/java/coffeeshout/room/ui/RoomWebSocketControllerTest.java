@@ -9,6 +9,10 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.repository.RoomRepository;
+import coffeeshout.room.infra.persistence.PlayerEntity;
+import coffeeshout.room.infra.persistence.PlayerJpaRepository;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,12 +31,30 @@ class RoomWebSocketControllerTest extends WebSocketIntegrationTestSupport {
     Room testRoom;
 
     @BeforeEach
-    void setUp(@Autowired RoomRepository roomRepository) throws Exception {
+    void setUp(@Autowired RoomRepository roomRepository,
+               @Autowired RoomJpaRepository roomJpaRepository,
+               @Autowired PlayerJpaRepository playerJpaRepository) throws Exception {
         testRoom = RoomFixture.호스트_꾹이();
         joinCode = testRoom.getJoinCode();  // Room에서 실제 joinCode 가져오기
         host = testRoom.getHost();
 
+        // MemoryRepository에 저장
         roomRepository.save(testRoom);
+
+        // DB에 RoomEntity 저장 (Redis 이벤트 핸들러가 DB에서 조회하므로 필요)
+        RoomEntity roomEntity = new RoomEntity(joinCode.getValue());
+        roomJpaRepository.save(roomEntity);
+
+        // DB에 PlayerEntity들 저장 (룰렛 결과 저장 시 필요)
+        testRoom.getPlayers().forEach(player -> {
+            PlayerEntity playerEntity = new PlayerEntity(
+                    roomEntity,
+                    player.getName().value(),
+                    player.getPlayerType()
+            );
+            playerJpaRepository.save(playerEntity);
+        });
+
         session = createSession();
     }
 

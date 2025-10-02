@@ -9,3 +9,17 @@ services:
       - type: tmpfs
         target: /data
     command: valkey-server --appendonly yes
+
+  mysql:
+    image: 'mysql:8.0'
+    environment:
+      MYSQL_ROOT_PASSWORD: coffee-shout_123
+      MYSQL_DATABASE: coffee_shout
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:

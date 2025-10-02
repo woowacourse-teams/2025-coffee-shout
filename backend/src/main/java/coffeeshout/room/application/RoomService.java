@@ -25,6 +25,8 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
 import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.time.Duration;
@@ -53,6 +55,7 @@ public class RoomService {
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
     private final RoomEnterStreamProducer roomEnterStreamProducer;
+    private final RoomJpaRepository roomJpaRepository;
 
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
@@ -140,6 +143,12 @@ public class RoomService {
     public List<Player> getPlayersInternal(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.getPlayers();
+    }
+
+
+    public void saveRoomEntity(String joinCodeValue) {
+        final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
+        roomJpaRepository.save(roomEntity);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {

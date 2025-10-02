@@ -24,17 +24,18 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
                     event.eventId(), event.joinCode(), event.hostName());
 
             final Winner winner = event.winner();
-            final WinnerResponse response = WinnerResponse.from(winner);
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/winner",
-                    WebSocketResponse.success(response));
-
-            log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
-                    event.eventId(), event.joinCode(), winner.name().value());
+            broadcastWinner(event.joinCode(), winner);
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);
         }
+    }
+
+    private void broadcastWinner(String joinCode, Winner winner) {
+        final WinnerResponse response = WinnerResponse.from(winner);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
+                WebSocketResponse.success(response));
     }
 
     @Override

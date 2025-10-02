@@ -1,4 +1,9 @@
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/coffee_shout
+    username: root
+    password: coffee-shout_123
+    driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     aws:
       s3:
@@ -13,6 +18,15 @@ spring:
       host: localhost
       ssl:
         enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  flyway:
+    enabled: false
 
 management:
   endpoint:
