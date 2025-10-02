@@ -59,10 +59,6 @@ public class StartMiniGameCommandPersistenceEventHandler {
     }
 
     private void saveToDatabase(StartMiniGameCommandEvent event, String doneKey) {
-        if (isAlreadyProcessed(doneKey, event.eventId())) {
-            return;
-        }
-
         cardGameService.saveGameEntities(event.joinCode());
 
         redisTemplate.opsForValue()

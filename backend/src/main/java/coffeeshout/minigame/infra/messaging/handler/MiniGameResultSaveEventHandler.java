@@ -85,10 +85,6 @@ public class MiniGameResultSaveEventHandler {
     }
 
     private void saveToDatabase(CardGameStateChangedEvent event, String doneKey, String joinCode) {
-        if (isAlreadyProcessed(doneKey, joinCode)) {
-            return;
-        }
-
         final RoomEntity roomEntity = roomJpaRepository.findByJoinCode(joinCode)
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다: " + joinCode));
 

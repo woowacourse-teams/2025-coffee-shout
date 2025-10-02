@@ -85,10 +85,6 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     }
 
     private void saveToDatabase(RoomCreateEvent event, String doneKey) {
-        if (isAlreadyProcessed(doneKey, event.eventId())) {
-            return;
-        }
-
         roomService.saveRoomEntity(event.joinCode());
 
         redisTemplate.opsForValue()

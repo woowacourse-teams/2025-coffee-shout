@@ -70,10 +70,6 @@ public class RouletteSpinPersistenceEventHandler {
     }
 
     private void saveToDatabase(RouletteSpinEvent event, Winner winner, String doneKey) {
-        if (isAlreadyProcessed(doneKey, event.eventId())) {
-            return;
-        }
-
         saveRouletteResult(event.joinCode(), winner);
 
         redisTemplate.opsForValue()
