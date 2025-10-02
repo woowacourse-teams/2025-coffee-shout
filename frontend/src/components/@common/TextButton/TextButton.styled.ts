@@ -7,8 +7,8 @@ type Props = {
 };
 
 export const Container = styled.button<Props>`
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 35px;
   border: none;
   border-radius: 4px;
   display: flex;
@@ -16,16 +16,12 @@ export const Container = styled.button<Props>`
   justify-content: center;
   cursor: pointer;
   background-color: ${({ theme }) => theme.color.gray[100]};
+  color: ${({ theme }) => theme.color.gray[400]};
+  font-weight: 600;
 
   ${({ theme, $touchState }) =>
     buttonHoverPress({
       activeColor: theme.color.gray[200],
       touchState: $touchState,
-    })}
-`;
-
-export const Icon = styled.img`
-  width: 25px;
-  height: 25px;
-  opacity: 0.5;
+    })};
 `;
