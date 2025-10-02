@@ -1,7 +1,7 @@
 package coffeeshout.minigame.infra.persistence;
 
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.infra.persistance.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomEntity;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.Repository;

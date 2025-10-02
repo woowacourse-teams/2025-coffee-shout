@@ -1,14 +1,14 @@
-package coffeeshout.room.infra.persistance.handler;
+package coffeeshout.room.infra.persistence.handler;
 
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.infra.persistance.PlayerEntity;
-import coffeeshout.room.infra.persistance.PlayerJpaRepository;
-import coffeeshout.room.infra.persistance.RoomEntity;
-import coffeeshout.room.infra.persistance.RoomJpaRepository;
-import coffeeshout.room.infra.persistance.RouletteResultEntity;
-import coffeeshout.room.infra.persistance.RouletteResultJpaRepository;
+import coffeeshout.room.infra.persistence.PlayerEntity;
+import coffeeshout.room.infra.persistence.PlayerJpaRepository;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
+import coffeeshout.room.infra.persistence.RouletteResultEntity;
+import coffeeshout.room.infra.persistence.RouletteResultJpaRepository;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.persistance;
+package coffeeshout.room.infra.persistence;
 
 import java.util.Optional;
 import org.springframework.data.repository.Repository;

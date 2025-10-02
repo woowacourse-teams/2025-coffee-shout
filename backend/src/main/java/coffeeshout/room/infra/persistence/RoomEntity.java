@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.persistance;
+package coffeeshout.room.infra.persistence;
 
 import coffeeshout.room.domain.RoomState;
 import jakarta.persistence.Column;

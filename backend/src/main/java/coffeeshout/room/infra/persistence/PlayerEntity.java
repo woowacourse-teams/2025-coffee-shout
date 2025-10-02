@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.persistance;
+package coffeeshout.room.infra.persistence;
 
 import coffeeshout.room.domain.player.PlayerType;
 import jakarta.persistence.Column;
