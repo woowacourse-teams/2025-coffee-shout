@@ -36,8 +36,8 @@ if [ -f "app/coffee-shout.pid" ]; then
 fi
 
 # JVM 옵션 설정
-JVM_OPTS="-Xms512m -Xmx1024m"
-JVM_OPTS="$JVM_OPTS -XX:+UseG1GC"
+JVM_OPTS="-Xms256m -Xmx512m"
+JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC"
 JVM_OPTS="$JVM_OPTS -XX:+PrintGCDetails"
 JVM_OPTS="$JVM_OPTS -Xloggc:logs/gc.log"
 JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
