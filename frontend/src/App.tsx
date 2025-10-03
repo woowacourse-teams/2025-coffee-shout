@@ -9,7 +9,7 @@ import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
 import { Suspense } from 'react';
-import GlobalErrorBoundary from './apis/error/GlobalErrorBoundary';
+import GlobalErrorBoundary from './components/@common/ErrorBoundary/GlobalErrorBoundary';
 
 const App = () => {
   return (

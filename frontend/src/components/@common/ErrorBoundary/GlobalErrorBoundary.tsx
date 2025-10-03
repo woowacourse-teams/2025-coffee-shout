@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from 'react';
-import { ApiError, NetworkError } from '../rest/error';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 import { ToastContext } from '@/components/@common/Toast/ToastContext';
-import GlobalErrorFallback from './GlobalErrorFallback';
+import GlobalErrorFallback from '@/components/@common/ErrorFallback/GlobalErrorFallback';
 
 interface Props {
   children: ReactNode;

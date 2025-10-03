@@ -1,8 +1,8 @@
 import Button from '@/components/@common/Button/Button';
-import * as S from './LocalErrorFallback.styled';
+import * as S from './ErrorFallback.styled';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import ErrorIcon from './ErrorIcon';
-import { getErrorInfo } from './errorMessages';
+import ErrorIcon from '@/components/@common/ErrorIcon/ErrorIcon';
+import { getErrorInfo } from '@/utils/errorMessages';
 
 const GlobalErrorFallback = ({ error }: { error: Error }) => {
   const { message, description } = getErrorInfo(error);

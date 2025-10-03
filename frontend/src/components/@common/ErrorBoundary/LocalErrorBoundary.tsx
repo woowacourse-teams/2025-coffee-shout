@@ -1,6 +1,6 @@
 import { Component, ReactNode } from 'react';
 import { ApiError, NetworkError } from '@/apis/rest/error';
-import LocalErrorFallback from './LocalErrorFallback';
+import LocalErrorFallback from '@/components/@common/ErrorFallback/LocalErrorFallback';
 
 interface Props {
   children: ReactNode;
