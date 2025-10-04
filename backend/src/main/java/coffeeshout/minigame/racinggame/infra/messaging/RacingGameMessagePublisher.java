@@ -24,8 +24,7 @@ public class RacingGameMessagePublisher {
     @EventListener
     @MessageResponse(
             path = "/room/{joinCode}/racing-game",
-            returnType = WebSocketResponse.class,
-            genericType = RacingGameRunnersStateResponse.class
+            returnType = RacingGameRunnersStateResponse.class
     )
     public void publishRunnersPosition(RunnersMovedEvent runnersMovedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
@@ -39,8 +38,7 @@ public class RacingGameMessagePublisher {
     @EventListener
     @MessageResponse(
             path = "/room/{joinCode}/racing-game/state",
-            returnType = WebSocketResponse.class,
-            genericType = RacingGameState.class
+            returnType = RacingGameState.class
     )
     public void publishRacingGameStart(RaceStartedEvent raceStartedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
