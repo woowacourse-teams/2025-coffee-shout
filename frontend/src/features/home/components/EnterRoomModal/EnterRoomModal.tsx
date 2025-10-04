@@ -55,7 +55,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) ABCDE"
+        placeholder="ex) ABCD"
         value={joinCode}
         onClear={() => setJoinCode('')}
         onChange={handleJoinCodeChange}
