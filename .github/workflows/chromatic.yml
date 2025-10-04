@@ -5,6 +5,10 @@ on:
     branches:
       - fe/dev
     types: [opened, synchronize]
+    paths:
+      - "frontend/**/*.stories.*"
+      - "frontend/.storybook/**"
+      - "frontend/src/**"
 
 env:
   CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
