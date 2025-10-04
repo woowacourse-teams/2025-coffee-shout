@@ -7,8 +7,7 @@ type Props = {
 };
 
 export const Container = styled.button<Props>`
-  width: 70px;
-  height: 35px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   display: flex;
