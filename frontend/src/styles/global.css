@@ -13,6 +13,9 @@ body {
 
   /* 모바일 더블탭 확대 차단 */
   touch-action: manipulation;
+
+  /*당겨서 새로고침 막기*/
+  overscroll-behavior: none;
 }
 
 body {

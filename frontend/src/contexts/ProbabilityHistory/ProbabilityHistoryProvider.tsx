@@ -9,10 +9,12 @@ const ProbabilityHistoryProvider = ({ children }: PropsWithChildren) => {
   });
 
   const updateCurrentProbabilities = useCallback((probabilities: PlayerProbability[]) => {
-    setProbabilityHistoryState((prev) => ({
-      prev: prev.current,
-      current: probabilities,
-    }));
+    setProbabilityHistoryState((prevState) => {
+      return {
+        prev: prevState.current,
+        current: probabilities,
+      };
+    });
   }, []);
 
   const clearProbabilityHistory = useCallback(() => {

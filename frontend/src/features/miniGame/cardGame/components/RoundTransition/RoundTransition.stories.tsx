@@ -1,19 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import MiniGameTransition from './MiniGameTransition';
+import RoundTransition from './RoundTransition';
 import CardIcon from '@/assets/card-icon.svg';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
 const meta = {
-  title: 'composition/MiniGameTransition',
-  component: MiniGameTransition,
+  title: 'Features/MiniGame/CardGame/RoundTransition',
+  component: RoundTransition,
 
   tags: ['autodocs'],
-} satisfies Meta<typeof MiniGameTransition>;
+} satisfies Meta<typeof RoundTransition>;
 
 export default meta;
 
-type Story = StoryObj<typeof MiniGameTransition>;
+type Story = StoryObj<typeof RoundTransition>;
 
 export const Default: Story = {
   args: {
@@ -22,7 +22,7 @@ export const Default: Story = {
   },
   render: (args) => (
     <RootContainer>
-      <MiniGameTransition {...args} />
+      <RoundTransition {...args} />
     </RootContainer>
   ),
 };
@@ -34,7 +34,7 @@ export const Animated: Story = {
   },
   render: (args) => (
     <AnimatedContainer>
-      <MiniGameTransition {...args} />
+      <RoundTransition {...args} />
     </AnimatedContainer>
   ),
 };

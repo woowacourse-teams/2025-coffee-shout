@@ -13,22 +13,17 @@ export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTra
   const [touchState, setTouchState] = useState<TouchState>('idle');
   const isTouchDevice = checkIsTouchDevice();
 
-  const handleTouchStart = useCallback(
-    (e: TouchEvent<HTMLButtonElement>) => {
-      if (!isTouchDevice) return;
-      if (isDisabled) return;
+  const handleTouchStart = useCallback(() => {
+    if (!isTouchDevice) return;
+    if (isDisabled) return;
 
-      e.preventDefault();
-      setTouchState('pressing');
-    },
-    [isTouchDevice, isDisabled]
-  );
+    setTouchState('pressing');
+  }, [isTouchDevice, isDisabled]);
 
   const handleTouchEnd = useCallback(
     (e: TouchEvent<HTMLButtonElement>) => {
       if (!isTouchDevice || isDisabled) return;
 
-      e.preventDefault();
       setTouchState('releasing');
       setTimeout(() => {
         setTouchState('idle');
