@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { ToastProvider } from '@/components/@common/Toast/ToastContext';
 import { ThemeProvider } from '@emotion/react';
 import type { Preview } from '@storybook/react-webpack5';
