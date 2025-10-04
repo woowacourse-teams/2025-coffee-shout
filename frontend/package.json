@@ -19,7 +19,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:jest": "jest --passWithNoTests --config jest.config.cjs",
-    "test:cypress": "cypress open"
+    "test:cypress": "cypress open",
+    "chromatic": "chromatic --exit-zero-on-changes"
   },
   "sideEffects": [
     "*.css",
@@ -50,6 +51,7 @@
     "@types/sockjs-client": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
+    "chromatic": "^13.3.0",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
     "cypress": "^14.5.1",
