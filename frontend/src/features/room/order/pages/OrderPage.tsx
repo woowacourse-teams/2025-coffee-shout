@@ -17,12 +17,12 @@ type ViewMode = 'simple' | 'detail';
 const VIEW_MODE_CONFIG = {
   simple: {
     title: '주문 리스트',
-    buttonText: '상세 보기',
+    buttonText: '참가자별 보기',
     ViewComponent: MenuCount,
   },
   detail: {
     title: '주문 리스트 상세',
-    buttonText: '요약 보기',
+    buttonText: '메뉴별 보기',
     ViewComponent: PlayerMenu,
   },
 } as const;
