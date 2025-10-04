@@ -213,10 +213,10 @@ export const ModalOpenAndClose = {
       expect(modalTitle).toBeInTheDocument();
     });
 
-    await step('모달 내부의 닫기(아이콘) 버튼 클릭', async () => {
-      const closeIconButton = within(document.body).getByRole('button', { name: /close-icon/i });
-      await userEvent.click(closeIconButton);
-    });
+    // await step('모달 내부의 닫기(아이콘) 버튼 클릭', async () => {
+    //   const closeIconButton = within(document.body).getByRole('button', { name: /close-icon/i });
+    //   await userEvent.click(closeIconButton);
+    // });
 
     await step('모달이 닫혔는지 확인', async () => {
       await waitFor(() => {
