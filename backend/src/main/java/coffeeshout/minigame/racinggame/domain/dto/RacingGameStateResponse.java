@@ -1,4 +1,9 @@
 package coffeeshout.minigame.racinggame.domain.dto;
 
-public record RacingGameStateResponse(String state) {
+import coffeeshout.minigame.racinggame.domain.RacingGameState;
+import generator.annotaions.JsonSchemaEnumType;
+
+public record RacingGameStateResponse(
+        @JsonSchemaEnumType(enumType = RacingGameState.class) String state
+) {
 }

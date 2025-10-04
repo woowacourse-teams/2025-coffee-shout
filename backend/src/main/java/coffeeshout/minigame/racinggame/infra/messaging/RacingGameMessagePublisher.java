@@ -38,7 +38,7 @@ public class RacingGameMessagePublisher {
     @EventListener
     @MessageResponse(
             path = "/room/{joinCode}/racing-game/state",
-            returnType = RacingGameState.class
+            returnType = RacingGameStateResponse.class
     )
     public void publishRacingGameStart(RaceStartedEvent raceStartedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
