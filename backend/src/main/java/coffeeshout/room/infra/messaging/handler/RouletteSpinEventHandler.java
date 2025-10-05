@@ -30,7 +30,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
 
             broadcastWinner(event.joinCode(), winner);
             
-            tryDbSave(event);
+            saveToDatabase(event);
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);
@@ -50,7 +50,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
             waitTime = 0,
             leaseTime = 5000
     )
-    public void tryDbSave(RouletteSpinEvent event) {
+    public void saveToDatabase(RouletteSpinEvent event) {
         final Winner winner = event.winner();
         rouletteService.saveRouletteResult(event.joinCode(), winner);
         log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",

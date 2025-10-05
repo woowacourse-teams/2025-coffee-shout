@@ -28,7 +28,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
 
             updateRoomStateAndStartGame(event);
             
-            tryDbSave(event);
+            saveToDatabase(event);
 
         } catch (Exception e) {
             log.error("미니게임 시작 이벤트 처리 실패: eventId={}, joinCode={}",
@@ -50,8 +50,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
             waitTime = 0,
             leaseTime = 5000
     )
-    @Transactional
-    public void tryDbSave(StartMiniGameCommandEvent event) {
+    public void saveToDatabase(StartMiniGameCommandEvent event) {
         cardGameService.saveGameEntities(event.joinCode());
         log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
