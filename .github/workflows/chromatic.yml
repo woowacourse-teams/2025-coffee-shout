@@ -10,9 +10,6 @@ on:
       - "frontend/.storybook/**"
       - "frontend/src/**"
 
-env:
-  CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
 jobs:
   chromatic-deploy:
     runs-on: ubuntu-latest
@@ -32,7 +29,7 @@ jobs:
       - name: Publish to Chromatic
         uses: chromaui/action@latest
         with:
-          projectToken: $CHROMATIC_PROJECT_TOKEN
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: frontend
           branchName: preview
           exitZeroOnChanges: true
