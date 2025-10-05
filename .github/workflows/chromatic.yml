@@ -8,7 +8,6 @@ on:
     paths:
       - "frontend/**/*.stories.*"
       - "frontend/.storybook/**"
-      - "frontend/src/**"
 
 jobs:
   chromatic-deploy:
@@ -44,5 +43,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## 📚 Storybook Preview\n\n🔗 **고정 URL**: ${{ steps.chromatic.outputs.storybookUrl }}`
+              body: `## 📚 Storybook Preview\n\n🔗 **고정 URL**: https://preview--68db92900b71dbe8fcff669b.chromatic.com\n\n최신 스토리북이 배포되었습니다!`
             })
