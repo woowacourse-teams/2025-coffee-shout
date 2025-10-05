@@ -33,7 +33,7 @@ export const Primary: Story = {
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
-    children: 'Secondary',
+    children: 'Secondary?',
     width: '120px',
     height: 'large',
   },
