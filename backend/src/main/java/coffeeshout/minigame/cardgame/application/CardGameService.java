@@ -8,8 +8,8 @@ import coffeeshout.minigame.cardgame.domain.cardgame.service.CardGameCommandServ
 import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.cardgame.infra.messaging.CardSelectStreamProducer;
 import coffeeshout.minigame.cardgame.infra.messaging.MiniGameEventPublisher;
-import coffeeshout.minigame.infra.persistence.MiniGameEntity;
-import coffeeshout.minigame.infra.persistence.MiniGameJpaRepository;
+import coffeeshout.minigame.cardgame.infra.persistence.MiniGameEntity;
+import coffeeshout.minigame.cardgame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;

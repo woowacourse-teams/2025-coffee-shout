@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.persistence.handler;
+package coffeeshout.minigame.cardgame.infra.persistence.handler;
 
 import coffeeshout.global.lock.RedisLock;
 import coffeeshout.minigame.cardgame.application.CardGameService;

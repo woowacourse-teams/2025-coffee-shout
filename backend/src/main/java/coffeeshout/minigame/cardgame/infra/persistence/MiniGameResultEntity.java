@@ -1,4 +1,4 @@
-package coffeeshout.minigame.infra.persistence;
+package coffeeshout.minigame.cardgame.infra.persistence;
 
 import coffeeshout.room.infra.persistence.PlayerEntity;
 import jakarta.persistence.Column;

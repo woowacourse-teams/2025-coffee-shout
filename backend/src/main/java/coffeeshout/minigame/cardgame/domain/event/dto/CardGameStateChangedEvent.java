@@ -1,4 +1,4 @@
-package coffeeshout.minigame.domain.cardgame.event.dto;
+package coffeeshout.minigame.cardgame.domain.event.dto;
 
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGameTaskType;
