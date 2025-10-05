@@ -3,7 +3,7 @@ import App from './App';
 import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 import CardGameProvider from './contexts/CardGame/CardGameProvider';
 import { lazy } from 'react';
-import RacingGamePlayPage from './features/miniGame/racingGame/RacingGamePlayPage';
+import RacingGamePlayPage from './features/miniGame/racingGame/pages/RacingGamePlayPage';
 
 const LobbyPage = lazy(
   /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')

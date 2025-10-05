@@ -2,9 +2,11 @@ import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPag
 import { MiniGameType } from '@/types/miniGame/common';
 import { JSX } from 'react';
 import { useParams } from 'react-router-dom';
+import RacingGamePlayPage from '../../racingGame/pages/RacingGamePlayPage';
 
 const MINI_GAME_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
   CARD_GAME: CardGamePlayPage,
+  RACING_GAME: RacingGamePlayPage,
   // '31_GAME': Random31GamePlayPage,
 } as const;
 
