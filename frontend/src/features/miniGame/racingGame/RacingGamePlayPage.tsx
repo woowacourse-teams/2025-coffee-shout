@@ -1,6 +1,6 @@
 import RacingPlayer from './components/RacingPlayer/RacingPlayer';
 import RacingLine from './components/RacingLine/RacingLine';
-import * as S from './RacingGamePage.styled';
+import * as S from './RacingGamePlayPage.styled';
 import PrepareOverlay from '../cardGame/components/PrepareOverlay/PrepareOverlay';
 import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
 import Finish from './components/Finish/Finish';
