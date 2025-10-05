@@ -30,4 +30,8 @@ jobs:
         run: npm install
 
       - name: Publish to Chromatic
-        run: npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN --branch-name=preview --exit-zero-on-changes
+        uses: chromaui/action@latest
+        with:
+          projectToken: $CHROMATIC_PROJECT_TOKEN
+          branchName: preview
+          exitZeroOnChanges: true
