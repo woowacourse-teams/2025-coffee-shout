@@ -47,7 +47,16 @@ const EnterRoomModal = ({ onClose }: Props) => {
   };
 
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setJoinCode(e.target.value.toUpperCase());
+    const value = e.target.value;
+
+    if (
+      value.length > 4 ||
+      (value.length > 0 && !/^[A-Z0-9]$/.test(value[value.length - 1].toUpperCase()))
+    ) {
+      return;
+    }
+
+    setJoinCode(value.toUpperCase());
   };
 
   return (
@@ -55,7 +64,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) ABCD"
+        placeholder="4자리 영문과 숫자 조합 ex) AB12"
         value={joinCode}
         onClear={() => setJoinCode('')}
         onChange={handleJoinCodeChange}
