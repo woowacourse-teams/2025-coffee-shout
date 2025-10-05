@@ -1,5 +1,6 @@
 package coffeeshout.minigame.infra.messaging.handler;
 
+import coffeeshout.global.lock.RedisLock;
 import coffeeshout.minigame.application.CardGameService;
 import coffeeshout.minigame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
@@ -9,6 +10,7 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -25,6 +27,8 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
                     event.eventId(), event.joinCode(), event.hostName());
 
             updateRoomStateAndStartGame(event);
+            
+            tryDbSave(event);
 
         } catch (Exception e) {
             log.error("미니게임 시작 이벤트 처리 실패: eventId={}, joinCode={}",
@@ -37,6 +41,20 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
         room.startNextGame(event.hostName());
 
         cardGameService.startInternal(event.joinCode(), event.hostName());
+    }
+
+    @Transactional
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
+    private void tryDbSave(StartMiniGameCommandEvent event) {
+        cardGameService.saveGameEntities(event.joinCode());
+        log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
+                event.eventId(), event.joinCode());
     }
 
     @Override
