@@ -28,8 +28,21 @@ jobs:
 
       - name: Publish to Chromatic
         uses: chromaui/action@latest
+        id: chromatic
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: frontend
           branchName: preview
           exitZeroOnChanges: true
+
+      - name: Comment PR with Storybook URL
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📚 Storybook Preview\n\n🔗 **고정 URL**: ${{ steps.chromatic.outputs.storybookUrl }}`
+            })
