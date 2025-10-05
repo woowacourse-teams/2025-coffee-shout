@@ -27,7 +27,7 @@ class RacingGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
     @BeforeEach
     void setUp(@Autowired RoomRepository roomRepository) throws Exception {
-        joinCode = new JoinCode("A4B2C");
+        joinCode = new JoinCode("A4BX");
         Room room = RoomFixture.호스트_꾹이();
         room.getPlayers().forEach(player -> player.updateReadyState(true));
         host = room.getHost();
@@ -63,7 +63,7 @@ class RacingGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // 자동 이동으로 위치 업데이트 메시지가 계속 발행됨
         MessageResponse positionUpdate1 = positionResponses.get(1, TimeUnit.SECONDS);
-        assertMessageContains(positionUpdate1, "\"runnerPosition\"");
+        assertMessageContains(positionUpdate1, "\"position\"");
         assertMessageContains(positionUpdate1, "\"distance\"");
     }
 
@@ -97,14 +97,14 @@ class RacingGameIntegrationTest extends WebSocketIntegrationTestSupport {
 
         // then - 위치 업데이트 메시지 확인
         MessageResponse positionUpdate = positionResponses.get(1, TimeUnit.SECONDS);
-        assertMessageContains(positionUpdate, "\"runnerPosition\"");
+        assertMessageContains(positionUpdate, "\"position\"");
         assertMessageContains(positionUpdate, "\"success\":true");
     }
 
     @Test
     void 게임이_완주되면_FINISHED_상태가_전송된다(@Autowired RoomRepository roomRepository) throws Exception {
         // given - 2인 플레이어 방 생성 (빠른 완주를 위해 최소 인원)
-        JoinCode singlePlayerJoinCode = new JoinCode("ABCDE");
+        JoinCode singlePlayerJoinCode = new JoinCode("A4BX");
         Room singlePlayerRoom = new Room(
                 singlePlayerJoinCode,
                 new PlayerName("솔로"),
@@ -121,7 +121,7 @@ class RacingGameIntegrationTest extends WebSocketIntegrationTestSupport {
         String joinCodeValue = singlePlayerJoinCode.getValue();
         String subscribeStateUrl = String.format("/topic/room/%s/racing-game/state", joinCodeValue);
         String startRequestUrl = String.format("/app/room/%s/racing-game/start", joinCodeValue);
-        String tapRequestUrl = String.format("/app/room/%s/racinggame/tap", joinCodeValue);
+        String tapRequestUrl = String.format("/app/room/%s/racing-game/tap", joinCodeValue);
 
         var stateResponses = singleSession.subscribe(subscribeStateUrl);
 
@@ -152,9 +152,9 @@ class RacingGameIntegrationTest extends WebSocketIntegrationTestSupport {
             Thread.sleep(50);
         }
 
-        // then - FINISHED 상태 확인 (최대 15초 대기)
+        // then - DONE 상태 확인 (최대 15초 대기)
         MessageResponse finishedState = stateResponses.get(15, TimeUnit.SECONDS);
-        assertMessageContains(finishedState, "\"state\":\"FINISHED\"");
+        assertMessageContains(finishedState, "\"state\":\"DONE\"");
         assertMessageContains(finishedState, "\"success\":true");
     }
 }
