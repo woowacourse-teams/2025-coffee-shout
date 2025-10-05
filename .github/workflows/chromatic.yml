@@ -33,5 +33,6 @@ jobs:
         uses: chromaui/action@latest
         with:
           projectToken: $CHROMATIC_PROJECT_TOKEN
+          workingDir: frontend
           branchName: preview
           exitZeroOnChanges: true
