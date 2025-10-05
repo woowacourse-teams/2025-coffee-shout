@@ -2,10 +2,9 @@ import RacingPlayer from '../components/RacingPlayer/RacingPlayer';
 import RacingLine from '../components/RacingLine/RacingLine';
 import * as S from './RacingGamePlayPage.styled';
 import PrepareOverlay from '../../cardGame/components/PrepareOverlay/PrepareOverlay';
-import { useRacingGameMock } from '@/features/miniGame/racingGame/mock/useRacingGameMock';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
@@ -13,12 +12,35 @@ import { useBackgroundAnimation } from '../hooks/useBackgroundAnimation';
 import { usePlayerData } from '../hooks/usePlayerData';
 import { getVisiblePlayers } from '../utils/getVisiblePlayers';
 import RacingGameOverlay from '../components/RacingGameOverlay/RacingGameOverlay';
-// import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
-const myName = '김철수';
+type RacingGameState = 'READY' | 'PLAYING' | 'FINISH';
+
+type RacingGameData = {
+  distance: {
+    start: number;
+    end: number;
+  };
+  players: Array<{
+    playerName: string;
+    x: number;
+    speed: number;
+  }>;
+};
 
 const RacingGamePage = () => {
-  const { racingGameState, racingGameData } = useRacingGameMock();
+  const { joinCode, myName } = useIdentifier();
+  const { send } = useWebSocket();
+  const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
+  const [racingGameData, setRacingGameData] = useState<RacingGameData>({
+    players: [],
+    distance: {
+      start: 0,
+      end: 1000,
+    },
+  });
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
@@ -39,16 +61,22 @@ const RacingGamePage = () => {
     mySpeed,
   });
 
-  // const handleRacingGameData = useCallback((data: RacingGameState) => {
-  //   setRacingGameData(data);
-  // }, []);
+  const handleRacingGameData = useCallback((data: RacingGameData) => {
+    setRacingGameData(data);
+  }, []);
 
-  // const handleRacingGameState = useCallback((data: RacingGameState) => {
-  //   setRacingGameState(data);
-  // }, []);
+  const handleRacingGameState = useCallback((data: RacingGameState) => {
+    setRacingGameState(data);
+  }, []);
 
-  // useWebSocketSubscription('/room/${joinCode}/racingGame', handleRacingGameData);
-  // useWebSocketSubscription('/room/${joinCode}/racingGame/state', handleRacingGameState);
+  useWebSocketSubscription(`/room/${joinCode}/racing-game`, handleRacingGameData);
+  useWebSocketSubscription(`/room/${joinCode}/racing-game/state`, handleRacingGameState);
+
+  useEffect(() => {
+    send(`/room/${joinCode}/racing-game/start`, {
+      hostName: myName,
+    });
+  }, [joinCode, send, myName]);
 
   return (
     <>
