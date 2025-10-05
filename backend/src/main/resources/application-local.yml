@@ -37,14 +37,14 @@ management:
       exposure:
         include: "health,info,metrics,prometheus,tracing"
   tracing:
-    enabled: true
+    enabled: false
     sampling:
       probability: 1.0
   otlp:
     tracing:
       endpoint: http://localhost:4318/v1/traces
       export:
-        enabled: true
+        enabled: false
   metrics:
     enable:
       tomcat: true
