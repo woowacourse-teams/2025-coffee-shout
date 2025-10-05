@@ -23,6 +23,7 @@ export const scalePressEffect = ({
   };
 
   return css`
+    isolation: isolate;
     transform: scale(${getScale()});
     transition: transform ${duration}ms ease-out;
   `;
