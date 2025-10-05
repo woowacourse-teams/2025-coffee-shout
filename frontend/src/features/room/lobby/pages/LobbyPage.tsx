@@ -133,9 +133,10 @@ const LobbyPage = () => {
   const handleMiniGameClick = (miniGameType: MiniGameType) => {
     if (playerType === 'GUEST') return;
 
-    const updatedMiniGames = selectedMiniGames.includes(miniGameType)
-      ? selectedMiniGames.filter((game) => game !== miniGameType)
-      : [...selectedMiniGames, miniGameType];
+    // const updatedMiniGames = selectedMiniGames.includes(miniGameType)
+    //   ? selectedMiniGames.filter((game) => game !== miniGameType)
+    //   : [...selectedMiniGames, miniGameType];
+    const updatedMiniGames = [miniGameType];
 
     setSelectedMiniGames(updatedMiniGames);
 
