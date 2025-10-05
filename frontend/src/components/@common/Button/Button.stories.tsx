@@ -24,7 +24,7 @@ type Story = StoryObj<typeof Button>;
 export const Primary: Story = {
   args: {
     variant: 'primary',
-    children: '테스트',
+    children: 'Primary',
     width: '120px',
     height: 'large',
   },
