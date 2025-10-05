@@ -52,7 +52,6 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
                 WebSocketResponse.success(response));
     }
 
-    @Transactional
     @RedisLock(
             key = "#event.eventId()",
             lockPrefix = "event:lock:",
@@ -60,20 +59,20 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
             waitTime = 0,
             leaseTime = 5000
     )
-    private void tryDbSave(RouletteSpinEvent event) {
+    @Transactional
+    public void tryDbSave(RouletteSpinEvent event) {
         final Winner winner = event.winner();
-        saveRouletteResult(event.joinCode(), winner);
-        log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
-                event.eventId(), event.joinCode(), winner.name().value());
-    }
-
-    private void saveRouletteResult(String joinCode, Winner winner) {
-        final RoomEntity roomEntity = getRoomEntity(joinCode);
+        
+        // RoomEntity 조회 및 상태 업데이트
+        final RoomEntity roomEntity = getRoomEntity(event.joinCode());
         roomEntity.updateRoomStatus(RoomState.DONE);
         roomEntity.finish();
+        roomJpaRepository.save(roomEntity);  // ← 명시적 save 추가
 
+        // PlayerEntity 조회
         final PlayerEntity playerEntity = getPlayerEntity(roomEntity, winner.name().value());
 
+        // RouletteResultEntity 저장
         final RouletteResultEntity rouletteResult = new RouletteResultEntity(
                 roomEntity,
                 playerEntity,
@@ -82,7 +81,9 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
         rouletteResultJpaRepository.save(rouletteResult);
 
         log.info("RouletteResultEntity 저장 완료: joinCode={}, winner={}, probability={}",
-                joinCode, winner.name().value(), winner.probability());
+                event.joinCode(), winner.name().value(), winner.probability());
+        log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
+                event.eventId(), event.joinCode(), winner.name().value());
     }
 
     private RoomEntity getRoomEntity(String joinCode) {

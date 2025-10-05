@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -63,6 +64,7 @@ public class CardGameService implements MiniGameService {
         eventPublisher.publishEvent(new CardGameStartedEvent(roomJoinCode, cardGame));
     }
 
+    @Transactional
     public void saveGameEntities(String joinCode) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);

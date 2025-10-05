@@ -43,7 +43,6 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
         cardGameService.startInternal(event.joinCode(), event.hostName());
     }
 
-    @Transactional
     @RedisLock(
             key = "#event.eventId()",
             lockPrefix = "event:lock:",
@@ -51,7 +50,8 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
             waitTime = 0,
             leaseTime = 5000
     )
-    private void tryDbSave(StartMiniGameCommandEvent event) {
+    @Transactional
+    public void tryDbSave(StartMiniGameCommandEvent event) {
         cardGameService.saveGameEntities(event.joinCode());
         log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
