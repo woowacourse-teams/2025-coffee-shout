@@ -11,7 +11,7 @@ const RouletteResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { joinCode } = useIdentifier();
-  const winner = location.state?.winner ?? '당첨자';
+  const winner = location.state?.winner ?? '알 수 없는 사용자';
 
   useEffect(() => {
     const timer = setTimeout(() => {

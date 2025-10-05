@@ -1,14 +1,14 @@
 import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
-import * as S from './IconButton.styled';
+import * as S from './TextButton.styled';
 import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
-  iconSrc: string;
+  text: string;
   onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
-const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
+const TextButton = ({ text, onClick, ...rest }: Props) => {
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
   const isTouchDevice = checkIsTouchDevice();
 
@@ -25,9 +25,9 @@ const IconButton = ({ iconSrc, onClick, ...rest }: Props) => {
       $touchState={touchState}
       {...rest}
     >
-      <S.Icon src={iconSrc} alt={'icon-button'} />
+      {text}
     </S.Container>
   );
 };
 
-export default IconButton;
+export default TextButton;
