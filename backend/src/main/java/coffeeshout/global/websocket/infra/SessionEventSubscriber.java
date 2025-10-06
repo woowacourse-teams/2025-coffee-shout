@@ -29,6 +29,8 @@ public class SessionEventSubscriber implements MessageListener {
 
     @PostConstruct
     public void subscribe() {
+        // 중복 등록 방지: 이미 등록되어 있으면 제거 후 재등록
+        redisMessageListenerContainer.removeMessageListener(this, sessionEventTopic);
         redisMessageListenerContainer.addMessageListener(this, sessionEventTopic);
         log.info("세션 이벤트 구독 시작: topic={}", sessionEventTopic.getTopic());
     }

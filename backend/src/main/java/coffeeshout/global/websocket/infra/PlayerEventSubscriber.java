@@ -29,6 +29,8 @@ public class PlayerEventSubscriber implements MessageListener {
 
     @PostConstruct
     public void subscribe() {
+        // 중복 등록 방지: 이미 등록되어 있으면 제거 후 재등록
+        redisMessageListenerContainer.removeMessageListener(this, playerEventTopic);
         redisMessageListenerContainer.addMessageListener(this, playerEventTopic);
         log.info("플레이어 이벤트 구독 시작: topic={}", playerEventTopic.getTopic());
     }
