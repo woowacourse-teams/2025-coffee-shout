@@ -23,6 +23,14 @@ public class RouletteService {
     private final RouletteResultJpaRepository rouletteResultJpaRepository;
 
     @Transactional
+    public void updateRoomStatusToRoulette(String joinCode) {
+        final RoomEntity roomEntity = getRoomEntity(joinCode);
+        roomEntity.updateRoomStatus(RoomState.ROULETTE);
+        
+        log.info("RoomEntity 상태 업데이트 완료: joinCode={}, status=ROULETTE", joinCode);
+    }
+
+    @Transactional
     public void saveRouletteResult(String joinCode, Winner winner) {
         // RoomEntity 조회 및 상태 업데이트
         final RoomEntity roomEntity = getRoomEntity(joinCode);
