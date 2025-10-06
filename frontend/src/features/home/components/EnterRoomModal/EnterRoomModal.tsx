@@ -6,6 +6,7 @@ import { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
+import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -47,7 +48,17 @@ const EnterRoomModal = ({ onClose }: Props) => {
   };
 
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setJoinCode(e.target.value.toUpperCase());
+    const value = e.target.value;
+    const upperValue = value.toUpperCase();
+    const lastChar = upperValue.slice(-1);
+
+    const isTooLong = upperValue.length > JOIN_CODE_LENGTH;
+    const isNotEmpty = upperValue.length > 0;
+    const isInvalidChar = isNotEmpty && !/^[A-Z0-9]$/.test(lastChar);
+
+    if (isTooLong || isInvalidChar) return;
+
+    setJoinCode(value.toUpperCase());
   };
 
   return (
@@ -55,7 +66,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) ABCD"
+        placeholder={`${JOIN_CODE_LENGTH}자리 영문과 숫자 조합 ex) AB12`}
         value={joinCode}
         onClear={() => setJoinCode('')}
         onChange={handleJoinCodeChange}
