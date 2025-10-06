@@ -30,6 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
@@ -46,8 +47,18 @@ public abstract class WebSocketIntegrationTestSupport {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private org.springframework.data.redis.listener.RedisMessageListenerContainer redisMessageListenerContainer;
+
     @LocalServerPort
     private int port;
+
+    @BeforeEach
+    void cleanupRedisListeners() {
+        // 모든 리스너 제거 후 재시작하여 중복 등록 방지
+        redisMessageListenerContainer.stop();
+        redisMessageListenerContainer.start();
+    }
 
     protected TestStompSession createSession() throws InterruptedException, ExecutionException, TimeoutException {
         SockJsClient sockJsClient = new SockJsClient(List.of(
