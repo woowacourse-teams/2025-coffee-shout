@@ -21,6 +21,13 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
     private final RoomQueryService roomQueryService;
 
     @Override
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
     public void handle(StartMiniGameCommandEvent event) {
         try {
             log.info("미니게임 시작 이벤트 수신: eventId={}, joinCode={}, hostName={}",
@@ -28,7 +35,9 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
 
             updateRoomStateAndStartGame(event);
             
-            saveToDatabase(event);
+            cardGameService.saveGameEntities(event.joinCode());
+            log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
+                    event.eventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("미니게임 시작 이벤트 처리 실패: eventId={}, joinCode={}",
@@ -41,19 +50,6 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
         room.startNextGame(event.hostName());
 
         cardGameService.startInternal(event.joinCode(), event.hostName());
-    }
-
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
-    public void saveToDatabase(StartMiniGameCommandEvent event) {
-        cardGameService.saveGameEntities(event.joinCode());
-        log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
-                event.eventId(), event.joinCode());
     }
 
     @Override

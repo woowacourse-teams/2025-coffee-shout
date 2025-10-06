@@ -21,6 +21,13 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
     private final RouletteService rouletteService;
 
     @Override
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
     public void handle(RouletteSpinEvent event) {
         try {
             log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
@@ -30,7 +37,9 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
 
             broadcastWinner(event.joinCode(), winner);
             
-            saveToDatabase(event);
+            rouletteService.saveRouletteResult(event.joinCode(), winner);
+            log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
+                    event.eventId(), event.joinCode(), winner.name().value());
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);
@@ -41,20 +50,6 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
         final WinnerResponse response = WinnerResponse.from(winner);
         messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
                 WebSocketResponse.success(response));
-    }
-
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
-    public void saveToDatabase(RouletteSpinEvent event) {
-        final Winner winner = event.winner();
-        rouletteService.saveRouletteResult(event.joinCode(), winner);
-        log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
-                event.eventId(), event.joinCode(), winner.name().value());
     }
 
     @Override

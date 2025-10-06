@@ -31,8 +31,12 @@ public class RedisLockAspect {
     private final RedisTemplate<String, String> redisTemplate;
     private final ExpressionParser parser = new SpelExpressionParser();
 
-    @Around("@annotation(redisLock)")
-    public Object lock(ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
+    @Around("@annotation(coffeeshout.global.lock.RedisLock)")
+    public Object lock(ProceedingJoinPoint joinPoint) throws Throwable {
+        final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        final Method method = signature.getMethod();
+        final RedisLock redisLock = method.getAnnotation(RedisLock.class);
+        
         final String lockKey = getLockKey(joinPoint, redisLock);
         final String doneKey = getDoneKey(joinPoint, redisLock);
 

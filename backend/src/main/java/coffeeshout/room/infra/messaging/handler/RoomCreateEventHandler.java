@@ -27,6 +27,13 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     private final RoomService roomService;
 
     @Override
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
     public void handle(RoomCreateEvent event) {
 
         try {
@@ -54,24 +61,13 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
 
-            saveToDatabase(event);
+            roomService.saveRoomEntity(event.joinCode());
+            log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
+                    event.eventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
         }
-    }
-
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
-    private void saveToDatabase(RoomCreateEvent event) {
-        roomService.saveRoomEntity(event.joinCode());
-        log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
-                event.eventId(), event.joinCode());
     }
 
     @Override
