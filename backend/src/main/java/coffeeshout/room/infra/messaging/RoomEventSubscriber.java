@@ -37,8 +37,6 @@ public class RoomEventSubscriber implements MessageListener {
 
     @PostConstruct
     public void subscribe() {
-        // 중복 등록 방지: 이미 등록되어 있으면 제거 후 재등록
-        redisMessageListenerContainer.removeMessageListener(this, roomEventTopic);
         redisMessageListenerContainer.addMessageListener(this, roomEventTopic);
         log.info("방 이벤트 구독 시작: topic={}", roomEventTopic.getTopic());
     }
