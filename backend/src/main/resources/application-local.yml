@@ -49,6 +49,9 @@ management:
     enable:
       tomcat: true
 
+redisson:
+  enabled: true
+
 room:
   qr:
     prefix: http://localhost:8080/join/
