@@ -3,7 +3,11 @@ import { StompSubscription } from '@stomp/stompjs';
 import { useCallback, useEffect, useRef } from 'react';
 import { useWebSocket } from '../contexts/WebSocketContext';
 
-export const useWebSocketSubscription = <T>(destination: string, onData: (data: T) => void) => {
+export const useWebSocketSubscription = <T>(
+  destination: string,
+  onData: (data: T) => void,
+  onError?: (error: Error) => void
+) => {
   const { isVisible } = usePageVisibility();
   const { subscribe, isConnected, client } = useWebSocket();
   const subscriptionRef = useRef<StompSubscription | null>(null);
@@ -29,7 +33,7 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
 
     if (shouldSubscribe) {
       try {
-        const subscription = subscribe<T>(destination, onData);
+        const subscription = subscribe<T>(destination, onData, onError);
         subscriptionRef.current = subscription;
         lastConnectedRef.current = true;
         console.log(`✅ 웹소켓 구독 성공: ${destination}`);
@@ -39,5 +43,5 @@ export const useWebSocketSubscription = <T>(destination: string, onData: (data: 
     }
 
     return unsubscribe;
-  }, [isConnected, isVisible, subscribe, destination, onData, client, unsubscribe]);
+  }, [isConnected, isVisible, subscribe, destination, onData, onError, client, unsubscribe]);
 };

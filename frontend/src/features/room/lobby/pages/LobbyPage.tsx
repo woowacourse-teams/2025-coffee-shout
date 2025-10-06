@@ -79,6 +79,14 @@ const LobbyPage = () => {
     setSelectedMiniGames(data);
   }, []);
 
+  const handleMiniGameError = useCallback(() => {
+    if (playerType === 'GUEST') return;
+    showToast({
+      type: 'error',
+      message: '미니게임 선택에 실패하였습니다. 다시 시도해주세요.',
+    });
+  }, [playerType, showToast]);
+
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
@@ -89,7 +97,11 @@ const LobbyPage = () => {
   );
 
   useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
-  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+  useWebSocketSubscription<MiniGameType[]>(
+    `/room/${joinCode}/minigame`,
+    handleMiniGameData,
+    handleMiniGameError
+  );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   useEffect(() => {
@@ -145,12 +157,14 @@ const LobbyPage = () => {
       ? selectedMiniGames.filter((game) => game !== miniGameType)
       : [...selectedMiniGames, miniGameType];
 
-    setSelectedMiniGames(updatedMiniGames);
-
-    send(`/room/${joinCode}/update-minigames`, {
-      hostName: myName,
-      miniGameTypes: updatedMiniGames,
-    });
+    send(
+      `/room/${joinCode}/update-minigames`,
+      {
+        hostName: myName,
+        miniGameTypes: updatedMiniGames,
+      },
+      handleMiniGameError
+    );
   };
 
   const handleGameReadyButtonClick = () => {
