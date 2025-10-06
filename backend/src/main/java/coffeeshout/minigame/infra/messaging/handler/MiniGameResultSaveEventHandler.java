@@ -40,7 +40,7 @@ public class MiniGameResultSaveEventHandler {
             return;
         }
 
-        tryDbSaveResult(event);
+        saveToDatabase(event);
     }
 
     @RedisLock(
@@ -50,7 +50,7 @@ public class MiniGameResultSaveEventHandler {
             waitTime = 0,
             leaseTime = 5000
     )
-    private void tryDbSaveResult(CardGameStateChangedEvent event) {
+    private void saveToDatabase(CardGameStateChangedEvent event) {
         final String joinCode = event.room().getJoinCode().getValue();
 
         final RoomEntity roomEntity = roomJpaRepository.findByJoinCode(joinCode)

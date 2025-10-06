@@ -54,7 +54,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));
 
-            tryDbSave(event);
+            saveToDatabase(event);
 
         } catch (Exception e) {
             log.error("방 생성 이벤트 처리 실패", e);
@@ -68,7 +68,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             waitTime = 0,
             leaseTime = 5000
     )
-    private void tryDbSave(RoomCreateEvent event) {
+    private void saveToDatabase(RoomCreateEvent event) {
         roomService.saveRoomEntity(event.joinCode());
         log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
