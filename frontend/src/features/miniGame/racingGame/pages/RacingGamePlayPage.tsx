@@ -5,6 +5,7 @@ import PrepareOverlay from '../../cardGame/components/PrepareOverlay/PrepareOver
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
@@ -16,7 +17,7 @@ import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSub
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 
-type RacingGameState = 'READY' | 'PLAYING' | 'FINISH';
+type RacingGameState = 'READY' | 'PLAYING' | 'FINISH' | 'DONE';
 
 type RacingGameData = {
   distance: {
@@ -33,6 +34,7 @@ type RacingGameData = {
 const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
+  const navigate = useNavigate();
   const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
   const [racingGameData, setRacingGameData] = useState<RacingGameData>({
     players: [],
@@ -42,6 +44,7 @@ const RacingGamePage = () => {
     },
   });
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { miniGameType } = useParams();
 
   const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
 
@@ -76,9 +79,9 @@ const RacingGamePage = () => {
     [myName]
   );
 
-  const handleRacingGameState = useCallback((data: RacingGameState) => {
+  const handleRacingGameState = useCallback((data: { state: RacingGameState }) => {
     console.log('handleRacingGameState', data);
-    setRacingGameState(data);
+    setRacingGameState(data.state);
   }, []);
 
   useWebSocketSubscription(`/room/${joinCode}/racing-game`, handleRacingGameData);
@@ -90,10 +93,16 @@ const RacingGamePage = () => {
     });
   }, [joinCode, send, myName]);
 
+  useEffect(() => {
+    if (racingGameState === 'DONE') {
+      navigate(`/room/${joinCode}/${miniGameType}/result`);
+    }
+  }, [racingGameState, joinCode, navigate, miniGameType]);
+
   return (
     <>
       {racingGameState === 'READY' && <PrepareOverlay />}
-      {racingGameState === 'FINISH' && <Finish />}
+      {racingGameState === 'DONE' && <Finish />}
       {showGoal && <Goal />}
       <RacingGameOverlay>
         <S.Container ref={containerRef}>
