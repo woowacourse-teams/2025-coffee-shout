@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.div`
+export const Container = styled.section`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,7 +15,7 @@ export const LogoImage = styled.img`
   user-select: none;
 `;
 
-export const LogoText = styled.span`
+export const LogoText = styled.h1`
   font-size: 40px;
   color: white;
   font-family: 'PartialSansKR-Regular';

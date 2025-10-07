@@ -28,7 +28,7 @@ export const Logo = styled.img`
   }
 `;
 
-export const ButtonContainer = styled.div`
+export const ButtonContainer = styled.section`
   display: flex;
   flex-direction: column;
   gap: 16px;
