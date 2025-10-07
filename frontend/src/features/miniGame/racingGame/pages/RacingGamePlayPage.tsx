@@ -17,7 +17,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 
-type RacingGameState = 'READY' | 'PLAYING' | 'FINISH' | 'DONE';
+type RacingGameState = 'READY' | 'PLAYING' | 'DONE';
 
 type RacingGameData = {
   distance: {
