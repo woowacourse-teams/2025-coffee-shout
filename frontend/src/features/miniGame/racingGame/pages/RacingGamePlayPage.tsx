@@ -53,8 +53,6 @@ const RacingGamePage = () => {
     myName,
   });
 
-  console.log('Current myPosition:', myPosition, 'mySpeed:', mySpeed);
-
   const showGoal = useGoalDisplay({
     myPosition,
     endDistance: racingGameData.distance.end,
@@ -66,21 +64,12 @@ const RacingGamePage = () => {
     mySpeed,
   });
 
-  const handleRacingGameData = useCallback(
-    (data: RacingGameData) => {
-      console.log('handleRacingGameData', data);
-      console.log('myName:', myName);
-      console.log(
-        'myPosition will be:',
-        data.players.find((p) => p.playerName === myName)?.position
-      );
-      setRacingGameData(data);
-    },
-    [myName]
-  );
+  const handleRacingGameData = useCallback((data: RacingGameData) => {
+    setRacingGameData(data);
+  }, []);
 
   const handleRacingGameState = useCallback((data: { state: RacingGameState }) => {
-    console.log('handleRacingGameState', data);
+    console.log('handleRacingGameState', data.state);
     setRacingGameState(data.state);
   }, []);
 
@@ -88,9 +77,11 @@ const RacingGamePage = () => {
   useWebSocketSubscription(`/room/${joinCode}/racing-game/state`, handleRacingGameState);
 
   useEffect(() => {
-    send(`/room/${joinCode}/racing-game/start`, {
-      hostName: myName,
-    });
+    setTimeout(() => {
+      send(`/room/${joinCode}/racing-game/start`, {
+        hostName: myName,
+      });
+    }, 2000);
   }, [joinCode, send, myName]);
 
   useEffect(() => {

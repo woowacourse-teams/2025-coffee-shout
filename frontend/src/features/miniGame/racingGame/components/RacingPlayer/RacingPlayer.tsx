@@ -16,10 +16,6 @@ type Props = {
 const RacingPlayer = ({ position, speed, isMe, myPosition, colorIndex, playerName }: Props) => {
   const rotatingRef = useRotationAnimation({ speed });
 
-  console.log(
-    `RacingPlayer ${playerName} - position: ${position}, myPosition: ${myPosition}, isMe: ${isMe}`
-  );
-
   return (
     <S.Player $isMe={isMe} $position={position} $myPosition={myPosition}>
       <S.PlayerName>
