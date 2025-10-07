@@ -1,11 +1,8 @@
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { ChangeEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { ChangeEvent } from 'react';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
@@ -21,9 +18,6 @@ import MenuList from './components/MenuList/MenuList';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 
 const EntryMenuPage = () => {
-  const navigate = useNavigate();
-  const { isConnected } = useWebSocket();
-  const { joinCode, qrCodeUrl } = useIdentifier();
   const { playerType } = usePlayerType();
 
   const {
@@ -49,14 +43,6 @@ const EntryMenuPage = () => {
   const { menus } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
-
-  useEffect(() => {
-    const isReadyToNavigateLobby =
-      joinCode && qrCodeUrl && (menu.value || customMenu.value) && isConnected;
-    if (isReadyToNavigateLobby) {
-      navigate(`/room/${joinCode}/lobby`);
-    }
-  }, [joinCode, qrCodeUrl, menu, customMenu, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetAll();

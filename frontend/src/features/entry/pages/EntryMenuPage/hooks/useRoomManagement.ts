@@ -35,25 +35,6 @@ export const useRoomManagement = () => {
   const { showToast } = useToast();
   const { setQrCodeUrl } = useIdentifier();
 
-  const handleRoomRequest = async (
-    selectedMenu: Menu | null,
-    customMenuName: string | null,
-    selectedTemperature: TemperatureOption
-  ) => {
-    try {
-      setIsLoading(true);
-      const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-        createUrl(playerType, joinCode),
-        createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
-      );
-      setJoinCode(_joinCode);
-      setQrCodeUrl(qrCodeUrl);
-      startSocket(_joinCode, myName);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const isMenuSelectionValid = (selectedMenu: Menu | null, customMenuName: string | null) => {
     if (!selectedMenu && !customMenuName) {
       showToast({
@@ -86,7 +67,23 @@ export const useRoomManagement = () => {
     if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
     try {
-      await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
+      setIsLoading(true);
+
+      const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
+        createUrl(playerType, joinCode),
+        createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
+      );
+
+      setJoinCode(_joinCode);
+      setQrCodeUrl(qrCodeUrl);
+
+      startSocket(_joinCode, myName);
+
+      const isReadyToNavigateLobby = _joinCode && qrCodeUrl && (selectedMenu || customMenuName);
+
+      if (isReadyToNavigateLobby) {
+        navigate(`/room/${_joinCode}/lobby`);
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         showToast({
