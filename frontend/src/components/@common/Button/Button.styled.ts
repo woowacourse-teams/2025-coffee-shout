@@ -2,7 +2,7 @@ import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 
 import { Size } from '@/types/styles';
 import { TouchState } from '@/types/touchState';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading' | 'ready';
@@ -12,6 +12,7 @@ type Props = {
   $width: string;
   $height: Size;
   $touchState: TouchState;
+  $isLoading: boolean;
 };
 
 export const Container = styled.button<Props>`
@@ -35,31 +36,17 @@ export const Container = styled.button<Props>`
   border: none;
   border-radius: 12px;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 
   ${({ $variant, theme, $touchState }) => {
     switch ($variant) {
-      case 'secondary': {
-        const baseColor = theme.color.gray[50];
-        const activeColor = theme.color.gray[100];
-        const hoverPressStyles = buttonHoverPress({
-          activeColor,
-          touchState: $touchState,
-        });
-
+      case 'secondary':
         return css`
-          background: ${baseColor};
+          background: ${theme.color.gray[50]};
           color: ${theme.color.gray[700]};
-          ${hoverPressStyles}
+          ${buttonHoverPress({ activeColor: theme.color.gray[100], touchState: $touchState })}
         `;
-      }
-
-      case 'loading':
-        return css`
-          background: ${theme.color.point[200]};
-          color: ${theme.color.white};
-          cursor: default;
-        `;
-
       case 'disabled':
         return css`
           background: ${theme.color.gray[200]};
@@ -67,28 +54,73 @@ export const Container = styled.button<Props>`
           cursor: default;
           opacity: 0.7;
         `;
-
       case 'ready':
         return css`
           background: ${theme.color.point[50]};
           color: ${theme.color.point[400]};
         `;
-
-      case 'primary':
-      default: {
-        const baseColor = theme.color.point[400];
-        const activeColor = theme.color.point[500];
-        const hoverPressStyles = buttonHoverPress({
-          activeColor,
-          touchState: $touchState,
-        });
-
+      default:
         return css`
-          background: ${baseColor};
+          background: ${theme.color.point[400]};
           color: ${theme.color.white};
-          ${hoverPressStyles}
+          ${buttonHoverPress({ activeColor: theme.color.point[500], touchState: $touchState })}
         `;
-      }
     }
   }}
+
+  ${({ $variant, $isLoading, theme }) =>
+    ($variant === 'loading' || $isLoading) &&
+    css`
+      cursor: default;
+      background: ${theme.color.point[300]};
+      color: transparent;
+      pointer-events: none;
+
+      /* hover/active 효과 완전 비활성화 */
+      &:hover,
+      &:active,
+      &:focus {
+        transform: none;
+        background: inherit;
+        box-shadow: none;
+        outline: none;
+      }
+    `}
+`;
+
+const dotPulse = keyframes`
+  0%, 20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  80%, 100% {
+    opacity: 0.3;
+  }
+`;
+
+export const LoadingDots = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    animation: ${dotPulse} 1.2s infinite ease-in-out;
+
+    &:nth-of-type(1) {
+      animation-delay: 0s;
+    }
+    &:nth-of-type(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-of-type(3) {
+      animation-delay: 0.4s;
+    }
+  }
 `;

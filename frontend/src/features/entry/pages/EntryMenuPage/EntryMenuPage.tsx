@@ -48,7 +48,7 @@ const EntryMenuPage = () => {
   const { categories } = useCategories();
   const { menus } = useMenus(category.value?.id ?? null);
 
-  const { proceedToRoom } = useRoomManagement();
+  const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
   useEffect(() => {
     const isReadyToNavigateLobby =
@@ -140,7 +140,9 @@ const EntryMenuPage = () => {
       {shouldShowButtonBar &&
         (playerType === 'HOST' ? (
           <Layout.ButtonBar>
-            <Button onClick={handleProceedToRoom}>방 만들러 가기</Button>
+            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
+              방 만들러 가기
+            </Button>
           </Layout.ButtonBar>
         ) : (
           <Layout.ButtonBar>

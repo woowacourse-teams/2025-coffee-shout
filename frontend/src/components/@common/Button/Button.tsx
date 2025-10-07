@@ -5,21 +5,23 @@ import { Size } from '@/types/styles';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
-  onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
   variant?: S.ButtonVariant;
+  onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  isLoading?: boolean;
   width?: string;
   height?: Size;
 } & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({
   variant = 'primary',
+  isLoading = false,
   width = '100%',
   height = 'large',
   children,
   onClick,
   ...rest
 }: Props) => {
-  const isDisabled = variant === 'disabled' || variant === 'loading';
+  const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
     onClick,
     isDisabled,
@@ -33,6 +35,8 @@ const Button = ({
     onClick?.(e);
   };
 
+  const isInLoadingState = variant === 'loading' || isLoading;
+
   return (
     <S.Container
       type="button"
@@ -40,15 +44,24 @@ const Button = ({
       $touchState={touchState}
       $width={width}
       $height={height}
+      $isLoading={isLoading}
       disabled={isDisabled}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       {...rest}
     >
-      {children}
+      {isInLoadingState ? <LoadingDots /> : children}
     </S.Container>
   );
 };
 
 export default Button;
+
+const LoadingDots = () => (
+  <S.LoadingDots>
+    <span></span>
+    <span></span>
+    <span></span>
+  </S.LoadingDots>
+);

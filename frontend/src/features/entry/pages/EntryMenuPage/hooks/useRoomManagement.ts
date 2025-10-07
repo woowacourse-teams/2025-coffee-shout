@@ -7,6 +7,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
+import { useState } from 'react';
 
 export type RoomRequest = {
   playerName: string;
@@ -24,6 +25,8 @@ type RoomResponse = {
 
 export const useRoomManagement = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
 
@@ -37,13 +40,18 @@ export const useRoomManagement = () => {
     customMenuName: string | null,
     selectedTemperature: TemperatureOption
   ) => {
-    const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-      createUrl(playerType, joinCode),
-      createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
-    );
-    setJoinCode(_joinCode);
-    setQrCodeUrl(qrCodeUrl);
-    startSocket(_joinCode, myName);
+    try {
+      setIsLoading(true);
+      const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
+        createUrl(playerType, joinCode),
+        createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
+      );
+      setJoinCode(_joinCode);
+      setQrCodeUrl(qrCodeUrl);
+      startSocket(_joinCode, myName);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isMenuSelectionValid = (selectedMenu: Menu | null, customMenuName: string | null) => {
@@ -101,5 +109,6 @@ export const useRoomManagement = () => {
 
   return {
     proceedToRoom,
+    isLoading,
   };
 };
