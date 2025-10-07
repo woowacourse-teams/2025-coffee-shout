@@ -1,5 +1,4 @@
-import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import Button from '@/components/@common/Button/Button';
 import Description from '@/components/@common/Description/Description';
@@ -12,7 +11,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
@@ -46,10 +45,27 @@ const MiniGameResultPage = () => {
   const { myName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { getParticipantColorIndex } = useParticipants();
-  const [ranks, setRanks] = useState<PlayerRank[] | null>(null);
-  const [scores, setScores] = useState<PlayerScore[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const {
+    data: ranksData,
+    loading: ranksLoading,
+    error: ranksError,
+  } = useFetch<PlayerRankResponse>({
+    endpoint: `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`,
+    enabled: !!(joinCode && miniGameType),
+  });
+
+  const {
+    data: scoresData,
+    loading: scoresLoading,
+    error: scoresError,
+  } = useFetch<PlayerScoreResponse>({
+    endpoint: `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`,
+    enabled: !!(joinCode && miniGameType),
+  });
+
+  const loading = ranksLoading || scoresLoading;
+  const error = ranksError || scoresError;
 
   const handleNavigateToRoulettePlayPage = useCallback(() => {
     navigate(`/room/${joinCode}/roulette/play`);
@@ -64,33 +80,11 @@ const MiniGameResultPage = () => {
     send(`/room/${joinCode}/show-roulette`);
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
+  const ranks = ranksData?.ranks?.sort((a, b) => a.rank - b.rank) || null;
+  const scores = scoresData?.scores || null;
 
-        const { ranks } = await api.get<PlayerRankResponse>(
-          `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`
-        );
-        const { scores } = await api.get<PlayerScoreResponse>(
-          `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`
-        );
-        ranks.sort((a, b) => a.rank - b.rank);
-        setRanks(ranks);
-        setScores(scores);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setError(error.message);
-        } else if (error instanceof NetworkError) {
-          setError('네트워크 연결을 확인해주세요');
-        } else {
-          setError('알 수 없는 오류가 발생했습니다');
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [joinCode, miniGameType]);
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <Layout>
@@ -104,11 +98,7 @@ const MiniGameResultPage = () => {
         </S.Banner>
       </Layout.Banner>
       <Layout.Content>
-        {loading ? (
-          <div>로딩 중...</div>
-        ) : error ? (
-          <div>{error}</div>
-        ) : ranks && scores ? (
+        {ranks && scores ? (
           <S.ResultList>
             {ranks.map((playerRank) => (
               <S.PlayerCardWrapper

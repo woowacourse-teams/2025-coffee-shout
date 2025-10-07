@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import CafeCategoryCard from './CafeCategoryCard';
-import AdeIcon from '@/assets/ade.svg';
+import CoffeeCharacterIcon from '@/assets/coffee-character.svg';
+import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 
 const meta: Meta<typeof CafeCategoryCard> = {
   title: 'Composition/CafeCategoryCard',
@@ -14,30 +15,27 @@ const meta: Meta<typeof CafeCategoryCard> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Ade: Story = {
-  args: {
-    imageUrl: AdeIcon,
-    categoryName: '에이드',
-    onClick: () => alert('에이드 카테고리 클릭!'),
-    color: '#87CEEB',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: '400px' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export const CategoryList: Story = {
+export const CoffeeCategory: Story = {
   render: () => (
     <div style={{ width: '400px' }}>
       <CafeCategoryCard
-        imageUrl={AdeIcon}
-        categoryName="에이드"
-        onClick={() => alert('에이드 카테고리 클릭!')}
-        color="#87CEEB"
+        imageUrl={CoffeeCharacterIcon}
+        categoryName="아메리카노"
+        onClick={() => alert('아메리카노 카테고리 클릭!')}
+        color="#8B4513"
+      />
+    </div>
+  ),
+};
+
+export const CustomMenuCategory: Story = {
+  render: () => (
+    <div style={{ width: '400px' }}>
+      <CafeCategoryCard
+        imageUrl={CustomMenuIcon}
+        categoryName="커스텀 메뉴"
+        onClick={() => alert('커스텀 메뉴 카테고리 클릭!')}
+        color="#FF6B6B"
       />
     </div>
   ),

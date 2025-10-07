@@ -5,8 +5,8 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
-import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
+import useLazyFetch from '@/apis/rest/useLazyFetch';
+import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -20,40 +20,45 @@ const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
 
-  const handleEnter = async () => {
+  const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({
+    endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
+    onSuccess: (data) => {
+      if (!data.exist) {
+        alert('참여코드가 유효한 방이 존재하지 않습니다.');
+        return;
+      }
+
+      navigate(`/entry/name`);
+      onClose();
+    },
+    onError: (error) => {
+      // 추후 에러 바운더리에서 처리
+      alert(error.message);
+      setJoinCode('');
+    },
+  });
+
+  const handleEnter = () => {
     if (!joinCode.trim()) {
       alert('초대코드를 입력해주세요.');
       return;
     }
 
-    try {
-      const { exist } = await api.get<JoinCodeCheckResponse>(
-        `/rooms/check-joinCode?joinCode=${joinCode}`
-      );
-
-      if (!exist) {
-        alert('참여코드가 유효한 방이 존재하지 않습니다.');
-        return;
-      }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        alert(error.message);
-      } else if (error instanceof NetworkError) {
-        alert('네트워크 연결을 확인해주세요');
-      } else {
-        alert('알 수 없는 오류가 발생했습니다');
-      }
-
-      setJoinCode('');
-      return;
-    }
-
-    navigate(`/entry/name`);
-    onClose();
+    checkJoinCode();
   };
 
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setJoinCode(e.target.value.toUpperCase());
+    const value = e.target.value;
+    const upperValue = value.toUpperCase();
+    const lastChar = upperValue.slice(-1);
+
+    const isTooLong = upperValue.length > JOIN_CODE_LENGTH;
+    const isNotEmpty = upperValue.length > 0;
+    const isInvalidChar = isNotEmpty && !/^[A-Z0-9]$/.test(lastChar);
+
+    if (isTooLong || isInvalidChar) return;
+
+    setJoinCode(value.toUpperCase());
   };
 
   return (
@@ -61,7 +66,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
       <Paragraph>초대코드를 입력해주세요</Paragraph>
       <Input
         type="text"
-        placeholder="ex) ABCDE"
+        placeholder={`${JOIN_CODE_LENGTH}자리 영문과 숫자 조합 ex) AB12`}
         value={joinCode}
         onClear={() => setJoinCode('')}
         onChange={handleJoinCodeChange}

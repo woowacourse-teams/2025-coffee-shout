@@ -1,4 +1,4 @@
-import { api } from '@/apis/rest/api';
+import useFetch from '@/apis/rest/useFetch';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
@@ -67,11 +67,28 @@ const LobbyPage = () => {
     [setParticipants, myName, setPlayerType, updateCurrentProbabilities]
   );
 
+  useFetch<MiniGameType[]>({
+    endpoint: `/rooms/minigames/selected?joinCode=${joinCode}`,
+    enabled: !!joinCode,
+    onSuccess: (data) => {
+      setSelectedMiniGames(data);
+    },
+  });
+
   const handleMiniGameData = useCallback((data: MiniGameType[]) => {
     setSelectedMiniGames(data);
   }, []);
 
   //TODO: 통일 필요
+
+  const handleMiniGameError = useCallback(() => {
+    if (playerType === 'GUEST') return;
+    showToast({
+      type: 'error',
+      message: '미니게임 선택에 실패하였습니다. 다시 시도해주세요.',
+    });
+  }, [playerType, showToast]);
+
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
@@ -82,7 +99,11 @@ const LobbyPage = () => {
   );
 
   useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
-  useWebSocketSubscription<MiniGameType[]>(`/room/${joinCode}/minigame`, handleMiniGameData);
+  useWebSocketSubscription<MiniGameType[]>(
+    `/room/${joinCode}/minigame`,
+    handleMiniGameData,
+    handleMiniGameError
+  );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   useEffect(() => {
@@ -146,12 +167,14 @@ const LobbyPage = () => {
     //   : [...selectedMiniGames, miniGameType];
     const updatedMiniGames = [miniGameType];
 
-    setSelectedMiniGames(updatedMiniGames);
-
-    send(`/room/${joinCode}/update-minigames`, {
-      hostName: myName,
-      miniGameTypes: updatedMiniGames,
-    });
+    send(
+      `/room/${joinCode}/update-minigames`,
+      {
+        hostName: myName,
+        miniGameTypes: updatedMiniGames,
+      },
+      handleMiniGameError
+    );
   };
 
   const handleGameReadyButtonClick = () => {
@@ -179,17 +202,6 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (joinCode) {
-        const _selectedMiniGames = await api.get<MiniGameType[]>(
-          `/rooms/minigames/selected?joinCode=${joinCode}`
-        );
-        setSelectedMiniGames(_selectedMiniGames);
-      }
-    })();
-  }, [joinCode]);
-
-  useEffect(() => {
     const isFirstTimeUser = storageManager.getItem(STORAGE_KEYS.FIRST_TIME_USER, 'localStorage');
 
     if (!isFirstTimeUser) {
@@ -202,6 +214,7 @@ const LobbyPage = () => {
         />,
         {
           showCloseButton: false,
+          closeOnBackdropClick: false,
         }
       );
     }

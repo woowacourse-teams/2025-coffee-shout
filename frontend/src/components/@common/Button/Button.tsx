@@ -20,7 +20,10 @@ const Button = ({
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading';
-  const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
+    onClick,
+    isDisabled,
+  });
   const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -30,29 +33,11 @@ const Button = ({
     onClick?.(e);
   };
 
-  const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice) return;
-    if (isDisabled) return;
-
-    e.preventDefault();
-    startTouchPress();
-  };
-
-  const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice) return;
-    if (isDisabled) return;
-
-    e.preventDefault();
-
-    onClick?.(e);
-    endTouchPress();
-  };
-
   return (
     <S.Container
       type="button"
       $variant={variant}
-      $isTouching={isTouching}
+      $touchState={touchState}
       $width={width}
       $height={height}
       disabled={isDisabled}

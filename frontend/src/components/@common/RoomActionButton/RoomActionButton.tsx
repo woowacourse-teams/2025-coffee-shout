@@ -13,7 +13,9 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const { isTouching, startTouchPress, endTouchPress } = useTouchInteraction();
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
+    onClick,
+  });
   const isTouchDevice = checkIsTouchDevice();
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -22,27 +24,12 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
     onClick?.(e);
   };
 
-  const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice) return;
-
-    e.preventDefault();
-    startTouchPress();
-  };
-
-  const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
-    if (!isTouchDevice) return;
-
-    e.preventDefault();
-    onClick?.(e);
-    endTouchPress();
-  };
-
   return (
     <S.Container
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      $isTouching={isTouching}
+      $touchState={touchState}
       {...rest}
     >
       <Headline3>{title}</Headline3>

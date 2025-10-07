@@ -1,5 +1,4 @@
-import { CardGameState, CardInfo } from '@/types/miniGame/cardGame';
-import { RoundType } from '@/types/miniGame/round';
+import { CardGameRound, CardGameState, CardInfo } from '@/types/miniGame/cardGame';
 import React, { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIdentifier } from '../../Identifier/IdentifierContext';
@@ -7,7 +6,7 @@ import { Action } from '../reducer/cardGameReducer';
 
 type CardGameStateResponse = {
   cardGameState: CardGameState;
-  currentRound: RoundType;
+  currentRound: CardGameRound;
   cardInfoMessages: CardInfo[];
   allSelected: boolean;
 };
@@ -15,7 +14,7 @@ type CardGameStateResponse = {
 type CardGameStateHandlers = {
   updateSelectedCardInfo: (
     cardInfoMessages: CardInfo[],
-    round: RoundType,
+    round: CardGameRound,
     shouldCheckAlreadySelected?: boolean
   ) => void;
 };
@@ -54,7 +53,7 @@ export const useCardGameHandlers = (
           break;
 
         case 'LOADING':
-          dispatch({ type: 'LOADING', payload: { currentRound } });
+          dispatch({ type: 'LOADING', payload: { round: currentRound } });
           break;
 
         case 'DONE':

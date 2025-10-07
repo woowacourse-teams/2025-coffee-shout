@@ -1,7 +1,7 @@
 import { ChangeEvent, PropsWithChildren } from 'react';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
-import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuIntput';
+import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 import CustomMenuIcon from '@/assets/custom-menu-icon.svg';
 import * as S from './InputCustomMenu.styled';
 import { theme } from '@/styles/theme';

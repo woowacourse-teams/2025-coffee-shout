@@ -1,4 +1,8 @@
+import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
+
 import { Size } from '@/types/styles';
+import { TouchState } from '@/types/touchState';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'loading' | 'ready';
@@ -7,7 +11,7 @@ type Props = {
   $variant: ButtonVariant;
   $width: string;
   $height: Size;
-  $isTouching: boolean;
+  $touchState: TouchState;
 };
 
 export const Container = styled.button<Props>`
@@ -32,35 +36,32 @@ export const Container = styled.button<Props>`
   border-radius: 12px;
   cursor: pointer;
 
-  ${({ $variant, theme, $isTouching }) => {
+  ${({ $variant, theme, $touchState }) => {
     switch ($variant) {
       case 'secondary': {
         const baseColor = theme.color.gray[50];
         const activeColor = theme.color.gray[100];
+        const hoverPressStyles = buttonHoverPress({
+          activeColor,
+          touchState: $touchState,
+        });
 
-        return `
+        return css`
           background: ${baseColor};
           color: ${theme.color.gray[700]};
-          
-          /* 데스크톱: hover 효과 */
-          @media (hover: hover) and (pointer: fine) {
-            &:hover { background: ${activeColor}; }
-          }
-          
-          /* 터치 디바이스: isTouching 상태로 제어 */
-          ${$isTouching && `background: ${activeColor};`}
+          ${hoverPressStyles}
         `;
       }
 
       case 'loading':
-        return `
+        return css`
           background: ${theme.color.point[200]};
           color: ${theme.color.white};
           cursor: default;
         `;
 
       case 'disabled':
-        return `
+        return css`
           background: ${theme.color.gray[200]};
           color: ${theme.color.white};
           cursor: default;
@@ -68,7 +69,7 @@ export const Container = styled.button<Props>`
         `;
 
       case 'ready':
-        return `
+        return css`
           background: ${theme.color.point[50]};
           color: ${theme.color.point[400]};
         `;
@@ -77,18 +78,15 @@ export const Container = styled.button<Props>`
       default: {
         const baseColor = theme.color.point[400];
         const activeColor = theme.color.point[500];
+        const hoverPressStyles = buttonHoverPress({
+          activeColor,
+          touchState: $touchState,
+        });
 
-        return `
+        return css`
           background: ${baseColor};
           color: ${theme.color.white};
-          
-          /* 데스크톱: hover 효과 */
-          @media (hover: hover) and (pointer: fine) {
-            &:hover { background: ${activeColor}; }
-          }
-          
-          /* 터치 디바이스: isTouching 상태로 제어 */
-            ${$isTouching && `background: ${activeColor};`}
+          ${hoverPressStyles}
         `;
       }
     }
