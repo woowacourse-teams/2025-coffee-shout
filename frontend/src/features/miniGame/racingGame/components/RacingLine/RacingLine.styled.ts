@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.div<{ $x: number }>`
+export const Container = styled.div<{ $position: number }>`
   position: absolute;
   left: 50%;
   top: 0;
   width: 30px;
   height: 100%;
-  transform: translateX(${({ $x }) => $x}px);
+  transform: translateX(${({ $position }) => $position}px);
   transition: transform 0.3s ease-in-out;
   z-index: 1;
 `;

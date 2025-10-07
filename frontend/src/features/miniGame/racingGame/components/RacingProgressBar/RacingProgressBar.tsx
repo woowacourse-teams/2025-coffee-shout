@@ -3,7 +3,7 @@ import { usePlayerProgressData } from '../../hooks/usePlayerProgressData';
 
 type Player = {
   playerName: string;
-  x: number;
+  position: number; // 서버에서 position으로 보내고 있음
 };
 
 type Props = {

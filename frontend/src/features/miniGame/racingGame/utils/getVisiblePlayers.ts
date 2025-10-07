@@ -2,7 +2,7 @@
 type Player = {
   playerName: string;
   speed: number;
-  x: number;
+  position: number; // 서버에서 position으로 보내고 있음
 };
 
 // 상수 정의

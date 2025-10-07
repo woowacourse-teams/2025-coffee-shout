@@ -71,7 +71,7 @@ const LobbyPage = () => {
     setSelectedMiniGames(data);
   }, []);
 
-  //통일 필요
+  //TODO: 통일 필요
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
@@ -112,7 +112,13 @@ const LobbyPage = () => {
       return;
     }
 
-    //통일 필요
+    //TODO: 통일 필요
+    if (selectedMiniGames.includes('RACING_GAME')) {
+      navigate(`/racing`);
+      return;
+    }
+
+    //TODO: 통일 필요
     send(`/room/${joinCode}/minigame/command`, {
       commandType: 'START_MINI_GAME',
       commandRequest: {
@@ -217,13 +223,6 @@ const LobbyPage = () => {
       <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
-          <Button
-            onClick={() => {
-              navigate(`/racing`);
-            }}
-          >
-            레이싱 게임 하러가기
-          </Button>
           {SECTIONS[currentSection]}
           <S.Wrapper>
             <ToggleButton

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 type Player = {
   playerName: string;
-  x: number;
+  position: number; // 서버에서 position으로 보내고 있음
   speed: number;
 };
 
@@ -17,12 +17,12 @@ export const usePlayerData = ({ players, myName }: Props) => {
     [players, myName]
   );
 
-  const myX = myPlayer?.x ?? 0;
+  const myPosition = myPlayer?.position ?? 0;
   const mySpeed = myPlayer?.speed ?? 0;
 
   return {
     myPlayer,
-    myX,
+    myPosition,
     mySpeed,
   };
 };

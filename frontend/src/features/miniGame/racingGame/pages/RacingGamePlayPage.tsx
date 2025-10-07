@@ -25,7 +25,7 @@ type RacingGameData = {
   };
   players: Array<{
     playerName: string;
-    x: number;
+    position: number; // 서버에서 position으로 보내고 있음
     speed: number;
   }>;
 };
@@ -45,13 +45,15 @@ const RacingGamePage = () => {
 
   const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
 
-  const { myX, mySpeed } = usePlayerData({
+  const { myPosition, mySpeed } = usePlayerData({
     players: visiblePlayers,
     myName,
   });
 
+  console.log('Current myPosition:', myPosition, 'mySpeed:', mySpeed);
+
   const showGoal = useGoalDisplay({
-    myX,
+    myPosition,
     endDistance: racingGameData.distance.end,
     gameState: racingGameState,
   });
@@ -61,11 +63,21 @@ const RacingGamePage = () => {
     mySpeed,
   });
 
-  const handleRacingGameData = useCallback((data: RacingGameData) => {
-    setRacingGameData(data);
-  }, []);
+  const handleRacingGameData = useCallback(
+    (data: RacingGameData) => {
+      console.log('handleRacingGameData', data);
+      console.log('myName:', myName);
+      console.log(
+        'myPosition will be:',
+        data.players.find((p) => p.playerName === myName)?.position
+      );
+      setRacingGameData(data);
+    },
+    [myName]
+  );
 
   const handleRacingGameState = useCallback((data: RacingGameState) => {
+    console.log('handleRacingGameState', data);
     setRacingGameState(data);
   }, []);
 
@@ -94,17 +106,17 @@ const RacingGamePage = () => {
           <S.ContentWrapper>
             <S.PlayersWrapper>
               {/* 출발선 */}
-              <RacingLine x={0} myX={myX} />
+              <RacingLine position={0} myPosition={myPosition} />
               {/* 도착선 */}
-              <RacingLine x={1000} myX={myX} />
+              <RacingLine position={1000} myPosition={myPosition} />
               {visiblePlayers.map((player, index) => (
                 <RacingPlayer
                   key={player.playerName}
                   playerName={player.playerName}
-                  x={player.x}
+                  position={player.position}
                   speed={player.speed}
                   isMe={player.playerName === myName}
-                  myX={myX}
+                  myPosition={myPosition}
                   colorIndex={index}
                 />
               ))}

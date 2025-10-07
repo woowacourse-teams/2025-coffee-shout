@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 const GOAL_DISPLAY_DURATION_MS = 1000;
 
 type Props = {
-  myX: number;
+  myPosition: number;
   endDistance: number;
   gameState: string;
 };
 
-export const useGoalDisplay = ({ myX, endDistance, gameState }: Props) => {
+export const useGoalDisplay = ({ myPosition, endDistance, gameState }: Props) => {
   const [showGoal, setShowGoal] = useState(false);
   const hasShownGoalRef = useRef(false);
   const goalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -27,7 +27,7 @@ export const useGoalDisplay = ({ myX, endDistance, gameState }: Props) => {
 
   // Goal 도달 감지 및 1초 표시
   useEffect(() => {
-    const hasReachedGoal = myX >= endDistance;
+    const hasReachedGoal = myPosition >= endDistance;
 
     if (hasReachedGoal && !hasShownGoalRef.current && !goalTimerRef.current) {
       hasShownGoalRef.current = true;
@@ -38,7 +38,7 @@ export const useGoalDisplay = ({ myX, endDistance, gameState }: Props) => {
         goalTimerRef.current = null;
       }, GOAL_DISPLAY_DURATION_MS);
     }
-  }, [myX, endDistance]);
+  }, [myPosition, endDistance]);
 
   return showGoal;
 };

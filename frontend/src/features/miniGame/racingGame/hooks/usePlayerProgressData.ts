@@ -5,7 +5,7 @@ const MAX_PROGRESS_PERCENTAGE = 100;
 
 type Player = {
   playerName: string;
-  x: number;
+  position: number; // 서버에서 position으로 보내고 있음
 };
 
 type Props = {
@@ -26,7 +26,7 @@ export const usePlayerProgressData = ({ players, endDistance, myName }: Props) =
   const playerProgressData = useMemo((): PlayerProgressData[] => {
     return players.map((player, index) => {
       const progress = Math.min(
-        (player.x / endDistance) * MAX_PROGRESS_PERCENTAGE,
+        (player.position / endDistance) * MAX_PROGRESS_PERCENTAGE,
         MAX_PROGRESS_PERCENTAGE
       );
       const isMe = player.playerName === myName;

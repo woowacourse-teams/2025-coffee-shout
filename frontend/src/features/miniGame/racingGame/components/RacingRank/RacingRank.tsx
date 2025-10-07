@@ -4,7 +4,7 @@ import * as S from './RacingRank.styled';
 
 type Player = {
   playerName: string;
-  x: number;
+  position: number; // 서버에서 position으로 보내고 있음
 };
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
 
 const RacingRank = ({ players, myName }: Props) => {
   const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => b.x - a.x);
+    return [...players].sort((a, b) => b.position - a.position);
   }, [players]);
 
   return (
