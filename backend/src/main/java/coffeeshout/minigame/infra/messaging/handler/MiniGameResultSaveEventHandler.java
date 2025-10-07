@@ -35,14 +35,6 @@ public class MiniGameResultSaveEventHandler {
 
     @EventListener
     @Transactional
-    public void handle(CardGameStateChangedEvent event) {
-        if (event.currentTask() != CardGameTaskType.GAME_FINISH_STATE) {
-            return;
-        }
-
-        tryDbSaveResult(event);
-    }
-
     @RedisLock(
             key = "#event.eventId()",
             lockPrefix = "minigame:result:lock:",
@@ -50,7 +42,11 @@ public class MiniGameResultSaveEventHandler {
             waitTime = 0,
             leaseTime = 5000
     )
-    private void tryDbSaveResult(CardGameStateChangedEvent event) {
+    public void handle(CardGameStateChangedEvent event) {
+        if (event.currentTask() != CardGameTaskType.GAME_FINISH_STATE) {
+            return;
+        }
+
         final String joinCode = event.room().getJoinCode().getValue();
 
         final RoomEntity roomEntity = roomJpaRepository.findByJoinCode(joinCode)

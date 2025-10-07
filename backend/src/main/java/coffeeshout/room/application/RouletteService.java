@@ -1,8 +1,6 @@
-package coffeeshout.room.infra.persistence.handler;
+package coffeeshout.room.application;
 
-import coffeeshout.global.lock.RedisLock;
 import coffeeshout.room.domain.RoomState;
-import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.infra.persistence.PlayerEntity;
 import coffeeshout.room.infra.persistence.PlayerJpaRepository;
@@ -12,42 +10,37 @@ import coffeeshout.room.infra.persistence.RouletteResultEntity;
 import coffeeshout.room.infra.persistence.RouletteResultJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class RouletteSpinPersistenceEventHandler {
+public class RouletteService {
 
     private final RoomJpaRepository roomJpaRepository;
     private final PlayerJpaRepository playerJpaRepository;
     private final RouletteResultJpaRepository rouletteResultJpaRepository;
 
-    @EventListener
     @Transactional
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
-    void handle(RouletteSpinEvent event) {
-        final Winner winner = event.winner();
-        saveRouletteResult(event.joinCode(), winner);
-        log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
-                event.eventId(), event.joinCode(), winner.name().value());
+    public void updateRoomStatusToRoulette(String joinCode) {
+        final RoomEntity roomEntity = getRoomEntity(joinCode);
+        roomEntity.updateRoomStatus(RoomState.ROULETTE);
+        
+        log.info("RoomEntity 상태 업데이트 완료: joinCode={}, status=ROULETTE", joinCode);
     }
 
-    private void saveRouletteResult(String joinCode, Winner winner) {
+    @Transactional
+    public void saveRouletteResult(String joinCode, Winner winner) {
+        // RoomEntity 조회 및 상태 업데이트
         final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.DONE);
         roomEntity.finish();
 
+        // PlayerEntity 조회
         final PlayerEntity playerEntity = getPlayerEntity(roomEntity, winner.name().value());
 
+        // RouletteResultEntity 저장
         final RouletteResultEntity rouletteResult = new RouletteResultEntity(
                 roomEntity,
                 playerEntity,
