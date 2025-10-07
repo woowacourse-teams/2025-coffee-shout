@@ -1,7 +1,6 @@
 import RacingPlayer from '../components/RacingPlayer/RacingPlayer';
 import RacingLine from '../components/RacingLine/RacingLine';
 import * as S from './RacingGamePlayPage.styled';
-import PrepareOverlay from '../../cardGame/components/PrepareOverlay/PrepareOverlay';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -16,6 +15,7 @@ import RacingGameOverlay from '../components/RacingGameOverlay/RacingGameOverlay
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 
 type RacingGameState = 'READY' | 'PLAYING' | 'FINISH' | 'DONE';
 
