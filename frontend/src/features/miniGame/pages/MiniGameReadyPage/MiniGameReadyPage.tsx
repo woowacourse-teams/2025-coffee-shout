@@ -6,12 +6,14 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MiniGameIntroSlide from '../../components/MiniGameIntroSlide/MiniGameIntroSlide';
 import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
+import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 
 const MiniGameReadyPage = () => {
   const navigate = useNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
   const { currentCardGameState } = useCardGame();
+  const { racingGameState } = useRacingGame();
 
   const isValidGameType = miniGameType && miniGameType in GAME_SLIDE_CONFIGS;
   const gameType = miniGameType as MiniGameType;
@@ -20,10 +22,13 @@ const MiniGameReadyPage = () => {
 
   useEffect(() => {
     if (!joinCode || !gameType) return;
-    if (currentCardGameState === 'PREPARE') {
+    if (
+      (gameType === 'CARD_GAME' && currentCardGameState === 'PREPARE') ||
+      (gameType === 'RACING_GAME' && racingGameState === 'PREPARE')
+    ) {
       navigate(`/room/${joinCode}/${gameType}/play`);
     }
-  }, [currentCardGameState, joinCode, gameType, navigate]);
+  }, [currentCardGameState, racingGameState, joinCode, gameType, navigate]);
 
   if (!isValidGameType) {
     return (

@@ -17,7 +17,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 
-type RacingGameState = 'READY' | 'PLAYING' | 'DONE';
+import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 
 type RacingGameData = {
   distance: {
@@ -35,7 +35,8 @@ const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
   const navigate = useNavigate();
-  const [racingGameState, setRacingGameState] = useState<RacingGameState>('READY');
+  const { racingGameState } = useRacingGame();
+
   const [racingGameData, setRacingGameData] = useState<RacingGameData>({
     players: [],
     distance: {
@@ -68,13 +69,7 @@ const RacingGamePage = () => {
     setRacingGameData(data);
   }, []);
 
-  const handleRacingGameState = useCallback((data: { state: RacingGameState }) => {
-    console.log('handleRacingGameState', data.state);
-    setRacingGameState(data.state);
-  }, []);
-
   useWebSocketSubscription(`/room/${joinCode}/racing-game`, handleRacingGameData);
-  useWebSocketSubscription(`/room/${joinCode}/racing-game/state`, handleRacingGameState);
 
   useEffect(() => {
     setTimeout(() => {
