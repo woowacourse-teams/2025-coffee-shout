@@ -8,12 +8,9 @@ import { IdentifierProvider } from './contexts/Identifier/IdentifierProvider';
 import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvider';
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
-import { useBrowserBackButton } from './hooks/useBrowserBackButton';
 import { theme } from './styles/theme';
 
 const App = () => {
-  useBrowserBackButton();
-
   return (
     <ThemeProvider theme={theme}>
       <IdentifierProvider>
