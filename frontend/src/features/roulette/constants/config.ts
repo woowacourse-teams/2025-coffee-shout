@@ -3,5 +3,5 @@ export const WHEEL_CONFIG = {
   CENTER: 150,
   RADIUS: 140,
   TEXT_RADIUS: 80,
-  STROKE_WIDTH: 1,
+  STROKE_WIDTH: 4,
 } as const;
