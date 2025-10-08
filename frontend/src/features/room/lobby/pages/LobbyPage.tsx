@@ -15,9 +15,10 @@ import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/Probability
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
+import { STORAGE_KEYS, storageManager } from '@/utils/StorageManager';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
+import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
@@ -110,8 +111,21 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send, isConnected]);
 
-  const handleNavigateToHome = () => {
-    navigate('/');
+  const handleBackClick = () => {
+    openModal(
+      <ConfirmModal
+        message="방을 나가시겠습니까?"
+        onConfirm={() => {
+          closeModal();
+          navigate('/');
+        }}
+        onCancel={closeModal}
+      />,
+      {
+        title: '방 나가기',
+        showCloseButton: false,
+      }
+    );
   };
 
   const handleClickGameStartButton = () => {
@@ -223,7 +237,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
+      <Layout.TopBar left={<BackButton onClick={handleBackClick} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}
