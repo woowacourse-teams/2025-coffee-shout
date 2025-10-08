@@ -7,12 +7,13 @@ type Props = {
   flippedView: ReactNode;
   width?: string;
   height?: string;
+  duration?: number;
 };
 
-const Flip = ({ flipped, initialView, flippedView, width, height }: Props) => {
+const Flip = ({ flipped, initialView, flippedView, width, height, duration }: Props) => {
   return (
     <S.FlipWrapper $width={width} $height={height}>
-      <S.Flipper flipped={flipped}>
+      <S.Flipper flipped={flipped} $duration={duration}>
         <S.InitialView>{initialView}</S.InitialView>
         <S.FlippedView>{flippedView}</S.FlippedView>
       </S.Flipper>
