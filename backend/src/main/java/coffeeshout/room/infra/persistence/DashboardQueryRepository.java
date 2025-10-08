@@ -2,8 +2,6 @@ package coffeeshout.room.infra.persistence;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import coffeeshout.minigame.infra.persistence.QMiniGameEntity;
-import coffeeshout.room.ui.response.GamePlayCountResponse;
 import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.room.ui.response.TopWinnerResponse;
 import lombok.RequiredArgsConstructor;
@@ -70,23 +68,5 @@ public class DashboardQueryRepository {
                 .fetch();
 
         return Optional.of(new LowestProbabilityWinnerResponse(minProbability, nicknames));
-    }
-
-    public List<GamePlayCountResponse> findGamePlayCountByMonth(LocalDateTime startDate, LocalDateTime endDate) {
-        final QMiniGameEntity m = QMiniGameEntity.miniGameEntity;
-        final QRoomEntity room = QRoomEntity.roomEntity;
-
-        return queryFactory
-                .select(Projections.constructor(
-                        GamePlayCountResponse.class,
-                        m.miniGameType,
-                        m.count()
-                ))
-                .from(m)
-                .join(m.roomSession, room)
-                .where(room.createdAt.between(startDate, endDate))
-                .groupBy(m.miniGameType)
-                .orderBy(m.count().desc())
-                .fetch();
     }
 }
