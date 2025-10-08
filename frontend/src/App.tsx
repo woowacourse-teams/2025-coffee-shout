@@ -9,6 +9,7 @@ import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
 import { Suspense } from 'react';
+import RacingGameProvider from './contexts/RacingGame/RacingGameProvider';
 
 const App = () => {
   return (
@@ -17,15 +18,17 @@ const App = () => {
         <ParticipantsProvider>
           <WebSocketProvider>
             <PlayerTypeProvider>
-              <ProbabilityHistoryProvider>
-                <ToastProvider>
-                  <ModalProvider>
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Outlet />
-                    </Suspense>
-                  </ModalProvider>
-                </ToastProvider>
-              </ProbabilityHistoryProvider>
+              <RacingGameProvider>
+                <ProbabilityHistoryProvider>
+                  <ToastProvider>
+                    <ModalProvider>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Outlet />
+                      </Suspense>
+                    </ModalProvider>
+                  </ToastProvider>
+                </ProbabilityHistoryProvider>
+              </RacingGameProvider>
             </PlayerTypeProvider>
           </WebSocketProvider>
         </ParticipantsProvider>
