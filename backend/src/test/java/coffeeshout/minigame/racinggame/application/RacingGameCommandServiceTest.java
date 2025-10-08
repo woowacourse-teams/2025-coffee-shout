@@ -9,7 +9,7 @@ import coffeeshout.global.ServiceTest;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
-import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
@@ -72,7 +72,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         assertThat(startedGame.isStarted()).isTrue();
         assertThat(startedGame.isFinished()).isFalse();
         verify(taskScheduler).scheduleAtFixedRate(any(Runnable.class), any());
-        verify(eventPublisher).publishEvent(any(RaceStartedEvent.class));
+        verify(eventPublisher).publishEvent(any(RaceStateChangedEvent.class));
     }
 
     @Test
@@ -111,12 +111,12 @@ class RacingGameCommandServiceTest extends ServiceTest {
     }
 
     @Test
-    void 게임_시작_전_상태는_READY이다() {
+    void 게임_시작_전_상태는_DESCRIPTION이다() {
         // given
         final RacingGame racingGame = new RacingGame();
 
         // when & then
-        assertThat(racingGame.getState()).isEqualTo(RacingGameState.READY);
+        assertThat(racingGame.getState()).isEqualTo(RacingGameState.DESCRIPTION);
         assertThat(racingGame.isStarted()).isFalse();
         assertThat(racingGame.isFinished()).isFalse();
     }

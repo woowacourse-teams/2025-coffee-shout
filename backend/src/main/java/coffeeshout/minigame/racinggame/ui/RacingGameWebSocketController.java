@@ -1,7 +1,7 @@
 package coffeeshout.minigame.racinggame.ui;
 
 import coffeeshout.minigame.racinggame.application.RacingGameService;
-import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.minigame.racinggame.ui.request.TapCommand;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
@@ -26,7 +26,7 @@ public class RacingGameWebSocketController {
     )
     @MessageResponse(
             path = "/topic/room/{joinCode}/racing-game/state",
-            returnType = RaceStartedEvent.class
+            returnType = RaceStateChangedEvent.class
     )
     public void tap(@DestinationVariable String joinCode, @Payload TapCommand command) {
         racingGameService.tap(joinCode, command.playerName(), command.tapCount());

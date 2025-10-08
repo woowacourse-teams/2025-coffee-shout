@@ -16,10 +16,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
-/*
-    redis pub/sub 도입시 메시지를 처리하게될 클래스
- */
-
 @Component
 public class CardGameMessageConsumer {
 

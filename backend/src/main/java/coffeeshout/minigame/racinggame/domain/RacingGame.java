@@ -27,14 +27,10 @@ public class RacingGame implements Playable {
     private RacingGameState state;
     private ScheduledFuture<?> autoMoveFuture;
 
-    public RacingGame() {
-        this.state = RacingGameState.READY;
-    }
-
     @Override
     public void startGame(List<Player> players) {
         this.runners = new Runners(players);
-        this.state = RacingGameState.PLAYING;
+        this.state = RacingGameState.DESCRIPTION;
     }
 
     public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
@@ -104,5 +100,9 @@ public class RacingGame implements Playable {
 
     public boolean isFinished() {
         return state == RacingGameState.DONE;
+    }
+
+    public void updateState(RacingGameState state) {
+        this.state = state;
     }
 }

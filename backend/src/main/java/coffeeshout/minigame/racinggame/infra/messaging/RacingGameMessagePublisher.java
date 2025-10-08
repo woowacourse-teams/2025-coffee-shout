@@ -2,15 +2,26 @@ package coffeeshout.minigame.racinggame.infra.messaging;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
 import coffeeshout.minigame.racinggame.domain.dto.RacingGameRunnersStateResponse;
 import coffeeshout.minigame.racinggame.domain.dto.RacingGameStateResponse;
 import coffeeshout.minigame.racinggame.domain.event.RaceFinishedEvent;
-import coffeeshout.minigame.racinggame.domain.event.RaceStartedEvent;
+import coffeeshout.minigame.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.minigame.racinggame.domain.event.RunnersMovedEvent;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.service.RoomQueryService;
 import generator.annotaions.MessageResponse;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties.Application;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,10 +51,10 @@ public class RacingGameMessagePublisher {
             path = "/room/{joinCode}/racing-game/state",
             returnType = RacingGameStateResponse.class
     )
-    public void publishRacingGameStart(RaceStartedEvent raceStartedEvent) {
+    public void publishRacingGameStart(RaceStateChangedEvent raceStateChangedEvent) {
         loggingSimpMessagingTemplate.convertAndSend(
-                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceStartedEvent.joinCode()),
-                WebSocketResponse.success(new RacingGameStateResponse(raceStartedEvent.state()))
+                String.format(RACING_GAME_STATE_DESTINATION_FORMAT, raceStateChangedEvent.joinCode()),
+                WebSocketResponse.success(new RacingGameStateResponse(raceStateChangedEvent.state()))
         );
     }
 

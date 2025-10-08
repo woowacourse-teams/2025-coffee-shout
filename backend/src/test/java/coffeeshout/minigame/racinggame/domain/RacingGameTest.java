@@ -17,7 +17,7 @@ class RacingGameTest {
         final RacingGame racingGame = new RacingGame();
 
         // then
-        assertThat(racingGame.getState()).isEqualTo(RacingGameState.READY);
+        assertThat(racingGame.getState()).isEqualTo(RacingGameState.DESCRIPTION);
     }
 
     @Test
