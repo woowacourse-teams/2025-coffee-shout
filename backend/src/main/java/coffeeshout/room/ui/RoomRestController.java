@@ -107,8 +107,9 @@ public class RoomRestController {
         if (removed) {
             final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
             roomEventPublisher.publishEvent(event);
+            return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 }
