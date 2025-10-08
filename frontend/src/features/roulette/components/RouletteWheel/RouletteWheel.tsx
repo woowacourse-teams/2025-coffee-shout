@@ -5,6 +5,7 @@ import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils';
 import RouletteSlice from '../RouletteSlice/RouletteSlice';
 import { memo } from 'react';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 type Props =
   | {
@@ -27,6 +28,7 @@ const RouletteWheel = ({
   finalRotation = 0,
 }: Props) => {
   const theme = useTheme();
+  const { myName } = useIdentifier();
 
   const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
@@ -43,7 +45,7 @@ const RouletteWheel = ({
             <RouletteSlice
               key={player.playerName}
               player={player}
-              strokeColor={theme.color.point[100]}
+              strokeColor={player.playerName === myName ? theme.color.point[300] : 'transparent'}
             />
           ))}
         </svg>
