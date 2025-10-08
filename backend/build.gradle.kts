@@ -36,6 +36,12 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql")
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    // QueryDSL
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     implementation("io.github.20hyeonsulee:websocket-docs-generator:1.0.7")
 
