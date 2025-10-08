@@ -1,11 +1,10 @@
-import { useTheme } from '@emotion/react';
-import { RouletteSector, PlayerProbability } from '@/types/roulette';
-import * as S from './RouletteWheel.styled';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { PlayerProbability, RouletteSector } from '@/types/roulette';
+import { memo } from 'react';
 import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils';
 import RouletteSlice from '../RouletteSlice/RouletteSlice';
-import { memo } from 'react';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import * as S from './RouletteWheel.styled';
 
 type Props =
   | {
@@ -27,7 +26,6 @@ const RouletteWheel = ({
   isSpinning = false,
   finalRotation = 0,
 }: Props) => {
-  const theme = useTheme();
   const { myName } = useIdentifier();
 
   const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
@@ -47,11 +45,21 @@ const RouletteWheel = ({
           height={WHEEL_CONFIG.SIZE}
           viewBox={`0 0 ${WHEEL_CONFIG.SIZE} ${WHEEL_CONFIG.SIZE}`}
         >
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
           {sortedPlayers.map((player) => (
             <RouletteSlice
               key={player.playerName}
               player={player}
-              strokeColor={player.playerName === myName ? theme.color.point[300] : 'transparent'}
+              strokeColor={player.playerName === myName ? '#FFFF8F' : 'transparent'}
+              isGlowing={player.playerName === myName}
             />
           ))}
         </svg>
