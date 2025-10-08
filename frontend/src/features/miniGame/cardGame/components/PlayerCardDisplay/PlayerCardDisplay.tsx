@@ -18,6 +18,7 @@ const PlayerCardDisplay = ({ selectedCardInfo }: Props) => {
         flipped={cardInfo.isSelected}
         width={DESIGN_TOKENS.card.medium.width}
         height={DESIGN_TOKENS.card.medium.height}
+        duration={0.5}
         initialView={<CardBack size="medium" disabled={true} />}
         flippedView={
           <CardFront

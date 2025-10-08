@@ -29,6 +29,7 @@ const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
             flipped={cardInfo.selected}
             width={DESIGN_TOKENS.card.large.width}
             height={DESIGN_TOKENS.card.large.height}
+            duration={0.5}
             initialView={<CardBack onClick={() => onCardClick(index)} />}
             flippedView={
               <CardFront
