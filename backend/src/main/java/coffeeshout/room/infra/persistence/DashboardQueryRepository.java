@@ -65,6 +65,7 @@ public class DashboardQueryRepository {
                         r.winnerProbability.eq(minProbability)
                 )
                 .distinct()
+                .orderBy(p.playerName.asc())
                 .limit(5)
                 .fetch();
 
