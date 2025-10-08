@@ -3,6 +3,8 @@ package coffeeshout.room.ui;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerKickEvent;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
@@ -15,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController {
 
     private final RoomService roomService;
+    private final RoomEventPublisher roomEventPublisher;
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@Valid @RequestBody RoomEnterRequest request) {
@@ -91,5 +95,20 @@ public class RoomRestController {
         final List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/{joinCode}/players/{playerName}")
+    public ResponseEntity<Void> kickPlayer(
+            @PathVariable String joinCode,
+            @PathVariable String playerName
+    ) {
+        boolean removed = roomService.removePlayer(joinCode, playerName);
+
+        if (removed) {
+            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
+            roomEventPublisher.publishEvent(event);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
