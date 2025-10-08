@@ -45,7 +45,6 @@ const RacingGamePage = () => {
     },
   });
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { miniGameType } = useParams();
 
   const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
 
@@ -81,9 +80,9 @@ const RacingGamePage = () => {
 
   useEffect(() => {
     if (racingGameState === 'DONE') {
-      navigate(`/room/${joinCode}/${miniGameType}/result`);
+      navigate(`/room/${joinCode}/RACING_GAME/result`);
     }
-  }, [racingGameState, joinCode, navigate, miniGameType]);
+  }, [racingGameState, joinCode, navigate]);
 
   return (
     <>
