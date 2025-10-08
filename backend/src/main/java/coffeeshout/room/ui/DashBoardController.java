@@ -1,7 +1,6 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.room.application.DashboardService;
-import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.room.ui.response.TopWinnerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +20,5 @@ public class DashBoardController {
     @GetMapping("/top-winners")
     public ResponseEntity<List<TopWinnerResponse>> getTop5Winners() {
         return ResponseEntity.ok(dashboardService.getTop5Winners());
-    }
-
-    @GetMapping("/lowest-probability-winner")
-    public ResponseEntity<LowestProbabilityWinnerResponse> getLowestProbabilityWinner() {
-        return ResponseEntity.ok(dashboardService.getLowestProbabilityWinner());
     }
 }
