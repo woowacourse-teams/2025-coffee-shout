@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export const useBrowserBackButton = () => {
   useEffect(() => {
-    window.history.pushState(null, '', window.location.href);
+    window.history.replaceState(null, '', window.location.href);
 
     const handlePopState = () => {
       window.history.back();
