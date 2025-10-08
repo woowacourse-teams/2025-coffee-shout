@@ -19,24 +19,32 @@ public class DashboardService {
     private final DashboardQueryRepository dashboardQueryRepository;
 
     public List<TopWinnerResponse> getTop5Winners() {
-        final LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        final LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+        final LocalDateTime startOfMonth = getStartOfMonth();
+        final LocalDateTime endOfMonth = getEndOfMonth();
 
         return dashboardQueryRepository.findTop5WinnersByMonth(startOfMonth, endOfMonth);
     }
 
     public LowestProbabilityWinnerResponse getLowestProbabilityWinner() {
-        final LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        final LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+        final LocalDateTime startOfMonth = getStartOfMonth();
+        final LocalDateTime endOfMonth = getEndOfMonth();
 
         return dashboardQueryRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth)
                 .orElseThrow(() -> new IllegalStateException("이번달 당첨 기록이 없습니다"));
     }
 
     public List<GamePlayCountResponse> getGamePlayCounts() {
-        final LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        final LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+        final LocalDateTime startOfMonth = getStartOfMonth();
+        final LocalDateTime endOfMonth = getEndOfMonth();
 
         return dashboardQueryRepository.findGamePlayCountByMonth(startOfMonth, endOfMonth);
+    }
+
+    private LocalDateTime getStartOfMonth() {
+        return LocalDate.now().withDayOfMonth(1).atStartOfDay();
+    }
+
+    private LocalDateTime getEndOfMonth() {
+        return getStartOfMonth().plusMonths(1);
     }
 }
