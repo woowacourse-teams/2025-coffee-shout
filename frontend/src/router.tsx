@@ -95,7 +95,7 @@ const router = createBrowserRouter([
         element: <NotFoundPage />,
       },
       {
-        path: '/room/:joinCode/:miniGameType/play',
+        path: '/room/:joinCode/RACING_GAME/play',
         element: <RacingGamePlayPage />,
       },
     ],

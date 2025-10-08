@@ -79,8 +79,6 @@ const LobbyPage = () => {
     setSelectedMiniGames(data);
   }, []);
 
-  //TODO: 통일 필요
-
   const handleMiniGameError = useCallback(() => {
     if (playerType === 'GUEST') return;
     showToast({
@@ -135,7 +133,7 @@ const LobbyPage = () => {
 
     //TODO: 통일 필요
     if (selectedMiniGames.includes('RACING_GAME')) {
-      navigate(`/room/${joinCode}/RACING_GAME/play`);
+      navigate(`/room/${joinCode}/RACING_GAME/ready`);
       return;
     }
 

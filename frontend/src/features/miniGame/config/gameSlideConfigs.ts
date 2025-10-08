@@ -1,5 +1,7 @@
 import CardGameDescription1 from '@/assets/card_game_desc1.svg';
 import CardGameDescription2 from '@/assets/card_game_desc2.svg';
+import RacingGameDescription1 from '@/assets/racing_game_desc1.svg';
+import RacingGameDescription2 from '@/assets/racing_game_desc2.svg';
 import { MiniGameType } from '@/types/miniGame/common';
 
 type SlideConfig = {
@@ -21,16 +23,15 @@ const CARD_GAME_SLIDES: SlideConfig[] = [
   },
 ] as const;
 
-//TODO: 이미지 추가, 문구 수정 필요요
 const RACING_GAME_SLIDES: SlideConfig[] = [
   {
-    textLines: ['화면을 클릭해 속도를 높여서', '가장 먼저 도착하세요!'],
-    imageSrc: CardGameDescription1,
+    textLines: ['빠르게 터치하세요!'],
+    imageSrc: RacingGameDescription1,
     className: 'slide-first',
   },
   {
-    textLines: ['합산된 값으로', '등수가 결정됩니다'],
-    imageSrc: CardGameDescription2,
+    textLines: ['먼저 도착한 순으로', '등수가 결정됩니다'],
+    imageSrc: RacingGameDescription2,
     className: 'slide-second',
   },
 ];
