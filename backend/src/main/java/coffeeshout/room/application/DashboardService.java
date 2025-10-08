@@ -45,6 +45,6 @@ public class DashboardService {
     }
 
     private LocalDateTime getEndOfMonth() {
-        return getStartOfMonth().plusMonths(1);
+        return getStartOfMonth().plusMonths(1).minusNanos(1);
     }
 }
