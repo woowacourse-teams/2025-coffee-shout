@@ -5,11 +5,13 @@ type Props = {
   flipped: boolean;
   initialView: ReactNode;
   flippedView: ReactNode;
+  width?: string;
+  height?: string;
 };
 
-const Flip = ({ flipped, initialView, flippedView }: Props) => {
+const Flip = ({ flipped, initialView, flippedView, width, height }: Props) => {
   return (
-    <S.FlipWrapper>
+    <S.FlipWrapper $width={width} $height={height}>
       <S.Flipper flipped={flipped}>
         <S.InitialView>{initialView}</S.InitialView>
         <S.FlippedView>{flippedView}</S.FlippedView>

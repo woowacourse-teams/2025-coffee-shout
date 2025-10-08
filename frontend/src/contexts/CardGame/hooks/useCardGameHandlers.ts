@@ -58,7 +58,7 @@ export const useCardGameHandlers = (
 
         case 'DONE':
           dispatch({ type: 'DONE' });
-          navigate(`/room/${joinCode}/${miniGameType}/result`);
+          // navigate(`/room/${joinCode}/${miniGameType}/result`);
           break;
       }
     },

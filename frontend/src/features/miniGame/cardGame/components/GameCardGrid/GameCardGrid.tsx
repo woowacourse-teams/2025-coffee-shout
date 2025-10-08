@@ -4,6 +4,9 @@ import { Card, CardInfo } from '@/types/miniGame/cardGame';
 import CardBack from '../CardBack/CardBack';
 import CardFront from '../CardFront/CardFront';
 import * as S from './GameCardGrid.styled';
+import Flip from '@/components/@common/Flip/Flip';
+
+import { DESIGN_TOKENS } from '@/constants/design';
 
 type Props = {
   cardInfos: CardInfo[];
@@ -13,30 +16,31 @@ type Props = {
 const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
   const { getParticipantColorIndex } = useParticipants();
 
-  const renderCard = (cardInfo: CardInfo, index: number) => {
-    if (cardInfo.selected) {
-      const playerColor = cardInfo.playerName
-        ? colorList[getParticipantColorIndex(cardInfo.playerName)]
-        : null;
+  return (
+    <S.Container>
+      {cardInfos.map((cardInfo, index) => {
+        const playerColor = cardInfo.playerName
+          ? colorList[getParticipantColorIndex(cardInfo.playerName)]
+          : null;
 
-      return (
-        <CardFront
-          key={index}
-          card={
-            {
-              type: cardInfo.cardType,
-              value: cardInfo.value,
-            } as Card
-          }
-          playerColor={playerColor}
-        />
-      );
-    }
-
-    return <CardBack key={index} onClick={() => onCardClick(index)} />;
-  };
-
-  return <S.Container>{cardInfos.map(renderCard)}</S.Container>;
+        return (
+          <Flip
+            key={index}
+            flipped={cardInfo.selected}
+            width={DESIGN_TOKENS.card.large.width}
+            height={DESIGN_TOKENS.card.large.height}
+            initialView={<CardBack onClick={() => onCardClick(index)} />}
+            flippedView={
+              <CardFront
+                card={{ type: cardInfo.cardType, value: cardInfo.value } as Card}
+                playerColor={playerColor}
+              />
+            }
+          />
+        );
+      })}
+    </S.Container>
+  );
 };
 
 export default GameCardGrid;

@@ -1,17 +1,22 @@
 import styled from '@emotion/styled';
 
-type Props = {
+type FlipperProps = {
   flipped: boolean;
 };
 
-export const FlipWrapper = styled.div`
+type FlipWrapperProps = {
+  $width?: string;
+  $height?: string;
+};
+
+export const FlipWrapper = styled.div<FlipWrapperProps>`
   position: relative;
   perspective: 1000px;
-  width: 100%;
-  height: 100%;
+  width: ${({ $width }) => $width || '100%'};
+  height: ${({ $height }) => $height || '100%'};
 `;
 
-export const Flipper = styled.div<Props>`
+export const Flipper = styled.div<FlipperProps>`
   position: absolute;
   width: 100%;
   height: 100%;
