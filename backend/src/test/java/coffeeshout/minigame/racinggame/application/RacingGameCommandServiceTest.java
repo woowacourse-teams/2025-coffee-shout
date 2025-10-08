@@ -64,7 +64,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         given(taskScheduler.scheduleAtFixedRate(any(Runnable.class), any())).willReturn(null);
 
         // when
-        racingGameCommandService.startGame(room.getJoinCode().getValue(), HOST_NAME);
+            racingGameCommandService.start(room.getJoinCode().getValue(), HOST_NAME);
 
         // then
         final RacingGame startedGame = (RacingGame) room.findMiniGame(MiniGameType.RACING_GAME);
@@ -82,7 +82,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         given(taskScheduler.scheduleAtFixedRate(any(Runnable.class), any())).willReturn(null);
 
         // when
-        racingGameCommandService.startGame(room.getJoinCode().getValue(), HOST_NAME);
+        racingGameCommandService.start(room.getJoinCode().getValue(), HOST_NAME);
 
         // then
         verify(taskScheduler).scheduleAtFixedRate(any(Runnable.class), any());
@@ -93,7 +93,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         // given
         final Room room = createRoomWithRacingGame();
         given(taskScheduler.scheduleAtFixedRate(any(Runnable.class), any())).willReturn(null);
-        racingGameCommandService.startGame(room.getJoinCode().getValue(), HOST_NAME);
+        racingGameCommandService.start(room.getJoinCode().getValue(), HOST_NAME);
 
         final RacingGame racingGame = (RacingGame) room.findMiniGame(MiniGameType.RACING_GAME);
         final String playerName = "루키";

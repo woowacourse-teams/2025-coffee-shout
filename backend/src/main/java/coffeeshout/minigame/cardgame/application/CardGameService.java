@@ -2,12 +2,8 @@ package coffeeshout.minigame.cardgame.application;
 
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.cardgame.domain.cardgame.service.CardGameCommandService;
-import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
-import coffeeshout.minigame.cardgame.infra.messaging.CardSelectStreamProducer;
-import coffeeshout.minigame.cardgame.infra.messaging.MiniGameEventPublisher;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.room.domain.JoinCode;
@@ -32,31 +28,12 @@ public class CardGameService implements MiniGameService {
     private final RoomQueryService roomQueryService;
     private final CardGameCommandService cardGameCommandService;
     private final ApplicationEventPublisher eventPublisher;
-    private final MiniGameEventPublisher miniGameEventPublisher;
     private final RoomJpaRepository roomJpaRepository;
     private final PlayerJpaRepository playerJpaRepository;
     private final MiniGameJpaRepository miniGameJpaRepository;
-    private final CardSelectStreamProducer cardSelectStreamProducer;
 
     @Override
-    public void publishStartEvent(String joinCode, String hostName) {
-        final StartMiniGameCommandEvent event = new StartMiniGameCommandEvent(joinCode, hostName);
-        miniGameEventPublisher.publishEvent(event);
-        log.info("미니게임 시작 이벤트 발행: joinCode={}, hostName={}, eventId={}",
-                joinCode, hostName, event.eventId());
-    }
-
-    @Override
-    public void publishSelectCardEvent(String joinCode, String playerName, Integer cardIndex) {
-        final SelectCardCommandEvent event = new SelectCardCommandEvent(joinCode, playerName, cardIndex);
-        cardSelectStreamProducer.broadcastCardSelect(event);
-        log.info("카드 선택 이벤트 발행: joinCode={}, playerName={}, cardIndex={}, eventId={}",
-                joinCode, playerName, cardIndex, event.eventId());
-    }
-
-    // === Internal 메서드들 (Redis 리스너용) ===
-
-    public void startInternal(String joinCode, String hostName) {
+    public void start(String joinCode, String hostName) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final CardGame cardGame = getCardGame(roomJoinCode);
 
@@ -86,6 +63,11 @@ public class CardGameService implements MiniGameService {
 
     public void selectCardInternal(String joinCode, String playerName, Integer cardIndex) {
         cardGameCommandService.selectCard(new JoinCode(joinCode), new PlayerName(playerName), cardIndex);
+    }
+
+    @Override
+    public MiniGameType getMiniGameType() {
+        return MiniGameType.CARD_GAME;
     }
 
     private CardGame getCardGame(JoinCode joinCode) {

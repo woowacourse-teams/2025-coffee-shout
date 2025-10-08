@@ -1,5 +1,6 @@
 package coffeeshout.minigame.racinggame.application;
 
+import coffeeshout.minigame.cardgame.application.MiniGameService;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.event.RaceFinishedEvent;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class RacingGameCommandService {
+public class RacingGameCommandService implements MiniGameService {
 
     private final RoomQueryService roomQueryService;
     private final TaskScheduler taskScheduler;
@@ -36,16 +37,19 @@ public class RacingGameCommandService {
         this.eventPublisher = eventPublisher;
     }
 
-    public void startGame(String joinCode, String hostName) {
-        final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final Room room = roomQueryService.getByJoinCode(roomJoinCode);
-        room.startNextGame(hostName);
-
+    @Override
+    public void start(String joinCode, String hostName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final RacingGame racingGame = getRacingGame(room);
         startAutoMove(racingGame, joinCode);
 
         eventPublisher.publishEvent(RaceStartedEvent.of(racingGame, joinCode));
         log.info("레이싱 게임 시작 완료: joinCode={}", joinCode);
+    }
+
+    @Override
+    public MiniGameType getMiniGameType() {
+        return MiniGameType.RACING_GAME;
     }
 
     public void processTap(String joinCode, String playerName, int tapCount) {

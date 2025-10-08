@@ -1,22 +1,37 @@
 package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
-import coffeeshout.minigame.cardgame.application.CardGameService;
+import coffeeshout.minigame.cardgame.application.MiniGameService;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
-import lombok.RequiredArgsConstructor;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<StartMiniGameCommandEvent> {
 
-    private final CardGameService cardGameService;
+    private final Map<MiniGameType, MiniGameService> miniGameServiceMap;
     private final RoomQueryService roomQueryService;
+
+    public StartMiniGameCommandEventHandler(
+            RoomQueryService roomQueryService,
+            List<MiniGameService> miniGameServices
+    ) {
+        this.roomQueryService = roomQueryService;
+        this.miniGameServiceMap = new EnumMap<>(MiniGameType.class);
+        miniGameServices.forEach(miniGameService -> miniGameServiceMap.put(
+                miniGameService.getMiniGameType(),
+                miniGameService
+        ));
+    }
 
     @Override
     public void handle(StartMiniGameCommandEvent event) {
@@ -34,9 +49,8 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
 
     private void updateRoomStateAndStartGame(StartMiniGameCommandEvent event) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-        room.startNextGame(event.hostName());
-
-        cardGameService.startInternal(event.joinCode(), event.hostName());
+        final Playable playable = room.startNextGame(event.hostName());
+        miniGameServiceMap.get(playable.getMiniGameType()).start(event.joinCode(), event.hostName());
     }
 
     @Override
