@@ -1,6 +1,7 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.room.application.DashboardService;
+import coffeeshout.room.ui.response.GamePlayCountResponse;
 import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.room.ui.response.TopWinnerResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,10 @@ public class DashBoardController {
     @GetMapping("/lowest-probability-winner")
     public ResponseEntity<LowestProbabilityWinnerResponse> getLowestProbabilityWinner() {
         return ResponseEntity.ok(dashboardService.getLowestProbabilityWinner());
+    }
+
+    @GetMapping("/game-play-counts")
+    public ResponseEntity<List<GamePlayCountResponse>> getGamePlayCounts() {
+        return ResponseEntity.ok(dashboardService.getGamePlayCounts());
     }
 }
