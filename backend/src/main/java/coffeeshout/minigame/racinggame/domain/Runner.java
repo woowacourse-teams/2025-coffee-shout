@@ -66,7 +66,7 @@ public class Runner {
         if (isFinished()) {
             return;
         }
-        this.position += speed;
+        this.position += 10;
         if (position >= RacingGame.FINISH_LINE) {
             this.position = RacingGame.FINISH_LINE;
             this.finishTime = Instant.now();

@@ -2,6 +2,7 @@ package coffeeshout.room.application;
 
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.service.MenuQueryService;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
