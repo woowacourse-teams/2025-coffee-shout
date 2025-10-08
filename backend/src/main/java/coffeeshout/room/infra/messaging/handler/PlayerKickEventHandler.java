@@ -7,11 +7,10 @@ import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.ui.response.PlayerResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -42,6 +41,7 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
 
         } catch (Exception e) {
             log.error("플레이어 강퇴 이벤트 처리 실패", e);
+            throw e;
         }
     }
 
