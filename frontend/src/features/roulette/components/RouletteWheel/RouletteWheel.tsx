@@ -32,6 +32,12 @@ const RouletteWheel = ({
 
   const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
 
+  const sortedPlayers = [...playersWithAngles].sort((a, b) => {
+    if (a.playerName === myName) return 1;
+    if (b.playerName === myName) return -1;
+    return 0;
+  });
+
   return (
     <S.Container>
       <Pin />
@@ -41,7 +47,7 @@ const RouletteWheel = ({
           height={WHEEL_CONFIG.SIZE}
           viewBox={`0 0 ${WHEEL_CONFIG.SIZE} ${WHEEL_CONFIG.SIZE}`}
         >
-          {playersWithAngles.map((player) => (
+          {sortedPlayers.map((player) => (
             <RouletteSlice
               key={player.playerName}
               player={player}
