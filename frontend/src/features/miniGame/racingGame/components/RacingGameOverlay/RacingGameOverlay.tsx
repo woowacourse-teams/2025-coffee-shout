@@ -15,7 +15,7 @@ const RacingGameOverlay = ({ children }: Props) => {
     console.log('clicked tabCount: 30');
     send(`/room/${joinCode}/racing-game/tap`, {
       playerName: myName,
-      tabCount: 30,
+      tapCount: 30,
     });
   };
 

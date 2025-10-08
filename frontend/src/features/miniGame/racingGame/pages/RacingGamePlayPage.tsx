@@ -4,7 +4,7 @@ import * as S from './RacingGamePlayPage.styled';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
