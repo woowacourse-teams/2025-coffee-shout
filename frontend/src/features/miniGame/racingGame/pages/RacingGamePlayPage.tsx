@@ -87,7 +87,7 @@ const RacingGamePage = () => {
 
   return (
     <>
-      {racingGameState === 'READY' && <PrepareOverlay />}
+      {racingGameState === 'PREPARE' && <PrepareOverlay />}
       {racingGameState === 'DONE' && <Finish />}
       {showGoal && <Goal />}
       <RacingGameOverlay>
