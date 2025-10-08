@@ -2,7 +2,8 @@ package coffeeshout.minigame.cardgame.application;
 
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartedEvent;
+import coffeeshout.minigame.cardgame.domain.cardgame.CardGameTaskType;
+import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartMessage;
 import coffeeshout.minigame.cardgame.domain.cardgame.service.CardGameCommandService;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameJpaRepository;
@@ -34,10 +35,10 @@ public class CardGameService implements MiniGameService {
 
     @Override
     public void start(String joinCode, String hostName) {
-        final JoinCode roomJoinCode = new JoinCode(joinCode);
-        final CardGame cardGame = getCardGame(roomJoinCode);
-
-        eventPublisher.publishEvent(new CardGameStartedEvent(roomJoinCode, cardGame));
+        eventPublisher.publishEvent(new CardGameStartMessage(
+                joinCode,
+                CardGameTaskType.getFirstTask().name()
+        ));
     }
 
     public void saveGameEntities(String joinCode) {

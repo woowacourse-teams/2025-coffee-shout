@@ -2,6 +2,7 @@ package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
 import coffeeshout.minigame.cardgame.application.MiniGameService;
 import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
 import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
 import coffeeshout.room.domain.JoinCode;
@@ -12,6 +13,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,12 +22,15 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
 
     private final Map<MiniGameType, MiniGameService> miniGameServiceMap;
     private final RoomQueryService roomQueryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public StartMiniGameCommandEventHandler(
             RoomQueryService roomQueryService,
-            List<MiniGameService> miniGameServices
+            List<MiniGameService> miniGameServices,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.roomQueryService = roomQueryService;
+        this.eventPublisher = eventPublisher;
         this.miniGameServiceMap = new EnumMap<>(MiniGameType.class);
         miniGameServices.forEach(miniGameService -> miniGameServiceMap.put(
                 miniGameService.getMiniGameType(),
@@ -50,6 +55,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
     private void updateRoomStateAndStartGame(StartMiniGameCommandEvent event) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
         final Playable playable = room.startNextGame(event.hostName());
+        eventPublisher.publishEvent(new MiniGameStartedEvent(event.joinCode(), playable.getMiniGameType().name()));
         miniGameServiceMap.get(playable.getMiniGameType()).start(event.joinCode(), event.hostName());
     }
 

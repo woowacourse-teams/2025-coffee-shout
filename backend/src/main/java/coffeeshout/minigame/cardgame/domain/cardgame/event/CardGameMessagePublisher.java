@@ -2,17 +2,18 @@ package coffeeshout.minigame.cardgame.domain.cardgame.event;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.minigame.cardgame.domain.MiniGameType;
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
 import coffeeshout.minigame.cardgame.domain.cardgame.CardGameTaskType;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartMessage;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartedEvent;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStateChangeMessage;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStateChangedEvent;
 import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardSelectedEvent;
+import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.cardgame.ui.response.MiniGameStartMessage;
 import coffeeshout.minigame.cardgame.ui.response.MiniGameStateMessage;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import generator.annotaions.MessageResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -53,20 +54,16 @@ public class CardGameMessagePublisher {
     }
 
     @EventListener
-    public void publishCardGameStarted(CardGameStartedEvent cardGameStartedEvent) {
-        JoinCode joinCode = cardGameStartedEvent.joinCode();
-        CardGame cardGame = cardGameStartedEvent.cardGame();
-        
-        // 비즈니스 로직: 첫 번째 태스크 스케줄링
-        publisher.publishEvent(new CardGameStartMessage(
-                joinCode.getValue(),
-                CardGameTaskType.getFirstTask().name()
-        ));
-        
+    @MessageResponse(
+            path = "/room/{joinCode}/round",
+            returnType = MiniGameStartMessage.class
+    )
+    public void publishCardGameStarted(MiniGameStartedEvent miniGameStartedEvent) {
         // 웹소켓 브로드캐스트
+        final MiniGameType miniGameType = MiniGameType.valueOf(miniGameStartedEvent.gameType());
         messagingTemplate.convertAndSend(
-                String.format(GAME_START_DESTINATION_FORMAT, joinCode.getValue()),
-                WebSocketResponse.success(new MiniGameStartMessage(cardGame.getMiniGameType()))
+                String.format(GAME_START_DESTINATION_FORMAT, miniGameStartedEvent.joinCode()),
+                WebSocketResponse.success(new MiniGameStartMessage(miniGameType))
         );
     }
 
