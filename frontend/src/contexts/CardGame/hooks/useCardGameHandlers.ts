@@ -1,6 +1,7 @@
 import { CardGameRound, CardGameState, CardInfo } from '@/types/miniGame/cardGame';
 import React, { useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import { useIdentifier } from '../../Identifier/IdentifierContext';
 import { Action } from '../reducer/cardGameReducer';
 
@@ -23,7 +24,7 @@ export const useCardGameHandlers = (
   dispatch: React.Dispatch<Action>,
   { updateSelectedCardInfo }: CardGameStateHandlers
 ) => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
 

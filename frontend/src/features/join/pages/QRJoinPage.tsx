@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './QRJoinPage.styled';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 
 const QRJoinPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { joinCode } = useParams<{ joinCode: string }>();
   const { setJoinCode } = useIdentifier();
   const { setPlayerType } = usePlayerType();

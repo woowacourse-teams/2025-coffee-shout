@@ -3,7 +3,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 
 type Props = {
   isConnected: boolean;
@@ -13,7 +13,7 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
   const { myName, joinCode } = useIdentifier();
   const { participants } = useParticipants();
   const { playerType } = usePlayerType();
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
 
   const { execute: checkRoomExists } = useLazyFetch<{ exist: boolean }>({
     endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,

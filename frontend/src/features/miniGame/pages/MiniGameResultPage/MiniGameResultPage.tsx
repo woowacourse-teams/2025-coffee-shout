@@ -12,7 +12,8 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
@@ -39,7 +40,7 @@ type ShowRouletteResponse = {
 };
 
 const MiniGameResultPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();

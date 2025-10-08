@@ -3,12 +3,13 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import MiniGameIntroSlide from '../../components/MiniGameIntroSlide/MiniGameIntroSlide';
 import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
 
 const MiniGameReadyPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
   const { currentCardGameState } = useCardGame();

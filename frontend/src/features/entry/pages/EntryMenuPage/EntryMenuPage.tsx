@@ -5,7 +5,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { ChangeEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
@@ -21,7 +21,7 @@ import MenuList from './components/MenuList/MenuList';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 
 const EntryMenuPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { isConnected } = useWebSocket();
   const { joinCode, qrCodeUrl } = useIdentifier();
   const { playerType } = usePlayerType();

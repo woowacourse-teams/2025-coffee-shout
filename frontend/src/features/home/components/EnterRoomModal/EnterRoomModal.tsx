@@ -3,7 +3,7 @@ import Input from '@/components/@common/Input/Input';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import * as S from './EnterRoomModal.styled';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
 import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
@@ -17,7 +17,7 @@ type Props = {
 };
 
 const EnterRoomModal = ({ onClose }: Props) => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
 
   const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({

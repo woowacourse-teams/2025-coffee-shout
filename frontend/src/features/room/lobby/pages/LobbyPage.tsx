@@ -17,7 +17,7 @@ import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { STORAGE_KEYS, storageManager } from '@/utils/StorageManager';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '@/hooks/useCustomNavigate';
 import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
@@ -34,7 +34,7 @@ type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
   const { send, isConnected } = useWebSocket();
   const { myName, joinCode } = useIdentifier();
   const { openModal, closeModal } = useModal();
