@@ -64,6 +64,10 @@ public class Runners {
                 .orElseThrow(() -> new IllegalArgumentException("해당 플레이어의 러너를 찾을 수 없습니다."));
     }
 
+    public void initialSpeed() {
+        runners.forEach(Runner::firstMoveSpeed);
+    }
+
     public Stream<Runner> stream() {
         return runners.stream();
     }

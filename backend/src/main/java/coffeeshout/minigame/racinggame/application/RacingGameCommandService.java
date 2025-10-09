@@ -68,8 +68,8 @@ public class RacingGameCommandService implements MiniGameService {
         racingGame.updateState(RacingGameState.PREPARE);
         eventPublisher.publishEvent(RunnersMovedEvent.from(racingGame, joinCode));
         taskScheduler.schedule(() -> {
-            startAutoMove(racingGame, joinCode);
             eventPublisher.publishEvent(RaceStateChangedEvent.of(racingGame, joinCode));
+            startAutoMove(racingGame, joinCode);
         }, Instant.now().plus(racingGame.getState().getDuration(), ChronoUnit.MILLIS));
     }
 

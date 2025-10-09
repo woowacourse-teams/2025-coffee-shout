@@ -18,11 +18,12 @@ import lombok.Getter;
 @Getter
 public class RacingGame implements Playable {
 
-    public static final int INITIAL_SPEED = 1;
+    public static final int INITIAL_SPEED = 0;
     public static final int MIN_SPEED = 1;
     public static final int MAX_SPEED = 10;
     public static final int FINISH_LINE = 1000;
     public static final int START_LINE = 0;
+    public static final int SCALE = 3;
     public static final double CLICKS_PER_SECOND_THRESHOLD = 10.0;
 
     public static final long MOVE_INTERVAL_MILLIS = 100L;
@@ -32,6 +33,18 @@ public class RacingGame implements Playable {
     private RacingGameState state;
     private ScheduledFuture<?> autoMoveFuture;
 
+    public static int scaleMinSpeed() {
+        return SCALE * MIN_SPEED;
+    }
+
+    public static int scaleMaxSpeed() {
+        return SCALE * MAX_SPEED;
+    }
+
+    public static int scaleFinishLine() {
+        return SCALE * FINISH_LINE;
+    }
+
     @Override
     public void startGame(List<Player> players) {
         this.runners = new Runners(players);
@@ -39,6 +52,7 @@ public class RacingGame implements Playable {
     }
 
     public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
+        this.runners.initialSpeed();
         this.startTime = Instant.now();
         this.autoMoveFuture = autoMoveFuture;
     }
@@ -78,10 +92,7 @@ public class RacingGame implements Playable {
 
     @Override
     public Map<Player, MiniGameScore> getScores() {
-        return runners.stream().collect(Collectors.toMap(
-                Runner::getPlayer,
-                this::convertScore
-        ));
+        return runners.stream().collect(Collectors.toMap(Runner::getPlayer, this::convertScore));
     }
 
     @Override

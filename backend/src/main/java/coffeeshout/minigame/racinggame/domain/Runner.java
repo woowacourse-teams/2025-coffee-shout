@@ -51,7 +51,7 @@ public class Runner {
 
     private int determineSpeed(double clicksPerSecond) {
         if (clicksPerSecond >= RacingGame.CLICKS_PER_SECOND_THRESHOLD) {
-            return RacingGame.MAX_SPEED;
+            return RacingGame.scaleMaxSpeed();
         }
 
         int calculatedSpeed = (int) Math.ceil(clicksPerSecond);
@@ -59,7 +59,7 @@ public class Runner {
     }
 
     private int clampSpeed(int speed) {
-        return Math.max(RacingGame.MIN_SPEED, Math.min(RacingGame.MAX_SPEED, speed));
+        return Math.max(RacingGame.scaleMinSpeed(), Math.min(RacingGame.scaleMaxSpeed(), speed));
     }
 
     public void move() {
@@ -67,13 +67,18 @@ public class Runner {
             return;
         }
         this.position += speed;
-        if (position >= RacingGame.FINISH_LINE) {
-            this.position = RacingGame.FINISH_LINE;
+        if (position >= RacingGame.scaleFinishLine()) {
+            this.position = RacingGame.scaleFinishLine();
+            this.speed = RacingGame.INITIAL_SPEED;
             this.finishTime = Instant.now();
         }
     }
 
     public boolean isFinished() {
-        return position >= RacingGame.FINISH_LINE;
+        return position >= RacingGame.scaleFinishLine();
+    }
+
+    public void firstMoveSpeed() {
+        this.speed = RacingGame.scaleMinSpeed();
     }
 }
