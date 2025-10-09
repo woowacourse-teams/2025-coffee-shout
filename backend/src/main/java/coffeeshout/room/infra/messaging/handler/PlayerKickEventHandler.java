@@ -26,6 +26,14 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
             log.info("플레이어 강퇴 이벤트 수신: eventId={}, joinCode={}, playerName={}",
                     event.eventId(), event.joinCode(), event.playerName());
 
+            final boolean removed = roomService.removePlayer(event.joinCode(), event.playerName());
+            if (!removed) {
+                log.warn("플레이어 강퇴 실패 - 플레이어 없음: eventId={}, joinCode={}, playerName={}",
+                        event.eventId(), event.joinCode(), event.playerName());
+                // 실패 응답 보내거나, 아니면 그냥 리턴
+                return;
+            }
+
             final List<Player> players = roomService.getPlayersInternal(event.joinCode());
             final List<PlayerResponse> responses = players.stream()
                     .map(PlayerResponse::from)
@@ -35,7 +43,6 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
                     "/topic/room/" + event.joinCode(),
                     WebSocketResponse.success(responses)
             );
-
             log.info("플레이어 강퇴 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}",
                     event.eventId(), event.joinCode(), event.playerName());
 

@@ -277,4 +277,9 @@ public class RoomService {
         room.showRoulette();
         return room;
     }
+
+    public boolean hasPlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.hasPlayer(new PlayerName(playerName));
+    }
 }

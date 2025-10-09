@@ -102,9 +102,9 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @PathVariable String playerName
     ) {
-        boolean removed = roomService.removePlayer(joinCode, playerName);
+        boolean exists = roomService.hasPlayer(joinCode, playerName);
 
-        if (removed) {
+        if (exists) {
             final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
             roomEventPublisher.publishEvent(event);
             return ResponseEntity.noContent().build();
