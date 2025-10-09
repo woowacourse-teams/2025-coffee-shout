@@ -1,6 +1,6 @@
 import { useEffect, useRef, RefObject } from 'react';
 
-const BACKGROUND_SPEED_MULTIPLIER = 2.5;
+const BACKGROUND_SPEED_MULTIPLIER = 10;
 
 type Props = {
   containerRef: RefObject<HTMLDivElement | null>;
