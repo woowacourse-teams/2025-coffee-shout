@@ -1,5 +1,5 @@
 import PlayerIcon from '@/components/@composition/PlayerIcon/PlayerIcon';
-import { colorList } from '@/constants/color';
+import { ColorList } from '@/constants/color';
 import { useRotationAnimation } from '../../hooks/useRotationAnimation';
 import Description from '@/components/@common/Description/Description';
 import * as S from './RacingPlayer.styled';
@@ -10,10 +10,10 @@ type Props = {
   speed: number;
   isMe: boolean;
   myPosition: number;
-  colorIndex: number;
+  color: ColorList;
 };
 
-const RacingPlayer = ({ position, speed, isMe, myPosition, colorIndex, playerName }: Props) => {
+const RacingPlayer = ({ position, speed, isMe, myPosition, color, playerName }: Props) => {
   const rotatingRef = useRotationAnimation({ speed });
 
   return (
@@ -23,7 +23,7 @@ const RacingPlayer = ({ position, speed, isMe, myPosition, colorIndex, playerNam
       </S.PlayerName>
 
       <S.RotatingWrapper ref={rotatingRef}>
-        <PlayerIcon color={colorList[colorIndex % colorList.length]} />
+        <PlayerIcon color={color} />
       </S.RotatingWrapper>
     </S.Player>
   );

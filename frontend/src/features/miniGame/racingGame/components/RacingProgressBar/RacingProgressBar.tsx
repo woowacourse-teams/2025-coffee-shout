@@ -1,5 +1,7 @@
 import * as S from './RacingProgressBar.styled';
 import { usePlayerProgressData } from '../../hooks/usePlayerProgressData';
+import { colorList } from '@/constants/color';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
 type Player = {
   playerName: string;
@@ -14,23 +16,24 @@ type Props = {
 
 const RacingProgressBar = ({ myName, endDistance, players }: Props) => {
   const playerProgressData = usePlayerProgressData({ players, endDistance, myName });
+  const { getParticipantColorIndex } = useParticipants();
 
   return (
     <S.Container>
       <S.ProgressTrack>
-        {playerProgressData.map(({ player, progress, color, isMe }) => (
+        {playerProgressData.map(({ player, progress, isMe }) => (
           <S.ProgressFill
             key={`fill-${player.playerName}`}
             $progress={progress}
-            $color={color}
+            $color={colorList[getParticipantColorIndex(player.playerName)]}
             $isMe={isMe}
           />
         ))}
-        {playerProgressData.map(({ player, progress, color, isMe }) => (
+        {playerProgressData.map(({ player, progress, isMe }) => (
           <S.ProgressMarker
             key={player.playerName}
             $progress={progress}
-            $color={color}
+            $color={colorList[getParticipantColorIndex(player.playerName)]}
             $isMe={isMe}
           />
         ))}

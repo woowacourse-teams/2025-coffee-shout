@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { colorList } from '@/constants/color';
 
 const MAX_PROGRESS_PERCENTAGE = 100;
 
@@ -18,7 +17,6 @@ type PlayerProgressData = {
   player: Player;
   progress: number;
   isMe: boolean;
-  color: string;
   index: number;
 };
 
@@ -30,13 +28,11 @@ export const usePlayerProgressData = ({ players, endDistance, myName }: Props) =
         MAX_PROGRESS_PERCENTAGE
       );
       const isMe = player.playerName === myName;
-      const color = colorList[index % colorList.length];
 
       return {
         player,
         progress,
         isMe,
-        color,
         index,
       };
     });

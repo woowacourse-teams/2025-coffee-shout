@@ -16,12 +16,15 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
+import { colorList } from '@/constants/color';
 
 const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
   const navigate = useNavigate();
   const { racingGameState, racingGameData } = useRacingGame();
+  const { getParticipantColorIndex } = useParticipants();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -76,7 +79,7 @@ const RacingGamePage = () => {
               <RacingLine position={0} myPosition={myPosition} />
               {/* 도착선 */}
               <RacingLine position={1000} myPosition={myPosition} />
-              {visiblePlayers.map((player, index) => (
+              {visiblePlayers.map((player) => (
                 <RacingPlayer
                   key={player.playerName}
                   playerName={player.playerName}
@@ -84,7 +87,7 @@ const RacingGamePage = () => {
                   speed={player.speed}
                   isMe={player.playerName === myName}
                   myPosition={myPosition}
-                  colorIndex={index}
+                  color={colorList[getParticipantColorIndex(player.playerName)]}
                 />
               ))}
             </S.PlayersWrapper>
