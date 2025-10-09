@@ -1,7 +1,9 @@
+import { RacingGameData, RacingGameState } from '@/types/miniGame/racingGame';
 import { createContext, useContext } from 'react';
 
 type RacingGameContextType = {
-  racingGameState: 'DESCRIPTION' | 'PREPARE' | 'PLAYING' | 'DONE';
+  racingGameState: RacingGameState;
+  racingGameData: RacingGameData;
 };
 
 export const RacingGameContext = createContext<RacingGameContextType | null>(null);

@@ -12,10 +12,9 @@ const RacingGameOverlay = ({ children }: Props) => {
   const { send } = useWebSocket();
   const handleClick = (event: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    console.log('clicked tabCount: 30');
     send(`/room/${joinCode}/racing-game/tap`, {
       playerName: myName,
-      tapCount: 30,
+      tapCount: 1,
     });
   };
 

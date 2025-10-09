@@ -3,7 +3,7 @@ import RacingLine from '../components/RacingLine/RacingLine';
 import * as S from './RacingGamePlayPage.styled';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
@@ -12,38 +12,17 @@ import { useBackgroundAnimation } from '../hooks/useBackgroundAnimation';
 import { usePlayerData } from '../hooks/usePlayerData';
 import { getVisiblePlayers } from '../utils/getVisiblePlayers';
 import RacingGameOverlay from '../components/RacingGameOverlay/RacingGameOverlay';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
-
 import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
-
-type RacingGameData = {
-  distance: {
-    start: number;
-    end: number;
-  };
-  players: Array<{
-    playerName: string;
-    position: number; // 서버에서 position으로 보내고 있음
-    speed: number;
-  }>;
-};
 
 const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
   const navigate = useNavigate();
-  const { racingGameState } = useRacingGame();
+  const { racingGameState, racingGameData } = useRacingGame();
 
-  const [racingGameData, setRacingGameData] = useState<RacingGameData>({
-    players: [],
-    distance: {
-      start: 0,
-      end: 1000,
-    },
-  });
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const visiblePlayers = getVisiblePlayers(racingGameData.players, myName);
@@ -63,12 +42,6 @@ const RacingGamePage = () => {
     containerRef,
     mySpeed,
   });
-
-  const handleRacingGameData = useCallback((data: RacingGameData) => {
-    setRacingGameData(data);
-  }, []);
-
-  useWebSocketSubscription(`/room/${joinCode}/racing-game`, handleRacingGameData);
 
   useEffect(() => {
     setTimeout(() => {
