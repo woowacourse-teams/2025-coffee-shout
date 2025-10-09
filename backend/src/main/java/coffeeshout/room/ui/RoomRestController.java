@@ -102,7 +102,7 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @PathVariable String playerName
     ) {
-        boolean exists = roomService.hasPlayer(joinCode, playerName);
+        final boolean exists = roomService.hasPlayer(joinCode, playerName);
 
         if (exists) {
             final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
