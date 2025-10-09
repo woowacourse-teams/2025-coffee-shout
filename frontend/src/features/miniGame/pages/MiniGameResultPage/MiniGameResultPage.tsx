@@ -85,6 +85,7 @@ const MiniGameResultPage = () => {
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>{error.message}</div>;
+  if (!miniGameType) return <div>잘못된 미니게임 타입입니다.</div>;
 
   return (
     <Layout>
@@ -113,7 +114,11 @@ const MiniGameResultPage = () => {
                   playerColor={colorList[getParticipantColorIndex(playerRank.playerName)]}
                 >
                   <Headline4>
-                    {scores.find((score) => score.playerName === playerRank.playerName)?.score}점
+                    {getScoreTextByGameType({
+                      gameType: miniGameType,
+                      playScores: scores,
+                      playerName: playerRank.playerName,
+                    })}
                   </Headline4>
                 </PlayerCard>
               </S.PlayerCardWrapper>
@@ -135,3 +140,33 @@ const MiniGameResultPage = () => {
 };
 
 export default MiniGameResultPage;
+
+const getScoreTextByGameType = ({
+  gameType,
+  playScores,
+  playerName,
+}: {
+  gameType: MiniGameType;
+  playScores: PlayerScore[];
+  playerName: string;
+}) => {
+  const secondsFormatter = new Intl.NumberFormat('ko-KR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const playerScore = playScores.find((score) => score.playerName === playerName);
+  const scoreValue = playerScore ? playerScore.score : 0;
+
+  switch (gameType) {
+    case 'RACING_GAME': {
+      const seconds = scoreValue / 1000;
+      return secondsFormatter.format(seconds) + '초';
+    }
+    case 'CARD_GAME': {
+      return scoreValue + '점';
+    }
+    default:
+      return null;
+  }
+};
