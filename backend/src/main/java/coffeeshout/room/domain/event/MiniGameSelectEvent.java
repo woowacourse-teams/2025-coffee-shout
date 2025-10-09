@@ -3,7 +3,7 @@ package coffeeshout.room.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
-import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.domain.MiniGameType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

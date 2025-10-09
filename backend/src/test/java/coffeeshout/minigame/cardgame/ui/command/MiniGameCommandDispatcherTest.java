@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.minigame.cardgame.ui.command.MiniGameCommand;
-import coffeeshout.minigame.cardgame.ui.command.MiniGameCommandDispatcher;
-import coffeeshout.minigame.cardgame.ui.command.MiniGameCommandHandler;
+import coffeeshout.minigame.ui.command.MiniGameCommand;
+import coffeeshout.minigame.ui.command.MiniGameCommandDispatcher;
+import coffeeshout.minigame.ui.command.MiniGameCommandHandler;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

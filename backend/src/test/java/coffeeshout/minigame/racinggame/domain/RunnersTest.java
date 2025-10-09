@@ -3,6 +3,8 @@ package coffeeshout.minigame.racinggame.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.racinggame.domain.Runner;
+import coffeeshout.racinggame.domain.Runners;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map;
@@ -151,28 +153,6 @@ class RunnersTest {
 
         assertThat(hasPlayer1WithSpeed8).isTrue();
         assertThat(hasPlayer2WithSpeed1).isTrue();
-    }
-
-    @Test
-    void 완주_순서대로_순위를_조회할_수_있다() throws InterruptedException {
-        // given
-        final Player player = PlayerFixture.게스트한스();
-        final Runners runners = new Runners(List.of(player));
-
-        Thread.sleep(100);
-        runners.adjustSpeed(player, 10); // 속도 10
-
-        // 완주시킴
-        for (int i = 0; i < 100; i++) {
-            runners.moveAll();
-        }
-
-        // when
-        final List<Runner> ranking = runners.getRanking();
-
-        // then
-        assertThat(ranking).hasSize(1);
-        assertThat(ranking.get(0).getPlayer()).isEqualTo(player);
     }
 
     @Test

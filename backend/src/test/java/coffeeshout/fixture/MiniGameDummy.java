@@ -1,11 +1,12 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.MiniGameResult;
-import coffeeshout.minigame.MiniGameScore;
-import coffeeshout.minigame.MiniGameType;
-import coffeeshout.minigame.cardgame.domain.CardGameScore;
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class MiniGameDummy implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(getScores());
+        return MiniGameResult.from(getScores(), Comparator.naturalOrder());
     }
 
     @Override

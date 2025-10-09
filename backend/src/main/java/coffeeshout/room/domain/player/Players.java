@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.player;
 
-import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import java.util.ArrayList;

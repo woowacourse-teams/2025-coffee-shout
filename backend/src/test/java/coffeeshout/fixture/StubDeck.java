@@ -1,7 +1,7 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.cardgame.domain.card.Card;
-import coffeeshout.minigame.cardgame.domain.card.Deck;
+import coffeeshout.cardgame.domain.card.Card;
+import coffeeshout.cardgame.domain.card.Deck;
 import io.micrometer.common.lang.NonNull;
 import java.util.List;
 

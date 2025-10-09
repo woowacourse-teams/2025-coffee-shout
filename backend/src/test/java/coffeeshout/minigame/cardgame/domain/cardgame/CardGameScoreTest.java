@@ -2,10 +2,10 @@ package coffeeshout.minigame.cardgame.domain.cardgame;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import coffeeshout.minigame.cardgame.domain.CardGameScore;
-import coffeeshout.minigame.cardgame.domain.CardHand;
-import coffeeshout.minigame.cardgame.domain.card.AdditionCard;
-import coffeeshout.minigame.cardgame.domain.card.MultiplierCard;
+import coffeeshout.cardgame.domain.CardGameScore;
+import coffeeshout.cardgame.domain.CardHand;
+import coffeeshout.cardgame.domain.card.AdditionCard;
+import coffeeshout.cardgame.domain.card.MultiplierCard;
 import org.junit.jupiter.api.Test;
 
 class CardGameScoreTest {

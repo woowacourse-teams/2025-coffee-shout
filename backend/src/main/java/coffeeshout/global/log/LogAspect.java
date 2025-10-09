@@ -42,7 +42,7 @@ public class LogAspect {
     }
 
     @After(
-            value = "execution(* coffeeshout.minigame.MiniGameService.publishStartEvent(..)) && args(playable, joinCode)",
+            value = "execution(* coffeeshout.minigame.domain.MiniGameService.publishStartEvent(..)) && args(playable, joinCode)",
             argNames = "playable,joinCode"
     )
     public void logMiniGameStart(Playable playable, String joinCode) {

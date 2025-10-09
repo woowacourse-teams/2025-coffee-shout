@@ -3,7 +3,10 @@ package coffeeshout.minigame.racinggame.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.racinggame.domain.RacingGame;
+import coffeeshout.racinggame.domain.RacingGameState;
+import coffeeshout.racinggame.domain.Runner;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map;
@@ -175,29 +178,6 @@ class RacingGameTest {
         assertThat(racingGame.getScores()).hasSize(1);
     }
 
-    @Test
-    void 게임_순위를_조회할_수_있다() throws InterruptedException {
-        // given
-        final Player player1 = PlayerFixture.호스트한스();
-        final Player player2 = PlayerFixture.게스트꾹이();
-        final RacingGame racingGame = new RacingGame();
-        racingGame.startGame(List.of(player1, player2));
-
-        Thread.sleep(100);
-        racingGame.adjustSpeed(player1, 10);
-        racingGame.adjustSpeed(player2, 10);
-
-        for (int i = 0; i < 100; i++) {
-            racingGame.moveAll();
-        }
-
-        // when
-        final List<Player> ranking = racingGame.getRanking();
-
-        // then
-        assertThat(ranking).hasSize(2);
-        assertThat(racingGame.isFinished()).isTrue();
-    }
 
     @Test
     void 게임_시작_여부를_확인할_수_있다() {

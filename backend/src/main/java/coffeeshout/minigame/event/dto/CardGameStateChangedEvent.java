@@ -1,7 +1,7 @@
 package coffeeshout.minigame.event.dto;
 
-import coffeeshout.minigame.cardgame.domain.CardGame;
-import coffeeshout.minigame.cardgame.domain.CardGameTaskType;
+import coffeeshout.cardgame.domain.CardGame;
+import coffeeshout.cardgame.domain.CardGameTaskType;
 import coffeeshout.room.domain.Room;
 import java.util.UUID;
 

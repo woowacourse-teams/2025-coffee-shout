@@ -6,10 +6,11 @@ import static org.mockito.Mockito.reset;
 
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.ServiceTest;
-import coffeeshout.minigame.MiniGameType;
-import coffeeshout.minigame.racinggame.domain.RacingGame;
-import coffeeshout.minigame.racinggame.domain.RacingGameState;
-import coffeeshout.minigame.racinggame.domain.event.RaceStateChangedEvent;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.racinggame.application.RacingGameCommandService;
+import coffeeshout.racinggame.domain.RacingGame;
+import coffeeshout.racinggame.domain.RacingGameState;
+import coffeeshout.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;

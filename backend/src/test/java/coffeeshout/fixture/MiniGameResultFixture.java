@@ -1,6 +1,6 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.room.domain.player.Player;
 import java.util.Map;
 

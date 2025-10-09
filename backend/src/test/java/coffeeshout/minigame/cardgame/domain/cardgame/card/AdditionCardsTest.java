@@ -3,9 +3,9 @@ package coffeeshout.minigame.cardgame.domain.cardgame.card;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import coffeeshout.minigame.cardgame.domain.card.AdditionCard;
-import coffeeshout.minigame.cardgame.domain.card.AdditionCards;
-import coffeeshout.minigame.cardgame.domain.card.Card;
+import coffeeshout.cardgame.domain.card.AdditionCard;
+import coffeeshout.cardgame.domain.card.AdditionCards;
+import coffeeshout.cardgame.domain.card.Card;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

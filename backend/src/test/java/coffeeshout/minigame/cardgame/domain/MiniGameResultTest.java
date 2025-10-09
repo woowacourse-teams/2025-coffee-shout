@@ -2,10 +2,12 @@ package coffeeshout.minigame.cardgame.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.MiniGameResult;
-import coffeeshout.minigame.MiniGameScore;
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
+import java.util.Comparator;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores);
+        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.naturalOrder());
 
         // then
         SoftAssertions.assertSoftly(
@@ -57,7 +59,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores);
+        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.naturalOrder());
 
         // then
         SoftAssertions.assertSoftly(

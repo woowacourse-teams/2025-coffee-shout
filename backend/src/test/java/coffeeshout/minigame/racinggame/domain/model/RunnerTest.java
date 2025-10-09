@@ -3,7 +3,7 @@ package coffeeshout.minigame.racinggame.domain.model;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.racinggame.domain.Runner;
+import coffeeshout.racinggame.domain.Runner;
 import org.junit.jupiter.api.Test;
 
 class RunnerTest {
