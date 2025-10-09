@@ -67,10 +67,8 @@ public class RacingGameCommandService implements MiniGameService {
     private void processPrepare(RacingGame racingGame, String joinCode) {
         racingGame.updateState(RacingGameState.PREPARE);
         eventPublisher.publishEvent(RunnersMovedEvent.from(racingGame, joinCode));
-        taskScheduler.schedule(() -> {
-            eventPublisher.publishEvent(RaceStateChangedEvent.of(racingGame, joinCode));
-            startAutoMove(racingGame, joinCode);
-        }, Instant.now().plus(racingGame.getState().getDuration(), ChronoUnit.MILLIS));
+        taskScheduler.schedule(() -> startAutoMove(racingGame, joinCode),
+                Instant.now().plus(racingGame.getState().getDuration(), ChronoUnit.MILLIS));
     }
 
     public void processTap(String joinCode, String playerName, int tapCount) {
@@ -84,6 +82,7 @@ public class RacingGameCommandService implements MiniGameService {
 
     public void startAutoMove(RacingGame racingGame, String joinCode) {
         racingGame.updateState(RacingGameState.PLAYING);
+        eventPublisher.publishEvent(RaceStateChangedEvent.of(racingGame, joinCode));
         final ScheduledFuture<?> autoMoveFuture = scheduleAutoMoveTask(racingGame, joinCode);
         racingGame.startAutoMove(autoMoveFuture);
     }
