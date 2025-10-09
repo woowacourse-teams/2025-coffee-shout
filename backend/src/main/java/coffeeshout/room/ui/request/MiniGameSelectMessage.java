@@ -1,7 +1,7 @@
 package coffeeshout.room.ui.request;
 
 
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameType;
 import java.util.List;
 
 public record MiniGameSelectMessage(

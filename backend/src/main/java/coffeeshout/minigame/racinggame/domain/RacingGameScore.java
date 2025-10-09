@@ -1,17 +1,17 @@
 package coffeeshout.minigame.racinggame.domain;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
+import coffeeshout.minigame.MiniGameScore;
 
 public class RacingGameScore extends MiniGameScore {
 
-    private final int ranking;
+    private final long finishMillis;
 
-    public RacingGameScore(int ranking) {
-        this.ranking = ranking;
+    public RacingGameScore(long finishMillis) {
+        this.finishMillis = finishMillis;
     }
 
     @Override
-    public int getValue() {
-        return ranking;
+    public long getValue() {
+        return finishMillis;
     }
 }

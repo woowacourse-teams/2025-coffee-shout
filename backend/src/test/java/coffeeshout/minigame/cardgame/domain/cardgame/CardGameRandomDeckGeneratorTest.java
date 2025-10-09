@@ -2,10 +2,10 @@ package coffeeshout.minigame.cardgame.domain.cardgame;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.card.CardGameDeckGenerator;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.CardGameRandomDeckGenerator;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.CardType;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.Deck;
+import coffeeshout.minigame.cardgame.domain.card.CardGameDeckGenerator;
+import coffeeshout.minigame.cardgame.domain.card.CardGameRandomDeckGenerator;
+import coffeeshout.minigame.cardgame.domain.card.CardType;
+import coffeeshout.minigame.cardgame.domain.card.Deck;
 import org.junit.jupiter.api.Test;
 
 class CardGameRandomDeckGeneratorTest {

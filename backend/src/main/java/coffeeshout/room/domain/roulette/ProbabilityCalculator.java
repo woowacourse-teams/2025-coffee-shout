@@ -2,7 +2,7 @@ package coffeeshout.room.domain.roulette;
 
 import static org.springframework.util.Assert.isTrue;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameResultType;
+import coffeeshout.minigame.MiniGameResultType;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

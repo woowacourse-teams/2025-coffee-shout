@@ -1,14 +1,18 @@
 package coffeeshout.minigame.racinggame.domain;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameResult;
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.MiniGameScore;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -23,6 +27,7 @@ public class RacingGame implements Playable {
 
     public static final long MOVE_INTERVAL_MILLIS = 100L;
 
+    private Instant startTime;
     private Runners runners;
     private RacingGameState state;
     private ScheduledFuture<?> autoMoveFuture;
@@ -34,6 +39,7 @@ public class RacingGame implements Playable {
     }
 
     public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
+        this.startTime = Instant.now();
         this.autoMoveFuture = autoMoveFuture;
     }
 
@@ -67,27 +73,20 @@ public class RacingGame implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(getScores());
+        return MiniGameResult.from(getScores(), Comparator.naturalOrder());
     }
 
     @Override
     public Map<Player, MiniGameScore> getScores() {
-        final List<Runner> ranking = runners.getRanking();
-
-        final Map<Player, MiniGameScore> scores = new LinkedHashMap<>();
-        for (int i = 0; i < ranking.size(); i++) {
-            scores.put(ranking.get(i).getPlayer(), new RacingGameScore(i + 1));
-        }
-        return scores;
+        return runners.stream().collect(Collectors.toMap(
+                Runner::getPlayer,
+                this::convertScore
+        ));
     }
 
     @Override
     public MiniGameType getMiniGameType() {
         return MiniGameType.RACING_GAME;
-    }
-
-    public List<Player> getRanking() {
-        return runners.getRanking().stream().map(Runner::getPlayer).toList();
     }
 
     public Map<Runner, Integer> getPositions() {
@@ -104,5 +103,15 @@ public class RacingGame implements Playable {
 
     public void updateState(RacingGameState state) {
         this.state = state;
+    }
+
+    private MiniGameScore convertScore(Runner runner) {
+        final Instant finishTime = runner.getFinishTime();
+        final long durationMillis = diffInstant(getStartTime(), finishTime);
+        return new RacingGameScore(durationMillis);
+    }
+
+    private long diffInstant(Instant startTime, Instant endTime) {
+        return Duration.between(startTime, endTime).toMillis();
     }
 }

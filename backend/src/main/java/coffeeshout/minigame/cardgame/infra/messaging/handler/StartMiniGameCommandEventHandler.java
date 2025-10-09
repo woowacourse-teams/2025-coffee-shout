@@ -1,10 +1,10 @@
 package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
-import coffeeshout.minigame.cardgame.application.MiniGameService;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.MiniGameStartedEvent;
-import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
-import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
+import coffeeshout.minigame.MiniGameService;
+import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.event.dto.MiniGameStartedEvent;
+import coffeeshout.minigame.event.MiniGameEventType;
+import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;

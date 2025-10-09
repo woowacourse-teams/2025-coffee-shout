@@ -1,7 +1,7 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.CardGameDeckGenerator;
+import coffeeshout.minigame.cardgame.domain.CardGame;
+import coffeeshout.minigame.cardgame.domain.card.CardGameDeckGenerator;
 
 public class CardGameFake extends CardGame {
 

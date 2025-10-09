@@ -1,10 +1,10 @@
 package coffeeshout.minigame.cardgame.infra.messaging;
 
 import coffeeshout.global.trace.TracerProvider;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
-import coffeeshout.minigame.cardgame.domain.event.MiniGameBaseEvent;
-import coffeeshout.minigame.cardgame.domain.event.MiniGameEventType;
-import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
+import coffeeshout.minigame.cardgame.domain.event.SelectCardCommandEvent;
+import coffeeshout.minigame.event.MiniGameBaseEvent;
+import coffeeshout.minigame.event.MiniGameEventType;
+import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.cardgame.infra.messaging.handler.MiniGameEventHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

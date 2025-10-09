@@ -2,7 +2,7 @@ package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.RoomEventType;

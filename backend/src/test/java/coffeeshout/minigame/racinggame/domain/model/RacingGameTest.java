@@ -3,7 +3,7 @@ package coffeeshout.minigame.racinggame.domain.model;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
 import coffeeshout.minigame.racinggame.domain.Runner;

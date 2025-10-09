@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.ui.command.handler;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
+import coffeeshout.minigame.cardgame.domain.event.SelectCardCommandEvent;
 import coffeeshout.minigame.cardgame.infra.messaging.CardSelectStreamProducer;
 import coffeeshout.minigame.cardgame.ui.command.MiniGameCommandHandler;
 import coffeeshout.minigame.cardgame.ui.request.command.SelectCardCommand;

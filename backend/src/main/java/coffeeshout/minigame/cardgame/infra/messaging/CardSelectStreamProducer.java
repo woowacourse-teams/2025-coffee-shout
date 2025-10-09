@@ -1,7 +1,7 @@
 package coffeeshout.minigame.cardgame.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
+import coffeeshout.minigame.cardgame.domain.event.SelectCardCommandEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

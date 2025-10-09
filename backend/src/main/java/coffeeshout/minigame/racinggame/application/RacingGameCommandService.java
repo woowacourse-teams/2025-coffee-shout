@@ -1,7 +1,7 @@
 package coffeeshout.minigame.racinggame.application;
 
-import coffeeshout.minigame.cardgame.application.MiniGameService;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameService;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
 import coffeeshout.minigame.racinggame.domain.event.RaceFinishedEvent;

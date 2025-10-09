@@ -2,7 +2,7 @@ package coffeeshout.minigame.cardgame.infra.persistence.handler;
 
 import coffeeshout.global.lock.RedisLock;
 import coffeeshout.minigame.cardgame.application.CardGameService;
-import coffeeshout.minigame.cardgame.domain.event.StartMiniGameCommandEvent;
+import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

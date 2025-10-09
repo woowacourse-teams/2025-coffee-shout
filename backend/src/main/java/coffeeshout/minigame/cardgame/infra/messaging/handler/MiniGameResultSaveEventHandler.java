@@ -1,12 +1,12 @@
 package coffeeshout.minigame.cardgame.infra.messaging.handler;
 
 import coffeeshout.global.lock.RedisLock;
-import coffeeshout.minigame.cardgame.domain.MiniGameResult;
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameTaskType;
-import coffeeshout.minigame.cardgame.domain.event.dto.CardGameStateChangedEvent;
+import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.MiniGameScore;
+import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.CardGame;
+import coffeeshout.minigame.cardgame.domain.CardGameTaskType;
+import coffeeshout.minigame.event.dto.CardGameStateChangedEvent;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameResultEntity;
@@ -70,7 +70,7 @@ public class MiniGameResultSaveEventHandler {
                     .orElseThrow(() -> new IllegalArgumentException("플레이어가 존재하지 않습니다: " + player.getName().value()));
 
             final Integer rank = result.getPlayerRank(player);
-            final Integer score = scores.get(player).getValue();
+            final Integer score = Math.toIntExact(scores.get(player).getValue());
 
             final MiniGameResultEntity resultEntity = new MiniGameResultEntity(
                     miniGameEntity,

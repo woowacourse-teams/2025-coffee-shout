@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.infra.messaging;
 
-import coffeeshout.minigame.cardgame.domain.event.MiniGameBaseEvent;
+import coffeeshout.minigame.event.MiniGameBaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

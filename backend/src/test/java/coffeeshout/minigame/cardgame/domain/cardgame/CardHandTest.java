@@ -3,12 +3,12 @@ package coffeeshout.minigame.cardgame.domain.cardgame;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameScore;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardHand;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.AdditionCard;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.Card;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.cardgame.domain.CardGameRound;
+import coffeeshout.minigame.cardgame.domain.CardGameScore;
+import coffeeshout.minigame.cardgame.domain.CardHand;
+import coffeeshout.minigame.cardgame.domain.card.AdditionCard;
+import coffeeshout.minigame.cardgame.domain.card.Card;
+import coffeeshout.minigame.cardgame.domain.card.MultiplierCard;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

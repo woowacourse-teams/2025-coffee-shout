@@ -6,7 +6,7 @@ import static org.mockito.Mockito.reset;
 
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.ServiceTest;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.minigame.racinggame.domain.RacingGame;
 import coffeeshout.minigame.racinggame.domain.RacingGameState;
 import coffeeshout.minigame.racinggame.domain.event.RaceStateChangedEvent;

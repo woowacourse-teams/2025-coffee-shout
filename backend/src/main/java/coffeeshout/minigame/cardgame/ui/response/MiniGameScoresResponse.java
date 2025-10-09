@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.ui.response;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
+import coffeeshout.minigame.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +10,14 @@ public record MiniGameScoresResponse(List<MiniGameScoreResponse> scores) {
 
     public record MiniGameScoreResponse(
             String playerName,
-            Integer score
+            Long score
     ) {
 
         public static MiniGameScoreResponse from(@NonNull Map.Entry<Player, MiniGameScore> scoreEntry) {
-            return new MiniGameScoreResponse(scoreEntry.getKey().getName().value(), scoreEntry.getValue().getValue());
+            return new MiniGameScoreResponse(
+                    scoreEntry.getKey().getName().value(),
+                    scoreEntry.getValue().getValue()
+            );
         }
     }
 

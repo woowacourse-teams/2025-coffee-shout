@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameRound;
-import coffeeshout.minigame.cardgame.domain.cardgame.PlayerHands;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.AdditionCard;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.Card;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.MiniGameScore;
+import coffeeshout.minigame.cardgame.domain.CardGameRound;
+import coffeeshout.minigame.cardgame.domain.PlayerHands;
+import coffeeshout.minigame.cardgame.domain.card.AdditionCard;
+import coffeeshout.minigame.cardgame.domain.card.Card;
+import coffeeshout.minigame.cardgame.domain.card.MultiplierCard;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;

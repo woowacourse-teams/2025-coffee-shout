@@ -3,9 +3,8 @@ package coffeeshout.minigame.cardgame.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.cardgame.domain.MiniGameResult;
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameScore;
+import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;

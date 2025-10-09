@@ -1,6 +1,7 @@
 package coffeeshout.minigame.racinggame.domain;
 
 import coffeeshout.room.domain.player.Player;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,13 +39,6 @@ public class Runners {
 
     public boolean hasWinner() {
         return findWinner().isPresent();
-    }
-
-    public List<Runner> getRanking() {
-        return runners.stream()
-                .filter(Runner::isFinished)
-                .sorted(Comparator.comparing(Runner::getFinishTime))
-                .toList();
     }
 
     public Map<Runner, Integer> getPositions() {

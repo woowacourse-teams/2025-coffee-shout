@@ -3,7 +3,7 @@ package coffeeshout.minigame.cardgame.domain.cardgame;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameRound;
+import coffeeshout.minigame.cardgame.domain.CardGameRound;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

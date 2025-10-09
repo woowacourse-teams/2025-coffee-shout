@@ -4,8 +4,8 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
-import coffeeshout.minigame.cardgame.domain.MiniGameResult;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
+import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.MiniGameType;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;

@@ -1,10 +1,11 @@
 package coffeeshout.minigame.cardgame.application;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGame;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameTaskType;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.dto.CardGameStartMessage;
-import coffeeshout.minigame.cardgame.domain.cardgame.service.CardGameCommandService;
+import coffeeshout.minigame.MiniGameService;
+import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.CardGame;
+import coffeeshout.minigame.cardgame.domain.CardGameTaskType;
+import coffeeshout.minigame.cardgame.domain.event.dto.CardGameStartMessage;
+import coffeeshout.minigame.cardgame.domain.service.CardGameCommandService;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.cardgame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.room.domain.JoinCode;

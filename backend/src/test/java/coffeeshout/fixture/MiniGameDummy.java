@@ -1,9 +1,9 @@
 package coffeeshout.fixture;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameResult;
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
-import coffeeshout.minigame.cardgame.domain.MiniGameType;
-import coffeeshout.minigame.cardgame.domain.cardgame.CardGameScore;
+import coffeeshout.minigame.MiniGameResult;
+import coffeeshout.minigame.MiniGameScore;
+import coffeeshout.minigame.MiniGameType;
+import coffeeshout.minigame.cardgame.domain.CardGameScore;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;

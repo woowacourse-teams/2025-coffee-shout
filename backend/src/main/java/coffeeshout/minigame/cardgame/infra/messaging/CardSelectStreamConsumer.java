@@ -2,8 +2,8 @@ package coffeeshout.minigame.cardgame.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.global.message.RedisStreamStartStrategy;
-import coffeeshout.minigame.cardgame.domain.cardgame.event.SelectCardCommandEvent;
-import coffeeshout.minigame.cardgame.domain.cardgame.service.CardGameCommandService;
+import coffeeshout.minigame.cardgame.domain.event.SelectCardCommandEvent;
+import coffeeshout.minigame.cardgame.domain.service.CardGameCommandService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.player.PlayerName;
 import com.fasterxml.jackson.core.JsonProcessingException;

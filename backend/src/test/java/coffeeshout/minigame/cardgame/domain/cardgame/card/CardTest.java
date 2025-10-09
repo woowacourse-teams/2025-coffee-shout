@@ -2,9 +2,9 @@ package coffeeshout.minigame.cardgame.domain.cardgame.card;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import coffeeshout.minigame.cardgame.domain.cardgame.card.AdditionCard;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.Card;
-import coffeeshout.minigame.cardgame.domain.cardgame.card.MultiplierCard;
+import coffeeshout.minigame.cardgame.domain.card.AdditionCard;
+import coffeeshout.minigame.cardgame.domain.card.Card;
+import coffeeshout.minigame.cardgame.domain.card.MultiplierCard;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.ui.response;
 
-import coffeeshout.minigame.cardgame.domain.MiniGameScore;
+import coffeeshout.minigame.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ public record MiniGameScoresMessage(List<MiniGameScoreMessage> scores) {
 
     public record MiniGameScoreMessage(
             String playerName,
-            Integer score
+            Long score
     ) {
 
         public static MiniGameScoreMessage from(@NonNull Map.Entry<Player, MiniGameScore> scoreEntry) {
