@@ -22,6 +22,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+/*
+1. 동점자 랭크 계산
+2. 랭크 확률 반영
+ */
 @Slf4j
 @Service
 public class RacingGameCommandService implements MiniGameService {
