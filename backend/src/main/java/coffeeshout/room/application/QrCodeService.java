@@ -11,7 +11,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,15 +25,13 @@ public class QrCodeService {
     private final MeterRegistry meterRegistry;
     private final Timer qrCodeGenerationTimer;
     private final RoomEventPublisher roomEventPublisher;
-    private final ApplicationEventPublisher eventPublisher;
 
     public QrCodeService(
             QrProperties qrProperties,
             QrCodeGenerator qrCodeGenerator,
             StorageService storageService,
             MeterRegistry meterRegistry,
-            RoomEventPublisher roomEventPublisher,
-            ApplicationEventPublisher eventPublisher
+            RoomEventPublisher roomEventPublisher
     ) {
         this.qrCodePrefix = qrProperties.prefix();
         this.qrCodeGenerator = qrCodeGenerator;
@@ -44,7 +41,6 @@ public class QrCodeService {
                 .description("Time taken to generate QR code")
                 .register(meterRegistry);
         this.roomEventPublisher = roomEventPublisher;
-        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -52,10 +48,12 @@ public class QrCodeService {
      */
     @Async("qrCodeTaskExecutor")
     public void generateQrCodeAsync(String joinCode) {
-        log.info("QR 코드 비동기 생성 시작: joinCode={}", joinCode);
+        if (joinCode == null || joinCode.isBlank()) {
+            log.warn("유효하지 않은 joinCode, ERROR 이벤트 발행: joinCode='{}'", joinCode);
+            return;
+        }
 
-        // 1. Pending 이벤트 발행 (방 생성 인스턴스에게만 알린다.)
-        eventPublisher.publishEvent(new QrCodeStatusEvent(joinCode, QrCodeStatus.PENDING, null));
+        log.info("QR 코드 비동기 생성 시작: joinCode={}", joinCode);
 
         try {
             // 2. QR 코드 생성

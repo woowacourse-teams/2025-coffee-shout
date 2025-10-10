@@ -520,8 +520,8 @@ class RoomServiceTest extends ServiceTest {
 
         // then
 
-        // 비동기 작업이 완료될 때까지 대기 (최대 10초)
-        await().atMost(10, SECONDS)
+        // 비동기 작업이 완료될 때까지 대기 (최대 3초)
+        await().atMost(3, SECONDS)
                 .pollInterval(500, java.util.concurrent.TimeUnit.MILLISECONDS)
                 .untilAsserted(() -> {
                     Room room = roomQueryService.getByJoinCode(joinCode);
@@ -544,7 +544,7 @@ class RoomServiceTest extends ServiceTest {
         QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
         // then
-        assertThat(qrCodeStatus).isNotNull();
+        assertThat(qrCodeStatus).isIn(QrCodeStatus.PENDING, QrCodeStatus.SUCCESS, QrCodeStatus.ERROR);
     }
 
     @Test

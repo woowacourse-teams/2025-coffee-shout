@@ -8,8 +8,6 @@ public interface RoomRepository {
 
     Optional<Room> findByJoinCode(JoinCode joinCode);
 
-    Optional<Room> findByJoinCode(String joinCode);
-
     boolean existsByJoinCode(JoinCode joinCode);
 
     Room save(Room room);

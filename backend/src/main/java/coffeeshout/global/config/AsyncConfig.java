@@ -1,27 +1,27 @@
 package coffeeshout.global.config;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Executors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+@Slf4j
 @Configuration
 @EnableAsync
-public class AsyncConfig {
-
+public class AsyncConfig implements AsyncConfigurer {
 
     @Bean(name = "qrCodeTaskExecutor")
     public Executor qrCodeTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("qr-async-");
-        executor.setVirtualThreads(true);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.initialize();
-        return executor;
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) ->
+                log.error("비동기 작업 실패: method={}, params={}", method.getName(), params, ex);
     }
 }

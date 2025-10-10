@@ -52,7 +52,7 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
 
             log.info("방 생성 이벤트 처리 완료: eventId={}, hostName={}, joinCode={}",
                     event.eventId(),
-                    room.getHost().getName(),
+                    room.getHost().getName().value(),
                     room.getJoinCode().getValue()
             );
 

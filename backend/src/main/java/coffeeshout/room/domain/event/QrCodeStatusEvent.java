@@ -28,7 +28,7 @@ public record QrCodeStatusEvent(
                 RoomEventType.QR_CODE_COMPLETE,
                 joinCode,
                 status,
-                qrCodeUrl
+                status == QrCodeStatus.SUCCESS ? qrCodeUrl : null
         );
     }
 

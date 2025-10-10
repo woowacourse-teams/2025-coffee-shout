@@ -39,7 +39,6 @@ class RoomCommandServiceTest extends ServiceTest {
         void 방을_생성한다() {
             // given
             PlayerName hostName = new PlayerName("호스트");
-            String qrCodeUrl = "https://example.com/qr";
 
             // when
             Room room = roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT);

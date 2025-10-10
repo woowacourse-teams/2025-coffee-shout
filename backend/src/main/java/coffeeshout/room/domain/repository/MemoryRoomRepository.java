@@ -24,11 +24,6 @@ public class MemoryRoomRepository implements RoomRepository {
     }
 
     @Override
-    public Optional<Room> findByJoinCode(String joinCode) {
-        return findByJoinCode(new JoinCode(joinCode));
-    }
-
-    @Override
     public boolean existsByJoinCode(JoinCode joinCode) {
         return rooms.containsKey(joinCode);
     }
