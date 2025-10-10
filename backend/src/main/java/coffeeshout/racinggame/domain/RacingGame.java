@@ -92,10 +92,6 @@ public class RacingGame implements Playable {
         return runners.getPositions();
     }
 
-    public Map<Runner, Integer> getSpeeds() {
-        return runners.getSpeeds();
-    }
-
     public boolean isFinished() {
         return state == RacingGameState.DONE;
     }

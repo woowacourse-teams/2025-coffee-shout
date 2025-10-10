@@ -23,11 +23,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-/*
-TODO
-1. 동점자 랭크 계산
-2. 랭크 확률 반영
- */
 @Slf4j
 @Service
 public class RacingGameCommandService implements MiniGameService {
@@ -106,7 +101,6 @@ public class RacingGameCommandService implements MiniGameService {
             if (!racingGame.isStarted()) {
                 return;
             }
-
             racingGame.moveAll();
             publishRunnersMoved(racingGame, joinCode);
 
@@ -120,6 +114,8 @@ public class RacingGameCommandService implements MiniGameService {
 
     private void handleRaceFinished(RacingGame racingGame, String joinCode) {
         racingGame.stopAutoMove();
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        room.applyMiniGameResult(racingGame.getResult());
         eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode));
         log.info("레이싱 게임 종료: joinCode={}", joinCode);
     }

@@ -6,6 +6,7 @@ import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.racinggame.domain.RacingGameScore;
 import coffeeshout.room.domain.player.Player;
 import java.util.Comparator;
 import java.util.Map;
@@ -75,15 +76,17 @@ class MiniGameResultTest {
     @Test
     void 동점자가_몇_명인지_확인한다() {
         // given
-        MiniGameResult miniGameResult = new MiniGameResult(Map.of(호스트_한스, 1,
-                게스트_루키, 1,
-                게스트_엠제이, 3,
-                게스트_꾹이, 4));
+        MiniGameResult result = MiniGameResult.from(Map.of(
+                호스트_한스, new RacingGameScore(99999),
+                게스트_루키, new RacingGameScore(99999),
+                게스트_엠제이, new RacingGameScore(99999),
+                게스트_꾹이, new RacingGameScore(99999)
+        ), Comparator.reverseOrder());
 
         // when
-        int count = miniGameResult.getTieCountByRank(1);
+        int count = result.getTieCountByRank(1);
 
         // then
-        assertThat(count).isEqualTo(2);
+        assertThat(count).isEqualTo(4);
     }
 }

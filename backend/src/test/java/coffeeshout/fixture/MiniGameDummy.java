@@ -14,7 +14,7 @@ public class MiniGameDummy implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(getScores(), Comparator.naturalOrder());
+        return MiniGameResult.from(getScores(), Comparator.reverseOrder());
     }
 
     @Override
