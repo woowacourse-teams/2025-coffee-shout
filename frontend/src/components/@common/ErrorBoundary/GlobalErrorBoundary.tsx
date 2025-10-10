@@ -3,14 +3,14 @@ import { ApiError, NetworkError } from '@/apis/rest/error';
 import { ToastContext } from '@/components/@common/Toast/ToastContext';
 import GlobalErrorFallback from '@/components/@common/ErrorFallback/GlobalErrorFallback';
 
-interface Props {
+type Props = {
   children: ReactNode;
   fallback?: ReactNode;
-}
+};
 
-interface State {
+type State = {
   error: Error | null;
-}
+};
 
 class GlobalErrorBoundary extends Component<Props, State> {
   static contextType = ToastContext;

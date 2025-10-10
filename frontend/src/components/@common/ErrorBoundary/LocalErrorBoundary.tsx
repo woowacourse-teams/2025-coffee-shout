@@ -2,14 +2,14 @@ import { Component, ReactNode } from 'react';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import LocalErrorFallback from '@/components/@common/ErrorFallback/LocalErrorFallback';
 
-interface Props {
+type Props = {
   children: ReactNode;
   fallback?: (error: Error, retry: () => void) => ReactNode;
-}
+};
 
-interface State {
+type State = {
   error: Error | null;
-}
+};
 
 class LocalErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
