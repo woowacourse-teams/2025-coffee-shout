@@ -1,7 +1,5 @@
 import type { PointerEvent } from 'react';
-
 import { useCallback } from 'react';
-
 import { useCancelablePress } from '@/hooks/useCancelablePress';
 import { usePressAnimation } from '@/hooks/usePressAnimation';
 
@@ -9,13 +7,15 @@ type Props = {
   onClick?: () => void;
 };
 
+const RELEASE_SYNC_DELAY_MS = 100;
+
 export const useButtonInteraction = ({ onClick }: Props = {}) => {
   const {
     touchState,
     onPointerDown: onPointerDownAnimation,
     onPointerUp: onPointerUpAnimation,
     onPointerCancel: onPointerCancelAnimation,
-  } = usePressAnimation();
+  } = usePressAnimation({ releaseSyncDelay: RELEASE_SYNC_DELAY_MS });
 
   const {
     moved,
@@ -25,6 +25,7 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
     onPointerUp: onPointerUpCancel,
   } = useCancelablePress({
     onClick,
+    releaseSyncDelay: RELEASE_SYNC_DELAY_MS,
   });
 
   const onPointerDown = useCallback(
@@ -79,7 +80,7 @@ const suppressNextClick = () => {
     e.preventDefault();
   };
 
-  document.addEventListener('click', handler, true); // capture 단계에서 차단
+  document.addEventListener('click', handler, true);
   requestAnimationFrame(() => {
     document.removeEventListener('click', handler, true);
   });

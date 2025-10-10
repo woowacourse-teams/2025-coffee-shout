@@ -5,9 +5,14 @@ import { useRef } from 'react';
 type Props = {
   onClick?: () => void;
   cancelThreshold?: number;
+  releaseSyncDelay?: number;
 };
 
-export const useCancelablePress = ({ onClick, cancelThreshold = 10 }: Props) => {
+export const useCancelablePress = ({
+  onClick,
+  cancelThreshold = 10,
+  releaseSyncDelay = 0,
+}: Props) => {
   const startY = useRef(0);
   const startX = useRef(0);
   const moved = useRef(false);
@@ -40,8 +45,13 @@ export const useCancelablePress = ({ onClick, cancelThreshold = 10 }: Props) => 
     if (e.pointerType !== 'touch') return;
 
     if (!moved.current) {
-      console.log('onClick 실행!');
-      onClick?.();
+      if (releaseSyncDelay > 0) {
+        setTimeout(() => {
+          onClick?.();
+        }, releaseSyncDelay);
+      } else {
+        onClick?.();
+      }
     }
   };
 
