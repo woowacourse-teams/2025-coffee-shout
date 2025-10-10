@@ -1,9 +1,10 @@
 import { type ComponentProps, type PointerEvent } from 'react';
 
-import * as S from './Button.styled';
-import { useCancelablePress } from '@/hooks/useCancelablePress';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
+
 import { Size } from '@/types/styles';
+
+import * as S from './Button.styled';
 
 type Props = {
   variant?: S.ButtonVariant;
@@ -24,30 +25,26 @@ const Button = ({
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
 
-  const {
-    touchState,
-    onPointerDown: onPointerDownAnimation,
-    onPointerUp: onPointerUpAnimation,
-  } = usePressAnimation();
-
-  const {
-    onPointerDown: onPointerDownCancel,
-    onPointerMove: onPointerMoveCancel,
-    onPointerUp: onPointerUpCancel,
-  } = useCancelablePress({
-    onClick,
-  });
+  const { touchState, onPointerDown, onPointerMove, onPointerCancel, onPointerUp } =
+    useButtonInteraction({
+      onClick,
+    });
 
   const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     if (e.pointerType === 'touch') {
-      onPointerDownAnimation(e);
-      onPointerDownCancel(e);
+      onPointerDown(e);
     }
   };
 
   const handlePointerMove = (e: PointerEvent<HTMLButtonElement>) => {
     if (e.pointerType === 'touch') {
-      onPointerMoveCancel(e);
+      onPointerMove(e);
+    }
+  };
+
+  const handlePointerCancel = (e: PointerEvent<HTMLButtonElement>) => {
+    if (e.pointerType === 'touch') {
+      onPointerCancel(e);
     }
   };
 
@@ -55,8 +52,7 @@ const Button = ({
     if (isDisabled) return;
 
     if (e.pointerType === 'touch') {
-      onPointerUpAnimation(e);
-      onPointerUpCancel(e);
+      onPointerUp(e);
     } else {
       onClick?.();
     }
@@ -81,6 +77,7 @@ const Button = ({
       disabled={isDisabled}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
+      onPointerCancel={handlePointerCancel}
       onPointerUp={handlePointerUp}
       {...rest}
     >
