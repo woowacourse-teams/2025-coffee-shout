@@ -77,10 +77,12 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
 
   return {
     touchState,
-    onPointerDown,
-    onPointerMove,
-    onPointerCancel,
-    onPointerUp,
+    pointerHandlers: {
+      onPointerDown,
+      onPointerMove,
+      onPointerCancel,
+      onPointerUp,
+    },
   };
 };
 

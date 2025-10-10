@@ -25,14 +25,13 @@ const Button = ({
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
 
-  const { touchState, onPointerDown, onPointerMove, onPointerCancel, onPointerUp } =
-    useButtonInteraction({
-      onClick,
-    });
+  const { touchState, pointerHandlers } = useButtonInteraction({
+    onClick,
+  });
 
   const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     if (isDisabled) return;
-    onPointerUp(e);
+    pointerHandlers.onPointerUp(e);
   };
 
   const showLoading = variant === 'loading' || isLoading;
@@ -52,9 +51,7 @@ const Button = ({
       $height={height}
       $isLoading={isLoading}
       disabled={isDisabled}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerCancel={onPointerCancel}
+      {...pointerHandlers}
       onPointerUp={handlePointerUp}
       {...rest}
     >
