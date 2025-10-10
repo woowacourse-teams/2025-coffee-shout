@@ -30,6 +30,8 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
 
   const onPointerDown = useCallback(
     (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'touch') return;
+
       onPointerDownAnimation(e);
       onPointerDownCancel(e);
     },
@@ -38,6 +40,8 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
 
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'touch') return;
+
       onPointerMoveCancel(e);
 
       if (moved.current && touchState === 'pressing') {
@@ -49,6 +53,8 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
 
   const onPointerCancel = useCallback(
     (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'touch') return;
+
       suppressNextClick();
       onPointerCancelAnimation(e);
       onPointerCancelPress(e);
@@ -58,11 +64,15 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
 
   const onPointerUp = useCallback(
     (e: PointerEvent<HTMLElement>) => {
-      suppressNextClick();
-      onPointerUpAnimation(e);
-      onPointerUpCancel(e);
+      if (e.pointerType === 'touch') {
+        suppressNextClick();
+        onPointerUpAnimation(e);
+        onPointerUpCancel(e);
+      } else {
+        onClick?.();
+      }
     },
-    [onPointerUpAnimation, onPointerUpCancel]
+    [onClick, onPointerUpAnimation, onPointerUpCancel]
   );
 
   return {

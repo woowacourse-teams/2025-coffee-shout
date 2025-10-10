@@ -30,32 +30,9 @@ const Button = ({
       onClick,
     });
 
-  const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
-    if (e.pointerType === 'touch') {
-      onPointerDown(e);
-    }
-  };
-
-  const handlePointerMove = (e: PointerEvent<HTMLButtonElement>) => {
-    if (e.pointerType === 'touch') {
-      onPointerMove(e);
-    }
-  };
-
-  const handlePointerCancel = (e: PointerEvent<HTMLButtonElement>) => {
-    if (e.pointerType === 'touch') {
-      onPointerCancel(e);
-    }
-  };
-
   const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     if (isDisabled) return;
-
-    if (e.pointerType === 'touch') {
-      onPointerUp(e);
-    } else {
-      onClick?.();
-    }
+    onPointerUp(e);
   };
 
   const showLoading = variant === 'loading' || isLoading;
@@ -75,9 +52,9 @@ const Button = ({
       $height={height}
       $isLoading={isLoading}
       disabled={isDisabled}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerCancel={handlePointerCancel}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerCancel={onPointerCancel}
       onPointerUp={handlePointerUp}
       {...rest}
     >
