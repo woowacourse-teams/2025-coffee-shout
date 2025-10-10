@@ -1,5 +1,6 @@
 package coffeeshout.dashboard.infra.persistence;
 
+import coffeeshout.dashboard.domain.repository.DashboardStatisticsRepository;
 import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
 import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.dashboard.ui.response.TopWinnerResponse;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class DashboardStatisticsRepository {
+public class QueryDslDashboardStatisticsRepository implements DashboardStatisticsRepository {
 
     private static final QRouletteResultEntity ROULETTE_RESULT = QRouletteResultEntity.rouletteResultEntity;
     private static final QPlayerEntity PLAYER = QPlayerEntity.playerEntity;
@@ -26,6 +27,7 @@ public class DashboardStatisticsRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Override
     public List<TopWinnerResponse> findTopWinnersByMonth(
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -46,6 +48,7 @@ public class DashboardStatisticsRepository {
                 .fetch();
     }
 
+    @Override
     public Optional<LowestProbabilityWinnerResponse> findLowestProbabilityWinner(
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -79,6 +82,7 @@ public class DashboardStatisticsRepository {
         return Optional.of(new LowestProbabilityWinnerResponse(minProbability, nicknames));
     }
 
+    @Override
     public List<GamePlayCountResponse> findGamePlayCountByMonth(LocalDateTime startDate, LocalDateTime endDate) {
         return queryFactory
                 .select(Projections.constructor(

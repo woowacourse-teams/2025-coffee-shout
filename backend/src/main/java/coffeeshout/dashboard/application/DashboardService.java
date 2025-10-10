@@ -1,6 +1,6 @@
 package coffeeshout.dashboard.application;
 
-import coffeeshout.dashboard.infra.persistence.DashboardStatisticsRepository;
+import coffeeshout.dashboard.domain.repository.DashboardStatisticsRepository;
 import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
 import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.dashboard.ui.response.TopWinnerResponse;
