@@ -7,7 +7,7 @@ type UseFetchOptions<T> = {
   enabled?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
-  displayMode?: ErrorDisplayMode;
+  errorDisplayMode?: ErrorDisplayMode;
 };
 
 type UseFetchReturn<T> = {
@@ -18,7 +18,7 @@ type UseFetchReturn<T> = {
 };
 
 const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
-  const { endpoint, enabled = true, onSuccess, onError, displayMode } = options;
+  const { endpoint, enabled = true, onSuccess, onError, errorDisplayMode } = options;
 
   const [data, setData] = useState<T | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,7 +33,7 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     try {
       setLoading(true);
       setError(null);
-      const result = await api.get<T>(endpoint, { displayMode });
+      const result = await api.get<T>(endpoint, { errorDisplayMode });
       setData(result);
       onSuccessRef.current?.(result);
     } catch (error) {
@@ -42,7 +42,7 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
     } finally {
       setLoading(false);
     }
-  }, [endpoint, enabled, displayMode]);
+  }, [endpoint, enabled, errorDisplayMode]);
 
   useEffect(() => {
     if (enabled) {
