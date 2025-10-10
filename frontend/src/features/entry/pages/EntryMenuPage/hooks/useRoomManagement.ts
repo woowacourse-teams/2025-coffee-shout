@@ -7,6 +7,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
+import { useState } from 'react';
 
 export type RoomRequest = {
   playerName: string;
@@ -24,6 +25,8 @@ type RoomResponse = {
 
 export const useRoomManagement = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
 
@@ -31,20 +34,6 @@ export const useRoomManagement = () => {
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
   const { setQrCodeUrl } = useIdentifier();
-
-  const handleRoomRequest = async (
-    selectedMenu: Menu | null,
-    customMenuName: string | null,
-    selectedTemperature: TemperatureOption
-  ) => {
-    const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-      createUrl(playerType, joinCode),
-      createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
-    );
-    setJoinCode(_joinCode);
-    setQrCodeUrl(qrCodeUrl);
-    startSocket(_joinCode, myName);
-  };
 
   const isMenuSelectionValid = (selectedMenu: Menu | null, customMenuName: string | null) => {
     if (!selectedMenu && !customMenuName) {
@@ -78,8 +67,19 @@ export const useRoomManagement = () => {
     if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
     try {
-      await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
+      setIsLoading(true);
+
+      const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
+        createUrl(playerType, joinCode),
+        createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
+      );
+
+      setJoinCode(_joinCode);
+      setQrCodeUrl(qrCodeUrl);
+
+      startSocket(_joinCode, myName);
     } catch (error) {
+      setIsLoading(false);
       if (error instanceof ApiError) {
         showToast({
           type: 'error',
@@ -101,5 +101,6 @@ export const useRoomManagement = () => {
 
   return {
     proceedToRoom,
+    isLoading,
   };
 };
