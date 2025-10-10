@@ -76,7 +76,6 @@ export const Container = styled.button<Props>`
       color: transparent;
       pointer-events: none;
 
-      /* hover/active 효과 완전 비활성화 */
       &:hover,
       &:active,
       &:focus {
