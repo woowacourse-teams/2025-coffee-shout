@@ -53,14 +53,16 @@ public class RoomCommandService {
     }
 
     public void assignQrCode(JoinCode joinCode, String qrCodeUrl) {
-        Room room = roomQueryService.getByJoinCode(joinCode);
-        room.assignQrCode(QrCode.success(qrCodeUrl));
-        save(room);
+        updateRoomWithQrCode(joinCode, room -> room.assignQrCode(QrCode.success(qrCodeUrl)));
     }
 
     public void assignQrCodeError(JoinCode joinCode) {
+        updateRoomWithQrCode(joinCode, room -> room.assignQrCode(QrCode.error()));
+    }
+
+    private void updateRoomWithQrCode(JoinCode joinCode, java.util.function.Consumer<Room> qrCodeAssigner) {
         Room room = roomQueryService.getByJoinCode(joinCode);
-        room.assignQrCode(QrCode.error());
+        qrCodeAssigner.accept(room);
         save(room);
     }
 }
