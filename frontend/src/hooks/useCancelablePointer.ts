@@ -29,7 +29,9 @@ export const useCancelablePointer = ({ onClick, cancelThreshold = 10 }: Props) =
   };
 
   const handlePointerUp = (e: PointerEvent<HTMLElement>) => {
-    if (e.pointerType !== 'touch' || !moved.current) {
+    if (e.pointerType !== 'touch') return;
+
+    if (!moved.current) {
       onClick?.();
     }
   };

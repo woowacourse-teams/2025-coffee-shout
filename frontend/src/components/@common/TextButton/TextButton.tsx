@@ -8,13 +8,15 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const TextButton = ({ text, onClick, ...rest }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
+  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
 
   return (
     <S.Container
-      onPointerUp={onClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      onPointerDown={handleTouchDown}
+      onPointerUp={(e) => {
+        handleTouchUp(e);
+        onClick();
+      }}
       $touchState={touchState}
       {...rest}
     >

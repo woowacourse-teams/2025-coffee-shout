@@ -11,14 +11,16 @@ type Props = {
 };
 
 const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
+  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
 
   return (
     <S.Container
-      onPointerUp={onClick}
+      onPointerDown={handleTouchDown}
+      onPointerUp={(e) => {
+        handleTouchUp(e);
+        onClick();
+      }}
       $touchState={touchState}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       <IconTextItem
         iconContent={<CircleIcon imageUrl={imageUrl} color={color} />}

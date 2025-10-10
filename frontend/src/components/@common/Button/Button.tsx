@@ -1,7 +1,8 @@
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type PointerEvent } from 'react';
 import * as S from './Button.styled';
 import { Size } from '@/types/styles';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
+import { useCancelablePointer } from '@/hooks/useCancelablePointer';
 
 type Props = {
   variant?: S.ButtonVariant;
@@ -21,11 +22,45 @@ const Button = ({
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
-  const handlePointerUp = () => {
+  // 애니메이션 상태 관리
+  const {
+    touchState,
+    handleTouchDown: handleTouchDownAnimation,
+    handleTouchUp: handleTouchUpAnimation,
+  } = useTouchInteraction();
+
+  // 스크롤 감지 + 클릭 처리
+  const {
+    handlePointerDown: handlePointerDownCancel,
+    handlePointerMove: handlePointerMoveCancel,
+    handlePointerUp: handlePointerUpCancel,
+  } = useCancelablePointer({
+    onClick,
+  });
+
+  const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
+    handleTouchDownAnimation(e);
+    if (e.pointerType === 'touch') {
+      handlePointerDownCancel(e);
+    }
+  };
+
+  const handlePointerMove = (e: PointerEvent<HTMLButtonElement>) => {
+    if (e.pointerType === 'touch') {
+      handlePointerMoveCancel(e);
+    }
+  };
+
+  const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     if (isDisabled) return;
-    onClick?.();
+
+    handleTouchUpAnimation(e);
+    if (e.pointerType === 'touch') {
+      handlePointerUpCancel(e);
+    } else {
+      onClick?.();
+    }
   };
 
   const showLoading = variant === 'loading' || isLoading;
@@ -45,9 +80,9 @@ const Button = ({
       $height={height}
       $isLoading={isLoading}
       disabled={isDisabled}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
       {...rest}
     >
       {renderContent()}

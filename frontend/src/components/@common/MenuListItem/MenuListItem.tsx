@@ -8,14 +8,16 @@ type Props = {
 };
 
 const MenuListItem = ({ text, onClick }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
+  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
 
   return (
     <S.Container
-      onPointerUp={onClick}
+      onPointerDown={handleTouchDown}
+      onPointerUp={(e) => {
+        handleTouchUp(e);
+        onClick();
+      }}
       $touchState={touchState}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       <Paragraph>{text}</Paragraph>
     </S.Container>

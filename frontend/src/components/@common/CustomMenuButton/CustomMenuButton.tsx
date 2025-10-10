@@ -7,14 +7,16 @@ interface Props {
 }
 
 const CustomMenuButton = ({ onClick }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
+  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
 
   return (
     <S.Container
-      onPointerUp={onClick}
+      onPointerDown={handleTouchDown}
+      onPointerUp={(e) => {
+        handleTouchUp(e);
+        onClick();
+      }}
       $touchState={touchState}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       <S.Icon src={WriteIcon} alt="직접 입력" />
       <S.Text>직접 입력</S.Text>
