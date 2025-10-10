@@ -42,12 +42,14 @@ class LocalErrorBoundary extends Component<Props, State> {
   };
 
   render(): ReactNode {
-    if (this.state.error) {
-      if (this.props.fallback) {
-        return this.props.fallback(this.state.error, this.handleRetry);
-      }
+    const {
+      fallback = (error: Error, retry: () => void) => (
+        <LocalErrorFallback error={error} handleRetry={retry} />
+      ),
+    } = this.props;
 
-      return <LocalErrorFallback error={this.state.error} handleRetry={this.handleRetry} />;
+    if (this.state.error) {
+      return fallback(this.state.error, this.handleRetry);
     }
 
     return this.props.children;
