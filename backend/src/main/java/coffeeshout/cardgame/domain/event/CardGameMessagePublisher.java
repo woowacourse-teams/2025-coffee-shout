@@ -4,8 +4,6 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.cardgame.domain.CardGame;
-import coffeeshout.cardgame.domain.CardGameTaskType;
-import coffeeshout.cardgame.domain.event.dto.CardGameStateChangeMessage;
 import coffeeshout.cardgame.domain.event.dto.CardGameStateChangedEvent;
 import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.ui.response.MiniGameStartMessage;
@@ -14,7 +12,6 @@ import coffeeshout.minigame.event.dto.CardSelectedEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import generator.annotaions.MessageResponse;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

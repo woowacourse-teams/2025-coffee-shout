@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import org.springframework.scheduling.TaskScheduler;
 
 @Getter
 public class RacingGame implements Playable {

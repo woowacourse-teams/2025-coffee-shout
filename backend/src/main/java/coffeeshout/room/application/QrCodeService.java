@@ -6,8 +6,6 @@ import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
