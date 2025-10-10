@@ -1,6 +1,6 @@
 package coffeeshout.dashboard.application;
 
-import coffeeshout.dashboard.infra.persistence.DashboardQueryRepository;
+import coffeeshout.dashboard.infra.persistence.DashboardStatisticsRepository;
 import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
 import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
 import coffeeshout.dashboard.ui.response.TopWinnerResponse;
@@ -16,20 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private final DashboardQueryRepository dashboardQueryRepository;
+    private final DashboardStatisticsRepository dashboardStatisticsRepository;
 
     public List<TopWinnerResponse> getTop5Winners() {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardQueryRepository.findTop5WinnersByMonth(startOfMonth, endOfMonth);
+        return dashboardStatisticsRepository.findTop5WinnersByMonth(startOfMonth, endOfMonth);
     }
 
     public LowestProbabilityWinnerResponse getLowestProbabilityWinner() {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardQueryRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth)
+        return dashboardStatisticsRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth)
                 .orElseThrow(() -> new IllegalStateException("이번달 당첨 기록이 없습니다"));
     }
 
@@ -37,7 +37,7 @@ public class DashboardService {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardQueryRepository.findGamePlayCountByMonth(startOfMonth, endOfMonth);
+        return dashboardStatisticsRepository.findGamePlayCountByMonth(startOfMonth, endOfMonth);
     }
 
     private LocalDateTime getStartOfMonth() {

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class DashboardQueryRepository {
+public class DashboardStatisticsRepository {
 
     private final JPAQueryFactory queryFactory;
 
