@@ -31,7 +31,7 @@ export const apiRequest = async <T, TData>(
     headers = {},
     body = null,
     retry = { count: 0, delay: 1000 },
-    displayMode,
+    displayMode = options.displayMode || (method === 'GET' ? 'fallback' : 'toast'),
   } = options;
 
   let requestUrl = API_URL + url;
@@ -75,9 +75,13 @@ export const apiRequest = async <T, TData>(
           console.warn('응답 메시지 파싱 실패', parseError);
         }
 
-        // 지정된 display가 있으면 지정된 모드를, 없으면 get일 때는 fallback, 나머지는 toast
-        const display = displayMode || (method === 'GET' ? 'fallback' : 'toast');
-        const apiError = new ApiError(response.status, errorMessage, errorData, display, method);
+        const apiError = new ApiError(
+          response.status,
+          errorMessage,
+          errorData,
+          displayMode,
+          method
+        );
         reportApiError(apiError);
         throw apiError;
       }
