@@ -24,10 +24,16 @@ export const usePressAnimation = () => {
     }, TOUCH_DELAY_MS);
   }, []);
 
+  const onPointerCancel = useCallback((e: PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== 'touch') return;
+
+    setTouchState('idle');
+  }, []);
+
   return {
     touchState,
     onPointerDown,
     onPointerUp,
+    onPointerCancel,
   };
 };
-
