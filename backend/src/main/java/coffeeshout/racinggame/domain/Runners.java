@@ -1,6 +1,7 @@
 package coffeeshout.racinggame.domain;
 
 import coffeeshout.room.domain.player.Player;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Getter;
 
+@Getter
 public class Runners {
 
     private final List<Runner> runners;
@@ -19,15 +22,14 @@ public class Runners {
         players.forEach(player -> runners.add(new Runner(player)));
     }
 
-    public void adjustSpeed(Player player, int tapCount) {
+    public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator) {
         final Runner runner = findRunnerByPlayer(player);
-        runner.adjustSpeed(tapCount);
+        runner.updateSpeed(speedCalculator.calculateSpeed(runner.getLastSpeedUpdateTime(), Instant.now(), tapCount));
     }
 
     public void moveAll() {
         runners.forEach(Runner::move);
     }
-
 
     public Optional<Runner> findWinner() {
         return runners.stream()
@@ -55,18 +57,22 @@ public class Runners {
         return runners.stream().allMatch(Runner::isFinished);
     }
 
+    public void initialSpeed() {
+        runners.forEach(Runner::firstMoveSpeed);
+    }
+
+    public void initialLastTapTime(Instant time) {
+        runners.forEach(runner -> runner.setFirstMoveTime(time));
+    }
+
+    public Stream<Runner> stream() {
+        return runners.stream();
+    }
+
     private Runner findRunnerByPlayer(Player player) {
         return runners.stream()
                 .filter(runner -> runner.getPlayer().equals(player))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 플레이어의 러너를 찾을 수 없습니다."));
-    }
-
-    public void initialSpeed() {
-        runners.forEach(Runner::firstMoveSpeed);
-    }
-
-    public Stream<Runner> stream() {
-        return runners.stream();
     }
 }

@@ -23,6 +23,6 @@ public class IntegrationTestConfig {
 
     @Bean(name = "racingGameScheduler")
     public TaskScheduler testIntegrationRacingGameScheduler() {
-        return new TestTaskScheduler();
+        return new ShutDownTestScheduler();
     }
 }

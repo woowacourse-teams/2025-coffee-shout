@@ -31,6 +31,6 @@ public class MiniGameDummy implements Playable {
     }
 
     @Override
-    public void startGame(List<Player> players) {
+    public void setUp(List<Player> players) {
     }
 }

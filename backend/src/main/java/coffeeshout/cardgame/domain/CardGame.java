@@ -49,7 +49,7 @@ public class CardGame implements Playable {
     }
 
     @Override
-    public void startGame(List<Player> players) {
+    public void setUp(List<Player> players) {
         playerHands = new PlayerHands(players);
     }
 

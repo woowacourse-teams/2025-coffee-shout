@@ -3,73 +3,118 @@ package coffeeshout.minigame.racinggame.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.Runner;
 import org.junit.jupiter.api.Test;
 
 class RunnerTest {
 
     @Test
-    void 러너의_초기_속도는_1이다() {
+    void 러너의_초기_속도는_0이다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
         // when && then
-        assertThat(runner.getSpeed()).isEqualTo(1);
+        assertThat(runner.getSpeed()).isEqualTo(RacingGame.INITIAL_SPEED);
     }
 
     @Test
-    void 초당_클릭수를_기반으로_속도를_조정할_수_있다() throws InterruptedException {
+    void 속도를_업데이트할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
-        Thread.sleep(1000); // 1초 대기
-
         // when
-        runner.adjustSpeed(5); // 1초에 5번 클릭 = 초당 5번
+        runner.updateSpeed(15);
 
         // then
-        assertThat(runner.getSpeed()).isEqualTo(5);
+        assertThat(runner.getSpeed()).isEqualTo(15);
     }
 
     @Test
-    void 초당_10번_이상_클릭하면_최대_속도가_된다() throws InterruptedException {
-        // given
-        final Runner runner = new Runner(PlayerFixture.게스트한스());
-
-        Thread.sleep(1000); // 1초 대기
-
-        // when
-        runner.adjustSpeed(10); // 1초에 10번 클릭 = 초당 10번
-
-        // then
-        assertThat(runner.getSpeed()).isEqualTo(10); // MAX_SPEED
-    }
-
-    @Test
-    void 초당_클릭수가_최소_속도보다_낮으면_최소_속도가_된다() throws InterruptedException {
-        // given
-        final Runner runner = new Runner(PlayerFixture.게스트한스());
-
-        Thread.sleep(2000); // 2초 대기
-
-        // when
-        runner.adjustSpeed(1); // 2초에 1번 클릭 = 초당 0.5번
-
-        // then
-        assertThat(runner.getSpeed()).isEqualTo(1); // MIN_SPEED
-    }
-
-    @Test
-    void 러너의_초기_현재_위치는_0이다() {
+    void 속도가_최소값보다_작으면_예외가_발생한다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
         // when && then
-        assertThat(runner.getPosition()).isEqualTo(0);
+        assertThatThrownBy(() -> runner.updateSpeed(2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("스피드는 0 ~30이어야 합니다.");
     }
 
     @Test
-    void 러너는_현재_속도로_움직일_수_있다() {
+    void 속도가_최대값보다_크면_예외가_발생한다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+
+        // when && then
+        assertThatThrownBy(() -> runner.updateSpeed(31))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("스피드는 0 ~30이어야 합니다.");
+    }
+
+    @Test
+    void 최소_속도로_업데이트할_수_있다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+
+        // when
+        runner.updateSpeed(RacingGame.MIN_SPEED);
+
+        // then
+        assertThat(runner.getSpeed()).isEqualTo(RacingGame.MIN_SPEED);
+    }
+
+    @Test
+    void 최대_속도로_업데이트할_수_있다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+
+        // when
+        runner.updateSpeed(RacingGame.MAX_SPEED);
+
+        // then
+        assertThat(runner.getSpeed()).isEqualTo(RacingGame.MAX_SPEED);
+    }
+
+    @Test
+    void 러너의_초기_위치는_0이다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+
+        // when && then
+        assertThat(runner.getPosition()).isEqualTo(RacingGame.START_LINE);
+    }
+
+    @Test
+    void 러너는_현재_속도만큼_이동할_수_있다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(15);
+
+        // when
+        runner.move();
+
+        // then
+        assertThat(runner.getPosition()).isEqualTo(15);
+    }
+
+    @Test
+    void 러너는_여러_번_이동할_수_있다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(10);
+
+        // when
+        runner.move();
+        runner.move();
+        runner.move();
+
+        // then
+        assertThat(runner.getPosition()).isEqualTo(30);
+    }
+
+    @Test
+    void 속도가_0이면_이동하지_않는다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
@@ -77,41 +122,69 @@ class RunnerTest {
         runner.move();
 
         // then
-        assertThat(runner.getPosition()).isEqualTo(1);
+        assertThat(runner.getPosition()).isEqualTo(RacingGame.START_LINE);
     }
 
     @Test
-    void 러너가_완주_라인에_도달하면_더이상_움직이지_않는다() throws InterruptedException {
+    void 러너가_완주_라인에_도달하면_위치가_정확히_완주_라인이_된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(RacingGame.MAX_SPEED);
 
-        Thread.sleep(100);
-        runner.adjustSpeed(10); // speed = 10
+        // when
         for (int i = 0; i < 100; i++) {
             runner.move();
         }
 
-        final int position = runner.getPosition();
+        // then
+        assertThat(runner.getPosition()).isEqualTo(RacingGame.FINISH_LINE);
+    }
+
+    @Test
+    void 러너가_완주_라인을_넘으면_속도가_0이_된다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(RacingGame.MAX_SPEED);
+
+        // when
+        for (int i = 0; i < 100; i++) {
+            runner.move();
+        }
+
+        // then
+        assertThat(runner.getSpeed()).isEqualTo(RacingGame.INITIAL_SPEED);
+    }
+
+    @Test
+    void 러너가_완주하면_더이상_움직이지_않는다() {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(RacingGame.MAX_SPEED);
+        for (int i = 0; i < 100; i++) {
+            runner.move();
+        }
+        final int finishPosition = runner.getPosition();
 
         // when
         runner.move();
+        runner.move();
 
         // then
-        assertThat(runner.getPosition()).isEqualTo(position);
+        assertThat(runner.getPosition()).isEqualTo(finishPosition);
     }
 
     @Test
-    void 러너가_완주했는지_확인할_수_있다() throws InterruptedException {
+    void 러너가_완주했는지_확인할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        runner.updateSpeed(RacingGame.MAX_SPEED);
 
-        Thread.sleep(100);
-        runner.adjustSpeed(10);
+        // when
         for (int i = 0; i < 100; i++) {
             runner.move();
         }
 
-        // when && then
+        // then
         assertThat(runner.isFinished()).isTrue();
     }
 
@@ -125,24 +198,10 @@ class RunnerTest {
     }
 
     @Test
-    void 시간_차이가_0_이하면_속도가_조정되지_않는다() {
+    void 러너가_완주하면_완주_시간이_기록된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-
-        // when
-        runner.adjustSpeed(10);
-
-        // then
-        assertThat(runner.getSpeed()).isEqualTo(1); // 초기 속도 유지 (첫 업데이트는 시간만 기록)
-    }
-
-    @Test
-    void 러너가_완주하면_완주_시간이_기록된다() throws InterruptedException {
-        // given
-        final Runner runner = new Runner(PlayerFixture.게스트한스());
-
-        Thread.sleep(100);
-        runner.adjustSpeed(10);
+        runner.updateSpeed(RacingGame.MAX_SPEED);
         for (int i = 0; i < 99; i++) {
             runner.move();
         }
@@ -156,30 +215,14 @@ class RunnerTest {
     }
 
     @Test
-    void 속도_계산_로직을_검증한다() throws InterruptedException {
+    void 첫_이동_속도는_최소_속도가_된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
-        Thread.sleep(500); // 0.5초 대기
-
         // when
-        runner.adjustSpeed(3); // 0.5초에 3번 클릭 = 초당 6번
+        runner.firstMoveSpeed();
 
         // then
-        assertThat(runner.getSpeed()).isEqualTo(6);
-    }
-
-    @Test
-    void 속도는_최소_1_최대_10으로_제한된다() throws InterruptedException {
-        // given
-        final Runner runner = new Runner(PlayerFixture.게스트한스());
-
-        Thread.sleep(1000);
-
-        // when
-        runner.adjustSpeed(15); // 초당 15번 (MAX_SPEED 초과)
-
-        // then
-        assertThat(runner.getSpeed()).isEqualTo(10); // MAX_SPEED로 제한
+        assertThat(runner.getSpeed()).isEqualTo(RacingGame.MIN_SPEED);
     }
 }

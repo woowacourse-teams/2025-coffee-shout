@@ -30,7 +30,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.naturalOrder());
+        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.reverseOrder());
 
         // then
         SoftAssertions.assertSoftly(
@@ -59,7 +59,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.naturalOrder());
+        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.reverseOrder());
 
         // then
         SoftAssertions.assertSoftly(

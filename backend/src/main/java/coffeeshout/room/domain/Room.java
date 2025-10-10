@@ -143,7 +143,7 @@ public class Room {
 
         Playable currentGame = miniGames.poll();
 
-        currentGame.startGame(players.getPlayers());
+        currentGame.setUp(players.getPlayers());
 
         roomState = RoomState.PLAYING;
 

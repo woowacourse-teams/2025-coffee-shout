@@ -17,7 +17,6 @@ public class TestTaskScheduler extends ThreadPoolTaskScheduler {
 
     @Override
     public ScheduledFuture<?> schedule(Runnable task, Instant startTime) {
-        System.out.println("dsa");
         return super.schedule(task, Instant.now());
     }
 }

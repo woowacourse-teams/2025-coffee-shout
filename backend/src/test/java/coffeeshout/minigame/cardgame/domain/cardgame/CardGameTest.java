@@ -33,7 +33,7 @@ class CardGameTest {
         players = PlayersFixture.호스트꾹이_루키_엠제이_한스;
 
         cardGame = new CardGameFake(deckGenerator);
-        cardGame.startGame(players.getPlayers());
+        cardGame.setUp(players.getPlayers());
     }
 
     @Nested

@@ -25,7 +25,7 @@ public class ServiceTestConfig {
 
     @Bean(name = "racingGameScheduler")
     public TaskScheduler testRacingGameScheduler() {
-        return Mockito.mock(TaskScheduler.class);
+        return new TestTaskScheduler();
     }
 
     @Bean
