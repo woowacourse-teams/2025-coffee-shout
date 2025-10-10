@@ -13,7 +13,7 @@ export type ApiRequestOptions<TData> = {
     count: number;
     delay: number;
   };
-  displayMode?: ErrorDisplayMode;
+  errorDisplayMode?: ErrorDisplayMode;
 };
 
 export type ApiConfig = {
@@ -31,7 +31,7 @@ export const apiRequest = async <T, TData>(
     headers = {},
     body = null,
     retry = { count: 0, delay: 1000 },
-    displayMode = options.displayMode || (method === 'GET' ? 'fallback' : 'toast'),
+    errorDisplayMode = options.errorDisplayMode || (method === 'GET' ? 'fallback' : 'toast'),
   } = options;
 
   let requestUrl = API_URL + url;
@@ -79,7 +79,7 @@ export const apiRequest = async <T, TData>(
           status: response.status,
           message: errorMessage,
           data: errorData,
-          displayMode,
+          displayMode: errorDisplayMode,
           method,
         });
         reportApiError(apiError);
@@ -103,7 +103,7 @@ export const apiRequest = async <T, TData>(
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
           const networkError = new NetworkError({
             message: error.message,
-            displayMode,
+            displayMode: errorDisplayMode,
           });
           reportApiError(networkError);
           throw networkError;
