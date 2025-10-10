@@ -7,10 +7,6 @@ export const HTTP_ERROR_MESSAGE = {
     message: '요청을 처리할 수 없어요',
     description: '입력하신 정보를 다시 확인해주세요. 문제가 지속되면 잠시 후 다시 시도해주세요.',
   },
-  403: {
-    message: '접근 권한이 없어요',
-    description: '로그인 상태를 확인하거나 관리자에게 문의해주세요.',
-  },
   404: {
     message: '페이지를 찾을 수 없어요',
     description: '요청하신 페이지가 존재하지 않거나 이동되었을 수 있어요. URL을 다시 확인해주세요.',
