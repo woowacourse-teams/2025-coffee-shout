@@ -12,14 +12,14 @@ const RacingGameOverlay = ({ children }: Props) => {
   const { send } = useWebSocket();
 
   const tapCountRef = useRef(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   const handlePointerDown = () => {
     tapCountRef.current += 1;
   };
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       send(`/room/${joinCode}/racing-game/tap`, {
         playerName: myName,
         tapCount: tapCountRef.current,
@@ -29,7 +29,7 @@ const RacingGameOverlay = ({ children }: Props) => {
     }, 200);
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        window.clearInterval(intervalRef.current);
       }
     };
   }, [joinCode, myName, send]);
