@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from 'react';
+import { ContextType, Component, ReactNode } from 'react';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import { ToastContext } from '@/components/@common/Toast/ToastContext';
 import GlobalErrorFallback from '@/components/@common/ErrorFallback/GlobalErrorFallback';
@@ -14,7 +14,7 @@ type State = {
 
 class GlobalErrorBoundary extends Component<Props, State> {
   static contextType = ToastContext;
-  declare context: React.ContextType<typeof ToastContext>;
+  declare context: ContextType<typeof ToastContext>;
 
   constructor(props: Props) {
     super(props);
