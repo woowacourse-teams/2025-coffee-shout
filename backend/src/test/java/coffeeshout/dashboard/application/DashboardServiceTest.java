@@ -4,9 +4,9 @@ package coffeeshout.dashboard.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
-import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.dashboard.ui.response.TopWinnerResponse;
+import coffeeshout.dashboard.domain.GamePlayCountResponse;
+import coffeeshout.dashboard.domain.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.domain.TopWinnerResponse;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;

@@ -1,9 +1,9 @@
 package coffeeshout.dashboard.ui;
 
 import coffeeshout.dashboard.application.DashboardService;
-import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
-import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.dashboard.ui.response.TopWinnerResponse;
+import coffeeshout.dashboard.domain.GamePlayCountResponse;
+import coffeeshout.dashboard.domain.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.domain.TopWinnerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

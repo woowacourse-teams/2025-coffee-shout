@@ -1,4 +1,4 @@
-package coffeeshout.dashboard.ui.response;
+package coffeeshout.dashboard.domain;
 
 import java.util.List;
 

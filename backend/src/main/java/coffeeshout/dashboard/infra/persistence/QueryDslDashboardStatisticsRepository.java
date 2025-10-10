@@ -1,9 +1,9 @@
 package coffeeshout.dashboard.infra.persistence;
 
+import coffeeshout.dashboard.domain.GamePlayCountResponse;
+import coffeeshout.dashboard.domain.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.domain.TopWinnerResponse;
 import coffeeshout.dashboard.domain.repository.DashboardStatisticsRepository;
-import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
-import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.dashboard.ui.response.TopWinnerResponse;
 import coffeeshout.minigame.infra.persistence.QMiniGameEntity;
 import coffeeshout.room.infra.persistence.QPlayerEntity;
 import coffeeshout.room.infra.persistence.QRoomEntity;
