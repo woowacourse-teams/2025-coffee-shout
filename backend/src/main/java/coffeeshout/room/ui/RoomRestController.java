@@ -3,7 +3,6 @@ package coffeeshout.room.ui;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
@@ -102,11 +101,9 @@ public class RoomRestController {
             @PathVariable String joinCode,
             @PathVariable String playerName
     ) {
-        final boolean exists = roomService.hasPlayer(joinCode, playerName);
+        final boolean exists = roomService.kickPlayer(joinCode, playerName);
 
         if (exists) {
-            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
-            roomEventPublisher.publishEvent(event);
             return ResponseEntity.noContent().build();
         }
 
