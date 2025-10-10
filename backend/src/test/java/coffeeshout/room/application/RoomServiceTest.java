@@ -544,7 +544,7 @@ class RoomServiceTest extends ServiceTest {
         QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
         // then
-        assertThat(qrCodeStatus).isIn(QrCodeStatus.PENDING, QrCodeStatus.SUCCESS, QrCodeStatus.ERROR);
+        assertThat(qrCodeStatus.status()).isIn(QrCodeStatus.PENDING, QrCodeStatus.SUCCESS, QrCodeStatus.ERROR);
     }
 
     @Test
