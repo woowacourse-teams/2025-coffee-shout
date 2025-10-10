@@ -21,7 +21,7 @@ public class QrCodeEventListener {
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @EventListener
-    private void handleQrCodePending(QrCodeStatusEvent event) {
+    public void handleQrCodePending(QrCodeStatusEvent event) {
         if (event.status() != PENDING) {
             return;
         }
