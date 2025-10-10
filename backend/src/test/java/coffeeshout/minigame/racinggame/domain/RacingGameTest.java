@@ -88,15 +88,22 @@ class RacingGameTest {
     }
 
     @Test
-    void 게임_결과를_조회할_수_있다() {
+    void 게임_결과를_조회할_수_있다() throws InterruptedException {
         // given
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
         racingGame.startAutoMove(null);
 
-        for (int i = 0; i < 300; i++) {
-            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
+        for (int i = 0; i < 100; i++) {
             racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30);
+            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
+            racingGame.moveAll();
+        }
+
+        Thread.sleep(2);
+
+        for (int i = 0; i < 200; i++) {
+            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
             racingGame.moveAll();
         }
 
