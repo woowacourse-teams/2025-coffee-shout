@@ -121,3 +121,57 @@ export const LoadingDots = styled.div`
     }
   }
 `;
+
+const textPulse = keyframes`
+  0%, 20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  80%, 100% {
+    opacity: 0.3;
+  }
+`;
+
+export const LoadingText = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+
+  span {
+    animation: ${textPulse} 1.2s infinite ease-in-out;
+  }
+
+  span:nth-of-type(1) {
+    animation-delay: 0s;
+  }
+  span:nth-of-type(2) {
+    animation-delay: 0.1s;
+  }
+  span:nth-of-type(3) {
+    animation-delay: 0.2s;
+  }
+  span:nth-of-type(4) {
+    animation-delay: 0.3s;
+  }
+  span:nth-of-type(5) {
+    animation-delay: 0.4s;
+  }
+  span:nth-of-type(6) {
+    animation-delay: 0.5s;
+  }
+  span:nth-of-type(7) {
+    animation-delay: 0.6s;
+  }
+  span:nth-of-type(8) {
+    animation-delay: 0.7s;
+  }
+  span:nth-of-type(9) {
+    animation-delay: 0.8s;
+  }
+  span:nth-of-type(10) {
+    animation-delay: 0.9s;
+  }
+`;
