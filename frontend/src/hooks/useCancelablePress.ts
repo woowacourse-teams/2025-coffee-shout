@@ -30,18 +30,26 @@ export const useCancelablePress = ({ onClick, cancelThreshold = 10 }: Props) => 
     }
   };
 
+  const onPointerCancel = (e: PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== 'touch') return;
+
+    moved.current = true;
+  };
+
   const onPointerUp = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     if (!moved.current) {
+      console.log('onClick 실행!');
       onClick?.();
     }
   };
 
   return {
+    moved,
     onPointerDown,
     onPointerMove,
+    onPointerCancel,
     onPointerUp,
   };
 };
-
