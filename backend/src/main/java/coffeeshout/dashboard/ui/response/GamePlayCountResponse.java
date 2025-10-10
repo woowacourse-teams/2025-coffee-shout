@@ -1,4 +1,4 @@
-package coffeeshout.room.ui.response;
+package coffeeshout.dashboard.ui.response;
 
 import coffeeshout.minigame.domain.MiniGameType;
 

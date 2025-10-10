@@ -1,9 +1,12 @@
-package coffeeshout.room.infra.persistence;
+package coffeeshout.dashboard.infra.persistence;
 
+import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
+import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.ui.response.TopWinnerResponse;
 import coffeeshout.minigame.infra.persistence.QMiniGameEntity;
-import coffeeshout.room.ui.response.GamePlayCountResponse;
-import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.room.ui.response.TopWinnerResponse;
+import coffeeshout.room.infra.persistence.QPlayerEntity;
+import coffeeshout.room.infra.persistence.QRoomEntity;
+import coffeeshout.room.infra.persistence.QRouletteResultEntity;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;

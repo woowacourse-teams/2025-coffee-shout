@@ -1,4 +1,4 @@
-package coffeeshout.room.ui.response;
+package coffeeshout.dashboard.ui.response;
 
 public record TopWinnerResponse(
         String nickname,

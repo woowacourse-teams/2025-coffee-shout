@@ -1,9 +1,12 @@
-package coffeeshout.room.application;
+package coffeeshout.dashboard.application;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
+import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.ui.response.TopWinnerResponse;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;
@@ -15,9 +18,6 @@ import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import coffeeshout.room.infra.persistence.RouletteResultEntity;
 import coffeeshout.room.infra.persistence.RouletteResultJpaRepository;
-import coffeeshout.room.ui.response.GamePlayCountResponse;
-import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.room.ui.response.TopWinnerResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,9 +1,9 @@
-package coffeeshout.room.application;
+package coffeeshout.dashboard.application;
 
-import coffeeshout.room.infra.persistence.DashboardQueryRepository;
-import coffeeshout.room.ui.response.GamePlayCountResponse;
-import coffeeshout.room.ui.response.LowestProbabilityWinnerResponse;
-import coffeeshout.room.ui.response.TopWinnerResponse;
+import coffeeshout.dashboard.infra.persistence.DashboardQueryRepository;
+import coffeeshout.dashboard.ui.response.GamePlayCountResponse;
+import coffeeshout.dashboard.ui.response.LowestProbabilityWinnerResponse;
+import coffeeshout.dashboard.ui.response.TopWinnerResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
