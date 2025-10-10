@@ -2,6 +2,9 @@ package coffeeshout.racinggame.application;
 
 import coffeeshout.minigame.domain.MiniGameService;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.event.dto.MiniGameFinishedEvent;
+import coffeeshout.minigame.infra.persistence.MiniGameEntity;
+import coffeeshout.minigame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.RacingGameState;
 import coffeeshout.racinggame.domain.SpeedCalculator;
@@ -10,9 +13,14 @@ import coffeeshout.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.racinggame.domain.event.RunnersMovedEvent;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.infra.persistence.PlayerEntity;
+import coffeeshout.room.infra.persistence.PlayerJpaRepository;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -117,6 +125,7 @@ public class RacingGameCommandService implements MiniGameService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.applyMiniGameResult(racingGame.getResult());
         eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode));
+        eventPublisher.publishEvent(new MiniGameFinishedEvent(joinCode, MiniGameType.RACING_GAME.name()));
         log.info("레이싱 게임 종료: joinCode={}", joinCode);
     }
 

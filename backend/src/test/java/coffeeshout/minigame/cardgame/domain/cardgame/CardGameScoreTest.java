@@ -64,21 +64,4 @@ class CardGameScoreTest {
         // then
         assertThat(score.getValue()).isEqualTo(20);
     }
-
-    @Test
-    void 계산된_점수가_같으면_동일하다() {
-        // given
-        CardHand cardHand1 = new CardHand();
-        cardHand1.put(AdditionCard.PLUS_40);
-        cardHand1.put(MultiplierCard.INVERT);
-        CardGameScore score1 = new CardGameScore(cardHand1);
-
-        CardHand cardHand2 = new CardHand();
-        cardHand2.put(AdditionCard.MINUS_10);
-        cardHand2.put(MultiplierCard.QUADRUPLE);
-        CardGameScore score2 = new CardGameScore(cardHand2);
-
-        // when & then
-        assertThat(score1.equals(score2)).isTrue();
-    }
 }

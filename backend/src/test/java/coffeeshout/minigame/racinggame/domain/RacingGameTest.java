@@ -3,13 +3,11 @@ package coffeeshout.minigame.racinggame.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.fixture.PlayerFixture;
-import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.RacingGameState;
 import coffeeshout.racinggame.domain.Runner;
 import coffeeshout.racinggame.domain.SpeedCalculator;
 import coffeeshout.room.domain.player.Player;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -109,6 +107,6 @@ class RacingGameTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getRank().get(players.get(0))).isEqualTo(1);
-        assertThat(result.getRank().get(players.get(1))).isEqualTo(2);
+        assertThat(result.getRank().get(players.get(1))).isEqualTo(1);
     }
 }

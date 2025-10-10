@@ -4,6 +4,8 @@ import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameTask;
 import coffeeshout.cardgame.domain.event.dto.CardGameStateChangedEvent;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.event.dto.MiniGameFinishedEvent;
 import coffeeshout.room.domain.Room;
 import java.time.Instant;
 import java.util.Arrays;
@@ -148,7 +150,12 @@ public enum CardGameTaskType {
                 MiniGameResult result = cardGame.getResult();
                 room.applyMiniGameResult(result);
                 final CardGameStateChangedEvent event = new CardGameStateChangedEvent(room, cardGame, this);
+                final MiniGameFinishedEvent finishedEvent = new MiniGameFinishedEvent(
+                        room.getJoinCode().getValue(),
+                        MiniGameType.CARD_GAME.name()
+                );
                 eventPublisher.publishEvent(event);
+                eventPublisher.publishEvent(finishedEvent);
             }, generateCorrelationId(room, this));
             taskScheduler.schedule(miniGameTask, Instant.now().plusMillis(previousTask().state.getDuration()));
         }
