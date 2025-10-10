@@ -36,8 +36,6 @@ export const Container = styled.button<Props>`
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
 
   ${({ $variant, theme, $touchState }) => {
     switch ($variant) {
