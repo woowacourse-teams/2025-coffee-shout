@@ -252,6 +252,5 @@ class QrCodeServiceTest {
         InOrder inOrder = Mockito.inOrder(eventPublisher, roomEventPublisher);
         inOrder.verify(eventPublisher).publishEvent(any(QrCodeStatusEvent.class));
         inOrder.verify(roomEventPublisher).publishEvent(any(QrCodeStatusEvent.class));
-
     }
 }
