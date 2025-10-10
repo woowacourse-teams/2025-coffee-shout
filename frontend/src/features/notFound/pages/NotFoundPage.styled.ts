@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Container = styled.div`
+export const Container = styled.section`
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@ export const Container = styled.div`
   gap: 40px;
 `;
 
-export const NotFoundText = styled.span`
+export const NotFoundText = styled.h1`
   font-size: 40px;
   color: white;
   font-family: 'PartialSansKR-Regular';

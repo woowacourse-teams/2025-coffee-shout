@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.section`
   padding: 16px 0;
   display: flex;
   flex-direction: column;
