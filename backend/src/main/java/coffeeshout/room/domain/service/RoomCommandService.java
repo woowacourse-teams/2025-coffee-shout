@@ -8,6 +8,7 @@ import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,7 @@ public class RoomCommandService {
         updateRoomWithQrCode(joinCode, room -> room.assignQrCode(QrCode.error()));
     }
 
-    private void updateRoomWithQrCode(JoinCode joinCode, java.util.function.Consumer<Room> qrCodeAssigner) {
+    private void updateRoomWithQrCode(JoinCode joinCode, Consumer<Room> qrCodeAssigner) {
         Room room = roomQueryService.getByJoinCode(joinCode);
         qrCodeAssigner.accept(room);
         save(room);
