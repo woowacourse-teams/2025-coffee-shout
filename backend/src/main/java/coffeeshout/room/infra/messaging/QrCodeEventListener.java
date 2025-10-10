@@ -5,6 +5,8 @@ import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -41,10 +43,12 @@ public class QrCodeEventListener {
 
             QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
-            messagingTemplate.convertAndSendToUser(
-                    Objects.requireNonNull(sessionId),
-                    destination,
-                    WebSocketResponse.success(qrCodeStatus)
+            CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS).execute(() ->
+                    messagingTemplate.convertAndSendToUser(
+                            Objects.requireNonNull(sessionId),
+                            destination,
+                            WebSocketResponse.success(qrCodeStatus)
+                    )
             );
 
             log.debug("QR 코드 구독 시 현재 상태 전송 완료: sessionId={}, joinCode={}, status={}",
