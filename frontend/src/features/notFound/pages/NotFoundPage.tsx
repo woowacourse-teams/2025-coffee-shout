@@ -1,11 +1,11 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
-import { useCustomNavigate } from '@/hooks/useCustomNavigate';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './NotFoundPage.styled';
 
 const NotFoundPage = () => {
-  const navigate = useCustomNavigate();
+  const navigate = useReplaceNavigate();
 
   const handleClickHomeButton = () => {
     navigate('/');

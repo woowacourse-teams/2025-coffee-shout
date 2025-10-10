@@ -6,7 +6,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
-import { useCustomNavigate } from '@/hooks/useCustomNavigate';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { storageManager, STORAGE_KEYS } from '@/utils/StorageManager';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
@@ -14,7 +14,7 @@ import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
 
 const HomePage = () => {
-  const navigate = useCustomNavigate();
+  const navigate = useReplaceNavigate();
   const [showSplash, setShowSplash] = useState<boolean>(false);
   const { openModal, closeModal } = useModal();
   const { setHost, setGuest } = usePlayerType();

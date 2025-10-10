@@ -1,4 +1,4 @@
-import { useCustomNavigate } from '@/hooks/useCustomNavigate';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { api } from '@/apis/rest/api';
 import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
@@ -23,7 +23,7 @@ type RoomResponse = {
 };
 
 export const useRoomManagement = () => {
-  const navigate = useCustomNavigate();
+  const navigate = useReplaceNavigate();
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
 

@@ -13,7 +13,7 @@ import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useCustomNavigate } from '@/hooks/useCustomNavigate';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
@@ -40,7 +40,7 @@ type ShowRouletteResponse = {
 };
 
 const MiniGameResultPage = () => {
-  const navigate = useCustomNavigate();
+  const navigate = useReplaceNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
   const { send } = useWebSocket();
   const { myName, joinCode } = useIdentifier();

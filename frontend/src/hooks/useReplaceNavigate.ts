@@ -1,6 +1,6 @@
 import { useNavigate, NavigateOptions } from 'react-router-dom';
 
-export const useCustomNavigate = () => {
+export const useReplaceNavigate = () => {
   const navigate = useNavigate();
 
   return (to: string | number, options?: NavigateOptions) => {

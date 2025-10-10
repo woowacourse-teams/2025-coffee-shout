@@ -7,7 +7,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { useState } from 'react';
-import { useCustomNavigate } from '@/hooks/useCustomNavigate';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './EntryNamePage.styled';
 import useToast from '@/components/@common/Toast/useToast';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
@@ -20,7 +20,7 @@ type PlayerNameCheckResponse = {
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
-  const navigate = useCustomNavigate();
+  const navigate = useReplaceNavigate();
   const { setMyName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { showToast } = useToast();
