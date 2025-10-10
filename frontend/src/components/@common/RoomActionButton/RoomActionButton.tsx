@@ -1,7 +1,7 @@
 import { type ComponentProps } from 'react';
 
 import NextStepIcon from '@/assets/next-step-icon.svg';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
@@ -15,18 +15,10 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick?.();
-      }}
-      $touchState={touchState}
-      {...rest}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState} {...rest}>
       <Headline3>{title}</Headline3>
       <div>
         {descriptions.map((description, index) => (

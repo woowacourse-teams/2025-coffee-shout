@@ -1,4 +1,4 @@
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import Paragraph from '../Paragraph/Paragraph';
 
@@ -10,17 +10,10 @@ type Props = {
 };
 
 const MenuListItem = ({ text, onClick }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick();
-      }}
-      $touchState={touchState}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState}>
       <Paragraph>{text}</Paragraph>
     </S.Container>
   );

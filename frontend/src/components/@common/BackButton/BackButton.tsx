@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 
 import BackIcon from '@/assets/back-icon.svg';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import * as S from './BackButton.styled';
 
@@ -10,18 +10,10 @@ type Props = {
 } & ComponentProps<'button'>;
 
 const BackButton = ({ onClick, ...rest }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick();
-      }}
-      $touchState={touchState}
-      {...rest}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState} {...rest}>
       <img src={BackIcon} alt="뒤로가기" />
     </S.Container>
   );

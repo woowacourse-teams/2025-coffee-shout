@@ -1,6 +1,6 @@
 import { type ComponentProps } from 'react';
 
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import * as S from './TextButton.styled';
 
@@ -10,18 +10,10 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const TextButton = ({ text, onClick, ...rest }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick();
-      }}
-      $touchState={touchState}
-      {...rest}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState} {...rest}>
       {text}
     </S.Container>
   );

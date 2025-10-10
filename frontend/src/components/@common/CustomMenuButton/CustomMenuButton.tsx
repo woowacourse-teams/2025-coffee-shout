@@ -1,5 +1,5 @@
 import WriteIcon from '@/assets/write-icon.svg';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import * as S from './CustomMenuButton.styled';
 
@@ -8,17 +8,10 @@ interface Props {
 }
 
 const CustomMenuButton = ({ onClick }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick();
-      }}
-      $touchState={touchState}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState}>
       <S.Icon src={WriteIcon} alt="직접 입력" />
       <S.Text>직접 입력</S.Text>
     </S.Container>

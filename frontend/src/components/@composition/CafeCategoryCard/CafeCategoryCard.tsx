@@ -1,4 +1,4 @@
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
 
 import CircleIcon from '@/components/@common/CircleIcon/CircleIcon';
 import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
@@ -13,17 +13,10 @@ type Props = {
 };
 
 const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color }: Props) => {
-  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onPointerDown={onPointerDown}
-      onPointerUp={(e) => {
-        onPointerUp(e);
-        onClick();
-      }}
-      $touchState={touchState}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState}>
       <IconTextItem
         iconContent={<CircleIcon imageUrl={imageUrl} color={color} />}
         textContent={<S.CategoryName>{categoryName}</S.CategoryName>}
