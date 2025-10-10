@@ -1,9 +1,8 @@
-// ErrorIcon.tsx
-type ErrorIconProps = {
+type Props = {
   size?: number;
 };
 
-const ErrorIcon = ({ size = 100 }: ErrorIconProps) => {
+const ErrorIcon = ({ size = 100 }: Props) => {
   return (
     <svg
       width={size}
