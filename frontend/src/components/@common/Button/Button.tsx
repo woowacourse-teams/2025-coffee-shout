@@ -60,8 +60,8 @@ export default Button;
 
 const LoadingDots = () => (
   <S.LoadingDots>
-    <span></span>
-    <span></span>
-    <span></span>
+    <span />
+    <span />
+    <span />
   </S.LoadingDots>
 );
