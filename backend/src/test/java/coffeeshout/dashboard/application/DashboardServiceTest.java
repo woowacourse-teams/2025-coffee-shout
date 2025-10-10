@@ -258,11 +258,12 @@ class DashboardServiceTest extends ServiceTest {
         }
 
         @Test
-        void 이번달_당첨_기록이_없으면_예외가_발생한다() {
-            // when & then
-            assertThatThrownBy(() -> dashboardService.getLowestProbabilityWinner())
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("이번달 당첨 기록이 없습니다");
+        void 이번달_당첨_기록이_없으면_null을_반환한다() {
+            // when
+            final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
+
+            // then
+            assertThat(result).isNull();
         }
     }
 

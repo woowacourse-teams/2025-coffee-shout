@@ -30,7 +30,7 @@ public class DashboardService {
         final LocalDateTime endOfMonth = getEndOfMonth();
 
         return dashboardStatisticsRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth, 5)
-                .orElseThrow(() -> new IllegalStateException("이번달 당첨 기록이 없습니다"));
+                .orElse(null);
     }
 
     public List<GamePlayCountResponse> getGamePlayCounts() {
