@@ -202,7 +202,7 @@ class QrCodeServiceTest {
         // then
         ArgumentCaptor<QrCodeStatusEvent> errorCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
         verify(roomEventPublisher).publishEvent(errorCaptor.capture());
-        
+
         assertThat(errorCaptor.getValue().status()).isEqualTo(QrCodeStatus.ERROR);
     }
 
