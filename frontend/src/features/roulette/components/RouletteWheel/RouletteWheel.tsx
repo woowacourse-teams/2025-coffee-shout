@@ -45,15 +45,7 @@ const RouletteWheel = ({
           height={WHEEL_CONFIG.SIZE}
           viewBox={`0 0 ${WHEEL_CONFIG.SIZE} ${WHEEL_CONFIG.SIZE}`}
         >
-          <defs>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="5" result="coloredBlur" />
-              <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
+          <GlowFilter />
           {sortedPlayers.map((player) => (
             <RouletteSlice
               key={player.playerName}
@@ -72,3 +64,16 @@ export default RouletteWheel;
 
 const Pin = memo(() => <S.Pin />);
 Pin.displayName = 'Pin';
+
+const GlowFilter = memo(({ id = 'glow' }: { id?: string }) => (
+  <defs>
+    <filter id={id} x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+));
+GlowFilter.displayName = 'GlowFilter';
