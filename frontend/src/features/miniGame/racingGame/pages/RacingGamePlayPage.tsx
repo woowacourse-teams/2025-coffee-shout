@@ -76,9 +76,9 @@ const RacingGamePage = () => {
           <S.ContentWrapper>
             <S.PlayersWrapper>
               {/* 출발선 */}
-              <RacingLine position={0} myPosition={myPosition} />
+              <RacingLine position={racingGameData.distance.start} myPosition={myPosition} />
               {/* 도착선 */}
-              <RacingLine position={1000} myPosition={myPosition} />
+              <RacingLine position={racingGameData.distance.end} myPosition={myPosition} />
               {visiblePlayers.map((player) => (
                 <RacingPlayer
                   key={player.playerName}
