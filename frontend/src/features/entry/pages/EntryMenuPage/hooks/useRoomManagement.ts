@@ -28,7 +28,7 @@ export const useRoomManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
-  const { startSocket } = useWebSocket();
+  const { startSocket, isConnected } = useWebSocket();
 
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
@@ -79,7 +79,8 @@ export const useRoomManagement = () => {
 
       startSocket(_joinCode, myName);
 
-      const isReadyToNavigateLobby = _joinCode && qrCodeUrl && (selectedMenu || customMenuName);
+      const isReadyToNavigateLobby =
+        isConnected && _joinCode && qrCodeUrl && (selectedMenu || customMenuName);
 
       if (isReadyToNavigateLobby) {
         navigate(`/room/${_joinCode}/lobby`);
