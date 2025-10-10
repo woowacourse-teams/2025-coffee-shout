@@ -22,7 +22,7 @@ public class DashboardService {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardStatisticsRepository.findTopWinnersByMonth(startOfMonth, endOfMonth, 5);
+        return dashboardStatisticsRepository.findTopWinnersBetween(startOfMonth, endOfMonth, 5);
     }
 
     public LowestProbabilityWinnerResponse getLowestProbabilityWinner() {

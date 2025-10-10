@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface DashboardStatisticsRepository {
 
-    List<TopWinnerResponse> findTopWinnersByMonth(
+    List<TopWinnerResponse> findTopWinnersBetween(
             LocalDateTime startDate,
             LocalDateTime endDate,
             int limit

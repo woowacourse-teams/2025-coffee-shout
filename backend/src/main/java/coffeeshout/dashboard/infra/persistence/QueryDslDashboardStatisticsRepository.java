@@ -28,7 +28,7 @@ public class QueryDslDashboardStatisticsRepository implements DashboardStatistic
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<TopWinnerResponse> findTopWinnersByMonth(
+    public List<TopWinnerResponse> findTopWinnersBetween(
             LocalDateTime startDate,
             LocalDateTime endDate,
             int limit
