@@ -14,7 +14,7 @@ const RacingGameOverlay = ({ children }: Props) => {
   const tapCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleClick = () => {
+  const handlePointerDown = () => {
     tapCountRef.current += 1;
   };
 
@@ -34,7 +34,7 @@ const RacingGameOverlay = ({ children }: Props) => {
     };
   }, [joinCode, myName, send]);
 
-  return <S.Overlay onClick={handleClick}>{children}</S.Overlay>;
+  return <S.Overlay onPointerDown={handlePointerDown}>{children}</S.Overlay>;
 };
 
 export default RacingGameOverlay;
