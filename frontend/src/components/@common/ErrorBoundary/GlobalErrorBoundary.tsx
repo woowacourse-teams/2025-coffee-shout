@@ -54,8 +54,10 @@ class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   render(): ReactNode {
+    const { fallback = <GlobalErrorFallback error={this.state.error!} /> } = this.props;
+
     if (this.state.error) {
-      return this.props.fallback || <GlobalErrorFallback error={this.state.error} />;
+      return fallback;
     }
 
     return this.props.children;
