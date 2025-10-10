@@ -1,5 +1,6 @@
 package coffeeshout.room.ui;
 
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
@@ -16,16 +17,20 @@ import coffeeshout.room.ui.request.MiniGameSelectMessage;
 import coffeeshout.room.ui.request.ReadyChangeMessage;
 import coffeeshout.room.ui.request.RouletteSpinMessage;
 import coffeeshout.room.ui.response.PlayerResponse;
+import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import coffeeshout.room.ui.response.RoomStatusResponse;
 import coffeeshout.room.ui.response.WinnerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class RoomWebSocketController {
@@ -122,5 +127,22 @@ public class RoomWebSocketController {
         final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
         final RouletteSpinEvent event = new RouletteSpinEvent(joinCode, message.hostName(), winner);
         roomEventPublisher.publishEvent(event);
+    }
+
+    @SubscribeMapping("/room/{joinCode}/qr-code")
+    @MessageResponse(
+            path = "/room/{joinCode}/qr-code",
+            returnType = QrCodeStatusResponse.class
+    )
+    @Operation(
+            summary = "QR 코드 상태 조회",
+            description = """
+                    QR 코드 토픽 구독 시 현재 상태를 즉시 반환합니다.
+                    이후 변경사항은 QrCodeCompleteEventHandler가 브로드캐스트합니다.
+                    """
+    )
+    public WebSocketResponse<QrCodeStatusResponse> getCurrentQrCodeStatus(@DestinationVariable String joinCode) {
+        log.info("QR 코드 상태 구독 요청: joinCode={}", joinCode);
+        return roomService.getQrCodeStatus(joinCode);
     }
 }

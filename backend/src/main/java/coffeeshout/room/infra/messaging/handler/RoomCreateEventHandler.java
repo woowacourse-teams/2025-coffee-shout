@@ -1,8 +1,8 @@
 package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.lock.RedisLock;
-import coffeeshout.room.application.RoomService;
 import coffeeshout.room.application.DelayedRoomRemovalService;
+import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
@@ -35,7 +35,6 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
             leaseTime = 5000
     )
     public void handle(RoomCreateEvent event) {
-
         try {
             String joinCode = event.joinCode();
             log.info("방 생성 이벤트 수신: eventId={}, hostName={}, joinCode={}",
@@ -48,15 +47,13 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
                     new JoinCode(joinCode),
                     new PlayerName(event.hostName()),
                     menu,
-                    selectedMenuRequest.temperature(),
-                    event.qrCodeUrl()
+                    selectedMenuRequest.temperature()
             );
 
-            log.info("방 생성 이벤트 처리 완료: eventId={}, hostName={}, joinCode={}, qrCodeUrl={}",
+            log.info("방 생성 이벤트 처리 완료: eventId={}, hostName={}, joinCode={}",
                     event.eventId(),
                     room.getHost().getName(),
-                    room.getJoinCode().getValue(),
-                    room.getJoinCode().getQrCodeUrl()
+                    room.getJoinCode().getValue()
             );
 
             delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(joinCode));

@@ -1,6 +1,7 @@
 package coffeeshout.room.domain.service;
 
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.QrCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -38,8 +39,7 @@ public class RoomCommandService {
         return save(room);
     }
 
-    public Room saveIfAbsentRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature,
-                                 String qrCodeUrl) {
+    public Room saveIfAbsentRoom(JoinCode joinCode, PlayerName hostName, Menu menu, MenuTemperature menuTemperature) {
         if (roomRepository.existsByJoinCode(joinCode)) {
             log.warn("JoinCode[{}] 방 생성 실패 - 이미 존재하는 방", joinCode);
             return roomQueryService.getByJoinCode(joinCode);
@@ -48,8 +48,19 @@ public class RoomCommandService {
         log.info("JoinCode[{}] 방 생성 - 호스트 이름: {}, 메뉴 정보: {}, 온도 : {} ", joinCode, hostName, menu, menuTemperature);
 
         final Room room = Room.createNewRoom(joinCode, hostName, new SelectedMenu(menu, menuTemperature));
-        room.assignQrCodeUrl(qrCodeUrl);
 
         return save(room);
+    }
+
+    public void assignQrCode(JoinCode joinCode, String qrCodeUrl) {
+        Room room = roomQueryService.getByJoinCode(joinCode);
+        room.assignQrCode(QrCode.success(qrCodeUrl));
+        save(room);
+    }
+
+    public void assignQrCodeError(JoinCode joinCode) {
+        Room room = roomQueryService.getByJoinCode(joinCode);
+        room.assignQrCode(QrCode.error());
+        save(room);
     }
 }

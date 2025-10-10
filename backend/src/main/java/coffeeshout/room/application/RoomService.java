@@ -1,10 +1,13 @@
 package coffeeshout.room.application;
 
+import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
+import coffeeshout.room.domain.QrCode;
+import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -29,6 +32,7 @@ import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -64,23 +68,22 @@ public class RoomService {
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
 
-        // QR 코드 생성
-        final String qrCodeUrl = qrCodeService.getQrCodeUrl(joinCode.getValue());
-
-        // 방 생성
+        // 방 생성 (QR 코드는 PENDING 상태로 시작)
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
         final Room room = roomCommandService.saveIfAbsentRoom(joinCode, new PlayerName(hostName),
-                menu, selectedMenuRequest.temperature(), qrCodeUrl);
+                menu, selectedMenuRequest.temperature());
 
         // 방 생성 후 이벤트 전달
         final RoomCreateEvent event = new RoomCreateEvent(
                 hostName,
                 selectedMenuRequest,
-                joinCode.getValue(),
-                qrCodeUrl
+                joinCode.getValue()
         );
 
         roomEventPublisher.publishEvent(event);
+
+        // QR 코드 비동기 생성 시작
+        qrCodeService.generateQrCodeAsync(joinCode.getValue());
 
         // 해당 방 정보 수신
         return room;
@@ -276,5 +279,25 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.showRoulette();
         return room;
+    }
+
+    public WebSocketResponse<QrCodeStatusResponse> getQrCodeStatus(String joinCode) {
+        try {
+            final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+            final QrCode qrCode = room.getJoinCode().getQrCode();
+
+            if (qrCode.getStatus() == QrCodeStatus.ERROR) {
+                log.warn("QR 코드 에러 상태 반환: joinCode={}", joinCode);
+                return WebSocketResponse.error("QR 코드 생성에 실패했습니다.");
+            }
+
+            QrCodeStatusResponse response = new QrCodeStatusResponse(qrCode.getStatus(), qrCode.getUrl());
+            log.debug("QR 코드 상태 반환: joinCode={}, status={}", joinCode, qrCode.getStatus());
+            return WebSocketResponse.success(response);
+
+        } catch (Exception e) {
+            log.error("QR 코드 상태 조회 실패: joinCode={}, error={}", joinCode, e.getMessage(), e);
+            return WebSocketResponse.error("QR 코드 상태 조회에 실패했습니다.");
+        }
     }
 }

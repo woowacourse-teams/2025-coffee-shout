@@ -16,11 +16,12 @@ public final class JoinCode {
     private static final int CODE_LENGTH = 4;
 
     private final String value;
-    private String qrCodeUrl;
+    private QrCode qrCode;
 
     public JoinCode(String value) {
         validate(value);
         this.value = value;
+        this.qrCode = QrCode.pending();
     }
 
     public static JoinCode generate() {
@@ -32,11 +33,8 @@ public final class JoinCode {
                 .collect(Collectors.joining()));
     }
 
-    public void assignQrCodeUrl(@NonNull String qrCodeUrl) {
-        if (qrCodeUrl.isBlank()) {
-            throw new IllegalArgumentException("QR 코드 URL은 공백일 수 없습니다. qrCOdeUrl: " + qrCodeUrl);
-        }
-        this.qrCodeUrl = qrCodeUrl;
+    public void assignQrCode(@NonNull QrCode qrCode) {
+        this.qrCode = qrCode;
     }
 
     private void validate(String value) {
@@ -51,7 +49,7 @@ public final class JoinCode {
     private void validateLength(String value) {
         if (value.length() != CODE_LENGTH) {
             throw new InvalidArgumentException(RoomErrorCode.JOIN_CODE_ILLEGAL_LENGTH,
-                    "5자리 코드여야 합니다. 현재 길이: " + value.length());
+                    "4자리 코드여야 합니다. 현재 길이: " + value.length());
         }
     }
 

@@ -2,6 +2,7 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,16 +10,20 @@ import static org.mockito.Mockito.when;
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
+import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
+import coffeeshout.room.domain.event.QrCodeCompleteEvent;
 import coffeeshout.room.domain.service.QrCodeGenerator;
+import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class QrCodeServiceTest {
@@ -29,6 +34,12 @@ class QrCodeServiceTest {
     @Mock
     StorageService storageService;
 
+    @Mock
+    RoomEventPublisher roomEventPublisher;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     QrCodeService qrCodeService;
@@ -38,17 +49,23 @@ class QrCodeServiceTest {
     @BeforeEach
     void setUp() {
         QrProperties qrProperties = new QrProperties(qrCodePrefix, 10, 100, null, "");
-        qrCodeService = new QrCodeService(qrProperties, qrCodeGenerator, storageService, meterRegistry);
+        qrCodeService = new QrCodeService(
+                qrProperties,
+                qrCodeGenerator,
+                storageService,
+                meterRegistry,
+                roomEventPublisher,
+                eventPublisher
+        );
     }
 
     @Test
-    @DisplayName("QR 코드 URL 생성이 성공적으로 완료된다")
-    void getQrCodeUrl_Success() throws Exception {
+    void QR_코드_URL_생성이_성공적으로_완료된다() throws Exception {
         // given
-        String contents = "TEST123";
+        String contents = "TXXX";
         byte[] qrCodeImage = "mock qr code image".getBytes();
-        String storageKey = "qr-code/TEST123/uuid.png";
-        String expectedUrl = "https://storage.example.com/qr-code/TEST123/uuid.png";
+        String storageKey = "qr-code/TXXX/uuid.png";
+        String expectedUrl = "https://storage.example.com/qr-code/TXXX/uuid.png";
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
         when(storageService.upload(contents, qrCodeImage)).thenReturn(storageKey);
@@ -60,17 +77,15 @@ class QrCodeServiceTest {
         // then
         assertThat(result).isEqualTo(expectedUrl);
 
-        verify(qrCodeGenerator).generate("https://example.com/join/TEST123");
+        verify(qrCodeGenerator).generate("https://example.com/join/TXXX");
         verify(storageService).upload(contents, qrCodeImage);
         verify(storageService).getUrl(storageKey);
     }
 
     @Test
-    @DisplayName("QR 코드 생성 실패 시 QR_CODE_GENERATION_FAILED 에러를 던진다")
-    void getQrCodeUrl_ThrowsException_WhenQrGenerationFails() throws Exception {
+    void QR_코드_생성_실패_시_QR_CODE_GENERATION_FAILED_에러를_던진다() throws Exception {
         // given
-        String contents = "TEST123";
-
+        String contents = "TXXX";
         when(qrCodeGenerator.generate(anyString()))
                 .thenThrow(new RuntimeException("QR code generation failed"));
 
@@ -81,10 +96,9 @@ class QrCodeServiceTest {
     }
 
     @Test
-    @DisplayName("스토리지 업로드 실패 시 해당 예외를 그대로 전파한다 (503 에러)")
-    void getQrCodeUrl_PropagatesStorageUploadException() throws Exception {
+    void 스토리지_업로드_실패_시_해당_예외를_그대로_전파한다_503_에러() throws Exception {
         // given
-        String contents = "TEST123";
+        String contents = "TXXX";
         byte[] qrCodeImage = "mock qr code image".getBytes();
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
@@ -98,12 +112,11 @@ class QrCodeServiceTest {
     }
 
     @Test
-    @DisplayName("URL 생성 실패 시 해당 예외를 그대로 전파한다 (503 에러)")
-    void getQrCodeUrl_PropagatesUrlGenerationException() throws Exception {
+    void URL_생성_실패_시_해당_예외를_그대로_전파한다_503_에러() throws Exception {
         // given
-        String contents = "TEST123";
+        String contents = "TXXX";
         byte[] qrCodeImage = "mock qr code image".getBytes();
-        String storageKey = "qr-code/TEST123/uuid.png";
+        String storageKey = "qr-code/TXXX/uuid.png";
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
         when(storageService.upload(contents, qrCodeImage)).thenReturn(storageKey);
@@ -118,13 +131,12 @@ class QrCodeServiceTest {
     }
 
     @Test
-    @DisplayName("QR 코드 생성 시 올바른 URL을 사용한다")
-    void getQrCodeUrl_UsesCorrectUrl() throws Exception {
+    void QR_코드_생성_시_올바른_URL을_사용한다() throws Exception {
         // given
-        String contents = "ABC123";
+        String contents = "TXXX";
         byte[] qrCodeImage = "mock qr code image".getBytes();
-        String storageKey = "qr-code/ABC123/uuid.png";
-        String expectedUrl = "https://storage.example.com/qr-code/ABC123/uuid.png";
+        String storageKey = "qr-code/TXXX/uuid.png";
+        String expectedUrl = "https://storage.example.com/qr-code/TXXX/uuid.png";
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
         when(storageService.upload(contents, qrCodeImage)).thenReturn(storageKey);
@@ -134,14 +146,13 @@ class QrCodeServiceTest {
         qrCodeService.getQrCodeUrl(contents);
 
         // then
-        verify(qrCodeGenerator).generate("https://example.com/join/ABC123");
+        verify(qrCodeGenerator).generate("https://example.com/join/TXXX");
     }
 
     @Test
-    @DisplayName("일반 예외 발생 시 QR_CODE_GENERATION_FAILED 에러로 래핑한다")
-    void getQrCodeUrl_WrapsGenericException() throws Exception {
+    void 일반_예외_발생_시_QR_CODE_GENERATION_FAILED_에러로_래핑한다() throws Exception {
         // given
-        String contents = "TEST123";
+        String contents = "TXXX";
 
         when(qrCodeGenerator.generate(anyString())).thenThrow(new RuntimeException("Unexpected error"));
 
@@ -149,5 +160,102 @@ class QrCodeServiceTest {
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(QRCodeGenerationException.class)
                 .hasMessageContaining(RoomErrorCode.QR_CODE_GENERATION_FAILED.getMessage());
+    }
+
+    // ===== 비동기 QR 코드 생성 테스트 =====
+
+    @Test
+    void 비동기_QR_코드_생성이_성공하면_Redis_pub_sub으로_PENDING과_SUCCESS_이벤트를_발행한다() throws Exception {
+        // given
+        String joinCode = "TXMK";
+
+        byte[] qrCodeImage = "mock qr code image".getBytes();
+        String storageKey = "qr-code/TEST123/uuid.png";
+        String expectedUrl = "https://storage.example.com/qr-code/TEST123/uuid.png";
+
+        when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
+        when(storageService.upload(joinCode, qrCodeImage)).thenReturn(storageKey);
+        when(storageService.getUrl(storageKey)).thenReturn(expectedUrl);
+
+        // when
+        qrCodeService.generateQrCodeAsync(joinCode);
+
+        // then
+        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
+
+        ArgumentCaptor<QrCodeCompleteEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        verify(roomEventPublisher).publishEvent(successEventCaptor.capture());
+
+        // 1. 첫 번째 이벤트는 PENDING (eventPublisher를 통해 발행)
+        QrCodeCompleteEvent pendingEvent = pendingEventCaptor.getValue();
+        assertThat(pendingEvent.joinCode()).isEqualTo(joinCode);
+        assertThat(pendingEvent.status()).isEqualTo(QrCodeStatus.PENDING);
+        assertThat(pendingEvent.qrCodeUrl()).isNull();
+
+        // 2. 두 번째 이벤트는 SUCCESS (roomEventPublisher를 통해 발행)
+        QrCodeCompleteEvent successEvent = successEventCaptor.getValue();
+        assertThat(successEvent.joinCode()).isEqualTo(joinCode);
+        assertThat(successEvent.status()).isEqualTo(QrCodeStatus.SUCCESS);
+        assertThat(successEvent.qrCodeUrl()).isEqualTo(expectedUrl);
+    }
+
+    @Test
+    void 비동기_QR_코드_생성_실패_시_Redis_pub_sub으로_PENDING과_ERROR_이벤트를_발행한다() throws Exception {
+        // given
+        String joinCode = "TXMK";
+
+        when(qrCodeGenerator.generate(anyString())).thenThrow(new RuntimeException("QR generation failed"));
+
+        // when
+        qrCodeService.generateQrCodeAsync(joinCode);
+
+        // then
+        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
+
+        ArgumentCaptor<QrCodeCompleteEvent> errorEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        verify(roomEventPublisher).publishEvent(errorEventCaptor.capture());
+
+        // 1. 첫 번째 이벤트는 PENDING (eventPublisher를 통해 발행)
+        QrCodeCompleteEvent pendingEvent = pendingEventCaptor.getValue();
+        assertThat(pendingEvent.joinCode()).isEqualTo(joinCode);
+        assertThat(pendingEvent.status()).isEqualTo(QrCodeStatus.PENDING);
+        assertThat(pendingEvent.qrCodeUrl()).isNull();
+
+        // 2. 두 번째 이벤트는 ERROR (roomEventPublisher를 통해 발행)
+        QrCodeCompleteEvent errorEvent = errorEventCaptor.getValue();
+        assertThat(errorEvent.joinCode()).isEqualTo(joinCode);
+        assertThat(errorEvent.status()).isEqualTo(QrCodeStatus.ERROR);
+        assertThat(errorEvent.qrCodeUrl()).isNull();
+    }
+
+    @Test
+    void 비동기_QR_코드_생성_시_Pending_이벤트를_먼저_발행한다() throws Exception {
+        // given
+        String joinCode = "TXMK";
+        byte[] qrCodeImage = "mock qr code image".getBytes();
+        String storageKey = "qr-code/TEST123/uuid.png";
+        String expectedUrl = "https://storage.example.com/qr-code/TEST123/uuid.png";
+
+        when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
+        when(storageService.upload(joinCode, qrCodeImage)).thenReturn(storageKey);
+        when(storageService.getUrl(storageKey)).thenReturn(expectedUrl);
+
+        // when
+        qrCodeService.generateQrCodeAsync(joinCode);
+
+        // then
+        // PENDING 이벤트가 먼저 발행되는지 확인 (eventPublisher를 통해 발행)
+        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
+
+        // 첫 번째 이벤트가 PENDING 상태인지 확인
+        QrCodeCompleteEvent firstEvent = pendingEventCaptor.getValue();
+        assertThat(firstEvent.status()).isEqualTo(QrCodeStatus.PENDING);
+        assertThat(firstEvent.joinCode()).isEqualTo(joinCode);
+
+        // roomEventPublisher는 SUCCESS/ERROR 이벤트를 발행하므로, 최소 1번 호출되는지 확인
+        verify(roomEventPublisher, org.mockito.Mockito.atLeastOnce()).publishEvent(any(QrCodeCompleteEvent.class));
     }
 }

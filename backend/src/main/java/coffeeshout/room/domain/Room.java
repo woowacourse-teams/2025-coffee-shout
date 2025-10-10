@@ -183,8 +183,8 @@ public class Room {
         return roomState == RoomState.READY;
     }
 
-    public void assignQrCodeUrl(String qrCodeUrl) {
-        joinCode.assignQrCodeUrl(qrCodeUrl);
+    public void assignQrCode(QrCode qrCode) {
+        joinCode.assignQrCode(qrCode);
     }
 
     public void showRoulette() {

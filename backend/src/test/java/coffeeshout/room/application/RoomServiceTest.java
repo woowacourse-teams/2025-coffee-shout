@@ -1,7 +1,9 @@
 package coffeeshout.room.application;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
@@ -14,6 +16,7 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -22,6 +25,7 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.domain.service.JoinCodeGenerator;
+import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.util.List;
@@ -45,6 +49,9 @@ class RoomServiceTest extends ServiceTest {
 
     @Autowired
     JoinCodeGenerator joinCodeGenerator;
+
+    @Autowired
+    RoomQueryService roomQueryService;
 
     @Test
     void 방을_생성한다() {
@@ -497,5 +504,99 @@ class RoomServiceTest extends ServiceTest {
 
         // then
         assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
+    }
+
+    @Test
+    void 방_생성_시_QR_코드가_비동기로_생성된다() {
+        // given
+        String hostName = "호스트";
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+
+        // when
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        // then
+        // 초기에는 PENDING 상태
+        assertThat(createdRoom.getJoinCode().getQrCode().getStatus()).isEqualTo(QrCodeStatus.PENDING);
+
+        // 비동기 작업이 완료될 때까지 대기 (최대 10초)
+        await().atMost(10, SECONDS)
+                .pollInterval(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+                .untilAsserted(() -> {
+                    Room room = roomQueryService.getByJoinCode(joinCode);
+                    QrCodeStatus status = room.getJoinCode().getQrCode().getStatus();
+
+                    // SUCCESS 또는 ERROR 상태로 변경되었는지 확인
+                    assertThat(status).isIn(QrCodeStatus.SUCCESS, QrCodeStatus.ERROR);
+                });
+    }
+
+    @Test
+    void QR코드_상태를_정상적으로_조회한다() {
+        // given
+        String hostName = "호스트";
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        String qrUrl = "https://example.com/qr.png";
+
+        await().atMost(10, SECONDS)
+            .untilAsserted(() -> {
+                Room room = roomQueryService.getByJoinCode(joinCode);
+                ReflectionTestUtils.setField(room.getJoinCode(), "qrCode", coffeeshout.room.domain.QrCode.success(qrUrl));
+            });
+
+        // when
+        var response = roomService.getQrCodeStatus(joinCode.getValue());
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.success()).isTrue();
+            softly.assertThat(response.errorMessage()).isNull();
+            softly.assertThat(response.data().status()).isEqualTo(QrCodeStatus.SUCCESS);
+            softly.assertThat(response.data().url()).isEqualTo(qrUrl);
+        });
+    }
+
+    @Test
+    void QR코드_생성_실패_시_에러_상태를_반환한다() {
+        // given
+        String hostName = "호스트";
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        await().atMost(10, SECONDS)
+            .untilAsserted(() -> {
+                Room room = roomQueryService.getByJoinCode(joinCode);
+                ReflectionTestUtils.setField(room.getJoinCode(), "qrCode", coffeeshout.room.domain.QrCode.error());
+            });
+
+        // when
+        var response = roomService.getQrCodeStatus(joinCode.getValue());
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.success()).isFalse();
+            softly.assertThat(response.data()).isNull();
+            softly.assertThat(response.errorMessage()).isEqualTo("QR 코드 생성에 실패했습니다.");
+        });
+    }
+
+    @Test
+    void QR코드_상태_조회_실패_시_에러를_반환한다() {
+        // given
+        String invalidJoinCode = "INVALID_CODE";
+
+        // when
+        var response = roomService.getQrCodeStatus(invalidJoinCode);
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.success()).isFalse();
+            softly.assertThat(response.data()).isNull();
+            softly.assertThat(response.errorMessage()).isEqualTo("QR 코드 상태 조회에 실패했습니다.");
+        });
     }
 }
