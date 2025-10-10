@@ -4,7 +4,7 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.QrCodeStatus;
-import coffeeshout.room.domain.event.QrCodeCompleteEvent;
+import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
@@ -18,15 +18,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeCompleteEvent> {
+public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeStatusEvent> {
 
-    public static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
+    private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
 
     private final RoomCommandService roomCommandService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(QrCodeCompleteEvent event) {
+    public void handle(QrCodeStatusEvent event) {
         try {
             log.info("QR 코드 완료 이벤트 수신: eventId={}, joinCode={}, status={}",
                     event.eventId(), event.joinCode(), event.status());
@@ -34,7 +34,7 @@ public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeComple
             switch (event.status()) {
                 case SUCCESS -> handleQrCodeSuccess(event);
                 case ERROR -> handleQrCodeError(event);
-                default -> log.error("처리할 수 없는 QR 코드 상태: eventId={}, joinCode={}, status={}",
+                default -> log.warn("처리할 수 없는 QR 코드 상태: eventId={}, joinCode={}, status={}",
                         event.eventId(), event.joinCode(), event.status());
             }
 
@@ -44,7 +44,7 @@ public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeComple
         }
     }
 
-    private void handleQrCodeError(QrCodeCompleteEvent event) {
+    private void handleQrCodeError(QrCodeStatusEvent event) {
         log.info("QR 코드 완료 이벤트 처리 완료 (ERROR): eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
 
@@ -58,7 +58,7 @@ public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeComple
         log.debug("QR 코드 Error 이벤트 전송 완료: destination={}", destination);
     }
 
-    private void handleQrCodeSuccess(QrCodeCompleteEvent event) {
+    private void handleQrCodeSuccess(QrCodeStatusEvent event) {
         log.info("QR 코드 완료 이벤트 처리 완료 (SUCCESS): eventId={}, joinCode={}, url={}",
                 event.eventId(), event.joinCode(), event.qrCodeUrl());
 

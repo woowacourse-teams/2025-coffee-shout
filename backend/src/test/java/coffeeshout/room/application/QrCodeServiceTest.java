@@ -12,7 +12,7 @@ import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
-import coffeeshout.room.domain.event.QrCodeCompleteEvent;
+import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -21,7 +21,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -181,20 +183,20 @@ class QrCodeServiceTest {
         qrCodeService.generateQrCodeAsync(joinCode);
 
         // then
-        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        ArgumentCaptor<QrCodeStatusEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
         verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
 
-        ArgumentCaptor<QrCodeCompleteEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        ArgumentCaptor<QrCodeStatusEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
         verify(roomEventPublisher).publishEvent(successEventCaptor.capture());
 
         // 1. 첫 번째 이벤트는 PENDING (eventPublisher를 통해 발행)
-        QrCodeCompleteEvent pendingEvent = pendingEventCaptor.getValue();
+        QrCodeStatusEvent pendingEvent = pendingEventCaptor.getValue();
         assertThat(pendingEvent.joinCode()).isEqualTo(joinCode);
         assertThat(pendingEvent.status()).isEqualTo(QrCodeStatus.PENDING);
         assertThat(pendingEvent.qrCodeUrl()).isNull();
 
         // 2. 두 번째 이벤트는 SUCCESS (roomEventPublisher를 통해 발행)
-        QrCodeCompleteEvent successEvent = successEventCaptor.getValue();
+        QrCodeStatusEvent successEvent = successEventCaptor.getValue();
         assertThat(successEvent.joinCode()).isEqualTo(joinCode);
         assertThat(successEvent.status()).isEqualTo(QrCodeStatus.SUCCESS);
         assertThat(successEvent.qrCodeUrl()).isEqualTo(expectedUrl);
@@ -211,20 +213,20 @@ class QrCodeServiceTest {
         qrCodeService.generateQrCodeAsync(joinCode);
 
         // then
-        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        ArgumentCaptor<QrCodeStatusEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
         verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
 
-        ArgumentCaptor<QrCodeCompleteEvent> errorEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
+        ArgumentCaptor<QrCodeStatusEvent> errorEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
         verify(roomEventPublisher).publishEvent(errorEventCaptor.capture());
 
         // 1. 첫 번째 이벤트는 PENDING (eventPublisher를 통해 발행)
-        QrCodeCompleteEvent pendingEvent = pendingEventCaptor.getValue();
+        QrCodeStatusEvent pendingEvent = pendingEventCaptor.getValue();
         assertThat(pendingEvent.joinCode()).isEqualTo(joinCode);
         assertThat(pendingEvent.status()).isEqualTo(QrCodeStatus.PENDING);
         assertThat(pendingEvent.qrCodeUrl()).isNull();
 
         // 2. 두 번째 이벤트는 ERROR (roomEventPublisher를 통해 발행)
-        QrCodeCompleteEvent errorEvent = errorEventCaptor.getValue();
+        QrCodeStatusEvent errorEvent = errorEventCaptor.getValue();
         assertThat(errorEvent.joinCode()).isEqualTo(joinCode);
         assertThat(errorEvent.status()).isEqualTo(QrCodeStatus.ERROR);
         assertThat(errorEvent.qrCodeUrl()).isNull();
@@ -247,15 +249,9 @@ class QrCodeServiceTest {
 
         // then
         // PENDING 이벤트가 먼저 발행되는지 확인 (eventPublisher를 통해 발행)
-        ArgumentCaptor<QrCodeCompleteEvent> pendingEventCaptor = ArgumentCaptor.forClass(QrCodeCompleteEvent.class);
-        verify(eventPublisher).publishEvent(pendingEventCaptor.capture());
+        InOrder inOrder = Mockito.inOrder(eventPublisher, roomEventPublisher);
+        inOrder.verify(eventPublisher).publishEvent(any(QrCodeStatusEvent.class));
+        inOrder.verify(roomEventPublisher).publishEvent(any(QrCodeStatusEvent.class));
 
-        // 첫 번째 이벤트가 PENDING 상태인지 확인
-        QrCodeCompleteEvent firstEvent = pendingEventCaptor.getValue();
-        assertThat(firstEvent.status()).isEqualTo(QrCodeStatus.PENDING);
-        assertThat(firstEvent.joinCode()).isEqualTo(joinCode);
-
-        // roomEventPublisher는 SUCCESS/ERROR 이벤트를 발행하므로, 최소 1번 호출되는지 확인
-        verify(roomEventPublisher, org.mockito.Mockito.atLeastOnce()).publishEvent(any(QrCodeCompleteEvent.class));
     }
 }

@@ -1,11 +1,10 @@
 package coffeeshout.room.infra.messaging;
 
 import static coffeeshout.room.domain.QrCodeStatus.PENDING;
-import static coffeeshout.room.infra.messaging.handler.QrCodeCompleteEventHandler.QR_CODE_TOPIC_TEMPLATE;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
-import coffeeshout.room.domain.event.QrCodeCompleteEvent;
+import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +16,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class QrCodeEventListener {
 
+    private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
+
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @EventListener
-    private void handleQrCodePending(QrCodeCompleteEvent event) {
+    private void handleQrCodePending(QrCodeStatusEvent event) {
         if (event.status() != PENDING) {
             return;
         }
-        log.info("PENDING 상태의 QR 코드 완료 이벤트는 처리하지 않습니다: eventId={}, joinCode={}",
+
+        log.info("PENDING 상태 이벤트 처리 eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
 
         QrCodeStatusResponse response = new QrCodeStatusResponse(PENDING, null);

@@ -143,6 +143,6 @@ public class RoomWebSocketController {
     )
     public WebSocketResponse<QrCodeStatusResponse> getCurrentQrCodeStatus(@DestinationVariable String joinCode) {
         log.info("QR 코드 상태 구독 요청: joinCode={}", joinCode);
-        return roomService.getQrCodeStatus(joinCode);
+        return WebSocketResponse.success(roomService.getQrCodeStatus(joinCode));
     }
 }

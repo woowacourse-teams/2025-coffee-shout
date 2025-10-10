@@ -1,13 +1,11 @@
 package coffeeshout.room.application;
 
-import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.QrCode;
-import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
@@ -282,24 +280,14 @@ public class RoomService {
         return room;
     }
 
-    public WebSocketResponse<QrCodeStatusResponse> getQrCodeStatus(String joinCode) {
-        try {
-            final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-            final QrCode qrCode = room.getJoinCode().getQrCode();
+    public QrCodeStatusResponse getQrCodeStatus(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final QrCode qrCode = room.getJoinCode().getQrCode();
 
-            if (qrCode.getStatus() == QrCodeStatus.ERROR) {
-                log.warn("QR 코드 에러 상태 반환: joinCode={}", joinCode);
-                return WebSocketResponse.error("QR 코드 생성에 실패했습니다.");
-            }
+        QrCodeStatusResponse response = new QrCodeStatusResponse(qrCode.getStatus(), qrCode.getUrl());
 
-            QrCodeStatusResponse response = new QrCodeStatusResponse(qrCode.getStatus(), qrCode.getUrl());
-            log.debug("QR 코드 상태 반환: joinCode={}, status={}", joinCode, qrCode.getStatus());
-            return WebSocketResponse.success(response);
-
-        } catch (Exception e) {
-            log.error("QR 코드 상태 조회 실패: joinCode={}, error={}", joinCode, e.getMessage(), e);
-            return WebSocketResponse.error("QR 코드 상태 조회에 실패했습니다.");
-        }
+        log.debug("QR 코드 상태 반환: joinCode={}, status={}", joinCode, qrCode.getStatus());
+        return response;
     }
 
     public boolean kickPlayer(String joinCode, String playerName) {

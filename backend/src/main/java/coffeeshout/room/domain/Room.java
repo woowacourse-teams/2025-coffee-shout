@@ -188,6 +188,11 @@ public class Room {
     }
 
     public void assignQrCode(QrCode qrCode) {
+        if (qrCode == null) {
+            throw new InvalidArgumentException(RoomErrorCode.QR_CODE_GENERATION_FAILED,
+                    "QR 코드는 null일 수 없습니다.");
+        }
+
         joinCode.assignQrCode(qrCode);
     }
 

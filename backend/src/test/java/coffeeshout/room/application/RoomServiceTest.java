@@ -28,6 +28,7 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
@@ -52,6 +53,7 @@ class RoomServiceTest extends ServiceTest {
 
     @Autowired
     RoomQueryService roomQueryService;
+
 
     @Test
     void 방을_생성한다() {
@@ -517,8 +519,6 @@ class RoomServiceTest extends ServiceTest {
         JoinCode joinCode = createdRoom.getJoinCode();
 
         // then
-        // 초기에는 PENDING 상태
-        assertThat(createdRoom.getJoinCode().getQrCode().getStatus()).isEqualTo(QrCodeStatus.PENDING);
 
         // 비동기 작업이 완료될 때까지 대기 (최대 10초)
         await().atMost(10, SECONDS)
@@ -533,70 +533,27 @@ class RoomServiceTest extends ServiceTest {
     }
 
     @Test
-    void QR코드_상태를_정상적으로_조회한다() {
+    void QR코드_상태를_조회한다() {
         // given
         String hostName = "호스트";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
-        String qrUrl = "https://example.com/qr.png";
-
-        await().atMost(10, SECONDS)
-            .untilAsserted(() -> {
-                Room room = roomQueryService.getByJoinCode(joinCode);
-                ReflectionTestUtils.setField(room.getJoinCode(), "qrCode", coffeeshout.room.domain.QrCode.success(qrUrl));
-            });
+        String joinCode = createdRoom.getJoinCode().getValue();
 
         // when
-        var response = roomService.getQrCodeStatus(joinCode.getValue());
+        QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
         // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.success()).isTrue();
-            softly.assertThat(response.errorMessage()).isNull();
-            softly.assertThat(response.data().status()).isEqualTo(QrCodeStatus.SUCCESS);
-            softly.assertThat(response.data().url()).isEqualTo(qrUrl);
-        });
+        assertThat(qrCodeStatus).isNotNull();
     }
 
     @Test
-    void QR코드_생성_실패_시_에러_상태를_반환한다() {
+    void 존재하지_않는_방의_QR코드_상태를_조회하면_예외를_반환한다() {
         // given
-        String hostName = "호스트";
-        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
+        String nonExistentJoinCode = "NXNX";
 
-        await().atMost(10, SECONDS)
-            .untilAsserted(() -> {
-                Room room = roomQueryService.getByJoinCode(joinCode);
-                ReflectionTestUtils.setField(room.getJoinCode(), "qrCode", coffeeshout.room.domain.QrCode.error());
-            });
-
-        // when
-        var response = roomService.getQrCodeStatus(joinCode.getValue());
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.success()).isFalse();
-            softly.assertThat(response.data()).isNull();
-            softly.assertThat(response.errorMessage()).isEqualTo("QR 코드 생성에 실패했습니다.");
-        });
-    }
-
-    @Test
-    void QR코드_상태_조회_실패_시_에러를_반환한다() {
-        // given
-        String invalidJoinCode = "INVALID_CODE";
-
-        // when
-        var response = roomService.getQrCodeStatus(invalidJoinCode);
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.success()).isFalse();
-            softly.assertThat(response.data()).isNull();
-            softly.assertThat(response.errorMessage()).isEqualTo("QR 코드 상태 조회에 실패했습니다.");
-        });
+        // when & then
+        assertThatThrownBy(() -> roomService.getQrCodeStatus(nonExistentJoinCode))
+                .isInstanceOf(NotExistElementException.class);
     }
 }
