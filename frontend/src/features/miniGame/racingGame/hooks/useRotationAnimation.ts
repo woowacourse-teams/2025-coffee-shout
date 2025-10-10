@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 const ROTATION_SPEED_MULTIPLIER = 22;
-const SPEED_SMOOTHING_FACTOR = 0.02;
+const SPEED_SMOOTHING_FACTOR = 0.08;
 
 type Props = {
   speed: number;

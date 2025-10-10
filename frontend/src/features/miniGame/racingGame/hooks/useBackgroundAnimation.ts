@@ -1,7 +1,7 @@
 import { useEffect, useRef, RefObject } from 'react';
 
 const BACKGROUND_SPEED_MULTIPLIER = 10;
-const SPEED_SMOOTHING_FACTOR = 0.02;
+const SPEED_SMOOTHING_FACTOR = 0.08;
 
 type Props = {
   containerRef: RefObject<HTMLDivElement | null>;

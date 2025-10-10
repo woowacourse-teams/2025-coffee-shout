@@ -1,4 +1,4 @@
-import { ReactNode, MouseEvent, TouchEvent, useRef, useEffect } from 'react';
+import { ReactNode, useRef, useEffect } from 'react';
 import * as S from './RacingGameOverlay.styled';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
