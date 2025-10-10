@@ -23,14 +23,12 @@ const Button = ({
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
 
-  // 애니메이션 상태 관리
   const {
     touchState,
     handleTouchDown: handleTouchDownAnimation,
     handleTouchUp: handleTouchUpAnimation,
   } = useTouchInteraction();
 
-  // 스크롤 감지 + 클릭 처리
   const {
     handlePointerDown: handlePointerDownCancel,
     handlePointerMove: handlePointerMoveCancel,
@@ -40,8 +38,8 @@ const Button = ({
   });
 
   const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
-    handleTouchDownAnimation(e);
     if (e.pointerType === 'touch') {
+      handleTouchDownAnimation(e);
       handlePointerDownCancel(e);
     }
   };
@@ -55,8 +53,8 @@ const Button = ({
   const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     if (isDisabled) return;
 
-    handleTouchUpAnimation(e);
     if (e.pointerType === 'touch') {
+      handleTouchUpAnimation(e);
       handlePointerUpCancel(e);
     } else {
       onClick?.();
