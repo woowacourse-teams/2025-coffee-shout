@@ -54,30 +54,38 @@ public class QueryDslDashboardStatisticsRepository implements DashboardStatistic
             LocalDateTime endDate,
             int limit
     ) {
-        // 1. 최소 확률 찾기
-        final Integer minProbability = queryFactory
-                .select(ROULETTE_RESULT.winnerProbability.min())
-                .from(ROULETTE_RESULT)
-                .where(ROULETTE_RESULT.createdAt.between(startDate, endDate))
-                .fetchOne();
-
-        if (minProbability == null) {
-            return Optional.empty();
-        }
-
-        // 2. 최소 확률로 당첨된 닉네임들 조회
-        final List<String> nicknames = queryFactory
-                .select(PLAYER.playerName)
+        // 서브쿼리로 최소 확률 찾기
+        final QRouletteResultEntity subRouletteResult = new QRouletteResultEntity("subRouletteResult");
+        
+        final List<com.querydsl.core.Tuple> results = queryFactory
+                .select(
+                        ROULETTE_RESULT.winnerProbability,
+                        PLAYER.playerName
+                )
                 .from(ROULETTE_RESULT)
                 .join(ROULETTE_RESULT.winner, PLAYER)
                 .where(
                         ROULETTE_RESULT.createdAt.between(startDate, endDate),
-                        ROULETTE_RESULT.winnerProbability.eq(minProbability)
+                        ROULETTE_RESULT.winnerProbability.eq(
+                                queryFactory
+                                        .select(subRouletteResult.winnerProbability.min())
+                                        .from(subRouletteResult)
+                                        .where(subRouletteResult.createdAt.between(startDate, endDate))
+                        )
                 )
                 .distinct()
                 .orderBy(PLAYER.playerName.asc())
                 .limit(limit)
                 .fetch();
+
+        if (results.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final Integer minProbability = results.get(0).get(ROULETTE_RESULT.winnerProbability);
+        final List<String> nicknames = results.stream()
+                .map(tuple -> tuple.get(PLAYER.playerName))
+                .toList();
 
         return Optional.of(new LowestProbabilityWinnerResponse(minProbability, nicknames));
     }
