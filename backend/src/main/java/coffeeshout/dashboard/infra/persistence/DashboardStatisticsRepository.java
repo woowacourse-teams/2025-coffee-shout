@@ -19,6 +19,11 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class DashboardStatisticsRepository {
 
+    private static final QRouletteResultEntity ROULETTE_RESULT = QRouletteResultEntity.rouletteResultEntity;
+    private static final QPlayerEntity PLAYER = QPlayerEntity.playerEntity;
+    private static final QMiniGameEntity MINI_GAME = QMiniGameEntity.miniGameEntity;
+    private static final QRoomEntity ROOM = QRoomEntity.roomEntity;
+
     private final JPAQueryFactory queryFactory;
 
     public List<TopWinnerResponse> findTopWinnersByMonth(
@@ -26,20 +31,17 @@ public class DashboardStatisticsRepository {
             LocalDateTime endDate,
             int limit
     ) {
-        final QRouletteResultEntity r = QRouletteResultEntity.rouletteResultEntity;
-        final QPlayerEntity p = QPlayerEntity.playerEntity;
-
         return queryFactory
                 .select(Projections.constructor(
                         TopWinnerResponse.class,
-                        p.playerName,
-                        r.count()
+                        PLAYER.playerName,
+                        ROULETTE_RESULT.count()
                 ))
-                .from(r)
-                .join(r.winner, p)
-                .where(r.createdAt.between(startDate, endDate))
-                .groupBy(p.playerName)
-                .orderBy(r.count().desc())
+                .from(ROULETTE_RESULT)
+                .join(ROULETTE_RESULT.winner, PLAYER)
+                .where(ROULETTE_RESULT.createdAt.between(startDate, endDate))
+                .groupBy(PLAYER.playerName)
+                .orderBy(ROULETTE_RESULT.count().desc())
                 .limit(limit)
                 .fetch();
     }
@@ -49,14 +51,11 @@ public class DashboardStatisticsRepository {
             LocalDateTime endDate,
             int limit
     ) {
-        final QRouletteResultEntity r = QRouletteResultEntity.rouletteResultEntity;
-        final QPlayerEntity p = QPlayerEntity.playerEntity;
-
         // 1. 최소 확률 찾기
         final Integer minProbability = queryFactory
-                .select(r.winnerProbability.min())
-                .from(r)
-                .where(r.createdAt.between(startDate, endDate))
+                .select(ROULETTE_RESULT.winnerProbability.min())
+                .from(ROULETTE_RESULT)
+                .where(ROULETTE_RESULT.createdAt.between(startDate, endDate))
                 .fetchOne();
 
         if (minProbability == null) {
@@ -65,15 +64,15 @@ public class DashboardStatisticsRepository {
 
         // 2. 최소 확률로 당첨된 닉네임들 조회
         final List<String> nicknames = queryFactory
-                .select(p.playerName)
-                .from(r)
-                .join(r.winner, p)
+                .select(PLAYER.playerName)
+                .from(ROULETTE_RESULT)
+                .join(ROULETTE_RESULT.winner, PLAYER)
                 .where(
-                        r.createdAt.between(startDate, endDate),
-                        r.winnerProbability.eq(minProbability)
+                        ROULETTE_RESULT.createdAt.between(startDate, endDate),
+                        ROULETTE_RESULT.winnerProbability.eq(minProbability)
                 )
                 .distinct()
-                .orderBy(p.playerName.asc())
+                .orderBy(PLAYER.playerName.asc())
                 .limit(limit)
                 .fetch();
 
@@ -81,20 +80,17 @@ public class DashboardStatisticsRepository {
     }
 
     public List<GamePlayCountResponse> findGamePlayCountByMonth(LocalDateTime startDate, LocalDateTime endDate) {
-        final QMiniGameEntity m = QMiniGameEntity.miniGameEntity;
-        final QRoomEntity room = QRoomEntity.roomEntity;
-
         return queryFactory
                 .select(Projections.constructor(
                         GamePlayCountResponse.class,
-                        m.miniGameType,
-                        m.count()
+                        MINI_GAME.miniGameType,
+                        MINI_GAME.count()
                 ))
-                .from(m)
-                .join(m.roomSession, room)
-                .where(room.createdAt.between(startDate, endDate))
-                .groupBy(m.miniGameType)
-                .orderBy(m.count().desc())
+                .from(MINI_GAME)
+                .join(MINI_GAME.roomSession, ROOM)
+                .where(ROOM.createdAt.between(startDate, endDate))
+                .groupBy(MINI_GAME.miniGameType)
+                .orderBy(MINI_GAME.count().desc())
                 .fetch();
     }
 }
