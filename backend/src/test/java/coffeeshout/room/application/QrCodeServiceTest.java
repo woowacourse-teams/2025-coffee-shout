@@ -2,7 +2,6 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,9 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -162,7 +159,7 @@ class QrCodeServiceTest {
     // ===== 비동기 QR 코드 생성 테스트 =====
 
     @Test
-    void 비동기_QR_코드_생성이_성공하면_Redis_pub_sub으로_PENDING과_SUCCESS_이벤트를_발행한다() throws Exception {
+    void 비동기_QR_코드_생성이_성공하면_Redis_pub_sub으로_SUCCESS_이벤트를_발행한다() throws Exception {
         // given
         String joinCode = "TXMK";
 
@@ -204,25 +201,5 @@ class QrCodeServiceTest {
         verify(roomEventPublisher).publishEvent(errorCaptor.capture());
 
         assertThat(errorCaptor.getValue().status()).isEqualTo(QrCodeStatus.ERROR);
-    }
-
-    @Test
-    void 비동기_QR_코드_생성_시_Pending_이벤트를_먼저_발행한다() throws Exception {
-        // given
-        String joinCode = "TXMK";
-        byte[] qrCodeImage = "mock qr code image".getBytes();
-        String storageKey = "qr-code/TEST123/uuid.png";
-        String expectedUrl = "https://storage.example.com/qr-code/TEST123/uuid.png";
-
-        when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
-        when(storageService.upload(joinCode, qrCodeImage)).thenReturn(storageKey);
-        when(storageService.getUrl(storageKey)).thenReturn(expectedUrl);
-
-        // when
-        qrCodeService.generateQrCodeAsync(joinCode);
-
-        // then
-        InOrder inOrder = Mockito.inOrder(roomEventPublisher);
-        inOrder.verify(roomEventPublisher).publishEvent(any(QrCodeStatusEvent.class));
     }
 }

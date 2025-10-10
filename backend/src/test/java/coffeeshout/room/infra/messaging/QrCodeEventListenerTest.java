@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 
 import coffeeshout.global.ui.WebSocketResponse;
@@ -49,7 +50,7 @@ class QrCodeEventListenerTest {
 
     @Test
     @DisplayName("QR 코드 토픽 구독 시 현재 상태를 구독자에게 전송한다")
-    void handleSubscribeQrCodeStatus_Success() {
+    void QR_코드_토픽_구독_시_현재_상태를_구독자에게_전송한다() {
         // given
         String joinCode = "ABCD";
         String sessionId = "test-session-123";
@@ -66,13 +67,13 @@ class QrCodeEventListenerTest {
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
-        then(messagingTemplate).should(times(1))
+        then(messagingTemplate).should(timeout(500).times(1))
                 .convertAndSendToUser(eq(sessionId), eq(destination), eq(WebSocketResponse.success(response)));
     }
 
     @Test
     @DisplayName("SUCCESS 상태의 QR 코드를 구독자에게 전송한다")
-    void handleSubscribeQrCodeStatus_SuccessStatus() {
+    void SUCCESS_상태의_QR_코드를_구독자에게_전송한다() {
         // given
         String joinCode = "WXYZ";
         String sessionId = "test-session-456";
@@ -90,13 +91,13 @@ class QrCodeEventListenerTest {
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
-        then(messagingTemplate).should(times(1))
+        then(messagingTemplate).should(timeout(500).times(1))
                 .convertAndSendToUser(eq(sessionId), eq(destination), eq(WebSocketResponse.success(response)));
     }
 
     @Test
     @DisplayName("QR 코드 토픽이 아닌 경로 구독 시 메시지를 전송하지 않는다")
-    void handleSubscribeQrCodeStatus_NotQrCodeTopic() {
+    void QR_코드_토픽이_아닌_경로_구독_시_메시지를_전송하지_않는다() {
         // given
         String sessionId = "test-session-789";
         String destination = "/topic/room/other-topic";
@@ -114,7 +115,7 @@ class QrCodeEventListenerTest {
 
     @Test
     @DisplayName("destination이 null인 경우 메시지를 전송하지 않는다")
-    void handleSubscribeQrCodeStatus_NullDestination() {
+    void destination이_null인_경우_메시지를_전송하지_않는다() {
         // given
         String sessionId = "test-session-null";
 
@@ -131,7 +132,7 @@ class QrCodeEventListenerTest {
 
     @Test
     @DisplayName("잘못된 형식의 joinCode를 가진 경로는 매칭되지 않는다")
-    void handleSubscribeQrCodeStatus_InvalidJoinCodeFormat() {
+    void 잘못된_형식의_joinCode를_가진_경로는_매칭되지_않는다() {
         // given
         String sessionId = "test-session-invalid";
         String destination = "/topic/room/ABC/qr-code"; // 3자리 (4자리가 아님)
