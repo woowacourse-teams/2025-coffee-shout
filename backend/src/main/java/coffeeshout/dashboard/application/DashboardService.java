@@ -22,14 +22,14 @@ public class DashboardService {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardStatisticsRepository.findTop5WinnersByMonth(startOfMonth, endOfMonth);
+        return dashboardStatisticsRepository.findTopWinnersByMonth(startOfMonth, endOfMonth, 5);
     }
 
     public LowestProbabilityWinnerResponse getLowestProbabilityWinner() {
         final LocalDateTime startOfMonth = getStartOfMonth();
         final LocalDateTime endOfMonth = getEndOfMonth();
 
-        return dashboardStatisticsRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth)
+        return dashboardStatisticsRepository.findLowestProbabilityWinner(startOfMonth, endOfMonth, 5)
                 .orElseThrow(() -> new IllegalStateException("이번달 당첨 기록이 없습니다"));
     }
 

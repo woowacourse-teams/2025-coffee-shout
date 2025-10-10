@@ -21,7 +21,11 @@ public class DashboardStatisticsRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<TopWinnerResponse> findTop5WinnersByMonth(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<TopWinnerResponse> findTopWinnersByMonth(
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            int limit
+    ) {
         final QRouletteResultEntity r = QRouletteResultEntity.rouletteResultEntity;
         final QPlayerEntity p = QPlayerEntity.playerEntity;
 
@@ -36,13 +40,14 @@ public class DashboardStatisticsRepository {
                 .where(r.createdAt.between(startDate, endDate))
                 .groupBy(p.playerName)
                 .orderBy(r.count().desc())
-                .limit(5)
+                .limit(limit)
                 .fetch();
     }
 
     public Optional<LowestProbabilityWinnerResponse> findLowestProbabilityWinner(
             LocalDateTime startDate,
-            LocalDateTime endDate
+            LocalDateTime endDate,
+            int limit
     ) {
         final QRouletteResultEntity r = QRouletteResultEntity.rouletteResultEntity;
         final QPlayerEntity p = QPlayerEntity.playerEntity;
@@ -58,7 +63,7 @@ public class DashboardStatisticsRepository {
             return Optional.empty();
         }
 
-        // 2. 최소 확률로 당첨된 닉네임들 조회 (5명 제한)
+        // 2. 최소 확률로 당첨된 닉네임들 조회
         final List<String> nicknames = queryFactory
                 .select(p.playerName)
                 .from(r)
@@ -69,7 +74,7 @@ public class DashboardStatisticsRepository {
                 )
                 .distinct()
                 .orderBy(p.playerName.asc())
-                .limit(5)
+                .limit(limit)
                 .fetch();
 
         return Optional.of(new LowestProbabilityWinnerResponse(minProbability, nicknames));
