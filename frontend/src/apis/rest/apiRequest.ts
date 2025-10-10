@@ -75,13 +75,13 @@ export const apiRequest = async <T, TData>(
           console.warn('응답 메시지 파싱 실패', parseError);
         }
 
-        const apiError = new ApiError(
-          response.status,
-          errorMessage,
-          errorData,
+        const apiError = new ApiError({
+          status: response.status,
+          message: errorMessage,
+          data: errorData,
           displayMode,
-          method
-        );
+          method,
+        });
         reportApiError(apiError);
         throw apiError;
       }
@@ -101,7 +101,10 @@ export const apiRequest = async <T, TData>(
 
       if (error instanceof TypeError) {
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-          const networkError = new NetworkError(error.message, displayMode);
+          const networkError = new NetworkError({
+            message: error.message,
+            displayMode,
+          });
           reportApiError(networkError);
           throw networkError;
         }

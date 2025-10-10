@@ -33,7 +33,13 @@ type Story = StoryObj<typeof LocalErrorFallback>;
 
 export const BadRequest: Story = {
   args: {
-    error: new ApiError(400, 'Bad Request', null, 'fallback', 'GET'),
+    error: new ApiError({
+      status: 400,
+      message: 'Bad Request',
+      data: null,
+      displayMode: 'fallback',
+      method: 'GET',
+    }),
     handleRetry: () => console.log('Retry clicked'),
   },
   parameters: {
@@ -47,7 +53,13 @@ export const BadRequest: Story = {
 
 export const Forbidden: Story = {
   args: {
-    error: new ApiError(403, 'Forbidden', null, 'fallback', 'GET'),
+    error: new ApiError({
+      status: 403,
+      message: 'Forbidden',
+      data: null,
+      displayMode: 'fallback',
+      method: 'GET',
+    }),
     handleRetry: () => console.log('Retry clicked'),
   },
   parameters: {
@@ -61,7 +73,13 @@ export const Forbidden: Story = {
 
 export const NotFound: Story = {
   args: {
-    error: new ApiError(404, 'Not Found', null, 'fallback', 'GET'),
+    error: new ApiError({
+      status: 404,
+      message: 'Not Found',
+      data: null,
+      displayMode: 'fallback',
+      method: 'GET',
+    }),
     handleRetry: () => console.log('Retry clicked'),
   },
   parameters: {
@@ -75,7 +93,13 @@ export const NotFound: Story = {
 
 export const InternalServerError: Story = {
   args: {
-    error: new ApiError(500, 'Internal Server Error', null, 'fallback', 'GET'),
+    error: new ApiError({
+      status: 500,
+      message: 'Internal Server Error',
+      data: null,
+      displayMode: 'fallback',
+      method: 'GET',
+    }),
     handleRetry: () => console.log('Retry clicked'),
   },
   parameters: {
@@ -103,7 +127,13 @@ export const UnknownError: Story = {
 
 export const UndefinedHttpError: Story = {
   args: {
-    error: new ApiError(418, "I'm a teapot", null, 'fallback', 'GET'),
+    error: new ApiError({
+      status: 418,
+      message: "I'm a teapot",
+      data: null,
+      displayMode: 'fallback',
+      method: 'GET',
+    }),
     handleRetry: () => console.log('Retry clicked'),
   },
   parameters: {
