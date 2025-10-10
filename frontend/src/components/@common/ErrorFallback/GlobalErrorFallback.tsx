@@ -4,7 +4,11 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import ErrorIcon from '@/components/@common/ErrorIcon/ErrorIcon';
 import { getErrorInfo } from '@/utils/errorMessages';
 
-const GlobalErrorFallback = ({ error }: { error: Error }) => {
+type Props = {
+  error: Error;
+};
+
+const GlobalErrorFallback = ({ error }: Props) => {
   const { message, description } = getErrorInfo(error);
 
   return (

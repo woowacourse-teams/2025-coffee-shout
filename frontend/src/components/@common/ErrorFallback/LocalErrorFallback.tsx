@@ -4,7 +4,12 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import ErrorIcon from '@/components/@common/ErrorIcon/ErrorIcon';
 import { getErrorInfo } from '@/utils/errorMessages';
 
-const LocalErrorFallback = ({ error, handleRetry }: { error: Error; handleRetry: () => void }) => {
+type Props = {
+  error: Error;
+  handleRetry: () => void;
+};
+
+const LocalErrorFallback = ({ error, handleRetry }: Props) => {
   const { message, description } = getErrorInfo(error);
 
   return (
