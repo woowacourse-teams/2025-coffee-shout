@@ -56,7 +56,7 @@ public class QueryDslDashboardStatisticsRepository implements DashboardStatistic
     ) {
         // 서브쿼리로 최소 확률 찾기
         final QRouletteResultEntity subRouletteResult = new QRouletteResultEntity("subRouletteResult");
-        
+
         final List<com.querydsl.core.Tuple> results = queryFactory
                 .select(
                         ROULETTE_RESULT.winnerProbability,
@@ -82,7 +82,7 @@ public class QueryDslDashboardStatisticsRepository implements DashboardStatistic
             return Optional.empty();
         }
 
-        final Integer minProbability = results.get(0).get(ROULETTE_RESULT.winnerProbability);
+        final Integer minProbability = results.getFirst().get(ROULETTE_RESULT.winnerProbability);
         final List<String> nicknames = results.stream()
                 .map(tuple -> tuple.get(PLAYER.playerName))
                 .toList();
