@@ -47,6 +47,30 @@ public class QrCodeService {
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * QR 코드를 비동기로 생성하고 WebSocket을 통해 상태를 브로드캐스트합니다.
+     */
+    @Async
+    public void generateQrCodeAsync(String joinCode) {
+        log.info("QR 코드 비동기 생성 시작: joinCode={}", joinCode);
+
+        // 1. Pending 이벤트 발행 (방 생성 인스턴스에게만 알린다.)
+        eventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.PENDING, null));
+
+        try {
+            // 2. QR 코드 생성
+            String qrCodeUrl = getQrCodeUrl(joinCode);
+
+            // 3. Room에 저장
+            roomEventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.SUCCESS, qrCodeUrl));
+            log.info("QR 코드 생성 완료: joinCode={}, url={}", joinCode, qrCodeUrl);
+        } catch (Exception e) {
+            log.error("QR 코드 생성 실패: joinCode={}, error={}", joinCode, e.getMessage(), e);
+
+            roomEventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.ERROR, null));
+        }
+    }
+
     @Observed(name = "qrcode.generation")
     public String getQrCodeUrl(String contents) {
         try {
@@ -90,29 +114,5 @@ public class QrCodeService {
         return UriComponentsBuilder.fromUriString(qrCodePrefix)
                 .pathSegment(contents)
                 .toUriString();
-    }
-
-    /**
-     * QR 코드를 비동기로 생성하고 WebSocket을 통해 상태를 브로드캐스트합니다.
-     */
-    @Async
-    public void generateQrCodeAsync(String joinCode) {
-        log.info("QR 코드 비동기 생성 시작: joinCode={}", joinCode);
-
-        // 1. Pending 이벤트 발행 (방 생성 인스턴스에게만 알린다.)
-        eventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.PENDING, null));
-
-        try {
-            // 2. QR 코드 생성
-            String qrCodeUrl = getQrCodeUrl(joinCode);
-
-            // 3. Room에 저장
-            roomEventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.SUCCESS, qrCodeUrl));
-            log.info("QR 코드 생성 완료: joinCode={}, url={}", joinCode, qrCodeUrl);
-        } catch (Exception e) {
-            log.error("QR 코드 생성 실패: joinCode={}, error={}", joinCode, e.getMessage(), e);
-
-            roomEventPublisher.publishEvent(new QrCodeCompleteEvent(joinCode, QrCodeStatus.ERROR, null));
-        }
     }
 }
