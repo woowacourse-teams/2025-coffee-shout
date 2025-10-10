@@ -35,7 +35,7 @@ const Button = ({
     onClick?.(e);
   };
 
-  const isInLoadingState = variant === 'loading' || isLoading;
+  const showLoading = variant === 'loading' || isLoading;
 
   return (
     <S.Container
@@ -51,7 +51,7 @@ const Button = ({
       onTouchEnd={handleTouchEnd}
       {...rest}
     >
-      {isInLoadingState ? <LoadingDots /> : children}
+      {showLoading ? <LoadingDots /> : children}
     </S.Container>
   );
 };
