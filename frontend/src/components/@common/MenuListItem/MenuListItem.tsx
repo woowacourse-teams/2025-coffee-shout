@@ -1,5 +1,7 @@
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
+
 import Paragraph from '../Paragraph/Paragraph';
+
 import * as S from './MenuListItem.styled';
 
 type Props = {
@@ -8,13 +10,13 @@ type Props = {
 };
 
 const MenuListItem = ({ text, onClick }: Props) => {
-  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
+  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
 
   return (
     <S.Container
-      onPointerDown={handleTouchDown}
+      onPointerDown={onPointerDown}
       onPointerUp={(e) => {
-        handleTouchUp(e);
+        onPointerUp(e);
         onClick();
       }}
       $touchState={touchState}

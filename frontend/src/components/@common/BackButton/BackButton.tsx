@@ -1,6 +1,8 @@
+import type { ComponentProps } from 'react';
+
 import BackIcon from '@/assets/back-icon.svg';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
-import { ComponentProps } from 'react';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
+
 import * as S from './BackButton.styled';
 
 type Props = {
@@ -8,13 +10,13 @@ type Props = {
 } & ComponentProps<'button'>;
 
 const BackButton = ({ onClick, ...rest }: Props) => {
-  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
+  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
 
   return (
     <S.Container
-      onPointerDown={handleTouchDown}
+      onPointerDown={onPointerDown}
       onPointerUp={(e) => {
-        handleTouchUp(e);
+        onPointerUp(e);
         onClick();
       }}
       $touchState={touchState}

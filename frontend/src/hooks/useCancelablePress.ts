@@ -1,16 +1,18 @@
-import { useRef, PointerEvent } from 'react';
+import type { PointerEvent } from 'react';
+
+import { useRef } from 'react';
 
 type Props = {
   onClick?: () => void;
   cancelThreshold?: number;
 };
 
-export const useCancelablePointer = ({ onClick, cancelThreshold = 10 }: Props) => {
+export const useCancelablePress = ({ onClick, cancelThreshold = 10 }: Props) => {
   const startY = useRef(0);
   const startX = useRef(0);
   const moved = useRef(false);
 
-  const handlePointerDown = (e: PointerEvent<HTMLElement>) => {
+  const onPointerDown = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     startY.current = e.clientY;
@@ -18,7 +20,7 @@ export const useCancelablePointer = ({ onClick, cancelThreshold = 10 }: Props) =
     moved.current = false;
   };
 
-  const handlePointerMove = (e: PointerEvent<HTMLElement>) => {
+  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     const diffY = Math.abs(e.clientY - startY.current);
@@ -28,7 +30,7 @@ export const useCancelablePointer = ({ onClick, cancelThreshold = 10 }: Props) =
     }
   };
 
-  const handlePointerUp = (e: PointerEvent<HTMLElement>) => {
+  const onPointerUp = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     if (!moved.current) {
@@ -37,8 +39,9 @@ export const useCancelablePointer = ({ onClick, cancelThreshold = 10 }: Props) =
   };
 
   return {
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
   };
 };
+

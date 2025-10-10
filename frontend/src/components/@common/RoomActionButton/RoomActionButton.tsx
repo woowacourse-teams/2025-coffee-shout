@@ -1,9 +1,12 @@
-import NextStepIcon from '@/assets/next-step-icon.svg';
 import { type ComponentProps } from 'react';
+
+import NextStepIcon from '@/assets/next-step-icon.svg';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
+
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
+
 import * as S from './RoomActionButton.styled';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
   title: string;
@@ -12,13 +15,13 @@ type Props = {
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
+  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
 
   return (
     <S.Container
-      onPointerDown={handleTouchDown}
+      onPointerDown={onPointerDown}
       onPointerUp={(e) => {
-        handleTouchUp(e);
+        onPointerUp(e);
         onClick?.();
       }}
       $touchState={touchState}

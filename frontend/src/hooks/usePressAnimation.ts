@@ -1,18 +1,21 @@
-import { TouchState } from '@/types/touchState';
-import { useState, useCallback, PointerEvent } from 'react';
+import type { PointerEvent } from 'react';
+
+import { useState, useCallback } from 'react';
+
+import type { TouchState } from '@/types/touchState';
 
 const TOUCH_DELAY_MS = 100;
 
-export const useTouchInteraction = () => {
+export const usePressAnimation = () => {
   const [touchState, setTouchState] = useState<TouchState>('idle');
 
-  const handleTouchDown = useCallback((e: PointerEvent<HTMLElement>) => {
+  const onPointerDown = useCallback((e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     setTouchState('pressing');
   }, []);
 
-  const handleTouchUp = useCallback((e: PointerEvent<HTMLElement>) => {
+  const onPointerUp = useCallback((e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
 
     setTouchState('releasing');
@@ -23,7 +26,8 @@ export const useTouchInteraction = () => {
 
   return {
     touchState,
-    handleTouchDown,
-    handleTouchUp,
+    onPointerDown,
+    onPointerUp,
   };
 };
+

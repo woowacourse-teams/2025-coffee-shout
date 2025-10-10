@@ -1,7 +1,9 @@
-import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
-import * as S from './CafeCategoryCard.styled';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
+
 import CircleIcon from '@/components/@common/CircleIcon/CircleIcon';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
+import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
+
+import * as S from './CafeCategoryCard.styled';
 
 type Props = {
   imageUrl: string;
@@ -11,13 +13,13 @@ type Props = {
 };
 
 const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color }: Props) => {
-  const { touchState, handleTouchDown, handleTouchUp } = useTouchInteraction();
+  const { touchState, onPointerDown, onPointerUp } = usePressAnimation();
 
   return (
     <S.Container
-      onPointerDown={handleTouchDown}
+      onPointerDown={onPointerDown}
       onPointerUp={(e) => {
-        handleTouchUp(e);
+        onPointerUp(e);
         onClick();
       }}
       $touchState={touchState}

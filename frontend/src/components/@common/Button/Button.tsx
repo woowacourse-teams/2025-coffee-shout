@@ -1,8 +1,9 @@
 import { type ComponentProps, type PointerEvent } from 'react';
+
 import * as S from './Button.styled';
+import { useCancelablePress } from '@/hooks/useCancelablePress';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { Size } from '@/types/styles';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
-import { useCancelablePointer } from '@/hooks/useCancelablePointer';
 
 type Props = {
   variant?: S.ButtonVariant;
@@ -25,28 +26,28 @@ const Button = ({
 
   const {
     touchState,
-    handleTouchDown: handleTouchDownAnimation,
-    handleTouchUp: handleTouchUpAnimation,
-  } = useTouchInteraction();
+    onPointerDown: onPointerDownAnimation,
+    onPointerUp: onPointerUpAnimation,
+  } = usePressAnimation();
 
   const {
-    handlePointerDown: handlePointerDownCancel,
-    handlePointerMove: handlePointerMoveCancel,
-    handlePointerUp: handlePointerUpCancel,
-  } = useCancelablePointer({
+    onPointerDown: onPointerDownCancel,
+    onPointerMove: onPointerMoveCancel,
+    onPointerUp: onPointerUpCancel,
+  } = useCancelablePress({
     onClick,
   });
 
   const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     if (e.pointerType === 'touch') {
-      handleTouchDownAnimation(e);
-      handlePointerDownCancel(e);
+      onPointerDownAnimation(e);
+      onPointerDownCancel(e);
     }
   };
 
   const handlePointerMove = (e: PointerEvent<HTMLButtonElement>) => {
     if (e.pointerType === 'touch') {
-      handlePointerMoveCancel(e);
+      onPointerMoveCancel(e);
     }
   };
 
@@ -54,8 +55,8 @@ const Button = ({
     if (isDisabled) return;
 
     if (e.pointerType === 'touch') {
-      handleTouchUpAnimation(e);
-      handlePointerUpCancel(e);
+      onPointerUpAnimation(e);
+      onPointerUpCancel(e);
     } else {
       onClick?.();
     }
