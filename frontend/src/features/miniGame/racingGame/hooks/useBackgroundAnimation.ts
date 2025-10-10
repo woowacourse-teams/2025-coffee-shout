@@ -1,6 +1,7 @@
 import { useEffect, useRef, RefObject } from 'react';
 
 const BACKGROUND_SPEED_MULTIPLIER = 10;
+const SPEED_SMOOTHING_FACTOR = 0.02;
 
 type Props = {
   containerRef: RefObject<HTMLDivElement | null>;
@@ -9,6 +10,7 @@ type Props = {
 
 export const useBackgroundAnimation = ({ containerRef, mySpeed }: Props) => {
   const backgroundPositionRef = useRef(0);
+  const currentSpeedRef = useRef(0);
 
   useEffect(() => {
     let frameId: number;
@@ -20,7 +22,11 @@ export const useBackgroundAnimation = ({ containerRef, mySpeed }: Props) => {
       const delta = (time - lastTime) / 1000; // 초 단위
       lastTime = time;
 
-      backgroundPositionRef.current += mySpeed * delta * BACKGROUND_SPEED_MULTIPLIER; // 속도에 비례해 증가
+      // Lerp를 사용하여 현재 속도를 목표 속도로 부드럽게 전환
+      currentSpeedRef.current += (mySpeed - currentSpeedRef.current) * SPEED_SMOOTHING_FACTOR;
+
+      backgroundPositionRef.current +=
+        currentSpeedRef.current * delta * BACKGROUND_SPEED_MULTIPLIER;
       if (containerRef.current) {
         containerRef.current.style.backgroundPosition = `${backgroundPositionRef.current}% center`;
       }

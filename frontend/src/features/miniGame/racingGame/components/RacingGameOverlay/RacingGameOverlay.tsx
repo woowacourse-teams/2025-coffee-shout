@@ -26,7 +26,7 @@ const RacingGameOverlay = ({ children }: Props) => {
       });
 
       tapCountRef.current = 0;
-    }, 300);
+    }, 200);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
