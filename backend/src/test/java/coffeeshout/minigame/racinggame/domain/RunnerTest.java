@@ -38,7 +38,7 @@ class RunnerTest {
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(2))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~30이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
 
     @Test
@@ -49,7 +49,7 @@ class RunnerTest {
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(31))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~30이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
 
     @Test

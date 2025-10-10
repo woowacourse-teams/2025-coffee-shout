@@ -94,10 +94,9 @@ class RacingGameTest {
         racingGame.updateState(RacingGameState.PLAYING);
         racingGame.startAutoMove(null);
 
-        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
-        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30);
-
         for (int i = 0; i < 300; i++) {
+            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
+            racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30);
             racingGame.moveAll();
         }
 
@@ -106,7 +105,7 @@ class RacingGameTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getRank().get(players.get(0))).isEqualTo(1);
+        assertThat(result.getRank().get(players.get(0))).isEqualTo(2);
         assertThat(result.getRank().get(players.get(1))).isEqualTo(1);
     }
 }

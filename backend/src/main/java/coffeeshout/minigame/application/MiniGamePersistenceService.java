@@ -16,21 +16,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MiniGameService {
+public class MiniGamePersistenceService {
 
     private final RoomQueryService roomQueryService;
     private final RoomJpaRepository roomJpaRepository;
     private final PlayerJpaRepository playerJpaRepository;
     private final MiniGameJpaRepository miniGameJpaRepository;
 
-    public void saveGameEntities(String joinCode) {
+    public void saveGameEntities(String joinCode, MiniGameType miniGameType) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
 
         final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.PLAYING);
 
-        final MiniGameEntity miniGameEntity = new MiniGameEntity(roomEntity, room.nextGame().getMiniGameType());
+        final MiniGameEntity miniGameEntity = new MiniGameEntity(roomEntity, miniGameType);
         miniGameJpaRepository.save(miniGameEntity);
 
         room.getPlayers().forEach(player -> {

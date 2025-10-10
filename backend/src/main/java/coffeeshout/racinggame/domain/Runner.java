@@ -22,7 +22,7 @@ public class Runner {
     }
 
     public void updateSpeed(int speed) {
-        isTrue(speed >= RacingGame.MIN_SPEED && speed <= RacingGame.MAX_SPEED, "스피드는 0 ~30이어야 합니다.");
+        isTrue(speed >= RacingGame.MIN_SPEED && speed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 30이어야 합니다.");
         this.lastSpeedUpdateTime = Instant.now();
         this.speed = speed;
     }

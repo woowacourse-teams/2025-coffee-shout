@@ -1,5 +1,6 @@
 package coffeeshout.minigame.infra.messaging.handler;
 
+import coffeeshout.minigame.application.MiniGamePersistenceService;
 import coffeeshout.minigame.domain.MiniGameService;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
@@ -23,14 +24,17 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
     private final Map<MiniGameType, MiniGameService> miniGameServiceMap;
     private final RoomQueryService roomQueryService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MiniGamePersistenceService miniGamePersistenceService;
 
     public StartMiniGameCommandEventHandler(
             RoomQueryService roomQueryService,
             List<MiniGameService> miniGameServices,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            MiniGamePersistenceService miniGamePersistenceService
     ) {
         this.roomQueryService = roomQueryService;
         this.eventPublisher = eventPublisher;
+        this.miniGamePersistenceService = miniGamePersistenceService;
         this.miniGameServiceMap = new EnumMap<>(MiniGameType.class);
         miniGameServices.forEach(miniGameService -> miniGameServiceMap.put(
                 miniGameService.getMiniGameType(),
@@ -57,6 +61,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
         final Playable playable = room.startNextGame(event.hostName());
         eventPublisher.publishEvent(new MiniGameStartedEvent(event.joinCode(), playable.getMiniGameType().name()));
         miniGameServiceMap.get(playable.getMiniGameType()).start(event.joinCode(), event.hostName());
+        miniGamePersistenceService.saveGameEntities(event.joinCode(), playable.getMiniGameType());
     }
 
     @Override
