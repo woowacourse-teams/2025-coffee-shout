@@ -3,9 +3,9 @@ import * as S from './CustomMenuButton.styled';
 import WriteIcon from '@/assets/write-icon.svg';
 import { MouseEvent, TouchEvent } from 'react';
 
-interface Props {
+type Props = {
   onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
-}
+};
 
 const CustomMenuButton = ({ onClick }: Props) => {
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
