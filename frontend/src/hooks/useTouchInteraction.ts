@@ -1,37 +1,27 @@
 import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import { TouchState } from '@/types/touchState';
-import { useState, useCallback, TouchEvent, MouseEvent } from 'react';
+import { useState, useCallback } from 'react';
 
 const TOUCH_DELAY_MS = 100;
 
-type UseTouchTransitionProps = {
-  onClick?: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;
-  isDisabled?: boolean;
-};
-
-export const useTouchInteraction = ({ onClick, isDisabled = false }: UseTouchTransitionProps) => {
+export const useTouchInteraction = () => {
   const [touchState, setTouchState] = useState<TouchState>('idle');
   const isTouchDevice = checkIsTouchDevice();
 
   const handleTouchStart = useCallback(() => {
     if (!isTouchDevice) return;
-    if (isDisabled) return;
 
     setTouchState('pressing');
-  }, [isTouchDevice, isDisabled]);
+  }, [isTouchDevice]);
 
-  const handleTouchEnd = useCallback(
-    (e: TouchEvent<HTMLButtonElement>) => {
-      if (!isTouchDevice || isDisabled) return;
+  const handleTouchEnd = useCallback(() => {
+    if (!isTouchDevice) return;
 
-      setTouchState('releasing');
-      setTimeout(() => {
-        setTouchState('idle');
-        onClick?.(e);
-      }, TOUCH_DELAY_MS);
-    },
-    [isTouchDevice, isDisabled, onClick]
-  );
+    setTouchState('releasing');
+    setTimeout(() => {
+      setTouchState('idle');
+    }, TOUCH_DELAY_MS);
+  }, [isTouchDevice]);
 
   return {
     touchState,

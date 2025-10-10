@@ -13,9 +13,7 @@ type Props = {
 
 const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
   const theme = useTheme();
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick: onClose,
-  });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
   return (
     <S.Container>
@@ -23,7 +21,7 @@ const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
       {showCloseButton && (
         <S.CloseButton
           aria-label="close-icon"
-          onClick={onClose}
+          onPointerUp={onClose}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           $touchState={touchState}

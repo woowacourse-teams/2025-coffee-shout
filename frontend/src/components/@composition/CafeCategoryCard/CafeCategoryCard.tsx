@@ -2,21 +2,20 @@ import IconTextItem from '@/components/@common/IconTextItem/IconTextItem';
 import * as S from './CafeCategoryCard.styled';
 import CircleIcon from '@/components/@common/CircleIcon/CircleIcon';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
-import { MouseEvent, TouchEvent } from 'react';
 
 type Props = {
   imageUrl: string;
   categoryName: string;
-  onClick: (e: TouchEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>) => void;
+  onClick: () => void;
   color: string;
 };
 
 const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
   return (
     <S.Container
-      onClick={onClick}
+      onPointerUp={onClick}
       $touchState={touchState}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}

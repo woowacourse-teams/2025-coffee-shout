@@ -1,18 +1,18 @@
 import BackIcon from '@/assets/back-icon.svg';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
-import { ComponentProps, MouseEvent, TouchEvent } from 'react';
+import { ComponentProps } from 'react';
 import * as S from './BackButton.styled';
 
 type Props = {
-  onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick: () => void;
 } & ComponentProps<'button'>;
 
 const BackButton = ({ onClick, ...rest }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
   return (
     <S.Container
-      onClick={onClick}
+      onPointerUp={onClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       $touchState={touchState}

@@ -10,16 +10,14 @@ type Props = {
 
 const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Props) => {
   const hasValue = Boolean(value && String(value).length > 0);
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick: onClear,
-  });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
   return (
     <S.Container $height={height} $hasValue={hasValue}>
       <S.Input ref={ref} value={value} onChange={onChange} {...rest} />
       <S.ClearButton
         type="button"
-        onClick={onClear}
+        onPointerUp={onClear}
         aria-label="입력 내용 지우기"
         $hasValue={hasValue}
         onTouchStart={handleTouchStart}

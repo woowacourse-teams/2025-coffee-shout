@@ -1,18 +1,17 @@
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 import * as S from './CustomMenuButton.styled';
 import WriteIcon from '@/assets/write-icon.svg';
-import { MouseEvent, TouchEvent } from 'react';
 
 interface Props {
-  onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick: () => void;
 }
 
 const CustomMenuButton = ({ onClick }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction();
 
   return (
     <S.Container
-      onClick={onClick}
+      onPointerUp={onClick}
       $touchState={touchState}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
