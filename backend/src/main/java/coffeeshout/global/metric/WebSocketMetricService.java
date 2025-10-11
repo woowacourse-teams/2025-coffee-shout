@@ -25,12 +25,15 @@ public class WebSocketMetricService {
     // 메시지 처리 시간 측정용
     private final Map<String, Sample> inboundMessageSamples = new ConcurrentHashMap<>();
     private final Map<String, Sample> outboundMessageSamples = new ConcurrentHashMap<>();
+    // 비즈니스 로직 처리 시간 측정용
+    private final Map<String, Sample> businessLogicSamples = new ConcurrentHashMap<>();
 
     private Timer connectionEstablishmentTimer;
     private Counter inboundMessageCounter;
     private Counter outboundMessageCounter;
-    private Timer inboundMessageTimer;
+    private Timer inboundMessageTimer;  // 큐 대기 시간 측정용
     private Timer outboundMessageTimer;
+    private Timer businessLogicTimer;
 
     public WebSocketMetricService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -53,12 +56,16 @@ public class WebSocketMetricService {
                 .description("아웃바운드 메시지 총 개수")
                 .register(meterRegistry);
         this.inboundMessageTimer = Timer.builder("websocket.message.inbound.time")
-                .description("웹소켓 inbound 메시지 처리 시간")
+                .description("웹소켓 inbound 메시지 큐 대기 시간")
 		.publishPercentiles(0.95, 0.99)
                 .register(meterRegistry);
         this.outboundMessageTimer = Timer.builder("websocket.message.outbound.time")
                 .description("웹소켓 outbound 메시지 처리 시간")
 		.publishPercentiles(0.95, 0.99)
+                .register(meterRegistry);
+        this.businessLogicTimer = Timer.builder("websocket.message.business.logic.time")
+                .description("웹소켓 inbound 메시지 비즈니스 로직 처리 시간")
+                .publishPercentiles(0.95, 0.99)
                 .register(meterRegistry);
     }
 
@@ -123,13 +130,6 @@ public class WebSocketMetricService {
         inboundMessageSamples.put(messageId, sample);
     }
 
-    public void stopInboundMessageTimer(String messageId) {
-        Sample sample = inboundMessageSamples.remove(messageId);
-        if (sample != null) {
-            sample.stop(inboundMessageTimer);
-        }
-    }
-
     public void startOutboundMessageTimer(String messageId) {
         Sample sample = Timer.start(meterRegistry);
         outboundMessageSamples.put(messageId, sample);
@@ -139,6 +139,28 @@ public class WebSocketMetricService {
         Sample sample = outboundMessageSamples.remove(messageId);
         if (sample != null) {
             sample.stop(outboundMessageTimer);
+        }
+    }
+
+    // 큐 대기 시간 측정 종료
+    public void stopInboundMessageTimer(String messageId) {
+        Sample inboundSample = inboundMessageSamples.remove(messageId);
+        if (inboundSample != null) {
+            inboundSample.stop(inboundMessageTimer);
+        }
+    }
+
+    // 비즈니스 로직 시간 측정 시작
+    public void startBusinessTimer(String messageId) {
+        Sample businessSample = Timer.start(meterRegistry);
+        businessLogicSamples.put(messageId, businessSample);
+    }
+
+    // 비즈니스 로직 시간 측정 종료
+    public void stopBusinessTimer(String messageId) {
+        Sample sample = businessLogicSamples.remove(messageId);
+        if (sample != null) {
+            sample.stop(businessLogicTimer);
         }
     }
 }
