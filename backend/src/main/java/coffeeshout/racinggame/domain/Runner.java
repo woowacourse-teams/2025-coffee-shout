@@ -21,10 +21,11 @@ public class Runner {
         this.lastSpeedUpdateTime = Instant.now();
     }
 
-    public void updateSpeed(int speed) {
-        isTrue(speed >= RacingGame.MIN_SPEED && speed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 30이어야 합니다.");
-        this.lastSpeedUpdateTime = Instant.now();
-        this.speed = speed;
+    public void updateSpeed(int tapCount, SpeedCalculator speedCalculator, Instant now) {
+        final int nextSpeed = speedCalculator.calculateSpeed(lastSpeedUpdateTime, now, tapCount);
+        isTrue(nextSpeed >= RacingGame.MIN_SPEED && nextSpeed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 30이어야 합니다.");
+        this.lastSpeedUpdateTime = now;
+        this.speed = nextSpeed;
     }
 
     public void move() {

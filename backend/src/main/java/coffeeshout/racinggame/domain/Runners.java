@@ -24,7 +24,7 @@ public class Runners {
 
     public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator, Instant now) {
         final Runner runner = findRunnerByPlayer(player);
-        runner.updateSpeed(speedCalculator.calculateSpeed(runner.getLastSpeedUpdateTime(), now, tapCount));
+        runner.updateSpeed(tapCount, speedCalculator, now);
     }
 
     public void moveAll() {

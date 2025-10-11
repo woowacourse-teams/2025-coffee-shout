@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.Runner;
+import coffeeshout.racinggame.domain.SpeedCalculator;
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 class RunnerTest {
@@ -22,9 +24,11 @@ class RunnerTest {
     void 속도를_업데이트할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 15;
+        final Instant now = Instant.now();
 
         // when
-        runner.updateSpeed(15);
+        runner.updateSpeed(10, speedCalculator, now);
 
         // then
         assertThat(runner.getSpeed()).isEqualTo(15);
@@ -34,9 +38,11 @@ class RunnerTest {
     void 속도가_최소값보다_작으면_예외가_발생한다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 2;
+        final Instant now = Instant.now();
 
         // when && then
-        assertThatThrownBy(() -> runner.updateSpeed(2))
+        assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
@@ -45,9 +51,11 @@ class RunnerTest {
     void 속도가_최대값보다_크면_예외가_발생한다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 31;
+        final Instant now = Instant.now();
 
         // when && then
-        assertThatThrownBy(() -> runner.updateSpeed(31))
+        assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
@@ -56,9 +64,11 @@ class RunnerTest {
     void 최소_속도로_업데이트할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MIN_SPEED;
+        final Instant now = Instant.now();
 
         // when
-        runner.updateSpeed(RacingGame.MIN_SPEED);
+        runner.updateSpeed(10, speedCalculator, now);
 
         // then
         assertThat(runner.getSpeed()).isEqualTo(RacingGame.MIN_SPEED);
@@ -68,9 +78,11 @@ class RunnerTest {
     void 최대_속도로_업데이트할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
 
         // when
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        runner.updateSpeed(10, speedCalculator, now);
 
         // then
         assertThat(runner.getSpeed()).isEqualTo(RacingGame.MAX_SPEED);
@@ -89,7 +101,9 @@ class RunnerTest {
     void 러너는_현재_속도만큼_이동할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(15);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 15;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
 
         // when
         runner.move();
@@ -102,7 +116,9 @@ class RunnerTest {
     void 러너는_여러_번_이동할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(10);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 10;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
 
         // when
         runner.move();
@@ -129,7 +145,9 @@ class RunnerTest {
     void 러너가_완주_라인에_도달하면_위치가_정확히_완주_라인이_된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
 
         // when
         for (int i = 0; i < 100; i++) {
@@ -144,7 +162,9 @@ class RunnerTest {
     void 러너가_완주_라인을_넘으면_속도가_0이_된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
 
         // when
         for (int i = 0; i < 100; i++) {
@@ -159,7 +179,9 @@ class RunnerTest {
     void 러너가_완주하면_더이상_움직이지_않는다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
         for (int i = 0; i < 100; i++) {
             runner.move();
         }
@@ -177,7 +199,9 @@ class RunnerTest {
     void 러너가_완주했는지_확인할_수_있다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
 
         // when
         for (int i = 0; i < 100; i++) {
@@ -201,7 +225,9 @@ class RunnerTest {
     void 러너가_완주하면_완주_시간이_기록된다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        runner.updateSpeed(RacingGame.MAX_SPEED);
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
+        final Instant now = Instant.now();
+        runner.updateSpeed(10, speedCalculator, now);
         for (int i = 0; i < 99; i++) {
             runner.move();
         }
