@@ -43,15 +43,14 @@ export const useCancelablePress = ({
 
   const onPointerUp = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'touch') return;
+    if (moved.current) return;
 
-    if (!moved.current) {
-      if (releaseSyncDelay > 0) {
-        setTimeout(() => {
-          onClick?.();
-        }, releaseSyncDelay);
-      } else {
+    if (releaseSyncDelay > 0) {
+      setTimeout(() => {
         onClick?.();
-      }
+      }, releaseSyncDelay);
+    } else {
+      onClick?.();
     }
   };
 
