@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 type Player = {
   playerName: string;
-  position: number; 
+  position: number;
   speed: number;
 };
 

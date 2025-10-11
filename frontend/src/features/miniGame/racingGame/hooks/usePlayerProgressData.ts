@@ -4,7 +4,7 @@ const MAX_PROGRESS_PERCENTAGE = 100;
 
 type Player = {
   playerName: string;
-  position: number; 
+  position: number;
 };
 
 type Props = {
