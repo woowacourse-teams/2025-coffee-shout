@@ -2,13 +2,13 @@ package coffeeshout.racinggame.domain.event;
 
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record StartRacingGameCommandEvent(
         String eventId,
         RacingGameEventType eventType,
-        LocalDateTime createdAt,
+        Instant createdAt,
         TraceInfo traceInfo,
         String joinCode,
         String hostName
@@ -19,7 +19,7 @@ public record StartRacingGameCommandEvent(
         return new StartRacingGameCommandEvent(
                 eventId,
                 RacingGameEventType.START_RACING_GAME_COMMAND,
-                LocalDateTime.now(),
+                Instant.now(),
                 TraceInfoExtractor.extract(),
                 joinCode,
                 hostName

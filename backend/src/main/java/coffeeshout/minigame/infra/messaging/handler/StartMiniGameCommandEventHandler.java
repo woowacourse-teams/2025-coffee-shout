@@ -62,6 +62,7 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
         eventPublisher.publishEvent(new MiniGameStartedEvent(event.joinCode(), playable.getMiniGameType().name()));
         miniGameServiceMap.get(playable.getMiniGameType()).start(event.joinCode(), event.hostName());
         miniGamePersistenceService.saveGameEntities(event.joinCode(), playable.getMiniGameType());
+        log.info("JoinCode[{}] 미니게임 시작됨 - MiniGameType : {}", event.joinCode(), playable.getMiniGameType());
     }
 
     @Override

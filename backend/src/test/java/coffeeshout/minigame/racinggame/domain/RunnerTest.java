@@ -220,7 +220,7 @@ class RunnerTest {
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
         // when
-        runner.firstMoveSpeed();
+        runner.initializeSpeed();
 
         // then
         assertThat(runner.getSpeed()).isEqualTo(RacingGame.MIN_SPEED);

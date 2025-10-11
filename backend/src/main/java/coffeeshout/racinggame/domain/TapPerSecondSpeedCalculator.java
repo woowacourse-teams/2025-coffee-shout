@@ -15,7 +15,8 @@ public class TapPerSecondSpeedCalculator implements SpeedCalculator {
     }
 
     private double calculateClickPerSecond(int boundedClickCount, Duration duration) {
-        return (double) boundedClickCount / duration.toMillis() * 1000;
+        final long millis = Math.max(1, duration.toMillis());
+        return (double) boundedClickCount / millis * 1000;
     }
 
     private int convertToSpeed(double clicksPerSecond) {

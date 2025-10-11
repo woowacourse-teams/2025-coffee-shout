@@ -3,13 +3,12 @@ package coffeeshout.racinggame.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record TapCommandEvent(
         String eventId,
         RacingGameEventType eventType,
-        LocalDateTime createdAt,
+        Instant createdAt,
         String joinCode,
         String playerName,
         int tapCount,
@@ -22,7 +21,7 @@ public record TapCommandEvent(
         return new TapCommandEvent(
                 eventId,
                 RacingGameEventType.TAP_COMMAND,
-                LocalDateTime.now(),
+                Instant.now(),
                 joinCode,
                 playerName,
                 tapCount,

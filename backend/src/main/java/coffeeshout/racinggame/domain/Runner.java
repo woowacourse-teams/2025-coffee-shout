@@ -43,11 +43,11 @@ public class Runner {
         return position >= RacingGame.FINISH_LINE;
     }
 
-    public void firstMoveSpeed() {
+    public void initializeSpeed() {
         this.speed = RacingGame.MIN_SPEED;
     }
 
-    public void setFirstMoveTime(Instant time) {
+    public void initializeLastSpeedUpdateTime(Instant time) {
         this.lastSpeedUpdateTime = time;
     }
 }

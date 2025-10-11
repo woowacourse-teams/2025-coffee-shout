@@ -41,14 +41,6 @@ public class LogAspect {
         log.info("JoinCode[{}] 플레이어 Ready 상태 변경 - 플레이어: {}, 상태: {}", joinCode, playerName, isReady);
     }
 
-    @After(
-            value = "execution(* coffeeshout.minigame.domain.MiniGameService.publishStartEvent(..)) && args(playable, joinCode)",
-            argNames = "playable,joinCode"
-    )
-    public void logMiniGameStart(Playable playable, String joinCode) {
-        log.info("JoinCode[{}] 미니게임 시작됨 - MiniGameType : {}", joinCode, playable.getMiniGameType());
-    }
-
     @AfterReturning(
             value = "execution(* coffeeshout.room.application.RoomService.spinRoulette(..)) && args(joinCode, hostName)",
             returning = "winner",

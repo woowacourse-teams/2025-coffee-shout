@@ -34,7 +34,7 @@ public class Runners {
     public Optional<Runner> findWinner() {
         return runners.stream()
                 .filter(Runner::isFinished)
-                .max(Comparator.comparing(Runner::getFinishTime));
+                .min(Comparator.comparing(Runner::getFinishTime));
     }
 
     public boolean hasWinner() {
@@ -58,11 +58,11 @@ public class Runners {
     }
 
     public void initialSpeed() {
-        runners.forEach(Runner::firstMoveSpeed);
+        runners.forEach(Runner::initializeSpeed);
     }
 
     public void initialLastTapTime(Instant time) {
-        runners.forEach(runner -> runner.setFirstMoveTime(time));
+        runners.forEach(runner -> runner.initializeLastSpeedUpdateTime(time));
     }
 
     public Stream<Runner> stream() {

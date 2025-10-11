@@ -15,9 +15,9 @@ public enum MiniGameType {
     ;
 
     public Playable createMiniGame(String joinCode) {
+        Objects.requireNonNull(joinCode, "joinCode는 null이 아니어야 합니다.");
         switch (this) {
             case CARD_GAME:
-                Objects.requireNonNull(joinCode, "joinCode must not be null");
                 final long seed = Integer.toUnsignedLong(joinCode.hashCode());
                 return new CardGame(new CardGameRandomDeckGenerator(), seed);
             case RACING_GAME:

@@ -1,4 +1,4 @@
-package coffeeshout.racinggame.ui.response;
+package coffeeshout.racinggame.domain;
 
 public record RacingRange(int start, int end) {
 

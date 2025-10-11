@@ -5,6 +5,7 @@ import coffeeshout.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.racinggame.ui.request.TapCommand;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -28,7 +29,7 @@ public class RacingGameWebSocketController {
             path = "/topic/room/{joinCode}/racing-game/state",
             returnType = RaceStateChangedEvent.class
     )
-    public void tap(@DestinationVariable String joinCode, @Payload TapCommand command) {
+    public void tap(@DestinationVariable String joinCode, @Payload @Valid TapCommand command) {
         racingGameService.tap(joinCode, command.playerName(), command.tapCount());
     }
 }

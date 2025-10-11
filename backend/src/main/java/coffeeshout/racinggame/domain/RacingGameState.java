@@ -4,15 +4,15 @@ import lombok.Getter;
 
 @Getter
 public enum RacingGameState {
-    DESCRIPTION(4000),
-    PREPARE(2000),
-    PLAYING(30000),
-    DONE(0),
+    DESCRIPTION(4000L),
+    PREPARE(2000L),
+    PLAYING(30000L),
+    DONE(0L),
     ;
 
     final long duration;
 
-    RacingGameState(int duration) {
+    RacingGameState(long duration) {
         this.duration = duration;
     }
 }

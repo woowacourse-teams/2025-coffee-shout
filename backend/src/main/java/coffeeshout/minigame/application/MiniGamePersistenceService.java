@@ -13,6 +13,7 @@ import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class MiniGamePersistenceService {
     private final PlayerJpaRepository playerJpaRepository;
     private final MiniGameJpaRepository miniGameJpaRepository;
 
+    @Transactional
     public void saveGameEntities(String joinCode, MiniGameType miniGameType) {
         final JoinCode roomJoinCode = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(roomJoinCode);
