@@ -55,7 +55,6 @@ export const useButtonInteraction = ({ onClick }: Props = {}) => {
     (e: PointerEvent<HTMLElement>) => {
       if (e.pointerType !== 'touch') return;
 
-      suppressNextClick();
       onPointerCancelAnimation(e);
       onPointerCancelPress(e);
     },
