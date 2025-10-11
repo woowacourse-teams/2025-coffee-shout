@@ -38,7 +38,6 @@ const RacingGamePage = () => {
   const showGoal = useGoalDisplay({
     myPosition,
     endDistance: racingGameData.distance.end,
-    gameState: racingGameState,
   });
 
   useBackgroundAnimation({

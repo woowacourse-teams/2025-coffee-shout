@@ -28,7 +28,6 @@ const RacingGameProvider = ({ children }: PropsWithChildren) => {
   const { joinCode } = useIdentifier();
 
   const handleRacingGameState = useCallback((data: { state: RacingGameState }) => {
-    console.log('handleRacingGameState', data.state);
     setRacingGameState(data.state);
   }, []);
   const handleRacingGameData = useCallback((data: RacingGameData) => {
