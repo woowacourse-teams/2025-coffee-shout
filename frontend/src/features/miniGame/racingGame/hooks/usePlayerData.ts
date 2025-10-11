@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 type Player = {
   playerName: string;
-  position: number; // 서버에서 position으로 보내고 있음
+  position: number; 
   speed: number;
 };
 
