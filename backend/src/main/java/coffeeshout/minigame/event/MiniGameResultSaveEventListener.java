@@ -66,7 +66,7 @@ public class MiniGameResultSaveEventListener {
                     .orElseThrow(() -> new IllegalArgumentException("플레이어가 존재하지 않습니다: " + player.getName().value()));
 
             final Integer rank = result.getPlayerRank(player);
-            final Integer score = Math.toIntExact(scores.get(player).getValue());
+            final Long score = scores.get(player).getValue();
 
             final MiniGameResultEntity resultEntity = new MiniGameResultEntity(
                     miniGameEntity,
