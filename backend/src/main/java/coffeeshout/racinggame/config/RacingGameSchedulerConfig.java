@@ -1,4 +1,4 @@
-package coffeeshout.global.config;
+package coffeeshout.racinggame.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -11,15 +11,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 @EnableScheduling
 @Slf4j
-public class MiniGameTaskSchedulerConfig {
+public class RacingGameSchedulerConfig {
 
-    @Bean(name = "miniGameTaskScheduler")
+    @Bean(name = "racingGameScheduler")
     @Profile("!test")
-    public TaskScheduler miniGameTaskScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    public TaskScheduler racingGameScheduler() {
+        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         scheduler.setPoolSize(3);
-        scheduler.setThreadNamePrefix("mini-game-task");
+        scheduler.setThreadNamePrefix("racing-game-");
         scheduler.setDaemon(false);
         scheduler.setErrorHandler(t ->
                 log.error("스케줄 실행 중 예외가 발생했습니다.", t)

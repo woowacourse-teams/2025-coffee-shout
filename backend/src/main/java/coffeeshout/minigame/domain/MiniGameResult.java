@@ -55,7 +55,7 @@ public class MiniGameResult {
     }
 
     private static boolean isTieScore(MiniGameScore score, MiniGameScore prevScore) {
-        return score.getValue() == prevScore.getValue();
+        return score.equals(prevScore);
     }
 
     public int getTieCountByRank(int rank) {

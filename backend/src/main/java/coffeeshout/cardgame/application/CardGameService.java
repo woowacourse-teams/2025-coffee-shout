@@ -29,7 +29,7 @@ public class CardGameService implements MiniGameService {
     public CardGameService(
             RoomQueryService roomQueryService,
             CardGameCommandService cardGameCommandService,
-            @Qualifier("miniGameTaskScheduler") TaskScheduler taskScheduler,
+            @Qualifier("cardGameTaskScheduler") TaskScheduler taskScheduler,
             GameDurationMetricService gameDurationMetricService,
             ApplicationEventPublisher eventPublisher
     ) {

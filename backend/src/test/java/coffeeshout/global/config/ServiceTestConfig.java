@@ -13,8 +13,8 @@ import org.springframework.scheduling.TaskScheduler;
 @Profile("test")
 public class ServiceTestConfig {
 
-    @Bean(name = "miniGameTaskScheduler")
-    public TaskScheduler testMiniGameTaskScheduler() {
+    @Bean(name = "cardGameTaskScheduler")
+    public TaskScheduler testCardGameTaskScheduler() {
         return new TestTaskScheduler();
     }
 

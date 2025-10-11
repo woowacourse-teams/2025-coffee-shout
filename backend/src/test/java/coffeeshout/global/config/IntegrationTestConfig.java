@@ -11,8 +11,8 @@ import org.springframework.scheduling.TaskScheduler;
 @Import(TestContainerConfig.class)
 public class IntegrationTestConfig {
 
-    @Bean(name = "miniGameTaskScheduler")
-    public TaskScheduler testIntegrationMiniGameTaskScheduler() {
+    @Bean(name = "cardGameTaskScheduler")
+    public TaskScheduler testIntegrationCardGameTaskScheduler() {
         return new ShutDownTestScheduler();
     }
 
