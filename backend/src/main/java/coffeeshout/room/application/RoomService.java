@@ -6,6 +6,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.Menu;
@@ -40,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -145,7 +147,7 @@ public class RoomService {
         return room.getPlayers();
     }
 
-
+    @Transactional
     public void saveRoomEntity(String joinCodeValue) {
         final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
         roomJpaRepository.save(roomEntity);
@@ -275,5 +277,21 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.showRoulette();
         return room;
+    }
+
+    public boolean kickPlayer(String joinCode, String playerName) {
+        final boolean exists = hasPlayer(joinCode, playerName);
+
+        if (exists) {
+            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
+            roomEventPublisher.publishEvent(event);
+        }
+
+        return exists;
+    }
+
+    private boolean hasPlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.hasPlayer(new PlayerName(playerName));
     }
 }

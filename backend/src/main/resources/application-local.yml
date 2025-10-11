@@ -37,7 +37,7 @@ management:
       exposure:
         include: "health,info,metrics,prometheus,tracing"
   tracing:
-    enabled: true
+    enabled: false
     sampling:
       probability: 1.0
   otlp:
@@ -48,6 +48,9 @@ management:
   metrics:
     enable:
       tomcat: true
+
+redisson:
+  enabled: true
 
 room:
   qr:
