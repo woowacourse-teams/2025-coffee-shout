@@ -53,7 +53,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         registration.interceptors(webSocketInboundMetricInterceptor)
                 .taskExecutor()
                 .corePoolSize(32)
-                .corePoolSize(32)
+                .maxPoolSize(32)
                 .queueCapacity(2048)
                 .keepAliveSeconds(60);
     }
@@ -78,7 +78,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
             });
         });
         executor.setCorePoolSize(16);
-        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
         executor.setQueueCapacity(4096);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
