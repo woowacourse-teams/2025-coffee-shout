@@ -1,4 +1,4 @@
-package coffeeshout.racinggame.domain.dto;
+package coffeeshout.racinggame.ui.response;
 
 import java.util.List;
 

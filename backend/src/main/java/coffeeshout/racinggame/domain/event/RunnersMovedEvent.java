@@ -1,8 +1,8 @@
 package coffeeshout.racinggame.domain.event;
 
 import coffeeshout.racinggame.domain.RacingGame;
-import coffeeshout.racinggame.domain.dto.RacingRange;
-import coffeeshout.racinggame.domain.dto.RunnerPosition;
+import coffeeshout.racinggame.ui.response.RacingRange;
+import coffeeshout.racinggame.ui.response.RunnerPosition;
 import java.util.List;
 
 public record RunnersMovedEvent(String joinCode, RacingRange racingRange, List<RunnerPosition> runnerPositions) {
