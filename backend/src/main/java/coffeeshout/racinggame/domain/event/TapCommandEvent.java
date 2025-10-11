@@ -8,7 +8,6 @@ import java.util.UUID;
 public record TapCommandEvent(
         String eventId,
         RacingGameEventType eventType,
-        Instant createdAt,
         String joinCode,
         String playerName,
         int tapCount,
@@ -16,16 +15,15 @@ public record TapCommandEvent(
         TraceInfo traceInfo
 ) {
 
-    public static TapCommandEvent create(String joinCode, String playerName, int tapCount, Instant timestamp) {
+    public static TapCommandEvent create(String joinCode, String playerName, int tapCount) {
         final String eventId = UUID.randomUUID().toString();
         return new TapCommandEvent(
                 eventId,
                 RacingGameEventType.TAP_COMMAND,
-                Instant.now(),
                 joinCode,
                 playerName,
                 tapCount,
-                timestamp,
+                Instant.now(),
                 TraceInfoExtractor.extract()
         );
     }

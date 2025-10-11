@@ -15,7 +15,7 @@ public class RacingGameFacade {
     private final RacingGameEventPublisher racingGameEventPublisher;
 
     public void tap(String joinCode, String hostName, int tapCount) {
-        final TapCommandEvent event = TapCommandEvent.create(joinCode, hostName, tapCount, Instant.now());
+        final TapCommandEvent event = TapCommandEvent.create(joinCode, hostName, tapCount);
         racingGameEventPublisher.publishEvent(event);
         log.debug("탭 이벤트 발행: joinCode={}, playerName={}, tapCount={}, eventId={}",
                 joinCode, hostName, tapCount, event.eventId());

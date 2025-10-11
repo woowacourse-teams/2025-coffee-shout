@@ -8,7 +8,7 @@ import java.util.UUID;
 public record StartRacingGameCommandEvent(
         String eventId,
         RacingGameEventType eventType,
-        Instant createdAt,
+        Instant timestamp,
         TraceInfo traceInfo,
         String joinCode,
         String hostName
