@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeStatusEvent> {
+public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEvent> {
 
     private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
 
@@ -50,9 +50,9 @@ public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeStatus
 
         roomCommandService.assignQrCodeError(new JoinCode(event.joinCode()));
 
-        QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.ERROR, null);
+        final QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.ERROR, null);
 
-        String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
+        final String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
 
         log.debug("QR 코드 Error 이벤트 전송 완료: destination={}", destination);
@@ -64,9 +64,9 @@ public class QrCodeCompleteEventHandler implements RoomEventHandler<QrCodeStatus
 
         roomCommandService.assignQrCode(new JoinCode(event.joinCode()), event.qrCodeUrl());
 
-        QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.SUCCESS, event.qrCodeUrl());
+        final QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.SUCCESS, event.qrCodeUrl());
 
-        String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
+        final String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
 
         log.debug("QR 코드 Success 이벤트 전송 완료: destination={}, url={}", destination, event.qrCodeUrl());

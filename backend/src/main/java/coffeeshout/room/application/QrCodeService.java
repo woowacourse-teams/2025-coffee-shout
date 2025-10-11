@@ -57,7 +57,7 @@ public class QrCodeService {
 
         try {
             // 2. QR 코드 생성
-            String qrCodeUrl = getQrCodeUrl(joinCode);
+            final String qrCodeUrl = getQrCodeUrl(joinCode);
 
             // 3. Room에 저장
             roomEventPublisher.publishEvent(new QrCodeStatusEvent(joinCode, QrCodeStatus.SUCCESS, qrCodeUrl));
@@ -72,8 +72,8 @@ public class QrCodeService {
     @Observed(name = "qrcode.generation")
     public String getQrCodeUrl(String contents) {
         try {
-            byte[] qrCodeImage = generateQrCode(contents);
-            String storageKey = uploadToStorage(contents, qrCodeImage);
+            final byte[] qrCodeImage = generateQrCode(contents);
+            final String storageKey = uploadToStorage(contents, qrCodeImage);
             return getStorageUrl(storageKey);
         } catch (Exception e) {
             meterRegistry.counter("qr.service.failed",
@@ -93,7 +93,7 @@ public class QrCodeService {
     }
 
     private byte[] generateQrCode(String contents) {
-        String url = getUrl(contents);
+        final String url = getUrl(contents);
 
         try {
             return qrCodeGenerationTimer.recordCallable(() ->

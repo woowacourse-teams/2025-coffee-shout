@@ -29,7 +29,7 @@ public class AsyncConfig implements AsyncConfigurer {
 
     @Bean(name = "qrCodeTaskExecutor")
     public Executor qrCodeTaskExecutor(ExecutorService virtualThreadExecutor) {
-        TaskExecutorAdapter adapter = new TaskExecutorAdapter(virtualThreadExecutor);
+        final TaskExecutorAdapter adapter = new TaskExecutorAdapter(virtualThreadExecutor);
         adapter.setTaskDecorator(runnable -> {
             ContextSnapshot snapshot = snapshotFactory.captureAll();
             return snapshot.wrap(runnable);

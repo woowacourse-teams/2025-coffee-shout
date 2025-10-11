@@ -29,19 +29,19 @@ public class QrCodeEventListener {
 
     @EventListener
     public void handleSubscribeQrCodeStatus(SessionSubscribeEvent event) {
-        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
+        final SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
 
-        String destination = headerAccessor.getDestination();
+        final String destination = headerAccessor.getDestination();
 
         if (destination != null && pathMatcher.match(QR_CODE_TOPIC_PATTERN, destination)) {
-            String sessionId = headerAccessor.getSessionId();
+            final String sessionId = headerAccessor.getSessionId();
             log.info("QR 코드 상태 구독 이벤트 감지: sessionId={}, destination={}",
                     sessionId, destination);
 
-            Map<String, String> variables = pathMatcher.extractUriTemplateVariables(QR_CODE_TOPIC_PATTERN, destination);
-            String joinCode = variables.get("joinCode");
+            final Map<String, String> variables = pathMatcher.extractUriTemplateVariables(QR_CODE_TOPIC_PATTERN, destination);
+            final String joinCode = variables.get("joinCode");
 
-            QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
+            final QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
             CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS).execute(() -> {
                 if (sessionId != null) {

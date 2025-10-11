@@ -22,12 +22,10 @@ import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class RoomWebSocketController {
