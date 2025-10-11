@@ -76,7 +76,12 @@ export const useRoomManagement = () => {
     if (!isPlayerNameValid()) return;
     if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
-    await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
+    try {
+      await handleRoomRequest(selectedMenu, customMenuName, selectedTemperature);
+    } catch (error) {
+      console.error(error);
+      alert('방 만들기 실패!');
+    }
   };
 
   return {
