@@ -1,36 +1,18 @@
-import { useCardGame } from '@/contexts/CardGame/CardGameContext';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import Layout from '@/layouts/Layout';
+import CardGameReadyPage from '@/features/miniGame/cardGame/pages/CardGameReadyPage';
+import RacingGameReadyPage from '@/features/miniGame/racingGame/pages/RacingGameReadyPage';
 import { MiniGameType } from '@/types/miniGame/common';
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import MiniGameIntroSlide from '../../components/MiniGameIntroSlide/MiniGameIntroSlide';
-import { GAME_SLIDE_CONFIGS, getGameSlideConfig } from '../../config/gameSlideConfigs';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { JSX } from 'react';
+import { useParams } from 'react-router-dom';
+
+const READY_PAGE_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
+  CARD_GAME: CardGameReadyPage,
+  RACING_GAME: RacingGameReadyPage,
+} as const;
 
 const MiniGameReadyPage = () => {
-  const navigate = useNavigate();
-  const { joinCode } = useIdentifier();
   const { miniGameType } = useParams();
-  const { currentCardGameState } = useCardGame();
-  const { racingGameState } = useRacingGame();
 
-  const isValidGameType = miniGameType && miniGameType in GAME_SLIDE_CONFIGS;
-  const gameType = miniGameType as MiniGameType;
-  // TODO: slideConfig가 존재하지 않으면 MiniGameReadyPage를 건너뛰게 하기
-  const slideConfig = isValidGameType ? getGameSlideConfig(gameType) : [];
-
-  useEffect(() => {
-    if (!joinCode || !gameType) return;
-    if (
-      (gameType === 'CARD_GAME' && currentCardGameState === 'PREPARE') ||
-      (gameType === 'RACING_GAME' && racingGameState === 'PREPARE')
-    ) {
-      navigate(`/room/${joinCode}/${gameType}/play`);
-    }
-  }, [currentCardGameState, racingGameState, joinCode, gameType, navigate]);
-
-  if (!isValidGameType) {
+  if (!miniGameType || !(miniGameType in READY_PAGE_COMPONENTS)) {
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
@@ -39,20 +21,9 @@ const MiniGameReadyPage = () => {
     );
   }
 
-  return (
-    <Layout color="point-400">
-      <Layout.Content>
-        {slideConfig.map((slide, index) => (
-          <MiniGameIntroSlide
-            key={index}
-            textLines={slide.textLines}
-            imageSrc={slide.imageSrc}
-            className={slide.className}
-          />
-        ))}
-      </Layout.Content>
-    </Layout>
-  );
+  const ReadyPageComponent = READY_PAGE_COMPONENTS[miniGameType as MiniGameType];
+
+  return <ReadyPageComponent />;
 };
 
 export default MiniGameReadyPage;
