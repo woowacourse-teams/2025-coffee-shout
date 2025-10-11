@@ -34,7 +34,6 @@ export const BadRequest: Story = {
       message: 'Bad Request',
       data: null,
       displayMode: 'fallback',
-      method: 'GET',
     }),
   },
   parameters: {
@@ -53,7 +52,6 @@ export const Forbidden: Story = {
       message: 'Forbidden',
       data: null,
       displayMode: 'fallback',
-      method: 'GET',
     }),
   },
   parameters: {
@@ -72,7 +70,6 @@ export const NotFound: Story = {
       message: 'Not Found',
       data: null,
       displayMode: 'fallback',
-      method: 'GET',
     }),
   },
   parameters: {
@@ -91,7 +88,6 @@ export const InternalServerError: Story = {
       message: 'Internal Server Error',
       data: null,
       displayMode: 'fallback',
-      method: 'GET',
     }),
   },
   parameters: {
@@ -123,7 +119,6 @@ export const UndefinedHttpError: Story = {
       message: "I'm a teapot",
       data: null,
       displayMode: 'fallback',
-      method: 'GET',
     }),
   },
   parameters: {

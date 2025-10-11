@@ -80,7 +80,6 @@ export const apiRequest = async <T, TData>(
           message: errorMessage,
           data: errorData,
           displayMode: errorDisplayMode,
-          method,
         });
         reportApiError(apiError);
         throw apiError;

@@ -18,19 +18,9 @@ class LocalErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    if (error instanceof ApiError) {
-      if (error.method !== 'GET') {
-        throw error;
-      }
-
+    if (error instanceof ApiError || error instanceof NetworkError) {
       if (error.displayMode === 'fallback') {
-        return { error: error as ApiError };
-      }
-    }
-
-    if (error instanceof NetworkError) {
-      if (error.displayMode === 'fallback') {
-        return { error: error as NetworkError };
+        return { error };
       }
     }
 
