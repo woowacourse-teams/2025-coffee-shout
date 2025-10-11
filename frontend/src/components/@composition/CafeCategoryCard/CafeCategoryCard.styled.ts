@@ -12,6 +12,7 @@ export const Container = styled.button<Props>`
   cursor: pointer;
   background-color: ${({ theme }) => theme.color.white};
   width: 100%;
+  min-height: 81px;
 
   ${({ theme, $touchState }) =>
     buttonHoverPress({

@@ -1,10 +1,10 @@
-import { useTheme } from '@emotion/react';
-import { RouletteSector, PlayerProbability } from '@/types/roulette';
-import * as S from './RouletteWheel.styled';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { PlayerProbability, RouletteSector } from '@/types/roulette';
+import { memo } from 'react';
 import { WHEEL_CONFIG } from '../../constants/config';
 import { convertProbabilitiesToAngles } from '../../utils';
 import RouletteSlice from '../RouletteSlice/RouletteSlice';
-import { memo } from 'react';
+import * as S from './RouletteWheel.styled';
 
 type Props =
   | {
@@ -26,9 +26,15 @@ const RouletteWheel = ({
   isSpinning = false,
   finalRotation = 0,
 }: Props) => {
-  const theme = useTheme();
+  const { myName } = useIdentifier();
 
   const playersWithAngles = sectors || convertProbabilitiesToAngles(playerProbabilities);
+
+  const sortedPlayers = [...playersWithAngles].sort((a, b) => {
+    if (a.playerName === myName) return 1;
+    if (b.playerName === myName) return -1;
+    return 0;
+  });
 
   return (
     <S.Container>
@@ -39,11 +45,13 @@ const RouletteWheel = ({
           height={WHEEL_CONFIG.SIZE}
           viewBox={`0 0 ${WHEEL_CONFIG.SIZE} ${WHEEL_CONFIG.SIZE}`}
         >
-          {playersWithAngles.map((player) => (
+          <GlowFilter />
+          {sortedPlayers.map((player) => (
             <RouletteSlice
               key={player.playerName}
               player={player}
-              strokeColor={theme.color.point[100]}
+              strokeColor={player.playerName === myName ? '#FFFF8F' : 'transparent'}
+              isGlowing={player.playerName === myName}
             />
           ))}
         </svg>
@@ -56,3 +64,16 @@ export default RouletteWheel;
 
 const Pin = memo(() => <S.Pin />);
 Pin.displayName = 'Pin';
+
+const GlowFilter = memo(({ id = 'glow' }: { id?: string }) => (
+  <defs>
+    <filter id={id} x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+));
+GlowFilter.displayName = 'GlowFilter';

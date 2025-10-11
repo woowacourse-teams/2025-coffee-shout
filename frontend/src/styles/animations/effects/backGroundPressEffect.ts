@@ -35,6 +35,7 @@ export const backgroundPressEffect = ({ activeColor, touchState }: Props) => {
   return css`
     position: relative;
     overflow: hidden;
+    isolation: isolate;
 
     &::before {
       z-index: -1;

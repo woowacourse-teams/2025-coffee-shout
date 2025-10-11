@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import PrepareOverlay from './PrepareOverlay';
 
 const meta = {
-  title: 'Features/MiniGame/CardGame/PrepareOverlay',
+  title: 'Features/MiniGame/PrepareOverlay',
   component: PrepareOverlay,
   parameters: {
     layout: 'centered',

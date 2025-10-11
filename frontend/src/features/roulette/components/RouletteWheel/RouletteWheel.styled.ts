@@ -20,7 +20,6 @@ export const Wrapper = styled.div<WrapperProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   position: relative;
 
   --final-rotation: ${({ $finalRotation }) => $finalRotation ?? 0}deg;

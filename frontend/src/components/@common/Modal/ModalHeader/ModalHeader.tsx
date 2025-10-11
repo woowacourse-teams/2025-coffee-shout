@@ -22,6 +22,7 @@ const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
       <Headline3 id={id}>{title}</Headline3>
       {showCloseButton && (
         <S.CloseButton
+          aria-label="close-icon"
           onClick={onClose}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
