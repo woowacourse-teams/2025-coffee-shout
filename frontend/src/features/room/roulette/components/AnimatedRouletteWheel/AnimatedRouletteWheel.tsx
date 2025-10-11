@@ -5,13 +5,13 @@ import { useEffect } from 'react';
 
 type Props = {
   finalRotation: number;
-  isSpinning: boolean;
+  isSpinStarted: boolean;
   startAnimation: boolean;
 };
 
 const ANIMATION_DURATION = 500;
 
-const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimation }: Props) => {
+const AnimatedRouletteWheel = ({ finalRotation, isSpinStarted, startAnimation }: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
 
   const {
@@ -35,7 +35,7 @@ const AnimatedRouletteWheel = ({ finalRotation, isSpinning, startAnimation }: Pr
     <RouletteWheel
       sectors={animatedSectors}
       finalRotation={finalRotation}
-      isSpinning={isSpinning}
+      isSpinStarted={isSpinStarted}
     />
   );
 };
