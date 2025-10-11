@@ -65,7 +65,7 @@ server:
       max: 200
       min-spare: 30
     max-connections: 700
-    accept-count: 100
+    accept-count: 300
 
 websocket:
   docs:
