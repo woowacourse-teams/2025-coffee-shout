@@ -1,6 +1,6 @@
 package coffeeshout.racinggame.ui;
 
-import coffeeshout.racinggame.application.RacingGameService;
+import coffeeshout.racinggame.application.RacingGameFacade;
 import coffeeshout.racinggame.domain.event.RaceStateChangedEvent;
 import coffeeshout.racinggame.ui.request.TapCommand;
 import generator.annotaions.MessageResponse;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class RacingGameWebSocketController {
 
-    private final RacingGameService racingGameService;
+    private final RacingGameFacade racingGameFacade;
 
     @MessageMapping("/room/{joinCode}/racing-game/tap")
     @Operation(
@@ -30,6 +30,6 @@ public class RacingGameWebSocketController {
             returnType = RaceStateChangedEvent.class
     )
     public void tap(@DestinationVariable String joinCode, @Payload @Valid TapCommand command) {
-        racingGameService.tap(joinCode, command.playerName(), command.tapCount());
+        racingGameFacade.tap(joinCode, command.playerName(), command.tapCount());
     }
 }

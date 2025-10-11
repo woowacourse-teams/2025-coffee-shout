@@ -1,6 +1,6 @@
 package coffeeshout.racinggame.infra.messaging.handler;
 
-import coffeeshout.racinggame.application.RacingGameCommandService;
+import coffeeshout.racinggame.application.RacingGameService;
 import coffeeshout.racinggame.domain.event.RacingGameEventType;
 import coffeeshout.racinggame.domain.event.TapCommandEvent;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TapCommandEventHandler implements RacingGameEventHandler<TapCommandEvent> {
 
-    private final RacingGameCommandService racingGameCommandService;
+    private final RacingGameService racingGameService;
 
     @Override
     public void handle(TapCommandEvent event) {
@@ -24,7 +24,7 @@ public class TapCommandEventHandler implements RacingGameEventHandler<TapCommand
             log.debug("탭 이벤트 수신: eventId={}, joinCode={}, playerName={}, tapCount={}",
                     event.eventId(), event.joinCode(), event.playerName(), event.tapCount());
 
-            racingGameCommandService.tap(
+            racingGameService.tap(
                     event.joinCode(),
                     event.playerName(),
                     event.tapCount()

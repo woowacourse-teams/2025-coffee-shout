@@ -1,36 +1,26 @@
 package coffeeshout.minigame.racinggame.application;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.ServiceTest;
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.racinggame.application.RacingGameCommandService;
+import coffeeshout.racinggame.application.RacingGameService;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.RacingGameState;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.repository.RoomRepository;
-import coffeeshout.room.domain.roulette.Probability;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import org.aspectj.util.Reflection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.util.ReflectionTestUtils;
 
-class RacingGameCommandServiceTest extends ServiceTest {
+class RacingGameServiceTest extends ServiceTest {
 
     @Autowired
     private RoomRepository roomRepository;
 
     @Autowired
-    private RacingGameCommandService racingGameCommandService;
+    private RacingGameService racingGameService;
 
     private static final String HOST_NAME = "꾹이";
 
@@ -50,7 +40,7 @@ class RacingGameCommandServiceTest extends ServiceTest {
         room.startNextGame(HOST_NAME);
 
         // when
-        racingGameCommandService.start(room.getJoinCode().getValue(), HOST_NAME);
+        racingGameService.start(room.getJoinCode().getValue(), HOST_NAME);
         Thread.sleep(100);
 
         // then
