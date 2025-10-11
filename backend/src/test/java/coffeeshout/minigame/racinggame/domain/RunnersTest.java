@@ -23,7 +23,7 @@ class RunnersTest {
     @Test
     void 플레이어의_속도를_업데이트할_수_있다() {
         // when
-        runners.updateSpeed(players.get(0), 5, speedCalculator);
+        runners.updateSpeed(players.get(0), 5, speedCalculator, Instant.now());
 
         // then
         assertThat(runners.getRunners().get(0).getSpeed()).isEqualTo(30);
@@ -42,7 +42,7 @@ class RunnersTest {
     @Test
     void 우승자를_찾을_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator);
+        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
         for (int i = 0; i < 100; i++) {
             runners.moveAll();
         }
@@ -63,7 +63,7 @@ class RunnersTest {
     @Test
     void 우승자가_있는지_확인할_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator);
+        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
         for (int i = 0; i < 100; i++) {
             runners.moveAll();
         }
@@ -88,8 +88,8 @@ class RunnersTest {
     @Test
     void 모든_러너의_속도를_조회할_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 8, speedCalculator);
-        runners.updateSpeed(players.get(1), 8, speedCalculator);
+        runners.updateSpeed(players.get(0), 8, speedCalculator, Instant.now());
+        runners.updateSpeed(players.get(1), 8, speedCalculator, Instant.now());
 
         // then
         assertThat(runners.getSpeeds().values()).allMatch(speed -> speed == 30);
@@ -98,8 +98,8 @@ class RunnersTest {
     @Test
     void 모든_러너가_완주했는지_확인할_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator);
-        runners.updateSpeed(players.get(1), 10, speedCalculator);
+        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
+        runners.updateSpeed(players.get(1), 10, speedCalculator, Instant.now());
         for (int i = 0; i < 100; i++) {
             runners.moveAll();
         }

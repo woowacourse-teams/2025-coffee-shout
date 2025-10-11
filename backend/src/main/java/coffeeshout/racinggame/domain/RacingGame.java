@@ -61,9 +61,9 @@ public class RacingGame implements Playable {
         }
     }
 
-    public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator) {
+    public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator, Instant now) {
         validatePlaying();
-        runners.updateSpeed(player, tapCount, speedCalculator);
+        runners.updateSpeed(player, tapCount, speedCalculator, now);
     }
 
     private void validatePlaying() {

@@ -8,6 +8,7 @@ import coffeeshout.racinggame.domain.RacingGameState;
 import coffeeshout.racinggame.domain.Runner;
 import coffeeshout.racinggame.domain.SpeedCalculator;
 import coffeeshout.room.domain.player.Player;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ class RacingGameTest {
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
 
-        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
-        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 10);
+        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
+        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
 
         // when
         racingGame.moveAll();
@@ -50,8 +51,8 @@ class RacingGameTest {
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
 
-        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 30);
-        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30);
+        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 30, Instant.now());
+        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30, Instant.now());
 
         // when
         for (int i = 0; i < 101; ++i) {
@@ -68,8 +69,8 @@ class RacingGameTest {
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
 
-        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
-        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 10);
+        racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
+        racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
 
         // then
         assertThat(racingGame.getRunners().getSpeeds().values()).allMatch(value -> value == 10);
@@ -82,7 +83,7 @@ class RacingGameTest {
         racingGame.setUp(players);
 
         // when && then
-        assertThatThrownBy(() -> racingGame.updateSpeed(players.get(0), 10, speedCalculator))
+        assertThatThrownBy(() -> racingGame.updateSpeed(players.get(0), 10, speedCalculator, Instant.now()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("게임이 진행 중이 아닙니다.");
     }
@@ -95,15 +96,15 @@ class RacingGameTest {
         racingGame.startAutoMove(null);
 
         for (int i = 0; i < 100; i++) {
-            racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30);
-            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
+            racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30, Instant.now());
+            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
             racingGame.moveAll();
         }
 
         Thread.sleep(2);
 
         for (int i = 0; i < 200; i++) {
-            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10);
+            racingGame.updateSpeed(players.get(0), 10, (lastTapedTime, now, tapCount) -> 10, Instant.now());
             racingGame.moveAll();
         }
 

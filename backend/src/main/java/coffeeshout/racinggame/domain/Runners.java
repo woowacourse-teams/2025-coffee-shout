@@ -22,9 +22,9 @@ public class Runners {
         players.forEach(player -> runners.add(new Runner(player)));
     }
 
-    public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator) {
+    public void updateSpeed(Player player, int tapCount, SpeedCalculator speedCalculator, Instant now) {
         final Runner runner = findRunnerByPlayer(player);
-        runner.updateSpeed(speedCalculator.calculateSpeed(runner.getLastSpeedUpdateTime(), Instant.now(), tapCount));
+        runner.updateSpeed(speedCalculator.calculateSpeed(runner.getLastSpeedUpdateTime(), now, tapCount));
     }
 
     public void moveAll() {

@@ -65,7 +65,7 @@ public class RacingGameService implements MiniGameService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         final RacingGame racingGame = getRacingGame(room);
         final Player player = room.findPlayer(new PlayerName(playerName));
-        racingGame.updateSpeed(player, tapCount, speedCalculator);
+        racingGame.updateSpeed(player, tapCount, speedCalculator, Instant.now());
 
         log.debug("탭 처리 완료: joinCode={}, playerName={}, tapCount={}", joinCode, playerName, tapCount);
     }
