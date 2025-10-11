@@ -87,7 +87,7 @@ public class RacingGameService implements MiniGameService {
 
     private void processPrepare(RacingGame racingGame, String joinCode) {
         racingGame.updateState(RacingGameState.PREPARE);
-        eventPublisher.publishEvent(RunnersMovedEvent.from(racingGame, joinCode));
+        eventPublisher.publishEvent(RunnersMovedEvent.of(racingGame, joinCode));
         taskScheduler.schedule(() -> startAutoMove(racingGame, joinCode),
                 Instant.now().plus(racingGame.getState().getDuration(), ChronoUnit.MILLIS));
     }
@@ -123,7 +123,7 @@ public class RacingGameService implements MiniGameService {
     }
 
     private void publishRunnersMoved(RacingGame racingGame, String joinCode) {
-        eventPublisher.publishEvent(RunnersMovedEvent.from(racingGame, joinCode));
+        eventPublisher.publishEvent(RunnersMovedEvent.of(racingGame, joinCode));
     }
 
     private void handleAutoMoveError(RacingGame racingGame, Exception e) {
