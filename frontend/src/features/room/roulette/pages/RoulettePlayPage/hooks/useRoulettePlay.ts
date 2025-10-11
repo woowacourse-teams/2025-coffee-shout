@@ -28,7 +28,6 @@ const useRoulettePlay = () => {
 
     if (isSpinning) {
       const timer = setTimeout(() => {
-        setIsSpinning(false);
         navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
       }, 5000);
       return () => clearTimeout(timer);
