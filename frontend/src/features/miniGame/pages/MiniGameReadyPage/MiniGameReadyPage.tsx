@@ -1,18 +1,11 @@
-import CardGameReadyPage from '@/features/miniGame/cardGame/pages/CardGameReadyPage';
-import RacingGameReadyPage from '@/features/miniGame/racingGame/pages/RacingGameReadyPage';
 import { MiniGameType } from '@/types/miniGame/common';
-import { JSX } from 'react';
 import { useParams } from 'react-router-dom';
-
-const READY_PAGE_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
-  CARD_GAME: CardGameReadyPage,
-  RACING_GAME: RacingGameReadyPage,
-} as const;
+import { GAME_CONFIGS } from '../../config/gameConfigs';
 
 const MiniGameReadyPage = () => {
   const { miniGameType } = useParams();
 
-  if (!miniGameType || !(miniGameType in READY_PAGE_COMPONENTS)) {
+  if (!miniGameType || !(miniGameType in GAME_CONFIGS)) {
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
@@ -21,7 +14,7 @@ const MiniGameReadyPage = () => {
     );
   }
 
-  const ReadyPageComponent = READY_PAGE_COMPONENTS[miniGameType as MiniGameType];
+  const ReadyPageComponent = GAME_CONFIGS[miniGameType as MiniGameType].ReadyPage;
 
   return <ReadyPageComponent />;
 };

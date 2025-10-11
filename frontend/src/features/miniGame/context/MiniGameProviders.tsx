@@ -1,16 +1,16 @@
 import { MiniGameType } from '@/types/miniGame/common';
 import { PropsWithChildren } from 'react';
 import { useParams } from 'react-router-dom';
-import { GAME_PROVIDER } from '../config/gameProviderConfigs';
+import { GAME_CONFIGS } from '../config/gameConfigs';
 
 const MiniGameProviders = ({ children }: PropsWithChildren) => {
   const { miniGameType } = useParams();
 
-  if (!miniGameType || !(miniGameType in GAME_PROVIDER)) {
+  if (!miniGameType || !(miniGameType in GAME_CONFIGS)) {
     return <>{children}</>;
   }
 
-  const ProviderComponent = GAME_PROVIDER[miniGameType as MiniGameType];
+  const ProviderComponent = GAME_CONFIGS[miniGameType as MiniGameType].Provider;
 
   if (!ProviderComponent) {
     return <>{children}</>;
