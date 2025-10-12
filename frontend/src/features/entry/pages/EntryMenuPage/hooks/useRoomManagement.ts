@@ -7,6 +7,7 @@ import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
 import { useState } from 'react';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 
 export type RoomRequest = {
   playerName: string;
@@ -78,8 +79,22 @@ export const useRoomManagement = () => {
 
       startSocket(_joinCode, myName);
     } catch (error) {
-      console.error(error);
-      alert('방 만들기 실패!');
+      if (error instanceof ApiError) {
+        showToast({
+          type: 'error',
+          message: '방 생성/참가에 실패했습니다.',
+        });
+      } else if (error instanceof NetworkError) {
+        showToast({
+          type: 'error',
+          message: '네트워크 연결을 확인해주세요.',
+        });
+      } else {
+        showToast({
+          type: 'error',
+          message: '알 수 없는 오류가 발생했습니다.',
+        });
+      }
     }
   };
 
