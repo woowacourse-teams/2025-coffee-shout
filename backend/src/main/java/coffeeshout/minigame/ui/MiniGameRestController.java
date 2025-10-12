@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/minigames")
 @RequiredArgsConstructor
-public class MiniGameRestController {
+public class MiniGameRestController implements MiniGameApi {
 
     private final RoomService roomService;
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class PlayerController {
+public class MenuController implements MenuApi {
 
     private final MenuService menuService;
 
