@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.fixture.PlayerFixture;
@@ -8,7 +8,6 @@ import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.racinggame.domain.RacingGameScore;
 import coffeeshout.room.domain.player.Player;
-import java.util.Comparator;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.of(playerScores, Comparator.reverseOrder());
+        MiniGameResult miniGameResult = MiniGameResult.fromDescending(playerScores);
 
         // then
         SoftAssertions.assertSoftly(
@@ -60,7 +59,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.of(playerScores, Comparator.reverseOrder());
+        MiniGameResult miniGameResult = MiniGameResult.fromDescending(playerScores);
 
         // then
         SoftAssertions.assertSoftly(
@@ -76,12 +75,12 @@ class MiniGameResultTest {
     @Test
     void 동점자가_몇_명인지_확인한다() {
         // given
-        MiniGameResult result = MiniGameResult.of(Map.of(
+        MiniGameResult result = MiniGameResult.fromDescending(Map.of(
                 호스트_한스, new RacingGameScore(99999),
                 게스트_루키, new RacingGameScore(99999),
                 게스트_엠제이, new RacingGameScore(99999),
                 게스트_꾹이, new RacingGameScore(99999)
-        ), Comparator.reverseOrder());
+        ));
 
         // when
         int count = result.getTieCountByRank(1);

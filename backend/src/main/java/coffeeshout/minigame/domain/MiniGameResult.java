@@ -24,6 +24,14 @@ public class MiniGameResult {
         return rank.get(player);
     }
 
+    public static MiniGameResult fromDescending(@NonNull Map<Player, MiniGameScore> playerScores) {
+        return of(playerScores, Comparator.reverseOrder());
+    }
+
+    public static MiniGameResult fromAscending(@NonNull Map<Player, MiniGameScore> playerScores) {
+        return of(playerScores, Comparator.naturalOrder());
+    }
+
     public static MiniGameResult of(
             @NonNull Map<Player, MiniGameScore> playerScores,
             Comparator<MiniGameScore> comparator

@@ -2,16 +2,15 @@ package coffeeshout.cardgame.domain;
 
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.minigame.domain.MiniGameResult;
-import coffeeshout.minigame.domain.MiniGameScore;
-import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.cardgame.domain.card.Card;
 import coffeeshout.cardgame.domain.card.CardGameDeckGenerator;
 import coffeeshout.cardgame.domain.card.Deck;
+import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.minigame.domain.MiniGameScore;
+import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public class CardGame implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.of(getScores(), Comparator.reverseOrder());
+        return MiniGameResult.fromDescending(getScores());
     }
 
     @Override
