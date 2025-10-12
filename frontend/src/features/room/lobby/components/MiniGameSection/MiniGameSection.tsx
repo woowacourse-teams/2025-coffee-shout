@@ -17,16 +17,11 @@ type Props = {
 
 export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Props) => {
   const { playerType } = usePlayerType();
-  const {
-    data: miniGames,
-    loading,
-    error,
-  } = useFetch<MiniGameType[]>({
+  const { data: miniGames, loading } = useFetch<MiniGameType[]>({
     endpoint: '/rooms/minigames',
   });
 
   if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error.message}</div>;
 
   return (
     <>

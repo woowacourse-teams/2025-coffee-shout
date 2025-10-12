@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/apis/rest/api';
-import { ApiError, NetworkError } from '@/apis/rest/error';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
@@ -8,6 +7,7 @@ import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
 import { useState } from 'react';
+import { ApiError, NetworkError } from '@/apis/rest/error';
 
 export type RoomRequest = {
   playerName: string;
@@ -79,7 +79,6 @@ export const useRoomManagement = () => {
 
       startSocket(_joinCode, myName);
     } catch (error) {
-      setIsLoading(false);
       if (error instanceof ApiError) {
         showToast({
           type: 'error',

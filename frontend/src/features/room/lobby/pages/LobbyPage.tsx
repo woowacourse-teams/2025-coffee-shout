@@ -28,6 +28,7 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import { api } from '@/apis/rest/api';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
@@ -221,10 +222,12 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <MiniGameSection
-        selectedMiniGames={selectedMiniGames}
-        handleMiniGameClick={handleMiniGameClick}
-      />
+      <LocalErrorBoundary>
+        <MiniGameSection
+          selectedMiniGames={selectedMiniGames}
+          handleMiniGameClick={handleMiniGameClick}
+        />
+      </LocalErrorBoundary>
     ),
   };
 
