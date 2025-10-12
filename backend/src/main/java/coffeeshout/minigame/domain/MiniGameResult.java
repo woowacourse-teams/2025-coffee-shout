@@ -24,7 +24,7 @@ public class MiniGameResult {
         return rank.get(player);
     }
 
-    public static MiniGameResult from(
+    public static MiniGameResult of(
             @NonNull Map<Player, MiniGameScore> playerScores,
             Comparator<MiniGameScore> comparator
     ) {
