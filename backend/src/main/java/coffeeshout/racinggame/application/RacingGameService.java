@@ -70,7 +70,7 @@ public class RacingGameService implements MiniGameService {
         log.debug("탭 처리 완료: joinCode={}, playerName={}, tapCount={}", joinCode, playerName, tapCount);
     }
 
-    public void startAutoMove(RacingGame racingGame, String joinCode) {
+    private void startAutoMove(RacingGame racingGame, String joinCode) {
         racingGame.updateState(RacingGameState.PLAYING);
         eventPublisher.publishEvent(RaceStateChangedEvent.of(racingGame, joinCode));
         final ScheduledFuture<?> autoMoveFuture = scheduleAutoMoveTask(racingGame, joinCode);
