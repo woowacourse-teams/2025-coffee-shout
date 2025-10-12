@@ -74,7 +74,7 @@ public class RacingGame implements Playable {
 
     @Override
     public MiniGameResult getResult() {
-        return MiniGameResult.from(getScores(), Comparator.naturalOrder());
+        return MiniGameResult.of(getScores(), Comparator.naturalOrder());
     }
 
     @Override

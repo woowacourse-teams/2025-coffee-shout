@@ -31,7 +31,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.reverseOrder());
+        MiniGameResult miniGameResult = MiniGameResult.of(playerScores, Comparator.reverseOrder());
 
         // then
         SoftAssertions.assertSoftly(
@@ -60,7 +60,7 @@ class MiniGameResultTest {
         );
 
         // when
-        MiniGameResult miniGameResult = MiniGameResult.from(playerScores, Comparator.reverseOrder());
+        MiniGameResult miniGameResult = MiniGameResult.of(playerScores, Comparator.reverseOrder());
 
         // then
         SoftAssertions.assertSoftly(
@@ -76,7 +76,7 @@ class MiniGameResultTest {
     @Test
     void 동점자가_몇_명인지_확인한다() {
         // given
-        MiniGameResult result = MiniGameResult.from(Map.of(
+        MiniGameResult result = MiniGameResult.of(Map.of(
                 호스트_한스, new RacingGameScore(99999),
                 게스트_루키, new RacingGameScore(99999),
                 게스트_엠제이, new RacingGameScore(99999),
