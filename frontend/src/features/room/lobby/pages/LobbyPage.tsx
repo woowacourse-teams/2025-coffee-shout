@@ -29,6 +29,7 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
+import { api } from '@/apis/rest/api';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -111,8 +112,14 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send, isConnected]);
 
-  const handleNavigateToHome = () => {
-    navigate('/');
+  const handleNavigateToHome = async () => {
+    try {
+      await api.delete(`/rooms/${joinCode}/players/${myName}`);
+    } catch (error) {
+      console.error('플레이어 퇴장 중 에러 발생:', error);
+    } finally {
+      navigate('/');
+    }
   };
 
   const handleClickGameStartButton = () => {
