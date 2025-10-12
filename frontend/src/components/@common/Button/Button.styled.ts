@@ -71,14 +71,13 @@ export const Container = styled.button<Props>`
     css`
       cursor: default;
       background: ${theme.color.point[300]};
-      color: transparent;
+      /* color: transparent; */
       pointer-events: none;
 
       &:hover,
       &:active,
       &:focus {
         transform: none;
-        background: inherit;
         box-shadow: none;
         outline: none;
       }
