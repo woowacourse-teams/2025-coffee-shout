@@ -5,6 +5,7 @@ import coffeeshout.global.websocket.StompSessionManager;
 import coffeeshout.global.websocket.SubscriptionInfoService;
 import coffeeshout.global.websocket.event.player.PlayerDisconnectedEvent;
 import coffeeshout.global.websocket.infra.PlayerEventPublisher;
+import coffeeshout.global.websocket.lifecycle.WebSocketGracefulShutdownHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -23,6 +24,7 @@ public class SessionDisconnectEventListener {
     private final PlayerEventPublisher playerEventPublisher;
     private final SubscriptionInfoService subscriptionInfoService;
     private final WebSocketMetricService webSocketMetricService;
+    private final WebSocketGracefulShutdownHandler shutdownHandler;
 
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
@@ -53,5 +55,8 @@ public class SessionDisconnectEventListener {
         }
 
         webSocketMetricService.recordDisconnection(sessionId, CLIENT_DISCONNECT);
+
+        // Graceful Shutdown 핸들러에 세션 종료 알림
+        shutdownHandler.onSessionDisconnected();
     }
 }

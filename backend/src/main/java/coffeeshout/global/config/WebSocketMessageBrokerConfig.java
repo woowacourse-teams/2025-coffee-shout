@@ -1,8 +1,9 @@
 package coffeeshout.global.config;
 
 
-import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
-import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
+import coffeeshout.global.websocket.interceptor.ShutdownAwareHandshakeInterceptor;
+import coffeeshout.global.websocket.interceptor.WebSocketInboundMetricInterceptor;
+import coffeeshout.global.websocket.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
@@ -24,6 +25,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
+    private final ShutdownAwareHandshakeInterceptor shutdownAwareHandshakeInterceptor;
     private final ObservationRegistry observationRegistry;
     private final ContextSnapshotFactory snapshotFactory;
 
@@ -45,6 +47,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
+                .addInterceptors(shutdownAwareHandshakeInterceptor)
                 .withSockJS();
     }
 

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.event.SessionDisconnectEventListener;
 import coffeeshout.global.websocket.infra.PlayerEventPublisher;
+import coffeeshout.global.websocket.lifecycle.WebSocketGracefulShutdownHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,8 @@ class SessionDisconnectEventListenerTest {
     SubscriptionInfoService subscriptionInfoService;
     @Mock
     WebSocketMetricService metricService;
+    @Mock
+    WebSocketGracefulShutdownHandler gracefulShutdownHandler;
 
     StompSessionManager sessionManager;
     SessionDisconnectEventListener listener;
@@ -39,7 +42,7 @@ class SessionDisconnectEventListenerTest {
     void setUp() {
         sessionManager = new StompSessionManager();
         listener = new SessionDisconnectEventListener(sessionManager, playerEventPublisher,
-                subscriptionInfoService, metricService);
+                subscriptionInfoService, metricService, gracefulShutdownHandler);
     }
 
     @Nested
@@ -62,7 +65,6 @@ class SessionDisconnectEventListenerTest {
             // given
             sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
             SessionDisconnectEvent event = createSessionDisconnectEvent(sessionId);
-            String expectedPlayerKey = joinCode + ":" + playerName;
 
             // when
             listener.handleSessionDisconnectEvent(event);
