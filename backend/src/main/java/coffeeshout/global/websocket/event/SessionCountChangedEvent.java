@@ -1,7 +1,10 @@
 package coffeeshout.global.websocket.event;
 
-import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
+import coffeeshout.global.trace.TraceInfo;
+import coffeeshout.global.trace.TraceInfoExtractor;
+import coffeeshout.global.trace.Traceable;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * WebSocket 세션 수 변경 이벤트
@@ -9,29 +12,43 @@ import org.springframework.context.ApplicationEvent;
  * 세션이 연결되거나 해제될 때 발행되는 이벤트입니다.
  * </p>
  */
-@Getter
-public class SessionCountChangedEvent extends ApplicationEvent {
+public record SessionCountChangedEvent(
+        String eventId,
+        TraceInfo traceInfo,
+        LocalDateTime timestamp,
+        SessionChangeType changeType,
+        String sessionId,
+        int remainingSessionCount
+) implements Traceable {
 
-    private final int remainingSessionCount;
-    private final String sessionId;
-    private final ChangeType changeType;
-
-    private SessionCountChangedEvent(Object source, String sessionId, int remainingSessionCount, ChangeType changeType) {
-        super(source);
-        this.sessionId = sessionId;
-        this.remainingSessionCount = remainingSessionCount;
-        this.changeType = changeType;
+    public static SessionCountChangedEvent connected(String sessionId, int remainingCount) {
+        return new SessionCountChangedEvent(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                LocalDateTime.now(),
+                SessionChangeType.CONNECTED,
+                sessionId,
+                remainingCount
+        );
     }
 
-    public static SessionCountChangedEvent connected(Object source, String sessionId, int remainingCount) {
-        return new SessionCountChangedEvent(source, sessionId, remainingCount, ChangeType.CONNECTED);
+    public static SessionCountChangedEvent disconnected(String sessionId, int remainingCount) {
+        return new SessionCountChangedEvent(
+                UUID.randomUUID().toString(),
+                TraceInfoExtractor.extract(),
+                LocalDateTime.now(),
+                SessionChangeType.DISCONNECTED,
+                sessionId,
+                remainingCount
+        );
     }
 
-    public static SessionCountChangedEvent disconnected(Object source, String sessionId, int remainingCount) {
-        return new SessionCountChangedEvent(source, sessionId, remainingCount, ChangeType.DISCONNECTED);
+    @Override
+    public TraceInfo getTraceInfo() {
+        return traceInfo;
     }
 
-    public enum ChangeType {
+    public enum SessionChangeType {
         CONNECTED,
         DISCONNECTED
     }

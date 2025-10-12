@@ -43,7 +43,7 @@ public class WebSocketSessionTracker {
         log.debug("WebSocket 세션 추가: sessionId={}, 총 활성 세션 수={}", sessionId, currentCount);
 
         // 세션 수 변경 이벤트 발행
-        eventPublisher.publishEvent(SessionCountChangedEvent.connected(this, sessionId, currentCount));
+        eventPublisher.publishEvent(SessionCountChangedEvent.connected(sessionId, currentCount));
     }
 
     /**
@@ -59,7 +59,7 @@ public class WebSocketSessionTracker {
             log.debug("WebSocket 세션 제거: sessionId={}, 남은 활성 세션 수={}", sessionId, remainingCount);
 
             // 세션 수 변경 이벤트 발행
-            eventPublisher.publishEvent(SessionCountChangedEvent.disconnected(this, sessionId, remainingCount));
+            eventPublisher.publishEvent(SessionCountChangedEvent.disconnected(sessionId, remainingCount));
         }
     }
 

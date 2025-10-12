@@ -1,6 +1,7 @@
 package coffeeshout.global.websocket.lifecycle;
 
 import coffeeshout.global.websocket.event.SessionCountChangedEvent;
+import coffeeshout.global.websocket.event.SessionCountChangedEvent.SessionChangeType;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
@@ -111,7 +112,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
     @EventListener
     public void onSessionCountChanged(SessionCountChangedEvent event) {
         // DISCONNECTED 이벤트만 처리
-        if (event.getChangeType() != SessionCountChangedEvent.ChangeType.DISCONNECTED) {
+        if (event.changeType() != SessionChangeType.DISCONNECTED) {
             return;
         }
 
@@ -121,7 +122,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
             return;
         }
 
-        final int remaining = event.getRemainingSessionCount();
+        final int remaining = event.remainingSessionCount();
         log.debug("세션 종료 감지: 남은 연결 {} 개", remaining);
 
         if (remaining == 0 && !future.isDone()) {
