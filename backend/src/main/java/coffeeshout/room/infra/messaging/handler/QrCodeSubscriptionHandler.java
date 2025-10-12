@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.messaging;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.application.RoomService;
@@ -16,7 +16,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QrCodeEventListener {
+public class QrCodeSubscriptionHandler {
 
     private static final String QR_CODE_TOPIC_PATTERN = "/topic/room/{joinCode:.{4}}/qr-code";
 

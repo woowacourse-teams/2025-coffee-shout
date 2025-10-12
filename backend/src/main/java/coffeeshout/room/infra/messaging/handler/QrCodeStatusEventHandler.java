@@ -3,11 +3,12 @@ package coffeeshout.room.infra.messaging.handler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
+import generator.annotaions.MessageResponse;
+import generator.annotaions.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,12 +51,7 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
 
         roomCommandService.assignQrCodeError(new JoinCode(event.joinCode()));
 
-        final QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.ERROR, null);
-
-        final String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
-        messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
-
-        log.debug("QR 코드 Error 이벤트 전송 완료: destination={}", destination);
+        sendQrCode(event);
     }
 
     private void handleQrCodeSuccess(QrCodeStatusEvent event) {
@@ -64,12 +60,26 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
 
         roomCommandService.assignQrCode(new JoinCode(event.joinCode()), event.qrCodeUrl());
 
-        final QrCodeStatusResponse response = new QrCodeStatusResponse(QrCodeStatus.SUCCESS, event.qrCodeUrl());
+        sendQrCode(event);
+    }
+
+    @MessageResponse(
+            path = "/room/{joinCode}/qr-code",
+            returnType = QrCodeStatusResponse.class
+    )
+    @Operation(
+            summary = "QR 코드 완료 이벤트 처리",
+            description = "QR 코드 처리가 완료되면 클라이언트에게 상태와 URL을 전송합니다."
+    )
+    private void sendQrCode(QrCodeStatusEvent event) {
+
+        final QrCodeStatusResponse response = new QrCodeStatusResponse(event.status(), event.qrCodeUrl());
 
         final String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
 
-        log.debug("QR 코드 Success 이벤트 전송 완료: destination={}, url={}", destination, event.qrCodeUrl());
+        log.debug("QR 코드 이벤트 전송 완료: destination={}, status={}, url={}",
+                destination, event.status(), event.qrCodeUrl());
     }
 
 

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.infra.messaging.handler.QrCodeSubscriptionHandler;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ import org.springframework.util.PathMatcher;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 @ExtendWith(MockitoExtension.class)
-class QrCodeEventListenerTest {
+class QrCodeSubscriptionHandlerTest {
 
     @Mock
     private RoomService roomService;
@@ -40,12 +41,12 @@ class QrCodeEventListenerTest {
     private SimpMessagingTemplate messagingTemplate;
 
     @InjectMocks
-    private QrCodeEventListener qrCodeEventListener;
+    private QrCodeSubscriptionHandler qrCodeSubscriptionHandler;
 
     @BeforeEach
     void setUp() {
         final PathMatcher pathMatcher = new AntPathMatcher();
-        qrCodeEventListener = new QrCodeEventListener(roomService, messagingTemplate, pathMatcher);
+        qrCodeSubscriptionHandler = new QrCodeSubscriptionHandler(roomService, messagingTemplate, pathMatcher);
     }
 
     @Test
@@ -63,7 +64,7 @@ class QrCodeEventListenerTest {
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
         // when
-        qrCodeEventListener.handleSubscribeQrCodeStatus(event);
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
@@ -87,7 +88,7 @@ class QrCodeEventListenerTest {
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
         // when
-        qrCodeEventListener.handleSubscribeQrCodeStatus(event);
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
@@ -106,7 +107,7 @@ class QrCodeEventListenerTest {
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
         // when
-        qrCodeEventListener.handleSubscribeQrCodeStatus(event);
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
 
         // then
         then(roomService).should(never()).getQrCodeStatus(any());
@@ -123,7 +124,7 @@ class QrCodeEventListenerTest {
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
         // when
-        qrCodeEventListener.handleSubscribeQrCodeStatus(event);
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
 
         // then
         then(roomService).should(never()).getQrCodeStatus(any());
@@ -141,7 +142,7 @@ class QrCodeEventListenerTest {
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
         // when
-        qrCodeEventListener.handleSubscribeQrCodeStatus(event);
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
 
         // then
         then(roomService).should(never()).getQrCodeStatus(any());
