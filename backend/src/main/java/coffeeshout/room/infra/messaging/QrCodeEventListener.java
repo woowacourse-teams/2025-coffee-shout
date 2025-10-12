@@ -4,7 +4,6 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -48,7 +47,7 @@ public class QrCodeEventListener {
 
             try {
                 messagingTemplate.convertAndSendToUser(
-                        Objects.requireNonNull(sessionId),
+                        sessionId,
                         destination,
                         WebSocketResponse.success(qrCodeStatus)
                 );

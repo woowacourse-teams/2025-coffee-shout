@@ -49,7 +49,7 @@ public class QrCodeService {
     @Async("qrCodeTaskExecutor")
     public void generateQrCodeAsync(String joinCode) {
         if (joinCode == null || joinCode.isBlank()) {
-            log.warn("유효하지 않은 joinCode, ERROR 이벤트 발행: joinCode='{}'", joinCode);
+            log.warn("유효하지 않은 joinCode: joinCode='{}'", joinCode);
             return;
         }
 
