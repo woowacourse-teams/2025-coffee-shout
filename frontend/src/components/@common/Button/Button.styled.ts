@@ -71,7 +71,7 @@ export const Container = styled.button<Props>`
     css`
       cursor: default;
       background: ${theme.color.point[300]};
-      /* color: transparent; */
+      color: transparent;
       pointer-events: none;
 
       &:hover,
