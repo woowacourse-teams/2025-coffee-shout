@@ -139,12 +139,13 @@ const EntryMenuPage = () => {
       </Layout.Content>
       {shouldShowButtonBar && (
         <Layout.ButtonBar>
-          <Button
-            onClick={handleProceedToRoom}
-            isLoading={playerType === 'HOST' ? isRoomLoading : false}
-          >
-            {playerType === 'HOST' ? '방 만들러 가기' : '방 참가하기'}
-          </Button>
+          {playerType === 'HOST' ? (
+            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
+              방 만들러 가기
+            </Button>
+          ) : (
+            <Button onClick={handleProceedToRoom}>방 참가하기</Button>
+          )}
         </Layout.ButtonBar>
       )}
     </Layout>
