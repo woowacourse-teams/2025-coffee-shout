@@ -21,6 +21,12 @@ public record SessionCountChangedEvent(
         int remainingSessionCount
 ) implements Traceable {
 
+    public SessionCountChangedEvent {
+        if (remainingSessionCount < 0) {
+            throw new IllegalArgumentException("remainingSessionCount는 0 이상이어야 합니다: " + remainingSessionCount);
+        }
+    }
+
     public static SessionCountChangedEvent connected(String sessionId, int remainingCount) {
         return new SessionCountChangedEvent(
                 UUID.randomUUID().toString(),

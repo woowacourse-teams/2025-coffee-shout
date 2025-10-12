@@ -62,6 +62,12 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 
     @Override
     public void stop(@NonNull Runnable callback) {
+        if (isShuttingDown) {
+            log.warn("⚠️ 이미 WebSocket Graceful Shutdown이 진행 중입니다");
+            callback.run();
+            return;
+        }
+
         log.info("🛑 WebSocket Graceful Shutdown 시작");
 
         final int currentConnections = sessionTracker.getActiveSessionCount();

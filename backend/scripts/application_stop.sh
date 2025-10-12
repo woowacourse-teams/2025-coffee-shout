@@ -20,7 +20,7 @@ if [ -f "app/coffee-shout.pid" ]; then
 
         # 최대 360초 (6분) 대기 - Graceful Shutdown 5분 + 여유 1분
         echo "   ⏳ 정상 종료 대기 중... (최대 6분 - WebSocket Graceful Shutdown 포함)"
-        for i in {1..360}; do
+        for _ in {1..360}; do
             if ! ps -p $PID > /dev/null 2>&1; then
                 echo "   ✅ Spring Boot 애플리케이션이 정상 종료되었습니다"
                 break
