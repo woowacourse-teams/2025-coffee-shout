@@ -141,7 +141,7 @@ const EntryMenuPage = () => {
         (playerType === 'HOST' ? (
           <Layout.ButtonBar>
             <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
-              {!isRoomLoading && '방 만들러 가기'}
+              방 만들러 가기
             </Button>
           </Layout.ButtonBar>
         ) : (
