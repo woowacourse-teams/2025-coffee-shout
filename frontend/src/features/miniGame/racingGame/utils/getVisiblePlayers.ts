@@ -14,6 +14,8 @@ export const getVisiblePlayers = (players: Player[], myName: string): Player[] =
   const totalPlayers = players.length;
   const myIndex = players.findIndex((player) => player.playerName === myName);
 
+  if (myIndex === -1) return [];
+
   if (totalPlayers <= VISIBLE_PLAYER_COUNT) {
     const result: Player[] = [];
 
