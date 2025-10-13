@@ -47,18 +47,6 @@ SPRING_PROFILE="dev"
 export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
 echo "   🌍 환경 프로파일: $SPRING_PROFILE"
 
-# 환경변수 파일 로드
-if [ -f "app/app.env" ]; then
-    echo "   📝 환경변수 파일 로드 중..."
-    set -a
-    source app/app.env
-    set +a
-    echo "   ✅ 환경변수 로드 완료"
-else
-    echo "   ❌ app.env 파일을 찾을 수 없습니다!"
-    exit 1
-fi
-
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
 nohup java $JVM_OPTS \

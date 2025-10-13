@@ -8,11 +8,6 @@ files:
     destination: /opt/coffee-shout/app
     file_exists_behavior: OVERWRITE
 
-  # 환경변수 파일 복사
-  - source: app.env
-    destination: /opt/coffee-shout/app
-    file_exists_behavior: OVERWRITE
-
   # 설정 파일들 복사
   - source: /scripts/
     destination: /opt/coffee-shout/scripts
