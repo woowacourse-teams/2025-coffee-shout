@@ -1,8 +1,7 @@
 package coffeeshout.global.websocket.lifecycle;
 
-import coffeeshout.global.websocket.event.SessionCountChangedEvent;
-import coffeeshout.global.websocket.event.SessionCountChangedEvent.SessionChangeType;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -14,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
 
 /**
  * WebSocket Graceful Shutdown 핸들러
@@ -31,7 +30,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 
     private static final Duration STATUS_CHECK_INTERVAL = Duration.ofSeconds(5);
 
-    private final WebSocketSessionTracker sessionTracker;
+    private final WebSocketMessageBrokerStats webSocketMessageBrokerStats;
     private final TaskScheduler taskScheduler;
     private final Duration shutdownWaitDuration;
 
@@ -42,10 +41,10 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
     private final AtomicReference<ScheduledFuture<?>> statusCheckTask = new AtomicReference<>();
 
     public WebSocketGracefulShutdownHandler(
-            WebSocketSessionTracker sessionTracker,
+            WebSocketMessageBrokerStats webSocketMessageBrokerStats,
             @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
             @Value("${spring.lifecycle.timeout-per-shutdown-phase}") Duration shutdownWaitDuration) {
-        this.sessionTracker = sessionTracker;
+        this.webSocketMessageBrokerStats = webSocketMessageBrokerStats;
         this.taskScheduler = taskScheduler;
         this.shutdownWaitDuration = shutdownWaitDuration;
     }
@@ -71,7 +70,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 
         log.info("🛑 WebSocket Graceful Shutdown 시작");
 
-        final int currentConnections = sessionTracker.getActiveSessionCount();
+        final int currentConnections = getWebSocketSessionCount();
 
         // 활성 연결이 없으면 즉시 종료
         if (currentConnections == 0) {
@@ -101,7 +100,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
             }
             log.info("✅ 모든 WebSocket 연결 정상 종료 완료");
         } catch (TimeoutException e) {
-            final int remaining = sessionTracker.getActiveSessionCount();
+            final int remaining = getWebSocketSessionCount();
             log.warn("⚠️ Graceful Shutdown 타임아웃 ({}분 {}초): 활성 연결 {} 개가 남아있습니다. 강제 종료합니다.",
                     displayMinutes, displaySeconds, remaining);
         } catch (InterruptedException e) {
@@ -116,38 +115,10 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
     }
 
     /**
-     * 세션 수 변경 이벤트 수신
-     * <p>
-     * 세션이 해제될 때마다 호출되어, 모든 연결이 종료되었는지 확인합니다.
-     * </p>
-     */
-    @EventListener
-    public void onSessionCountChanged(SessionCountChangedEvent event) {
-        // DISCONNECTED 이벤트만 처리
-        if (event.changeType() != SessionChangeType.DISCONNECTED) {
-            return;
-        }
-
-        // Shutdown 모드가 아니면 무시
-        final CompletableFuture<Void> future = shutdownFuture.get();
-        if (!isShuttingDown || future == null) {
-            return;
-        }
-
-        final int remaining = event.remainingSessionCount();
-        log.debug("세션 종료 감지: 남은 연결 {} 개", remaining);
-
-        if (remaining == 0 && !future.isDone()) {
-            log.info("🎉 마지막 WebSocket 연결 종료 감지! Graceful Shutdown 완료");
-            future.complete(null);
-        }
-    }
-
-    /**
-     * Graceful Shutdown 진행 상황을 주기적으로 로깅
+     * Graceful Shutdown 진행 상황을 주기적으로 체크
      * <p>
      * STATUS_CHECK_INTERVAL마다 남은 연결 수를 확인하고,
-     * 안전장치로 세션이 0개인데 완료되지 않은 경우 강제 완료합니다.
+     * 모든 세션이 종료되면 Shutdown을 완료합니다.
      * </p>
      */
     private void scheduleStatusLogging() {
@@ -158,12 +129,12 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
                     return;
                 }
 
-                final int remaining = sessionTracker.getActiveSessionCount();
+                final int remaining = getWebSocketSessionCount();
                 log.info("📊 Graceful Shutdown 진행 중: 남은 연결 {} 개", remaining);
 
-                // 안전장치: 세션이 0개인데 CompletableFuture가 완료되지 않은 경우
-                if (remaining == 0 && !future.isDone()) {
-                    log.warn("⚠️ 세션이 0개인데 종료되지 않음. 강제로 완료 처리합니다");
+                // 모든 세션이 종료되면 Shutdown 완료
+                if (remaining == 0) {
+                    log.info("✅ 모든 WebSocket 세션 종료됨. Graceful Shutdown 완료");
                     future.complete(null);
                 }
             } catch (Exception e) {
@@ -203,5 +174,9 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
         // SmartLifecycle의 phase 값
         // 값이 클수록 나중에 종료됨 (WebSocket은 가장 마지막에 종료되어야 함)
         return Integer.MAX_VALUE;
+    }
+
+    private int getWebSocketSessionCount() {
+        return Objects.requireNonNull(webSocketMessageBrokerStats.getWebSocketSessionStats()).getWebSocketSessions();
     }
 }
