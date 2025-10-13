@@ -66,8 +66,11 @@ management:
         enabled: true
 server:
   tomcat:
-    mbeanregistry:
-      enabled: true
+    threads:
+      max: 200
+      min-spare: 30
+    max-connections: 700
+    accept-count: 300
 
 websocket:
   docs:
