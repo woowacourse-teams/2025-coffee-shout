@@ -52,12 +52,13 @@ export const Container = styled.div<Props>`
   align-items: center;
   justify-content: center;
 
-  ${({ $playerColor, $isMyCard }) =>
+  ${({ $playerColor, $isMyCard, theme }) =>
     $isMyCard && $playerColor
       ? ` box-shadow: 
-      0 0 10px ${$playerColor},
-      0 0 25px ${$playerColor},
-      0 0 50px ${$playerColor};`
+      0 0 8px ${theme.color.point[400]},
+      0 0 12px ${theme.color.point[400]},
+      0 0 16px ${theme.color.point[400]},
+      0 0 25px ${theme.color.point[400]}`
       : 'box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);'}
 `;
 
