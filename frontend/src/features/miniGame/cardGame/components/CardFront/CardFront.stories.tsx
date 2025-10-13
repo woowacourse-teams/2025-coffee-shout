@@ -89,7 +89,7 @@ export const Grid: Story = {
             <CardFront
               key={index}
               playerColor={playerColorMap[index]}
-              card={{ type: 'MULTIPLIER', value: -1 }}
+              card={{ type: 'MULTIPLIER', value: -1, playerName: `Player ${index + 1}` }}
             />
           ) : (
             <CardBack key={index} />

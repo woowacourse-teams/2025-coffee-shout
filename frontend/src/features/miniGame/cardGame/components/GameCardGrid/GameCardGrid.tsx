@@ -33,7 +33,13 @@ const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
             initialView={<CardBack onClick={() => onCardClick(index)} />}
             flippedView={
               <CardFront
-                card={{ type: cardInfo.cardType, value: cardInfo.value } as Card}
+                card={
+                  {
+                    type: cardInfo.cardType,
+                    value: cardInfo.value,
+                    playerName: cardInfo.playerName,
+                  } as Card
+                }
                 playerColor={playerColor}
               />
             }
