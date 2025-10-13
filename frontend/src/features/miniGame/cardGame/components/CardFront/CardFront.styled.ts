@@ -9,6 +9,7 @@ type Props = {
   $size?: Size;
   $playerColor?: ColorList | null;
   $card?: Card;
+  $isMyCard?: boolean;
 };
 
 const CARD_TEXT_COLORS = {
@@ -45,18 +46,19 @@ export const Container = styled.div<Props>`
   ${({ $size }) => cardVariants[$size || 'large']}
   background-color: ${({ theme }) => theme.color.point[200]};
   border-radius: 7px;
-  box-shadow: ${({ $playerColor }) =>
-    $playerColor
-      ? `
-         0 0 8px ${$playerColor},
-         0 0 14px ${$playerColor},
-         0 0 20px ${$playerColor}`
-      : '0 3px 3px rgba(0, 0, 0, 0.4)'};
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  ${({ $playerColor, $isMyCard }) =>
+    $isMyCard && $playerColor
+      ? ` box-shadow: 
+      0 0 10px ${$playerColor},
+      0 0 25px ${$playerColor},
+      0 0 50px ${$playerColor};`
+      : 'box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);'}
 `;
 
 export const Circle = styled.div<Props>`
@@ -91,4 +93,9 @@ export const PlayerName = styled.span<Props>`
   margin-top: 6px;
   font-size: ${DESIGN_TOKENS.typography.h4};
   font-weight: 700;
+  max-width: 80%;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

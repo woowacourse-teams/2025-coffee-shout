@@ -90,6 +90,7 @@ export const Grid: Story = {
               key={index}
               playerColor={playerColorMap[index]}
               card={{ type: 'MULTIPLIER', value: -1, playerName: `Player ${index + 1}` }}
+              isMyCard={index === 1}
             />
           ) : (
             <CardBack key={index} />

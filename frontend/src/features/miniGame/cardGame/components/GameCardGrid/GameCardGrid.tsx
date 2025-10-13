@@ -7,6 +7,7 @@ import * as S from './GameCardGrid.styled';
 import Flip from '@/components/@common/Flip/Flip';
 
 import { DESIGN_TOKENS } from '@/constants/design';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 type Props = {
   cardInfos: CardInfo[];
@@ -15,6 +16,7 @@ type Props = {
 
 const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
   const { getParticipantColorIndex } = useParticipants();
+  const { myName } = useIdentifier();
 
   return (
     <S.Container>
@@ -41,6 +43,7 @@ const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
                   } as Card
                 }
                 playerColor={playerColor}
+                isMyCard={cardInfo.playerName === myName}
               />
             }
           />
