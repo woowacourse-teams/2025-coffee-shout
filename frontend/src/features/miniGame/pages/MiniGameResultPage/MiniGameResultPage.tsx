@@ -46,26 +46,17 @@ const MiniGameResultPage = () => {
   const { playerType } = usePlayerType();
   const { getParticipantColorIndex } = useParticipants();
 
-  const {
-    data: ranksData,
-    loading: ranksLoading,
-    error: ranksError,
-  } = useFetch<PlayerRankResponse>({
+  const { data: ranksData, loading: ranksLoading } = useFetch<PlayerRankResponse>({
     endpoint: `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`,
     enabled: !!(joinCode && miniGameType),
   });
 
-  const {
-    data: scoresData,
-    loading: scoresLoading,
-    error: scoresError,
-  } = useFetch<PlayerScoreResponse>({
+  const { data: scoresData, loading: scoresLoading } = useFetch<PlayerScoreResponse>({
     endpoint: `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`,
     enabled: !!(joinCode && miniGameType),
   });
 
   const loading = ranksLoading || scoresLoading;
-  const error = ranksError || scoresError;
 
   const handleNavigateToRoulettePlayPage = useCallback(() => {
     navigate(`/room/${joinCode}/roulette/play`);
@@ -84,7 +75,6 @@ const MiniGameResultPage = () => {
   const scores = scoresData?.scores || null;
 
   if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error.message}</div>;
 
   return (
     <Layout>
