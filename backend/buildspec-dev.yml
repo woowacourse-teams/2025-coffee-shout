@@ -41,6 +41,19 @@ phases:
   post_build:
     commands:
       - echo "Build completed on $(date)"
+      
+      # 환경변수 파일 생성
+      - echo "Creating environment variables file..."
+      - cd ..
+      - |
+        cat > app.env << EOF
+        SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+        SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+        SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+        EOF
+      - echo "app.env file created"
+      
       - |
         if [ $CODEBUILD_BUILD_SUCCEEDING -eq 0 ]; then
           echo "Build failed, sending SNS notification..."
@@ -55,6 +68,7 @@ phases:
 artifacts:
   files:
     - coffee-shout-backend.jar
+    - app.env
     - scripts/*
     - appspec.yml
 
