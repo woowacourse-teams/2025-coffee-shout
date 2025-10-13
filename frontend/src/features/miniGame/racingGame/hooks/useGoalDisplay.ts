@@ -24,6 +24,11 @@ export const useGoalDisplay = ({ myPosition, endDistance }: Props) => {
         goalTimerRef.current = null;
       }, GOAL_DISPLAY_DURATION_MS);
     }
+    return () => {
+      if (goalTimerRef.current) {
+        clearTimeout(goalTimerRef.current);
+      }
+    };
   }, [myPosition, endDistance]);
 
   return showGoal;
