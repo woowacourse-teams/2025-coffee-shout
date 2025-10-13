@@ -20,12 +20,13 @@ const RacingGameOverlay = ({ children }: Props) => {
 
   useEffect(() => {
     intervalRef.current = window.setInterval(() => {
+      const currentTapCount = tapCountRef.current;
+      tapCountRef.current = 0;
+
       send(`/room/${joinCode}/racing-game/tap`, {
         playerName: myName,
-        tapCount: tapCountRef.current,
+        tapCount: currentTapCount,
       });
-
-      tapCountRef.current = 0;
     }, 200);
     return () => {
       if (intervalRef.current) {
