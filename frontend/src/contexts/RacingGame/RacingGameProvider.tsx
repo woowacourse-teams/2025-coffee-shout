@@ -1,20 +1,8 @@
 import { PropsWithChildren, useCallback, useState } from 'react';
 import { RacingGameContext } from './RacingGameContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { RacingGameState } from '@/types/miniGame/racingGame';
+import { RacingGameData, RacingGameState } from '@/types/miniGame/racingGame';
 import { useIdentifier } from '../Identifier/IdentifierContext';
-
-type RacingGameData = {
-  distance: {
-    start: number;
-    end: number;
-  };
-  players: Array<{
-    playerName: string;
-    position: number; 
-    speed: number;
-  }>;
-};
 
 const RacingGameProvider = ({ children }: PropsWithChildren) => {
   const [racingGameState, setRacingGameState] = useState<RacingGameState>('DESCRIPTION');
