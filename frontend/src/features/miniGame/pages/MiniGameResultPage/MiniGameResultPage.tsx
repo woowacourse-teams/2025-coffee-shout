@@ -38,6 +38,11 @@ type ShowRouletteResponse = {
   roomState: 'ROULETTE_SHOW';
 };
 
+const SECONDS_FORMATTER = new Intl.NumberFormat('ko-KR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 const MiniGameResultPage = () => {
   const navigate = useNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
@@ -150,18 +155,13 @@ const getScoreTextByGameType = ({
   playScores: PlayerScore[];
   playerName: string;
 }) => {
-  const secondsFormatter = new Intl.NumberFormat('ko-KR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
   const playerScore = playScores.find((score) => score.playerName === playerName);
   const scoreValue = playerScore ? playerScore.score : 0;
 
   switch (gameType) {
     case 'RACING_GAME': {
       const seconds = scoreValue / 1000;
-      return secondsFormatter.format(seconds) + '초';
+      return SECONDS_FORMATTER.format(seconds) + '초';
     }
     case 'CARD_GAME': {
       return scoreValue + '점';
