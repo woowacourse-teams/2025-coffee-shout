@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Tag(name = "Menu Category", description = "메뉴 카테고리 관련 API")
 public interface MenuCategoryApi {
@@ -17,6 +16,6 @@ public interface MenuCategoryApi {
 
     @Operation(summary = "카테고리별 메뉴 조회", description = "특정 카테고리에 속한 메뉴 목록을 조회합니다.")
     ResponseEntity<List<SelectableMenuResponse>> getMenusByCategory(
-            @Parameter(description = "메뉴 카테고리 ID", required = true) @PathVariable("categoryId") Long categoryId
+            @Parameter(description = "메뉴 카테고리 ID", required = true) Long categoryId
     );
 }

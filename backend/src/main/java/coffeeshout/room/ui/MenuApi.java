@@ -10,5 +10,5 @@ import org.springframework.http.ResponseEntity;
 public interface MenuApi {
 
     @Operation(summary = "전체 메뉴 조회", description = "모든 메뉴 목록을 조회합니다.")
-    ResponseEntity<List<MenuResponse>> getAllMenu();
+    ResponseEntity<List<MenuResponse>> getAllMenus();
 }
