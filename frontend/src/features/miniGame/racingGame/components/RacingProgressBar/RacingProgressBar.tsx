@@ -5,7 +5,7 @@ import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
 type Player = {
   playerName: string;
-  position: number; 
+  position: number;
 };
 
 type Props = {
