@@ -11,17 +11,22 @@ export const useRotationAnimation = ({ speed }: Props) => {
   const rotatingRef = useRef<HTMLDivElement>(null);
   const angleRef = useRef(0);
   const currentSpeedRef = useRef(0);
+  const speedRef = useRef(speed);
+
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
 
   useEffect(() => {
     let frameId: number;
     let lastTime = performance.now();
 
     const update = (time: number) => {
-      const delta = (time - lastTime) / 1000; // 초 단위
+      const delta = (time - lastTime) / 1000;
       lastTime = time;
 
-      // Lerp를 사용하여 현재 속도를 목표 속도로 부드럽게 전환
-      currentSpeedRef.current += (speed - currentSpeedRef.current) * SPEED_SMOOTHING_FACTOR;
+      currentSpeedRef.current +=
+        (speedRef.current - currentSpeedRef.current) * SPEED_SMOOTHING_FACTOR;
 
       angleRef.current += currentSpeedRef.current * delta * 10 * ROTATION_SPEED_MULTIPLIER;
       if (rotatingRef.current) {
@@ -33,7 +38,7 @@ export const useRotationAnimation = ({ speed }: Props) => {
 
     frameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frameId);
-  }, [speed]);
+  }, []);
 
   return rotatingRef;
 };
