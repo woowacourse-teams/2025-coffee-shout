@@ -5,9 +5,11 @@ export type RacingGameData = {
     start: number;
     end: number;
   };
-  players: Array<{
-    playerName: string;
-    position: number;
-    speed: number;
-  }>;
+  players: RacingPlayer[];
+};
+
+export type RacingPlayer = {
+  playerName: string;
+  position: number;
+  speed: number;
 };

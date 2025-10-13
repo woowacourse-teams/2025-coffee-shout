@@ -1,20 +1,16 @@
+import { RacingPlayer } from '@/types/miniGame/racingGame';
 import { useMemo } from 'react';
 
 const MAX_PROGRESS_PERCENTAGE = 100;
 
-type Player = {
-  playerName: string;
-  position: number;
-};
-
 type Props = {
-  players: Player[];
+  players: RacingPlayer[];
   endDistance: number;
   myName: string;
 };
 
 type PlayerProgressData = {
-  player: Player;
+  player: RacingPlayer;
   progress: number;
   isMe: boolean;
   index: number;

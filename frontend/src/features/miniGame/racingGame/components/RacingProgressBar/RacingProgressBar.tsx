@@ -2,16 +2,12 @@ import * as S from './RacingProgressBar.styled';
 import { usePlayerProgressData } from '../../hooks/usePlayerProgressData';
 import { colorList } from '@/constants/color';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
-
-type Player = {
-  playerName: string;
-  position: number;
-};
+import { RacingPlayer } from '@/types/miniGame/racingGame';
 
 type Props = {
   myName: string;
   endDistance: number;
-  players: Player[];
+  players: RacingPlayer[];
 };
 
 const RacingProgressBar = ({ myName, endDistance, players }: Props) => {
