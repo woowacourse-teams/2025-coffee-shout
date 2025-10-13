@@ -9,14 +9,14 @@ import Flip from '@/components/@common/Flip/Flip';
 import { useEffect, useState } from 'react';
 
 type Props = {
-  isSpinning: boolean;
+  isSpinStarted: boolean;
   winner: string | null;
   randomAngle: number;
   isProbabilitiesLoading: boolean;
 };
 
 const RoulettePlaySection = ({
-  isSpinning,
+  isSpinStarted,
   winner,
   randomAngle,
   isProbabilitiesLoading,
@@ -24,7 +24,7 @@ const RoulettePlaySection = ({
   const { probabilityHistory } = useProbabilityHistory();
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const shouldComputeFinalRotation = isSpinning && winner;
+  const shouldComputeFinalRotation = isSpinStarted && winner;
   const finalRotation = shouldComputeFinalRotation
     ? calculateFinalRotation({
         finalAngles: convertProbabilitiesToAngles(probabilityHistory.current),
@@ -50,7 +50,7 @@ const RoulettePlaySection = ({
           flippedView={
             <AnimatedRouletteWheel
               finalRotation={finalRotation}
-              isSpinning={isSpinning}
+              isSpinStarted={isSpinStarted}
               startAnimation={isFlipped}
             />
           }
