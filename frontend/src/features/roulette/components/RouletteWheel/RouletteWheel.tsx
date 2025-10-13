@@ -10,20 +10,20 @@ type Props =
   | {
       sectors: RouletteSector[];
       playerProbabilities?: never;
-      isSpinning?: boolean;
+      isSpinStarted?: boolean;
       finalRotation?: number;
     }
   | {
       sectors?: never;
       playerProbabilities: PlayerProbability[];
-      isSpinning?: boolean;
+      isSpinStarted?: boolean;
       finalRotation?: number;
     };
 
 const RouletteWheel = ({
   sectors,
   playerProbabilities,
-  isSpinning = false,
+  isSpinStarted = false,
   finalRotation = 0,
 }: Props) => {
   const { myName } = useIdentifier();
@@ -39,7 +39,7 @@ const RouletteWheel = ({
   return (
     <S.Container>
       <Pin />
-      <S.Wrapper $isSpinning={isSpinning} $finalRotation={finalRotation}>
+      <S.Wrapper $isSpinStarted={isSpinStarted} $finalRotation={finalRotation}>
         <svg
           width={WHEEL_CONFIG.SIZE}
           height={WHEEL_CONFIG.SIZE}

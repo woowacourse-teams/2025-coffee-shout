@@ -5,12 +5,14 @@ import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './InvitationModal.styled';
+import useToast from '@/components/@common/Toast/useToast';
 
 type props = {
   onClose: () => void;
 };
 
 const InvitationModal = ({ onClose }: props) => {
+  const { showToast } = useToast();
   const { joinCode, qrCodeUrl } = useIdentifier();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
@@ -26,7 +28,10 @@ const InvitationModal = ({ onClose }: props) => {
 
   const copyToClipboard = async (text: string, message: string) => {
     await navigator.clipboard.writeText(text);
-    alert(message);
+    showToast({
+      type: 'success',
+      message,
+    });
     onClose();
   };
 

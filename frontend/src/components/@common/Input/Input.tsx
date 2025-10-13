@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import { ComponentProps, KeyboardEvent } from 'react';
 import CloseIcon from '../CloseIcon/CloseIcon';
 import * as S from './Input.styled';
 import { useTouchInteraction } from '@/hooks/useTouchInteraction';
@@ -13,10 +13,15 @@ const Input = ({ height = '32px', onClear, value, onChange, ref, ...rest }: Prop
   const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
     onClick: onClear,
   });
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
+  };
 
   return (
     <S.Container $height={height} $hasValue={hasValue}>
-      <S.Input ref={ref} value={value} onChange={onChange} {...rest} />
+      <S.Input ref={ref} value={value} onChange={onChange} onKeyDown={handleKeyDown} {...rest} />
       <S.ClearButton
         type="button"
         onClick={onClear}
