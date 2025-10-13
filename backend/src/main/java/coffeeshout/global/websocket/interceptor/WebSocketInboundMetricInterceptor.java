@@ -1,4 +1,4 @@
-package coffeeshout.global.interceptor;
+package coffeeshout.global.websocket.interceptor;
 
 import coffeeshout.global.metric.WebSocketMetricService;
 import java.util.UUID;

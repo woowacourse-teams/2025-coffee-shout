@@ -62,7 +62,6 @@ class SessionDisconnectEventListenerTest {
             // given
             sessionManager.registerPlayerSession(joinCode, playerName, sessionId);
             SessionDisconnectEvent event = createSessionDisconnectEvent(sessionId);
-            String expectedPlayerKey = joinCode + ":" + playerName;
 
             // when
             listener.handleSessionDisconnectEvent(event);
