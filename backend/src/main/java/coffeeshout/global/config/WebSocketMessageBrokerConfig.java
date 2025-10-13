@@ -52,9 +52,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketInboundMetricInterceptor)
                 .taskExecutor()
-                .corePoolSize(8)
-                .maxPoolSize(16)
-                .queueCapacity(8192)
+                .corePoolSize(32)
+                .maxPoolSize(32)
+                .queueCapacity(2048)
                 .keepAliveSeconds(60);
     }
 
@@ -77,9 +77,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 }
             });
         });
-        executor.setCorePoolSize(18);
-        executor.setMaxPoolSize(64);
-        executor.setQueueCapacity(8192);
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(4096);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         registration.taskExecutor(executor);
