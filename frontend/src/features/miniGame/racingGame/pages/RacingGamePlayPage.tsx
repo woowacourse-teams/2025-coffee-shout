@@ -19,6 +19,8 @@ import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { colorList } from '@/constants/color';
 
+const FINISH_LINE_VISUAL_OFFSET = 30;
+
 const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
@@ -78,7 +80,10 @@ const RacingGamePage = () => {
               {/* 출발선 */}
               <RacingLine position={racingGameData.distance.start} myPosition={myPosition} />
               {/* 도착선 */}
-              <RacingLine position={racingGameData.distance.end - 30} myPosition={myPosition} />
+              <RacingLine
+                position={racingGameData.distance.end - FINISH_LINE_VISUAL_OFFSET}
+                myPosition={myPosition}
+              />
               {visiblePlayers.map((player) => (
                 <RacingPlayer
                   key={player.playerName}
