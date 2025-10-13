@@ -2,6 +2,7 @@ package coffeeshout.global.websocket.interceptor;
 
 import coffeeshout.global.websocket.lifecycle.WebSocketGracefulShutdownHandler;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -31,9 +32,10 @@ public class ShutdownAwareHandshakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) {
         final WebSocketGracefulShutdownHandler shutdownHandler = shutdownHandlerProvider.getObject();
+
         if (shutdownHandler.isShuttingDown()) {
             log.warn("🚫 WebSocket Handshake 거부: 서버 Graceful Shutdown 진행 중 (from: {})",
-                    request.getRemoteAddress());
+                    Objects.toString(request.getRemoteAddress(), "unknown"));
             return false;
         }
         return true;

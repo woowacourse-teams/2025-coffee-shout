@@ -177,6 +177,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
     }
 
     private int getWebSocketSessionCount() {
-        return Objects.requireNonNull(webSocketMessageBrokerStats.getWebSocketSessionStats()).getWebSocketSessions();
+        return Objects.requireNonNull(webSocketMessageBrokerStats.getWebSocketSessionStats(),
+                "WebSocketSessionStats를 가져올 수 없습니다.").getWebSocketSessions();
     }
 }
