@@ -12,6 +12,7 @@ type Props = {
   isLoading?: boolean;
   width?: string;
   height?: Size;
+  loadingText?: string;
 } & Omit<ComponentProps<'button'>, 'disabled'>;
 
 const Button = ({
@@ -21,6 +22,7 @@ const Button = ({
   height = 'large',
   children,
   onClick,
+  loadingText = '',
   ...rest
 }: Props) => {
   const isDisabled = variant === 'disabled' || variant === 'loading' || isLoading;
@@ -38,7 +40,7 @@ const Button = ({
 
   const renderContent = () => {
     if (!showLoading) return children;
-    if (children && typeof children === 'string') return <LoadingText text={children} />;
+    if (loadingText) return <LoadingText text={loadingText} />;
     return <LoadingDots />;
   };
 
