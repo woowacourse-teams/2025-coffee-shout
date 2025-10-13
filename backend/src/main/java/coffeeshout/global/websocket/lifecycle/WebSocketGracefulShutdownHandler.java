@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,8 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
     private volatile boolean isRunning = false;
     @Getter
     private volatile boolean isShuttingDown = false;
-    private CompletableFuture<Void> shutdownFuture;
-    private ScheduledFuture<?> statusCheckTask;
+    private final AtomicReference<CompletableFuture<Void>> shutdownFuture = new AtomicReference<>();
+    private final AtomicReference<ScheduledFuture<?>> statusCheckTask = new AtomicReference<>();
 
     public WebSocketGracefulShutdownHandler(
             WebSocketSessionTracker sessionTracker,
@@ -82,7 +83,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 
         // Shutdown 모드 활성화
         isShuttingDown = true;
-        shutdownFuture = new CompletableFuture<>();
+        shutdownFuture.set(new CompletableFuture<>());
 
         final long timeoutSeconds = shutdownWaitDuration.toSeconds();
         final long displayMinutes = timeoutSeconds / 60;
@@ -94,7 +95,10 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 
         // 타임아웃과 함께 대기 (이벤트 기반 - CompletableFuture 사용)
         try {
-            shutdownFuture.get(shutdownWaitDuration.toMillis(), TimeUnit.MILLISECONDS);
+            final CompletableFuture<Void> future = shutdownFuture.get();
+            if (future != null) {
+                future.get(shutdownWaitDuration.toMillis(), TimeUnit.MILLISECONDS);
+            }
             log.info("✅ 모든 WebSocket 연결 정상 종료 완료");
         } catch (TimeoutException e) {
             final int remaining = sessionTracker.getActiveSessionCount();
@@ -125,7 +129,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
         }
 
         // Shutdown 모드가 아니면 무시
-        final CompletableFuture<Void> future = shutdownFuture;
+        final CompletableFuture<Void> future = shutdownFuture.get();
         if (!isShuttingDown || future == null) {
             return;
         }
@@ -147,9 +151,9 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
      * </p>
      */
     private void scheduleStatusLogging() {
-        statusCheckTask = taskScheduler.scheduleAtFixedRate(() -> {
+        statusCheckTask.set(taskScheduler.scheduleAtFixedRate(() -> {
             try {
-                final CompletableFuture<Void> future = shutdownFuture;
+                final CompletableFuture<Void> future = shutdownFuture.get();
                 if (future == null || future.isDone()) {
                     return;
                 }
@@ -165,7 +169,7 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
             } catch (Exception e) {
                 log.error("❌ Graceful Shutdown 상태 체크 중 오류", e);
             }
-        }, STATUS_CHECK_INTERVAL);
+        }, STATUS_CHECK_INTERVAL));
     }
 
     /**
@@ -175,17 +179,17 @@ public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
         cancelStatusCheckTask();
         isShuttingDown = false;
         isRunning = false;
-        shutdownFuture = null;
+        shutdownFuture.set(null);
     }
 
     /**
      * 상태 체크 작업 취소
      */
     private void cancelStatusCheckTask() {
-        final ScheduledFuture<?> task = statusCheckTask;
+        final ScheduledFuture<?> task = statusCheckTask.get();
         if (task != null && !task.isCancelled()) {
             task.cancel(false);
-            statusCheckTask = null;
+            statusCheckTask.set(null);
         }
     }
 
