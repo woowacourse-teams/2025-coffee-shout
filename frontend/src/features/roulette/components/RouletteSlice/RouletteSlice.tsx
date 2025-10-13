@@ -6,9 +6,10 @@ import { getCenterAngle, getTextPosition, describeArc } from '../../utils';
 type Props = {
   player: RouletteSector;
   strokeColor: string;
+  isGlowing?: boolean;
 };
 
-const RouletteSlice = ({ player, strokeColor }: Props) => {
+const RouletteSlice = ({ player, strokeColor, isGlowing = false }: Props) => {
   const centerAngle = getCenterAngle(player.startAngle, player.endAngle);
   const textPosition = getTextPosition(centerAngle);
 
@@ -24,6 +25,7 @@ const RouletteSlice = ({ player, strokeColor }: Props) => {
           fill={player.playerColor}
           stroke={strokeColor}
           strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
+          filter={isGlowing ? 'url(#glow)' : undefined}
         />
       ) : (
         <path
@@ -37,6 +39,7 @@ const RouletteSlice = ({ player, strokeColor }: Props) => {
           fill={player.playerColor}
           stroke={strokeColor}
           strokeWidth={WHEEL_CONFIG.STROKE_WIDTH}
+          filter={isGlowing ? 'url(#glow)' : undefined}
         />
       )}
       <S.PlayerNameText

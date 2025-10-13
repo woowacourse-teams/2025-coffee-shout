@@ -51,7 +51,15 @@ export const Disabled: Story = {
 export const Loading: Story = {
   args: {
     variant: 'loading',
-    children: 'Loading',
+    width: '120px',
+    height: 'large',
+  },
+};
+
+export const LoadingWithText: Story = {
+  args: {
+    variant: 'loading',
+    children: '대기 중',
     width: '120px',
     height: 'large',
   },

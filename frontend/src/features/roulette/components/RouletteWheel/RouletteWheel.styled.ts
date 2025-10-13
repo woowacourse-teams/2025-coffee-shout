@@ -2,7 +2,7 @@ import { Z_INDEX } from '@/constants/zIndex';
 import styled from '@emotion/styled';
 
 type WrapperProps = {
-  $isSpinning?: boolean;
+  $isSpinStarted?: boolean;
   $finalRotation?: number;
 };
 
@@ -20,13 +20,12 @@ export const Wrapper = styled.div<WrapperProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   position: relative;
 
   --final-rotation: ${({ $finalRotation }) => $finalRotation ?? 0}deg;
 
-  ${({ $isSpinning }) =>
-    $isSpinning &&
+  ${({ $isSpinStarted }) =>
+    $isSpinStarted &&
     `
       animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
       animation-fill-mode: forwards;

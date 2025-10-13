@@ -1,11 +1,8 @@
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { ChangeEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
@@ -19,12 +16,15 @@ import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionL
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import MenuList from './components/MenuList/MenuList';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useNavigate } from 'react-router-dom';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
+  const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode, qrCodeUrl } = useIdentifier();
-  const { playerType } = usePlayerType();
 
   const {
     category,
@@ -48,7 +48,7 @@ const EntryMenuPage = () => {
   const { categories } = useCategories();
   const { menus } = useMenus(category.value?.id ?? null);
 
-  const { proceedToRoom } = useRoomManagement();
+  const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
   useEffect(() => {
     const isReadyToNavigateLobby =
@@ -56,7 +56,7 @@ const EntryMenuPage = () => {
     if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [joinCode, qrCodeUrl, menu, customMenu, isConnected, navigate]);
+  }, [joinCode, qrCodeUrl, menu.value, customMenu.value, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetAll();
@@ -140,7 +140,9 @@ const EntryMenuPage = () => {
       {shouldShowButtonBar &&
         (playerType === 'HOST' ? (
           <Layout.ButtonBar>
-            <Button onClick={handleProceedToRoom}>방 만들러 가기</Button>
+            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
+              {!isRoomLoading && '방 만들러 가기'}
+            </Button>
           </Layout.ButtonBar>
         ) : (
           <Layout.ButtonBar>

@@ -16,7 +16,7 @@ export const DescriptionWrapper = styled.div`
   gap: 5px;
 `;
 
-export const ResultList = styled.div`
+export const ResultList = styled.section`
   display: flex;
   flex-direction: column;
   gap: 8px;

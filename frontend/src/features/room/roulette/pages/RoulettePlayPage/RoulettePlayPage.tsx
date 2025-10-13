@@ -19,7 +19,7 @@ const RoulettePlayPage = () => {
   const { joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
-  const { winner, randomAngle, isSpinning, handleSpinClick, startSpinWithResult } =
+  const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
 
@@ -42,7 +42,7 @@ const RoulettePlayPage = () => {
   const VIEW_COMPONENTS = {
     roulette: (
       <RoulettePlaySection
-        isSpinning={isSpinning}
+        isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
         isProbabilitiesLoading={isProbabilitiesLoading}
@@ -67,8 +67,8 @@ const RoulettePlayPage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={getButtonVariant(isSpinning, playerType)} onClick={handleSpinClick}>
-          룰렛 돌리기
+        <Button variant={getButtonVariant(isSpinStarted, playerType)} onClick={handleSpinClick}>
+          {playerType === 'HOST' ? '룰렛 돌리기' : '대기 중'}
         </Button>
       </Layout.ButtonBar>
     </Layout>
@@ -77,8 +77,8 @@ const RoulettePlayPage = () => {
 
 export default RoulettePlayPage;
 
-const getButtonVariant = (isSpinning: boolean, playerType: PlayerType) => {
-  if (isSpinning) return 'disabled';
+const getButtonVariant = (isSpinStarted: boolean, playerType: PlayerType) => {
+  if (isSpinStarted) return 'disabled';
   if (playerType === 'GUEST') return 'loading';
   return 'primary';
 };

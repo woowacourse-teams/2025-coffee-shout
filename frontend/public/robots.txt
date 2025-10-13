@@ -1,0 +1,25 @@
+# 커피빵 (CoffeeShout) robots.txt
+# https://coffee-shout.com
+
+User-agent: *
+
+# 허용: 홈페이지
+Allow: /$
+
+# 차단
+# 게임 룸은 일회성 세션이므로 크롤링 불필요
+Disallow: /room/
+Disallow: /join/
+Disallow: /entry/
+
+# 정적 자산 허용
+Allow: /logo/
+Allow: /fonts/
+Allow: /*.svg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.woff2$
+
+# sitemap 위치
+Sitemap: https://coffee-shout.com/sitemap.xml
+

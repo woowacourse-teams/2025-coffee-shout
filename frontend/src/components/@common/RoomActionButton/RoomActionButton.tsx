@@ -1,37 +1,24 @@
+import { type ComponentProps } from 'react';
+
 import NextStepIcon from '@/assets/next-step-icon.svg';
-import { type ComponentProps, type MouseEvent, type TouchEvent } from 'react';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
+
 import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
+
 import * as S from './RoomActionButton.styled';
-import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
   title: string;
   descriptions: string[];
-  onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick?: () => void;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick,
-  });
-  const isTouchDevice = checkIsTouchDevice();
-
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isTouchDevice) return;
-
-    onClick?.(e);
-  };
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      $touchState={touchState}
-      {...rest}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState} {...rest}>
       <Headline3>{title}</Headline3>
       <div>
         {descriptions.map((description, index) => (
