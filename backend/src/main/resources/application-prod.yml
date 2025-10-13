@@ -2,6 +2,15 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+redisson:
+  enabled: true
 
 room:
   qr:
@@ -9,4 +18,10 @@ room:
 
 websocket:
   docs:
+    enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
     enabled: false

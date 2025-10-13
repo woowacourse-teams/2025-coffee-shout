@@ -6,6 +6,7 @@ import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.Menu;
@@ -25,6 +26,8 @@ import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
 import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
+import coffeeshout.room.infra.persistence.RoomEntity;
+import coffeeshout.room.infra.persistence.RoomJpaRepository;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import java.time.Duration;
@@ -38,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -53,6 +57,7 @@ public class RoomService {
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
     private final RoomEnterStreamProducer roomEnterStreamProducer;
+    private final RoomJpaRepository roomJpaRepository;
 
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
@@ -140,6 +145,12 @@ public class RoomService {
     public List<Player> getPlayersInternal(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.getPlayers();
+    }
+
+    @Transactional
+    public void saveRoomEntity(String joinCodeValue) {
+        final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
+        roomJpaRepository.save(roomEntity);
     }
 
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
@@ -266,5 +277,21 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.showRoulette();
         return room;
+    }
+
+    public boolean kickPlayer(String joinCode, String playerName) {
+        final boolean exists = hasPlayer(joinCode, playerName);
+
+        if (exists) {
+            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
+            roomEventPublisher.publishEvent(event);
+        }
+
+        return exists;
+    }
+
+    private boolean hasPlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.hasPlayer(new PlayerName(playerName));
     }
 }

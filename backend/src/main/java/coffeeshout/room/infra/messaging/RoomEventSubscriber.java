@@ -3,6 +3,7 @@ package coffeeshout.room.infra.messaging;
 import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
+import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomBaseEvent;
@@ -81,6 +82,7 @@ public class RoomEventSubscriber implements MessageListener {
             case ROOM_JOIN -> objectMapper.readValue(body, RoomJoinEvent.class);
             case PLAYER_LIST_UPDATE -> objectMapper.readValue(body, PlayerListUpdateEvent.class);
             case PLAYER_READY -> objectMapper.readValue(body, PlayerReadyEvent.class);
+            case PLAYER_KICK -> objectMapper.readValue(body, PlayerKickEvent.class);
             case MINI_GAME_SELECT -> objectMapper.readValue(body, MiniGameSelectEvent.class);
             case ROULETTE_SHOW -> objectMapper.readValue(body, RouletteShowEvent.class);
             case ROULETTE_SPIN -> objectMapper.readValue(body, RouletteSpinEvent.class);

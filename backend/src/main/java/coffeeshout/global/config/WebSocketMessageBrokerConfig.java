@@ -1,8 +1,9 @@
 package coffeeshout.global.config;
 
 
-import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
-import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
+import coffeeshout.global.websocket.interceptor.ShutdownAwareHandshakeInterceptor;
+import coffeeshout.global.websocket.interceptor.WebSocketInboundMetricInterceptor;
+import coffeeshout.global.websocket.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
@@ -24,6 +25,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
+    private final ShutdownAwareHandshakeInterceptor shutdownAwareHandshakeInterceptor;
     private final ObservationRegistry observationRegistry;
     private final ContextSnapshotFactory snapshotFactory;
 
@@ -45,6 +47,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
+                .addInterceptors(shutdownAwareHandshakeInterceptor)
                 .withSockJS();
     }
 
@@ -52,9 +55,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketInboundMetricInterceptor)
                 .taskExecutor()
-                .corePoolSize(8)
-                .maxPoolSize(16)
-                .queueCapacity(8192)
+                .corePoolSize(32)
+                .maxPoolSize(32)
+                .queueCapacity(2048)
                 .keepAliveSeconds(60);
     }
 
@@ -77,9 +80,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 }
             });
         });
-        executor.setCorePoolSize(18);
-        executor.setMaxPoolSize(64);
-        executor.setQueueCapacity(8192);
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(4096);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         registration.taskExecutor(executor);

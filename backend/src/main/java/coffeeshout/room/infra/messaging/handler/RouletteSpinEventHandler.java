@@ -1,7 +1,9 @@
 package coffeeshout.room.infra.messaging.handler;
 
+import coffeeshout.global.lock.RedisLock;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RouletteService;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
@@ -16,25 +18,38 @@ import org.springframework.stereotype.Component;
 public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEvent> {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final RouletteService rouletteService;
 
     @Override
+    @RedisLock(
+            key = "#event.eventId()",
+            lockPrefix = "event:lock:",
+            donePrefix = "event:done:",
+            waitTime = 0,
+            leaseTime = 5000
+    )
     public void handle(RouletteSpinEvent event) {
         try {
             log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
                     event.eventId(), event.joinCode(), event.hostName());
 
             final Winner winner = event.winner();
-            final WinnerResponse response = WinnerResponse.from(winner);
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/winner",
-                    WebSocketResponse.success(response));
-
-            log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
+            broadcastWinner(event.joinCode(), winner);
+            
+            rouletteService.saveRouletteResult(event.joinCode(), winner);
+            log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
                     event.eventId(), event.joinCode(), winner.name().value());
 
         } catch (Exception e) {
             log.error("룰렛 스핀 이벤트 처리 실패", e);
         }
+    }
+
+    private void broadcastWinner(String joinCode, Winner winner) {
+        final WinnerResponse response = WinnerResponse.from(winner);
+        messagingTemplate.convertAndSend("/topic/room/" + joinCode + "/winner",
+                WebSocketResponse.success(response));
     }
 
     @Override

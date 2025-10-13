@@ -108,6 +108,10 @@ public class Room {
         return players.getPlayer(playerName);
     }
 
+    public boolean hasPlayer(PlayerName playerName) {
+        return players.existsByName(playerName);
+    }
+
     private void join(Player player) {
         players.join(player);
     }
