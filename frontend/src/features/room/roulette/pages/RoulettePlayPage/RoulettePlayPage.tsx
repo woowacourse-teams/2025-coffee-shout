@@ -67,11 +67,13 @@ const RoulettePlayPage = () => {
       </Layout.Content>
       <Layout.ButtonBar>
         {playerType === 'HOST' ? (
-          <Button variant="primary" onClick={handleSpinClick}>
-            룰렛 돌리기
+          <Button variant={isSpinStarted ? 'disabled' : 'primary'} onClick={handleSpinClick}>
+            {isSpinStarted ? '룰렛 돌리는 중' : '룰렛 돌리기'}
           </Button>
         ) : (
-          <Button variant="loading" loadingText="대기 중" />
+          <Button variant={isSpinStarted ? 'disabled' : 'loading'} loadingText="대기 중">
+            룰렛 돌리는 중
+          </Button>
         )}
       </Layout.ButtonBar>
     </Layout>
