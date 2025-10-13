@@ -4,7 +4,7 @@ import * as S from './RacingRank.styled';
 
 type Player = {
   playerName: string;
-  position: number; 
+  position: number;
 };
 
 type Props = {
