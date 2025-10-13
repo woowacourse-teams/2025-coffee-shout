@@ -86,8 +86,8 @@ export const CardText = styled.span<Props>`
   text-align: center;
 `;
 
-export const PlayerName = styled.span<Props>`
-  color: ${({ $playerColor }) => $playerColor};
+export const PlayerName = styled.span`
+  color: ${({ theme }) => theme.color.point[400]};
   display: flex;
   align-items: center;
   margin-top: 6px;

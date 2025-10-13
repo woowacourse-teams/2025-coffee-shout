@@ -25,7 +25,7 @@ const CardFront = ({ size, playerColor, card, isMyCard = false }: Props) => {
           </S.CardText>
         )}
       </S.Circle>
-      <S.PlayerName $playerColor={playerColor}>{card.playerName}</S.PlayerName>
+      <S.PlayerName>{card.playerName}</S.PlayerName>
     </S.Container>
   );
 };
