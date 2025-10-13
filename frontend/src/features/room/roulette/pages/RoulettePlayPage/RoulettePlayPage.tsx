@@ -11,7 +11,6 @@ import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
 import { useCallback, useState } from 'react';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { PlayerType } from '@/types/player';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
@@ -67,18 +66,16 @@ const RoulettePlayPage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={getButtonVariant(isSpinStarted, playerType)} onClick={handleSpinClick}>
-          {playerType === 'HOST' ? '룰렛 돌리기' : '대기 중'}
-        </Button>
+        {playerType === 'HOST' ? (
+          <Button variant="primary" onClick={handleSpinClick}>
+            룰렛 돌리기
+          </Button>
+        ) : (
+          <Button variant="loading" loadingText="대기 중" />
+        )}
       </Layout.ButtonBar>
     </Layout>
   );
 };
 
 export default RoulettePlayPage;
-
-const getButtonVariant = (isSpinStarted: boolean, playerType: PlayerType) => {
-  if (isSpinStarted) return 'disabled';
-  if (playerType === 'GUEST') return 'loading';
-  return 'primary';
-};

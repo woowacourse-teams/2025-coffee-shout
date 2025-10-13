@@ -117,7 +117,7 @@ const MiniGameResultPage = () => {
             룰렛 현황 보러가기
           </Button>
         ) : (
-          <Button variant="loading">대기 중</Button>
+          <Button variant="loading" loadingText="대기 중" />
         )}
       </Layout.ButtonBar>
     </Layout>
