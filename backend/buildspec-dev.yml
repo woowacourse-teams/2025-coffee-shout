@@ -41,6 +41,7 @@ phases:
   post_build:
     commands:
       - echo "Build completed on $(date)"
+      
       - |
         if [ $CODEBUILD_BUILD_SUCCEEDING -eq 0 ]; then
           echo "Build failed, sending SNS notification..."
