@@ -15,7 +15,7 @@ const GameIntroSlides = ({ gameType }: Props) => {
       <Layout.Content>
         {slideConfig.map((slide, index) => (
           <MiniGameIntroSlide
-            key={index}
+            key={`${gameType}-slide-${index}`}
             textLines={slide.textLines}
             imageSrc={slide.imageSrc}
             className={slide.className}
