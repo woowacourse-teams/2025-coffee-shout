@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 const TRANSITION_DURATION_MS = 300;
 
@@ -9,7 +10,7 @@ export const Player = styled.div<{ $isMe: boolean; $position: number; $myPositio
     return `translateX(${relativeX}px)`;
   }};
   transition: transform ${TRANSITION_DURATION_MS}ms ease-in-out;
-  z-index: 10;
+  z-index: ${RACING_Z_INDEX.PLAYER};
 `;
 
 export const RotatingWrapper = styled.div`

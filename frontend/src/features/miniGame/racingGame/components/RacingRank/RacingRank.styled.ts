@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 export const Container = styled.div`
   position: absolute;
   left: 20px;
-  z-index: 200;
+  z-index: ${RACING_Z_INDEX.RANK};
   top: 4rem;
   left: 1rem;
 `;

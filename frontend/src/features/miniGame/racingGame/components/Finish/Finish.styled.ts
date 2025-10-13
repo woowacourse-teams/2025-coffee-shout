@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 export const Container = styled.div`
   position: absolute;
@@ -10,5 +11,5 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${RACING_Z_INDEX.FINISH};
 `;

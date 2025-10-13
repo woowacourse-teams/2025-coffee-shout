@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 const FILL_TRANSITION_DURATION = '0.3s';
 
@@ -29,7 +30,7 @@ export const ProgressFill = styled.div<{ $progress: number; $color: string; $isM
   transition:
     width ${FILL_TRANSITION_DURATION} ease-out,
     border-radius ${FILL_TRANSITION_DURATION} ease-out;
-  z-index: ${({ $isMe }) => ($isMe ? 2 : 1)};
+  z-index: ${({ $isMe }) => ($isMe ? RACING_Z_INDEX.PROGRESS_BAR_ME : RACING_Z_INDEX.PROGRESS_BAR)};
 `;
 
 export const ProgressMarker = styled.div<{ $progress: number; $color: string; $isMe: boolean }>`
@@ -44,7 +45,8 @@ export const ProgressMarker = styled.div<{ $progress: number; $color: string; $i
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: left ${FILL_TRANSITION_DURATION} ease-out;
-  z-index: ${({ $isMe }) => ($isMe ? 3 : 2)};
+  z-index: ${({ $isMe }) =>
+    $isMe ? RACING_Z_INDEX.PROGRESS_MARKER_ME : RACING_Z_INDEX.PROGRESS_MARKER};
 
   &::after {
     content: '';

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 export const Overlay = styled.div`
   position: absolute;
@@ -8,5 +9,5 @@ export const Overlay = styled.div`
   bottom: 0;
   width: 100%;
   height: 100%;
-  z-index: 900;
+  z-index: ${RACING_Z_INDEX.OVERLAY};
 `;

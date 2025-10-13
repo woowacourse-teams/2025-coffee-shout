@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 export const Container = styled.div<{ $position: number }>`
   position: absolute;
@@ -8,7 +9,7 @@ export const Container = styled.div<{ $position: number }>`
   height: 100%;
   transform: translateX(${({ $position }) => $position}px);
   transition: transform 0.3s ease-in-out;
-  z-index: 1;
+  z-index: ${RACING_Z_INDEX.LINE};
 `;
 
 export const Image = styled.img`
