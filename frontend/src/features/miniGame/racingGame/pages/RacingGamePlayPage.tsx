@@ -4,7 +4,7 @@ import * as S from './RacingGamePlayPage.styled';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
@@ -23,6 +23,7 @@ const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
   const navigate = useNavigate();
+  const { miniGameType } = useParams();
   const { racingGameState, racingGameData } = useRacingGame();
   const { getParticipantColorIndex } = useParticipants();
 
@@ -55,9 +56,9 @@ const RacingGamePage = () => {
 
   useEffect(() => {
     if (racingGameState === 'DONE') {
-      navigate(`/room/${joinCode}/RACING_GAME/result`);
+      navigate(`/room/${joinCode}/${miniGameType}/result`);
     }
-  }, [racingGameState, joinCode, navigate]);
+  }, [racingGameState, joinCode, navigate, miniGameType]);
 
   return (
     <>
