@@ -19,3 +19,9 @@ room:
 websocket:
   docs:
     server-url: "https://api.dev.coffee-shout.com/ws"
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

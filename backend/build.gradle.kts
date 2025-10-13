@@ -50,6 +50,8 @@ dependencies {
 
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.4.0")
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3")
+
     implementation(platform("io.micrometer:micrometer-bom:1.15.2"))
     implementation("io.micrometer:micrometer-registry-prometheus")
 
