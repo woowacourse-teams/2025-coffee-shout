@@ -34,8 +34,8 @@ export const ProgressFill = styled.div<Props>`
   opacity: ${({ $isMe }) => ($isMe ? 1 : 0.6)};
   border-radius: ${({ $progress }) => ($progress >= 99 ? '10px' : '10px 0 0 10px')};
   transition:
-    width ${FILL_TRANSITION_DURATION} ease-out,
-    border-radius ${FILL_TRANSITION_DURATION} ease-out;
+    width ${FILL_TRANSITION_DURATION}ms ease-out,
+    border-radius ${FILL_TRANSITION_DURATION}ms ease-out;
   z-index: ${({ $isMe }) => ($isMe ? RACING_Z_INDEX.PROGRESS_BAR_ME : RACING_Z_INDEX.PROGRESS_BAR)};
 `;
 

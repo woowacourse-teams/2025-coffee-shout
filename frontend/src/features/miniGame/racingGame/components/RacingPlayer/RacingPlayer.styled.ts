@@ -3,7 +3,13 @@ import { RACING_Z_INDEX } from '../../constants/zIndex';
 
 const TRANSITION_DURATION_MS = 300;
 
-export const Container = styled.div<{ $isMe: boolean; $position: number; $myPosition: number }>`
+type Props = {
+  $isMe: boolean;
+  $position: number;
+  $myPosition: number;
+};
+
+export const Container = styled.div<Props>`
   transform: ${({ $isMe, $position, $myPosition }) => {
     if ($isMe) return 'translateX(0)';
     const relativeX = $position - $myPosition;
