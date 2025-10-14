@@ -17,22 +17,20 @@ const RacingProgressBar = ({ myName, endDistance, players }: Props) => {
   return (
     <S.Container>
       <S.ProgressTrack>
-        {playerProgressData.map(({ player, progress, isMe }) => (
+        {playerProgressData.map(({ player, progress, isMe }) => [
           <S.ProgressFill
             key={`fill-${player.playerName}`}
             $progress={progress}
             $color={colorList[getParticipantColorIndex(player.playerName)]}
             $isMe={isMe}
-          />
-        ))}
-        {playerProgressData.map(({ player, progress, isMe }) => (
+          />,
           <S.ProgressMarker
-            key={player.playerName}
+            key={`marker-${player.playerName}`}
             $progress={progress}
             $color={colorList[getParticipantColorIndex(player.playerName)]}
             $isMe={isMe}
-          />
-        ))}
+          />,
+        ])}
       </S.ProgressTrack>
     </S.Container>
   );
