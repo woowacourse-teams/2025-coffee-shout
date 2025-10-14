@@ -63,7 +63,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("com.h2database:h2")
+    testImplementation("com.h2database:h2")
 
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
