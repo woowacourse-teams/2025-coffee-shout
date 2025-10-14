@@ -16,8 +16,8 @@ type PlayerProgressData = {
   index: number;
 };
 
-export const usePlayerProgressData = ({ players, endDistance, myName }: Props) => {
-  const playerProgressData = useMemo((): PlayerProgressData[] => {
+export const usePlayersProgressData = ({ players, endDistance, myName }: Props) => {
+  const playersProgressData = useMemo((): PlayerProgressData[] => {
     return players.map((player, index) => {
       const progress = Math.min(
         (player.position / endDistance) * MAX_PROGRESS_PERCENTAGE,
@@ -34,5 +34,5 @@ export const usePlayerProgressData = ({ players, endDistance, myName }: Props) =
     });
   }, [players, endDistance, myName]);
 
-  return playerProgressData;
+  return playersProgressData;
 };
