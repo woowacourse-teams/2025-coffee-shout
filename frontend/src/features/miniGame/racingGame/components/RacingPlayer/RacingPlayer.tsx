@@ -2,24 +2,23 @@ import PlayerIcon from '@/components/@composition/PlayerIcon/PlayerIcon';
 import { ColorList } from '@/constants/color';
 import { useRotationAnimation } from '../../hooks/useRotationAnimation';
 import Description from '@/components/@common/Description/Description';
+import type { RacingPlayer as RacingPlayerType } from '@/types/miniGame/racingGame';
 import * as S from './RacingPlayer.styled';
 
 type Props = {
-  playerName: string;
-  position: number;
-  speed: number;
+  player: RacingPlayerType;
   isMe: boolean;
   myPosition: number;
   color: ColorList;
 };
 
-const RacingPlayer = ({ position, speed, isMe, myPosition, color, playerName }: Props) => {
-  const rotatingRef = useRotationAnimation({ speed });
+const RacingPlayer = ({ player, isMe, myPosition, color }: Props) => {
+  const rotatingRef = useRotationAnimation({ speed: player.speed });
 
   return (
-    <S.Player $isMe={isMe} $position={position} $myPosition={myPosition}>
+    <S.Player $isMe={isMe} $position={player.position} $myPosition={myPosition}>
       <S.PlayerName>
-        <Description color={isMe ? 'point-500' : 'white'}>{playerName}</Description>
+        <Description color={isMe ? 'point-500' : 'white'}>{player.playerName}</Description>
       </S.PlayerName>
 
       <S.RotatingWrapper ref={rotatingRef}>

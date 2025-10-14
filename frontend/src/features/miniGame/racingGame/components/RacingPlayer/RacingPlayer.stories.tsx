@@ -24,18 +24,6 @@ const meta: Meta<typeof RacingPlayer> = {
     ),
   ],
   argTypes: {
-    playerName: {
-      control: 'text',
-      description: '플레이어 이름',
-    },
-    position: {
-      control: { type: 'range', min: -200, max: 200, step: 10 },
-      description: '플레이어의 x축 위치',
-    },
-    speed: {
-      control: { type: 'range', min: 1, max: 10, step: 0.5 },
-      description: '회전 속도 (useRotationAnimation 테스트용)',
-    },
     isMe: {
       control: 'boolean',
       description: '본인 여부',
@@ -61,9 +49,11 @@ const meta: Meta<typeof RacingPlayer> = {
     },
   },
   args: {
-    playerName: '플레이어1',
-    position: 0,
-    speed: 20,
+    player: {
+      playerName: '플레이어1',
+      position: 0,
+      speed: 20,
+    },
     isMe: true,
     myPosition: 0,
     color: '#FF6B6B',
@@ -87,9 +77,7 @@ export const MultiplePlayersComparison: Story = {
       <div style={{ textAlign: 'center' }}>
         <div style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.875rem' }}>속도: 1</div>
         <RacingPlayer
-          playerName="최소"
-          position={0}
-          speed={1}
+          player={{ playerName: '최소', position: 0, speed: 1 }}
           isMe={true}
           myPosition={0}
           color="#c6c8d0"
@@ -98,9 +86,7 @@ export const MultiplePlayersComparison: Story = {
       <div style={{ textAlign: 'center' }}>
         <div style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.875rem' }}>속도: 3</div>
         <RacingPlayer
-          playerName="느림"
-          position={0}
-          speed={3}
+          player={{ playerName: '느림', position: 0, speed: 3 }}
           isMe={true}
           myPosition={0}
           color="#5a88c8"
@@ -109,9 +95,7 @@ export const MultiplePlayersComparison: Story = {
       <div style={{ textAlign: 'center' }}>
         <div style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.875rem' }}>속도: 6</div>
         <RacingPlayer
-          playerName="중간"
-          position={0}
-          speed={6}
+          player={{ playerName: '중간', position: 0, speed: 6 }}
           isMe={true}
           myPosition={0}
           color="#a7e142"
@@ -120,9 +104,7 @@ export const MultiplePlayersComparison: Story = {
       <div style={{ textAlign: 'center' }}>
         <div style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.875rem' }}>속도: 10</div>
         <RacingPlayer
-          playerName="최대"
-          position={0}
-          speed={10}
+          player={{ playerName: '최대', position: 0, speed: 10 }}
           isMe={true}
           myPosition={0}
           color="#ffa102"

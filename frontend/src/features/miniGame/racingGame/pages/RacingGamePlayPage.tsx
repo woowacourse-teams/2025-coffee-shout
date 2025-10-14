@@ -87,9 +87,7 @@ const RacingGamePage = () => {
               {visiblePlayers.map((player) => (
                 <RacingPlayer
                   key={player.playerName}
-                  playerName={player.playerName}
-                  position={player.position}
-                  speed={player.speed}
+                  player={player}
                   isMe={player.playerName === myName}
                   myPosition={myPosition}
                   color={colorList[getParticipantColorIndex(player.playerName)]}
