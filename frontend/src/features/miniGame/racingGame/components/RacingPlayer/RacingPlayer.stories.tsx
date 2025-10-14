@@ -3,7 +3,7 @@ import RacingPlayer from './RacingPlayer';
 import { ColorList } from '@/constants/color';
 
 const meta: Meta<typeof RacingPlayer> = {
-  title: 'Features/MiniGame/RacingPlayer',
+  title: 'Features/MiniGame/RacingGame/RacingPlayer',
   component: RacingPlayer,
   tags: ['autodocs'],
   decorators: [
