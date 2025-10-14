@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import { RACING_Z_INDEX } from '../../constants/zIndex';
 
+const TRANSITION_DURATION = 300;
+
 type Props = {
   $position: number;
 };
@@ -12,7 +14,7 @@ export const Container = styled.div<Props>`
   width: 30px;
   height: 100%;
   transform: translateX(${({ $position }) => $position}px);
-  transition: transform 0.3s ease-in-out;
+  transition: transform ${TRANSITION_DURATION}ms ease-in-out;
   z-index: ${RACING_Z_INDEX.LINE};
 `;
 

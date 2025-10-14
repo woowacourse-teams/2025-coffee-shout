@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { RACING_Z_INDEX } from '../../constants/zIndex';
 
-const FILL_TRANSITION_DURATION = '0.3s';
+const FILL_TRANSITION_DURATION = 300;
 
 export const Container = styled.div`
   width: 100%;
