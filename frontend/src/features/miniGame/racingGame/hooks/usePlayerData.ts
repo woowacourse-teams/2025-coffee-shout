@@ -1,13 +1,8 @@
+import { RacingPlayer } from '@/types/miniGame/racingGame';
 import { useMemo } from 'react';
 
-type Player = {
-  playerName: string;
-  position: number;
-  speed: number;
-};
-
 type Props = {
-  players: Player[];
+  players: RacingPlayer[];
   myName: string;
 };
 
