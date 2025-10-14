@@ -16,7 +16,7 @@ const RacingPlayer = ({ player, isMe, myPosition, color }: Props) => {
   const rotatingRef = useRotationAnimation({ speed: player.speed });
 
   return (
-    <S.Player $isMe={isMe} $position={player.position} $myPosition={myPosition}>
+    <S.Container $isMe={isMe} $position={player.position} $myPosition={myPosition}>
       <S.PlayerName>
         <Description color={isMe ? 'point-500' : 'white'}>{player.playerName}</Description>
       </S.PlayerName>
@@ -24,7 +24,7 @@ const RacingPlayer = ({ player, isMe, myPosition, color }: Props) => {
       <S.RotatingWrapper ref={rotatingRef}>
         <PlayerIcon color={color} />
       </S.RotatingWrapper>
-    </S.Player>
+    </S.Container>
   );
 };
 
