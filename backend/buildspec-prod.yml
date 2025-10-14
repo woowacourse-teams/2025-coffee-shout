@@ -12,6 +12,7 @@ phases:
       - cd backend
       - ls -la
       - chmod +x ./gradlew
+      - docker info
 
   pre_build:
     commands:
@@ -32,7 +33,7 @@ phases:
       - cat src/main/resources/application-prod.yml
       - ls src/test/resources
       - cat src/test/resources/application-test.yml
-      - ./gradlew test --stacktrace
+      - ./gradlew clean test -Dspring.profiles.active=test --stacktrace
       - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
