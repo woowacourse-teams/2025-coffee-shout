@@ -1,12 +1,12 @@
 import RacingLineImg from '@/assets/racing-line.png';
 import * as S from './RacingLine.styled';
 
-type RacingLineProps = {
+type Props = {
   position: number;
   myPosition: number;
 };
 
-const RacingLine = ({ position, myPosition }: RacingLineProps) => {
+const RacingLine = ({ position, myPosition }: Props) => {
   const relativeX = position - myPosition;
 
   return (
