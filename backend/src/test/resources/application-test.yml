@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:mem:testdb;
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect  # 이것만 변경!
     hibernate:
       ddl-auto: create-drop
     properties:
