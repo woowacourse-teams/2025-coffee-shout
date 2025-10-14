@@ -89,8 +89,6 @@ export const CardText = styled.span<Props>`
 
 export const PlayerName = styled.span<Props>`
   color: ${({ theme, $playerColor }) => $playerColor || theme.color.point[400]};
-  display: flex;
-  align-items: center;
   margin-top: 10px;
   font-size: ${DESIGN_TOKENS.typography.h4};
   font-weight: 700;
