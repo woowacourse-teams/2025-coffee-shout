@@ -12,6 +12,7 @@ phases:
       - cd backend
       - ls -la
       - chmod +x ./gradlew
+      - docker info
 
   pre_build:
     commands:
