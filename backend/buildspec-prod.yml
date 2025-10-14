@@ -30,7 +30,7 @@ phases:
       # prod 환경에서는 모든 테스트 실행
       - ls src/test/resources
       - cat src/test/resources/application-test.yml
-      - ./gradlew test
+      - ./gradlew test --stacktrace
       - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
