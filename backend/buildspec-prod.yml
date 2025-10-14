@@ -28,6 +28,8 @@ phases:
   build:
     commands:
       # prod 환경에서는 모든 테스트 실행
+      - cat src/main/resources/application.yml
+      - cat src/main/resources/application-prod.yml
       - ls src/test/resources
       - cat src/test/resources/application-test.yml
       - ./gradlew test --stacktrace
