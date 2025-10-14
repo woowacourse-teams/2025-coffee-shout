@@ -1,6 +1,12 @@
 import styled from '@emotion/styled';
 import { RACING_Z_INDEX } from '../../constants/zIndex';
 
+type Props = {
+  $progress: number;
+  $color: string;
+  $isMe: boolean;
+};
+
 const FILL_TRANSITION_DURATION = 300;
 
 export const Container = styled.div`
@@ -18,7 +24,7 @@ export const ProgressTrack = styled.div`
   overflow: visible;
 `;
 
-export const ProgressFill = styled.div<{ $progress: number; $color: string; $isMe: boolean }>`
+export const ProgressFill = styled.div<Props>`
   position: absolute;
   left: 0;
   top: 0;
@@ -33,7 +39,7 @@ export const ProgressFill = styled.div<{ $progress: number; $color: string; $isM
   z-index: ${({ $isMe }) => ($isMe ? RACING_Z_INDEX.PROGRESS_BAR_ME : RACING_Z_INDEX.PROGRESS_BAR)};
 `;
 
-export const ProgressMarker = styled.div<{ $progress: number; $color: string; $isMe: boolean }>`
+export const ProgressMarker = styled.div<Props>`
   position: absolute;
   left: ${({ $progress }) => $progress}%;
   top: -20px;
