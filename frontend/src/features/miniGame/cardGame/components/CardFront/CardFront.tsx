@@ -9,9 +9,10 @@ type Props = {
   playerColor?: ColorList | null;
   card: Card;
   isMyCard?: boolean;
+  playerName?: string;
 };
 
-const CardFront = ({ size, playerColor, card, isMyCard = false }: Props) => {
+const CardFront = ({ size, playerColor, card, isMyCard = false, playerName }: Props) => {
   const isSignInversionCard = card.type === 'MULTIPLIER' && card.value === -1;
 
   return (
@@ -25,7 +26,7 @@ const CardFront = ({ size, playerColor, card, isMyCard = false }: Props) => {
           </S.CardText>
         )}
       </S.Circle>
-      {card.playerName && <S.PlayerName $playerColor={playerColor}>{card.playerName}</S.PlayerName>}
+      {playerName && <S.PlayerName $playerColor={playerColor}>{playerName}</S.PlayerName>}
     </S.Container>
   );
 };

@@ -22,7 +22,7 @@ export type MultiplierCard = {
   value: MultiplierValue;
 };
 
-export type Card = (AdditionCard | MultiplierCard) & { playerName?: string };
+export type Card = AdditionCard | MultiplierCard;
 
 export type CardInfo = {
   cardType: CardType;

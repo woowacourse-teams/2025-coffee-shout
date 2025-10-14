@@ -39,11 +39,11 @@ const GameCardGrid = ({ cardInfos, onCardClick }: Props) => {
                   {
                     type: cardInfo.cardType,
                     value: cardInfo.value,
-                    playerName: cardInfo.playerName,
                   } as Card
                 }
                 playerColor={playerColor}
                 isMyCard={cardInfo.playerName === myName}
+                playerName={cardInfo.playerName || undefined}
               />
             }
           />
