@@ -139,7 +139,6 @@ const LobbyPage = () => {
       return;
     }
 
-    //TODO: 통일 필요
     send(`/room/${joinCode}/minigame/command`, {
       commandType: 'START_MINI_GAME',
       commandRequest: {
