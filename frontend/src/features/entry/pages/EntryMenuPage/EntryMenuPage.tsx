@@ -137,18 +137,17 @@ const EntryMenuPage = () => {
         </S.Container>
         {shouldShowCustomMenuButton && <CustomMenuButton onClick={handleCustomMenuClick} />}
       </Layout.Content>
-      {shouldShowButtonBar &&
-        (playerType === 'HOST' ? (
-          <Layout.ButtonBar>
+      {shouldShowButtonBar && (
+        <Layout.ButtonBar>
+          {playerType === 'HOST' ? (
             <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
-              {!isRoomLoading && '방 만들러 가기'}
+              방 만들러 가기
             </Button>
-          </Layout.ButtonBar>
-        ) : (
-          <Layout.ButtonBar>
+          ) : (
             <Button onClick={handleProceedToRoom}>방 참가하기</Button>
-          </Layout.ButtonBar>
-        ))}
+          )}
+        </Layout.ButtonBar>
+      )}
     </Layout>
   );
 };

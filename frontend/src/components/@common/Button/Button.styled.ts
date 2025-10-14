@@ -78,7 +78,6 @@ export const Container = styled.button<Props>`
       &:active,
       &:focus {
         transform: none;
-        background: inherit;
         box-shadow: none;
         outline: none;
       }
