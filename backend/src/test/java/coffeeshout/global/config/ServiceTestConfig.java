@@ -13,14 +13,19 @@ import org.springframework.scheduling.TaskScheduler;
 @Profile("test")
 public class ServiceTestConfig {
 
-    @Bean(name = "miniGameTaskScheduler")
-    public TaskScheduler testMiniGameTaskScheduler() {
+    @Bean(name = "cardGameTaskScheduler")
+    public TaskScheduler testCardGameTaskScheduler() {
         return new TestTaskScheduler();
     }
 
     @Bean(name = "delayRemovalScheduler")
     public TaskScheduler testDelayRemovalScheduler() {
         return new ShutDownTestScheduler();
+    }
+
+    @Bean(name = "racingGameScheduler")
+    public TaskScheduler testRacingGameScheduler() {
+        return new TestTaskScheduler();
     }
 
     @Bean

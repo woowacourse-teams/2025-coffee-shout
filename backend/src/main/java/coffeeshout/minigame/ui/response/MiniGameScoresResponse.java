@@ -10,11 +10,14 @@ public record MiniGameScoresResponse(List<MiniGameScoreResponse> scores) {
 
     public record MiniGameScoreResponse(
             String playerName,
-            Integer score
+            Long score
     ) {
 
         public static MiniGameScoreResponse from(@NonNull Map.Entry<Player, MiniGameScore> scoreEntry) {
-            return new MiniGameScoreResponse(scoreEntry.getKey().getName().value(), scoreEntry.getValue().getValue());
+            return new MiniGameScoreResponse(
+                    scoreEntry.getKey().getName().value(),
+                    scoreEntry.getValue().getValue()
+            );
         }
     }
 
