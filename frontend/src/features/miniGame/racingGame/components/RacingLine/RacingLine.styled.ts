@@ -1,7 +1,11 @@
 import styled from '@emotion/styled';
 import { RACING_Z_INDEX } from '../../constants/zIndex';
 
-export const Container = styled.div<{ $position: number }>`
+type Props = {
+  $position: number;
+};
+
+export const Container = styled.div<Props>`
   position: absolute;
   left: 50%;
   top: 0;
