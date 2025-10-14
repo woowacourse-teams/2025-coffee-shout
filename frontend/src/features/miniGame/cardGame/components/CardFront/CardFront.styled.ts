@@ -52,13 +52,13 @@ export const Container = styled.div<Props>`
   align-items: center;
   justify-content: center;
 
-  ${({ $playerColor, $isMyCard, theme }) =>
+  ${({ $playerColor, $isMyCard }) =>
     $isMyCard && $playerColor
       ? ` box-shadow: 
-      0 0 8px ${theme.color.point[400]},
-      0 0 12px ${theme.color.point[400]},
-      0 0 16px ${theme.color.point[400]},
-      0 0 25px ${theme.color.point[400]}`
+      0 0 4px ${$playerColor},
+      0 0 8px ${$playerColor},
+      0 0 12px ${$playerColor},
+      0 0 14px ${$playerColor}`
       : 'box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);'}
 `;
 
@@ -87,11 +87,11 @@ export const CardText = styled.span<Props>`
   text-align: center;
 `;
 
-export const PlayerName = styled.span`
-  color: ${({ theme }) => theme.color.point[400]};
+export const PlayerName = styled.span<Props>`
+  color: ${({ theme, $playerColor }) => $playerColor || theme.color.point[400]};
   display: flex;
   align-items: center;
-  margin-top: 6px;
+  margin-top: 10px;
   font-size: ${DESIGN_TOKENS.typography.h4};
   font-weight: 700;
   max-width: 80%;
