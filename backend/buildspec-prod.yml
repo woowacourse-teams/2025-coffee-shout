@@ -27,7 +27,7 @@ phases:
     commands:
       # prod 환경에서는 모든 테스트 실행
       - ls src/test/resources
-      - cat ls src/test/resources
+      - cat src/test/resources
       - ./gradlew test
       - ./gradlew build -x test
       - ls -la build/libs/
