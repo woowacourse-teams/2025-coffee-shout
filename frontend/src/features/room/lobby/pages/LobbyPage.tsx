@@ -162,7 +162,9 @@ const LobbyPage = () => {
   const handleMiniGameClick = (miniGameType: MiniGameType) => {
     if (playerType === 'GUEST') return;
 
-    const updatedMiniGames = [miniGameType];
+    const updatedMiniGames = selectedMiniGames.includes(miniGameType)
+      ? selectedMiniGames.filter((game) => game !== miniGameType)
+      : [miniGameType];
 
     send(
       `/room/${joinCode}/update-minigames`,
