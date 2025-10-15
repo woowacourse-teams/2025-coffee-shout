@@ -4,6 +4,7 @@ import FadeInItem from '@/components/@common/FadeInItem/FadeInItem';
 import { useHeightDifference } from '@/hooks/useHeightDifference';
 import * as S from './GamePlayCountSlide.styled';
 import type { GamePlayCount } from '@/types/dashBoard';
+import { MINI_GAME_NAME_MAP, type MiniGameType } from '@/types/miniGame/common';
 
 type Props = {
   games: GamePlayCount[];
@@ -21,7 +22,11 @@ const GamePlayCountSlide = ({ games }: Props) => {
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
           {games.map((game, index) => (
             <FadeInItem key={game.gameType} index={index}>
-              <RankingItem rank={index + 1} name={game.gameType} count={game.playCount} />
+              <RankingItem
+                rank={index + 1}
+                name={MINI_GAME_NAME_MAP[game.gameType as MiniGameType] || game.gameType}
+                count={game.playCount}
+              />
             </FadeInItem>
           ))}
         </S.Wrapper>
