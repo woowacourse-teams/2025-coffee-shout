@@ -30,6 +30,7 @@ import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import { api } from '@/apis/rest/api';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -222,12 +223,15 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <LocalErrorBoundary>
-        <MiniGameSection
-          selectedMiniGames={selectedMiniGames}
-          handleMiniGameClick={handleMiniGameClick}
-        />
-      </LocalErrorBoundary>
+      <>
+        <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
+        <LocalErrorBoundary>
+          <MiniGameSection
+            selectedMiniGames={selectedMiniGames}
+            handleMiniGameClick={handleMiniGameClick}
+          />
+        </LocalErrorBoundary>
+      </>
     ),
   };
 
