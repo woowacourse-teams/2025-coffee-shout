@@ -50,7 +50,7 @@ export const ProgressMarker = styled.div<Props>`
   border: 2px solid ${({ $isMe }) => ($isMe ? '#fff' : 'transparent')};
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: left ${FILL_TRANSITION_DURATION} ease-out;
+  transition: left ${FILL_TRANSITION_DURATION}ms ease-out;
   z-index: ${({ $isMe }) =>
     $isMe ? RACING_Z_INDEX.PROGRESS_MARKER_ME : RACING_Z_INDEX.PROGRESS_MARKER};
 
