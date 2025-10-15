@@ -26,10 +26,6 @@ export const useHeightDifference = (options: UseHeightDifferenceOptions = {}) =>
         const difference = wrapperHeight - containerHeight - fadeInOffset;
 
         setHeightDifference(difference);
-        console.log('Container height:', containerHeight);
-        console.log('Wrapper height:', wrapperHeight);
-        console.log('FadeIn offset:', fadeInOffset);
-        console.log('Height difference:', difference);
       }
     };
 
