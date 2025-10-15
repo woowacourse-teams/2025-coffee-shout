@@ -45,7 +45,7 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { categories } = useCategories();
+  const { categories, loading: isCategoriesLoading } = useCategories();
   const { menus } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
@@ -124,7 +124,11 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           {currentView === 'selectCategory' ? (
-            <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
+            <SelectCategory
+              categories={categories}
+              isCategoriesLoading={isCategoriesLoading}
+              onClickCategory={handleCategorySelect}
+            />
           ) : (
             <MenuSelectionLayout
               categorySelection={categorySelection}
