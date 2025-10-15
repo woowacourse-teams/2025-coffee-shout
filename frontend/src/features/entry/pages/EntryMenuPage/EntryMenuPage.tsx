@@ -46,7 +46,7 @@ const EntryMenuPage = () => {
   } = useViewNavigation();
 
   const { categories, loading: isCategoriesLoading } = useCategories();
-  const { menus } = useMenus(category.value?.id ?? null);
+  const { menus, loading: isMenusLoading } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
@@ -95,7 +95,9 @@ const EntryMenuPage = () => {
   };
 
   const viewChildren = {
-    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectMenu: (
+      <MenuList menus={menus} isMenusLoading={isMenusLoading} onClickMenu={handleMenuSelect} />
+    ),
     selectTemperature: (
       <SelectTemperature
         temperatureAvailability={temperatureAvailability}
