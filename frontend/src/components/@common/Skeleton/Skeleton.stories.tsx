@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import Skeleton from './Skeleton';
 
 const meta = {
-  title: 'Components/Common/Skeleton',
+  title: 'Common/Skeleton',
   component: Skeleton,
   parameters: {
     layout: 'padded',
