@@ -7,9 +7,10 @@ import type { TopWinner } from '@/types/dashBoard';
 
 type Props = {
   winners: TopWinner[];
+  displayCount?: number;
 };
 
-const TopWinnersSlide = ({ winners }: Props) => {
+const TopWinnersSlide = ({ winners, displayCount = 3 }: Props) => {
   const { containerRef, wrapperRef, heightDifference } = useHeightDifference({
     fadeInOffset: 20,
     dependencies: [winners],
@@ -19,7 +20,7 @@ const TopWinnersSlide = ({ winners }: Props) => {
     <CarouselSlide title="이번달 TOP3 당첨자">
       <S.SlideContainer ref={containerRef}>
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
-          {winners.slice(0, 3).map((winner, index) => (
+          {winners.slice(0, displayCount).map((winner, index) => (
             <FadeInItem key={winner.nickname} index={index}>
               <RankingItem rank={index + 1} name={winner.nickname} count={winner.winCount} />
             </FadeInItem>
