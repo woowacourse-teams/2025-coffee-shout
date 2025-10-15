@@ -4,6 +4,6 @@ import java.util.List;
 
 public record LowestProbabilityWinnerResponse(
         Integer probability,
-        List<String> nicknames
+        List<String> playerNames
 ) {
 }

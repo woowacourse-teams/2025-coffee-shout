@@ -2,7 +2,6 @@ package coffeeshout.dashboard.application;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.dashboard.domain.GamePlayCountResponse;
 import coffeeshout.dashboard.domain.LowestProbabilityWinnerResponse;
@@ -179,7 +178,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result.probability()).isEqualTo(5);
-            assertThat(result.nicknames()).containsExactly("민수");
+            assertThat(result.playerNames()).containsExactly("민수");
         }
 
         @Test
@@ -206,7 +205,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result.probability()).isEqualTo(3);
-            assertThat(result.nicknames()).containsExactlyInAnyOrder("영희", "민수");
+            assertThat(result.playerNames()).containsExactlyInAnyOrder("영희", "민수");
         }
 
         @Test
@@ -226,7 +225,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result.probability()).isEqualTo(1);
-            assertThat(result.nicknames()).hasSize(5);
+            assertThat(result.playerNames()).hasSize(5);
         }
 
         @Test
@@ -254,7 +253,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result.probability()).isEqualTo(3);
-            assertThat(result.nicknames()).containsExactly("민수");
+            assertThat(result.playerNames()).containsExactly("민수");
         }
 
         @Test
