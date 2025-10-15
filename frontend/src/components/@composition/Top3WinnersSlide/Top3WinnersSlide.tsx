@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import CarouselSlide from '@/components/@common/CarouselSlide/CarouselSlide';
 import RankingItem from '@/components/@common/RankingItem/RankingItem';
+import FadeInItem from '@/components/@common/FadeInItem/FadeInItem';
 import * as S from './Top3WinnersSlide.styled';
 
 type Winner = {
@@ -22,11 +23,13 @@ const Top3WinnersSlide = ({ winners }: Props) => {
       if (containerRef.current && wrapperRef.current) {
         const containerHeight = containerRef.current.clientHeight;
         const wrapperHeight = wrapperRef.current.scrollHeight;
-        const difference = wrapperHeight - containerHeight;
+        const fadeInOffset = 20; // FadeIn 애니메이션의 translateY 값
+        const difference = wrapperHeight - containerHeight - fadeInOffset;
 
         setHeightDifference(difference);
         console.log('Container height:', containerHeight);
         console.log('Wrapper height:', wrapperHeight);
+        console.log('FadeIn offset:', fadeInOffset);
         console.log('Height difference:', difference);
       }
     };
@@ -47,12 +50,9 @@ const Top3WinnersSlide = ({ winners }: Props) => {
       <S.SlideContainer ref={containerRef}>
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
           {winners.slice(0, 3).map((winner, index) => (
-            <RankingItem
-              key={winner.name}
-              rank={index + 1}
-              name={winner.name}
-              count={winner.count}
-            />
+            <FadeInItem key={winner.name} index={index}>
+              <RankingItem rank={index + 1} name={winner.name} count={winner.count} />
+            </FadeInItem>
           ))}
         </S.Wrapper>
       </S.SlideContainer>
