@@ -2,18 +2,14 @@ import CarouselSlide from '@/components/@common/CarouselSlide/CarouselSlide';
 import RankingItem from '@/components/@common/RankingItem/RankingItem';
 import FadeInItem from '@/components/@common/FadeInItem/FadeInItem';
 import { useHeightDifference } from '@/hooks/useHeightDifference';
-import * as S from './MiniGameStatsSlide.styled';
-
-type Game = {
-  name: string;
-  count: number;
-};
+import * as S from './GamePlayCountSlide.styled';
+import type { GamePlayCount } from '@/types/dashBoard';
 
 type Props = {
-  games: Game[];
+  games: GamePlayCount[];
 };
 
-const MiniGameStatsSlide = ({ games }: Props) => {
+const GamePlayCountSlide = ({ games }: Props) => {
   const { containerRef, wrapperRef, heightDifference } = useHeightDifference({
     fadeInOffset: 20,
     dependencies: [games],
@@ -24,8 +20,8 @@ const MiniGameStatsSlide = ({ games }: Props) => {
       <S.SlideContainer ref={containerRef}>
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
           {games.map((game, index) => (
-            <FadeInItem key={game.name} index={index}>
-              <RankingItem rank={index + 1} name={game.name} count={game.count} />
+            <FadeInItem key={game.gameType} index={index}>
+              <RankingItem rank={index + 1} name={game.gameType} count={game.playCount} />
             </FadeInItem>
           ))}
         </S.Wrapper>
@@ -34,4 +30,4 @@ const MiniGameStatsSlide = ({ games }: Props) => {
   );
 };
 
-export default MiniGameStatsSlide;
+export default GamePlayCountSlide;
