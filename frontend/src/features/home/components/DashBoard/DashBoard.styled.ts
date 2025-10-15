@@ -6,14 +6,18 @@ export const CarouselContainer = styled.div`
   height: 100%;
 `;
 
-export const SlideWrapper = styled.div<{ $isTransitioning: boolean }>`
+type AnimationState = 'fadingIn' | 'fadingOut';
+
+export const SlideWrapper = styled.div<{ $animationState: AnimationState }>`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  animation: ${({ $isTransitioning }) =>
-    $isTransitioning ? 'fadeOut 600ms ease-in-out forwards' : 'fadeIn 600ms ease-in-out forwards'};
+  animation: ${({ $animationState }) =>
+    $animationState === 'fadingIn'
+      ? 'fadeIn 400ms ease-in-out forwards'
+      : 'fadeOut 400ms ease-in-out forwards'};
 
   @keyframes fadeIn {
     0% {
