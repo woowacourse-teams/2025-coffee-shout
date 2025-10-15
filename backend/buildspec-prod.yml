@@ -33,7 +33,7 @@ phases:
       - cat src/main/resources/application-prod.yml
       - ls src/test/resources
       - cat src/test/resources/application-test.yml
-      - ./gradlew clean test --refresh-dependencies -Dspring.profiles.active=test --debug
+      - ./gradlew clean test -Dspring.profiles.active=test
       - ./gradlew build -x test
       - ls -la build/libs/
       - JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
