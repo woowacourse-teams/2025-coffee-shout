@@ -10,10 +10,7 @@ type Props = {
   probability: number;
 };
 
-const LowestProbabilitySlide = ({
-  WinnerNames, // eslint-disable-line @typescript-eslint/no-unused-vars
-  probability,
-}: Props) => {
+const LowestProbabilitySlide = ({ WinnerNames, probability }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const namesRef = useRef<HTMLDivElement>(null);
   const [slideDistance, setSlideDistance] = useState(0);
@@ -23,11 +20,6 @@ const LowestProbabilitySlide = ({
       const containerWidth = containerRef.current.clientWidth;
       const namesWidth = namesRef.current.scrollWidth;
       const distance = namesWidth - containerWidth;
-
-      console.log('컨테이너 너비:', containerWidth);
-      console.log('이름들 전체 너비:', namesWidth);
-      console.log('슬라이드해야 할 길이:', distance);
-
       setSlideDistance(distance);
     }
   }, []);
