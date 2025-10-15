@@ -163,7 +163,7 @@ const LobbyPage = () => {
 
     const updatedMiniGames = selectedMiniGames.includes(miniGameType)
       ? selectedMiniGames.filter((game) => game !== miniGameType)
-      : [...selectedMiniGames, miniGameType];
+      : [miniGameType];
 
     send(
       `/room/${joinCode}/update-minigames`,
