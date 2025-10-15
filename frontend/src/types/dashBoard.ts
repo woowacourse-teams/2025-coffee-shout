@@ -4,7 +4,7 @@ export type TopWinner = {
 };
 
 export type LowestProbabilityWinner = {
-  nickname: [string];
+  nicknames: [string];
   probability: number;
 };
 

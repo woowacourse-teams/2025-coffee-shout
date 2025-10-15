@@ -24,9 +24,9 @@ const meta: Meta<typeof LowestProbabilitySlide> = {
     ),
   ],
   argTypes: {
-    winnerName: {
-      control: 'text',
-      description: '우승자 이름',
+    WinnerNames: {
+      control: 'object',
+      description: '우승자 이름 배열',
     },
     probability: {
       control: { type: 'range', min: 1, max: 100, step: 1 },
@@ -34,7 +34,7 @@ const meta: Meta<typeof LowestProbabilitySlide> = {
     },
   },
   args: {
-    winnerName: '세라',
+    WinnerNames: ['세라'],
     probability: 5,
   },
 };
@@ -55,10 +55,24 @@ export const DifferentProbabilities: Story = {
         height: '400px',
       }}
     >
-      <LowestProbabilitySlide winnerName="세라" probability={1} />
+      <LowestProbabilitySlide WinnerNames={['세라']} probability={1} />
     </div>
   ),
   parameters: {
     controls: { disable: true },
+  },
+};
+
+export const MultipleWinners: Story = {
+  args: {
+    WinnerNames: ['세라', '민수', '지영'],
+    probability: 3,
+  },
+};
+
+export const SingleWinner: Story = {
+  args: {
+    WinnerNames: ['김우승'],
+    probability: 0.5,
   },
 };
