@@ -22,7 +22,7 @@ export const SlideWrapper = styled.div<{ $animationState: AnimationState }>`
   @keyframes fadeIn {
     0% {
       opacity: 0;
-      transform: scale(0.8);
+      transform: scale(0.85);
     }
     100% {
       opacity: 1;
@@ -37,7 +37,7 @@ export const SlideWrapper = styled.div<{ $animationState: AnimationState }>`
     }
     100% {
       opacity: 0;
-      transform: scale(0.8);
+      transform: scale(0.85);
     }
   }
 `;
