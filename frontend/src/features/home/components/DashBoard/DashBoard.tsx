@@ -1,40 +1,42 @@
 import LowestProbabilitySlide from '@/components/@composition/LowestProbabilitySlide/LowestProbabilitySlide';
-import Top3WinnersSlide from '@/components/@composition/Top3WinnersSlide/Top3WinnersSlide';
-import MiniGameStatsSlide from '@/components/@composition/MiniGameStatsSlide/MiniGameStatsSlide';
+import TopWinnersSlide from '@/components/@composition/TopWinnersSlide/TopWinnersSlide';
+import GamePlayCountSlide from '@/components/@composition/GamePlayCountSlide/GamePlayCountSlide';
 import { useAutoSlideCarousel } from '@/hooks/useAutoSlideCarousel';
 import * as S from './DashBoard.styled';
-const slides = [
-  {
-    key: 'top3',
-    component: (
-      <Top3WinnersSlide
-        winners={[
-          { name: '세라', count: 20 },
-          { name: '민수', count: 15 },
-          { name: '지영', count: 12 },
-        ]}
-      />
-    ),
-  },
-  {
-    key: 'lowest',
-    component: <LowestProbabilitySlide winnerName="세라" probability={0.1} />,
-  },
-  {
-    key: 'minigame',
-    component: (
-      <MiniGameStatsSlide
-        games={[
-          { name: '카드게임', count: 20 },
-          { name: '레이싱게임', count: 15 },
-          { name: '룰렛', count: 8 },
-        ]}
-      />
-    ),
-  },
-];
+import useFetch from '@/apis/rest/useFetch';
+import type { TopWinner, LowestProbabilityWinner, GamePlayCount } from '@/types/dashBoard';
 
 const DashBoard = () => {
+  const { data: topWinners } = useFetch<TopWinner[]>({
+    endpoint: '/dashboard/top-winners',
+  });
+  const { data: lowestProbabilityWinner } = useFetch<LowestProbabilityWinner>({
+    endpoint: '/dashboard/lowest-probability-winner',
+  });
+  const { data: gamePlayCounts } = useFetch<GamePlayCount[]>({
+    endpoint: '/dashboard/game-play-counts',
+  });
+
+  const slides = [
+    {
+      key: 'top3',
+      component: <TopWinnersSlide winners={topWinners || []} displayCount={5} />,
+    },
+    {
+      key: 'lowest',
+      component: (
+        <LowestProbabilitySlide
+          winnerName={lowestProbabilityWinner?.nickname[0] || ''}
+          probability={lowestProbabilityWinner?.probability || 0}
+        />
+      ),
+    },
+    {
+      key: 'game-play-counts',
+      component: <GamePlayCountSlide games={gamePlayCounts || []} />,
+    },
+  ];
+
   const { currentSlideIndex, animationState } = useAutoSlideCarousel({
     slideCount: slides.length,
     displayDuration: 4000,
