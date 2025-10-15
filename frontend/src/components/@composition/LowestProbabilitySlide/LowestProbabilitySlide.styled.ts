@@ -6,8 +6,9 @@ export const Wrapper = styled.div`
   align-items: center;
   text-align: center;
   height: 100%;
+  max-width: 100%;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 1rem;
 `;
 
 export const Header = styled.div`
@@ -20,32 +21,26 @@ export const Content = styled.div`
   align-items: center;
 `;
 
-export const WinnerName = styled.div`
+export const NamesContainer = styled.div`
+  width: 100%;
+  max-width: 90vw;
+  overflow: hidden;
   margin-bottom: 1rem;
-  animation: spinAndReveal 0.5s ease-out;
-  transform-style: preserve-3d;
-  perspective: 1000px;
+`;
 
-  @keyframes spinAndReveal {
+export const WinnerName = styled.div<{ $slideDistance: number }>`
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+  animation: ${({ $slideDistance }) =>
+    $slideDistance > 0 ? `slide 5s linear infinite 600ms` : 'none'};
+
+  @keyframes slide {
     0% {
-      transform: rotateY(180deg) rotateX(0deg);
-      opacity: 0;
-    }
-    25% {
-      transform: rotateY(225deg) rotateX(0deg);
-      opacity: 0.3;
-    }
-    50% {
-      transform: rotateY(270deg) rotateX(0deg);
-      opacity: 0.6;
-    }
-    75% {
-      transform: rotateY(315deg) rotateX(0deg);
-      opacity: 0.8;
+      transform: translateX(0);
     }
     100% {
-      transform: rotateY(360deg) rotateX(0deg);
-      opacity: 1;
+      transform: translateX(${({ $slideDistance }) => -$slideDistance}px);
     }
   }
 `;
