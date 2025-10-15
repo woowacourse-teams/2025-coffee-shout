@@ -8,7 +8,7 @@ type Props = {
   duration?: number;
 };
 
-const FadeInItem = ({ children, index = 0, delay = 0.2, duration = 0.6 }: Props) => {
+const FadeInItem = ({ children, index = 0, delay = 200, duration = 600 }: Props) => {
   return (
     <S.Wrapper $index={index} $delay={delay} $duration={duration}>
       {children}
