@@ -30,10 +30,11 @@ export const NamesContainer = styled.div`
 
 export const WinnerName = styled.div<{ $slideDistance: number }>`
   display: flex;
+  justify-content: ${({ $slideDistance }) => ($slideDistance > 0 ? 'flex-start' : 'center')};
   gap: 0.5rem;
   white-space: nowrap;
   animation: ${({ $slideDistance }) =>
-    $slideDistance > 0 ? `slide 5s linear infinite 600ms` : 'none'};
+    $slideDistance > 0 ? `slide 3400ms linear infinite 600ms` : 'none'};
 
   @keyframes slide {
     0% {

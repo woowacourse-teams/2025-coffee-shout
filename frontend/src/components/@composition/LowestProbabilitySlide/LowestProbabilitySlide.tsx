@@ -38,22 +38,11 @@ const LowestProbabilitySlide = ({
         <S.NamesContainer ref={namesRef}>
           <FadeInItem index={0} delay={0}>
             <S.WinnerName $slideDistance={slideDistance}>
-              {[
-                '세라세[라세라세',
-                '다이앤이다이앤이다이',
-                '니야야야야야야',
-                // '야니니니니니니니',
-                // '앤이다ㅇ라ㅓ렁ㄹ',
-              ].map((winnerName) => (
+              {WinnerNames.map((winnerName) => (
                 <Headline1 key={winnerName} color="white">
                   {winnerName}
                 </Headline1>
               ))}
-              {/* {WinnerNames.map((winnerName) => (
-                <Headline1 key={winnerName} color="white">
-                  {winnerName}
-                </Headline1>
-              ))} */}
             </S.WinnerName>
           </FadeInItem>
         </S.NamesContainer>

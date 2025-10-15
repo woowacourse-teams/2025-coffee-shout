@@ -20,13 +20,13 @@ const DashBoard = () => {
   const slides = [
     {
       key: 'top3',
-      component: <TopWinnersSlide winners={topWinners || []} displayCount={5} />,
+      component: <TopWinnersSlide winners={topWinners || []} displayCount={3} />,
     },
     {
       key: 'lowest',
       component: (
         <LowestProbabilitySlide
-          winnerName={lowestProbabilityWinner?.nickname[0] || ''}
+          WinnerNames={lowestProbabilityWinner?.nicknames || []}
           probability={lowestProbabilityWinner?.probability || 0}
         />
       ),
