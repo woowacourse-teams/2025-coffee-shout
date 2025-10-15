@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import Top3WinnersSlide from './Top3WinnersSlide';
+import TopWinnersSlide from './TopWinnersSlide';
 
-const meta: Meta<typeof Top3WinnersSlide> = {
-  title: 'Composition/Top3WinnersSlide',
-  component: Top3WinnersSlide,
+const meta: Meta<typeof TopWinnersSlide> = {
+  title: 'Composition/TopWinnersSlide',
+  component: TopWinnersSlide,
   parameters: {
     layout: 'centered',
   },
@@ -31,9 +31,9 @@ const meta: Meta<typeof Top3WinnersSlide> = {
   },
   args: {
     winners: [
-      { name: '세라', count: 20 },
-      { name: '민수', count: 15 },
-      { name: '지영', count: 12 },
+      { nickname: '세라', winCount: 20 },
+      { nickname: '민수', winCount: 15 },
+      { nickname: '지영', winCount: 12 },
     ],
   },
 };
@@ -46,14 +46,14 @@ export const Default: Story = {};
 export const LessThanThree: Story = {
   args: {
     winners: [
-      { name: '세라', count: 20 },
-      { name: '민수', count: 15 },
+      { nickname: '세라', winCount: 20 },
+      { nickname: '민수', winCount: 15 },
     ],
   },
 };
 
 export const SingleWinner: Story = {
   args: {
-    winners: [{ name: '세라', count: 20 }],
+    winners: [{ nickname: '세라', winCount: 20 }],
   },
 };
