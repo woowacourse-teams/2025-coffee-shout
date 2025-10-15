@@ -26,7 +26,6 @@ import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
  * </p>
  */
 @Slf4j
-@Profile("!local & !test")
 @Component
 public class WebSocketGracefulShutdownHandler implements SmartLifecycle {
 

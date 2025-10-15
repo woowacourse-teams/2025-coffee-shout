@@ -12,6 +12,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: false
+  lifecycle:
+    timeout-per-shutdown-phase: 1s
   flyway:
     enabled: false
   cloud:
@@ -25,6 +27,9 @@ spring:
   autoconfigure:
     exclude:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
+server:
+  shutdown: immediate
 
 redisson:
   enabled: false
