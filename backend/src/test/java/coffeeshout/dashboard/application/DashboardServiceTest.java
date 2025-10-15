@@ -79,11 +79,11 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(3);
-            assertThat(result.get(0).nickname()).isEqualTo("철수");
+            assertThat(result.get(0).playerName()).isEqualTo("철수");
             assertThat(result.get(0).winCount()).isEqualTo(5);
-            assertThat(result.get(1).nickname()).isEqualTo("영희");
+            assertThat(result.get(1).playerName()).isEqualTo("영희");
             assertThat(result.get(1).winCount()).isEqualTo(3);
-            assertThat(result.get(2).nickname()).isEqualTo("민수");
+            assertThat(result.get(2).playerName()).isEqualTo("민수");
             assertThat(result.get(2).winCount()).isEqualTo(2);
         }
 
@@ -117,7 +117,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).nickname()).isEqualTo("철수");
+            assertThat(result.get(0).playerName()).isEqualTo("철수");
             assertThat(result.get(0).winCount()).isEqualTo(2);
         }
 
@@ -141,9 +141,9 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(5);
-            assertThat(result.get(0).nickname()).isEqualTo("플레이어10");
+            assertThat(result.get(0).playerName()).isEqualTo("플레이어10");
             assertThat(result.get(0).winCount()).isEqualTo(10);
-            assertThat(result.get(4).nickname()).isEqualTo("플레이어6");
+            assertThat(result.get(4).playerName()).isEqualTo("플레이어6");
             assertThat(result.get(4).winCount()).isEqualTo(6);
         }
 
