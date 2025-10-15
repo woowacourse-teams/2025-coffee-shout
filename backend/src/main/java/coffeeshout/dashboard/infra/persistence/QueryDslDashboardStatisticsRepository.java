@@ -87,7 +87,7 @@ public class QueryDslDashboardStatisticsRepository implements DashboardStatistic
                 .map(tuple -> tuple.get(PLAYER.playerName))
                 .toList();
 
-        return Optional.of(new LowestProbabilityWinnerResponse(minProbability, nicknames));
+        return Optional.of(LowestProbabilityWinnerResponse.of(minProbability, nicknames));
     }
 
     @Override
