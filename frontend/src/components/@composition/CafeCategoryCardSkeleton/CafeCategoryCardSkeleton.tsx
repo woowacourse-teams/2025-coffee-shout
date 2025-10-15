@@ -2,8 +2,8 @@ import Skeleton from '@/components/@common/Skeleton/Skeleton';
 import * as S from './CafeCategoryCardSkeleton.styled';
 
 const CafeCategoryCardSkeleton = () => {
-  return (
-    <S.Container>
+  return Array.from({ length: 4 }).map((_, index) => (
+    <S.Container key={index}>
       <S.Content>
         <S.IconWrapper>
           <Skeleton width={50} height={50} borderRadius="50%" />
@@ -13,7 +13,7 @@ const CafeCategoryCardSkeleton = () => {
         </S.TextWrapper>
       </S.Content>
     </S.Container>
-  );
+  ));
 };
 
 export default CafeCategoryCardSkeleton;
