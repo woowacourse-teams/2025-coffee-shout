@@ -177,7 +177,7 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(5);
+            assertThat(result.probability()).isEqualTo(0.05);
             assertThat(result.playerNames()).containsExactly("민수");
         }
 
@@ -204,7 +204,7 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(3);
+            assertThat(result.probability()).isEqualTo(0.03);
             assertThat(result.playerNames()).containsExactlyInAnyOrder("영희", "민수");
         }
 
@@ -224,7 +224,7 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(1);
+            assertThat(result.probability()).isEqualTo(0.01);
             assertThat(result.playerNames()).hasSize(5);
         }
 
@@ -252,7 +252,7 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(3);
+            assertThat(result.probability()).isEqualTo(0.03);
             assertThat(result.playerNames()).containsExactly("민수");
         }
 
