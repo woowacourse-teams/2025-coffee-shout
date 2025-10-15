@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
 import CarouselSlide from '@/components/@common/CarouselSlide/CarouselSlide';
 import ProbabilityTag from '@/components/@common/ProbabilityTag/ProbabilityTag';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import * as S from './LowestProbabilitySlide.styled';
 import FadeInItem from '@/components/@common/FadeInItem/FadeInItem';
+import { useWidthDifference } from '@/hooks/useWidthDifference';
 
 type Props = {
   WinnerNames: string[];
@@ -11,18 +11,7 @@ type Props = {
 };
 
 const LowestProbabilitySlide = ({ WinnerNames, probability }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const namesRef = useRef<HTMLDivElement>(null);
-  const [slideDistance, setSlideDistance] = useState(0);
-
-  useEffect(() => {
-    if (containerRef.current && namesRef.current) {
-      const containerWidth = containerRef.current.clientWidth;
-      const namesWidth = namesRef.current.scrollWidth;
-      const distance = namesWidth - containerWidth;
-      setSlideDistance(distance);
-    }
-  }, []);
+  const { containerRef, wrapperRef: namesRef, slideDistance } = useWidthDifference();
 
   return (
     <CarouselSlide title="최저 확률 우승자">
