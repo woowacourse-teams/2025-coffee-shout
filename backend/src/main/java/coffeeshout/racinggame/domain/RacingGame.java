@@ -24,7 +24,7 @@ public class RacingGame implements Playable {
     public static final int START_LINE = 0;
     public static final int CLICK_COUNT_THRESHOLD = 10;
 
-    public static final long MOVE_INTERVAL_MILLIS = 100L;
+    public static final long MOVE_INTERVAL_MILLIS = 10L;
 
     private Instant startTime;
     private Runners runners;
