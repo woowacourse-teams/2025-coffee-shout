@@ -20,7 +20,7 @@ public class TapPerSecondSpeedCalculator implements SpeedCalculator {
     }
 
     private int convertToSpeed(double clicksPerSecond) {
-        double speed = (clicksPerSecond / RacingGame.CLICK_COUNT_THRESHOLD) * RacingGame.MAX_SPEED;
+        double speed = clicksPerSecond * RacingGame.CLICK_PER_SPEED_SCALE;
         return Math.clamp((int) speed, RacingGame.MIN_SPEED, RacingGame.MAX_SPEED);
     }
 }
