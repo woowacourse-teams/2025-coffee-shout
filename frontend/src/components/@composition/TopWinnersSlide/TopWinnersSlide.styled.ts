@@ -12,21 +12,25 @@ export const Wrapper = styled.div<{ $slideDistance: number }>`
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
-  animation: ${({ $slideDistance }) =>
-    $slideDistance > 0 ? 'slideUp 4s linear infinite' : 'none'};
 
-  @keyframes slideUp {
-    0% {
-      transform: translateY(0);
-    }
-    20% {
-      transform: translateY(0);
-    }
-    60% {
-      transform: translateY(-${({ $slideDistance }) => $slideDistance}px);
-    }
-    100% {
-      transform: translateY(-${({ $slideDistance }) => $slideDistance}px);
-    }
-  }
+  ${({ $slideDistance }) =>
+    $slideDistance > 0 &&
+    `
+      animation: slideUp-${$slideDistance} 4s linear infinite forwards;
+
+      @keyframes slideUp-${$slideDistance} {
+        0% {
+          transform: translateY(0);
+        }
+        20% {
+          transform: translateY(0);
+        }
+        60% {
+          transform: translateY(-${$slideDistance}px);
+        }
+        100% {
+          transform: translateY(-${$slideDistance}px);
+        }
+      }
+    `}
 `;
