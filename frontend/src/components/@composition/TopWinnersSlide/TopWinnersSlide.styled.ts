@@ -16,7 +16,7 @@ export const Wrapper = styled.div<{ $slideDistance: number }>`
   ${({ $slideDistance }) =>
     $slideDistance > 0 &&
     `
-      animation: slideUp-${$slideDistance} 4s linear infinite forwards;
+      animation: slideUp-${$slideDistance} 5500ms linear infinite forwards;
 
       @keyframes slideUp-${$slideDistance} {
         0% {
