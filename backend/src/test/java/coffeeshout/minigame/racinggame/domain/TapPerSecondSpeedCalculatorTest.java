@@ -36,7 +36,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30);
+        assertThat(speed).isEqualTo(45);
     }
 
     @Test
@@ -106,7 +106,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30); // 10
+        assertThat(speed).isEqualTo(60); // 10
     }
 
     @Test
