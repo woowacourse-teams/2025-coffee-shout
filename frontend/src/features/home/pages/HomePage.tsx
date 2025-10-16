@@ -59,7 +59,7 @@ const HomePage = () => {
 
   return (
     <Layout>
-      <Layout.Banner height="100%">
+      <Layout.Banner height="55%">
         <S.Banner>
           <DashBoard />
         </S.Banner>
