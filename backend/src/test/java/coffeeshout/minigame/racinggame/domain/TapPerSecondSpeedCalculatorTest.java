@@ -1,8 +1,7 @@
 package coffeeshout.minigame.racinggame.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.TapPerSecondSpeedCalculator;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(24);
+        assertThat(speed).isEqualTo(8);
     }
 
     @Test
@@ -36,7 +35,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(45);
+        assertThat(speed).isEqualTo(15);
     }
 
     @Test
@@ -50,7 +49,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30); // 0.5초에 5번 = 초당 10번
+        assertThat(speed).isEqualTo(10); // 0.5초에 5번 = 초당 10번
     }
 
     @Test
@@ -64,7 +63,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(6); // 2초에 4번 = 초당 2번
+        assertThat(speed).isEqualTo(3); // 2초에 4번 = 초당 2번
     }
 
     @Test
@@ -92,7 +91,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30); // 0.1초에 1번 = 초당 10번
+        assertThat(speed).isEqualTo(10); // 0.1초에 1번 = 초당 10번
     }
 
     @Test
@@ -106,7 +105,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(60); // 10
+        assertThat(speed).isEqualTo(20); // 10
     }
 
     @Test
@@ -120,7 +119,7 @@ class TapPerSecondSpeedCalculatorTest {
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(21); // 정확히 7.0
+        assertThat(speed).isEqualTo(7); // 정확히 7.0
     }
 
     @Test
@@ -130,14 +129,14 @@ class TapPerSecondSpeedCalculatorTest {
 
         // when & then - 0.25초에 2번 = 초당 8번
         Instant now1 = lastTapedTime.plusMillis(250);
-        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now1, 2)).isEqualTo(24);
+        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now1, 2)).isEqualTo(8);
 
         // when & then - 1.5초에 9번 = 초당 6번
         Instant now2 = lastTapedTime.plusMillis(1500);
-        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now2, 9)).isEqualTo(18);
+        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now2, 9)).isEqualTo(6);
 
         // when & then - 3초에 6번 = 초당 2번
         Instant now3 = lastTapedTime.plusMillis(3000);
-        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now3, 6)).isEqualTo(6);
+        assertThat(speedCalculator.calculateSpeed(lastTapedTime, now3, 6)).isEqualTo(3);
     }
 }

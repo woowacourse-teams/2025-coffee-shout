@@ -7,7 +7,6 @@ import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.player.Player;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -20,7 +19,7 @@ public class RacingGame implements Playable {
     public static final int INITIAL_SPEED = 0;
     public static final int MIN_SPEED = 3;
     public static final int MAX_SPEED = 60;
-    public static final int CLICK_PER_SPEED_SCALE = 3;
+    public static final int CLICK_PER_SPEED_SCALE = 1;
     public static final int FINISH_LINE = 3000;
     public static final int START_LINE = 0;
 
