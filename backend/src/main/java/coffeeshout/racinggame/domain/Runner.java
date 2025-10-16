@@ -23,7 +23,7 @@ public class Runner {
 
     public void updateSpeed(int tapCount, SpeedCalculator speedCalculator, Instant now) {
         final int nextSpeed = speedCalculator.calculateSpeed(lastSpeedUpdateTime, now, tapCount);
-        isTrue(nextSpeed >= RacingGame.MIN_SPEED && nextSpeed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 30이어야 합니다.");
+        isTrue(nextSpeed >= RacingGame.MIN_SPEED && nextSpeed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 60이어야 합니다.");
         this.lastSpeedUpdateTime = now;
         this.speed = nextSpeed;
     }
