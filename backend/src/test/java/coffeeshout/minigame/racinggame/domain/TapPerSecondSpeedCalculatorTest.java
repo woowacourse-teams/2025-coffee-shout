@@ -30,13 +30,13 @@ class TapPerSecondSpeedCalculatorTest {
         // given
         final Instant lastTapedTime = Instant.now();
         final Instant now = lastTapedTime.plusMillis(1000);
-        final int tapCount = 15;
+        final int tapCount = 35;
 
         // when
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30);
+        assertThat(speed).isEqualTo(60);
     }
 
     @Test
@@ -100,13 +100,13 @@ class TapPerSecondSpeedCalculatorTest {
         // given
         final Instant lastTapedTime = Instant.now();
         final Instant now = lastTapedTime.plusMillis(1000);
-        final int tapCount = RacingGame.CLICK_COUNT_THRESHOLD;
+        final int tapCount = 20;
 
         // when
         final int speed = speedCalculator.calculateSpeed(lastTapedTime, now, tapCount);
 
         // then
-        assertThat(speed).isEqualTo(30); // 10
+        assertThat(speed).isEqualTo(60); // 10
     }
 
     @Test
