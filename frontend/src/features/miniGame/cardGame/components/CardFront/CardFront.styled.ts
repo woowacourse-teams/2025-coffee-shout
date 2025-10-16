@@ -1,7 +1,6 @@
 import { ColorList } from '@/constants/color';
 import { Card } from '@/types/miniGame/cardGame';
 import { Size } from '@/types/styles';
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { cardVariants, circleVariants } from '../../constants/variants';
 import { DESIGN_TOKENS } from '@/constants/design';
@@ -10,6 +9,7 @@ type Props = {
   $size?: Size;
   $playerColor?: ColorList | null;
   $card?: Card;
+  $isMyCard?: boolean;
 };
 
 const CARD_TEXT_COLORS = {
@@ -45,18 +45,21 @@ const cardTextFontSize = {
 export const Container = styled.div<Props>`
   ${({ $size }) => cardVariants[$size || 'large']}
   background-color: ${({ theme }) => theme.color.point[200]};
-  ${({ $playerColor }) =>
-    $playerColor &&
-    css`
-      border: 4px solid ${$playerColor};
-    `};
   border-radius: 7px;
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  ${({ $playerColor, $isMyCard }) =>
+    $isMyCard && $playerColor
+      ? ` box-shadow: 
+      0 0 4px ${$playerColor},
+      0 0 8px ${$playerColor},
+      0 0 12px ${$playerColor},
+      0 0 14px ${$playerColor}`
+      : 'box-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);'}
 `;
 
 export const Circle = styled.div<Props>`
@@ -82,4 +85,16 @@ export const CardText = styled.span<Props>`
   font-weight: 700;
   line-height: 1;
   text-align: center;
+`;
+
+export const PlayerName = styled.span<Props>`
+  color: ${({ theme, $playerColor }) => $playerColor || theme.color.point[400]};
+  margin-top: 10px;
+  font-size: ${DESIGN_TOKENS.typography.h4};
+  font-weight: 700;
+  max-width: 80%;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

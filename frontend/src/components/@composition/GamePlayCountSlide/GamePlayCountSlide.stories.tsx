@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import MiniGameStatsSlide from './MiniGameStatsSlide';
+import GamePlayCountSlide from './GamePlayCountSlide';
 
-const meta: Meta<typeof MiniGameStatsSlide> = {
-  title: 'Composition/MiniGameStatsSlide',
-  component: MiniGameStatsSlide,
+const meta: Meta<typeof GamePlayCountSlide> = {
+  title: 'Composition/GamePlayCountSlide',
+  component: GamePlayCountSlide,
   parameters: {
     layout: 'centered',
   },
@@ -31,8 +31,8 @@ const meta: Meta<typeof MiniGameStatsSlide> = {
   },
   args: {
     games: [
-      { name: '카드게임', count: 20 },
-      { name: '레이싱게임', count: 15 },
+      { gameType: '카드게임', playCount: 20 },
+      { gameType: '레이싱게임', playCount: 15 },
     ],
   },
 };
@@ -44,16 +44,16 @@ export const Default: Story = {};
 
 export const SingleGame: Story = {
   args: {
-    games: [{ name: '카드게임', count: 20 }],
+    games: [{ gameType: '카드게임', playCount: 20 }],
   },
 };
 
 export const MultipleGames: Story = {
   args: {
     games: [
-      { name: '카드게임', count: 20 },
-      { name: '레이싱게임', count: 15 },
-      { name: '룰렛게임', count: 10 },
+      { gameType: '카드게임', playCount: 20 },
+      { gameType: '레이싱게임', playCount: 15 },
+      { gameType: '룰렛게임', playCount: 10 },
     ],
   },
 };
