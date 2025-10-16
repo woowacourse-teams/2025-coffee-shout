@@ -19,11 +19,7 @@ const LowestProbabilitySlide = ({ WinnerNames, probability }: Props) => {
         <S.NamesContainer ref={namesRef}>
           <FadeInItem index={0} delay={0}>
             <S.WinnerName $slideDistance={slideDistance}>
-              {WinnerNames.map((winnerName) => (
-                <Headline1 key={winnerName} color="white">
-                  {winnerName}
-                </Headline1>
-              ))}
+              <Headline1 color="white">{WinnerNames.join(', ')}</Headline1>
             </S.WinnerName>
           </FadeInItem>
         </S.NamesContainer>
