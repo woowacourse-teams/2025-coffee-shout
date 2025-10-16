@@ -39,7 +39,7 @@ const DashBoard = () => {
 
   const { currentSlideIndex, animationState } = useAutoSlideCarousel({
     slideCount: slides.length,
-    displayDuration: 4000,
+    displayDuration: 5500,
     fadeDuration: 400,
   });
 
