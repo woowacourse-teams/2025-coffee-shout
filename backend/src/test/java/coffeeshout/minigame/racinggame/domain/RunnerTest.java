@@ -44,20 +44,20 @@ class RunnerTest {
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~ 60이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
 
     @Test
     void 속도가_최대값보다_크면_예외가_발생한다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 61;
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 31;
         final Instant now = Instant.now();
 
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~ 60이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
     }
 
     @Test
