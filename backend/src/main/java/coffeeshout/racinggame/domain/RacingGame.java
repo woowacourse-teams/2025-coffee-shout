@@ -23,7 +23,6 @@ public class RacingGame implements Playable {
     public static final int CLICK_PER_SPEED_SCALE = 3;
     public static final int FINISH_LINE = 3000;
     public static final int START_LINE = 0;
-    public static final int CLICK_COUNT_THRESHOLD = 20;
 
     public static final long MOVE_INTERVAL_MILLIS = 100L;
 
