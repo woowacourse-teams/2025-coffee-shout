@@ -99,12 +99,14 @@ public class RacingGame implements Playable {
     }
 
     private MiniGameScore convertScore(Runner runner) {
-        final Instant finishTime = runner.getFinishTime();
-        final long durationMillis = diffInstant(getStartTime(), finishTime);
+        final long durationMillis = calculateRunnerDurationMillis(runner);
         return new RacingGameScore(durationMillis);
     }
 
-    private long diffInstant(Instant startTime, Instant endTime) {
-        return Duration.between(startTime, endTime).toMillis();
+    private long calculateRunnerDurationMillis(Runner runner) {
+        long rawDurationMillis = Duration.between(startTime, runner.getFinishTime()).toMillis();
+        int position = runner.getPosition();
+
+        return Math.round(rawDurationMillis * FINISH_LINE / (double) position);
     }
 }
