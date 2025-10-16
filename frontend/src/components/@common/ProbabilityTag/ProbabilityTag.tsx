@@ -8,7 +8,7 @@ type Props = {
 const ProbabilityTag = ({ probability }: Props) => {
   return (
     <S.Container>
-      <Headline3 color="point-500">{probability}% 확률로 우승! </Headline3>
+      <Headline3 color="point-500">{probability}% 확률로 당첨! </Headline3>
     </S.Container>
   );
 };

@@ -14,7 +14,7 @@ const LowestProbabilitySlide = ({ WinnerNames, probability }: Props) => {
   const { containerRef, wrapperRef: namesRef, slideDistance } = useWidthDifference();
 
   return (
-    <CarouselSlide title="최저 확률 우승자">
+    <CarouselSlide title="최저 확률 당첨자">
       <S.Wrapper ref={containerRef}>
         <S.NamesContainer ref={namesRef}>
           <FadeInItem index={0} delay={0}>
