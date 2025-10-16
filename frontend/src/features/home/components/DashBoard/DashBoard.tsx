@@ -20,7 +20,7 @@ const DashBoard = () => {
   const slides = [
     {
       key: 'top3',
-      component: <TopWinnersSlide winners={topWinners || []} displayCount={3} />,
+      component: <TopWinnersSlide winners={topWinners || []} displayCount={5} />,
     },
     {
       key: 'lowest',

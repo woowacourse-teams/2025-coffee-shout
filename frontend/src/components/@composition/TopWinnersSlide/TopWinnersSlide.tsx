@@ -17,7 +17,7 @@ const TopWinnersSlide = ({ winners, displayCount = 3 }: Props) => {
   });
 
   return (
-    <CarouselSlide title="이번달 TOP3 당첨자">
+    <CarouselSlide title={`이번달 TOP${displayCount} 당첨자`}>
       <S.SlideContainer ref={containerRef}>
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
           {winners.slice(0, displayCount).map((winner, index) => (
