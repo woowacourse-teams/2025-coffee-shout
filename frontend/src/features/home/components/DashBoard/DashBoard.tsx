@@ -26,7 +26,7 @@ const DashBoard = () => {
       key: 'lowest',
       component: (
         <LowestProbabilitySlide
-          WinnerNames={lowestProbabilityWinner?.nicknames || []}
+          WinnerNames={lowestProbabilityWinner?.playerNames || []}
           probability={lowestProbabilityWinner?.probability || 0}
         />
       ),

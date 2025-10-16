@@ -21,8 +21,8 @@ const TopWinnersSlide = ({ winners, displayCount = 3 }: Props) => {
       <S.SlideContainer ref={containerRef}>
         <S.Wrapper ref={wrapperRef} $slideDistance={heightDifference}>
           {winners.slice(0, displayCount).map((winner, index) => (
-            <FadeInItem key={winner.nickname} index={index}>
-              <RankingItem rank={index + 1} name={winner.nickname} count={winner.winCount} />
+            <FadeInItem key={winner.playerName} index={index}>
+              <RankingItem rank={index + 1} name={winner.playerName} count={winner.winCount} />
             </FadeInItem>
           ))}
         </S.Wrapper>
