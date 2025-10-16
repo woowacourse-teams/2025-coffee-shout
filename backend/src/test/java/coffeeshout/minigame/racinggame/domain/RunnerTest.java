@@ -51,7 +51,7 @@ class RunnerTest {
     void 속도가_최대값보다_크면_예외가_발생한다() {
         // given
         final Runner runner = new Runner(PlayerFixture.게스트한스());
-        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 31;
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> 61;
         final Instant now = Instant.now();
 
         // when && then
