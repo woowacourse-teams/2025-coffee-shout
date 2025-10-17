@@ -45,8 +45,8 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { categories } = useCategories();
-  const { menus } = useMenus(category.value?.id ?? null);
+  const { categories, loading: isCategoriesLoading } = useCategories();
+  const { menus, loading: isMenusLoading } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
@@ -95,7 +95,9 @@ const EntryMenuPage = () => {
   };
 
   const viewChildren = {
-    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectMenu: (
+      <MenuList menus={menus} isMenusLoading={isMenusLoading} onClickMenu={handleMenuSelect} />
+    ),
     selectTemperature: (
       <SelectTemperature
         temperatureAvailability={temperatureAvailability}
@@ -124,7 +126,11 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           {currentView === 'selectCategory' ? (
-            <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
+            <SelectCategory
+              categories={categories}
+              isCategoriesLoading={isCategoriesLoading}
+              onClickCategory={handleCategorySelect}
+            />
           ) : (
             <MenuSelectionLayout
               categorySelection={categorySelection}
