@@ -22,24 +22,22 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
   });
 
   return (
-    <>
-      <S.Wrapper>
-        {loading ? (
-          <GameActionButtonSkeleton />
-        ) : (
-          miniGames?.map((miniGame) => (
-            <GameActionButton
-              key={miniGame}
-              isSelected={selectedMiniGames.includes(miniGame)}
-              isDisabled={playerType === 'GUEST'}
-              gameName={MINI_GAME_NAME_MAP[miniGame]}
-              description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
-              onClick={() => handleMiniGameClick(miniGame)}
-              icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
-            />
-          ))
-        )}
-      </S.Wrapper>
-    </>
+    <S.Wrapper>
+      {loading ? (
+        <GameActionButtonSkeleton />
+      ) : (
+        miniGames?.map((miniGame) => (
+          <GameActionButton
+            key={miniGame}
+            isSelected={selectedMiniGames.includes(miniGame)}
+            isDisabled={playerType === 'GUEST'}
+            gameName={MINI_GAME_NAME_MAP[miniGame]}
+            description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
+            onClick={() => handleMiniGameClick(miniGame)}
+            icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
+          />
+        ))
+      )}
+    </S.Wrapper>
   );
 };
