@@ -105,7 +105,7 @@ public class RacingGameService implements MiniGameService {
             racingGame.moveAll();
             publishRunnersMoved(racingGame, joinCode);
 
-            if (racingGame.isFinished()) {
+            if (racingGame.isAllStopped()) {
                 handleRaceFinished(racingGame, joinCode);
             }
         } catch (Exception e) {
@@ -114,6 +114,7 @@ public class RacingGameService implements MiniGameService {
     }
 
     private void handleRaceFinished(RacingGame racingGame, String joinCode) {
+        racingGame.updateState(RacingGameState.DONE);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.applyMiniGameResult(racingGame.getResult());
         eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode));

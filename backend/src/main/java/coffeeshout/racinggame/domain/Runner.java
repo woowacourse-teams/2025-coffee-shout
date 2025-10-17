@@ -22,25 +22,37 @@ public class Runner {
     }
 
     public void updateSpeed(int tapCount, SpeedCalculator speedCalculator, Instant now) {
+        if (isFinished()) {
+            return;
+        }
         final int nextSpeed = speedCalculator.calculateSpeed(lastSpeedUpdateTime, now, tapCount);
         isTrue(nextSpeed >= RacingGame.MIN_SPEED && nextSpeed <= RacingGame.MAX_SPEED, "스피드는 0 ~ 30이어야 합니다.");
         this.lastSpeedUpdateTime = now;
         this.speed = nextSpeed;
     }
 
-    public void move() {
-        if (isFinished()) {
+    public void move(Instant now) {
+        if (!isNotStopped()) {
             return;
         }
         final int nextPosition = position + speed;
-        if (nextPosition >= RacingGame.FINISH_LINE) {
+        if (nextPosition >= RacingGame.FINISH_LINE && !isFinished()) {
             final long remainingDistance = speed - nextPosition % RacingGame.FINISH_LINE;
             final double millisPerPosition = RacingGame.MOVE_INTERVAL_MILLIS / (double) speed;
             final long remainingMillis = (long) (millisPerPosition * remainingDistance);
-            finishTime = Instant.now().minusMillis(100).plusMillis(remainingMillis);
-            speed = 0;
+            finishTime = now.minusMillis(RacingGame.MOVE_INTERVAL_MILLIS).plusMillis(remainingMillis);
+        }
+        if (isFinished() && isNotStopped()) {
+            slowDown();
         }
         this.position = nextPosition;
+    }
+
+    private void slowDown() {
+        if (speed <= RacingGame.MIN_SPEED) {
+            speed = 0;
+        }
+        speed /= 2;
     }
 
     public boolean isFinished() {
@@ -53,5 +65,9 @@ public class Runner {
 
     public void initializeLastSpeedUpdateTime(Instant time) {
         this.lastSpeedUpdateTime = time;
+    }
+
+    public boolean isNotStopped() {
+        return speed != 0;
     }
 }

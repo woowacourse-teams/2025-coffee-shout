@@ -44,10 +44,7 @@ public class RacingGame implements Playable {
     }
 
     public void moveAll() {
-        runners.moveAll();
-        if (runners.isAllFinished()) {
-            this.state = RacingGameState.DONE;
-        }
+        runners.moveAll(Instant.now());
     }
 
     public boolean isStarted() {
@@ -92,6 +89,10 @@ public class RacingGame implements Playable {
 
     public boolean isFinished() {
         return state == RacingGameState.DONE;
+    }
+
+    public boolean isAllStopped() {
+        return !runners.stream().anyMatch(Runner::isNotStopped);
     }
 
     public void updateState(RacingGameState state) {
