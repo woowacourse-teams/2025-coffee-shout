@@ -251,7 +251,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleBackClick} />} />
+      <Layout.TopBar left={<BackButton onClick={handleBackClick} text="방 나가기" />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}
