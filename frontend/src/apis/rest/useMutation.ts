@@ -58,7 +58,7 @@ const useMutation = <TData = unknown, TVariables = void>(
             result = await api.patch<TData, TVariables>(endpoint, variables, { errorDisplayMode });
             break;
           default:
-            throw new Error(`Unsupported method: ${method}`);
+            throw new Error(`지원되지 않는 타입입니다. (${method})`);
         }
 
         setData(result);
