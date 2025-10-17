@@ -85,6 +85,10 @@ export const apiRequest = async <T, TData>(
         throw apiError;
       }
 
+      if (response.status === 204) {
+        return {} as T;
+      }
+
       return await response.json();
     } catch (error) {
       if (retryCount < retry.count) {

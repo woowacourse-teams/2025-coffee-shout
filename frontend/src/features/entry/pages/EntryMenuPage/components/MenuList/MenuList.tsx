@@ -1,8 +1,8 @@
-import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 import MenuListItemSkeleton from '@/components/@composition/MenuListItemSkeleton/MenuListItemSkeleton';
 import * as S from './MenuList.styled';
 import { Menu } from '@/types/menu';
 import { useMenus } from '../../hooks/useMenus';
+import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 
 type Props = {
   categoryId: number | null;
