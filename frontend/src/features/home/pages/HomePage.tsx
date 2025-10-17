@@ -67,7 +67,7 @@ const HomePage = () => {
             <br />
             새로운 방을 만들어보세요
           </Headline3>
-          <S.Logo src={LogoMainIcon} fetchPriority="high" />
+          <S.Logo src={LogoMainIcon} fetchPriority="high" alt="커피빵 로고" />
         </S.Banner>
       </Layout.Banner>
       <S.ButtonContainer>

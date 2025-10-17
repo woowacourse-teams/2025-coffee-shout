@@ -11,7 +11,6 @@ import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
 import { useCallback, useState } from 'react';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { PlayerType } from '@/types/player';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
@@ -19,7 +18,7 @@ const RoulettePlayPage = () => {
   const { joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
-  const { winner, randomAngle, isSpinning, handleSpinClick, startSpinWithResult } =
+  const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
 
@@ -42,7 +41,7 @@ const RoulettePlayPage = () => {
   const VIEW_COMPONENTS = {
     roulette: (
       <RoulettePlaySection
-        isSpinning={isSpinning}
+        isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
         isProbabilitiesLoading={isProbabilitiesLoading}
@@ -67,18 +66,18 @@ const RoulettePlayPage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={getButtonVariant(isSpinning, playerType)} onClick={handleSpinClick}>
-          룰렛 돌리기
-        </Button>
+        {playerType === 'HOST' ? (
+          <Button variant={isSpinStarted ? 'disabled' : 'primary'} onClick={handleSpinClick}>
+            {isSpinStarted ? '룰렛 돌리는 중' : '룰렛 돌리기'}
+          </Button>
+        ) : (
+          <Button variant={isSpinStarted ? 'disabled' : 'loading'} loadingText="대기 중">
+            룰렛 돌리는 중
+          </Button>
+        )}
       </Layout.ButtonBar>
     </Layout>
   );
 };
 
 export default RoulettePlayPage;
-
-const getButtonVariant = (isSpinning: boolean, playerType: PlayerType) => {
-  if (isSpinning) return 'disabled';
-  if (playerType === 'GUEST') return 'loading';
-  return 'primary';
-};

@@ -29,6 +29,8 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
+import { api } from '@/apis/rest/api';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -115,9 +117,15 @@ const LobbyPage = () => {
     openModal(
       <ConfirmModal
         message="방을 나가시겠습니까?"
-        onConfirm={() => {
+        onConfirm={async () => {
           closeModal();
-          navigate('/');
+          try {
+            await api.delete(`/rooms/${joinCode}/players/${myName}`);
+          } catch (error) {
+            console.error('플레이어 퇴장 중 에러 발생:', error);
+          } finally {
+            navigate('/');
+          }
         }}
         onCancel={closeModal}
       />,
@@ -169,7 +177,7 @@ const LobbyPage = () => {
 
     const updatedMiniGames = selectedMiniGames.includes(miniGameType)
       ? selectedMiniGames.filter((game) => game !== miniGameType)
-      : [...selectedMiniGames, miniGameType];
+      : [miniGameType];
 
     send(
       `/room/${joinCode}/update-minigames`,
@@ -228,10 +236,12 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <MiniGameSection
-        selectedMiniGames={selectedMiniGames}
-        handleMiniGameClick={handleMiniGameClick}
-      />
+      <LocalErrorBoundary>
+        <MiniGameSection
+          selectedMiniGames={selectedMiniGames}
+          handleMiniGameClick={handleMiniGameClick}
+        />
+      </LocalErrorBoundary>
     ),
   };
 

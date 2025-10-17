@@ -9,7 +9,7 @@ type ContainerProps = {
   $height: string;
 };
 
-export const Container = styled.div<ContainerProps>`
+export const Container = styled.header<ContainerProps>`
   width: 100%;
   height: ${({ $height }) => $height};
   display: grid;

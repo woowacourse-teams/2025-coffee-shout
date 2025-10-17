@@ -74,6 +74,14 @@ export default (_, argv) => {
             from: 'public/fonts',
             to: 'fonts',
           },
+          {
+            from: 'public/robots.txt',
+            to: 'robots.txt',
+          },
+          {
+            from: 'public/sitemap.xml',
+            to: 'sitemap.xml',
+          },
         ],
       }),
       new webpack.DefinePlugin(envKeys),

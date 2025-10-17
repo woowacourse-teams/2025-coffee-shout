@@ -1,10 +1,10 @@
 import useFetch from '@/apis/rest/useFetch';
-import CardIcon from '@/assets/card-icon.svg';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import {
   MINI_GAME_DESCRIPTION_MAP,
+  MINI_GAME_ICON_MAP,
   MINI_GAME_NAME_MAP,
   MiniGameType,
 } from '@/types/miniGame/common';
@@ -17,16 +17,11 @@ type Props = {
 
 export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Props) => {
   const { playerType } = usePlayerType();
-  const {
-    data: miniGames,
-    loading,
-    error,
-  } = useFetch<MiniGameType[]>({
+  const { data: miniGames, loading } = useFetch<MiniGameType[]>({
     endpoint: '/rooms/minigames',
   });
 
   if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error.message}</div>;
 
   return (
     <>
@@ -40,7 +35,7 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
             gameName={MINI_GAME_NAME_MAP[miniGame]}
             description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
             onClick={() => handleMiniGameClick(miniGame)}
-            icon={<S.Icon src={CardIcon} alt={miniGame} />}
+            icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
           />
         ))}
       </S.Wrapper>

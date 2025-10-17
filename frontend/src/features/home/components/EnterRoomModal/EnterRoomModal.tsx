@@ -22,29 +22,25 @@ const EnterRoomModal = ({ onClose }: Props) => {
 
   const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({
     endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
-    onSuccess: (data) => {
-      if (!data.exist) {
-        alert('참여코드가 유효한 방이 존재하지 않습니다.');
-        return;
-      }
-
-      navigate(`/entry/name`);
-      onClose();
-    },
-    onError: (error) => {
-      // 추후 에러 바운더리에서 처리
-      alert(error.message);
+    onError: () => {
       setJoinCode('');
     },
   });
 
-  const handleEnter = () => {
+  const handleEnter = async () => {
     if (!joinCode.trim()) {
       alert('초대코드를 입력해주세요.');
       return;
     }
 
-    checkJoinCode();
+    const { exist } = (await checkJoinCode()) as JoinCodeCheckResponse;
+    if (!exist) {
+      alert('참여코드가 유효한 방이 존재하지 않습니다.');
+      return;
+    }
+
+    navigate(`/entry/name`);
+    onClose();
   };
 
   const handleJoinCodeChange = (e: ChangeEvent<HTMLInputElement>) => {

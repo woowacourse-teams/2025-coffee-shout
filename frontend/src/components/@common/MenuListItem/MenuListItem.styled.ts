@@ -2,9 +2,9 @@ import { buttonHoverPress } from '@/styles/animations/buttonHoverPress';
 import { TouchState } from '@/types/touchState';
 import styled from '@emotion/styled';
 
-interface Props {
+type Props = {
   $touchState: TouchState;
-}
+};
 
 export const Container = styled.button<Props>`
   display: flex;

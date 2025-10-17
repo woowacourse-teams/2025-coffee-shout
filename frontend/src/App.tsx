@@ -2,6 +2,7 @@ import { ThemeProvider } from '@emotion/react';
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { WebSocketProvider } from './apis/websocket/contexts/WebSocketProvider';
+import GlobalErrorBoundary from './components/@common/ErrorBoundary/GlobalErrorBoundary';
 import { ModalProvider } from './components/@common/Modal/ModalContext';
 import { ToastProvider } from './components/@common/Toast/ToastContext';
 import { IdentifierProvider } from './contexts/Identifier/IdentifierProvider';
@@ -20,9 +21,11 @@ const App = () => {
               <ProbabilityHistoryProvider>
                 <ToastProvider>
                   <ModalProvider>
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Outlet />
-                    </Suspense>
+                    <GlobalErrorBoundary>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Outlet />
+                      </Suspense>
+                    </GlobalErrorBoundary>
                   </ModalProvider>
                 </ToastProvider>
               </ProbabilityHistoryProvider>

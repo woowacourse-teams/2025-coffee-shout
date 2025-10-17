@@ -35,7 +35,7 @@ const EntryNamePage = () => {
 
   const handleNavigateToMenu = async () => {
     if (playerType === 'GUEST') {
-      const { exist } = await checkGuestName();
+      const { exist } = (await checkGuestName()) as PlayerNameCheckResponse;
 
       if (exist) {
         showToast({

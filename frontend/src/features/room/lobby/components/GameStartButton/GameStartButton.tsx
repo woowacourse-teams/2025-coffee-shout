@@ -1,8 +1,8 @@
 import Button from '@/components/@common/Button/Button';
-import type { ComponentProps, MouseEvent, TouchEvent } from 'react';
+import type { ComponentProps } from 'react';
 
 type Props = {
-  onClick?: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick?: () => void;
 } & Omit<ComponentProps<typeof Button>, 'onClick'>;
 
 const GameStartButton = ({ onClick, ...rest }: Props) => {

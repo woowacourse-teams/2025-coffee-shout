@@ -1,23 +1,19 @@
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
+
 import Paragraph from '../Paragraph/Paragraph';
+
 import * as S from './MenuListItem.styled';
-import { MouseEvent, TouchEvent } from 'react';
 
 type Props = {
   text: string;
-  onClick: (e: MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
+  onClick: () => void;
 };
 
 const MenuListItem = ({ text, onClick }: Props) => {
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({ onClick });
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container
-      onClick={onClick}
-      $touchState={touchState}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <S.Container {...pointerHandlers} $touchState={touchState}>
       <Paragraph>{text}</Paragraph>
     </S.Container>
   );

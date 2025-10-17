@@ -12,11 +12,11 @@ export default meta;
 
 export const Interactive: StoryObj<typeof RouletteWheel> = {
   render: () => {
-    const [isSpinning, setIsSpinning] = useState(false);
+    const [isSpinStarted, setIsSpinning] = useState(false);
     const [finalRotation, setFinalRotation] = useState(0);
 
     const handleSpin = () => {
-      if (isSpinning) return;
+      if (isSpinStarted) return;
       setIsSpinning(true);
 
       // 3초 후 스피닝 완료
@@ -36,14 +36,14 @@ export const Interactive: StoryObj<typeof RouletteWheel> = {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
         <RouletteWheel
           playerProbabilities={mockPlayerProbabilities}
-          isSpinning={isSpinning}
+          isSpinStarted={isSpinStarted}
           finalRotation={finalRotation}
         />
         <div style={{ display: 'flex', gap: 16 }}>
-          <button onClick={handleSpin} disabled={isSpinning}>
-            {isSpinning ? '돌아가는 중...' : '돌리기'}
+          <button onClick={handleSpin} disabled={isSpinStarted}>
+            {isSpinStarted ? '돌아가는 중...' : '돌리기'}
           </button>
-          <button onClick={handleReset} disabled={isSpinning}>
+          <button onClick={handleReset} disabled={isSpinStarted}>
             리셋
           </button>
         </div>
@@ -55,11 +55,11 @@ export const Interactive: StoryObj<typeof RouletteWheel> = {
 
 export const WithFixedRotation: StoryObj<typeof RouletteWheel> = {
   render: () => {
-    const [isSpinning, setIsSpinning] = useState(false);
+    const [isSpinStarted, setIsSpinning] = useState(false);
     const [finalRotation, setFinalRotation] = useState(90);
 
     const handleSpin = () => {
-      if (isSpinning) return;
+      if (isSpinStarted) return;
       setIsSpinning(true);
 
       setTimeout(() => {
@@ -75,12 +75,12 @@ export const WithFixedRotation: StoryObj<typeof RouletteWheel> = {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
         <RouletteWheel
           playerProbabilities={mockPlayerProbabilities}
-          isSpinning={isSpinning}
+          isSpinStarted={isSpinStarted}
           finalRotation={finalRotation}
         />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <button onClick={handleSpin} disabled={isSpinning}>
-            {isSpinning ? '돌아가는 중...' : '돌리기'}
+          <button onClick={handleSpin} disabled={isSpinStarted}>
+            {isSpinStarted ? '돌아가는 중...' : '돌리기'}
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <label>Final Rotation:</label>
@@ -90,7 +90,7 @@ export const WithFixedRotation: StoryObj<typeof RouletteWheel> = {
               max="360"
               value={finalRotation}
               onChange={handleRotationChange}
-              disabled={isSpinning}
+              disabled={isSpinStarted}
             />
             <span>{finalRotation}°</span>
           </div>

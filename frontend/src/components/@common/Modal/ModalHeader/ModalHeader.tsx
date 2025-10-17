@@ -1,8 +1,11 @@
+import { useTheme } from '@emotion/react';
+
+import { useButtonInteraction } from '@/hooks/useButtonInteraction';
+
 import CloseIcon from '@/components/@common/CloseIcon/CloseIcon';
 import Headline3 from '@/components/@common/Headline3/Headline3';
+
 import * as S from './ModalHeader.styled';
-import { useTheme } from '@emotion/react';
-import { useTouchInteraction } from '@/hooks/useTouchInteraction';
 
 type Props = {
   id?: string;
@@ -13,21 +16,13 @@ type Props = {
 
 const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
   const theme = useTheme();
-  const { touchState, handleTouchStart, handleTouchEnd } = useTouchInteraction({
-    onClick: onClose,
-  });
+  const { touchState, pointerHandlers } = useButtonInteraction({ onClick: onClose });
 
   return (
     <S.Container>
       <Headline3 id={id}>{title}</Headline3>
       {showCloseButton && (
-        <S.CloseButton
-          aria-label="close-icon"
-          onClick={onClose}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          $touchState={touchState}
-        >
+        <S.CloseButton aria-label="close-icon" {...pointerHandlers} $touchState={touchState}>
           <CloseIcon stroke={theme.color.gray[600]} />
         </S.CloseButton>
       )}

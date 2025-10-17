@@ -5,7 +5,7 @@ type Props = {
   $height?: string;
 };
 
-export const Container = styled.div<Props>`
+export const Container = styled.section<Props>`
   width: calc(100% + ${LAYOUT_PADDING} * 2);
   height: ${({ $height }) => $height};
   background-color: ${({ theme }) => theme.color.point[400]};

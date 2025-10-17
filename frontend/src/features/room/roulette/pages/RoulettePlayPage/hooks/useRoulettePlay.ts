@@ -10,12 +10,12 @@ const useRoulettePlay = () => {
   const navigate = useReplaceNavigate();
   const [winner, setWinner] = useState<string | null>(null);
   const [randomAngle, setRandomAngle] = useState(0);
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isSpinStarted, setIsSpinStarted] = useState(false);
 
   const startSpinWithResult = (data: RouletteWinnerResponse) => {
     setWinner(data.playerName);
     setRandomAngle(data.randomAngle);
-    setIsSpinning(true);
+    setIsSpinStarted(true);
   };
 
   const handleSpinClick = () => {
@@ -26,19 +26,18 @@ const useRoulettePlay = () => {
     // TODO: 당첨자가 나오지 않았을 때, 에러 처리 방식 정하기
     if (!winner || !winner.trim()) console.warn('당첨자가 추첨되지 않았습니다.');
 
-    if (isSpinning) {
+    if (isSpinStarted) {
       const timer = setTimeout(() => {
-        setIsSpinning(false);
         navigate(`/room/${joinCode}/roulette/result`, { state: { winner } });
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [isSpinning, winner, navigate, joinCode]);
+  }, [isSpinStarted, winner, navigate, joinCode]);
 
   return {
     winner,
     randomAngle,
-    isSpinning,
+    isSpinStarted,
     handleSpinClick,
     startSpinWithResult,
   };
