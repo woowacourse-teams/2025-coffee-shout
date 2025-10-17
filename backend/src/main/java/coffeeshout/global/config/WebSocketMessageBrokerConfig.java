@@ -55,9 +55,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         registration.interceptors(webSocketInboundMetricInterceptor);
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("inbound-");
-        executor.setCorePoolSize(8);
-        executor.setMaxPoolSize(16);
-        executor.setQueueCapacity(8192);
+        executor.setCorePoolSize(32);
+        executor.setMaxPoolSize(32);
+        executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         executor.getThreadPoolExecutor().prestartAllCoreThreads();
@@ -73,9 +73,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
             final ContextSnapshot snapshot = ContextSnapshotFactory.builder().build().captureAll();
             return snapshot.wrap(runnable);
         });
-        executor.setCorePoolSize(8);
+        executor.setCorePoolSize(16);
         executor.setMaxPoolSize(16);
-        executor.setQueueCapacity(8192);
+        executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         executor.getThreadPoolExecutor().prestartAllCoreThreads();

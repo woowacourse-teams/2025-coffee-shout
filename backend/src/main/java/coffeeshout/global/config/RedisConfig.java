@@ -2,6 +2,7 @@ package coffeeshout.global.config;
 
 import coffeeshout.global.config.properties.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -61,18 +62,25 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
-        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-
+    @Bean(name = "redisListenerExecutor") 
+    public ThreadPoolTaskExecutor redisListenerExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(3);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("redis-listener-");
+        executor.setQueueCapacity(Integer.MAX_VALUE);
+        executor.setThreadNamePrefix("redis-listener-");                         
         executor.initialize();
+        return executor;
+    }
 
-        container.setTaskExecutor(executor);
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+		    RedisConnectionFactory connectionFactory,
+		    @Qualifier("redisListenerExecutor") ThreadPoolTaskExecutor redisListenerExecutor
+	) {
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+
+        container.setTaskExecutor(redisListenerExecutor);
         container.setConnectionFactory(connectionFactory);
 
         return container;
