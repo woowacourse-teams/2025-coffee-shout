@@ -39,7 +39,7 @@ public class Runner {
         }
         final int nextPosition = position + speed;
         if (crossesFinishLine(nextPosition)) {
-            final long remainingMillis = (long) (calculateRemainDistance(nextPosition) * calculateMillisPerPosition());
+            final long remainingMillis = (long) (calculateDistanceToFinishLine(nextPosition) * calculateMillisPerPosition());
             finishTime = now.minusMillis(RacingGame.MOVE_INTERVAL_MILLIS).plusMillis(remainingMillis);
         }
         if (isSlowingDown()) {
@@ -56,7 +56,7 @@ public class Runner {
         return RacingGame.MOVE_INTERVAL_MILLIS / (double) speed;
     }
 
-    private int calculateRemainDistance(int nextPosition) {
+    private int calculateDistanceToFinishLine(int nextPosition) {
         return speed - nextPosition % RacingGame.FINISH_LINE;
     }
 
