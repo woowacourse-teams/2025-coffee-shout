@@ -49,10 +49,11 @@ public class Runner {
     }
 
     private void slowDown() {
-        if (speed <= RacingGame.MIN_SPEED) {
+        if (speed - 3 <= 0) {
             speed = 0;
+            return;
         }
-        speed /= 4;
+        speed -= 3;
     }
 
     public boolean isFinished() {
