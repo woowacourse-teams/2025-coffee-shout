@@ -2,6 +2,7 @@ package coffeeshout.global.config;
 
 import coffeeshout.global.config.properties.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,13 +63,17 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean(name = "redisListenerExecutor") 
-    public ThreadPoolTaskExecutor redisListenerExecutor() {
+    @Bean(name = "redisListenerExecutor")
+    public ThreadPoolTaskExecutor redisListenerExecutor(MeterRegistry meterRegistry) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(3);
         executor.setQueueCapacity(Integer.MAX_VALUE);
-        executor.setThreadNamePrefix("redis-listener-");                         
+        executor.setThreadNamePrefix("redis-listener-");
+
+        // TaskDecorator 설정: 태스크가 큐에 들어간 시점부터 완료까지의 전체 시간 측정
+        executor.setTaskDecorator(new RedisListenerTaskDecorator(meterRegistry));
+
         executor.initialize();
         return executor;
     }
