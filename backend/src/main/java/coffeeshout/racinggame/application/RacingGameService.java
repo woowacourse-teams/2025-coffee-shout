@@ -117,7 +117,8 @@ public class RacingGameService implements MiniGameService {
         racingGame.updateState(RacingGameState.DONE);
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.applyMiniGameResult(racingGame.getResult());
-        eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode));
+        taskScheduler.schedule(() -> eventPublisher.publishEvent(RaceFinishedEvent.of(racingGame, joinCode)),
+                Instant.now().plusSeconds(2));
         eventPublisher.publishEvent(new MiniGameFinishedEvent(joinCode, MiniGameType.RACING_GAME.name()));
         racingGame.stopAutoMove();
         log.info("레이싱 게임 종료: joinCode={}", joinCode);

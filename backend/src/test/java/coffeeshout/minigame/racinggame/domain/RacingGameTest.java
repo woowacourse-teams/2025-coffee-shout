@@ -46,7 +46,7 @@ class RacingGameTest {
     }
 
     @Test
-    void 모든_러너가_결승선에_도착하면_게임_상태는_DONE이다() {
+    void 모든_러너가_결승선에_도착한다() {
         // given
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);

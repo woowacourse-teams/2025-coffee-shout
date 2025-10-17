@@ -52,7 +52,7 @@ public class Runner {
         if (speed <= RacingGame.MIN_SPEED) {
             speed = 0;
         }
-        speed /= 2;
+        speed /= 4;
     }
 
     public boolean isFinished() {
