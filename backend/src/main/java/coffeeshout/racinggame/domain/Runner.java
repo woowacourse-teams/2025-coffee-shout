@@ -32,12 +32,15 @@ public class Runner {
         if (isFinished()) {
             return;
         }
-        this.position += speed;
-        if (position >= RacingGame.FINISH_LINE) {
-            this.position = RacingGame.FINISH_LINE;
-            this.speed = RacingGame.INITIAL_SPEED;
-            this.finishTime = Instant.now();
+        final int nextPosition = position + speed;
+        if (nextPosition >= RacingGame.FINISH_LINE) {
+            final long remainingDistance = speed - nextPosition % RacingGame.FINISH_LINE;
+            final double millisPerPosition = RacingGame.MOVE_INTERVAL_MILLIS / (double) speed;
+            final long remainingMillis = (long) (millisPerPosition * remainingDistance);
+            finishTime = Instant.now().minusMillis(100).plusMillis(remainingMillis);
+            speed = 0;
         }
+        this.position = nextPosition;
     }
 
     public boolean isFinished() {

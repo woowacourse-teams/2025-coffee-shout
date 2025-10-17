@@ -6,8 +6,11 @@ import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.Runner;
 import coffeeshout.racinggame.domain.SpeedCalculator;
+import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.Speed;
 
 class RunnerTest {
 
