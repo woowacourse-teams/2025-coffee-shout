@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class Runner {
 
+    public static final int SLOW_DOWN_STEP = 3;
     private final Player player;
 
     private int position = 0;
@@ -32,28 +33,42 @@ public class Runner {
     }
 
     public void move(Instant now) {
-        if (!isNotStopped()) {
+        if (isStopped()) {
             return;
         }
         final int nextPosition = position + speed;
-        if (nextPosition >= RacingGame.FINISH_LINE && !isFinished()) {
-            final long remainingDistance = speed - nextPosition % RacingGame.FINISH_LINE;
-            final double millisPerPosition = RacingGame.MOVE_INTERVAL_MILLIS / (double) speed;
-            final long remainingMillis = (long) (millisPerPosition * remainingDistance);
+        if (crossesFinishLine(nextPosition)) {
+            final long remainingMillis = (long) (calculateRemainDistance(nextPosition) * calculateMillisPerPosition());
             finishTime = now.minusMillis(RacingGame.MOVE_INTERVAL_MILLIS).plusMillis(remainingMillis);
         }
-        if (isFinished() && isNotStopped()) {
+        if (isSlowingDown()) {
             slowDown();
         }
         this.position = nextPosition;
     }
 
+    private boolean isSlowingDown() {
+        return isFinished() && !isStopped();
+    }
+
+    private double calculateMillisPerPosition() {
+        return RacingGame.MOVE_INTERVAL_MILLIS / (double) speed;
+    }
+
+    private int calculateRemainDistance(int nextPosition) {
+        return speed - nextPosition % RacingGame.FINISH_LINE;
+    }
+
+    private boolean crossesFinishLine(int nextPosition) {
+        return nextPosition >= RacingGame.FINISH_LINE && !isFinished();
+    }
+
     private void slowDown() {
-        if (speed - 3 <= 0) {
+        if (speed - SLOW_DOWN_STEP <= 0) {
             speed = 0;
             return;
         }
-        speed -= 3;
+        speed -= SLOW_DOWN_STEP;
     }
 
     public boolean isFinished() {
@@ -68,7 +83,7 @@ public class Runner {
         this.lastSpeedUpdateTime = time;
     }
 
-    public boolean isNotStopped() {
-        return speed != 0;
+    public boolean isStopped() {
+        return speed == 0;
     }
 }

@@ -87,12 +87,16 @@ public class RacingGame implements Playable {
         return runners.getPositions();
     }
 
-    public boolean isFinished() {
+    public boolean isDone() {
         return state == RacingGameState.DONE;
     }
 
+    public boolean isFinished() {
+        return runners.isAllFinished();
+    }
+
     public boolean isAllStopped() {
-        return !runners.stream().anyMatch(Runner::isNotStopped);
+        return runners.stream().allMatch(Runner::isStopped);
     }
 
     public void updateState(RacingGameState state) {
