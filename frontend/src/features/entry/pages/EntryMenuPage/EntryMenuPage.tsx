@@ -1,24 +1,24 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import Layout from '@/layouts/Layout';
-import { ChangeEvent, useEffect } from 'react';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
-import SelectCategory from './components/SelectCategory/SelectCategory';
-import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
+import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
+import Headline3 from '@/components/@common/Headline3/Headline3';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import Layout from '@/layouts/Layout';
+import { CategoryWithColor, Menu } from '@/types/menu';
+import { ChangeEvent, useEffect } from 'react';
+import * as S from './EntryMenuPage.styled';
+import MenuList from './components/MenuList/MenuList';
+import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
+import SelectCategory from './components/SelectCategory/SelectCategory';
+import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import { useMenuFlow } from './hooks/useMenuFlow';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
-import { useCategories } from './hooks/useCategories';
-import { useMenus } from './hooks/useMenus';
-import * as S from './EntryMenuPage.styled';
-import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
-import SelectTemperature from './components/SelectTemperature/SelectTemperature';
-import MenuList from './components/MenuList/MenuList';
-import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 
 const EntryMenuPage = () => {
   const navigate = useReplaceNavigate();
@@ -44,9 +44,6 @@ const EntryMenuPage = () => {
     navigateToCustomMenu,
     handleNavigateToBefore,
   } = useViewNavigation();
-
-  const { categories } = useCategories();
-  const { menus } = useMenus(category.value?.id ?? null);
 
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
@@ -95,7 +92,11 @@ const EntryMenuPage = () => {
   };
 
   const viewChildren = {
-    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectMenu: (
+      <LocalErrorBoundary>
+        <MenuList categoryId={category.value?.id ?? null} onClickMenu={handleMenuSelect} />
+      </LocalErrorBoundary>
+    ),
     selectTemperature: (
       <SelectTemperature
         temperatureAvailability={temperatureAvailability}
@@ -124,7 +125,12 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           {currentView === 'selectCategory' ? (
-            <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
+            <>
+              <Headline3>카테고리를 선택해주세요</Headline3>
+              <LocalErrorBoundary>
+                <SelectCategory onClickCategory={handleCategorySelect} />
+              </LocalErrorBoundary>
+            </>
           ) : (
             <MenuSelectionLayout
               categorySelection={categorySelection}

@@ -30,7 +30,8 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
-import { api } from '@/apis/rest/api';
+import useMutation from '@/apis/rest/useMutation';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -47,6 +48,11 @@ const LobbyPage = () => {
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
   const isReady = checkPlayerReady(myName) ?? false;
+  const leaveRoom = useMutation<void, void>({
+    endpoint: `/rooms/${joinCode}/players/${myName}`,
+    method: 'DELETE',
+    errorDisplayMode: 'toast',
+  });
 
   useParticipantValidation({ isConnected });
 
@@ -119,13 +125,8 @@ const LobbyPage = () => {
         message="방을 나가시겠습니까?"
         onConfirm={async () => {
           closeModal();
-          try {
-            await api.delete(`/rooms/${joinCode}/players/${myName}`);
-          } catch (error) {
-            console.error('플레이어 퇴장 중 에러 발생:', error);
-          } finally {
-            navigate('/');
-          }
+          await leaveRoom.mutate();
+          navigate('/');
         }}
         onCancel={closeModal}
       />,
@@ -236,12 +237,15 @@ const LobbyPage = () => {
     참가자: <ParticipantSection participants={participants} />,
     룰렛: <RouletteSection playerProbabilities={probabilityHistory.current} />,
     미니게임: (
-      <LocalErrorBoundary>
-        <MiniGameSection
-          selectedMiniGames={selectedMiniGames}
-          handleMiniGameClick={handleMiniGameClick}
-        />
-      </LocalErrorBoundary>
+      <>
+        <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
+        <LocalErrorBoundary>
+          <MiniGameSection
+            selectedMiniGames={selectedMiniGames}
+            handleMiniGameClick={handleMiniGameClick}
+          />
+        </LocalErrorBoundary>
+      </>
     ),
   };
 

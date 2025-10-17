@@ -1,13 +1,11 @@
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
-import { api } from '@/apis/rest/api';
+import useMutation from '@/apis/rest/useMutation';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import useToast from '@/components/@common/Toast/useToast';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import useToast from '@/components/@common/Toast/useToast';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { Menu, TemperatureOption } from '@/types/menu';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
-import { useState } from 'react';
-import { ApiError, NetworkError } from '@/apis/rest/error';
 
 export type RoomRequest = {
   playerName: string;
@@ -25,14 +23,24 @@ type RoomResponse = {
 
 export const useRoomManagement = () => {
   const navigate = useReplaceNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
 
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode } = useIdentifier();
+  const { joinCode, myName, setJoinCode, setQrCodeUrl } = useIdentifier();
   const { showToast } = useToast();
-  const { setQrCodeUrl } = useIdentifier();
+
+  const createOrJoinRoom = useMutation<RoomResponse, RoomRequest>({
+    endpoint: createUrl(playerType, joinCode),
+    method: 'POST',
+    onSuccess: (data, variables) => {
+      const { joinCode, qrCodeUrl } = data;
+      setJoinCode(joinCode);
+      setQrCodeUrl(qrCodeUrl);
+      startSocket(joinCode, variables.playerName);
+    },
+    errorDisplayMode: 'toast',
+  });
 
   const isMenuSelectionValid = (selectedMenu: Menu | null, customMenuName: string | null) => {
     if (!selectedMenu && !customMenuName) {
@@ -65,40 +73,18 @@ export const useRoomManagement = () => {
     if (!isPlayerNameValid()) return;
     if (!isMenuSelectionValid(selectedMenu, customMenuName)) return;
 
-    try {
-      setIsLoading(true);
+    const requestBody = createRoomRequestBody(
+      myName,
+      selectedMenu,
+      customMenuName,
+      selectedTemperature
+    );
 
-      const { joinCode: _joinCode, qrCodeUrl } = await api.post<RoomResponse, RoomRequest>(
-        createUrl(playerType, joinCode),
-        createRoomRequestBody(myName, selectedMenu, customMenuName, selectedTemperature)
-      );
-
-      setJoinCode(_joinCode);
-      setQrCodeUrl(qrCodeUrl);
-
-      startSocket(_joinCode, myName);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        showToast({
-          type: 'error',
-          message: '방 생성/참가에 실패했습니다.',
-        });
-      } else if (error instanceof NetworkError) {
-        showToast({
-          type: 'error',
-          message: '네트워크 연결을 확인해주세요.',
-        });
-      } else {
-        showToast({
-          type: 'error',
-          message: '알 수 없는 오류가 발생했습니다.',
-        });
-      }
-    }
+    await createOrJoinRoom.mutate(requestBody);
   };
 
   return {
     proceedToRoom,
-    isLoading,
+    isLoading: createOrJoinRoom.loading,
   };
 };

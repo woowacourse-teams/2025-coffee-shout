@@ -1,6 +1,6 @@
 import useFetch from '@/apis/rest/useFetch';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import GameActionButtonSkeleton from '@/components/@composition/GameActionButtonSkeleton/GameActionButtonSkeleton';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import {
   MINI_GAME_DESCRIPTION_MAP,
@@ -21,13 +21,12 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
     endpoint: '/rooms/minigames',
   });
 
-  if (loading) return <div>로딩 중...</div>;
-
   return (
-    <>
-      <SectionTitle title="미니게임" description="미니게임을 선택해주세요" />
-      <S.Wrapper>
-        {miniGames?.map((miniGame) => (
+    <S.Wrapper>
+      {loading ? (
+        <GameActionButtonSkeleton />
+      ) : (
+        miniGames?.map((miniGame) => (
           <GameActionButton
             key={miniGame}
             isSelected={selectedMiniGames.includes(miniGame)}
@@ -37,8 +36,8 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
             onClick={() => handleMiniGameClick(miniGame)}
             icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
           />
-        ))}
-      </S.Wrapper>
-    </>
+        ))
+      )}
+    </S.Wrapper>
   );
 };

@@ -7,22 +7,18 @@ import ProbabilitiesText from '../ProbabilitiesText/ProbabilitiesText';
 import RouletteWheelBack from '@/features/roulette/components/RouletteWheelBack/RouletteWheelBack';
 import Flip from '@/components/@common/Flip/Flip';
 import { useEffect, useState } from 'react';
+import useRouletteProbabilities from '../../pages/RoulettePlayPage/hooks/useRouletteProbabilities';
 
 type Props = {
   isSpinStarted: boolean;
   winner: string | null;
   randomAngle: number;
-  isProbabilitiesLoading: boolean;
 };
 
-const RoulettePlaySection = ({
-  isSpinStarted,
-  winner,
-  randomAngle,
-  isProbabilitiesLoading,
-}: Props) => {
+const RoulettePlaySection = ({ isSpinStarted, winner, randomAngle }: Props) => {
   const { probabilityHistory } = useProbabilityHistory();
   const [isFlipped, setIsFlipped] = useState(false);
+  const { isLoading } = useRouletteProbabilities();
 
   const shouldComputeFinalRotation = isSpinStarted && winner;
   const finalRotation = shouldComputeFinalRotation
@@ -34,12 +30,12 @@ const RoulettePlaySection = ({
     : 0;
 
   useEffect(() => {
-    if (!isProbabilitiesLoading) {
+    if (!isLoading) {
       requestAnimationFrame(() => {
         setIsFlipped(true);
       });
     }
-  }, [isProbabilitiesLoading]);
+  }, [isLoading]);
 
   return (
     <S.Container>
@@ -56,7 +52,7 @@ const RoulettePlaySection = ({
           }
         />
       </S.RouletteWheelWrapper>
-      <ProbabilitiesText isProbabilitiesLoading={isProbabilitiesLoading} />
+      <ProbabilitiesText isProbabilitiesLoading={isLoading} />
     </S.Container>
   );
 };

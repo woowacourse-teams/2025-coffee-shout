@@ -6,6 +6,7 @@ import Headline2 from '@/components/@common/Headline2/Headline2';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import PlayerCard from '@/components/@composition/PlayerCard/PlayerCard';
+import MiniGameResultSkeleton from '@/components/@composition/MiniGameResultSkeleton/MiniGameResultSkeleton';
 import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
@@ -17,6 +18,7 @@ import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 
 type PlayerRank = {
   playerName: string;
@@ -48,21 +50,8 @@ const MiniGameResultPage = () => {
   const navigate = useReplaceNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
   const { send } = useWebSocket();
-  const { myName, joinCode } = useIdentifier();
+  const { joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
-  const { getParticipantColorIndex } = useParticipants();
-
-  const { data: ranksData, loading: ranksLoading } = useFetch<PlayerRankResponse>({
-    endpoint: `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`,
-    enabled: !!(joinCode && miniGameType),
-  });
-
-  const { data: scoresData, loading: scoresLoading } = useFetch<PlayerScoreResponse>({
-    endpoint: `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`,
-    enabled: !!(joinCode && miniGameType),
-  });
-
-  const loading = ranksLoading || scoresLoading;
 
   const handleNavigateToRoulettePlayPage = useCallback(() => {
     navigate(`/room/${joinCode}/roulette/play`);
@@ -77,10 +66,6 @@ const MiniGameResultPage = () => {
     send(`/room/${joinCode}/show-roulette`);
   };
 
-  const ranks = ranksData?.ranks?.sort((a, b) => a.rank - b.rank) || null;
-  const scores = scoresData?.scores || null;
-
-  if (loading) return <div>로딩 중...</div>;
   if (!miniGameType) return <div>잘못된 미니게임 타입입니다.</div>;
 
   return (
@@ -95,32 +80,9 @@ const MiniGameResultPage = () => {
         </S.Banner>
       </Layout.Banner>
       <Layout.Content>
-        {ranks && scores ? (
-          <S.ResultList>
-            {ranks.map((playerRank) => (
-              <S.PlayerCardWrapper
-                key={playerRank.playerName}
-                isHighlighted={playerRank.playerName === myName}
-              >
-                <Headline3>
-                  <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
-                </Headline3>
-                <PlayerCard
-                  name={playerRank.playerName}
-                  playerColor={colorList[getParticipantColorIndex(playerRank.playerName)]}
-                >
-                  <Headline4>
-                    {getScoreTextByGameType({
-                      gameType: miniGameType,
-                      playScores: scores,
-                      playerName: playerRank.playerName,
-                    })}
-                  </Headline4>
-                </PlayerCard>
-              </S.PlayerCardWrapper>
-            ))}
-          </S.ResultList>
-        ) : null}
+        <LocalErrorBoundary>
+          <ScoreBoardResultList joinCode={joinCode} miniGameType={miniGameType} />
+        </LocalErrorBoundary>
       </Layout.Content>
       <Layout.ButtonBar>
         {playerType === 'HOST' ? (
@@ -160,4 +122,63 @@ const getScoreTextByGameType = ({
     default:
       return null;
   }
+};
+
+const ScoreBoardResultList = ({
+  joinCode,
+  miniGameType,
+}: {
+  joinCode: string;
+  miniGameType: MiniGameType;
+}) => {
+  const { myName } = useIdentifier();
+  const { getParticipantColorIndex } = useParticipants();
+
+  const { data: ranksData, loading: ranksLoading } = useFetch<PlayerRankResponse>({
+    endpoint: `/minigames/ranks?joinCode=${joinCode}&miniGameType=${miniGameType}`,
+    enabled: !!(joinCode && miniGameType),
+  });
+
+  const { data: scoresData, loading: scoresLoading } = useFetch<PlayerScoreResponse>({
+    endpoint: `/minigames/scores?joinCode=${joinCode}&miniGameType=${miniGameType}`,
+    enabled: !!(joinCode && miniGameType),
+  });
+
+  const loading = ranksLoading || scoresLoading;
+
+  const ranks = ranksData?.ranks?.sort((a, b) => a.rank - b.rank);
+  const scores = scoresData?.scores;
+
+  if (loading) {
+    return <MiniGameResultSkeleton />;
+  }
+
+  if (!ranks || !scores) return <div>데이터를 불러오지 못했습니다.</div>;
+
+  return (
+    <S.ResultList>
+      {ranks.map((playerRank) => (
+        <S.PlayerCardWrapper
+          key={playerRank.playerName}
+          isHighlighted={playerRank.playerName === myName}
+        >
+          <Headline3>
+            <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
+          </Headline3>
+          <PlayerCard
+            name={playerRank.playerName}
+            playerColor={colorList[getParticipantColorIndex(playerRank.playerName)]}
+          >
+            <Headline4>
+              {getScoreTextByGameType({
+                gameType: miniGameType,
+                playScores: scores,
+                playerName: playerRank.playerName,
+              })}
+            </Headline4>
+          </PlayerCard>
+        </S.PlayerCardWrapper>
+      ))}
+    </S.ResultList>
+  );
 };
