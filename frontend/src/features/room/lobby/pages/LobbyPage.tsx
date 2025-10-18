@@ -47,6 +47,7 @@ const LobbyPage = () => {
   const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+  const [qrCodeStatus, setQrCodeStatus] = useState<'PENDING' | 'SUCCESS' | 'ERROR' | null>(null);
   const isReady = checkPlayerReady(myName) ?? false;
   const leaveRoom = useMutation<void, void>({
     endpoint: `/rooms/${joinCode}/players/${myName}`,
@@ -107,17 +108,18 @@ const LobbyPage = () => {
 
   const handleQRCodeEvent = useCallback(
     (data: QRCodeEvent) => {
-      console.log('QR Code: ', data);
-
       switch (data.status) {
         case 'PENDING':
+          setQrCodeStatus('PENDING');
           break;
         case 'SUCCESS':
+          setQrCodeStatus('SUCCESS');
           if (data.qrCodeUrl) {
             setQrCodeUrl(data.qrCodeUrl);
           }
           break;
         case 'ERROR':
+          setQrCodeStatus('ERROR');
           showToast({
             type: 'error',
             message: 'QR 코드 생성에 실패했습니다.',
@@ -135,7 +137,12 @@ const LobbyPage = () => {
     handleMiniGameError
   );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
-  useWebSocketSubscription<QRCodeEvent>(`/room/${joinCode}/qr-code`, handleQRCodeEvent);
+  useWebSocketSubscription<QRCodeEvent>(
+    `/room/${joinCode}/qr-code`,
+    handleQRCodeEvent,
+    undefined,
+    qrCodeStatus !== 'SUCCESS'
+  );
 
   useEffect(() => {
     if (joinCode && isConnected) {
