@@ -6,8 +6,6 @@ import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -46,31 +44,23 @@ public class QrCodeSubscriptionHandler {
                 return;
             }
 
-            // 구독이 완전히 완료될 시간을 주기 위해 100ms 지연 후 비동기로 메시지 전송
-            CompletableFuture.delayedExecutor(300, TimeUnit.MILLISECONDS)
-                    .execute(() -> sendQrCodeStatus(sessionId, destination, joinCode));
-        }
-    }
-
-    private void sendQrCodeStatus(String sessionId, String destination, String joinCode) {
-        try {
             final QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
-            messagingTemplate.convertAndSendToUser(
-                    sessionId,
-                    destination,
-                    WebSocketResponse.success(qrCodeStatus)
-            );
+            try {
+                messagingTemplate.convertAndSendToUser(
+                        sessionId,
+                        destination,
+                        WebSocketResponse.success(qrCodeStatus)
+                );
 
-            log.info("QR 코드 구독 시 현재 상태 전송 완료: sessionId={}, joinCode={}, status={}",
-                    sessionId, joinCode, qrCodeStatus.status());
-        } catch (NotExistElementException e) {
-            messagingTemplate.convertAndSendError(sessionId, "해당 방이 존재하지 않습니다.");
-            log.warn("QR 코드 상태 전송 실패 - 방이 존재하지 않음: sessionId={}, joinCode={}",
-                    sessionId, joinCode);
-        } catch (Exception e) {
-            log.error("QR 코드 상태 전송 중 오류 발생: sessionId={}, joinCode={}, error={}",
-                    sessionId, joinCode, e.getMessage(), e);
+                log.info("QR 코드 구독 시 현재 상태 전송 완료: sessionId={}, joinCode={}, status={}",
+                        sessionId, joinCode, qrCodeStatus.status());
+            } catch (NotExistElementException e) {
+                messagingTemplate.convertAndSendError(sessionId, "해당 방이 존재하지 않습니다.");
+            } catch (Exception e) {
+                log.error("QR 코드 상태 전송 중 오류 발생: sessionId={}, joinCode={}, error={}",
+                        sessionId, joinCode, e.getMessage(), e);
+            }
         }
     }
 }
