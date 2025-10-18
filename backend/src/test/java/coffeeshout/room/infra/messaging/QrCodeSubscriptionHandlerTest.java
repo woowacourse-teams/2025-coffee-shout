@@ -11,6 +11,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 
 import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.infra.messaging.handler.QrCodeSubscriptionHandler;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
@@ -25,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -38,7 +38,7 @@ class QrCodeSubscriptionHandlerTest {
     private RoomService roomService;
 
     @Mock
-    private SimpMessagingTemplate messagingTemplate;
+    private LoggingSimpMessagingTemplate messagingTemplate;
 
     @InjectMocks
     private QrCodeSubscriptionHandler qrCodeSubscriptionHandler;
