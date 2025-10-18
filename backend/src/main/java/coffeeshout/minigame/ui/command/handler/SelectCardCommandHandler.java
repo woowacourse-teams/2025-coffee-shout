@@ -1,21 +1,26 @@
 package coffeeshout.minigame.ui.command.handler;
 
-import coffeeshout.minigame.application.CardGameService;
+import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
+import coffeeshout.cardgame.infra.messaging.CardSelectStreamProducer;
 import coffeeshout.minigame.ui.command.MiniGameCommandHandler;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SelectCardCommandHandler implements MiniGameCommandHandler<SelectCardCommand> {
 
-    private final CardGameService cardGameService;
+    private final CardSelectStreamProducer cardSelectStreamProducer;
 
     @Override
     public void handle(String joinCode, SelectCardCommand command) {
-        // 바로 이벤트 발행만 함 - 모든 인스턴스가 동시에 처리하게 함
-        cardGameService.publishSelectCardEvent(joinCode, command.playerName(), command.cardIndex());
+        final SelectCardCommandEvent event = new SelectCardCommandEvent(joinCode, command.playerName(), command.cardIndex());
+        cardSelectStreamProducer.broadcastCardSelect(event);
+        log.info("카드 선택 이벤트 발행: joinCode={}, playerName={}, cardIndex={}, eventId={}",
+                joinCode, command.playerName(), command.cardIndex(), event.eventId());
     }
 
     @Override

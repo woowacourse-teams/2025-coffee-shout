@@ -19,3 +19,9 @@ room:
 websocket:
   docs:
     enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

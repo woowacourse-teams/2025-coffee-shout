@@ -37,12 +37,12 @@ public class MiniGameResultEntity {
     private Integer rank;
 
     @Column
-    private Integer score;
+    private Long score;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public MiniGameResultEntity(MiniGameEntity miniGamePlay, PlayerEntity player, Integer rank, Integer score) {
+    public MiniGameResultEntity(MiniGameEntity miniGamePlay, PlayerEntity player, Integer rank, Long score) {
         this.miniGamePlay = miniGamePlay;
         this.player = player;
         this.rank = rank;

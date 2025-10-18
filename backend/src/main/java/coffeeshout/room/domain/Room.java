@@ -138,6 +138,10 @@ public class Room {
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 미니게임이 존재하지 않습니다."));
     }
 
+    public Playable nextGame() {
+        return miniGames.peek();
+    }
+
     public Playable startNextGame(String hostName) {
         state(host.sameName(new PlayerName(hostName)), "호스트가 게임을 시작할 수 있습니다.");
         state(players.isAllReady(), "모든 플레이어가 준비완료해야합니다.");
@@ -147,7 +151,7 @@ public class Room {
 
         Playable currentGame = miniGames.poll();
 
-        currentGame.startGame(players.getPlayers());
+        currentGame.setUp(players.getPlayers());
 
         roomState = RoomState.PLAYING;
 

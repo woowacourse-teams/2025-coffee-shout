@@ -1,6 +1,6 @@
 package coffeeshout.minigame.domain;
 
-import coffeeshout.minigame.domain.cardgame.CardGameScore;
+import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.room.domain.player.Player;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,9 +24,20 @@ public class MiniGameResult {
         return rank.get(player);
     }
 
-    public static MiniGameResult from(@NonNull Map<Player, MiniGameScore> playerScores) {
+    public static MiniGameResult fromDescending(@NonNull Map<Player, MiniGameScore> playerScores) {
+        return of(playerScores, Comparator.reverseOrder());
+    }
+
+    public static MiniGameResult fromAscending(@NonNull Map<Player, MiniGameScore> playerScores) {
+        return of(playerScores, Comparator.naturalOrder());
+    }
+
+    public static MiniGameResult of(
+            @NonNull Map<Player, MiniGameScore> playerScores,
+            Comparator<MiniGameScore> comparator
+    ) {
         final List<MiniGameScore> sortedScores = playerScores.values().stream()
-                .sorted(Comparator.reverseOrder())
+                .sorted(comparator)
                 .toList();
         final Map<MiniGameScore, Integer> ranks = calculateRank(sortedScores);
         return new MiniGameResult(playerScores.entrySet().stream().collect(Collectors.toMap(

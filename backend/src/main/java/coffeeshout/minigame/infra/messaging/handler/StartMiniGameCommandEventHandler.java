@@ -1,43 +1,54 @@
 package coffeeshout.minigame.infra.messaging.handler;
 
-import coffeeshout.global.lock.RedisLock;
-import coffeeshout.minigame.application.CardGameService;
-import coffeeshout.minigame.domain.event.MiniGameEventType;
-import coffeeshout.minigame.domain.event.StartMiniGameCommandEvent;
+import coffeeshout.minigame.application.MiniGamePersistenceService;
+import coffeeshout.minigame.domain.MiniGameService;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
+import coffeeshout.minigame.event.MiniGameEventType;
+import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
-import lombok.RequiredArgsConstructor;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<StartMiniGameCommandEvent> {
 
-    private final CardGameService cardGameService;
+    private final Map<MiniGameType, MiniGameService> miniGameServiceMap;
     private final RoomQueryService roomQueryService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final MiniGamePersistenceService miniGamePersistenceService;
+
+    public StartMiniGameCommandEventHandler(
+            RoomQueryService roomQueryService,
+            List<MiniGameService> miniGameServices,
+            ApplicationEventPublisher eventPublisher,
+            MiniGamePersistenceService miniGamePersistenceService
+    ) {
+        this.roomQueryService = roomQueryService;
+        this.eventPublisher = eventPublisher;
+        this.miniGamePersistenceService = miniGamePersistenceService;
+        this.miniGameServiceMap = new EnumMap<>(MiniGameType.class);
+        miniGameServices.forEach(miniGameService -> miniGameServiceMap.put(
+                miniGameService.getMiniGameType(),
+                miniGameService
+        ));
+    }
 
     @Override
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
     public void handle(StartMiniGameCommandEvent event) {
         try {
             log.info("미니게임 시작 이벤트 수신: eventId={}, joinCode={}, hostName={}",
                     event.eventId(), event.joinCode(), event.hostName());
 
             updateRoomStateAndStartGame(event);
-            
-            cardGameService.saveGameEntities(event.joinCode());
-            log.info("미니게임 시작 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
-                    event.eventId(), event.joinCode());
 
         } catch (Exception e) {
             log.error("미니게임 시작 이벤트 처리 실패: eventId={}, joinCode={}",
@@ -47,9 +58,11 @@ public class StartMiniGameCommandEventHandler implements MiniGameEventHandler<St
 
     private void updateRoomStateAndStartGame(StartMiniGameCommandEvent event) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-        room.startNextGame(event.hostName());
-
-        cardGameService.startInternal(event.joinCode(), event.hostName());
+        final Playable playable = room.startNextGame(event.hostName());
+        eventPublisher.publishEvent(new MiniGameStartedEvent(event.joinCode(), playable.getMiniGameType().name()));
+        miniGameServiceMap.get(playable.getMiniGameType()).start(event.joinCode(), event.hostName());
+        miniGamePersistenceService.saveGameEntities(event.joinCode(), playable.getMiniGameType());
+        log.info("JoinCode[{}] 미니게임 시작됨 - MiniGameType : {}", event.joinCode(), playable.getMiniGameType());
     }
 
     @Override

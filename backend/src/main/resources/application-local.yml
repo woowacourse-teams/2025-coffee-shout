@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/coffee_shout
+    url: jdbc:mysql://localhost:33061/coffee_shout?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: root
     password: coffee-shout_123
     driver-class-name: com.mysql.cj.jdbc.Driver
