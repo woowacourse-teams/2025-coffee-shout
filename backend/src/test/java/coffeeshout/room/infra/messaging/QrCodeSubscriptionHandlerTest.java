@@ -15,18 +15,16 @@ import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.infra.messaging.handler.QrCodeSubscriptionHandler;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
@@ -40,7 +38,6 @@ class QrCodeSubscriptionHandlerTest {
     @Mock
     private LoggingSimpMessagingTemplate messagingTemplate;
 
-    @InjectMocks
     private QrCodeSubscriptionHandler qrCodeSubscriptionHandler;
 
     @BeforeEach
@@ -156,9 +153,6 @@ class QrCodeSubscriptionHandlerTest {
         String joinCode = "ABCD";
         String destination = "/topic/room/" + joinCode + "/qr-code";
 
-        QrCodeStatusResponse response = new QrCodeStatusResponse(PENDING, null);
-        given(roomService.getQrCodeStatus(joinCode)).willReturn(response);
-
         Message<byte[]> message = createSubscribeMessage(null, destination);  // sessionId를 null로
         SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
 
@@ -167,15 +161,15 @@ class QrCodeSubscriptionHandlerTest {
 
         // then
         // getQrCodeStatus는 호출되지만, 메시지 전송은 안됨
-        then(roomService).should(times(1)).getQrCodeStatus(joinCode);
+        then(roomService).should(times(0)).getQrCodeStatus(joinCode);
         then(messagingTemplate).should(never()).convertAndSendToUser(any(), any(), any());
     }
 
     private Message<byte[]> createSubscribeMessage(String sessionId, String destination) {
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
-        headers.put(SimpMessageHeaderAccessor.DESTINATION_HEADER, destination);
-
-        return new GenericMessage<>(new byte[0], headers);
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create(SimpMessageType.SUBSCRIBE);
+        accessor.setSessionId(sessionId);
+        accessor.setDestination(destination);
+        accessor.setLeaveMutable(true);
+        return MessageBuilder.createMessage(new byte[0], accessor.getMessageHeaders());
     }
 }
