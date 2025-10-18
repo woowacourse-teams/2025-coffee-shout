@@ -47,8 +47,7 @@ public class QrCodeSubscriptionHandler {
             final QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
             try {
-                messagingTemplate.convertAndSendToUser(
-                        sessionId,
+                messagingTemplate.convertAndSend(
                         destination,
                         WebSocketResponse.success(qrCodeStatus)
                 );
