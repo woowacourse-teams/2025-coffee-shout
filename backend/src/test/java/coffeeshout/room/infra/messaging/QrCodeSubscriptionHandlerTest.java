@@ -68,7 +68,7 @@ class QrCodeSubscriptionHandlerTest {
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
-        then(messagingTemplate).should(timeout(500).times(1))
+        then(messagingTemplate).should(times(1))
                 .convertAndSendToUser(eq(sessionId), eq(destination), eq(WebSocketResponse.success(response)));
     }
 
@@ -146,6 +146,28 @@ class QrCodeSubscriptionHandlerTest {
 
         // then
         then(roomService).should(never()).getQrCodeStatus(any());
+        then(messagingTemplate).should(never()).convertAndSendToUser(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("sessionId가 null인 경우 메시지를 전송하지 않는다")
+    void sessionId가_null인_경우_메시지를_전송하지_않는다() {
+        // given
+        String joinCode = "ABCD";
+        String destination = "/topic/room/" + joinCode + "/qr-code";
+
+        QrCodeStatusResponse response = new QrCodeStatusResponse(PENDING, null);
+        given(roomService.getQrCodeStatus(joinCode)).willReturn(response);
+
+        Message<byte[]> message = createSubscribeMessage(null, destination);  // sessionId를 null로
+        SessionSubscribeEvent event = new SessionSubscribeEvent(this, message);
+
+        // when
+        qrCodeSubscriptionHandler.handleSubscribeQrCodeStatus(event);
+
+        // then
+        // getQrCodeStatus는 호출되지만, 메시지 전송은 안됨
+        then(roomService).should(times(1)).getQrCodeStatus(joinCode);
         then(messagingTemplate).should(never()).convertAndSendToUser(any(), any(), any());
     }
 

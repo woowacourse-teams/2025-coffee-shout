@@ -39,12 +39,12 @@ public class QrCodeSubscriptionHandler {
             final Map<String, String> variables = pathMatcher.extractUriTemplateVariables(QR_CODE_TOPIC_PATTERN, destination);
             final String joinCode = variables.get("joinCode");
 
-            final QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
-
             if (sessionId == null) {
                 log.warn("세션 ID가 null입니다. QR 코드 상태를 전송할 수 없습니다: joinCode={}", joinCode);
                 return;
             }
+
+            final QrCodeStatusResponse qrCodeStatus = roomService.getQrCodeStatus(joinCode);
 
             try {
                 messagingTemplate.convertAndSendToUser(
