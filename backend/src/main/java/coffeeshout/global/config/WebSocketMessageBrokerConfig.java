@@ -71,7 +71,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         executor.setMaxPoolSize(32);
         executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.initialize();
-        executor.getThreadPoolExecutor().prestartAllCoreThreads();
         return executor;
     }
 
@@ -87,7 +86,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         executor.setMaxPoolSize(16);
         executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.initialize();
-        executor.getThreadPoolExecutor().prestartAllCoreThreads();
         return executor;
     }
 
