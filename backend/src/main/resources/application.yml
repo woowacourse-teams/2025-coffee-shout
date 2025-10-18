@@ -50,20 +50,15 @@ management:
       tomcat: true
     distribution:
       percentiles-histogram:
-        redis.event.processing: true
-        redis.listener.task.execution.time: true
-        redis.listener.task.total.time: true
-        redis.listener.task.queue.wait.time: true
+        redis.event.processing: false
+        redis.listener.task.execution.time: false
+        redis.listener.task.total.time: false
+        redis.listener.task.queue.wait.time: false
       percentiles:
         redis.event.processing: 0.5, 0.95, 0.99
         redis.listener.task.execution.time: 0.5, 0.95, 0.99
         redis.listener.task.total.time: 0.5, 0.95, 0.99
         redis.listener.task.queue.wait.time: 0.5, 0.95, 0.99
-      slo:
-        redis.event.processing: 10ms,50ms,100ms,200ms,500ms
-        redis.listener.task.execution.time: 10ms,50ms,100ms,200ms,500ms
-        redis.listener.task.total.time: 50ms,100ms,500ms,1000ms,2000ms
-        redis.listener.task.queue.wait.time: 10ms,50ms,100ms,500ms,1000ms
 
   prometheus:
     metrics:
