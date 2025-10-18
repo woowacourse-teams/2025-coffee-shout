@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import useMutation from '@/apis/rest/useMutation';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import useToast from '@/components/@common/Toast/useToast';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import useToast from '@/components/@common/Toast/useToast';
 import { Menu, TemperatureOption } from '@/types/menu';
+import { useNavigate } from 'react-router-dom';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
-import useMutation from '@/apis/rest/useMutation';
 
 export type RoomRequest = {
   playerName: string;
@@ -18,7 +18,6 @@ export type RoomRequest = {
 
 type RoomResponse = {
   joinCode: string;
-  qrCodeUrl: string;
 };
 
 export const useRoomManagement = () => {
@@ -28,16 +27,15 @@ export const useRoomManagement = () => {
   const { startSocket } = useWebSocket();
 
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode, setQrCodeUrl } = useIdentifier();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
 
   const createOrJoinRoom = useMutation<RoomResponse, RoomRequest>({
     endpoint: createUrl(playerType, joinCode),
     method: 'POST',
     onSuccess: (data, variables) => {
-      const { joinCode, qrCodeUrl } = data;
+      const { joinCode } = data;
       setJoinCode(joinCode);
-      setQrCodeUrl(qrCodeUrl);
       startSocket(joinCode, variables.playerName);
     },
     errorDisplayMode: 'toast',
