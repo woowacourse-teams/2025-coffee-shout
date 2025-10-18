@@ -66,8 +66,8 @@ public class RedisConfig {
     @Bean(name = "redisListenerExecutor")
     public ThreadPoolTaskExecutor redisListenerExecutor(MeterRegistry meterRegistry) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(3);
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(8);
         executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.setThreadNamePrefix("redis-listener-");
 

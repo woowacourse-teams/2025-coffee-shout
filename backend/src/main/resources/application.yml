@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: false
   application:
     name:
       coffee-shout
@@ -11,7 +13,7 @@ spring:
     redis:
       port: 6379
       ssl:
-        enabled: true
+        enabled: false
       host: localhost
 
 room:
@@ -25,10 +27,7 @@ room:
 
 logging:
   level:
-    root: info
-    io.opentelemetry.exporter.logging.LoggingSpanExporter: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
+    root: warn
 
 management:
   endpoint:
