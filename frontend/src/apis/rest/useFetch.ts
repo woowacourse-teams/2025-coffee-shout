@@ -47,6 +47,11 @@ const useFetch = <T>(options: UseFetchOptions<T>): UseFetchReturn<T> => {
         setError(null);
         return;
       }
+
+      if (errorDisplayMode === 'text') {
+        setError(null);
+        return;
+      }
     } finally {
       setLoading(false);
     }
