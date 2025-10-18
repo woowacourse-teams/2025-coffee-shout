@@ -64,14 +64,12 @@ class RoomRestControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.joinCode").exists())
-                    .andExpect(jsonPath("$.qrCodeUrl").exists())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
 
             RoomCreateResponse roomCreateResponse = objectMapper.readValue(response, RoomCreateResponse.class);
             assertThat(roomCreateResponse.joinCode()).isNotBlank();
-            assertThat(roomCreateResponse.qrCodeUrl()).isNotBlank();
         }
 
         @Test
@@ -154,7 +152,6 @@ class RoomRestControllerTest {
             String enterResponse = mockMvc.perform(asyncDispatch(result))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.joinCode").value(joinCode))
-                    .andExpect(jsonPath("$.qrCodeUrl").exists())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -163,7 +160,6 @@ class RoomRestControllerTest {
             Room room = roomRepository.findByJoinCode(new JoinCode(joinCode)).get();
 
             assertThat(roomEnterResponse.joinCode()).isEqualTo(joinCode);
-            assertThat(roomEnterResponse.qrCodeUrl()).isNotBlank();
             assertThat(room.getPlayers())
                     .extracting(player -> player.getName().value())
                     .containsExactlyInAnyOrder("호스트", "게스트");

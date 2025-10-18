@@ -8,5 +8,6 @@ public enum RoomEventType {
     PLAYER_KICK,
     MINI_GAME_SELECT,
     ROULETTE_SHOW,
-    ROULETTE_SPIN
+    ROULETTE_SPIN,
+    QR_CODE_COMPLETE,
 }

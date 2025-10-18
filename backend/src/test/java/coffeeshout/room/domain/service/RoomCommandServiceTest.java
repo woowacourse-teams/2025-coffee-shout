@@ -39,11 +39,9 @@ class RoomCommandServiceTest extends ServiceTest {
         void 방을_생성한다() {
             // given
             PlayerName hostName = new PlayerName("호스트");
-            String qrCodeUrl = "https://example.com/qr";
 
             // when
-            Room room = roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT,
-                    qrCodeUrl);
+            Room room = roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT);
 
             // then
             SoftAssertions.assertSoftly(softly -> {
@@ -53,7 +51,6 @@ class RoomCommandServiceTest extends ServiceTest {
                 softly.assertThat(room.getPlayers().get(0).getSelectedMenu().menu().getName()).isEqualTo("아메리카노");
                 softly.assertThat(room.getPlayers().get(0).getSelectedMenu().menuTemperature())
                         .isEqualTo(MenuTemperature.HOT);
-                softly.assertThat(room.getJoinCode().getQrCodeUrl()).isEqualTo(qrCodeUrl);
             });
         }
 
@@ -64,8 +61,8 @@ class RoomCommandServiceTest extends ServiceTest {
             PlayerName hostName2 = new PlayerName("호스트2");
 
             // when
-            roomCommandService.saveIfAbsentRoom(joinCode, hostName1, MenuFixture.아메리카노(), MenuTemperature.HOT, "qr1");
-            roomCommandService.saveIfAbsentRoom(joinCode, hostName2, MenuFixture.라떼(), MenuTemperature.ICE, "qr2");
+            roomCommandService.saveIfAbsentRoom(joinCode, hostName1, MenuFixture.아메리카노(), MenuTemperature.HOT);
+            roomCommandService.saveIfAbsentRoom(joinCode, hostName2, MenuFixture.라떼(), MenuTemperature.ICE);
 
             // then
             Room room = roomQueryService.getByJoinCode(joinCode);
@@ -85,7 +82,7 @@ class RoomCommandServiceTest extends ServiceTest {
             PlayerName hostName = new PlayerName("호스트");
             PlayerName guestName = new PlayerName("게스트");
 
-            roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT, "qr");
+            roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT);
 
             // when
             Room room = roomCommandService.joinGuest(joinCode, guestName, MenuFixture.라떼(), MenuTemperature.ICE);
@@ -108,7 +105,7 @@ class RoomCommandServiceTest extends ServiceTest {
             PlayerName guest2 = new PlayerName("게스트2");
             PlayerName guest3 = new PlayerName("게스트3");
 
-            roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT, "qr");
+            roomCommandService.saveIfAbsentRoom(joinCode, hostName, MenuFixture.아메리카노(), MenuTemperature.HOT);
 
             // when
             roomCommandService.joinGuest(joinCode, guest1, MenuFixture.라떼(), MenuTemperature.ICE);

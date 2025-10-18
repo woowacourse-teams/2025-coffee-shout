@@ -3,31 +3,29 @@ package coffeeshout.room.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
-import coffeeshout.room.ui.request.SelectedMenuRequest;
+import coffeeshout.room.domain.QrCodeStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record RoomCreateEvent(
+public record QrCodeStatusEvent(
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
         RoomEventType eventType,
-        String hostName,
-        SelectedMenuRequest selectedMenuRequest,
-        String joinCode
+        String joinCode,
+        QrCodeStatus status,
+        String qrCodeUrl
 ) implements RoomBaseEvent, Traceable {
 
-    public RoomCreateEvent(String hostName,
-                           SelectedMenuRequest selectedMenuRequest,
-                           String joinCode) {
+    public QrCodeStatusEvent(String joinCode, QrCodeStatus status, String qrCodeUrl) {
         this(
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),
-                RoomEventType.ROOM_CREATE,
-                hostName,
-                selectedMenuRequest,
-                joinCode
+                RoomEventType.QR_CODE_COMPLETE,
+                joinCode,
+                status,
+                status == QrCodeStatus.SUCCESS ? qrCodeUrl : null
         );
     }
 
