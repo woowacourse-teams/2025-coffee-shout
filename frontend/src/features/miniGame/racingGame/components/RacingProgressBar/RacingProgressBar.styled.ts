@@ -7,7 +7,7 @@ type Props = {
   $isMe: boolean;
 };
 
-const FILL_TRANSITION_DURATION = 300;
+const FILL_TRANSITION_DURATION = 100;
 
 export const Container = styled.div`
   width: 100%;
