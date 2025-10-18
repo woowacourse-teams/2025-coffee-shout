@@ -19,15 +19,15 @@ const App = () => {
           <WebSocketProvider>
             <PlayerTypeProvider>
               <ProbabilityHistoryProvider>
-                <ToastProvider>
-                  <ModalProvider>
-                    <GlobalErrorBoundary>
+                <GlobalErrorBoundary>
+                  <ToastProvider>
+                    <ModalProvider>
                       <Suspense fallback={<div>Loading...</div>}>
                         <Outlet />
                       </Suspense>
-                    </GlobalErrorBoundary>
-                  </ModalProvider>
-                </ToastProvider>
+                    </ModalProvider>
+                  </ToastProvider>
+                </GlobalErrorBoundary>
               </ProbabilityHistoryProvider>
             </PlayerTypeProvider>
           </WebSocketProvider>
