@@ -108,18 +108,16 @@ const LobbyPage = () => {
 
   const handleQRCodeEvent = useCallback(
     (data: QRCodeEvent) => {
+      setQrCodeStatus(data.status);
       switch (data.status) {
         case 'PENDING':
-          setQrCodeStatus('PENDING');
           break;
         case 'SUCCESS':
-          setQrCodeStatus('SUCCESS');
           if (data.qrCodeUrl) {
             setQrCodeUrl(data.qrCodeUrl);
           }
           break;
         case 'ERROR':
-          setQrCodeStatus('ERROR');
           showToast({
             type: 'error',
             message: 'QR 코드 생성에 실패했습니다.',
