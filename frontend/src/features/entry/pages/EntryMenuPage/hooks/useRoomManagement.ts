@@ -18,7 +18,6 @@ export type RoomRequest = {
 
 type RoomResponse = {
   joinCode: string;
-  qrCodeUrl: string;
 };
 
 export const useRoomManagement = () => {
@@ -27,16 +26,15 @@ export const useRoomManagement = () => {
   const { startSocket } = useWebSocket();
 
   const { playerType } = usePlayerType();
-  const { joinCode, myName, setJoinCode, setQrCodeUrl } = useIdentifier();
+  const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
 
   const createOrJoinRoom = useMutation<RoomResponse, RoomRequest>({
     endpoint: createUrl(playerType, joinCode),
     method: 'POST',
     onSuccess: (data, variables) => {
-      const { joinCode, qrCodeUrl } = data;
+      const { joinCode } = data;
       setJoinCode(joinCode);
-      setQrCodeUrl(qrCodeUrl);
       startSocket(joinCode, variables.playerName);
     },
     errorDisplayMode: 'toast',

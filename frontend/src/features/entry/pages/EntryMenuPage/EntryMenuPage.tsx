@@ -24,7 +24,7 @@ const EntryMenuPage = () => {
   const navigate = useReplaceNavigate();
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
-  const { joinCode, qrCodeUrl } = useIdentifier();
+  const { joinCode } = useIdentifier();
 
   const {
     category,
@@ -48,12 +48,11 @@ const EntryMenuPage = () => {
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
   useEffect(() => {
-    const isReadyToNavigateLobby =
-      joinCode && qrCodeUrl && (menu.value || customMenu.value) && isConnected;
+    const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
     if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [joinCode, qrCodeUrl, menu.value, customMenu.value, isConnected, navigate]);
+  }, [joinCode, menu.value, customMenu.value, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetAll();

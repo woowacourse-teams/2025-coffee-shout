@@ -1,23 +1,27 @@
 import useFetch from '@/apis/rest/useFetch';
+import useMutation from '@/apis/rest/useMutation';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import ShareIcon from '@/assets/share-icon.svg';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import useModal from '@/components/@common/Modal/useModal';
 import useToast from '@/components/@common/Toast/useToast';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
+import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { colorList } from '@/constants/color';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
+import { QRCodeEvent } from '@/types/qrCode';
 import { STORAGE_KEYS, storageManager } from '@/utils/StorageManager';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
@@ -29,9 +33,6 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
-import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
-import useMutation from '@/apis/rest/useMutation';
-import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -39,7 +40,7 @@ type SectionComponents = Record<SectionType, ReactElement>;
 const LobbyPage = () => {
   const navigate = useReplaceNavigate();
   const { send, isConnected } = useWebSocket();
-  const { myName, joinCode } = useIdentifier();
+  const { myName, joinCode, setQrCodeUrl } = useIdentifier();
   const { openModal, closeModal } = useModal();
   const { showToast } = useToast();
   const { playerType, setPlayerType } = usePlayerType();
@@ -47,6 +48,7 @@ const LobbyPage = () => {
   const { participants, setParticipants, isAllReady, checkPlayerReady } = useParticipants();
   const [currentSection, setCurrentSection] = useState<SectionType>('참가자');
   const [selectedMiniGames, setSelectedMiniGames] = useState<MiniGameType[]>([]);
+  const [qrCodeStatus, setQrCodeStatus] = useState<'PENDING' | 'SUCCESS' | 'ERROR' | null>(null);
   const isReady = checkPlayerReady(myName) ?? false;
   const leaveRoom = useMutation<void, void>({
     endpoint: `/rooms/${joinCode}/players/${myName}`,
@@ -105,6 +107,28 @@ const LobbyPage = () => {
     [joinCode, navigate]
   );
 
+  const handleQRCodeEvent = useCallback(
+    (data: QRCodeEvent) => {
+      setQrCodeStatus(data.status);
+      switch (data.status) {
+        case 'PENDING':
+          break;
+        case 'SUCCESS':
+          if (data.qrCodeUrl) {
+            setQrCodeUrl(data.qrCodeUrl);
+          }
+          break;
+        case 'ERROR':
+          showToast({
+            type: 'error',
+            message: 'QR 코드 생성에 실패했습니다.',
+          });
+          break;
+      }
+    },
+    [setQrCodeUrl, showToast]
+  );
+
   useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
   useWebSocketSubscription<MiniGameType[]>(
     `/room/${joinCode}/minigame`,
@@ -112,6 +136,12 @@ const LobbyPage = () => {
     handleMiniGameError
   );
   useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
+  useWebSocketSubscription<QRCodeEvent>(
+    `/room/${joinCode}/qr-code`,
+    handleQRCodeEvent,
+    undefined,
+    qrCodeStatus !== 'SUCCESS'
+  );
 
   useEffect(() => {
     if (joinCode && isConnected) {
