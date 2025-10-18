@@ -62,7 +62,7 @@ public class QrCodeSubscriptionHandler {
                     WebSocketResponse.success(qrCodeStatus)
             );
 
-            log.debug("QR 코드 구독 시 현재 상태 전송 완료: sessionId={}, joinCode={}, status={}",
+            log.info("QR 코드 구독 시 현재 상태 전송 완료: sessionId={}, joinCode={}, status={}",
                     sessionId, joinCode, qrCodeStatus.status());
         } catch (NotExistElementException e) {
             messagingTemplate.convertAndSendError(sessionId, "해당 방이 존재하지 않습니다.");
