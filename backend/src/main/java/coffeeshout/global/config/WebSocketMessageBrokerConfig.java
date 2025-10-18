@@ -5,6 +5,8 @@ import coffeeshout.global.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,6 +16,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+@Slf4j
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
@@ -29,16 +32,26 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         this.webSocketOutboundMetricInterceptor = webSocketOutboundMetricInterceptor;
     }
 
+    @Bean(name = "webSocketHeartbeatScheduler")
+    public ThreadPoolTaskScheduler webSocketHeartbeatScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("wss-heartbeat-thread-");
+        scheduler.setTaskDecorator(runnable -> {
+            return () -> {
+                log.info("하트비트 발송");
+                runnable.run();
+            };
+        });
+        scheduler.initialize();
+        return scheduler;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
-        heartbeatScheduler.setPoolSize(1);
-        heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
-        heartbeatScheduler.initialize();
-
         config.enableSimpleBroker("/topic/", "/queue/")
                 .setHeartbeatValue(new long[]{4000, 4000})
-                .setTaskScheduler(heartbeatScheduler);
+                .setTaskScheduler(webSocketHeartbeatScheduler());
 
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -50,23 +63,20 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .withSockJS();
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketInboundMetricInterceptor);
+    @Bean(name = "webSocketInboundExecutor")
+    public ThreadPoolTaskExecutor webSocketInboundExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("inbound-");
         executor.setCorePoolSize(32);
         executor.setMaxPoolSize(32);
         executor.setQueueCapacity(Integer.MAX_VALUE);
-        executor.setKeepAliveSeconds(60);
         executor.initialize();
         executor.getThreadPoolExecutor().prestartAllCoreThreads();
-        registration.taskExecutor(executor);
+        return executor;
     }
 
-    @Override
-    public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketOutboundMetricInterceptor);
+    @Bean(name = "webSocketOutboundExecutor")
+    public ThreadPoolTaskExecutor webSocketOutboundExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("outbound-");
         executor.setTaskDecorator(runnable -> {
@@ -76,9 +86,20 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         executor.setCorePoolSize(16);
         executor.setMaxPoolSize(16);
         executor.setQueueCapacity(Integer.MAX_VALUE);
-        executor.setKeepAliveSeconds(60);
         executor.initialize();
         executor.getThreadPoolExecutor().prestartAllCoreThreads();
-        registration.taskExecutor(executor);
+        return executor;
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketInboundMetricInterceptor);
+        registration.taskExecutor(webSocketInboundExecutor());
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketOutboundMetricInterceptor);
+        registration.taskExecutor(webSocketOutboundExecutor());
     }
 }
