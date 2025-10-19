@@ -45,6 +45,11 @@ const useLazyFetch = <T>(options: UseLazyFetchOptions<T>): UseLazyFetchReturn<T>
         setError(null);
         return;
       }
+
+      if (errorDisplayMode === 'text') {
+        setError(null);
+        return;
+      }
     } finally {
       setLoading(false);
     }

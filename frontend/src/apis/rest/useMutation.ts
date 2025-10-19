@@ -75,6 +75,11 @@ const useMutation = <TData = unknown, TVariables = void>(
           setError(null);
           return;
         }
+
+        if (errorDisplayMode === 'text') {
+          setError(null);
+          return;
+        }
       } finally {
         setLoading(false);
       }

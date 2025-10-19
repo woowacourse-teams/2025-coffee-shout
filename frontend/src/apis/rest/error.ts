@@ -1,4 +1,4 @@
-export type ErrorDisplayMode = 'fallback' | 'toast';
+export type ErrorDisplayMode = 'fallback' | 'toast' | 'text';
 
 export type ApiErrorParams = {
   status: number;

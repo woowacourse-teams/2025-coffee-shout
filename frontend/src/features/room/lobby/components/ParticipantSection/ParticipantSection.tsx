@@ -32,7 +32,7 @@ export const ParticipantSection = ({ participants }: Props) => {
     <>
       <SectionTitle
         title="참가자"
-        description="음료 아이콘을 누르면 음료를 변경할 수 있습니다"
+        description="참가자 목록과 준비상태를 확인할 수 있습니다"
         suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
       />
       <PlayerCard
