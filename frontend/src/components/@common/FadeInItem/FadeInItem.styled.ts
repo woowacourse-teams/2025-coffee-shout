@@ -1,10 +1,12 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div<{
+type Props = {
   $index: number;
   $delay: number;
   $duration: number;
-}>`
+};
+
+export const Wrapper = styled.div<Props>`
   animation: fadeInUp ${({ $duration }) => $duration}ms ease-out
     ${({ $index, $delay }) => $index * $delay}ms both;
 
