@@ -37,7 +37,7 @@ const EntryNamePage = () => {
     if (playerType === 'GUEST') {
       const response = await checkGuestName();
       if (!response) return;
-      if (!response.exist) {
+      if (response.exist) {
         showToast({
           type: 'error',
           message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
