@@ -4,8 +4,8 @@ import FadeInItem from '../../@common/FadeInItem/FadeInItem';
 type FadeInUpListProps<T> = {
   items: T[];
   renderItem: (item: T, index: number) => ReactNode;
-  staggerDelay?: number; // default 200ms
-  animationDuration?: number; // default 600ms
+  staggerDelay?: number;
+  animationDuration?: number;
 };
 
 const FadeInUpList = <T,>({
