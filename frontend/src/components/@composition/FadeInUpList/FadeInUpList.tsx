@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import * as S from './FadeInUpList.styled';
+import FadeInItem from '../../@common/FadeInItem/FadeInItem';
 
 type FadeInUpListProps<T> = {
   items: T[];
@@ -21,14 +21,9 @@ const FadeInUpList = <T,>({
       {items.map((item, index) => {
         const key = getItemKey ? getItemKey(item, index) : index;
         return (
-          <S.ItemWrapper
-            key={key}
-            $index={index}
-            $staggerDelay={staggerDelay}
-            $animationDuration={animationDuration}
-          >
+          <FadeInItem key={key} index={index} delay={staggerDelay} duration={animationDuration}>
             {renderItem(item, index)}
-          </S.ItemWrapper>
+          </FadeInItem>
         );
       })}
     </>
