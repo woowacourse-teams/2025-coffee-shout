@@ -1,12 +1,12 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
-import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
 import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -70,7 +70,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
 
   return (
     <S.Container>
-      <Paragraph>초대코드를 입력해주세요</Paragraph>
+      <Headline4>초대코드를 입력해주세요</Headline4>
       <Input
         type="text"
         placeholder={`${JOIN_CODE_LENGTH}자리 영문과 숫자 조합 ex) AB12`}
@@ -83,7 +83,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
         onKeyDown={handleKeyDown}
         autoFocus
       />
-      <S.ErrorText color="point-500">{errorText}</S.ErrorText>
+      <S.ErrorText>{errorText}</S.ErrorText>
       <S.ButtonContainer>
         <Button variant="secondary" onClick={onClose}>
           취소
