@@ -1,12 +1,12 @@
 import Button from '@/components/@common/Button/Button';
 import Input from '@/components/@common/Input/Input';
-import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
 import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -19,23 +19,28 @@ type Props = {
 const EnterRoomModal = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const { execute: checkJoinCode } = useLazyFetch<JoinCodeCheckResponse>({
     endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
-    onError: () => {
+    onError: (error: Error) => {
       setJoinCode('');
+      setErrorText(error.message);
     },
+    errorDisplayMode: 'text',
   });
 
   const handleEnter = async () => {
     if (!joinCode.trim()) {
-      alert('초대코드를 입력해주세요.');
+      setErrorText('초대코드를 입력해주세요.');
       return;
     }
 
-    const { exist } = (await checkJoinCode()) as JoinCodeCheckResponse;
-    if (!exist) {
-      alert('참여코드가 유효한 방이 존재하지 않습니다.');
+    const response = await checkJoinCode();
+
+    if (!response) return;
+    if (!response.exist) {
+      setErrorText('참여코드가 유효한 방이 존재하지 않습니다.');
       return;
     }
 
@@ -57,17 +62,28 @@ const EnterRoomModal = ({ onClose }: Props) => {
     setJoinCode(value.toUpperCase());
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleEnter();
+    }
+  };
+
   return (
     <S.Container>
-      <Paragraph>초대코드를 입력해주세요</Paragraph>
+      <Headline4>초대코드를 입력해주세요</Headline4>
       <Input
         type="text"
         placeholder={`${JOIN_CODE_LENGTH}자리 영문과 숫자 조합 ex) AB12`}
         value={joinCode}
-        onClear={() => setJoinCode('')}
+        onClear={() => {
+          setJoinCode('');
+          setErrorText(null);
+        }}
         onChange={handleJoinCodeChange}
+        onKeyDown={handleKeyDown}
         autoFocus
       />
+      <S.ErrorText>{errorText}</S.ErrorText>
       <S.ButtonContainer>
         <Button variant="secondary" onClick={onClose}>
           취소
