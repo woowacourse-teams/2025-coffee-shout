@@ -50,7 +50,7 @@ const InvitationModal = ({ onClose }: props) => {
 export default InvitationModal;
 
 type QRSectionProps = {
-  qrCodeUrl: string;
+  qrCodeUrl: string | null;
   handleShareLink: () => void;
 };
 
@@ -63,7 +63,11 @@ const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
   return (
     <S.QRSection>
       <S.QRCode>
-        <img src={qrCodeUrl} alt="QR Code" />
+        {qrCodeUrl && qrCodeUrl.trim() !== '' ? (
+          <img src={qrCodeUrl} alt="QR Code" />
+        ) : (
+          <S.Description>QR 코드 생성 중...</S.Description>
+        )}
       </S.QRCode>
       <S.ShareButton onClick={handleShareLink}>
         <Paragraph>링크 공유하기</Paragraph>
