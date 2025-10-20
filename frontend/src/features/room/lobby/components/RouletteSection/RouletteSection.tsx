@@ -1,6 +1,7 @@
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import { PlayerProbability, RouletteView } from '@/types/roulette';
 import { useEffect, useState } from 'react';
@@ -38,19 +39,7 @@ export const RouletteSection = ({ playerProbabilities }: Props) => {
 
   return (
     <>
-      <div
-        aria-live="polite"
-        aria-atomic="true"
-        style={{
-          position: 'absolute',
-          left: '-10000px',
-          width: '1px',
-          height: '1px',
-          overflow: 'hidden',
-        }}
-      >
-        {screenReaderMessage}
-      </div>
+      <ScreenReaderOnly>{screenReaderMessage}</ScreenReaderOnly>
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
       <S.IconButtonWrapper>
         <RouletteViewToggle currentView={currentView} onViewChange={handleViewChange} />
