@@ -26,7 +26,7 @@ import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import InvitationModal from '../components/JoinCodeModal/InvitationModal';
+import InvitationModal from '../components/InvitationModal/InvitationModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
