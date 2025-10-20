@@ -13,21 +13,25 @@ const SelectCategory = ({ onClickCategory }: Props) => {
   const { categories, loading } = useCategories();
 
   return (
-    <S.CategoryList role="listbox" aria-label="카테고리">
+    <S.CategoryList>
       {loading ? (
         <CafeCategoryCardSkeleton />
       ) : (
-        categories.map((category, index) => (
-          <CafeCategoryCard
-            key={category.id}
-            imageUrl={category.imageUrl}
-            categoryName={category.name}
-            onClick={() => onClickCategory(category)}
-            color={categoryColorList[index % categoryColorList.length]}
-            position={index + 1}
-            totalCount={categories.length}
-          />
-        ))
+        categories.map((category, index) => {
+          const isLast = index === categories.length - 1;
+          return (
+            <CafeCategoryCard
+              key={category.id}
+              imageUrl={category.imageUrl}
+              categoryName={category.name}
+              onClick={() => onClickCategory(category)}
+              color={categoryColorList[index % categoryColorList.length]}
+              position={index + 1}
+              totalCount={categories.length}
+              ariaLabel={`${category.name} 선택, ${index + 1}번째 카테고리${isLast ? ', 마지막 카테고리' : ''}`}
+            />
+          );
+        })
       )}
     </S.CategoryList>
   );

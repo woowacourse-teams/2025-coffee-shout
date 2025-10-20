@@ -12,26 +12,17 @@ type Props = {
   color: string;
   position: number;
   totalCount: number;
+  ariaLabel?: string;
 };
 
-const CafeCategoryCard = ({
-  imageUrl,
-  categoryName,
-  onClick,
-  color,
-  position,
-  totalCount,
-}: Props) => {
+const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color, ariaLabel }: Props) => {
   const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
     <S.Container
       {...pointerHandlers}
       $touchState={touchState}
-      aria-label={`${categoryName} 선택 버튼`}
-      role="option"
-      aria-posinset={position}
-      aria-setsize={totalCount}
+      aria-label={ariaLabel || `${categoryName} 선택 버튼`}
     >
       <IconTextItem
         iconContent={<CircleIcon imageUrl={imageUrl} color={color} />}
