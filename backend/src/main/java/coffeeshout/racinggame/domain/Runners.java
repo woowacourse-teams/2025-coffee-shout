@@ -27,8 +27,8 @@ public class Runners {
         runner.updateSpeed(tapCount, speedCalculator, now);
     }
 
-    public void moveAll() {
-        runners.forEach(Runner::move);
+    public void moveAll(Instant now) {
+        runners.forEach(runner -> runner.move(now));
     }
 
     public Optional<Runner> findWinner() {

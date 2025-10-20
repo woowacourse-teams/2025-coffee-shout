@@ -8,6 +8,9 @@ import coffeeshout.racinggame.domain.Runner;
 import coffeeshout.racinggame.domain.SpeedCalculator;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class RunnerTest {
 
@@ -44,7 +47,7 @@ class RunnerTest {
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 60이어야 합니다.");
     }
 
     @Test
@@ -57,7 +60,7 @@ class RunnerTest {
         // when && then
         assertThatThrownBy(() -> runner.updateSpeed(10, speedCalculator, now))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("스피드는 0 ~ 30이어야 합니다.");
+                .hasMessageContaining("스피드는 0 ~ 60이어야 합니다.");
     }
 
     @Test
@@ -106,7 +109,7 @@ class RunnerTest {
         runner.updateSpeed(10, speedCalculator, now);
 
         // when
-        runner.move();
+        runner.move(now);
 
         // then
         assertThat(runner.getPosition()).isEqualTo(15);
@@ -121,9 +124,9 @@ class RunnerTest {
         runner.updateSpeed(10, speedCalculator, now);
 
         // when
-        runner.move();
-        runner.move();
-        runner.move();
+        runner.move(now);
+        runner.move(now);
+        runner.move(now);
 
         // then
         assertThat(runner.getPosition()).isEqualTo(30);
@@ -135,27 +138,10 @@ class RunnerTest {
         final Runner runner = new Runner(PlayerFixture.게스트한스());
 
         // when
-        runner.move();
+        runner.move(Instant.now());
 
         // then
         assertThat(runner.getPosition()).isEqualTo(RacingGame.START_LINE);
-    }
-
-    @Test
-    void 러너가_완주_라인에_도달하면_위치가_정확히_완주_라인이_된다() {
-        // given
-        final Runner runner = new Runner(PlayerFixture.게스트한스());
-        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> RacingGame.MAX_SPEED;
-        final Instant now = Instant.now();
-        runner.updateSpeed(10, speedCalculator, now);
-
-        // when
-        for (int i = 0; i < 100; i++) {
-            runner.move();
-        }
-
-        // then
-        assertThat(runner.getPosition()).isEqualTo(RacingGame.FINISH_LINE);
     }
 
     @Test
@@ -168,7 +154,7 @@ class RunnerTest {
 
         // when
         for (int i = 0; i < 100; i++) {
-            runner.move();
+            runner.move(now);
         }
 
         // then
@@ -183,13 +169,13 @@ class RunnerTest {
         final Instant now = Instant.now();
         runner.updateSpeed(10, speedCalculator, now);
         for (int i = 0; i < 100; i++) {
-            runner.move();
+            runner.move(now);
         }
         final int finishPosition = runner.getPosition();
 
         // when
-        runner.move();
-        runner.move();
+        runner.move(now);
+        runner.move(now);
 
         // then
         assertThat(runner.getPosition()).isEqualTo(finishPosition);
@@ -205,7 +191,7 @@ class RunnerTest {
 
         // when
         for (int i = 0; i < 100; i++) {
-            runner.move();
+            runner.move(now);
         }
 
         // then
@@ -229,11 +215,11 @@ class RunnerTest {
         final Instant now = Instant.now();
         runner.updateSpeed(10, speedCalculator, now);
         for (int i = 0; i < 99; i++) {
-            runner.move();
+            runner.move(now);
         }
 
         // when
-        runner.move();
+        runner.move(now);
 
         // then
         assertThat(runner.getFinishTime()).isNotNull();
@@ -250,5 +236,38 @@ class RunnerTest {
 
         // then
         assertThat(runner.getSpeed()).isEqualTo(RacingGame.MIN_SPEED);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "2950, 60, 83",     // 2950 + 60 = 3010, 10 초과
+            "2980, 30, 66",     // 2980 + 30 = 3010, 10 초과
+            "2990, 20, 50",     // 2990 + 20 = 3010, 10 초과
+            "2995, 10, 50",      // 2995 + 10 = 3005, 5 초과
+            "2997, 5, 60",       // 2997 + 5 = 3002, 2 초과
+            "2999, 3, 33",      // 2999 + 3 = 3002, 2 초과
+    })
+    void 결승선을_초과하여_도착하면_남은_거리_비율만큼_시간이_보정된다(
+            int startPosition,
+            int speed,
+            int expectedTicksToFinish
+    ) {
+        // given
+        final Runner runner = new Runner(PlayerFixture.게스트한스());
+        final SpeedCalculator speedCalculator = (lastTapedTime, now, tapCount) -> speed;
+        final Instant tickStartTime = Instant.parse("2025-01-01T00:00:00Z");
+
+        ReflectionTestUtils.setField(runner, "position", startPosition);
+
+        runner.updateSpeed(1, speedCalculator, tickStartTime);
+
+        // when
+        runner.move(tickStartTime);
+        final Instant expectFinishTime = tickStartTime.minusMillis(RacingGame.MOVE_INTERVAL_MILLIS)
+                .plusMillis(expectedTicksToFinish);
+
+        // then
+        assertThat(runner.isFinished()).isTrue();
+        assertThat(runner.getFinishTime()).isEqualTo(expectFinishTime);
     }
 }
