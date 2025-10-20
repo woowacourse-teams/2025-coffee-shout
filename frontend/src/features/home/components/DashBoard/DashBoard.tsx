@@ -1,6 +1,6 @@
-import LowestProbabilitySlide from '@/components/@composition/LowestProbabilitySlide/LowestProbabilitySlide';
-import TopWinnersSlide from '@/components/@composition/TopWinnersSlide/TopWinnersSlide';
-import GamePlayCountSlide from '@/components/@composition/GamePlayCountSlide/GamePlayCountSlide';
+import LowestProbabilitySlide from './LowestProbabilitySlide/LowestProbabilitySlide';
+import TopWinnersSlide from './TopWinnersSlide/TopWinnersSlide';
+import GamePlayCountSlide from './GamePlayCountSlide/GamePlayCountSlide';
 import { useAutoSlideCarousel } from '@/hooks/useAutoSlideCarousel';
 import * as S from './DashBoard.styled';
 import useFetch from '@/apis/rest/useFetch';

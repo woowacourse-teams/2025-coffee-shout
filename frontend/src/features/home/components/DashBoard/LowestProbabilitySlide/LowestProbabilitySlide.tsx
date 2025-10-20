@@ -1,4 +1,4 @@
-import CarouselSlide from '@/components/@common/CarouselSlide/CarouselSlide';
+import CarouselSlide from '../CarouselSlide/CarouselSlide';
 import ProbabilityTag from '@/components/@common/ProbabilityTag/ProbabilityTag';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import * as S from './LowestProbabilitySlide.styled';

@@ -1,4 +1,4 @@
-import CarouselSlide from '@/components/@common/CarouselSlide/CarouselSlide';
+import CarouselSlide from '../CarouselSlide/CarouselSlide';
 import RankingItem from '@/components/@common/RankingItem/RankingItem';
 import FadeInUpList from '@/components/@composition/FadeInUpList/FadeInUpList';
 import { useHeightDifference } from '@/hooks/useHeightDifference';
