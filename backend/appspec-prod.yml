@@ -34,6 +34,18 @@ permissions:
 
 # 배포 생명주기 훅
 hooks:
+  # 트래픽 차단 전 Graceful Shutdown 시작 (SIGTERM 전송)
+  BeforeBlockTraffic:
+    - location: scripts/before_block_traffic.sh
+      timeout: 30
+      runas: ubuntu
+
+  # 애플리케이션 강제 종료 (Prod 환경: Graceful Shutdown 실패 시)
+  ApplicationStop:
+    - location: scripts/application_stop-prod.sh
+      timeout: 60
+      runas: ubuntu
+
   # 배포 시작 전 준비 작업
   BeforeInstall:
     - location: scripts/before_install.sh
@@ -46,16 +58,10 @@ hooks:
       timeout: 300
       runas: ubuntu
 
-  # 애플리케이션 시작 전 검증
+  # 애플리케이션 시작
   ApplicationStart:
     - location: scripts/application_start-prod.sh
       timeout: 600
-      runas: ubuntu
-
-  # 애플리케이션 시작 후 상태 검증
-  ApplicationStop:
-    - location: scripts/application_stop.sh
-      timeout: 300
       runas: ubuntu
 
   # 배포 성공 검증
