@@ -13,7 +13,7 @@ const SelectCategory = ({ onClickCategory }: Props) => {
   const { categories, loading } = useCategories();
 
   return (
-    <S.CategoryList>
+    <S.CategoryList role="listbox" aria-label="카테고리">
       {loading ? (
         <CafeCategoryCardSkeleton />
       ) : (
@@ -24,6 +24,8 @@ const SelectCategory = ({ onClickCategory }: Props) => {
             categoryName={category.name}
             onClick={() => onClickCategory(category)}
             color={categoryColorList[index % categoryColorList.length]}
+            position={index + 1}
+            totalCount={categories.length}
           />
         ))
       )}
