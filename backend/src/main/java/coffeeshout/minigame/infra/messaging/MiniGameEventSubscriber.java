@@ -2,6 +2,7 @@ package coffeeshout.minigame.infra.messaging;
 
 import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.event.MiniGameBaseEvent;
 import coffeeshout.minigame.event.MiniGameEventType;
 import coffeeshout.minigame.event.StartMiniGameCommandEvent;
@@ -28,6 +29,7 @@ public class MiniGameEventSubscriber implements MessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic miniGameEventTopic;
     private final TracerProvider tracerProvider;
+    private final LoggingSimpMessagingTemplate loggingSimpMessagingTemplate;
 
     @SuppressWarnings("unchecked")
     public MiniGameEventSubscriber(
@@ -35,7 +37,7 @@ public class MiniGameEventSubscriber implements MessageListener {
             ObjectMapper objectMapper,
             RedisMessageListenerContainer redisMessageListenerContainer,
             ChannelTopic miniGameEventTopic,
-            TracerProvider tracerProvider
+            TracerProvider tracerProvider, LoggingSimpMessagingTemplate loggingSimpMessagingTemplate
     ) {
         this.handlers = handlers.stream()
                 .collect(Collectors.toMap(
@@ -46,6 +48,7 @@ public class MiniGameEventSubscriber implements MessageListener {
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.miniGameEventTopic = miniGameEventTopic;
         this.tracerProvider = tracerProvider;
+        this.loggingSimpMessagingTemplate = loggingSimpMessagingTemplate;
     }
 
     @PostConstruct
@@ -56,6 +59,7 @@ public class MiniGameEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        MiniGameBaseEvent event = null;
         try {
             final String body = new String(message.getBody());
             final MiniGameEventType eventType = extractEventType(body);
@@ -65,15 +69,17 @@ public class MiniGameEventSubscriber implements MessageListener {
                 return;
             }
 
-            final MiniGameBaseEvent event = deserializeEvent(body, eventType);
+            event = deserializeEvent(body, eventType);
             final MiniGameEventHandler<MiniGameBaseEvent> handler = handlers.get(eventType);
+            final MiniGameBaseEvent finalEvent = event;
             tracerProvider.executeWithTraceContext(
                     event.traceInfo(),
-                    () -> handler.handle(event),
+                    () -> handler.handle(finalEvent),
                     event.eventType().name()
             );
 
         } catch (Exception e) {
+            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), "미니게임 이벤트 처리 실패");
             log.error("미니게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);
         }
     }

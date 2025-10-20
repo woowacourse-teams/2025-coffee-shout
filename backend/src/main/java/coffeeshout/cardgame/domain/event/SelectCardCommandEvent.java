@@ -1,5 +1,6 @@
 package coffeeshout.cardgame.domain.event;
 
+import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import coffeeshout.minigame.event.MiniGameBaseEvent;
 import coffeeshout.minigame.event.MiniGameEventType;
 import coffeeshout.global.trace.TraceInfo;
@@ -9,6 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record SelectCardCommandEvent(
+        String sessionId,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
@@ -20,6 +22,7 @@ public record SelectCardCommandEvent(
 
     public SelectCardCommandEvent(String joinCode, String playerName, Integer cardIndex) {
         this(
+                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

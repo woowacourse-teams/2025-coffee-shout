@@ -3,11 +3,13 @@ package coffeeshout.room.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
+import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import coffeeshout.room.domain.QrCodeStatus;
 import java.time.Instant;
 import java.util.UUID;
 
 public record QrCodeStatusEvent(
+        String sessionId,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
@@ -19,6 +21,7 @@ public record QrCodeStatusEvent(
 
     public QrCodeStatusEvent(String joinCode, QrCodeStatus status, String qrCodeUrl) {
         this(
+                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

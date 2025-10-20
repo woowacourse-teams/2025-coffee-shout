@@ -3,11 +3,13 @@ package coffeeshout.room.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
+import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import java.time.Instant;
 import java.util.UUID;
 
 public record RoomJoinEvent(
+        String sessionId,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
@@ -19,6 +21,7 @@ public record RoomJoinEvent(
 
     public RoomJoinEvent(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         this(
+                "none",
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

@@ -1,6 +1,7 @@
 package coffeeshout.global.config;
 
 
+import coffeeshout.global.websocket.SessionIdPrincipalHandshakeHandler;
 import coffeeshout.global.websocket.interceptor.ShutdownAwareHandshakeInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketOutboundMetricInterceptor;
@@ -48,6 +49,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(shutdownAwareHandshakeInterceptor)
+                .setHandshakeHandler(new SessionIdPrincipalHandshakeHandler())
                 .withSockJS();
     }
 

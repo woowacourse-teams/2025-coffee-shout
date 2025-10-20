@@ -1,6 +1,7 @@
 package coffeeshout.global.exception;
 
 import coffeeshout.global.ui.WebSocketResponse;
+import generator.annotaions.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;

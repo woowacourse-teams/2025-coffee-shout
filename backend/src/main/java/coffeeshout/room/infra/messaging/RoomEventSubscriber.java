@@ -2,6 +2,7 @@ package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.trace.TracerProvider;
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomEventSubscriber implements MessageListener {
 
+    private final LoggingSimpMessagingTemplate loggingSimpMessagingTemplate;
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
@@ -45,6 +47,7 @@ public class RoomEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        RoomBaseEvent event = null;
         try {
             final String body = new String(message.getBody());
             final RoomEventType eventType = extractEventType(body);
@@ -54,12 +57,13 @@ public class RoomEventSubscriber implements MessageListener {
                 return;
             }
 
-            final RoomBaseEvent event = deserializeEvent(body, eventType);
+            event = deserializeEvent(body, eventType);
             final RoomEventHandler<RoomBaseEvent> handler = handlerFactory.getHandler(eventType);
             if (event instanceof Traceable traceable) {
+                final RoomBaseEvent finalEvent = event;
                 tracerProvider.executeWithTraceContext(
                         traceable.getTraceInfo(),
-                        () -> handler.handle(event),
+                        () -> handler.handle(finalEvent),
                         event.eventType().name()
                 );
                 return;
@@ -68,6 +72,7 @@ public class RoomEventSubscriber implements MessageListener {
 
         } catch (Exception e) {
             log.error("이벤트 처리 실패: message={}", new String(message.getBody()), e);
+            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), "이벤트 처리 실패");
         }
     }
 

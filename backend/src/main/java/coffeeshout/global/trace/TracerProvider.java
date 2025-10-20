@@ -30,6 +30,8 @@ public class TracerProvider {
                 .start();
         try (Tracer.SpanInScope spanInScope = tracer.withSpan(span)) {
             task.run();
+        } catch (Throwable t) {
+            throw t;
         } finally {
             span.end();
         }
