@@ -85,14 +85,14 @@ type CodeSectionProps = {
 const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
   return (
     <S.QRSection>
-      <S.QRCode aria-hidden="true">
+      <S.QRCode>
         {qrCodeUrl && qrCodeUrl.trim() !== '' ? (
           <img src={qrCodeUrl} alt="QR Code" />
         ) : (
           <S.Description>QR 코드 생성 중...</S.Description>
         )}
       </S.QRCode>
-      <S.ShareButton onClick={handleShareLink} aria-label="링크 공유하기" tabIndex={0}>
+      <S.ShareButton onClick={handleShareLink} aria-label="링크 공유하기">
         <Paragraph>링크 공유하기</Paragraph>
       </S.ShareButton>
       <S.Wrapper>
@@ -116,12 +116,7 @@ const CodeSection = ({ joinCode, handleCopy }: CodeSectionProps) => {
           <span aria-hidden="true">{joinCode}</span>
           <ScreenReaderOnly>{joinCode.split('').join(' ')}</ScreenReaderOnly>
         </Headline4>
-        <S.CopyIcon
-          src={CopyIcon}
-          onClick={handleCopy}
-          aria-label="초대코드 복사하기"
-          tabIndex={0}
-        />
+        <S.CopyIcon src={CopyIcon} onClick={handleCopy} aria-label="초대코드 복사하기" />
       </S.CodeBox>
     </S.CodeSection>
   );
