@@ -1,11 +1,10 @@
-import { ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import * as S from './CarouselSlide.styled';
 
 type Props = {
   title: string;
-  children: ReactNode;
-};
+} & PropsWithChildren;
 
 const CarouselSlide = ({ title, children }: Props) => {
   return (
