@@ -3,7 +3,7 @@ import { colorList } from '@/constants/color';
 import PlayerIcon from './PlayerIcon';
 
 const meta: Meta<typeof PlayerIcon> = {
-  title: 'Common/PlayerIcon',
+  title: 'Composition/PlayerIcon',
   component: PlayerIcon,
   tags: ['autodocs'],
   argTypes: {

@@ -1,18 +1,15 @@
-import CardGamePlayPage from '@/features/miniGame/cardGame/pages/CardGamePlayPage';
 import { MiniGameType } from '@/types/miniGame/common';
-import { JSX } from 'react';
 import { useParams } from 'react-router-dom';
-
-const MINI_GAME_COMPONENTS: Record<MiniGameType, () => JSX.Element> = {
-  CARD_GAME: CardGamePlayPage,
-  // '31_GAME': Random31GamePlayPage,
-} as const;
+import { GAME_CONFIGS } from '../../config/gameConfigs';
 
 const MiniGamePlayPage = () => {
   const { miniGameType } = useParams();
 
-  if (!miniGameType || !(miniGameType in MINI_GAME_COMPONENTS)) {
-    // TODO: 에러 화면 추후 수정 필요
+  if (!miniGameType || !(miniGameType in GAME_CONFIGS)) {
+    /**
+     * TODO: NotFoundPage 스타일과 동일하게 가져갈 것
+     * TODO: 홈으로 돌아가기 버튼 추가
+     */
     return (
       <div>
         <h1>잘못된 미니게임입니다.</h1>
@@ -21,7 +18,7 @@ const MiniGamePlayPage = () => {
     );
   }
 
-  const GameComponent = MINI_GAME_COMPONENTS[miniGameType as MiniGameType];
+  const GameComponent = GAME_CONFIGS[miniGameType as MiniGameType].PlayPage;
 
   return <GameComponent />;
 };

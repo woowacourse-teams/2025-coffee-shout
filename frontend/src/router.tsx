@@ -1,8 +1,8 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
 import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
-import CardGameProvider from './contexts/CardGame/CardGameProvider';
 import { lazy } from 'react';
+import MiniGameProviders from './features/miniGame/context/MiniGameProviders';
 
 const LobbyPage = lazy(
   /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')
@@ -16,7 +16,7 @@ const MiniGamePlayPage = lazy(
 const MiniGameReadyPage = lazy(
   () =>
     import(
-      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReady/MiniGameReadyPage'
+      /*webpackChunkName: "miniGameReadyPage"*/ './features/miniGame/pages/MiniGameReadyPage/MiniGameReadyPage'
     )
 );
 const MiniGameResultPage = lazy(
@@ -73,9 +73,9 @@ const router = createBrowserRouter([
           {
             path: ':miniGameType',
             element: (
-              <CardGameProvider>
+              <MiniGameProviders>
                 <Outlet />
-              </CardGameProvider>
+              </MiniGameProviders>
             ),
             children: [
               { path: 'ready', element: <MiniGameReadyPage /> },

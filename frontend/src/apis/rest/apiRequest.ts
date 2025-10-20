@@ -1,9 +1,9 @@
-import { ApiError, NetworkError } from './error';
+import { ApiError, ErrorDisplayMode, NetworkError } from './error';
 import { reportApiError } from '@/apis/utils/reportSentryError';
 
 const API_URL = process.env.API_URL;
 
-type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type ApiRequestOptions<TData> = {
   method?: Method;
@@ -13,6 +13,7 @@ export type ApiRequestOptions<TData> = {
     count: number;
     delay: number;
   };
+  errorDisplayMode?: ErrorDisplayMode;
 };
 
 export type ApiConfig = {
@@ -25,7 +26,13 @@ export const apiRequest = async <T, TData>(
   url: string,
   options: ApiRequestOptions<TData> = {}
 ): Promise<T> => {
-  const { method = 'GET', headers = {}, body = null, retry = { count: 0, delay: 1000 } } = options;
+  const {
+    method = 'GET',
+    headers = {},
+    body = null,
+    retry = { count: 0, delay: 1000 },
+    errorDisplayMode = options.errorDisplayMode || (method === 'GET' ? 'fallback' : 'toast'),
+  } = options;
 
   let requestUrl = API_URL + url;
 
@@ -68,9 +75,18 @@ export const apiRequest = async <T, TData>(
           console.warn('응답 메시지 파싱 실패', parseError);
         }
 
-        const apiError = new ApiError(response.status, errorMessage, errorData);
+        const apiError = new ApiError({
+          status: response.status,
+          message: errorMessage,
+          data: errorData,
+          displayMode: errorDisplayMode,
+        });
         reportApiError(apiError);
         throw apiError;
+      }
+
+      if (response.status === 204) {
+        return {} as T;
       }
 
       return await response.json();
@@ -88,7 +104,10 @@ export const apiRequest = async <T, TData>(
 
       if (error instanceof TypeError) {
         if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-          const networkError = new NetworkError('네트워크 연결에 실패했습니다');
+          const networkError = new NetworkError({
+            message: error.message,
+            displayMode: errorDisplayMode,
+          });
           reportApiError(networkError);
           throw networkError;
         }
