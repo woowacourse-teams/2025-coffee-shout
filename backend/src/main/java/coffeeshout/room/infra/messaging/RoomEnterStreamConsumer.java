@@ -60,9 +60,11 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
 
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
+        log.info("방 입장 메시지 수신: messageId={}", message.getId());
         final RoomJoinEvent event = parseEvent(message);
-        log.info("방 입장 메시지 수신: messageId={}, eventId={}, joinCode={}, guestName={}",
-                message.getId(), event.eventId(), event.joinCode(), event.guestName());
+
+        log.info("방 입장 메시지 eventId={}, joinCode={}, guestName={}",
+                event.eventId(), event.joinCode(), event.guestName());
 
         try {
             final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
@@ -95,6 +97,10 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
             return objectMapper.readValue(value, RoomJoinEvent.class);
         } catch (JsonProcessingException e) {
             log.error("RoomJoinEvent 파싱 실패: messageId={}, messageValue={}, error={}",
+                    message.getId(), message.getValue(), e.getMessage(), e);
+            throw new IllegalArgumentException("이벤트 파싱 중 오류 발생: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("RoomJoinEvent 오류 발생: messageId={}, messageValue={}, error={}",
                     message.getId(), message.getValue(), e.getMessage(), e);
             throw new IllegalArgumentException("이벤트 파싱 중 오류 발생: " + e.getMessage(), e);
         }
