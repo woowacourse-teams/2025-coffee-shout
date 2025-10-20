@@ -80,7 +80,7 @@ export const MultiplePlayersComparison: Story = {
           player={{ playerName: '최소', position: 0, speed: 1 }}
           isMe={true}
           myPosition={0}
-          color="#c6c8d0"
+          color="#8a8b8e"
         />
       </div>
       <div style={{ textAlign: 'center' }}>
@@ -89,7 +89,7 @@ export const MultiplePlayersComparison: Story = {
           player={{ playerName: '느림', position: 0, speed: 3 }}
           isMe={true}
           myPosition={0}
-          color="#5a88c8"
+          color="#4cafa9"
         />
       </div>
       <div style={{ textAlign: 'center' }}>
@@ -98,7 +98,7 @@ export const MultiplePlayersComparison: Story = {
           player={{ playerName: '중간', position: 0, speed: 6 }}
           isMe={true}
           myPosition={0}
-          color="#a7e142"
+          color="#85b62e"
         />
       </div>
       <div style={{ textAlign: 'center' }}>
