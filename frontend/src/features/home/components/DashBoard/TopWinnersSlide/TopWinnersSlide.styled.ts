@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { ANIMATION_DURATION } from '@/constants/animation';
 
 export const SlideContainer = styled.div`
   width: 100%;
@@ -16,7 +17,7 @@ export const Wrapper = styled.div<{ $slideDistance: number }>`
   ${({ $slideDistance }) =>
     $slideDistance > 0 &&
     `
-      animation: slideUp-${$slideDistance} 5500ms linear infinite forwards;
+      animation: slideUp-${$slideDistance} ${ANIMATION_DURATION.DASHBOARD_DISPLAY}ms linear infinite forwards;
 
       @keyframes slideUp-${$slideDistance} {
         0% {

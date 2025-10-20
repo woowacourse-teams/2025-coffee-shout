@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ANIMATION_DURATION } from '@/constants/animation';
 
 type AnimationState = 'fadingIn' | 'fadingOut';
 
@@ -10,8 +11,8 @@ type UseAutoSlideCarouselOptions = {
 
 export const useAutoSlideCarousel = ({
   slideCount,
-  displayDuration = 4000,
-  fadeDuration = 400,
+  displayDuration = ANIMATION_DURATION.DASHBOARD_DISPLAY,
+  fadeDuration = ANIMATION_DURATION.DASHBOARD_FADE,
 }: UseAutoSlideCarouselOptions) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [animationState, setAnimationState] = useState<AnimationState>('fadingIn');
