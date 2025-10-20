@@ -1,5 +1,4 @@
 import Headline4 from '../Headline4/Headline4';
-import ScreenReaderOnly from '../ScreenReaderOnly/ScreenReaderOnly';
 import * as S from './ToggleButton.styled';
 
 type Props<Option extends string> = {
@@ -23,6 +22,7 @@ const ToggleButton = <Option extends string>({
             key={option}
             onClick={() => onSelectOption(option)}
             role="tab"
+            aria-selected={selectedIndex === index}
             tabIndex={selectedIndex === index ? 0 : -1}
             aria-label={`${option}, ${index + 1}/${options.length}`}
           >
@@ -31,7 +31,6 @@ const ToggleButton = <Option extends string>({
         ))}
         <S.Thumb index={selectedIndex} optionCount={options.length} />
       </S.Track>
-      <ScreenReaderOnly>{`현재 ${selectedOption} 탭이 선택된 상태입니다.`}</ScreenReaderOnly>
     </S.Container>
   );
 };
