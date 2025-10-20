@@ -74,7 +74,11 @@ const EntryNamePage = () => {
               }}
             />
             <S.ProgressWrapper>
-              <ProgressCounter current={name.length} total={MAX_NAME_LENGTH} />
+              <ProgressCounter
+                current={name.length}
+                total={MAX_NAME_LENGTH}
+                ariaLabel={`${MAX_NAME_LENGTH}글자 중 ${name.length}글자 입력하였습니다`}
+              />
             </S.ProgressWrapper>
           </S.Wrapper>
         </S.Container>
