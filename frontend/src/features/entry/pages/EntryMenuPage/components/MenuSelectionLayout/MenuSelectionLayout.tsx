@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useRef } from 'react';
 import * as S from './MenuSelectionLayout.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import Headline3 from '@/components/@common/Headline3/Headline3';
@@ -26,9 +26,19 @@ const MenuSelectionLayout = ({
   menuSelection,
   children,
 }: Props) => {
+  const liveRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (liveRef.current) {
+      liveRef.current.focus();
+    }
+  }, []);
+
   return (
     <>
-      <Headline3>메뉴를 선택해주세요</Headline3>
+      <Headline3 ref={liveRef} tabIndex={0}>
+        메뉴를 선택해주세요
+      </Headline3>
       <S.Wrapper>
         <SelectionCard
           color={categorySelection.color}
@@ -36,7 +46,7 @@ const MenuSelectionLayout = ({
           imageUrl={categorySelection.imageUrl}
         />
         {showSelectedMenuCard && (
-          <SelectionCard color={menuSelection.color} text={menuSelection.name} />
+          <SelectionCard color={menuSelection.color} text={menuSelection.name} aria-hidden="true" />
         )}
         <S.ChildrenWrapper>{children}</S.ChildrenWrapper>
       </S.Wrapper>
