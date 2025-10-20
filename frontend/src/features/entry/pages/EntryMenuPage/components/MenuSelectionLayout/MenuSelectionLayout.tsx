@@ -40,15 +40,19 @@ const MenuSelectionLayout = ({
       <Headline3 ref={liveRef} tabIndex={0}>
         메뉴를 선택해주세요
       </Headline3>
-      <ScreenReaderOnly>{`${categorySelection.name} 카테고리`}</ScreenReaderOnly>
       <S.Wrapper>
         <SelectionCard
           color={categorySelection.color}
           text={categorySelection.name}
           imageUrl={categorySelection.imageUrl}
+          ariaLabel={`${categorySelection.name} 카테고리`}
         />
         {showSelectedMenuCard && (
-          <SelectionCard color={menuSelection.color} text={menuSelection.name} />
+          <SelectionCard
+            color={menuSelection.color}
+            text={menuSelection.name}
+            ariaLabel={`${menuSelection.name} 카테고리`}
+          />
         )}
         <S.ChildrenWrapper>{children}</S.ChildrenWrapper>
       </S.Wrapper>
