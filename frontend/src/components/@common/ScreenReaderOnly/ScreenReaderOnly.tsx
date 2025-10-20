@@ -1,4 +1,4 @@
-import { ScreenReaderContainer } from './ScreenReaderOnly.styled';
+import * as S from './ScreenReaderOnly.styled';
 
 type Props = {
   children: string;
@@ -12,9 +12,9 @@ const ScreenReaderOnly = ({
   'aria-atomic': ariaAtomic = true,
 }: Props) => {
   return (
-    <ScreenReaderContainer aria-live={ariaLive} aria-atomic={ariaAtomic}>
+    <S.ScreenReaderContainer aria-live={ariaLive} aria-atomic={ariaAtomic}>
       {children}
-    </ScreenReaderContainer>
+    </S.ScreenReaderContainer>
   );
 };
 
