@@ -1,16 +1,19 @@
 package coffeeshout.minigame.domain;
 
-import coffeeshout.minigame.domain.cardgame.CardGameScore;
 import java.util.Objects;
 
 public abstract class MiniGameScore implements Comparable<MiniGameScore> {
 
     @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof final CardGameScore that)) {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        return Objects.equals(this.getValue(), that.getValue());
+        MiniGameScore that = (MiniGameScore) o;
+        return getValue() == that.getValue();
     }
 
     @Override
@@ -20,8 +23,8 @@ public abstract class MiniGameScore implements Comparable<MiniGameScore> {
 
     @Override
     public int compareTo(final MiniGameScore o) {
-        return Integer.compare(this.getValue(), o.getValue());
+        return Long.compare(this.getValue(), o.getValue());
     }
 
-    public abstract int getValue();
+    public abstract long getValue();
 }

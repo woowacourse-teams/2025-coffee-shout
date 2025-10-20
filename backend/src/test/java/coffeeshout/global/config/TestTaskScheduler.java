@@ -8,7 +8,7 @@ public class TestTaskScheduler extends ThreadPoolTaskScheduler {
 
     public TestTaskScheduler() {
         this.setPoolSize(2);
-        this.setThreadNamePrefix("mini-game-task");
+        this.setThreadNamePrefix("mini-game-task-");
         this.setDaemon(false);
         this.setWaitForTasksToCompleteOnShutdown(false);
         this.setAwaitTerminationSeconds(10);
@@ -17,7 +17,6 @@ public class TestTaskScheduler extends ThreadPoolTaskScheduler {
 
     @Override
     public ScheduledFuture<?> schedule(Runnable task, Instant startTime) {
-        System.out.println("dsa");
         return super.schedule(task, Instant.now());
     }
 }

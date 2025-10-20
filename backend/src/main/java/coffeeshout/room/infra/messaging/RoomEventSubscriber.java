@@ -1,11 +1,12 @@
 package coffeeshout.room.infra.messaging;
 
-import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.trace.Traceable;
+import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
+import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
@@ -86,6 +87,7 @@ public class RoomEventSubscriber implements MessageListener {
             case MINI_GAME_SELECT -> objectMapper.readValue(body, MiniGameSelectEvent.class);
             case ROULETTE_SHOW -> objectMapper.readValue(body, RouletteShowEvent.class);
             case ROULETTE_SPIN -> objectMapper.readValue(body, RouletteSpinEvent.class);
+            case QR_CODE_COMPLETE -> objectMapper.readValue(body, QrCodeStatusEvent.class);
         };
     }
 }

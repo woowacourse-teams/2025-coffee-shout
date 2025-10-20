@@ -44,13 +44,11 @@ class RoomCreateEventHandlerTest extends ServiceTest {
         // given
         String hostName = "호스트";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.HOT);
-        String qrCodeUrl = "https://example.com/qr";
 
         RoomCreateEvent event = new RoomCreateEvent(
                 hostName,
                 selectedMenuRequest,
-                joinCode.getValue(),
-                qrCodeUrl
+                joinCode.getValue()
         );
 
         // when
@@ -64,7 +62,6 @@ class RoomCreateEventHandlerTest extends ServiceTest {
             softly.assertThat(room.getPlayers().get(0).getName().value()).isEqualTo(hostName);
             softly.assertThat(room.getPlayers().get(0).getSelectedMenu().menuTemperature())
                     .isEqualTo(MenuTemperature.HOT);
-            softly.assertThat(room.getJoinCode().getQrCodeUrl()).isEqualTo(qrCodeUrl);
         });
     }
 
@@ -73,13 +70,11 @@ class RoomCreateEventHandlerTest extends ServiceTest {
         // given
         String hostName = "호스트";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.HOT);
-        String qrCodeUrl = "https://example.com/qr";
 
         RoomCreateEvent event = new RoomCreateEvent(
                 hostName,
                 selectedMenuRequest,
-                joinCode.getValue(),
-                qrCodeUrl
+                joinCode.getValue()
         );
 
         // when
@@ -95,13 +90,11 @@ class RoomCreateEventHandlerTest extends ServiceTest {
         String hostName = "호스트";
         String customMenuName = "커스텀아메리카노";
         SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(0L, customMenuName, MenuTemperature.ICE);
-        String qrCodeUrl = "https://example.com/qr";
 
         RoomCreateEvent event = new RoomCreateEvent(
                 hostName,
                 selectedMenuRequest,
-                joinCode.getValue(),
-                qrCodeUrl
+                joinCode.getValue()
         );
 
         // when
@@ -122,8 +115,7 @@ class RoomCreateEventHandlerTest extends ServiceTest {
         RoomCreateEvent event = new RoomCreateEvent(
                 hostName,
                 selectedMenuRequest,
-                joinCode.getValue(),
-                qrCodeUrl
+                joinCode.getValue()
         );
 
         // when

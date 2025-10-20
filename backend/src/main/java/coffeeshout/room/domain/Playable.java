@@ -15,5 +15,5 @@ public interface Playable {
 
     MiniGameType getMiniGameType();
 
-    void startGame(List<Player> players);
+    void setUp(List<Player> players);
 }

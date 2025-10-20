@@ -10,7 +10,7 @@ public record MiniGameScoresMessage(List<MiniGameScoreMessage> scores) {
 
     public record MiniGameScoreMessage(
             String playerName,
-            Integer score
+            Long score
     ) {
 
         public static MiniGameScoreMessage from(@NonNull Map.Entry<Player, MiniGameScore> scoreEntry) {

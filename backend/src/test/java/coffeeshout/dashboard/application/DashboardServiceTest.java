@@ -2,7 +2,6 @@ package coffeeshout.dashboard.application;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.dashboard.domain.GamePlayCountResponse;
 import coffeeshout.dashboard.domain.LowestProbabilityWinnerResponse;
@@ -80,11 +79,11 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(3);
-            assertThat(result.get(0).nickname()).isEqualTo("철수");
+            assertThat(result.get(0).playerName()).isEqualTo("철수");
             assertThat(result.get(0).winCount()).isEqualTo(5);
-            assertThat(result.get(1).nickname()).isEqualTo("영희");
+            assertThat(result.get(1).playerName()).isEqualTo("영희");
             assertThat(result.get(1).winCount()).isEqualTo(3);
-            assertThat(result.get(2).nickname()).isEqualTo("민수");
+            assertThat(result.get(2).playerName()).isEqualTo("민수");
             assertThat(result.get(2).winCount()).isEqualTo(2);
         }
 
@@ -118,7 +117,7 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).nickname()).isEqualTo("철수");
+            assertThat(result.get(0).playerName()).isEqualTo("철수");
             assertThat(result.get(0).winCount()).isEqualTo(2);
         }
 
@@ -142,9 +141,9 @@ class DashboardServiceTest extends ServiceTest {
 
             // then
             assertThat(result).hasSize(5);
-            assertThat(result.get(0).nickname()).isEqualTo("플레이어10");
+            assertThat(result.get(0).playerName()).isEqualTo("플레이어10");
             assertThat(result.get(0).winCount()).isEqualTo(10);
-            assertThat(result.get(4).nickname()).isEqualTo("플레이어6");
+            assertThat(result.get(4).playerName()).isEqualTo("플레이어6");
             assertThat(result.get(4).winCount()).isEqualTo(6);
         }
 
@@ -178,8 +177,8 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(5);
-            assertThat(result.nicknames()).containsExactly("민수");
+            assertThat(result.probability()).isEqualTo(0.05);
+            assertThat(result.playerNames()).containsExactly("민수");
         }
 
         @Test
@@ -205,8 +204,8 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(3);
-            assertThat(result.nicknames()).containsExactlyInAnyOrder("영희", "민수");
+            assertThat(result.probability()).isEqualTo(0.03);
+            assertThat(result.playerNames()).containsExactlyInAnyOrder("영희", "민수");
         }
 
         @Test
@@ -225,8 +224,8 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(1);
-            assertThat(result.nicknames()).hasSize(5);
+            assertThat(result.probability()).isEqualTo(0.01);
+            assertThat(result.playerNames()).hasSize(5);
         }
 
         @Test
@@ -253,8 +252,8 @@ class DashboardServiceTest extends ServiceTest {
             final LowestProbabilityWinnerResponse result = dashboardService.getLowestProbabilityWinner();
 
             // then
-            assertThat(result.probability()).isEqualTo(3);
-            assertThat(result.nicknames()).containsExactly("민수");
+            assertThat(result.probability()).isEqualTo(0.03);
+            assertThat(result.playerNames()).containsExactly("민수");
         }
 
         @Test
