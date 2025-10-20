@@ -1,9 +1,13 @@
 #!/bin/bash
+set -euo pipefail
 export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [APPLICATION_STOP] 애플리케이션 종료 ==="
 
-cd /opt/coffee-shout
+cd /opt/coffee-shout || {
+    echo "❌ 디렉토리 이동 실패: /opt/coffee-shout"
+    exit 1
+}
 
 # ==========================================
 # Dev 환경: 단순 종료
@@ -16,14 +20,14 @@ echo "☕ 1. Spring Boot 애플리케이션 종료 중..."
 if [ -f "app/coffee-shout.pid" ]; then
     PID=$(cat app/coffee-shout.pid)
 
-    if ps -p $PID > /dev/null 2>&1; then
+    if ps -p "$PID" > /dev/null 2>&1; then
         echo "   🛑 SIGTERM 신호 전송 (PID: $PID)"
-        kill -SIGTERM $PID
+        kill -SIGTERM "$PID"
 
         # 최대 30초 대기
         echo "   ⏳ Graceful Shutdown 대기 중... (최대 30초)"
         for i in {1..30}; do
-            if ! ps -p $PID > /dev/null 2>&1; then
+            if ! ps -p "$PID" > /dev/null 2>&1; then
                 echo "   ✅ 애플리케이션이 정상 종료되었습니다 (${i}초 소요)"
                 break
             fi
@@ -31,10 +35,10 @@ if [ -f "app/coffee-shout.pid" ]; then
         done
 
         # 여전히 실행 중이면 강제 종료
-        if ps -p $PID > /dev/null 2>&1; then
+        if ps -p "$PID" > /dev/null 2>&1; then
             echo "   ⚠️  30초 내에 종료되지 않았습니다"
             echo "   🔨 강제 종료를 수행합니다 (SIGKILL)"
-            kill -9 $PID 2>/dev/null || true
+            kill -9 "$PID" 2>/dev/null || true
             sleep 2
             echo "   ✅ 프로세스를 강제 종료했습니다"
         fi
@@ -50,9 +54,9 @@ fi
 
 # 포트 8080 사용 프로세스 강제 종료 (혹시 모를 좀비 프로세스)
 JAVA_PROCESS=$(lsof -ti:8080 2>/dev/null || true)
-if [ ! -z "$JAVA_PROCESS" ]; then
+if [ -n "$JAVA_PROCESS" ]; then
     echo "   🔫 포트 8080을 사용하는 좀비 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
-    kill -9 $JAVA_PROCESS 2>/dev/null || true
+    kill -9 "$JAVA_PROCESS" 2>/dev/null || true
     sleep 1
 fi
 

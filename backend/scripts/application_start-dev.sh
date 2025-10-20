@@ -1,10 +1,13 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [APPLICATION_START] 커피빵 게임 서버 시작 ==="
 
-cd /opt/coffee-shout
+cd /opt/coffee-shout || {
+    echo "❌ 디렉토리 이동 실패: /opt/coffee-shout"
+    exit 1
+}
 
 # ==========================================
 # 1단계: Spring Boot JAR 애플리케이션 시작
@@ -22,14 +25,14 @@ fi
 # 기존 JAR 프로세스 종료 (있다면)
 if [ -f "app/coffee-shout.pid" ]; then
     OLD_PID=$(cat app/coffee-shout.pid)
-    if ps -p $OLD_PID > /dev/null 2>&1; then
+    if ps -p "$OLD_PID" > /dev/null 2>&1; then
         echo "   🛑 기존 애플리케이션 프로세스 종료 중 (PID: $OLD_PID)"
-        kill -SIGTERM $OLD_PID
+        kill -SIGTERM "$OLD_PID"
         sleep 5
 
         # 강제 종료가 필요한 경우
-        if ps -p $OLD_PID > /dev/null 2>&1; then
-            kill -SIGKILL $OLD_PID
+        if ps -p "$OLD_PID" > /dev/null 2>&1; then
+            kill -SIGKILL "$OLD_PID"
         fi
     fi
     rm -f app/coffee-shout.pid
@@ -44,16 +47,18 @@ JVM_OPTS="$JVM_OPTS -Duser.timezone=Asia/Seoul"
 
 # 환경 프로파일 설정
 SPRING_PROFILE="dev"
-export SPRING_PROFILES_ACTIVE=$SPRING_PROFILE
+export SPRING_PROFILES_ACTIVE="$SPRING_PROFILE"
 echo "   🌍 환경 프로파일: $SPRING_PROFILE"
 
 # Spring Boot 애플리케이션 실행 (8080 포트)
 echo "   🚀 Spring Boot 애플리케이션 시작 중..."
+# shellcheck disable=SC2086
 nohup java $JVM_OPTS \
     -Dspring.profiles.active="$SPRING_PROFILE" \
     -jar app/coffee-shout-backend.jar \
     > logs/application.log 2>&1 &
 
 # PID 저장
-echo $! > app/coffee-shout.pid
-echo "   ✅ Spring Boot 애플리케이션 시작 완료 (PID: $(cat app/coffee-shout.pid))"
+APP_PID=$!
+echo "$APP_PID" > app/coffee-shout.pid
+echo "   ✅ Spring Boot 애플리케이션 시작 완료 (PID: $APP_PID)"

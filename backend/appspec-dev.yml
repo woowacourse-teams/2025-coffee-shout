@@ -40,12 +40,6 @@ hooks:
       timeout: 300
       runas: ubuntu
 
-  # 파일 복사 후 설정 작업
-  AfterInstall:
-    - location: scripts/after_install.sh
-      timeout: 300
-      runas: ubuntu
-
   # 애플리케이션 시작 전 검증
   ApplicationStart:
     - location: scripts/application_start-dev.sh
