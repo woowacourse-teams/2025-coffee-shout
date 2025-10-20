@@ -4,9 +4,12 @@ import coffeeshout.global.lock.RedisLock;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RouletteService;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
+import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.response.WinnerResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
     private final RouletteService rouletteService;
+    private final RoomQueryService roomQueryService;
 
     @Override
     @RedisLock(
@@ -34,6 +38,9 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
                     event.eventId(), event.joinCode(), event.hostName());
 
             final Winner winner = event.winner();
+
+            Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
+            room.updateDoneState();
 
             broadcastWinner(event.joinCode(), winner);
             
