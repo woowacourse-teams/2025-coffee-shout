@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CopyIcon from '@/assets/copy-icon.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
+import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './InvitationModal.styled';
@@ -16,6 +17,23 @@ const InvitationModal = ({ onClose }: props) => {
   const { joinCode, qrCodeUrl } = useIdentifier();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
+  const screenReaderRef = useRef<HTMLDivElement>(null);
+  const [screenReaderMessage, setScreenReaderMessage] = useState<string>('');
+
+  useEffect(() => {
+    const message =
+      '친구 초대하기 모달입니다. QR 코드 또는 초대코드를 복사하여 친구들을 초대해보아요.';
+    setScreenReaderMessage(message);
+    if (screenReaderRef.current) {
+      screenReaderRef.current.focus();
+    }
+
+    const timer = setTimeout(() => {
+      setScreenReaderMessage('');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCopy = async () => {
     copyToClipboard(joinCode, '초대 코드가 복사되었습니다.');
@@ -37,6 +55,11 @@ const InvitationModal = ({ onClose }: props) => {
 
   return (
     <S.Container>
+      {screenReaderMessage && (
+        <ScreenReaderOnly aria-live="assertive" ref={screenReaderRef}>
+          {screenReaderMessage}
+        </ScreenReaderOnly>
+      )}
       <TabBar tabs={tabs} activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex} />
       {activeTabIndex === 0 ? (
         <QRSection qrCodeUrl={qrCodeUrl} handleShareLink={handleShareLink} />
@@ -62,14 +85,14 @@ type CodeSectionProps = {
 const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
   return (
     <S.QRSection>
-      <S.QRCode>
+      <S.QRCode aria-hidden="true">
         {qrCodeUrl && qrCodeUrl.trim() !== '' ? (
           <img src={qrCodeUrl} alt="QR Code" />
         ) : (
           <S.Description>QR 코드 생성 중...</S.Description>
         )}
       </S.QRCode>
-      <S.ShareButton onClick={handleShareLink}>
+      <S.ShareButton onClick={handleShareLink} aria-label="링크 공유하기" tabIndex={0}>
         <Paragraph>링크 공유하기</Paragraph>
       </S.ShareButton>
       <S.Wrapper>
@@ -89,8 +112,16 @@ const CodeSection = ({ joinCode, handleCopy }: CodeSectionProps) => {
       </S.Wrapper>
       <S.CodeBox>
         <S.EmptyBox />
-        <Headline4>{joinCode}</Headline4>
-        <S.CopyIcon src={CopyIcon} onClick={handleCopy} />
+        <Headline4>
+          <span aria-hidden="true">{joinCode}</span>
+          <ScreenReaderOnly>{joinCode.split('').join(' ')}</ScreenReaderOnly>
+        </Headline4>
+        <S.CopyIcon
+          src={CopyIcon}
+          onClick={handleCopy}
+          aria-label="초대코드 복사하기"
+          tabIndex={0}
+        />
       </S.CodeBox>
     </S.CodeSection>
   );
