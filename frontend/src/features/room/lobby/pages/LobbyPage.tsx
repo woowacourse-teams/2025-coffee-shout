@@ -32,6 +32,8 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
+import useReadyAnnouncement from '../hooks/useReadyAnnouncement';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -54,6 +56,7 @@ const LobbyPage = () => {
     method: 'DELETE',
     errorDisplayMode: 'toast',
   });
+  const announcement = useReadyAnnouncement(isAllReady, participants.length, playerType);
 
   useParticipantValidation({ isConnected });
 
@@ -287,6 +290,7 @@ const LobbyPage = () => {
           <img src={ShareIcon} aria-hidden="true" alt="" />
         </Button>
       </Layout.ButtonBar>
+      <ScreenReaderOnly aria-live="assertive">{announcement}</ScreenReaderOnly>
     </Layout>
   );
 };
