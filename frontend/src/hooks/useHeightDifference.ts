@@ -29,10 +29,8 @@ export const useHeightDifference = (options: UseHeightDifferenceOptions = {}) =>
       }
     };
 
-    // 초기 계산
     calculateHeightDifference();
 
-    // 리사이즈 이벤트 리스너 추가
     window.addEventListener('resize', calculateHeightDifference);
 
     return () => {
