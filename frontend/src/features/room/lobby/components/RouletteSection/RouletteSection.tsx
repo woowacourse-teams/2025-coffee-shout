@@ -4,7 +4,7 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 import RouletteWheel from '@/features/roulette/components/RouletteWheel/RouletteWheel';
 import { PlayerProbability, RouletteView } from '@/types/roulette';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as S from './RouletteSection.styled';
 
 type Props = {
@@ -24,10 +24,23 @@ const formatProbabilitiesForScreenReader = (playerProbabilities: PlayerProbabili
 export const RouletteSection = ({ playerProbabilities }: Props) => {
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const [screenReaderMessage, setScreenReaderMessage] = useState<string>('');
+  const hasAnnouncedInitial = useRef(false);
+  const previousProbabilities = useRef<string>('');
 
   useEffect(() => {
-    const initialMessage = `룰렛 화면입니다. 미니게임을 통해 당첨 확률이 조정됩니다. ${formatProbabilitiesForScreenReader(playerProbabilities)}`;
-    setScreenReaderMessage(initialMessage);
+    const currentProbabilities = formatProbabilitiesForScreenReader(playerProbabilities);
+
+    if (!hasAnnouncedInitial.current) {
+      // 초기 진입 시에만 전체 안내 메시지 읽기
+      const initialMessage = `룰렛 화면입니다. 미니게임을 통해 당첨 확률이 조정됩니다. ${currentProbabilities}`;
+      setScreenReaderMessage(initialMessage);
+      hasAnnouncedInitial.current = true;
+    } else if (previousProbabilities.current !== currentProbabilities) {
+      // 확률 정보가 실제로 변경된 경우에만 확률 정보 읽기
+      setScreenReaderMessage(currentProbabilities);
+    }
+
+    previousProbabilities.current = currentProbabilities;
   }, [playerProbabilities]);
 
   const handleViewChange = () => {
