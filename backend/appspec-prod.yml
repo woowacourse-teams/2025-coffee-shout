@@ -34,15 +34,15 @@ permissions:
 
 # 배포 생명주기 훅
 hooks:
-  # 트래픽 차단 및 Graceful Shutdown
+  # 트래픽 차단 전 Graceful Shutdown 시작 (SIGTERM 전송)
   BeforeBlockTraffic:
-    - location: scripts/block_traffic.sh
-      timeout: 360
+    - location: scripts/before_block_traffic.sh
+      timeout: 30
       runas: ubuntu
 
-  # 애플리케이션 강제 종료 (Graceful Shutdown 실패 시)
+  # 애플리케이션 강제 종료 (Prod 환경: Graceful Shutdown 실패 시)
   ApplicationStop:
-    - location: scripts/application_stop.sh
+    - location: scripts/application_stop-prod.sh
       timeout: 60
       runas: ubuntu
 

@@ -52,10 +52,10 @@ hooks:
       timeout: 600
       runas: ubuntu
 
-  # 애플리케이션 시작 후 상태 검증
+  # 애플리케이션 종료 (Dev 환경: 단순 종료)
   ApplicationStop:
-    - location: scripts/application_stop.sh
-      timeout: 300
+    - location: scripts/application_stop-dev.sh
+      timeout: 60
       runas: ubuntu
 
   # 배포 성공 검증

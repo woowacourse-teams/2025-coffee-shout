@@ -1,36 +1,37 @@
 #!/bin/bash
 export PATH="/usr/bin:/bin:$PATH"
 
-echo "=== [APPLICATION_STOP] 커피빵 게임 서버 강제 종료 ==="
+echo "=== [APPLICATION_STOP] 강제 종료 확인 ==="
 
 cd /opt/coffee-shout
 
 # ==========================================
 # ApplicationStop 단계: 강제 종료
-# Graceful Shutdown은 BlockTraffic 단계에서 이미 시도됨
-# 이 단계에서는 남아있는 프로세스를 강제로 정리
+# BeforeBlockTraffic 단계에서 SIGTERM 신호를 전송했고
+# Spring Boot의 Graceful Shutdown이 진행되었어야 함
+# 이 단계에서는 여전히 살아있는 프로세스를 강제로 종료
 # ==========================================
 
 echo ""
-echo "☕ 1. Spring Boot 애플리케이션 강제 종료 중..."
+echo "☕ 1. Spring Boot 애플리케이션 종료 여부 확인..."
 
 if [ -f "app/coffee-shout.pid" ]; then
     PID=$(cat app/coffee-shout.pid)
 
     if ps -p $PID > /dev/null 2>&1; then
-        echo "   ⚠️  Graceful Shutdown이 완료되지 않은 프로세스 발견 (PID: $PID)"
-        echo "   🔫 SIGKILL 신호 전송 - 강제 종료 진행"
-        kill -SIGKILL $PID 2>/dev/null || true
+        echo "   ⚠️  프로세스가 여전히 실행 중입니다 (PID: $PID)"
+        echo "   🔨 강제 종료를 수행합니다 (SIGKILL)"
+        kill -9 $PID 2>/dev/null || true
         sleep 2
 
         if ps -p $PID > /dev/null 2>&1; then
             echo "   ❌ 애플리케이션 강제 종료 실패"
             exit 1
         else
-            echo "   ✅ 애플리케이션 강제 종료 완료"
+            echo "   ✅ 프로세스를 강제 종료했습니다"
         fi
     else
-        echo "   ✅ Spring Boot 애플리케이션이 이미 종료되어 있습니다"
+        echo "   ✅ Graceful Shutdown이 정상 완료되었습니다"
     fi
 
     # PID 파일 제거
