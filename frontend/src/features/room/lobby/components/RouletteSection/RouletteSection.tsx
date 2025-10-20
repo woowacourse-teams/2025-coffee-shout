@@ -31,12 +31,10 @@ export const RouletteSection = ({ playerProbabilities }: Props) => {
     const currentProbabilities = formatProbabilitiesForScreenReader(playerProbabilities);
 
     if (!hasAnnouncedInitial.current) {
-      // 초기 진입 시에만 전체 안내 메시지 읽기
       const initialMessage = `룰렛 화면입니다. 미니게임을 통해 당첨 확률이 조정됩니다. ${currentProbabilities}`;
       setScreenReaderMessage(initialMessage);
       hasAnnouncedInitial.current = true;
     } else if (previousProbabilities.current !== currentProbabilities) {
-      // 확률 정보가 실제로 변경된 경우에만 확률 정보 읽기
       setScreenReaderMessage(currentProbabilities);
     }
 
