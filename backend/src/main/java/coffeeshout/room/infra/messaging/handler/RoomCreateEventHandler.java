@@ -27,13 +27,6 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     private final RoomService roomService;
 
     @Override
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
     public void handle(RoomCreateEvent event) {
         try {
             String joinCode = event.joinCode();
