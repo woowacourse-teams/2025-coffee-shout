@@ -28,7 +28,7 @@ const SelectCategory = ({ onClickCategory }: Props) => {
               color={categoryColorList[index % categoryColorList.length]}
               position={index + 1}
               totalCount={categories.length}
-              ariaLabel={`${category.name} 선택, ${index + 1}번째 카테고리${isLast ? ', 마지막 카테고리' : ''}`}
+              ariaLabel={`${category.name} 선택, ${index + 1}번째 카테고리${isLast ? ', 마지막 카테고리입니다' : ''}`}
             />
           );
         })
