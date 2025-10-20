@@ -27,8 +27,8 @@ const RoulettePlayPage = () => {
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
-  const { data: selectedMiniGames } = useFetch<MiniGameType[]>({
-    endpoint: `/rooms/minigames/selected?joinCode=${joinCode}`,
+  const { data: remainingMiniGames } = useFetch<{ remaining: MiniGameType[] }>({
+    endpoint: `/rooms/${joinCode}/miniGames/remaining`,
     enabled: !!joinCode,
   });
 
@@ -40,11 +40,9 @@ const RoulettePlayPage = () => {
     [startSpinWithResult]
   );
 
-  // TODO: send를 보내도 여기서 응답이 안오고 있음
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
-      console.log('nextMiniGame: ', nextMiniGame);
       navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
     },
     [joinCode, navigate]
@@ -57,8 +55,7 @@ const RoulettePlayPage = () => {
     setCurrentView((prev) => (prev === 'statistics' ? 'roulette' : 'statistics'));
   };
 
-  // TODO: 다음 미니게임이 있는지 없는지로 구분해야 함
-  const hasNextMiniGame = selectedMiniGames && selectedMiniGames.length > 0;
+  const hasNextMiniGame = remainingMiniGames && remainingMiniGames.remaining.length > 0;
 
   const handleUnifiedButtonClick = () => {
     if (isSpinStarted) return;
