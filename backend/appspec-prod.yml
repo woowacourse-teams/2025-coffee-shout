@@ -35,7 +35,7 @@ permissions:
 # 배포 생명주기 훅
 hooks:
   # 트래픽 차단 및 Graceful Shutdown
-  BlockTraffic:
+  BeforeBlockTraffic:
     - location: scripts/block_traffic.sh
       timeout: 360
       runas: ubuntu
