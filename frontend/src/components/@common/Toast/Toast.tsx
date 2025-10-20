@@ -29,7 +29,12 @@ const Toast = ({ message, type, isExiting = false }: Props) => {
 
   return (
     <Portal containerId="toast-root">
-      <S.Container $type={type} className={isExiting ? 'toast-exit' : ''}>
+      <S.Container
+        $type={type}
+        className={isExiting ? 'toast-exit' : ''}
+        role="alert"
+        aria-live="polite"
+      >
         <S.IconWrapper>{renderIcon()}</S.IconWrapper>
         <Description>{message}</Description>
       </S.Container>
