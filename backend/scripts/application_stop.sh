@@ -1,58 +1,51 @@
 #!/bin/bash
 export PATH="/usr/bin:/bin:$PATH"
 
-echo "=== [APPLICATION_STOP] 커피빵 게임 서버 종료 ==="
+echo "=== [APPLICATION_STOP] 커피빵 게임 서버 강제 종료 ==="
 
 cd /opt/coffee-shout
 
 # ==========================================
-# 1단계: Spring Boot 애플리케이션 종료
+# ApplicationStop 단계: 강제 종료
+# Graceful Shutdown은 BlockTraffic 단계에서 이미 시도됨
+# 이 단계에서는 남아있는 프로세스를 강제로 정리
 # ==========================================
+
 echo ""
-echo "☕ 1. Spring Boot 애플리케이션 종료 중..."
+echo "☕ 1. Spring Boot 애플리케이션 강제 종료 중..."
 
 if [ -f "app/coffee-shout.pid" ]; then
     PID=$(cat app/coffee-shout.pid)
 
     if ps -p $PID > /dev/null 2>&1; then
-        echo "   🛑 Spring Boot 애플리케이션을 안전하게 종료합니다 (PID: $PID)"
-        kill -SIGTERM $PID
+        echo "   ⚠️  Graceful Shutdown이 완료되지 않은 프로세스 발견 (PID: $PID)"
+        echo "   🔫 SIGKILL 신호 전송 - 강제 종료 진행"
+        kill -SIGKILL $PID 2>/dev/null || true
+        sleep 2
 
-        # 최대 360초 (6분) 대기 - Graceful Shutdown 5분 + 여유 1분
-        echo "   ⏳ 정상 종료 대기 중... (최대 6분 - WebSocket Graceful Shutdown 포함)"
-        for _ in {1..360}; do
-            if ! ps -p $PID > /dev/null 2>&1; then
-                echo "   ✅ Spring Boot 애플리케이션이 정상 종료되었습니다"
-                break
-            fi
-            sleep 1
-        done
-
-        # 강제 종료가 필요한 경우
         if ps -p $PID > /dev/null 2>&1; then
-            echo "   ⚠️ 강제 종료를 진행합니다"
-            kill -SIGKILL $PID
-            sleep 2
-
-            if ps -p $PID > /dev/null 2>&1; then
-                echo "   ❌ 애플리케이션 종료 실패"
-            else
-                echo "   ✅ 애플리케이션 강제 종료 완료"
-            fi
+            echo "   ❌ 애플리케이션 강제 종료 실패"
+            exit 1
+        else
+            echo "   ✅ 애플리케이션 강제 종료 완료"
         fi
     else
-        echo "   ℹ️ Spring Boot 애플리케이션이 이미 종료되어 있습니다"
+        echo "   ✅ Spring Boot 애플리케이션이 이미 종료되어 있습니다"
     fi
 
     # PID 파일 제거
     rm -f app/coffee-shout.pid
 else
-    echo "   ℹ️ PID 파일이 없습니다. 애플리케이션이 실행 중이 아닐 수 있습니다"
+    echo "   ℹ️  PID 파일이 없습니다"
 fi
 
 # 포트 8080 사용 프로세스 강제 종료 (혹시 모를 좀비 프로세스)
 JAVA_PROCESS=$(lsof -ti:8080 2>/dev/null || true)
 if [ ! -z "$JAVA_PROCESS" ]; then
-    echo "   🔫 포트 8080을 사용하는 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
+    echo "   🔫 포트 8080을 사용하는 좀비 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
     kill -9 $JAVA_PROCESS 2>/dev/null || true
+    sleep 1
 fi
+
+echo ""
+echo "=== [APPLICATION_STOP] 완료 ==="
