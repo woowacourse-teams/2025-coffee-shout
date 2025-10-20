@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import GamePlayCountSlide from './GamePlayCountSlide';
 
 const meta: Meta<typeof GamePlayCountSlide> = {
-  title: 'Composition/GamePlayCountSlide',
+  title: 'Features/Home/DashBoard/GamePlayCountSlide',
   component: GamePlayCountSlide,
   parameters: {
     layout: 'centered',

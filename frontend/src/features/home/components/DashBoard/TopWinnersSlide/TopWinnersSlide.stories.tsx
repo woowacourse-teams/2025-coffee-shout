@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import TopWinnersSlide from './TopWinnersSlide';
 
 const meta: Meta<typeof TopWinnersSlide> = {
-  title: 'Composition/TopWinnersSlide',
+  title: 'Features/Home/DashBoard/TopWinnersSlide',
   component: TopWinnersSlide,
   parameters: {
     layout: 'centered',

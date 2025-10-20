@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import LowestProbabilitySlide from './LowestProbabilitySlide';
 
 const meta: Meta<typeof LowestProbabilitySlide> = {
-  title: 'Composition/LowestProbabilitySlide',
+  title: 'Features/Home/DashBoard/LowestProbabilitySlide',
   component: LowestProbabilitySlide,
   parameters: {
     layout: 'centered',
@@ -45,21 +45,9 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const DifferentProbabilities: Story = {
-  render: () => (
-    <div
-      style={{
-        background: '#ff6b6b',
-        padding: '2rem',
-        borderRadius: '20px',
-        width: '375px',
-        height: '400px',
-      }}
-    >
-      <LowestProbabilitySlide WinnerNames={['세라']} probability={1} />
-    </div>
-  ),
-  parameters: {
-    controls: { disable: true },
+  args: {
+    WinnerNames: ['세라'],
+    probability: 1,
   },
 };
 
