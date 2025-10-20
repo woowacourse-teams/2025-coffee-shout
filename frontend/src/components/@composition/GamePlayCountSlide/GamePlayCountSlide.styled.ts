@@ -1,5 +1,9 @@
 import styled from '@emotion/styled';
 
+type WrapperProps = {
+  $slideDistance: number;
+};
+
 export const SlideContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -7,7 +11,7 @@ export const SlideContainer = styled.div`
   position: relative;
 `;
 
-export const Wrapper = styled.div<{ $slideDistance: number }>`
+export const Wrapper = styled.div<WrapperProps>`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
