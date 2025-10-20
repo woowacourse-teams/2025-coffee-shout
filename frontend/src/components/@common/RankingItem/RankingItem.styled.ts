@@ -1,10 +1,5 @@
+import { RankColorKey, rankColorMap } from '@/constants/color';
 import styled from '@emotion/styled';
-
-const rankColorMap: Record<number, string> = {
-  1: '#FFDE65',
-  2: '#E5E7EB',
-  3: '#FFC8A4',
-};
 
 type Props = {
   $rank: number;
@@ -26,7 +21,7 @@ export const RankNumber = styled.div<Props>`
   width: 35px;
   height: 35px;
   border-radius: 12px;
-  background-color: ${({ $rank }) => rankColorMap[$rank] ?? '#ffffff'};
+  background-color: ${({ $rank }) => rankColorMap[$rank as RankColorKey] ?? '#ffffff'};
   flex-shrink: 0;
 `;
 

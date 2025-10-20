@@ -1,3 +1,4 @@
+import { RankColorKey, rankColorMap } from '@/constants/color';
 import styled from '@emotion/styled';
 
 export const Banner = styled.div`
@@ -34,12 +35,6 @@ export const PlayerCardWrapper = styled.div<{ isHighlighted?: boolean }>`
     isHighlighted ? theme.color.point[100] : 'transparent'};
 `;
 
-const rankColorMap: Record<number, string> = {
-  1: '#FFDE65',
-  2: '#E5E7EB',
-  3: '#FFC8A4',
-};
-
 export const RankNumber = styled.div<{ rank: number }>`
   display: flex;
   align-items: center;
@@ -47,7 +42,7 @@ export const RankNumber = styled.div<{ rank: number }>`
   width: 35px;
   height: 35px;
   border-radius: 12px;
-  background-color: ${({ rank }) => rankColorMap[rank] ?? 'none'};
+  background-color: ${({ rank }) => rankColorMap[rank as RankColorKey] ?? 'none'};
   font-size: 20px;
   font-weight: 600;
   color: ${({ rank }) => (rank <= 3 ? '#FFFFFF' : '#666')};

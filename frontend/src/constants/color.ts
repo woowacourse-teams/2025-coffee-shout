@@ -48,3 +48,11 @@ export const MenuColorMap: Record<CategoryColorKey, string> = {
 } as const;
 
 export type ColorList = (typeof colorList)[number];
+
+export const rankColorMap: Record<number, string> = {
+  1: '#FFDE65',
+  2: '#E5E7EB',
+  3: '#FFC8A4',
+};
+
+export type RankColorKey = keyof typeof rankColorMap;
