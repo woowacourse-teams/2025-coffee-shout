@@ -6,7 +6,7 @@ import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounte
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './EntryNamePage.styled';
 import useToast from '@/components/@common/Toast/useToast';
@@ -24,6 +24,7 @@ const EntryNamePage = () => {
   const { setMyName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { showToast } = useToast();
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { execute: checkGuestName } = useLazyFetch<PlayerNameCheckResponse>({
     endpoint: `/rooms/check-guestName?joinCode=${joinCode}&guestName=${name}`,
@@ -66,6 +67,11 @@ const EntryNamePage = () => {
               placeholder="닉네임을 입력해주세요"
               maxLength={MAX_NAME_LENGTH}
               autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && name.length > 0) {
+                  buttonRef.current?.focus();
+                }
+              }}
             />
             <S.ProgressWrapper>
               <ProgressCounter current={name.length} total={MAX_NAME_LENGTH} />
@@ -74,7 +80,11 @@ const EntryNamePage = () => {
         </S.Container>
       </Layout.Content>
       <Layout.ButtonBar>
-        <Button variant={isButtonDisabled ? 'disabled' : 'primary'} onClick={handleNavigateToMenu}>
+        <Button
+          ref={buttonRef}
+          variant={isButtonDisabled ? 'disabled' : 'primary'}
+          onClick={handleNavigateToMenu}
+        >
           메뉴 선택하러 가기
         </Button>
       </Layout.ButtonBar>
