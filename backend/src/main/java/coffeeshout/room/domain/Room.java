@@ -76,6 +76,7 @@ public class Room {
                 players.getPlayerCount(),
                 calculateMiniGameCount()
         );
+        this.roomState = RoomState.SCORE_BOARD;
         players.adjustProbabilities(miniGameResult, probabilityCalculator);
     }
 
@@ -147,7 +148,7 @@ public class Room {
         state(players.isAllReady(), "모든 플레이어가 준비완료해야합니다.");
         state(players.getPlayerCount() >= 2, "게임을 시작하려면 플레이어가 2명 이상이어야 합니다.");
         state(!miniGames.isEmpty(), "시작할 게임이 없습니다.");
-        state(roomState == RoomState.READY, "게임을 시작할 수 있는 상태가 아닙니다.");
+        state(isPlayableState(), "게임을 시작할 수 있는 상태가 아닙니다.");
 
         Playable currentGame = miniGames.poll();
 
@@ -158,6 +159,18 @@ public class Room {
         finishedGames.add(currentGame);
 
         return currentGame;
+    }
+
+    private boolean isPlayableState() {
+        return roomState == RoomState.READY || roomState == RoomState.ROULETTE;
+    }
+
+    public void updateRouletteState() {
+        this.roomState = RoomState.ROULETTE;
+    }
+
+    public void updateDoneState() {
+        this.roomState = RoomState.DONE;
     }
 
     public void clearMiniGames() {
@@ -202,6 +215,10 @@ public class Room {
 
     public void showRoulette() {
         this.roomState = RoomState.ROULETTE;
+    }
+
+    public boolean isFirstStarted() {
+        return finishedGames.size() == 1;
     }
 
     private boolean hasEnoughPlayers() {

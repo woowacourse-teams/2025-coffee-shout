@@ -41,6 +41,8 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
             
             final RoomStatusResponse response = RoomStatusResponse.of(room.getJoinCode(), room.getRoomState());
 
+            room.updateRouletteState();
+
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/roulette",
                     WebSocketResponse.success(response));
             
