@@ -13,12 +13,7 @@ const TOGGLE_TEXT_MAP = {
 
 const RouletteViewToggle = ({ currentView, onViewChange }: Props) => {
   const buttonText = TOGGLE_TEXT_MAP[currentView];
-  const ariaLabel =
-    currentView === 'roulette'
-      ? '확률 보기 버튼. 클릭하면 각 참여자의 확률을 목록으로 볼 수 있습니다.'
-      : '룰렛 보기 버튼. 클릭하면 룰렛 화면으로 전환됩니다.';
-
-  return <TextButton text={buttonText} onClick={onViewChange} aria-label={ariaLabel} />;
+  return <TextButton text={buttonText} onClick={onViewChange} aria-label={buttonText} />;
 };
 
 export default RouletteViewToggle;
