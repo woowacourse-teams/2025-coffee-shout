@@ -20,8 +20,8 @@ const RankingItem = ({ rank, name, count }: Props) => {
         <Headline4 color={getRankTextColor(rank)}>{rank}</Headline4>
       </S.RankNumber>
       <S.Content>
-        <Headline4 color="black">{name}</Headline4>
-        <Headline4 color="black">{count}회</Headline4>
+        <Headline4>{name}</Headline4>
+        <Headline4>{count}회</Headline4>
       </S.Content>
     </S.Container>
   );
