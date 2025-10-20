@@ -9,8 +9,8 @@ import {
   MINI_GAME_NAME_MAP,
   MiniGameType,
 } from '@/types/miniGame/common';
-import { useEffect, useRef, useState } from 'react';
 import * as S from './MiniGameSection.styled';
+import { useMiniGameScreenReader } from './useMiniGameScreenReader';
 
 type Props = {
   selectedMiniGames: MiniGameType[];
@@ -22,28 +22,14 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
   const { data: miniGames, loading } = useFetch<MiniGameType[]>({
     endpoint: '/rooms/minigames',
   });
-  const [screenReaderMessage, setScreenReaderMessage] = useState<string>('');
-  const screenReaderRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!loading && miniGames) {
-      const initialMessage =
-        '미니게임 선택 영역입니다. 원하는 미니게임을 여러 개 선택할 수 있습니다.';
-      setScreenReaderMessage(initialMessage);
-    }
-  }, [loading, miniGames]);
-
-  useEffect(() => {
-    if (screenReaderMessage && screenReaderRef.current) {
-      screenReaderRef.current.focus();
-    }
-  }, [screenReaderMessage]);
+  const { message, screenReaderRef } = useMiniGameScreenReader(loading, !!miniGames?.length);
 
   return (
     <>
-      {screenReaderMessage && (
+      {message && (
         <ScreenReaderOnly aria-live="assertive" ref={screenReaderRef}>
-          {screenReaderMessage}
+          {message}
         </ScreenReaderOnly>
       )}
       <S.Wrapper>
