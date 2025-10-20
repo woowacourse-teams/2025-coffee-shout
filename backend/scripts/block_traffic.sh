@@ -23,7 +23,7 @@ if [ -f "app/coffee-shout.pid" ]; then
         kill -SIGTERM $PID
 
         # 최대 300초 (5분) 대기
-        echo "   ⏳ Graceful Shutdown 대기 중... (최대 6분 - WebSocket 연결 종료 포함)"
+        echo "   ⏳ Graceful Shutdown 대기 중... (최대 5분 - WebSocket 연결 종료 포함)"
         for i in {1..300}; do
             if ! ps -p $PID > /dev/null 2>&1; then
                 echo "   ✅ Spring Boot 애플리케이션이 정상 종료되었습니다 (${i}초 소요)"
@@ -40,7 +40,7 @@ if [ -f "app/coffee-shout.pid" ]; then
 
         # 여전히 실행 중이면 경고만 출력 (강제 종료는 ApplicationStop에서 수행)
         if ps -p $PID > /dev/null 2>&1; then
-            echo "   ⚠️  Graceful Shutdown이 완료되지 않았습니다 (6분 초과)"
+            echo "   ⚠️  Graceful Shutdown이 완료되지 않았습니다 (5분 초과)"
             echo "   ℹ️  ApplicationStop 단계에서 강제 종료를 진행합니다"
         fi
     else
