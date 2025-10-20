@@ -5,7 +5,7 @@ import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile({"test", "local"})
+@Profile({"test", "local", "prod"})
 public class FromStartStrategy implements RedisStreamStartStrategy {
 
     @Override
