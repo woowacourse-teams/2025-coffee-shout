@@ -99,10 +99,10 @@ const MiniGameResultPage = () => {
             {ranks.map((playerRank) => (
               <S.PlayerCardWrapper
                 key={playerRank.playerName}
-                isHighlighted={playerRank.playerName === myName}
+                $isHighlighted={playerRank.playerName === myName}
               >
                 <Headline3>
-                  <S.RankNumber rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
+                  <S.RankNumber $rank={playerRank.rank}>{playerRank.rank}</S.RankNumber>
                 </Headline3>
                 <PlayerCard
                   name={playerRank.playerName}
