@@ -35,9 +35,9 @@ const EntryNamePage = () => {
 
   const handleNavigateToMenu = async () => {
     if (playerType === 'GUEST') {
-      const { exist } = (await checkGuestName()) as PlayerNameCheckResponse;
-
-      if (exist) {
+      const response = await checkGuestName();
+      if (!response) return;
+      if (response.exist) {
         showToast({
           type: 'error',
           message: '중복된 닉네임이 존재합니다. 새로운 닉네임을 입력해주세요.',
@@ -65,6 +65,7 @@ const EntryNamePage = () => {
               onClear={() => setName('')}
               placeholder="닉네임을 입력해주세요"
               maxLength={MAX_NAME_LENGTH}
+              autoFocus
             />
             <S.ProgressWrapper>
               <ProgressCounter current={name.length} total={MAX_NAME_LENGTH} />

@@ -5,13 +5,13 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
-import useRouletteProbabilities from './hooks/useRouletteProbabilities';
 import useRoulettePlay from './hooks/useRoulettePlay';
 import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
 import { useCallback, useState } from 'react';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 
 const RoulettePlayPage = () => {
@@ -21,8 +21,6 @@ const RoulettePlayPage = () => {
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
-
-  const { isLoading: isProbabilitiesLoading } = useRouletteProbabilities();
 
   const handleWinnerData = useCallback(
     (data: RouletteWinnerResponse) => {
@@ -44,7 +42,6 @@ const RoulettePlayPage = () => {
         isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
-        isProbabilitiesLoading={isProbabilitiesLoading}
       />
     ),
     statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
@@ -59,7 +56,7 @@ const RoulettePlayPage = () => {
       <Layout.Content>
         <S.Container>
           <SectionTitle title="룰렛 현황" description="미니게임 결과에 따라 확률이 조정됩니다" />
-          {VIEW_COMPONENTS[currentView]}
+          <LocalErrorBoundary>{VIEW_COMPONENTS[currentView]}</LocalErrorBoundary>
           <S.IconButtonWrapper>
             <RouletteViewToggle currentView={currentView} onViewChange={handleViewChange} />
           </S.IconButtonWrapper>

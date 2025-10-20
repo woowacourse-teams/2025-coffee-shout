@@ -9,8 +9,6 @@ import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuBu
 import { useMenuFlow } from './hooks/useMenuFlow';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
-import { useCategories } from './hooks/useCategories';
-import { useMenus } from './hooks/useMenus';
 import * as S from './EntryMenuPage.styled';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
 import SelectTemperature from './components/SelectTemperature/SelectTemperature';
@@ -19,12 +17,14 @@ import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInpu
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useNavigate } from 'react-router-dom';
+import Headline3 from '@/components/@common/Headline3/Headline3';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 
 const EntryMenuPage = () => {
   const navigate = useNavigate();
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
-  const { joinCode, qrCodeUrl } = useIdentifier();
+  const { joinCode } = useIdentifier();
 
   const {
     category,
@@ -45,18 +45,14 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { categories } = useCategories();
-  const { menus } = useMenus(category.value?.id ?? null);
-
   const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
 
   useEffect(() => {
-    const isReadyToNavigateLobby =
-      joinCode && qrCodeUrl && (menu.value || customMenu.value) && isConnected;
+    const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
     if (isReadyToNavigateLobby) {
       navigate(`/room/${joinCode}/lobby`);
     }
-  }, [joinCode, qrCodeUrl, menu.value, customMenu.value, isConnected, navigate]);
+  }, [joinCode, menu.value, customMenu.value, isConnected, navigate]);
 
   const resetMenuState = () => {
     resetAll();
@@ -95,7 +91,11 @@ const EntryMenuPage = () => {
   };
 
   const viewChildren = {
-    selectMenu: <MenuList menus={menus} onClickMenu={handleMenuSelect} />,
+    selectMenu: (
+      <LocalErrorBoundary>
+        <MenuList categoryId={category.value?.id ?? null} onClickMenu={handleMenuSelect} />
+      </LocalErrorBoundary>
+    ),
     selectTemperature: (
       <SelectTemperature
         temperatureAvailability={temperatureAvailability}
@@ -124,7 +124,12 @@ const EntryMenuPage = () => {
       <Layout.Content>
         <S.Container>
           {currentView === 'selectCategory' ? (
-            <SelectCategory categories={categories} onClickCategory={handleCategorySelect} />
+            <>
+              <Headline3>카테고리를 선택해주세요</Headline3>
+              <LocalErrorBoundary>
+                <SelectCategory onClickCategory={handleCategorySelect} />
+              </LocalErrorBoundary>
+            </>
           ) : (
             <MenuSelectionLayout
               categorySelection={categorySelection}

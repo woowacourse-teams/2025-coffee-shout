@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { RACING_Z_INDEX } from '../../constants/zIndex';
 
-const TRANSITION_DURATION_MS = 300;
+const TRANSITION_DURATION_MS = 100;
 
 type Props = {
   $isMe: boolean;
@@ -15,7 +15,7 @@ export const Container = styled.div<Props>`
     const relativeX = $position - $myPosition;
     return `translateX(${relativeX}px)`;
   }};
-  transition: transform ${TRANSITION_DURATION_MS}ms ease-in-out;
+  transition: transform ${TRANSITION_DURATION_MS}ms linear;
   z-index: ${RACING_Z_INDEX.PLAYER};
 `;
 

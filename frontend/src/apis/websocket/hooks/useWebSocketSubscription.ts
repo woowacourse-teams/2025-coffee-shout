@@ -6,7 +6,8 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 export const useWebSocketSubscription = <T>(
   destination: string,
   onData: (data: T) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
+  enabled: boolean = true
 ) => {
   const { isVisible } = usePageVisibility();
   const { subscribe, isConnected, client } = useWebSocket();
@@ -22,7 +23,7 @@ export const useWebSocketSubscription = <T>(
   }, [destination]);
 
   useEffect(() => {
-    if (!isConnected || !isVisible) {
+    if (!isConnected || !isVisible || !enabled) {
       unsubscribe();
       lastConnectedRef.current = false;
       return;
@@ -43,5 +44,15 @@ export const useWebSocketSubscription = <T>(
     }
 
     return unsubscribe;
-  }, [isConnected, isVisible, subscribe, destination, onData, onError, client, unsubscribe]);
+  }, [
+    isConnected,
+    isVisible,
+    subscribe,
+    destination,
+    onData,
+    onError,
+    client,
+    unsubscribe,
+    enabled,
+  ]);
 };

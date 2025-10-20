@@ -26,14 +26,14 @@ export type ColorKey = keyof typeof COLOR_MAP;
 
 export const colorList = [
   '#FF6B6B',
-  '#80d6d0',
-  '#a7e142',
+  '#4cafa9',
+  '#85b62e',
   '#bf77f6',
   '#ffa102',
   '#5a88c8',
   '#ff8ad8',
-  '#c6c8d0',
-  '#2ba727',
+  '#8a8b8e',
+  '#1d6d4a',
 ] as const;
 
 export const categoryColorList = [theme.color.point[200], '#FFD6A8', '#FEE685', '#D8F999'] as const;

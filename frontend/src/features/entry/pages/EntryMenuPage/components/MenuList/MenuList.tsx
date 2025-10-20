@@ -1,18 +1,26 @@
-import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
+import MenuListItemSkeleton from '@/components/@composition/MenuListItemSkeleton/MenuListItemSkeleton';
 import * as S from './MenuList.styled';
 import { Menu } from '@/types/menu';
+import { useMenus } from '../../hooks/useMenus';
+import MenuListItem from '@/components/@common/MenuListItem/MenuListItem';
 
 type Props = {
-  menus: Menu[];
+  categoryId: number | null;
   onClickMenu: (menu: Menu) => void;
 };
 
-const MenuList = ({ menus, onClickMenu }: Props) => {
+const MenuList = ({ categoryId, onClickMenu }: Props) => {
+  const { menus, loading } = useMenus(categoryId);
+
   return (
     <S.Container>
-      {menus.map((menu) => (
-        <MenuListItem key={menu.id} text={menu.name} onClick={() => onClickMenu(menu)} />
-      ))}
+      {loading ? (
+        <MenuListItemSkeleton />
+      ) : (
+        menus.map((menu) => (
+          <MenuListItem key={menu.id} text={menu.name} onClick={() => onClickMenu(menu)} />
+        ))
+      )}
     </S.Container>
   );
 };
