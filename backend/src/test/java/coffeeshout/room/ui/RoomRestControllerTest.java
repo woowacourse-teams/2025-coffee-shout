@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,7 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import coffeeshout.cardgame.domain.CardGame;
+import coffeeshout.cardgame.domain.card.CardGameRandomDeckGenerator;
+import coffeeshout.fixture.RoomFixture;
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.MenuTemperature;
@@ -17,6 +21,7 @@ import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
+import coffeeshout.room.ui.response.RemainingMiniGameResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import coffeeshout.support.test.IntegrationTest;
@@ -442,5 +447,26 @@ class RoomRestControllerTest {
                             .param("joinCode", INVALID_JOIN_CODE))
                     .andExpect(status().isNotFound());
         }
+    }
+
+    @Test
+    void 현재_남은_게임을_조회한다() throws Exception {
+        // given
+        Room 호스트_꾹이 = RoomFixture.호스트_꾹이();
+        roomRepository.save(호스트_꾹이);
+        호스트_꾹이.addMiniGame(호스트_꾹이.getHost().getName(), new CardGame(new CardGameRandomDeckGenerator(), 0));
+        호스트_꾹이.addMiniGame(호스트_꾹이.getHost().getName(), new RacingGame());
+
+        // when
+        var remainingMiniGamesResponse = objectMapper.readValue(mockMvc.perform(
+                        (get("/rooms/{joinCode}/miniGames/remaining", 호스트_꾹이.getJoinCode())
+                                .contentType(MediaType.APPLICATION_JSON)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(), RemainingMiniGameResponse.class);
+
+        // then
+        assertThat(remainingMiniGamesResponse.miniGameTypes()).containsExactly("CARD_GAME", "RACING_GAME");
     }
 }
