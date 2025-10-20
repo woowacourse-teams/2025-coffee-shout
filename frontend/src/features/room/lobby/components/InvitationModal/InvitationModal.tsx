@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
 import CopyIcon from '@/assets/copy-icon.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
-import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import * as S from './InvitationModal.styled';
 import useToast from '@/components/@common/Toast/useToast';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
+import { useState } from 'react';
+import * as S from './InvitationModal.styled';
+import { useInvitationModalScreenReader } from './useInvitationModalScreenReader';
 
 type props = {
   onClose: () => void;
@@ -17,23 +18,7 @@ const InvitationModal = ({ onClose }: props) => {
   const { joinCode, qrCodeUrl } = useIdentifier();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
-  const screenReaderRef = useRef<HTMLDivElement>(null);
-  const [screenReaderMessage, setScreenReaderMessage] = useState<string>('');
-
-  useEffect(() => {
-    const message =
-      '친구 초대하기 모달입니다. QR 코드 또는 초대코드를 복사하여 친구들을 초대해보아요.';
-    setScreenReaderMessage(message);
-    if (screenReaderRef.current) {
-      screenReaderRef.current.focus();
-    }
-
-    const timer = setTimeout(() => {
-      setScreenReaderMessage('');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { screenReaderRef, message: screenReaderMessage } = useInvitationModalScreenReader();
 
   const handleCopy = async () => {
     copyToClipboard(joinCode, '초대 코드가 복사되었습니다.');
