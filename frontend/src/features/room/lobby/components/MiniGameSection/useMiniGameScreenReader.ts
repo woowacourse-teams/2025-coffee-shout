@@ -16,5 +16,9 @@ export const useMiniGameScreenReader = (loading: boolean, hasMiniGames: boolean)
     }
   }, [message]);
 
-  return { message, screenReaderRef };
+  const announceSelection = (clickedGameName: string, isSelected: boolean) => {
+    setMessage(`'${clickedGameName}'이(가) ${isSelected ? '해제' : '선택'}되었습니다.`);
+  };
+
+  return { message, screenReaderRef, announceSelection };
 };

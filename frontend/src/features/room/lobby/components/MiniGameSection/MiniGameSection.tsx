@@ -23,7 +23,17 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
     endpoint: '/rooms/minigames',
   });
 
-  const { message, screenReaderRef } = useMiniGameScreenReader(loading, !!miniGames?.length);
+  const { message, screenReaderRef, announceSelection } = useMiniGameScreenReader(
+    loading,
+    !!miniGames?.length
+  );
+
+  const handleClick = (miniGame: MiniGameType) => {
+    const isAlreadySelected = selectedMiniGames.includes(miniGame);
+
+    handleMiniGameClick(miniGame);
+    announceSelection(MINI_GAME_NAME_MAP[miniGame], isAlreadySelected);
+  };
 
   return (
     <>
@@ -43,7 +53,7 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
               isDisabled={playerType === 'GUEST'}
               gameName={MINI_GAME_NAME_MAP[miniGame]}
               description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
-              onClick={() => handleMiniGameClick(miniGame)}
+              onClick={() => handleClick(miniGame)}
               icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
             />
           ))
