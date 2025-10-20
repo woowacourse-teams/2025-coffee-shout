@@ -1,6 +1,6 @@
 package coffeeshout.racinggame.domain;
 
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.isTrue;
 
 import coffeeshout.room.domain.player.Player;
 import java.time.Instant;

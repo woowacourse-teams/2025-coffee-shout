@@ -1,7 +1,7 @@
 package coffeeshout.cardgame.domain;
 
-import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.cardgame.domain.card.Card;
+import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import java.util.ArrayList;
