@@ -121,7 +121,14 @@ public class RoomService {
             Function<T, String> successLogParams
     ) {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
-        eventPublisher.run();
+
+        try {
+            eventPublisher.run();
+        } catch (Exception e) {
+            log.error("{} 이벤트 발행 실패: eventId={}, {}", operationName, eventId, logParams, e);
+            future.completeExceptionally(e);
+            return future;
+        }
 
         return future.orTimeout(eventTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete((result, throwable) -> {
