@@ -39,7 +39,7 @@ export const RouletteSection = ({ playerProbabilities }: Props) => {
 
   return (
     <>
-      <ScreenReaderOnly>{screenReaderMessage}</ScreenReaderOnly>
+      {screenReaderMessage && <ScreenReaderOnly>{screenReaderMessage}</ScreenReaderOnly>}
       <SectionTitle title="룰렛" description="미니게임을 통해 당첨 확률이 조정됩니다" />
       <S.IconButtonWrapper>
         <RouletteViewToggle currentView={currentView} onViewChange={handleViewChange} />
