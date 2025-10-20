@@ -1,15 +1,5 @@
-import { useEffect, useState } from 'react';
 import { PlayerProbability } from '@/types/roulette';
-
-const formatProbabilitiesForScreenReader = (playerProbabilities: PlayerProbability[]): string => {
-  if (playerProbabilities.length === 0) {
-    return '현재 참여한 인원이 없습니다.';
-  }
-
-  return playerProbabilities
-    .map(({ playerName, probability }) => `${playerName}님의 확률 ${probability}%`)
-    .join(', ');
-};
+import { useEffect, useState } from 'react';
 
 export const useRouletteScreenReader = (playerProbabilities: PlayerProbability[]) => {
   const [message, setMessage] = useState('');
@@ -29,4 +19,14 @@ export const useRouletteScreenReader = (playerProbabilities: PlayerProbability[]
     message,
     updateViewMessage,
   };
+};
+
+const formatProbabilitiesForScreenReader = (playerProbabilities: PlayerProbability[]): string => {
+  if (playerProbabilities.length === 0) {
+    return '현재 참여한 인원이 없습니다.';
+  }
+
+  return playerProbabilities
+    .map(({ playerName, probability }) => `${playerName}님의 확률 ${probability}%`)
+    .join(', ');
 };
