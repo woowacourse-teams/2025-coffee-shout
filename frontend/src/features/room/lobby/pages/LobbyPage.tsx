@@ -283,8 +283,8 @@ const LobbyPage = () => {
 
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         {renderGameButton()}
-        <Button variant="primary" onClick={handleShare}>
-          <img src={ShareIcon} alt="공유" />
+        <Button variant="primary" onClick={handleShare} aria-label="친구 초대하기">
+          <img src={ShareIcon} aria-hidden="true" alt="" />
         </Button>
       </Layout.ButtonBar>
     </Layout>
