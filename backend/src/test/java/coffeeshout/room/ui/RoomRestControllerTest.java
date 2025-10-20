@@ -467,6 +467,6 @@ class RoomRestControllerTest {
                 .getContentAsString(), RemainingMiniGameResponse.class);
 
         // then
-        assertThat(remainingMiniGamesResponse.miniGameTypes()).containsExactly("CARD_GAME", "RACING_GAME");
+        assertThat(remainingMiniGamesResponse.remaining()).containsExactly("CARD_GAME", "RACING_GAME");
     }
 }
