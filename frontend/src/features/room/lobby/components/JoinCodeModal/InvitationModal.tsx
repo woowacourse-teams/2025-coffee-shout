@@ -112,9 +112,8 @@ const CodeSection = ({ joinCode, handleCopy }: CodeSectionProps) => {
       </S.Wrapper>
       <S.CodeBox>
         <S.EmptyBox />
-        <Headline4>
-          <span aria-hidden="true">{joinCode}</span>
-          <ScreenReaderOnly>{joinCode.split('').join(' ')}</ScreenReaderOnly>
+        <Headline4 aria-label={joinCode.split('').join(' ')} aria-live="polite">
+          {joinCode}
         </Headline4>
         <S.CopyIcon src={CopyIcon} onClick={handleCopy} aria-label="초대코드 복사하기" />
       </S.CodeBox>
