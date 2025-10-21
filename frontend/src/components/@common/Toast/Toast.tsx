@@ -35,6 +35,7 @@ const Toast = ({ message, type, isExiting = false }: Props) => {
         role={['error', 'warning'].includes(type) ? 'alert' : 'status'}
         aria-live={type === 'error' ? 'assertive' : 'polite'}
         aria-atomic="true"
+      >
         <S.IconWrapper>{renderIcon()}</S.IconWrapper>
         <Description>{message}</Description>
       </S.Container>
