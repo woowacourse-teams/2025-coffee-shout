@@ -2,7 +2,6 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
 import * as S from './MenuSelectionLayout.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 
 type Props = {
   categorySelection: CategorySelection;

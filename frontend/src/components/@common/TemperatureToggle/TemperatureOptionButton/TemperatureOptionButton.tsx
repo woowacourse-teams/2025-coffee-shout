@@ -10,7 +10,19 @@ type Props = {
 
 const TemperatureOptionButton = ({ option, position, selected, onClick }: Props) => {
   return (
-    <S.Container $position={position} $selected={selected} $option={option} onClick={onClick}>
+    <S.Container
+      $position={position}
+      $selected={selected}
+      $option={option}
+      onClick={onClick}
+      aria-label={option}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
       {option}
     </S.Container>
   );
