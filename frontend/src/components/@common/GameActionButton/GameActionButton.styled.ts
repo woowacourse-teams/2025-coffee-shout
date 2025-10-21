@@ -97,7 +97,7 @@ export const NumberBadge = styled.div`
   color: ${({ theme }) => theme.color.white};
   font-weight: bold;
   font-size: 18px;
-  background-color: ${({ theme }) => theme.color.point[300]};
+  background-color: rgb(251, 164, 164);
   border-radius: 50%;
   box-shadow: 1px 1px 4px ${({ theme }) => theme.color.point[500]};
 `;
