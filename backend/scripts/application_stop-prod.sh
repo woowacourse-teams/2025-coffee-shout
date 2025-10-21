@@ -45,10 +45,8 @@ else
 fi
 
 # 포트 8080 사용 프로세스 강제 종료 (혹시 모를 좀비 프로세스)
-JAVA_PROCESS=$(lsof -ti:8080 2>/dev/null || true)
-if [ -n "$JAVA_PROCESS" ]; then
-    echo "   🔫 포트 8080을 사용하는 좀비 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
-    kill -9 "$JAVA_PROCESS" 2>/dev/null || true
+if lsof -ti:8080 2>/dev/null | xargs -r kill -9 2>/dev/null; then
+    echo "   🔫 포트 8080을 사용하는 좀비 프로세스를 강제 종료했습니다"
     sleep 1
 fi
 

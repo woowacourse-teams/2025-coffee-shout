@@ -22,7 +22,7 @@ health_check() {
             echo "✅ 서버 헬스체크 성공 (시도: $attempt/$max_attempts)"
 
             # 실제 헬스 상태 확인 (UP인지 검증)
-            HEALTH_STATUS=$(curl -s http://localhost:8080/actuator/health | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+            HEALTH_STATUS=$(curl -s http://localhost:8080/actuator/health | jq -r '.status')
             if [ "$HEALTH_STATUS" = "UP" ]; then
                 echo "✅ 애플리케이션 상태: UP"
                 return 0
