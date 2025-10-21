@@ -10,8 +10,6 @@ type Props = {
   categoryName: string;
   onClick: () => void;
   color: string;
-  position: number;
-  totalCount: number;
   ariaLabel?: string;
 };
 

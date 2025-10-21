@@ -23,8 +23,6 @@ export const CoffeeCategory: Story = {
         categoryName="아메리카노"
         onClick={() => alert('아메리카노 카테고리 클릭!')}
         color="#8B4513"
-        position={1}
-        totalCount={5}
       />
     </div>
   ),
@@ -38,8 +36,6 @@ export const CustomMenuCategory: Story = {
         categoryName="커스텀 메뉴"
         onClick={() => alert('커스텀 메뉴 카테고리 클릭!')}
         color="#FF6B6B"
-        position={2}
-        totalCount={5}
       />
     </div>
   ),
