@@ -10,7 +10,7 @@ import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
-import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
@@ -70,8 +70,8 @@ class RoomServiceTest extends ServiceTest {
         assertThat(room.getRoomState()).isEqualTo(RoomState.READY);
 
         assertThat(room.getPlayers()).hasSize(1);
-        assertThat(room.getPlayers().get(0).getName().value()).isEqualTo(hostName);
-        assertThat(room.isHost(room.getPlayers().get(0))).isTrue();
+        assertThat(room.getPlayers().getFirst().getName().value()).isEqualTo(hostName);
+        assertThat(room.isHost(room.getPlayers().getFirst())).isTrue();
     }
 
     @Test
@@ -148,7 +148,7 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThatThrownBy(
                 () -> roomService.enterRoom(existingJoinCode.getValue(), guestName.value(), hostSelectedMenuRequest))
-                .isInstanceOf(InvalidArgumentException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -186,7 +186,7 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThatThrownBy(
                 () -> roomService.enterRoom(joinCode, "게스트10", new SelectedMenuRequest(1L, null, MenuTemperature.ICE)))
-                .isInstanceOf(InvalidArgumentException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -203,7 +203,7 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThatThrownBy(
                 () -> roomService.enterRoom(joinCode, "게스트", selectedMenuRequest))
-                .isInstanceOf(InvalidArgumentException.class);
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test
@@ -250,7 +250,7 @@ class RoomServiceTest extends ServiceTest {
 
         // when
         List<Player> players = roomService.selectMenu(createdRoom.getJoinCode().getValue(), hostName, 1L);
-        Player host = players.get(0);
+        Player host = players.getFirst();
 
         // then
         assertThat(host.getSelectedMenu().menu().getId()).isEqualTo(1L);
@@ -314,7 +314,7 @@ class RoomServiceTest extends ServiceTest {
 
         // then
         assertThat(selectedMiniGames).hasSize(1);
-        assertThat(selectedMiniGames.get(0)).isEqualTo(MiniGameType.CARD_GAME);
+        assertThat(selectedMiniGames.getFirst()).isEqualTo(MiniGameType.CARD_GAME);
     }
 
     @Test

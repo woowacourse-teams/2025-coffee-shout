@@ -8,7 +8,7 @@ import coffeeshout.cardgame.domain.card.CardGameRandomDeckGenerator;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
-import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -68,7 +68,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_엠제이, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE)))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(InvalidStateException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_NOT_READY_TO_JOIN);
     }
 
@@ -79,7 +79,7 @@ class RoomTest {
 
         // when & then
         assertThatThrownBy(() -> room.joinGuest(게스트_꾹이, new SelectedMenu(MenuFixture.라떼(), MenuTemperature.ICE)))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(InvalidStateException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.DUPLICATE_PLAYER_NAME);
     }
 
@@ -97,7 +97,7 @@ class RoomTest {
                         MenuTemperature.ICE
                 )
         ))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(InvalidStateException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RoomErrorCode.ROOM_FULL);
     }
 
@@ -318,7 +318,7 @@ class RoomTest {
 
         // then
         assertThat(removed).isTrue();
-        assertThat(room.getPlayers()).hasSize(0);
+        assertThat(room.getPlayers()).isEmpty();
         // 원래 호스트 객체는 그대로 유지됨 (빈 방이므로)
         assertThat(room.getHost()).isEqualTo(originalHost);
     }

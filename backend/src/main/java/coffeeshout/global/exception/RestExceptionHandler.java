@@ -76,7 +76,7 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(NotExistElementException.class)
