@@ -3,6 +3,7 @@ import Button from '@/components/@common/Button/Button';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { ChangeEvent, useEffect } from 'react';
+import useAutoFocus from '@/hooks/useAutoFocus';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
@@ -25,6 +26,7 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
     category,
@@ -125,7 +127,9 @@ const EntryMenuPage = () => {
         <S.Container>
           {currentView === 'selectCategory' ? (
             <>
-              <Headline3>카테고리를 선택해주세요</Headline3>
+              <Headline3 ref={liveRef} tabIndex={0}>
+                카테고리를 선택해주세요
+              </Headline3>
               <LocalErrorBoundary>
                 <SelectCategory onClickCategory={handleCategorySelect} />
               </LocalErrorBoundary>
