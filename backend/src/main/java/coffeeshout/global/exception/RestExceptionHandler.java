@@ -75,7 +75,7 @@ public class RestExceptionHandler {
             InvalidStateException exception,
             HttpServletRequest request
     ) {
-        logError(exception, request);
+        logWarning(exception, request);
         return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode());
     }
 
