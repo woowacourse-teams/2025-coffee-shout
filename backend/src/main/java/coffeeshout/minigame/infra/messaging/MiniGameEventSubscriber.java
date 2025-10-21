@@ -79,7 +79,7 @@ public class MiniGameEventSubscriber implements MessageListener {
             );
 
         } catch (Exception e) {
-            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), "미니게임 이벤트 처리 실패");
+            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), e);
             log.error("미니게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);
         }
     }

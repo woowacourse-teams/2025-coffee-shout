@@ -6,7 +6,7 @@ import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import java.time.Instant;
 import java.util.UUID;
-
+//
 public record StartMiniGameCommandEvent(
         String sessionId,
         String eventId,

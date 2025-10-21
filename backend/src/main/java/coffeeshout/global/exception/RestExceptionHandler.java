@@ -34,12 +34,7 @@ public class RestExceptionHandler {
             public String getCode() {
                 return "INTERNAL_SERVER_ERROR";
             }
-
-            @Override
-            public String getMessage() {
-                return "서버 오류가 발생했습니다.";
-            }
-        });
+        }, "서버 오류가 발생했습니다.");
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -53,12 +48,7 @@ public class RestExceptionHandler {
             public String getCode() {
                 return "RESOURCE_NOT_FOUND";
             }
-
-            @Override
-            public String getMessage() {
-                return "요청한 리소스를 찾을 수 없습니다.";
-            }
-        });
+        }, "요청한 리소스를 찾을 수 없습니다.");
     }
 
     @ExceptionHandler(InvalidArgumentException.class)
@@ -67,7 +57,7 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(InvalidStateException.class)
@@ -76,7 +66,7 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(NotExistElementException.class)
@@ -85,21 +75,21 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(QRCodeGenerationException.class)
     public ProblemDetail handleQRCodeGenerationException(QRCodeGenerationException exception,
                                                          HttpServletRequest request) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(StorageServiceException.class)
     public ProblemDetail handleStorageServiceException(StorageServiceException exception,
                                                        HttpServletRequest request) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, exception, exception.getErrorCode());
+        return getProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -121,12 +111,7 @@ public class RestExceptionHandler {
             public String getCode() {
                 return "VALIDATION_ERROR";
             }
-
-            @Override
-            public String getMessage() {
-                return errorMessage;
-            }
-        });
+        }, errorMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -141,21 +126,18 @@ public class RestExceptionHandler {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining(", "));
 
+        String message = errorMessage.isBlank() ? "요청 파라미터가 유효하지 않습니다." : errorMessage;
+
         return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
             @Override
             public String getCode() {
                 return "CONSTRAINT_VIOLATION";
             }
-
-            @Override
-            public String getMessage() {
-                return errorMessage.isBlank() ? "요청 파라미터가 유효하지 않습니다." : errorMessage;
-            }
-        });
+        }, message);
     }
 
-    private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {
-        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorCode.getMessage());
+    private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode, String message) {
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, message);
 
         problemDetail.setProperty("errorCode", errorCode.getCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());

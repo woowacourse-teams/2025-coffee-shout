@@ -1,8 +1,8 @@
 package coffeeshout.global.config;
 
 
-import coffeeshout.global.websocket.SessionIdPrincipalHandshakeHandler;
 import coffeeshout.global.websocket.interceptor.ShutdownAwareHandshakeInterceptor;
+import coffeeshout.global.websocket.interceptor.StompPrincipalInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
@@ -25,6 +25,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
+    private final StompPrincipalInterceptor stompPrincipalInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
     private final ShutdownAwareHandshakeInterceptor shutdownAwareHandshakeInterceptor;
     private final ObservationRegistry observationRegistry;
@@ -49,13 +50,12 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(shutdownAwareHandshakeInterceptor)
-                .setHandshakeHandler(new SessionIdPrincipalHandshakeHandler())
                 .withSockJS();
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketInboundMetricInterceptor)
+        registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor)
                 .taskExecutor()
                 .corePoolSize(32)
                 .maxPoolSize(32)

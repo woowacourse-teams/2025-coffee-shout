@@ -8,12 +8,10 @@ import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.service.RoomQueryService;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -42,8 +40,6 @@ public class SessionConnectEventListener {
 
         // simpConnectMessage에서 원래 CONNECT 메시지 가져오기
         final Message<?> connectMessage = (Message<?>) event.getMessage().getHeaders().get("simpConnectMessage");
-
-        SynchronizedWebsocketInfo.bindWebsocketInfo(connectMessage);
 
         if (connectMessage == null) {
             log.warn("simpConnectMessage가 없음: sessionId={}", sessionId);

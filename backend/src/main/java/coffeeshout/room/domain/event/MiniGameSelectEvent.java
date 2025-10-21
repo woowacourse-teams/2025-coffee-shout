@@ -3,9 +3,7 @@ package coffeeshout.room.domain.event;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
-import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import coffeeshout.minigame.domain.MiniGameType;
-import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -21,9 +19,9 @@ public record MiniGameSelectEvent(
         List<MiniGameType> miniGameTypes
 ) implements RoomBaseEvent, Traceable {
 
-    public MiniGameSelectEvent(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
+    public MiniGameSelectEvent(String sessionId, String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpUser", Principal.class).getName(),
+                sessionId,
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

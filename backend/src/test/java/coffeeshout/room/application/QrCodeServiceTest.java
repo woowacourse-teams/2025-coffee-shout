@@ -86,7 +86,7 @@ class QrCodeServiceTest {
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(QRCodeGenerationException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_GENERATION_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 생성에 실패했습니다.");
     }
 
     @Test
@@ -97,12 +97,12 @@ class QrCodeServiceTest {
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
         when(storageService.upload(contents, qrCodeImage))
-                .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage()));
+                .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, "QR 코드 업로드에 실패했습니다."));
 
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(StorageServiceException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 업로드에 실패했습니다.");
     }
 
     @Test
@@ -116,12 +116,12 @@ class QrCodeServiceTest {
         when(storageService.upload(contents, qrCodeImage)).thenReturn(storageKey);
         when(storageService.getUrl(storageKey))
                 .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED,
-                        RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage()));
+                        "QR 코드 URL 생성에 실패했습니다."));
 
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(StorageServiceException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 URL 생성에 실패했습니다.");
     }
 
     @Test
@@ -153,7 +153,7 @@ class QrCodeServiceTest {
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(QRCodeGenerationException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_GENERATION_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 생성에 실패했습니다.");
     }
 
     // ===== 비동기 QR 코드 생성 테스트 =====

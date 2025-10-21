@@ -72,7 +72,7 @@ public class RoomEventSubscriber implements MessageListener {
 
         } catch (Exception e) {
             log.error("이벤트 처리 실패: message={}", new String(message.getBody()), e);
-            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), "이벤트 처리 실패");
+            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), e);
         }
     }
 
