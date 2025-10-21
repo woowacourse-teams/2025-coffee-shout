@@ -1,4 +1,3 @@
-// useGameAnnouncement.ts
 import { Player, PlayerType } from '@/types/player';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
