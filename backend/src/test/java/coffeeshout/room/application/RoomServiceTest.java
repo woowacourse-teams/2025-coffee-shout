@@ -10,6 +10,7 @@ import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.minigame.domain.MiniGameResult;
@@ -267,7 +268,7 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThatThrownBy(
                 () -> roomService.selectMenu(createdRoom.getJoinCode().getValue(), invalidPlayerName,
-                        3L)).isInstanceOf(IllegalArgumentException.class);
+                        3L)).isInstanceOf(InvalidArgumentException.class);
     }
 
     @Test
@@ -327,11 +328,12 @@ class RoomServiceTest extends ServiceTest {
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
+        List<MiniGameType> miniGameTypes = List.of(MiniGameType.CARD_GAME);
         // when & then
         assertThatThrownBy(
                 () -> roomService.updateMiniGames(createdRoom.getJoinCode().getValue(),
                         guestName,
-                        List.of(MiniGameType.CARD_GAME)))
+                        miniGameTypes))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

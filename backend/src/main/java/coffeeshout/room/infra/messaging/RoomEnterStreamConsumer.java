@@ -86,6 +86,7 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
         } catch (InvalidArgumentException | InvalidStateException e) {
             log.warn("방 입장 처리 오류: joinCode={}, guestName={}, eventId={}, messageId={}",
                     event.joinCode(), event.guestName(), event.eventId(), message.getId(), e);
+            roomEventWaitManager.notifyFailure(event.eventId(), e);
         } catch (Exception e) {
             log.error("방 입장 처리 실패: joinCode={}, guestName={}, eventId={}, messageId={}, error={}",
                     event.joinCode(), event.guestName(), event.eventId(), message.getId(), e.getMessage(), e);

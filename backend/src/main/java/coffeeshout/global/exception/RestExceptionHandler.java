@@ -189,7 +189,7 @@ public class RestExceptionHandler {
                 e.getClass().getSimpleName(),
                 e.getMessage()
         );
-        log.warn(logMessage);
+        log.warn(logMessage, e);
     }
 }
 

@@ -12,16 +12,12 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -118,13 +114,8 @@ public class Room {
         players.join(player);
     }
 
-    public Map<Player, Probability> getProbabilities() {
-        return players.getPlayers().stream()
-                .collect(Collectors.toMap(player -> player, Player::getProbability));
-    }
-
     public List<Playable> getAllMiniGame() {
-        return Collections.unmodifiableList(new ArrayList<>(miniGames));
+        return List.copyOf(miniGames);
     }
 
     public List<MiniGameType> getSelectedMiniGameTypes() {

@@ -37,8 +37,9 @@ public class PlayerEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        final String body = new String(message.getBody());
+
         try {
-            final String body = new String(message.getBody());
             final PlayerEventType eventType = extractEventType(body);
 
             if (!handlerFactory.canHandle(eventType)) {
@@ -51,9 +52,9 @@ public class PlayerEventSubscriber implements MessageListener {
             handler.handle(event);
 
         } catch (InvalidStateException | InvalidArgumentException e) {
-            log.warn("플레이어 이벤트 처리 중 오류: message={}", new String(message.getBody()), e);
+            log.warn("플레이어 이벤트 처리 중 오류: message={}", body, e);
         } catch (Exception e) {
-            log.error("플레이어 이벤트 처리 실패: message={}", new String(message.getBody()), e);
+            log.error("플레이어 이벤트 처리 실패: message={}", body, e);
         }
     }
 

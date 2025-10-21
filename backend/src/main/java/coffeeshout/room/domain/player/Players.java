@@ -1,6 +1,8 @@
 package coffeeshout.room.domain.player;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameResult;
+import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import java.util.ArrayList;
@@ -50,7 +52,10 @@ public class Players {
         return players.stream()
                 .filter(p -> p.sameName(playerName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new InvalidArgumentException(
+                        RoomErrorCode.NO_EXIST_PLAYER,
+                        "사용자가 존재하지 않습니다. name = " + playerName.value()
+                ));
     }
 
     public int getPlayerCount() {
