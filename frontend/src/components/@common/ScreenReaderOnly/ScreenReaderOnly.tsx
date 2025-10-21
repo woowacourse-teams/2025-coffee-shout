@@ -1,4 +1,3 @@
-
 import { RefAttributes } from 'react';
 import * as S from './ScreenReaderOnly.styled';
 
