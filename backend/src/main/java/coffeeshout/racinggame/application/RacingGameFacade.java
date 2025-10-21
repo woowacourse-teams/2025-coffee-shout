@@ -2,7 +2,6 @@ package coffeeshout.racinggame.application;
 
 import coffeeshout.racinggame.domain.event.TapCommandEvent;
 import coffeeshout.racinggame.infra.messaging.RacingGameEventPublisher;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

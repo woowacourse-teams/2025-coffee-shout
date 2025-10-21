@@ -44,18 +44,20 @@ public class MiniGamePersistenceService {
         final MiniGameEntity miniGameEntity = new MiniGameEntity(roomEntity, miniGameType);
         miniGameJpaRepository.save(miniGameEntity);
 
-        room.getPlayers().forEach(player -> {
-            final PlayerEntity playerEntity = new PlayerEntity(
-                    roomEntity,
-                    player.getName().value(),
-                    player.getPlayerType()
-            );
-            playerJpaRepository.save(playerEntity);
-        });
+        if (room.isFirstStarted()) {
+            room.getPlayers().forEach(player -> {
+                final PlayerEntity playerEntity = new PlayerEntity(
+                        roomEntity,
+                        player.getName().value(),
+                        player.getPlayerType()
+                );
+                playerJpaRepository.save(playerEntity);
+            });
+        }
     }
 
     private RoomEntity getRoomEntity(String joinCode) {
-        return roomJpaRepository.findByJoinCode(joinCode)
+        return roomJpaRepository.findFirstByJoinCodeOrderByCreatedAtDesc(joinCode)
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다: " + joinCode));
     }
 }

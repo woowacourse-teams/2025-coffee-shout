@@ -1,6 +1,6 @@
 package coffeeshout.minigame.racinggame.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.global.ServiceTest;

@@ -1,9 +1,8 @@
 package coffeeshout.cardgame.infra.messaging;
 
-import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.global.message.RedisStreamStartStrategy;
 import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
 import coffeeshout.cardgame.domain.service.CardGameCommandService;
+import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.player.PlayerName;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +11,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -22,19 +22,16 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
 
     private final CardGameCommandService cardGameCommandService;
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer;
-    private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
     public CardSelectStreamConsumer(
             CardGameCommandService cardGameCommandService,
             @Qualifier("cardSelectStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer,
-            RedisStreamStartStrategy redisStreamStartStrategy,
             RedisStreamProperties redisStreamProperties, ObjectMapper objectMapper
     ) {
         this.cardGameCommandService = cardGameCommandService;
         this.cardSelectStreamContainer = cardSelectStreamContainer;
-        this.redisStreamStartStrategy = redisStreamStartStrategy;
         this.redisStreamProperties = redisStreamProperties;
         this.objectMapper = objectMapper;
     }
@@ -43,7 +40,7 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
     public void registerListener() {
         // 단독 소비자 패턴으로 스트림 리스너 등록
         cardSelectStreamContainer.receive(
-                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.cardGameSelectKey()),
+                StreamOffset.fromStart(redisStreamProperties.cardGameSelectKey()),
                 this
         );
 

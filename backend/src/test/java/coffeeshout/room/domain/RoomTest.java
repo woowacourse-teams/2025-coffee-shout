@@ -3,13 +3,13 @@ package coffeeshout.room.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.cardgame.domain.CardGame;
+import coffeeshout.cardgame.domain.card.CardGameRandomDeckGenerator;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.fixture.MiniGameDummy;
 import coffeeshout.fixture.RouletteFixture;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.cardgame.domain.CardGame;
-import coffeeshout.cardgame.domain.card.CardGameRandomDeckGenerator;
 import coffeeshout.room.domain.menu.MenuTemperature;
 import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;

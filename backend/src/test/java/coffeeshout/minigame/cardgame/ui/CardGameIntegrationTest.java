@@ -1,12 +1,12 @@
 package coffeeshout.minigame.cardgame.ui;
 
+import coffeeshout.cardgame.domain.CardGame;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.RoomFixture;
 import coffeeshout.fixture.TestStompSession;
 import coffeeshout.fixture.WebSocketIntegrationTestSupport;
 import coffeeshout.global.MessageResponse;
-import coffeeshout.cardgame.domain.CardGame;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Player;

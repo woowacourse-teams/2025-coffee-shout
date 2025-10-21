@@ -2,11 +2,13 @@ package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;
 import coffeeshout.room.ui.response.GuestNameExistResponse;
 import coffeeshout.room.ui.response.JoinCodeExistResponse;
 import coffeeshout.room.ui.response.ProbabilityResponse;
+import coffeeshout.room.ui.response.RemainingMiniGameResponse;
 import coffeeshout.room.ui.response.RoomCreateResponse;
 import coffeeshout.room.ui.response.RoomEnterResponse;
 import jakarta.validation.Valid;
@@ -31,6 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController implements RoomApi {
 
     private final RoomService roomService;
+
+    @GetMapping("/{joinCode}/miniGames/remaining")
+    public ResponseEntity<RemainingMiniGameResponse> getRemainingMiniGames(@PathVariable String joinCode) {
+        final List<Playable> miniGames = roomService.getRemainingMiniGames(joinCode);
+
+        return ResponseEntity.ok(RemainingMiniGameResponse.from(miniGames));
+    }
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> createRoom(@Valid @RequestBody RoomEnterRequest request) {

@@ -121,7 +121,14 @@ public class RoomService {
             Function<T, String> successLogParams
     ) {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
-        eventPublisher.run();
+
+        try {
+            eventPublisher.run();
+        } catch (Exception e) {
+            log.error("{} 이벤트 발행 실패: eventId={}, {}", operationName, eventId, logParams, e);
+            future.completeExceptionally(e);
+            return future;
+        }
 
         return future.orTimeout(eventTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete((result, throwable) -> {
@@ -310,5 +317,10 @@ public class RoomService {
     private boolean hasPlayer(String joinCode, String playerName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.hasPlayer(new PlayerName(playerName));
+    }
+
+    public List<Playable> getRemainingMiniGames(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.getMiniGames().stream().toList();
     }
 }
