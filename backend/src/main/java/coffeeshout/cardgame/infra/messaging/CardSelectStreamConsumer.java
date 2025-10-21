@@ -3,6 +3,8 @@ package coffeeshout.cardgame.infra.messaging;
 import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
 import coffeeshout.cardgame.domain.service.CardGameCommandService;
 import coffeeshout.global.config.properties.RedisStreamProperties;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.player.PlayerName;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,9 +64,12 @@ public class CardSelectStreamConsumer implements StreamListener<String, ObjectRe
             log.info("카드 선택 처리 성공: joinCode={}, playerName={}, cardIndex={}, messageId={}",
                     event.joinCode(), event.playerName(), event.cardIndex(), message.getId());
 
+        } catch (InvalidArgumentException | InvalidStateException e) {
+            log.warn("카드 선택 처리 중 오류 발생: joinCode={}, playerName={}, cardIndex={}, messageId={}",
+                    event.joinCode(), event.playerName(), event.cardIndex(), message.getId(), e);
         } catch (Exception e) {
-            log.error("카드 선택 처리 실패: joinCode={}, playerName={}, cardIndex={}, messageId={}, error={}",
-                    event.joinCode(), event.playerName(), event.cardIndex(), message.getId(), e.getMessage(), e);
+            log.error("카드 선택 처리 실패: joinCode={}, playerName={}, cardIndex={}, messageId={}",
+                    event.joinCode(), event.playerName(), event.cardIndex(), message.getId(), e);
         }
     }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.racinggame.domain.RacingGame;
 import coffeeshout.racinggame.domain.RacingGameState;
 import coffeeshout.racinggame.domain.Runner;
@@ -85,8 +86,7 @@ class RacingGameTest {
 
         // when && then
         assertThatThrownBy(() -> racingGame.updateSpeed(players.get(0), 10, speedCalculator, Instant.now()))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("게임이 진행 중이 아닙니다.");
+                .isInstanceOf(InvalidStateException.class);
     }
 
     @Test

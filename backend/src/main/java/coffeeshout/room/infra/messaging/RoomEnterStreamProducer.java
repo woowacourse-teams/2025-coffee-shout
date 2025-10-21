@@ -39,12 +39,12 @@ public class RoomEnterStreamProducer {
             log.info("방 입장 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
                     event.eventId(), recordId, redisStreamProperties.roomJoinKey());
         } catch (JsonProcessingException e){
-            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, guestName={}, error={}",
-                    event.eventId(), event.joinCode(), event.guestName(), e.getMessage(), e);
+            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, guestName={}",
+                    event.eventId(), event.joinCode(), event.guestName(), e);
             throw new RuntimeException("RoomJoinEvent 직렬화 실패: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("방 입장 이벤트 발송 실패: eventId={}, joinCode={}, guestName={}, error={}",
-                    event.eventId(), event.joinCode(), event.guestName(), e.getMessage(), e);
+            log.error("방 입장 이벤트 발송 실패: eventId={}, joinCode={}, guestName={}",
+                    event.eventId(), event.joinCode(), event.guestName(), e);
             throw new RuntimeException("방 입장 이벤트 발송 실패: " + e.getMessage(), e);
         }
     }
