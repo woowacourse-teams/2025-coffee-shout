@@ -1,7 +1,6 @@
 package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.global.message.RedisStreamStartStrategy;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -16,6 +15,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,6 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer;
-    private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
@@ -36,14 +35,12 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
             RoomCommandService roomCommandService, MenuCommandService menuCommandService,
             RoomEventWaitManager roomEventWaitManager,
             @Qualifier("roomEnterStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer,
-            RedisStreamStartStrategy redisStreamStartStrategy,
             RedisStreamProperties redisStreamProperties, ObjectMapper objectMapper
     ) {
         this.roomCommandService = roomCommandService;
         this.menuCommandService = menuCommandService;
         this.roomEventWaitManager = roomEventWaitManager;
         this.roomEnterStreamContainer = roomEnterStreamContainer;
-        this.redisStreamStartStrategy = redisStreamStartStrategy;
         this.redisStreamProperties = redisStreamProperties;
         this.objectMapper = objectMapper;
     }
@@ -51,7 +48,7 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
     @PostConstruct
     public void registerListener() {
         roomEnterStreamContainer.receive(
-                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomJoinKey()),
+                StreamOffset.fromStart(redisStreamProperties.roomJoinKey()),
                 this
         );
 

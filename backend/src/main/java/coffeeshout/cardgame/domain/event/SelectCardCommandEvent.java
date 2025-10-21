@@ -1,10 +1,10 @@
 package coffeeshout.cardgame.domain.event;
 
-import coffeeshout.minigame.event.MiniGameBaseEvent;
-import coffeeshout.minigame.event.MiniGameEventType;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
+import coffeeshout.minigame.event.MiniGameBaseEvent;
+import coffeeshout.minigame.event.MiniGameEventType;
 import java.time.Instant;
 import java.util.UUID;
 

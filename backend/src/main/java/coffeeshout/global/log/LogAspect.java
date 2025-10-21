@@ -1,7 +1,6 @@
 package coffeeshout.global.log;
 
 import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
