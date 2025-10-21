@@ -2,7 +2,8 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
-import { ChangeEvent, useEffect, useRef } from 'react';
+import { ChangeEvent, useEffect } from 'react';
+import useAutoFocus from '@/hooks/useAutoFocus';
 import SelectCategory from './components/SelectCategory/SelectCategory';
 import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
@@ -25,7 +26,7 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
-  const liveRef = useRef<HTMLHeadingElement>(null);
+  const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
     category,
@@ -58,12 +59,6 @@ const EntryMenuPage = () => {
   const resetMenuState = () => {
     resetAll();
   };
-
-  useEffect(() => {
-    if (liveRef.current) {
-      liveRef.current.focus();
-    }
-  }, []);
 
   const handleCategorySelect = (categoryItem: CategoryWithColor) => {
     category.set(categoryItem);
