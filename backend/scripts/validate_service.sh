@@ -16,14 +16,16 @@ health_check() {
 
     while [ "$attempt" -le "$max_attempts" ]; do
         # Spring Boot Actuator 헬스체크 엔드포인트 확인
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:8080/actuator/health 2>/dev/null || echo "000")
+        RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 5 http://localhost:8080/actuator/health 2>/dev/null || echo "")
+        HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+        RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
 
         if [ "$HTTP_CODE" = "200" ]; then
             echo "✅ 서버 헬스체크 성공 (시도: $attempt/$max_attempts)"
 
             # jq를 사용한 안전한 파싱
             if command -v jq &> /dev/null; then
-                HEALTH_STATUS=$(curl -s --max-time 5 http://localhost:8080/actuator/health 2>/dev/null | jq -r '.status // "UNKNOWN"' 2>/dev/null)
+                HEALTH_STATUS=$(echo "$RESPONSE_BODY" | jq -r '.status // "UNKNOWN"' 2>/dev/null || echo "UNKNOWN")
                 if [ "$HEALTH_STATUS" = "UP" ]; then
                     echo "✅ 애플리케이션 상태: UP"
                     return 0
@@ -31,11 +33,8 @@ health_check() {
                     echo "⚠️  애플리케이션 상태: $HEALTH_STATUS (재시도...)"
                 fi
             else
-                # jq 미설치 시 HTTP 200만 확인
-                if [ "$HTTP_CODE" = "200" ]; then
-                    echo "✅ 애플리케이션 상태: HTTP 200 (jq 미설치)"
-                    return 0
-                fi
+                echo "✅ 애플리케이션 상태: HTTP 200 (jq 미설치)"
+                return 0
             fi
         elif [ "$HTTP_CODE" = "503" ]; then
             echo "⏳ 서버가 시작 중입니다 (HTTP 503)... (시도: $attempt/$max_attempts)"

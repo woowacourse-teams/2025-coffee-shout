@@ -5,13 +5,13 @@ export PATH="/usr/bin:/bin:$PATH"
 echo "=== [BEFORE_INSTALL] 커피빵 게임 서버 배포 준비 ==="
 
 # 기존 애플리케이션 안전하게 종료
-if pgrep -f "coffee-shout" > /dev/null; then
+pid=$(pgrep -f "coffee-shout" || echo "")
+if [ -n "$pid" ]; then
     echo "☕ 기존 애플리케이션을 안전하게 종료합니다..."
     pkill -SIGTERM -f "coffee-shout" || true
     sleep 10
 
-    # 강제 종료가 필요한 경우
-    if pgrep -f "coffee-shout" > /dev/null; then
+    if kill -0 "$pid" 2>/dev/null; then
         echo "   🔨 강제 종료를 진행합니다..."
         pkill -SIGKILL -f "coffee-shout" || true
     fi
@@ -28,11 +28,12 @@ sudo chown -R ubuntu:ubuntu /opt/coffee-shout
 # jq 설치 확인 및 설치
 if ! command -v jq &> /dev/null; then
     echo "🔧 jq가 설치되어 있지 않습니다. 설치를 시작합니다..."
-    sudo yum install -y jq || sudo apt-get install -y jq || {
+    if sudo yum install -y jq &>/dev/null 2>&1; then
+        echo "✅ jq 설치 완료 (yum)"
+    elif sudo apt-get install -y jq &>/dev/null 2>&1; then
+        echo "✅ jq 설치 완료 (apt-get)"
+    else
         echo "⚠️  jq 설치 실패. JSON 파싱 없이 계속 진행합니다."
-    }
-    if command -v jq &> /dev/null; then
-        echo "✅ jq 설치 완료"
     fi
 else
     echo "✅ jq가 이미 설치되어 있습니다"
