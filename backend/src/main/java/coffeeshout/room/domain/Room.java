@@ -53,6 +53,25 @@ public class Room {
         return new Room(joinCode, hostName, selectedMenu);
     }
 
+    // Redis 재구성용 정적 팩토리 메서드
+    public static Room reconstruct(
+            JoinCode joinCode,
+            Players players,
+            Queue<MiniGameType> miniGames,
+            List<MiniGameType> finishedGames,
+            Player host,
+            RoomState roomState
+    ) {
+        Room room = new Room();
+        room.joinCode = joinCode;
+        room.players = players;
+        room.miniGames = miniGames;
+        room.finishedGames = finishedGames;
+        room.host = host;
+        room.roomState = roomState;
+        return room;
+    }
+
     public void joinGuest(PlayerName guestName, SelectedMenu selectedMenu) {
         validateRoomReady();
         validateCanJoin();
@@ -122,6 +141,10 @@ public class Room {
 
     public List<MiniGameType> getAllMiniGames() {
         return List.copyOf(miniGames);
+    }
+
+    public List<MiniGameType> getFinishedGames() {
+        return List.copyOf(finishedGames);
     }
 
     public MiniGameType startNextGame(PlayerName hostName) {
