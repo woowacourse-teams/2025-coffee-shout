@@ -1,4 +1,4 @@
-import { ComponentProps, ChangeEvent, useRef, useEffect, KeyboardEvent } from 'react';
+import { ComponentProps, ChangeEvent, useRef, KeyboardEvent } from 'react';
 import * as S from './CustomMenuInput.styled';
 
 type Props = {
