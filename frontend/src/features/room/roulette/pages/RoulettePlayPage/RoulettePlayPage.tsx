@@ -28,13 +28,13 @@ const RoulettePlayPage = () => {
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
-  const isFirstLoad = useRef(true);
+  const isFirstLoadRef = useRef(true);
   const { data: remainingMiniGames } = useFetch<{ remaining: MiniGameType[] }>({
     endpoint: `/rooms/${joinCode}/miniGames/remaining`,
     enabled: !!joinCode,
   });
 
-  useRouletteProbabilities(isFirstLoad);
+  useRouletteProbabilities(isFirstLoadRef);
 
   const handleWinnerData = useCallback(
     (data: RouletteWinnerResponse) => {
@@ -88,7 +88,7 @@ const RoulettePlayPage = () => {
         isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
-        isFirstLoadRef={isFirstLoad}
+        isFirstLoadRef={isFirstLoadRef}
       />
     ),
     statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
