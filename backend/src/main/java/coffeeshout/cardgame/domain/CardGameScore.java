@@ -1,8 +1,8 @@
 package coffeeshout.cardgame.domain;
 
-import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.cardgame.domain.card.Card;
 import coffeeshout.cardgame.domain.card.CardType;
+import coffeeshout.minigame.domain.MiniGameScore;
 
 public class CardGameScore extends MiniGameScore {
 

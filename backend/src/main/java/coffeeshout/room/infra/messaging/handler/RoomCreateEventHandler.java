@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.lock.RedisLock;
 import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
