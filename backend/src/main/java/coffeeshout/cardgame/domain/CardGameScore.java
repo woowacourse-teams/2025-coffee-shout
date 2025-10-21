@@ -33,7 +33,7 @@ public class CardGameScore extends MiniGameScore {
 
     @Override
     public long getValue() {
-        return addition * multiplier;
+        return (long) addition * multiplier;
     }
 }
 

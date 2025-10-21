@@ -1,5 +1,7 @@
 package coffeeshout.global.websocket.infra;
 
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.websocket.event.player.PlayerBaseEvent;
 import coffeeshout.global.websocket.event.player.PlayerDisconnectedEvent;
 import coffeeshout.global.websocket.event.player.PlayerEventType;
@@ -35,8 +37,9 @@ public class PlayerEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        final String body = new String(message.getBody());
+
         try {
-            final String body = new String(message.getBody());
             final PlayerEventType eventType = extractEventType(body);
 
             if (!handlerFactory.canHandle(eventType)) {
@@ -48,8 +51,10 @@ public class PlayerEventSubscriber implements MessageListener {
             final PlayerEventHandler<PlayerBaseEvent> handler = handlerFactory.getHandler(eventType);
             handler.handle(event);
 
+        } catch (InvalidStateException | InvalidArgumentException e) {
+            log.warn("플레이어 이벤트 처리 중 오류: message={}", body, e);
         } catch (Exception e) {
-            log.error("플레이어 이벤트 처리 실패: message={}", new String(message.getBody()), e);
+            log.error("플레이어 이벤트 처리 실패: message={}", body, e);
         }
     }
 
