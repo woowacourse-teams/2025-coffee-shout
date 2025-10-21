@@ -311,4 +311,9 @@ public class RoomService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.hasPlayer(new PlayerName(playerName));
     }
+
+    public List<Playable> getRemainingMiniGames(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.getMiniGames().stream().toList();
+    }
 }
