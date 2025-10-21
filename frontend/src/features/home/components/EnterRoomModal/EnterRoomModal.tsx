@@ -84,7 +84,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
         autoFocus
         aria-label="초대코드를 입력해주세요"
       />
-      <S.ErrorText>{errorText}</S.ErrorText>
+      <S.ErrorText aria-live="assertive">{errorText}</S.ErrorText>
       <S.ButtonContainer>
         <Button variant="secondary" onClick={onClose}>
           취소
