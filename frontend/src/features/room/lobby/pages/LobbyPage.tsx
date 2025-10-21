@@ -33,7 +33,7 @@ import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
-import useReadyAnnouncement from '../hooks/useReadyAnnouncement';
+import useGameAnnouncement from '../hooks/useGameAnnouncement';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -56,7 +56,12 @@ const LobbyPage = () => {
     method: 'DELETE',
     errorDisplayMode: 'toast',
   });
-  const announcement = useReadyAnnouncement(isAllReady, participants.length, playerType);
+  const announcement = useGameAnnouncement({
+    isAllReady,
+    participants,
+    playerType,
+    myName,
+  });
 
   useParticipantValidation({ isConnected });
 
