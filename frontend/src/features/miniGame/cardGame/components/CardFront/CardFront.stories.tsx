@@ -65,14 +65,14 @@ export const Grid: Story = {
   render: () => {
     const playerColorMap = [
       '#FF6B6B' as ColorList,
-      '#FF6B6B' as ColorList,
-      undefined,
-      undefined,
-      undefined,
-      '#FF6B6B' as ColorList,
-      undefined,
-      '#FF6B6B' as ColorList,
-      '#FF6B6B' as ColorList,
+      '#4cafa9' as ColorList,
+      '#85b62e' as ColorList,
+      '#bf77f6' as ColorList,
+      '#ffa102' as ColorList,
+      '#5a88c8' as ColorList,
+      '#ff8ad8' as ColorList,
+      '#8a8b8e' as ColorList,
+      '#1d6d4a' as ColorList,
     ];
 
     return (
