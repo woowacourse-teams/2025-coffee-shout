@@ -21,7 +21,7 @@ const CustomMenuInput = ({
   return (
     <S.Container>
       <S.Input ref={ref} placeholder={placeholder} value={value} onChange={onChange} {...rest} />
-      <S.DoneButton $hasValue={hasValue} onClick={onClickDoneButton}>
+      <S.DoneButton $hasValue={hasValue} onClick={onClickDoneButton} aria-label="입력 완료">
         →
       </S.DoneButton>
     </S.Container>
