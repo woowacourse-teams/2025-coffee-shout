@@ -36,24 +36,29 @@ const typography = {
     fontWeight: 700,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    lineHeight: 1.4,
   },
   h2: {
     fontSize: DESIGN_TOKENS.typography.h2,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    lineHeight: 1.5,
   },
   h3: {
     fontSize: DESIGN_TOKENS.typography.h3,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    lineHeight: 1.6,
   },
   h4: {
     fontSize: DESIGN_TOKENS.typography.h4,
     fontWeight: 600,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+
+    lineHeight: 1.6,
   },
 
   paragraph: {
@@ -61,6 +66,8 @@ const typography = {
     fontWeight: 500,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+
+    lineHeight: 1.6,
   },
 
   small: {
@@ -68,6 +75,7 @@ const typography = {
     fontWeight: 400,
     fontFamily:
       "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    lineHeight: 1.6,
   },
 } as const;
 
