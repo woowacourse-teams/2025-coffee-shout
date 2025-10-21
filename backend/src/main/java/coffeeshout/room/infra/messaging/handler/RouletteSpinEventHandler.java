@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEvent> {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
-    private final RouletteEventDbService rouletteEventDbService;
+    private final RoulettePersistenceService roulettePersistenceService;
 
     @Override
     public void handle(RouletteSpinEvent event) {
@@ -30,7 +30,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
             broadcastWinner(event.joinCode(), winner);
 
             // DB 저장 (락으로 보호 - 중복 저장 방지)
-            rouletteEventDbService.saveRouletteResult(event);
+            roulettePersistenceService.saveRouletteResult(event);
 
             log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
                     event.eventId(), event.joinCode(), winner.name().value());

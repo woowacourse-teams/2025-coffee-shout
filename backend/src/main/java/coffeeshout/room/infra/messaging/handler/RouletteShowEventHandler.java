@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEvent> {
 
     private final RoomService roomService;
-    private final RouletteEventDbService rouletteEventDbService;
+    private final RoulettePersistenceService roulettePersistenceService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -25,16 +25,14 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
         try {
             log.info("룰렛 전환 이벤트 수신: eventId={}, joinCode={}", event.eventId(), event.joinCode());
 
-            // 도메인 로직 (항상 실행)
             final Room room = roomService.showRoulette(event.joinCode());
             final RoomStatusResponse response = RoomStatusResponse.of(room.getJoinCode(), room.getRoomState());
 
-            // 브로드캐스트 (항상 실행)
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/roulette",
                     WebSocketResponse.success(response));
 
             // DB 저장 (락으로 보호 - 중복 저장 방지)
-            rouletteEventDbService.saveRoomStatus(event);
+            roulettePersistenceService.saveRoomStatus(event);
 
             log.info("룰렛 전환 이벤트 처리 완료: eventId={}, joinCode={}",
                     event.eventId(), event.joinCode());
