@@ -26,7 +26,7 @@ public class RouletteService {
     public void updateRoomStatusToRoulette(String joinCode) {
         final RoomEntity roomEntity = getRoomEntity(joinCode);
         roomEntity.updateRoomStatus(RoomState.ROULETTE);
-        
+
         log.info("RoomEntity 상태 업데이트 완료: joinCode={}, status=ROULETTE", joinCode);
     }
 
@@ -53,7 +53,7 @@ public class RouletteService {
     }
 
     private RoomEntity getRoomEntity(String joinCode) {
-        return roomJpaRepository.findByJoinCode(joinCode)
+        return roomJpaRepository.findFirstByJoinCodeOrderByCreatedAtDesc(joinCode)
                 .orElseThrow(() -> new IllegalArgumentException("RoomEntity를 찾을 수 없습니다: " + joinCode));
     }
 
