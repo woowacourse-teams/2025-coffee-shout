@@ -365,7 +365,7 @@ class CardGameTest {
             cardGame.startPlay();
             Player player = players.getPlayer(new PlayerName("꾹이"));
             cardGame.selectCard(player, 0);
-            Card selectedCard = cardGame.getDeck().getCards().getFirst()
+            Card selectedCard = cardGame.getDeck().getCards().getFirst();
 
             // when
             Optional<Player> cardOwner = cardGame.findCardOwnerInCurrentRound(selectedCard);
