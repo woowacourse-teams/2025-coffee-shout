@@ -25,6 +25,19 @@ echo "📁 배포 디렉토리 생성 및 권한 설정..."
 sudo mkdir -p /opt/coffee-shout/{app,scripts,logs}
 sudo chown -R ubuntu:ubuntu /opt/coffee-shout
 
+# jq 설치 확인 및 설치
+if ! command -v jq &> /dev/null; then
+    echo "🔧 jq가 설치되어 있지 않습니다. 설치를 시작합니다..."
+    sudo yum install -y jq || sudo apt-get install -y jq || {
+        echo "⚠️  jq 설치 실패. JSON 파싱 없이 계속 진행합니다."
+    }
+    if command -v jq &> /dev/null; then
+        echo "✅ jq 설치 완료"
+    fi
+else
+    echo "✅ jq가 이미 설치되어 있습니다"
+fi
+
 # 기존 JAR 파일 삭제 (새 인스턴스 대응)
 if [ -f "/opt/coffee-shout/app/coffee-shout-backend.jar" ]; then
     echo "🗑️  기존 JAR 파일 삭제..."
