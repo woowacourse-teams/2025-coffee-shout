@@ -9,11 +9,3 @@ services:
       - type: tmpfs
         target: /data
     command: valkey-server --appendonly yes
-    deploy:
-      resources:
-        limits:
-          cpus: '2'           # t4g.micro vCPU
-          memory: 1G          # t4g.micro 메모리
-        reservations:
-          cpus: '1'
-          memory: 512M
