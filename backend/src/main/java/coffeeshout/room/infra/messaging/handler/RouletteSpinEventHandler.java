@@ -1,15 +1,10 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.lock.RedisLock;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
-import coffeeshout.room.application.RouletteService;
-import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.response.WinnerResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +16,9 @@ import org.springframework.stereotype.Component;
 public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEvent> {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
-    private final RouletteService rouletteService;
-    private final RoomQueryService roomQueryService;
+    private final RouletteEventDbService rouletteEventDbService;
 
     @Override
-    @RedisLock(
-            key = "#event.eventId()",
-            lockPrefix = "event:lock:",
-            donePrefix = "event:done:",
-            waitTime = 0,
-            leaseTime = 5000
-    )
     public void handle(RouletteSpinEvent event) {
         try {
             log.info("룰렛 스핀 이벤트 수신: eventId={}, joinCode={}, hostName={}",
@@ -39,13 +26,13 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
 
             final Winner winner = event.winner();
 
-            Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-            room.updateDoneState();
-
+            // 브로드캐스트 (항상 실행)
             broadcastWinner(event.joinCode(), winner);
-            
-            rouletteService.saveRouletteResult(event.joinCode(), winner);
-            log.info("룰렛 스핀 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}, winner={}",
+
+            // DB 저장 (락으로 보호 - 중복 저장 방지)
+            rouletteEventDbService.saveRouletteResult(event);
+
+            log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
                     event.eventId(), event.joinCode(), winner.name().value());
 
         } catch (Exception e) {
