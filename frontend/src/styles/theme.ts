@@ -28,6 +28,7 @@ const color = {
   blue: '#0066FF',
   white: '#FFFFFF',
   black: '#000000',
+  yellow: '#FFDF20',
 } as const;
 
 const typography = {

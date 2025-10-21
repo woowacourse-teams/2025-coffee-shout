@@ -23,6 +23,6 @@ export default RankItem;
 
 const getTextColor = (isMe: boolean, isFixed: boolean) => {
   if (isMe) return 'point-500';
-  if (isFixed) return 'black';
+  if (isFixed) return 'yellow';
   return 'white';
 };
