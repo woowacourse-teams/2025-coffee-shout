@@ -69,7 +69,11 @@ const RacingGamePage = () => {
       {showGoal && <Goal />}
       <RacingGameOverlay>
         <S.Container ref={containerRef}>
-          <RacingRank players={racingGameData.players} myName={myName} />
+          <RacingRank
+            players={racingGameData.players}
+            myName={myName}
+            endDistance={racingGameData.distance.end}
+          />
           <RacingProgressBar
             myName={myName}
             endDistance={racingGameData.distance.end}
