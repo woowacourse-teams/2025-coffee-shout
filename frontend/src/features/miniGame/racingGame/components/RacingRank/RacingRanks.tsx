@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import Description from '@/components/@common/Description/Description';
-import * as S from './RacingRank.styled';
+import RankItem from '../RankItem/RankItem';
+import * as S from './RacingRanks.styled';
 
 type Player = {
   playerName: string;
@@ -23,13 +23,12 @@ const RacingRank = ({ players, myName }: Props) => {
         {sortedPlayers.map((player, index) => {
           const isMe = player.playerName === myName;
           return (
-            <S.RankItem key={player.playerName}>
-              <S.RankNumber>
-                <Description color={isMe ? 'point-500' : 'white'}>{index + 1}</Description>
-              </S.RankNumber>
-
-              <Description color={isMe ? 'point-500' : 'white'}>{player.playerName}</Description>
-            </S.RankItem>
+            <RankItem
+              key={player.playerName}
+              playerName={player.playerName}
+              rank={index + 1}
+              isMe={isMe}
+            />
           );
         })}
       </S.RankList>
