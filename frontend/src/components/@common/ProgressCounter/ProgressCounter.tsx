@@ -1,4 +1,3 @@
-import ScreenReaderOnly from '../ScreenReaderOnly/ScreenReaderOnly';
 import * as S from './ProgressCounter.styled';
 
 type Props = {
