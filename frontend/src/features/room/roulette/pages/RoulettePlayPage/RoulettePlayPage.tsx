@@ -12,11 +12,12 @@ import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/Probability
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 import useRoulettePlay from './hooks/useRoulettePlay';
+import useRouletteProbabilities from './hooks/useRouletteProbabilities';
 
 const RoulettePlayPage = () => {
   const { joinCode, myName } = useIdentifier();
@@ -27,10 +28,13 @@ const RoulettePlayPage = () => {
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
+  const isFirstLoadRef = useRef(true);
   const { data: remainingMiniGames } = useFetch<{ remaining: MiniGameType[] }>({
     endpoint: `/rooms/${joinCode}/miniGames/remaining`,
     enabled: !!joinCode,
   });
+
+  useRouletteProbabilities(isFirstLoadRef);
 
   const handleWinnerData = useCallback(
     (data: RouletteWinnerResponse) => {
@@ -84,6 +88,7 @@ const RoulettePlayPage = () => {
         isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
+        isFirstLoadRef={isFirstLoadRef}
       />
     ),
     statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
