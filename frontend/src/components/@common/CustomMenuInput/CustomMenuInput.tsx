@@ -1,4 +1,4 @@
-import { ComponentProps, ChangeEvent } from 'react';
+import { ComponentProps, ChangeEvent, useRef, useEffect, KeyboardEvent } from 'react';
 import * as S from './CustomMenuInput.styled';
 
 type Props = {
@@ -17,11 +17,31 @@ const CustomMenuInput = ({
   ...rest
 }: Props) => {
   const hasValue = Boolean(value && String(value).length > 0);
+  const doneButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onClickDoneButton?.();
+    }
+  };
 
   return (
     <S.Container>
-      <S.Input ref={ref} placeholder={placeholder} value={value} onChange={onChange} {...rest} />
-      <S.DoneButton $hasValue={hasValue} onClick={onClickDoneButton} aria-label="입력 완료">
+      <S.Input
+        ref={ref}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        {...rest}
+        onKeyDown={handleKeyDown}
+      />
+      <S.DoneButton
+        $hasValue={hasValue}
+        onClick={onClickDoneButton}
+        aria-label="입력 완료"
+        ref={doneButtonRef}
+      >
         →
       </S.DoneButton>
     </S.Container>
