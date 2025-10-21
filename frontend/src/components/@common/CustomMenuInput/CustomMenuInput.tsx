@@ -33,8 +33,8 @@ const CustomMenuInput = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        {...rest}
         onKeyDown={handleKeyDown}
+        {...rest}
       />
       <S.DoneButton
         $hasValue={hasValue}
