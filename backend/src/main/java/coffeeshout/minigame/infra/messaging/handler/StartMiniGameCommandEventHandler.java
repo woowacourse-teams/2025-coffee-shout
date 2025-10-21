@@ -1,9 +1,9 @@
 package coffeeshout.minigame.infra.messaging.handler;
 
+import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.application.MiniGamePersistenceService;
 import coffeeshout.minigame.domain.MiniGameService;
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.cardgame.domain.event.dto.MiniGameStartedEvent;
 import coffeeshout.minigame.event.MiniGameEventType;
 import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import coffeeshout.room.domain.JoinCode;

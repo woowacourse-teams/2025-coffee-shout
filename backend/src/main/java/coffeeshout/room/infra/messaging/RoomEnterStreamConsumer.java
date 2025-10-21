@@ -1,7 +1,6 @@
 package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.global.message.RedisStreamStartStrategy;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -16,6 +15,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,6 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer;
-    private final RedisStreamStartStrategy redisStreamStartStrategy;
     private final RedisStreamProperties redisStreamProperties;
     private final ObjectMapper objectMapper;
 
@@ -36,14 +35,12 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
             RoomCommandService roomCommandService, MenuCommandService menuCommandService,
             RoomEventWaitManager roomEventWaitManager,
             @Qualifier("roomEnterStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer,
-            RedisStreamStartStrategy redisStreamStartStrategy,
             RedisStreamProperties redisStreamProperties, ObjectMapper objectMapper
     ) {
         this.roomCommandService = roomCommandService;
         this.menuCommandService = menuCommandService;
         this.roomEventWaitManager = roomEventWaitManager;
         this.roomEnterStreamContainer = roomEnterStreamContainer;
-        this.redisStreamStartStrategy = redisStreamStartStrategy;
         this.redisStreamProperties = redisStreamProperties;
         this.objectMapper = objectMapper;
     }
@@ -51,7 +48,7 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
     @PostConstruct
     public void registerListener() {
         roomEnterStreamContainer.receive(
-                redisStreamStartStrategy.getStreamOffset(redisStreamProperties.roomJoinKey()),
+                StreamOffset.fromStart(redisStreamProperties.roomJoinKey()),
                 this
         );
 
@@ -60,9 +57,11 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
 
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
+        log.info("방 입장 메시지 수신: messageId={}", message.getId());
         final RoomJoinEvent event = parseEvent(message);
-        log.info("방 입장 메시지 수신: messageId={}, eventId={}, joinCode={}, guestName={}",
-                message.getId(), event.eventId(), event.joinCode(), event.guestName());
+
+        log.info("방 입장 메시지 eventId={}, joinCode={}, guestName={}",
+                event.eventId(), event.joinCode(), event.guestName());
 
         try {
             final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
@@ -95,6 +94,10 @@ public class RoomEnterStreamConsumer implements StreamListener<String, ObjectRec
             return objectMapper.readValue(value, RoomJoinEvent.class);
         } catch (JsonProcessingException e) {
             log.error("RoomJoinEvent 파싱 실패: messageId={}, messageValue={}, error={}",
+                    message.getId(), message.getValue(), e.getMessage(), e);
+            throw new IllegalArgumentException("이벤트 파싱 중 오류 발생: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("RoomJoinEvent 오류 발생: messageId={}, messageValue={}, error={}",
                     message.getId(), message.getValue(), e.getMessage(), e);
             throw new IllegalArgumentException("이벤트 파싱 중 오류 발생: " + e.getMessage(), e);
         }

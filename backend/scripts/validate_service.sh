@@ -1,29 +1,52 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 export PATH="/usr/bin:/bin:$PATH"
 
 echo "=== [VALIDATE_SERVICE] 서비스 상태 검증 ==="
 
-cd /opt/coffee-shout
+cd /opt/coffee-shout || {
+    echo "❌ 디렉토리 이동 실패: /opt/coffee-shout"
+    exit 1
+}
 
-# 헬스체크 (Actuator 없는 환경 대응)
+# 헬스체크 (Spring Boot Actuator)
 health_check() {
     local max_attempts=30
     local attempt=1
 
-    while [ $attempt -le $max_attempts ]; do
-        # 방법 1: 기본 루트 경로로 확인 (404여도 서버 응답하면 OK)
-        if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health | grep -E "200|404" > /dev/null; then
-            echo "✅ 서버 응답 확인됨 (시도: $attempt/$max_attempts)"
-            return 0
+    while [ "$attempt" -le "$max_attempts" ]; do
+        # Spring Boot Actuator 헬스체크 엔드포인트 확인
+        RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 5 http://localhost:8080/actuator/health 2>/dev/null || echo "")
+        HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+        RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
+
+        if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ 서버 헬스체크 성공 (시도: $attempt/$max_attempts)"
+
+            # jq를 사용한 안전한 파싱
+            if command -v jq &> /dev/null; then
+                HEALTH_STATUS=$(echo "$RESPONSE_BODY" | jq -r '.status // "UNKNOWN"' 2>/dev/null || echo "UNKNOWN")
+                if [ "$HEALTH_STATUS" = "UP" ]; then
+                    echo "✅ 애플리케이션 상태: UP"
+                    return 0
+                else
+                    echo "⚠️  애플리케이션 상태: $HEALTH_STATUS (재시도...)"
+                fi
+            else
+                echo "✅ 애플리케이션 상태: HTTP 200 (jq 미설치)"
+                return 0
+            fi
+        elif [ "$HTTP_CODE" = "503" ]; then
+            echo "⏳ 서버가 시작 중입니다 (HTTP 503)... (시도: $attempt/$max_attempts)"
+        else
+            echo "⏳ 서버 응답 대기 중 (HTTP $HTTP_CODE)... (시도: $attempt/$max_attempts)"
         fi
 
-        echo "⏳ 서버 응답 대기 중... (시도: $attempt/$max_attempts)"
         sleep 2
         attempt=$((attempt + 1))
     done
 
-    echo "❌ 서버 응답 없음!"
+    echo "❌ 서버 헬스체크 실패 (최대 시도 횟수 초과)"
     return 1
 }
 

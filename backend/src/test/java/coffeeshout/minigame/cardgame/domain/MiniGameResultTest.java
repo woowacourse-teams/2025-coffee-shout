@@ -1,6 +1,6 @@
 package coffeeshout.minigame.cardgame.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.cardgame.domain.CardGameScore;
 import coffeeshout.fixture.PlayerFixture;

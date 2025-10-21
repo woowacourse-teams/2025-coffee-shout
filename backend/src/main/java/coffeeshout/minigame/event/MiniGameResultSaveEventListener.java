@@ -46,7 +46,7 @@ public class MiniGameResultSaveEventListener {
             leaseTime = 5000
     )
     public void handle(MiniGameFinishedEvent event) {
-        final RoomEntity roomEntity = roomJpaRepository.findByJoinCode(event.joinCode())
+        final RoomEntity roomEntity = roomJpaRepository.findFirstByJoinCodeOrderByCreatedAtDesc(event.joinCode())
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다: " + event.joinCode()));
         final MiniGameType miniGameType = MiniGameType.valueOf(event.miniGameType());
 

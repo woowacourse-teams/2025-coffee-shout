@@ -1,6 +1,6 @@
 package coffeeshout.minigame.racinggame.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.racinggame.domain.RacingGame;
@@ -32,7 +32,7 @@ class RunnersTest {
     @Test
     void 모든_러너를_이동시킬_수_있다() {
         // when
-        runners.moveAll();
+        runners.moveAll(Instant.now());
 
         // then
         final Map<Runner, Integer> positions = runners.getPositions();
@@ -42,9 +42,10 @@ class RunnersTest {
     @Test
     void 우승자를_찾을_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
+        final Instant now = Instant.now();
+        runners.updateSpeed(players.get(0), 10, speedCalculator, now);
         for (int i = 0; i < 100; i++) {
-            runners.moveAll();
+            runners.moveAll(now);
         }
 
         // when
@@ -63,9 +64,10 @@ class RunnersTest {
     @Test
     void 우승자가_있는지_확인할_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
+        final Instant now = Instant.now();
+        runners.updateSpeed(players.get(0), 10, speedCalculator, now);
         for (int i = 0; i < 100; i++) {
-            runners.moveAll();
+            runners.moveAll(now);
         }
 
         // when && then
@@ -75,7 +77,7 @@ class RunnersTest {
     @Test
     void 모든_러너의_위치를_조회할_수_있다() {
         // given
-        runners.moveAll();
+        runners.moveAll(Instant.now());
 
         // when
         final Map<Runner, Integer> positions = runners.getPositions();
@@ -98,10 +100,11 @@ class RunnersTest {
     @Test
     void 모든_러너가_완주했는지_확인할_수_있다() {
         // given
-        runners.updateSpeed(players.get(0), 10, speedCalculator, Instant.now());
-        runners.updateSpeed(players.get(1), 10, speedCalculator, Instant.now());
+        final Instant now = Instant.now();
+        runners.updateSpeed(players.get(0), 10, speedCalculator, now);
+        runners.updateSpeed(players.get(1), 10, speedCalculator, now);
         for (int i = 0; i < 100; i++) {
-            runners.moveAll();
+            runners.moveAll(now);
         }
 
         // when && then

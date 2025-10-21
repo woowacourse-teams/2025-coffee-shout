@@ -66,7 +66,7 @@ class QrCodeSubscriptionHandlerTest {
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
         then(messagingTemplate).should(times(1))
-                .convertAndSendToUser(eq(sessionId), eq(destination), eq(WebSocketResponse.success(response)));
+                .convertAndSend(eq(destination), eq(WebSocketResponse.success(response)));
     }
 
     @Test
@@ -90,7 +90,7 @@ class QrCodeSubscriptionHandlerTest {
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
         then(messagingTemplate).should(timeout(500).times(1))
-                .convertAndSendToUser(eq(sessionId), eq(destination), eq(WebSocketResponse.success(response)));
+                .convertAndSend(eq(destination), eq(WebSocketResponse.success(response)));
     }
 
     @Test

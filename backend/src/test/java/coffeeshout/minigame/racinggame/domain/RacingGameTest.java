@@ -1,6 +1,7 @@
 package coffeeshout.minigame.racinggame.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import coffeeshout.fixture.PlayerFixture;
 import coffeeshout.racinggame.domain.RacingGame;
@@ -46,7 +47,7 @@ class RacingGameTest {
     }
 
     @Test
-    void 모든_러너가_결승선에_도착하면_게임_상태는_DONE이다() {
+    void 모든_러너가_결승선에_도착한다() {
         // given
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
@@ -60,7 +61,7 @@ class RacingGameTest {
         }
 
         // then
-        assertThat(racingGame.getState()).isEqualTo(RacingGameState.DONE);
+        assertThat(racingGame.isFinished()).isTrue();
     }
 
     @Test

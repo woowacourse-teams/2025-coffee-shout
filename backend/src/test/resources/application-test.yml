@@ -1,16 +1,19 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect  # 이것만 변경!
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
         show_sql: false
+  lifecycle:
+    timeout-per-shutdown-phase: 1s
   flyway:
     enabled: false
   cloud:
@@ -24,6 +27,9 @@ spring:
   autoconfigure:
     exclude:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
+server:
+  shutdown: immediate
 
 redisson:
   enabled: false

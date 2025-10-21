@@ -34,7 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
-    runtimeOnly("com.mysql:mysql-connector-j")
+    implementation("com.mysql:mysql-connector-j")
 
     // QueryDSL
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
@@ -63,7 +63,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("com.h2database:h2")
+    testImplementation("com.h2database:h2")
 
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")

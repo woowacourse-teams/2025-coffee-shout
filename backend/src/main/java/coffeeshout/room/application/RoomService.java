@@ -64,6 +64,8 @@ public class RoomService {
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
 
+
+    @Transactional
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();
 
@@ -83,6 +85,11 @@ public class RoomService {
 
         // QR 코드 비동기 생성 시작
         qrCodeService.generateQrCodeAsync(joinCode.getValue());
+
+        saveRoomEntity(joinCode.getValue());
+
+        log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
+                event.eventId(), event.joinCode());
 
         // 해당 방 정보 수신
         return room;
@@ -114,7 +121,14 @@ public class RoomService {
             Function<T, String> successLogParams
     ) {
         final CompletableFuture<T> future = roomEventWaitManager.registerWait(eventId);
-        eventPublisher.run();
+
+        try {
+            eventPublisher.run();
+        } catch (Exception e) {
+            log.error("{} 이벤트 발행 실패: eventId={}, {}", operationName, eventId, logParams, e);
+            future.completeExceptionally(e);
+            return future;
+        }
 
         return future.orTimeout(eventTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete((result, throwable) -> {
@@ -148,7 +162,6 @@ public class RoomService {
         return room.getPlayers();
     }
 
-    @Transactional
     public void saveRoomEntity(String joinCodeValue) {
         final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
         roomJpaRepository.save(roomEntity);
@@ -304,5 +317,10 @@ public class RoomService {
     private boolean hasPlayer(String joinCode, String playerName) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.hasPlayer(new PlayerName(playerName));
+    }
+
+    public List<Playable> getRemainingMiniGames(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.getMiniGames().stream().toList();
     }
 }
