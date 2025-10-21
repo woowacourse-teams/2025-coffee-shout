@@ -82,6 +82,7 @@ const EnterRoomModal = ({ onClose }: Props) => {
         onChange={handleJoinCodeChange}
         onKeyDown={handleKeyDown}
         autoFocus
+        aria-label="초대코드를 입력해주세요"
       />
       <S.ErrorText>{errorText}</S.ErrorText>
       <S.ButtonContainer>
