@@ -48,7 +48,7 @@ public class MiniGamePersistenceService {
     }
 
     private RoomEntity getRoomEntity(String joinCode) {
-        return roomJpaRepository.findByJoinCode(joinCode)
+        return roomJpaRepository.findFirstByJoinCodeOrderByCreatedAtDesc(joinCode)
                 .orElseThrow(() -> new IllegalArgumentException("방이 존재하지 않습니다: " + joinCode));
     }
 }
