@@ -14,9 +14,9 @@ export const Container = styled.button<Props>`
   gap: 20px;
 
   width: 100%;
-  height: 130px;
+  height: fit-content;
   border-radius: 12px;
-  padding: 28px 20px;
+  padding: 24px;
   background-color: ${({ theme }) => theme.color.gray[50]};
 
   ${({ theme, $touchState }) =>
