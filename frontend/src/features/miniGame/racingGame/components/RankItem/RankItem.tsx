@@ -5,17 +5,24 @@ type Props = {
   playerName: string;
   rank: number;
   isMe: boolean;
+  isFixed: boolean;
 };
 
-const RankItem = ({ playerName, rank, isMe }: Props) => {
+const RankItem = ({ playerName, rank, isMe, isFixed }: Props) => {
   return (
-    <S.Container>
+    <S.Container $isFixed={isFixed}>
       <S.RankNumber>
-        <Description color={isMe ? 'point-500' : 'white'}>{rank}</Description>
+        <Description color={getTextColor(isMe, isFixed)}>{rank}</Description>
       </S.RankNumber>
-      <Description color={isMe ? 'point-500' : 'white'}>{playerName}</Description>
+      <Description color={getTextColor(isMe, isFixed)}>{playerName}</Description>
     </S.Container>
   );
 };
 
 export default RankItem;
+
+const getTextColor = (isMe: boolean, isFixed: boolean) => {
+  if (isMe) return 'point-500';
+  if (isFixed) return 'black';
+  return 'white';
+};

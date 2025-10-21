@@ -28,6 +28,7 @@ const RacingRank = ({ players, myName }: Props) => {
               playerName={player.playerName}
               rank={index + 1}
               isMe={isMe}
+              isFixed={false}
             />
           );
         })}
