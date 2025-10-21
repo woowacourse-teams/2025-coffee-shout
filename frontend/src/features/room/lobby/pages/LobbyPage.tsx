@@ -26,12 +26,14 @@ import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import InvitationModal from '../components/JoinCodeModal/InvitationModal';
+import InvitationModal from '../components/InvitationModal/InvitationModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
+import useGameAnnouncement from '../hooks/useGameAnnouncement';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -53,6 +55,12 @@ const LobbyPage = () => {
     endpoint: `/rooms/${joinCode}/players/${myName}`,
     method: 'DELETE',
     errorDisplayMode: 'toast',
+  });
+  const announcement = useGameAnnouncement({
+    isAllReady,
+    participants,
+    playerType,
+    myName,
   });
 
   useParticipantValidation({ isConnected });
@@ -283,10 +291,11 @@ const LobbyPage = () => {
 
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         {renderGameButton()}
-        <Button variant="primary" onClick={handleShare}>
-          <img src={ShareIcon} alt="공유" />
+        <Button variant="primary" onClick={handleShare} aria-label="친구 초대하기">
+          <img src={ShareIcon} aria-hidden="true" alt="" />
         </Button>
       </Layout.ButtonBar>
+      <ScreenReaderOnly aria-live="assertive">{announcement}</ScreenReaderOnly>
     </Layout>
   );
 };
