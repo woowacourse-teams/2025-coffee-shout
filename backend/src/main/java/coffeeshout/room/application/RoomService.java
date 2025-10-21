@@ -104,14 +104,18 @@ public class RoomService {
     }
 
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Player player = room.findPlayer(new PlayerName(playerName));
+        final JoinCode code = new JoinCode(joinCode);
+        final PlayerName name = new PlayerName(playerName);
+        
+        final Room room = roomQueryService.getByJoinCode(code);
+        final Player player = room.findPlayer(name);
 
         if (player.getPlayerType() != PlayerType.HOST) {
             player.updateReadyState(isReady);
+            
+            // 전체 save 대신 부분 업데이트 사용
+            roomCommandService.updatePlayerReadyState(code, name, isReady);
         }
-
-        roomCommandService.save(room);
 
         return room.getPlayers();
     }
@@ -128,14 +132,16 @@ public class RoomService {
     }
 
     public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final JoinCode code = new JoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(code);
         room.clearMiniGames();
 
         miniGameTypes.forEach(miniGameType -> {
             room.addMiniGame(new PlayerName(hostName), miniGameType);
         });
 
-        roomCommandService.save(room);
+        // miniGames만 업데이트
+        roomCommandService.updateMiniGames(code, room);
 
         return room.getAllMiniGames();
     }
@@ -176,9 +182,12 @@ public class RoomService {
     }
 
     public void applyMiniGameResult(String joinCode, MiniGameResult miniGameResult) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final JoinCode code = new JoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(code);
         room.applyMiniGameResult(miniGameResult);
-        roomCommandService.save(room);
+        
+        // 전체 save 대신 players만 업데이트
+        roomCommandService.updatePlayers(code, room);
     }
 
     public boolean isReadyState(String joinCode) {
@@ -187,10 +196,14 @@ public class RoomService {
     }
 
     public void startNextGame(String joinCode, String hostName) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final JoinCode code = new JoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(code);
         MiniGameType miniGameType = room.startNextGame(new PlayerName(hostName));
         miniGameManager.startGame(miniGameType, joinCode, room.getPlayers());
-        roomCommandService.save(room);
+        
+        // miniGames와 state 업데이트
+        roomCommandService.updateMiniGames(code, room);
+        roomCommandService.updateRoomState(code, room.getRoomState().name());
     }
 
     private void scheduleRemoveRoom(JoinCode joinCode) {

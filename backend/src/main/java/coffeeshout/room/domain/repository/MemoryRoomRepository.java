@@ -4,10 +4,10 @@ import static org.springframework.util.Assert.notNull;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.player.PlayerName;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.stereotype.Repository;
 
 //@Repository
 public class MemoryRoomRepository implements RoomRepository {
@@ -37,7 +37,33 @@ public class MemoryRoomRepository implements RoomRepository {
     @Override
     public void deleteByJoinCode(JoinCode joinCode) {
         notNull(joinCode, "JoinCode는 null일 수 없습니다.");
-
         rooms.remove(joinCode);
+    }
+
+    @Override
+    public void updatePlayerReadyState(JoinCode joinCode, PlayerName playerName, Boolean isReady) {
+        // 메모리 방식에서는 save()와 동일
+        Room room = rooms.get(joinCode);
+        if (room != null) {
+            room.findPlayer(playerName).updateReadyState(isReady);
+        }
+    }
+
+    @Override
+    public void updatePlayers(JoinCode joinCode, Room room) {
+        // 메모리 방식에서는 save()와 동일
+        save(room);
+    }
+
+    @Override
+    public void updateRoomState(JoinCode joinCode, String state) {
+        // 메모리 방식에서는 객체 참조라 자동 반영됨
+        // 별도 작업 불필요
+    }
+
+    @Override
+    public void updateMiniGames(JoinCode joinCode, Room room) {
+        // 메모리 방식에서는 save()와 동일
+        save(room);
     }
 }
