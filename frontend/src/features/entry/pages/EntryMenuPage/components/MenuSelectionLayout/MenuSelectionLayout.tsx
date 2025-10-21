@@ -1,7 +1,8 @@
-import { PropsWithChildren, useEffect, useRef } from 'react';
+import { PropsWithChildren } from 'react';
 import * as S from './MenuSelectionLayout.styled';
 import SelectionCard from '@/components/@common/SelectionCard/SelectionCard';
 import Headline3 from '@/components/@common/Headline3/Headline3';
+import useAutoFocus from '@/hooks/useAutoFocus';
 
 type Props = {
   categorySelection: CategorySelection;
@@ -26,13 +27,7 @@ const MenuSelectionLayout = ({
   menuSelection,
   children,
 }: Props) => {
-  const liveRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    if (liveRef.current) {
-      liveRef.current.focus();
-    }
-  }, []);
+  const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   return (
     <>

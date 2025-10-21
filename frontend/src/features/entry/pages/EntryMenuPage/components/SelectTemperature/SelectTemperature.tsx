@@ -1,7 +1,7 @@
 import TemperatureToggle from '@/components/@common/TemperatureToggle/TemperatureToggle';
 import TemperatureOnly from '@/components/@common/TemperatureOnly/TemperatureOnly';
 import { TemperatureAvailability, TemperatureOption } from '@/types/menu';
-import { useEffect, useRef } from 'react';
+import useAutoFocus from '@/hooks/useAutoFocus';
 
 type Props = {
   temperatureAvailability: TemperatureAvailability;
@@ -22,13 +22,7 @@ const SelectTemperature = ({
   selectedTemperature,
   onChangeTemperature,
 }: Props) => {
-  const liveRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (liveRef.current) {
-      liveRef.current.focus();
-    }
-  }, []);
+  const liveRef = useAutoFocus<HTMLDivElement>();
 
   if (temperatureAvailability === 'BOTH') {
     return (
