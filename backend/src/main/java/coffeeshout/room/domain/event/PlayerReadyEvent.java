@@ -20,7 +20,7 @@ public record PlayerReadyEvent(
 
     public PlayerReadyEvent(String joinCode, String playerName, Boolean isReady) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

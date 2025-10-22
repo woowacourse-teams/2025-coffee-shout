@@ -89,7 +89,7 @@ public class RoomWebSocketController {
             MiniGameSelectMessage message
     ) {
         final MiniGameSelectEvent event = new MiniGameSelectEvent(joinCode, message.hostName(),
-            message.miniGameTypes());
+                message.miniGameTypes());
         roomEventPublisher.publishEvent(event);
     }
 

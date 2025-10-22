@@ -21,7 +21,7 @@ public record RouletteSpinEvent(
 
     public RouletteSpinEvent(String joinCode, String hostName, Winner winner) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

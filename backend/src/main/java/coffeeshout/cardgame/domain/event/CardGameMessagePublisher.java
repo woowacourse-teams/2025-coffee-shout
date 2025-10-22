@@ -15,10 +15,6 @@ import generator.annotaions.MessageResponse;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-/*
-    TODO: redis도입시 event발송에서 redis pub/sub message 발송으로 변경하기
- */
-
 @Component
 public class CardGameMessagePublisher {
 

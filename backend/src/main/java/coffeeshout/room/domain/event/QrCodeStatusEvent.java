@@ -21,7 +21,7 @@ public record QrCodeStatusEvent(
 
     public QrCodeStatusEvent(String joinCode, QrCodeStatus status, String qrCodeUrl) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

@@ -19,7 +19,7 @@ public record PlayerKickEvent(
 
     public PlayerKickEvent(String joinCode, String playerName) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

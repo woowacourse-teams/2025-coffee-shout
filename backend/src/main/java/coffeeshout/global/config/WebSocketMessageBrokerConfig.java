@@ -62,7 +62,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         executor.setThreadNamePrefix("inbound-");
         executor.initialize();
         registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor, messageMappingExecutorChannelInterceptor)
-                .taskExecutor(executor);
+                .executor(executor);
     }
 
     @Override

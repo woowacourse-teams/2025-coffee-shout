@@ -22,7 +22,7 @@ public record SelectCardCommandEvent(
 
     public SelectCardCommandEvent(String joinCode, String playerName, Integer cardIndex) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),
