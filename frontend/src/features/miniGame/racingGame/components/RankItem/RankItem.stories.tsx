@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import RankItem from './RankItem';
-import { PropsWithChildren } from 'react';
 
 const meta: Meta<typeof RankItem> = {
   title: 'Features/MiniGame/RacingGame/RankItem/RankItem',
@@ -15,16 +14,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
-    <BlueBackground>
+    <div style={{ backgroundColor: '#354557', padding: '20px', borderRadius: '8px' }}>
       <RankItem playerName="Player1" rank={1} isMe={false} isFixed={false} />
-    </BlueBackground>
+    </div>
   ),
 };
 
 export const Fixed: Story = {
   render: () => (
-    <BlueBackground>
+    <div style={{ backgroundColor: '#354557', padding: '20px', borderRadius: '8px' }}>
       <RankItem playerName="Player1" rank={1} isMe={false} isFixed={true} />
-    </BlueBackground>
+    </div>
   ),
 };
