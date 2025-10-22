@@ -1,19 +1,20 @@
+import { useBackButtonConfirm } from '@/hooks/useBackButtonConfirm';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { MiniGameType } from '@/types/miniGame/common';
 import { PropsWithChildren } from 'react';
 import { useParams } from 'react-router-dom';
 import { GAME_CONFIGS } from '../config/gameConfigs';
-import { useBackButtonConfirm } from '@/hooks/useBackButtonConfirm';
 
 const MiniGameProviders = ({ children }: PropsWithChildren) => {
-  useBackButtonConfirm();
-  const { miniGameType } = useParams();
+  const navigate = useReplaceNavigate();
+  useBackButtonConfirm({ onConfirm: () => navigate('/') });
 
+  const { miniGameType } = useParams();
   if (!miniGameType || !(miniGameType in GAME_CONFIGS)) {
     return <>{children}</>;
   }
 
   const ProviderComponent = GAME_CONFIGS[miniGameType as MiniGameType].Provider;
-
   if (!ProviderComponent) {
     return <>{children}</>;
   }
