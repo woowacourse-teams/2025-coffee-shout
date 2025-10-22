@@ -1,7 +1,7 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { StompSubscription } from '@stomp/stompjs';
 import { useCallback, useEffect, useRef } from 'react';
-import { useWebSocket } from '../contexts/WebSocketContext';
 
 export const useWebSocketSubscription = <T>(
   destination: string,
@@ -10,36 +10,45 @@ export const useWebSocketSubscription = <T>(
   enabled: boolean = true
 ) => {
   const { isVisible } = usePageVisibility();
-  const { subscribe, isConnected, client } = useWebSocket();
+  const { subscribe, isConnected, sessionId } = useWebSocket();
   const subscriptionRef = useRef<StompSubscription | null>(null);
-  const lastConnectedRef = useRef(false);
+  const lastSessionIdRef = useRef<string | null>(null);
 
   const unsubscribe = useCallback(() => {
     if (subscriptionRef.current) {
-      subscriptionRef.current.unsubscribe();
-      subscriptionRef.current = null;
-      console.log(`🔌 웹소켓 구독 해제: ${destination}`);
+      try {
+        subscriptionRef.current.unsubscribe();
+        console.log(`🔌 구독 해제 완료: ${destination}`);
+      } catch (error) {
+        console.error(`❌ 구독 해제 실패: ${destination}`, error);
+      } finally {
+        subscriptionRef.current = null;
+      }
     }
   }, [destination]);
 
   useEffect(() => {
     if (!isConnected || !isVisible || !enabled) {
       unsubscribe();
-      lastConnectedRef.current = false;
+      lastSessionIdRef.current = null;
       return;
     }
 
-    const shouldSubscribe =
-      !lastConnectedRef.current || (lastConnectedRef.current && !subscriptionRef.current);
+    const sessionChanged = sessionId !== lastSessionIdRef.current;
 
-    if (shouldSubscribe) {
+    if (sessionChanged || !subscriptionRef.current) {
+      if (sessionChanged) {
+        console.log(`🔄 SessionId 변경 → 재구독: ${destination}`);
+        unsubscribe();
+      }
+
       try {
-        const subscription = subscribe<T>(destination, onData, onError);
-        subscriptionRef.current = subscription;
-        lastConnectedRef.current = true;
-        console.log(`✅ 웹소켓 구독 성공: ${destination}`);
+        const sub = subscribe<T>(destination, onData, onError);
+        subscriptionRef.current = sub;
+        lastSessionIdRef.current = sessionId;
+        console.log(`✅ 구독 성공: ${destination}`, { sessionId });
       } catch (error) {
-        console.error('❌ 웹소켓 구독 실패:', error);
+        console.error('❌ 구독 실패:', error);
       }
     }
 
@@ -47,12 +56,12 @@ export const useWebSocketSubscription = <T>(
   }, [
     isConnected,
     isVisible,
+    enabled,
+    sessionId,
     subscribe,
     destination,
     onData,
     onError,
-    client,
     unsubscribe,
-    enabled,
   ]);
 };
