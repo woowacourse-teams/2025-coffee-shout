@@ -9,11 +9,11 @@ import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
 import { useCallback, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 import useRoulettePlay from './hooks/useRoulettePlay';
@@ -23,7 +23,7 @@ const RoulettePlayPage = () => {
   const { joinCode, myName } = useIdentifier();
   const { playerType } = usePlayerType();
   const { send } = useWebSocket();
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
