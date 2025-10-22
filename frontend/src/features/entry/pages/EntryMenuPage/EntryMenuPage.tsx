@@ -48,11 +48,12 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { proceedToRoom, isLoading } = useRoomManagement();
+  const { proceedToRoom, isLoading, error } = useRoomManagement();
 
   useEffect(() => {
     if (isLoading) setIsRoomLoading(true);
-  }, [isLoading]);
+    if (error) setIsRoomLoading(false);
+  }, [isLoading, error]);
 
   useEffect(() => {
     const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
