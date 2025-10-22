@@ -1,9 +1,9 @@
 import { PropsWithChildren } from 'react';
+import { useStompSessionWatcher } from '../hooks/useStompSessionWatcher';
 import { useWebSocketConnection } from '../hooks/useWebSocketConnection';
 import { useWebSocketMessaging } from '../hooks/useWebSocketMessaging';
 import { useWebSocketReconnection } from '../hooks/useWebSocketReconnection';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
-import { useStompSessionWatcher } from '../hooks/useStompSessionWatcher';
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const { client, isConnected, startSocket, stopSocket } = useWebSocketConnection();

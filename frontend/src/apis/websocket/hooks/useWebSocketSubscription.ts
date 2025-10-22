@@ -28,7 +28,7 @@ export const useWebSocketSubscription = <T>(
   }, [destination]);
 
   const doSubscribe = useCallback(() => {
-    if (!isVisible || !enabled) {
+    if (!enabled || !isVisible) {
       unsubscribe();
       return;
     }
