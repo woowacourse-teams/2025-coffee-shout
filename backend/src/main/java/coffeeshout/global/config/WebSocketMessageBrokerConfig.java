@@ -11,6 +11,7 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -22,6 +23,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
+@DependsOn({
+        "applicationTaskExecutor1",
+        "cardGameTaskScheduler",
+        "racingGameScheduler"
+})
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
