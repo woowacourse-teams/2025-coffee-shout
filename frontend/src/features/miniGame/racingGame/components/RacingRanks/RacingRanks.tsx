@@ -13,7 +13,7 @@ type Props = {
   endDistance: number;
 };
 
-const RacingRank = ({ players, myName, endDistance }: Props) => {
+const RacingRanks = ({ players, myName, endDistance }: Props) => {
   const finishOrderRef = useRef<Player[]>([]);
 
   const rankedPlayers = useMemo(() => {
@@ -56,4 +56,4 @@ const RacingRank = ({ players, myName, endDistance }: Props) => {
   );
 };
 
-export default RacingRank;
+export default RacingRanks;
