@@ -33,6 +33,8 @@ import { ParticipantSection } from '../components/ParticipantSection/Participant
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
+import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
+import useGameAnnouncement from '../hooks/useGameAnnouncement';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
@@ -54,6 +56,12 @@ const LobbyPage = () => {
     endpoint: `/rooms/${joinCode}/players/${myName}`,
     method: 'DELETE',
     errorDisplayMode: 'toast',
+  });
+  const announcement = useGameAnnouncement({
+    isAllReady,
+    participants,
+    playerType,
+    myName,
   });
 
   useParticipantValidation({ isConnected });
@@ -208,7 +216,7 @@ const LobbyPage = () => {
 
     const updatedMiniGames = selectedMiniGames.includes(miniGameType)
       ? selectedMiniGames.filter((game) => game !== miniGameType)
-      : [miniGameType];
+      : [...selectedMiniGames, miniGameType];
 
     send(
       `/room/${joinCode}/update-minigames`,
@@ -297,10 +305,11 @@ const LobbyPage = () => {
 
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         {renderGameButton()}
-        <Button variant="primary" onClick={handleShare}>
-          <img src={ShareIcon} alt="공유" />
+        <Button variant="primary" onClick={handleShare} aria-label="친구 초대하기">
+          <img src={ShareIcon} aria-hidden="true" alt="" />
         </Button>
       </Layout.ButtonBar>
+      <ScreenReaderOnly aria-live="assertive">{announcement}</ScreenReaderOnly>
     </Layout>
   );
 };

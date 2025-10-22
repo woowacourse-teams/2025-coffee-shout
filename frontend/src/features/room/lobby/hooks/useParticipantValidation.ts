@@ -49,8 +49,8 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
 
     // 방 존재 여부 체크
     const response = await checkRoomExists();
-
-    if (!response?.exist) {
+    if (!response) return;
+    if (!response.exist) {
       navigateToHome('방이 존재하지 않음');
       return;
     }

@@ -5,7 +5,6 @@ import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import RacingRank from '../components/RacingRank/RacingRank';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
 import { useBackgroundAnimation } from '../hooks/useBackgroundAnimation';
@@ -18,6 +17,7 @@ import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { colorList } from '@/constants/color';
+import RacingRanks from '../components/RacingRanks/RacingRanks';
 
 const FINISH_LINE_VISUAL_OFFSET = 30;
 
@@ -69,7 +69,11 @@ const RacingGamePage = () => {
       {showGoal && <Goal />}
       <RacingGameOverlay>
         <S.Container ref={containerRef}>
-          <RacingRank players={racingGameData.players} myName={myName} />
+          <RacingRanks
+            players={racingGameData.players}
+            myName={myName}
+            endDistance={racingGameData.distance.end}
+          />
           <RacingProgressBar
             myName={myName}
             endDistance={racingGameData.distance.end}

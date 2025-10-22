@@ -7,6 +7,7 @@ import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBou
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import useAutoFocus from '@/hooks/useAutoFocus';
 import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { CategoryWithColor, Menu } from '@/types/menu';
@@ -25,6 +26,7 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
     category,
@@ -125,7 +127,9 @@ const EntryMenuPage = () => {
         <S.Container>
           {currentView === 'selectCategory' ? (
             <>
-              <Headline3>카테고리를 선택해주세요</Headline3>
+              <Headline3 ref={liveRef} tabIndex={0}>
+                카테고리를 선택해주세요
+              </Headline3>
               <LocalErrorBoundary>
                 <SelectCategory onClickCategory={handleCategorySelect} />
               </LocalErrorBoundary>

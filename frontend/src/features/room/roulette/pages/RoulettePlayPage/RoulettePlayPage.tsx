@@ -1,26 +1,40 @@
+import useFetch from '@/apis/rest/useFetch';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
 import Button from '@/components/@common/Button/Button';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import ProbabilityList from '@/components/@composition/ProbabilityList/ProbabilityList';
+import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
 import Layout from '@/layouts/Layout';
+import { MiniGameType } from '@/types/miniGame/common';
+import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
+import { useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import RoulettePlaySection from '../../components/RoulettePlaySection/RoulettePlaySection';
 import * as S from './RoulettePlayPage.styled';
 import useRoulettePlay from './hooks/useRoulettePlay';
-import { RouletteView, RouletteWinnerResponse } from '@/types/roulette';
-import { useCallback, useState } from 'react';
-import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import RouletteViewToggle from '@/components/@composition/RouletteViewToggle/RouletteViewToggle';
-import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
-import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
+import useRouletteProbabilities from './hooks/useRouletteProbabilities';
 
 const RoulettePlayPage = () => {
-  const { joinCode } = useIdentifier();
+  const { joinCode, myName } = useIdentifier();
   const { playerType } = usePlayerType();
+  const { send } = useWebSocket();
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<RouletteView>('roulette');
   const { winner, randomAngle, isSpinStarted, handleSpinClick, startSpinWithResult } =
     useRoulettePlay();
   const { probabilityHistory } = useProbabilityHistory();
+  const isFirstLoadRef = useRef(true);
+  const { data: remainingMiniGames } = useFetch<{ remaining: MiniGameType[] }>({
+    endpoint: `/rooms/${joinCode}/miniGames/remaining`,
+    enabled: !!joinCode,
+  });
+
+  useRouletteProbabilities(isFirstLoadRef);
 
   const handleWinnerData = useCallback(
     (data: RouletteWinnerResponse) => {
@@ -30,10 +44,42 @@ const RoulettePlayPage = () => {
     [startSpinWithResult]
   );
 
+  const handleGameStart = useCallback(
+    (data: { miniGameType: MiniGameType }) => {
+      const { miniGameType: nextMiniGame } = data;
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+    },
+    [joinCode, navigate]
+  );
+
   useWebSocketSubscription<RouletteWinnerResponse>(`/room/${joinCode}/winner`, handleWinnerData);
+  useWebSocketSubscription(`/room/${joinCode}/round`, handleGameStart);
 
   const handleViewChange = () => {
     setCurrentView((prev) => (prev === 'statistics' ? 'roulette' : 'statistics'));
+  };
+
+  const hasNextMiniGame = remainingMiniGames && remainingMiniGames.remaining.length > 0;
+
+  const handleUnifiedButtonClick = () => {
+    if (isSpinStarted) return;
+
+    if (hasNextMiniGame) {
+      send(`/room/${joinCode}/minigame/command`, {
+        commandType: 'START_MINI_GAME',
+        commandRequest: {
+          hostName: myName,
+        },
+      });
+    } else {
+      handleSpinClick();
+    }
+  };
+
+  const getButtonText = () => {
+    if (isSpinStarted) return '룰렛 돌리는 중';
+    if (hasNextMiniGame) return '다음 미니게임 하러가기';
+    return '룰렛 돌리기';
   };
 
   const VIEW_COMPONENTS = {
@@ -42,6 +88,7 @@ const RoulettePlayPage = () => {
         isSpinStarted={isSpinStarted}
         winner={winner}
         randomAngle={randomAngle}
+        isFirstLoadRef={isFirstLoadRef}
       />
     ),
     statistics: <ProbabilityList playerProbabilities={probabilityHistory.current} />,
@@ -64,8 +111,11 @@ const RoulettePlayPage = () => {
       </Layout.Content>
       <Layout.ButtonBar>
         {playerType === 'HOST' ? (
-          <Button variant={isSpinStarted ? 'disabled' : 'primary'} onClick={handleSpinClick}>
-            {isSpinStarted ? '룰렛 돌리는 중' : '룰렛 돌리기'}
+          <Button
+            variant={isSpinStarted ? 'disabled' : 'primary'}
+            onClick={handleUnifiedButtonClick}
+          >
+            {getButtonText()}
           </Button>
         ) : (
           <Button variant={isSpinStarted ? 'disabled' : 'loading'} loadingText="대기 중">

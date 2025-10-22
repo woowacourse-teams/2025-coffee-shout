@@ -1,5 +1,3 @@
-import LogoMainIcon from '@/assets/logo/logo-main.png';
-import Headline3 from '@/components/@common/Headline3/Headline3';
 import useModal from '@/components/@common/Modal/useModal';
 import RoomActionButton from '@/components/@common/RoomActionButton/RoomActionButton';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
@@ -12,6 +10,7 @@ import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import EnterRoomModal from '../components/EnterRoomModal/EnterRoomModal';
 import Splash from '../components/Splash/Splash';
 import * as S from './HomePage.styled';
+import DashBoard from '../components/DashBoard/DashBoard';
 
 const HomePage = () => {
   const navigate = useReplaceNavigate();
@@ -60,14 +59,9 @@ const HomePage = () => {
 
   return (
     <Layout>
-      <Layout.Banner>
+      <Layout.Banner height="55%">
         <S.Banner>
-          <Headline3 color="white">
-            초대받은 방에 참가하거나
-            <br />
-            새로운 방을 만들어보세요
-          </Headline3>
-          <S.Logo src={LogoMainIcon} fetchPriority="high" alt="커피빵 로고" />
+          <DashBoard />
         </S.Banner>
       </Layout.Banner>
       <S.ButtonContainer>
