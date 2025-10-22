@@ -11,7 +11,6 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -23,11 +22,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-@DependsOn({
-        "applicationTaskExecutor1",
-        "cardGameTaskScheduler",
-        "racingGameScheduler"
-})
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
@@ -36,6 +30,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     private final ShutdownAwareHandshakeInterceptor shutdownAwareHandshakeInterceptor;
     private final ObservationRegistry observationRegistry;
     private final ContextSnapshotFactory snapshotFactory;
+    private final MessageMappingExecutorChannelInterceptor messageMappingExecutorChannelInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -61,12 +56,13 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor)
-                .taskExecutor()
-                .corePoolSize(32)
-                .maxPoolSize(32)
-                .queueCapacity(2048)
-                .keepAliveSeconds(60);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(16);
+        executor.setThreadNamePrefix("inbound-");
+        executor.initialize();
+        registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor, messageMappingExecutorChannelInterceptor)
+                .taskExecutor(executor);
     }
 
     @Override

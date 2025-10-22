@@ -20,7 +20,6 @@ import coffeeshout.room.ui.response.RoomStatusResponse;
 import coffeeshout.room.ui.response.WinnerResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;
-import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -87,10 +86,9 @@ public class RoomWebSocketController {
     )
     public void broadcastMiniGames(
             @DestinationVariable String joinCode,
-            Principal principal,
             MiniGameSelectMessage message
     ) {
-        final MiniGameSelectEvent event = new MiniGameSelectEvent(principal.getName(), joinCode, message.hostName(),
+        final MiniGameSelectEvent event = new MiniGameSelectEvent(joinCode, message.hostName(),
             message.miniGameTypes());
         roomEventPublisher.publishEvent(event);
     }
