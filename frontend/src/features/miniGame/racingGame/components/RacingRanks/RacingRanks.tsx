@@ -14,7 +14,7 @@ type Props = {
 };
 
 const RacingRank = ({ players, myName, endDistance }: Props) => {
-  const finishOrderRef = useRef<{ playerName: string; position: number }[]>([]);
+  const finishOrderRef = useRef<Player[]>([]);
 
   const rankedPlayers = useMemo(() => {
     const finishOrder = finishOrderRef.current;
