@@ -27,15 +27,13 @@ export const useWebSocketSubscription = <T>(
     }
   }, [destination]);
 
-  useEffect(() => {
-    if (!isConnected || !isVisible || !enabled) {
+  const doSubscribe = useCallback(() => {
+    if (!isVisible || !enabled) {
       unsubscribe();
-      lastSessionIdRef.current = null;
       return;
     }
 
     const sessionChanged = sessionId !== lastSessionIdRef.current;
-
     if (sessionChanged || !subscriptionRef.current) {
       if (sessionChanged) {
         console.log(`🔄 SessionId 변경 → 재구독: ${destination}`);
@@ -51,17 +49,10 @@ export const useWebSocketSubscription = <T>(
         console.error('❌ 구독 실패:', error);
       }
     }
+  }, [enabled, isVisible, sessionId, destination, onData, onError, unsubscribe, subscribe]);
 
+  useEffect(() => {
+    if (isConnected) doSubscribe();
     return unsubscribe;
-  }, [
-    isConnected,
-    isVisible,
-    enabled,
-    sessionId,
-    subscribe,
-    destination,
-    onData,
-    onError,
-    unsubscribe,
-  ]);
+  }, [isConnected, doSubscribe, unsubscribe]);
 };
