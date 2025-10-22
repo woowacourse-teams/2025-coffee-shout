@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import RankItem from './RankItem';
-import { ReactNode } from 'react';
-
-const BlueBackground = ({ children }: { children: ReactNode }) => (
-  <div style={{ backgroundColor: '#354557', padding: '20px', borderRadius: '8px' }}>{children}</div>
-);
+import { PropsWithChildren } from 'react';
 
 const meta: Meta<typeof RankItem> = {
   title: 'Features/MiniGame/RacingGame/RankItem/RankItem',
