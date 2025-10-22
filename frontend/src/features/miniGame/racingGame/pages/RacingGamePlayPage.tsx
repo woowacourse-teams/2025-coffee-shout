@@ -5,7 +5,7 @@ import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
 import { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import RacingRank from '../components/RacingRank/RacingRanks';
+import RacingRank from '../components/RacingRanks/RacingRanks';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
 import { useGoalDisplay } from '../hooks/useGoalDisplay';
 import { useBackgroundAnimation } from '../hooks/useBackgroundAnimation';
