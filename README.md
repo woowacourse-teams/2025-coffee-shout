@@ -16,35 +16,7 @@
 
 ## 🎯 서비스 흐름
 
-### 1️⃣ 커피 내기를 할 사람들을 모아보세요!
-
-> 심심할 때! 밥 다 먹었을 때! 
->
-> 커피 내기 하러 가실래요?
->
-> QR 코드, 링크, 참가 코드를 통해 쉽게 사람들을 모아보세요!
->
-> <img width="200" height="737" alt="image" src="https://github.com/user-attachments/assets/8812ed58-d720-4580-babb-949deed46ca8" />
-
-### 2️⃣ 재밌게 게임을 즐기세요!
-
-> 카드게임! 레이싱 게임!
-> 
-> 다음엔 어떤 게임이 있을까요?
-> 
-> 게임 결과에 따라 룰렛의 확률이 변합니다!
-> 
-> <img width="200" height="738" alt="image" src="https://github.com/user-attachments/assets/22589971-b8b4-4ecb-892e-109b5daaba8f" />
-> 
-> <img width="200" height="740" alt="image" src="https://github.com/user-attachments/assets/6a1ee2bd-9b30-4586-904e-ad485df86154" />
-
-### 3️⃣ 룰렛을 돌려 당첨자를 뽑아보세요!
-
-> 두구두구! 룰렛을 돌려볼까요?
-> 
-> 당첨자가 정해지면 모든 사람들의 메뉴가 종합되어 보여집니다!
-> 
-> <img width="200" height="735" alt="image" src="https://github.com/user-attachments/assets/3c2f954f-50c9-47ab-bdee-cff56ad47528" />
+<img width="7680" height="12960" alt="커피빵 리드미" src="https://github.com/user-attachments/assets/d7355bce-a09a-4f53-8d63-b5b152e24230" />
 
 ## 🛠 기술 스택
 
