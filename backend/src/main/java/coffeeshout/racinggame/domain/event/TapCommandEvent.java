@@ -15,7 +15,7 @@ public record TapCommandEvent(
         int tapCount,
         Instant timestamp,
         TraceInfo traceInfo
-) {
+) implements RacingGameBaseEvent {
 
     public static TapCommandEvent create(String joinCode, String playerName, int tapCount) {
         final String eventId = UUID.randomUUID().toString();

@@ -1,5 +1,7 @@
 package coffeeshout.racinggame.infra.messaging;
 
+import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.racinggame.domain.event.RacingGameBaseEvent;
 import coffeeshout.racinggame.domain.event.RacingGameEventType;
 import coffeeshout.racinggame.domain.event.StartRacingGameCommandEvent;
 import coffeeshout.racinggame.domain.event.TapCommandEvent;
@@ -25,12 +27,14 @@ public class RacingGameEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic racingGameEventTopic;
+    private final LoggingSimpMessagingTemplate loggingSimpMessagingTemplate;
 
     public RacingGameEventSubscriber(
             List<RacingGameEventHandler<?>> handlers,
             ObjectMapper objectMapper,
             RedisMessageListenerContainer redisMessageListenerContainer,
-            ChannelTopic racingGameEventTopic
+            ChannelTopic racingGameEventTopic,
+            LoggingSimpMessagingTemplate loggingSimpMessagingTemplate
     ) {
         this.handlers = handlers.stream().collect(Collectors.toMap(
                 RacingGameEventHandler::getSupportedEventType,
@@ -39,6 +43,7 @@ public class RacingGameEventSubscriber implements MessageListener {
         this.objectMapper = objectMapper;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.racingGameEventTopic = racingGameEventTopic;
+        this.loggingSimpMessagingTemplate = loggingSimpMessagingTemplate;
     }
 
     @PostConstruct
@@ -49,6 +54,7 @@ public class RacingGameEventSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        RacingGameBaseEvent event = null;
         try {
             final String body = new String(message.getBody());
             final RacingGameEventType eventType = extractEventType(body);
@@ -58,13 +64,14 @@ public class RacingGameEventSubscriber implements MessageListener {
                 return;
             }
 
-            final Object event = deserializeEvent(body, eventType);
+            event = deserializeEvent(body, eventType);
             @SuppressWarnings("unchecked")
             final RacingGameEventHandler<Object> handler = (RacingGameEventHandler<Object>) handlers.get(eventType);
             handler.handle(event);
 
         } catch (Exception e) {
             log.error("레이싱 게임 이벤트 처리 실패: message={}", new String(message.getBody()), e);
+            loggingSimpMessagingTemplate.convertAndSendError(event.sessionId(), e);
         }
     }
 
@@ -78,7 +85,7 @@ public class RacingGameEventSubscriber implements MessageListener {
         return handlers.containsKey(eventType);
     }
 
-    private Object deserializeEvent(String body, RacingGameEventType eventType) throws Exception {
+    private RacingGameBaseEvent deserializeEvent(String body, RacingGameEventType eventType) throws Exception {
         return switch (eventType) {
             case START_RACING_GAME_COMMAND -> objectMapper.readValue(body, StartRacingGameCommandEvent.class);
             case TAP_COMMAND -> objectMapper.readValue(body, TapCommandEvent.class);

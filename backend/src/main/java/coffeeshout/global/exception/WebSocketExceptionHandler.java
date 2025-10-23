@@ -1,7 +1,5 @@
 package coffeeshout.global.exception;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import generator.annotaions.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -24,7 +22,7 @@ public class WebSocketExceptionHandler {
         messagingTemplate.convertAndSendToUser(
                 sessionId,
                 "/queue/errors",
-                WebSocketResponse.error("처리 중 오류가 발생했습니다.")
+                WebSocketErrorResponse.from(e)
         );
     }
 }

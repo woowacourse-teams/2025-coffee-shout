@@ -14,7 +14,7 @@ public record StartRacingGameCommandEvent(
         TraceInfo traceInfo,
         String joinCode,
         String hostName
-) {
+) implements RacingGameBaseEvent{
 
     public static StartRacingGameCommandEvent create(String joinCode, String hostName) {
         final String eventId = UUID.randomUUID().toString();
