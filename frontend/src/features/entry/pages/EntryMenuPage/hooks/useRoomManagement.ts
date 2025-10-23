@@ -84,5 +84,6 @@ export const useRoomManagement = () => {
   return {
     proceedToRoom,
     isLoading: createOrJoinRoom.loading,
+    error: createOrJoinRoom.error,
   };
 };

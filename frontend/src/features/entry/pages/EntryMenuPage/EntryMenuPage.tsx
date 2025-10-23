@@ -11,7 +11,7 @@ import useAutoFocus from '@/hooks/useAutoFocus';
 import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { CategoryWithColor, Menu } from '@/types/menu';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import * as S from './EntryMenuPage.styled';
 import MenuList from './components/MenuList/MenuList';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
@@ -26,6 +26,7 @@ const EntryMenuPage = () => {
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const [isRoomLoading, setIsRoomLoading] = useState(false);
   const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
@@ -47,7 +48,12 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
+  const { proceedToRoom, isLoading, error } = useRoomManagement();
+
+  useEffect(() => {
+    if (isLoading) setIsRoomLoading(true);
+    if (error) setIsRoomLoading(false);
+  }, [isLoading, error]);
 
   useEffect(() => {
     const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
@@ -153,7 +159,9 @@ const EntryMenuPage = () => {
               방 만들러 가기
             </Button>
           ) : (
-            <Button onClick={handleProceedToRoom}>방 참가하기</Button>
+            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
+              방 참가하기
+            </Button>
           )}
         </Layout.ButtonBar>
       )}
