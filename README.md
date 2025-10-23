@@ -58,7 +58,13 @@
 
 ### ⚙️ Infra
 <img width="1000" height="500" alt="image" src="https://github.com/user-attachments/assets/48910643-33ba-409d-b98b-5d274e93e40d" />
+
+## 📌 Infra Design 
+
+### CI / CD
 <img width="1000" height="1530" alt="image" src="https://github.com/user-attachments/assets/7c52feab-d94e-432a-bc3f-453d6f902e14" />
+
+### Application
 <img width="1000" height="1692" alt="image" src="https://github.com/user-attachments/assets/52f80fd5-c77a-43b8-a988-159e0c8866c6" />
 
 
