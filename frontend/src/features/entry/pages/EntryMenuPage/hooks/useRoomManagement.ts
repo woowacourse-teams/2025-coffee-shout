@@ -22,9 +22,7 @@ type RoomResponse = {
 
 export const useRoomManagement = () => {
   const navigate = useReplaceNavigate();
-  //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
-
   const { playerType } = usePlayerType();
   const { joinCode, myName, setJoinCode } = useIdentifier();
   const { showToast } = useToast();
@@ -36,6 +34,7 @@ export const useRoomManagement = () => {
       const { joinCode } = data;
       setJoinCode(joinCode);
       startSocket(joinCode, variables.playerName);
+      if (joinCode) navigate(`/room/${joinCode}/lobby`);
     },
     errorDisplayMode: 'toast',
   });

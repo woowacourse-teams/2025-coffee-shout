@@ -1,17 +1,14 @@
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
 import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
 import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import Headline3 from '@/components/@common/Headline3/Headline3';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import useAutoFocus from '@/hooks/useAutoFocus';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { CategoryWithColor, Menu } from '@/types/menu';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent } from 'react';
 import * as S from './EntryMenuPage.styled';
 import MenuList from './components/MenuList/MenuList';
 import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
@@ -22,11 +19,7 @@ import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
 
 const EntryMenuPage = () => {
-  const navigate = useReplaceNavigate();
   const { playerType } = usePlayerType();
-  const { isConnected } = useWebSocket();
-  const { joinCode } = useIdentifier();
-  const [isRoomLoading, setIsRoomLoading] = useState(false);
   const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
@@ -48,19 +41,7 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { proceedToRoom, isLoading, error } = useRoomManagement();
-
-  useEffect(() => {
-    if (isLoading) setIsRoomLoading(true);
-    if (error) setIsRoomLoading(false);
-  }, [isLoading, error]);
-
-  useEffect(() => {
-    const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
-    if (isReadyToNavigateLobby) {
-      navigate(`/room/${joinCode}/lobby`);
-    }
-  }, [joinCode, menu.value, customMenu.value, isConnected, navigate]);
+  const { proceedToRoom, isLoading } = useRoomManagement();
 
   const resetMenuState = () => {
     resetAll();
@@ -154,15 +135,9 @@ const EntryMenuPage = () => {
       </Layout.Content>
       {shouldShowButtonBar && (
         <Layout.ButtonBar>
-          {playerType === 'HOST' ? (
-            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
-              방 만들러 가기
-            </Button>
-          ) : (
-            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
-              방 참가하기
-            </Button>
-          )}
+          <Button onClick={handleProceedToRoom} isLoading={isLoading}>
+            {playerType === 'HOST' ? '방 만들러 가기' : '방 참가하기'}
+          </Button>
         </Layout.ButtonBar>
       )}
     </Layout>
