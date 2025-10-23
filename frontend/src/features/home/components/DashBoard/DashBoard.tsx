@@ -42,7 +42,7 @@ const DashBoard = () => {
   });
 
   return (
-    <S.CarouselContainer tabIndex={-1} aria-hidden="true">
+    <S.CarouselContainer>
       <S.SlideWrapper
         key={`${slides[currentSlideIndex].key}-active`}
         $animationState={animationState}

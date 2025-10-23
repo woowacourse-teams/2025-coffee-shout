@@ -1,13 +1,11 @@
+import { useState } from 'react';
 import CopyIcon from '@/assets/copy-icon.svg';
 import Headline4 from '@/components/@common/Headline4/Headline4';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
-import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
-import useToast from '@/components/@common/Toast/useToast';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import TabBar from '@/features/room/lobby/components/TabBar/TabBar';
-import { useState } from 'react';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import * as S from './InvitationModal.styled';
-import { useInvitationModalScreenReader } from './useInvitationModalScreenReader';
+import useToast from '@/components/@common/Toast/useToast';
 
 type props = {
   onClose: () => void;
@@ -18,7 +16,6 @@ const InvitationModal = ({ onClose }: props) => {
   const { joinCode, qrCodeUrl } = useIdentifier();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = ['QR코드', '초대코드'];
-  const { screenReaderRef, message: screenReaderMessage } = useInvitationModalScreenReader();
 
   const handleCopy = async () => {
     copyToClipboard(joinCode, '초대 코드가 복사되었습니다.');
@@ -40,11 +37,6 @@ const InvitationModal = ({ onClose }: props) => {
 
   return (
     <S.Container>
-      {screenReaderMessage && (
-        <ScreenReaderOnly aria-live="assertive" ref={screenReaderRef}>
-          {screenReaderMessage}
-        </ScreenReaderOnly>
-      )}
       <TabBar tabs={tabs} activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex} />
       {activeTabIndex === 0 ? (
         <QRSection qrCodeUrl={qrCodeUrl} handleShareLink={handleShareLink} />
@@ -77,7 +69,7 @@ const QRSection = ({ qrCodeUrl, handleShareLink }: QRSectionProps) => {
           <S.Description>QR 코드 생성 중...</S.Description>
         )}
       </S.QRCode>
-      <S.ShareButton onClick={handleShareLink} aria-label="링크 공유하기">
+      <S.ShareButton onClick={handleShareLink}>
         <Paragraph>링크 공유하기</Paragraph>
       </S.ShareButton>
       <S.Wrapper>
@@ -97,10 +89,8 @@ const CodeSection = ({ joinCode, handleCopy }: CodeSectionProps) => {
       </S.Wrapper>
       <S.CodeBox>
         <S.EmptyBox />
-        <Headline4 aria-label={joinCode.split('').join(' ')} aria-live="polite">
-          {joinCode}
-        </Headline4>
-        <S.CopyIcon src={CopyIcon} onClick={handleCopy} aria-label="초대코드 복사하기" />
+        <Headline4>{joinCode}</Headline4>
+        <S.CopyIcon src={CopyIcon} onClick={handleCopy} />
       </S.CodeBox>
     </S.CodeSection>
   );

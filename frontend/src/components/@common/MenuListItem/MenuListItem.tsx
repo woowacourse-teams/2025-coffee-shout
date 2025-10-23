@@ -7,14 +7,13 @@ import * as S from './MenuListItem.styled';
 type Props = {
   text: string;
   onClick: () => void;
-  ariaLabel?: string;
 };
 
-const MenuListItem = ({ text, onClick, ariaLabel, ...rest }: Props) => {
+const MenuListItem = ({ text, onClick }: Props) => {
   const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container {...pointerHandlers} $touchState={touchState} aria-label={ariaLabel} {...rest}>
+    <S.Container {...pointerHandlers} $touchState={touchState}>
       <Paragraph>{text}</Paragraph>
     </S.Container>
   );

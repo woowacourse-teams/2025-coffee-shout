@@ -84,20 +84,3 @@ export const Description = styled.p`
 export const Icon = styled.img`
   width: 20px;
 `;
-
-export const NumberBadge = styled.div`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.color.white};
-  font-weight: bold;
-  font-size: 18px;
-  background-color: rgb(251, 164, 164);
-  border-radius: 50%;
-  box-shadow: 1px 1px 4px ${({ theme }) => theme.color.point[500]};
-`;

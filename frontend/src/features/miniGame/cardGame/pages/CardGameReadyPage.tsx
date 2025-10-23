@@ -1,11 +1,11 @@
 import { useCardGame } from '@/contexts/CardGame/CardGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GameIntroSlides from '../../components/GameIntroSlides/GameIntroSlides';
 
 const CardGameReadyPage = () => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const { joinCode } = useIdentifier();
   const { currentCardGameState } = useCardGame();
 

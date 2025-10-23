@@ -6,10 +6,11 @@ export const Container = styled.section`
   justify-content: center;
   align-items: center;
   height: 100%;
+  gap: 20px;
 `;
 
 export const Logo = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
 `;

@@ -1,6 +1,5 @@
 import useFetch from '@/apis/rest/useFetch';
 import GameActionButton from '@/components/@common/GameActionButton/GameActionButton';
-import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 import GameActionButtonSkeleton from '@/components/@composition/GameActionButtonSkeleton/GameActionButtonSkeleton';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import {
@@ -10,7 +9,6 @@ import {
   MiniGameType,
 } from '@/types/miniGame/common';
 import * as S from './MiniGameSection.styled';
-import { useMiniGameScreenReader } from './useMiniGameScreenReader';
 
 type Props = {
   selectedMiniGames: MiniGameType[];
@@ -23,43 +21,23 @@ export const MiniGameSection = ({ selectedMiniGames, handleMiniGameClick }: Prop
     endpoint: '/rooms/minigames',
   });
 
-  const { message, screenReaderRef, announceSelection } = useMiniGameScreenReader(
-    loading,
-    !!miniGames?.length
-  );
-
-  const handleClick = (miniGame: MiniGameType) => {
-    const isAlreadySelected = selectedMiniGames.includes(miniGame);
-
-    handleMiniGameClick(miniGame);
-    announceSelection(MINI_GAME_NAME_MAP[miniGame], isAlreadySelected);
-  };
-
   return (
-    <>
-      {message && (
-        <ScreenReaderOnly aria-live="assertive" ref={screenReaderRef}>
-          {message}
-        </ScreenReaderOnly>
+    <S.Wrapper>
+      {loading ? (
+        <GameActionButtonSkeleton />
+      ) : (
+        miniGames?.map((miniGame) => (
+          <GameActionButton
+            key={miniGame}
+            isSelected={selectedMiniGames.includes(miniGame)}
+            isDisabled={playerType === 'GUEST'}
+            gameName={MINI_GAME_NAME_MAP[miniGame]}
+            description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
+            onClick={() => handleMiniGameClick(miniGame)}
+            icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
+          />
+        ))
       )}
-      <S.Wrapper>
-        {loading ? (
-          <GameActionButtonSkeleton />
-        ) : (
-          miniGames?.map((miniGame) => (
-            <GameActionButton
-              key={miniGame}
-              isSelected={selectedMiniGames.includes(miniGame)}
-              isDisabled={playerType === 'GUEST'}
-              gameName={MINI_GAME_NAME_MAP[miniGame]}
-              description={MINI_GAME_DESCRIPTION_MAP[miniGame]}
-              onClick={() => handleClick(miniGame)}
-              icon={<S.Icon src={MINI_GAME_ICON_MAP[miniGame]} alt={miniGame} />}
-              orderNumber={selectedMiniGames.indexOf(miniGame) + 1}
-            />
-          ))
-        )}
-      </S.Wrapper>
-    </>
+    </S.Wrapper>
   );
 };

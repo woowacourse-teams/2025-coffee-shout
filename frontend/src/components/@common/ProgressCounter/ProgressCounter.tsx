@@ -3,12 +3,11 @@ import * as S from './ProgressCounter.styled';
 type Props = {
   current: number;
   total: number;
-  ariaLabel?: string;
 };
 
-const ProgressCounter = ({ current, total, ariaLabel }: Props) => {
+const ProgressCounter = ({ current, total }: Props) => {
   return (
-    <S.Container aria-label={ariaLabel}>
+    <S.Container>
       {current}/{total}
     </S.Container>
   );

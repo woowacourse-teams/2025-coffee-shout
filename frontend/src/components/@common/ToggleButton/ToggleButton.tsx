@@ -15,17 +15,10 @@ const ToggleButton = <Option extends string>({
   const selectedIndex = options.indexOf(selectedOption);
 
   return (
-    <S.Container role="tabList">
+    <S.Container>
       <S.Track>
         {options.map((option, index) => (
-          <S.Option
-            key={option}
-            onClick={() => onSelectOption(option)}
-            role="tab"
-            aria-selected={selectedIndex === index}
-            tabIndex={selectedIndex === index ? 0 : -1}
-            aria-label={`${option}, ${index + 1}/${options.length}`}
-          >
+          <S.Option key={option} onClick={() => onSelectOption(option)}>
             <Headline4 color={selectedIndex === index ? 'white' : 'gray-400'}>{option}</Headline4>
           </S.Option>
         ))}

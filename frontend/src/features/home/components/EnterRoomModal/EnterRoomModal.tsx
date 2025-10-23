@@ -1,12 +1,12 @@
-import useLazyFetch from '@/apis/rest/useLazyFetch';
 import Button from '@/components/@common/Button/Button';
-import Headline4 from '@/components/@common/Headline4/Headline4';
 import Input from '@/components/@common/Input/Input';
-import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as S from './EnterRoomModal.styled';
+import useLazyFetch from '@/apis/rest/useLazyFetch';
+import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
+import Headline4 from '@/components/@common/Headline4/Headline4';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -17,7 +17,7 @@ type Props = {
 };
 
 const EnterRoomModal = ({ onClose }: Props) => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -82,9 +82,8 @@ const EnterRoomModal = ({ onClose }: Props) => {
         onChange={handleJoinCodeChange}
         onKeyDown={handleKeyDown}
         autoFocus
-        aria-label="초대코드를 입력해주세요"
       />
-      <S.ErrorText aria-live="assertive">{errorText}</S.ErrorText>
+      <S.ErrorText>{errorText}</S.ErrorText>
       <S.ButtonContainer>
         <Button variant="secondary" onClick={onClose}>
           취소

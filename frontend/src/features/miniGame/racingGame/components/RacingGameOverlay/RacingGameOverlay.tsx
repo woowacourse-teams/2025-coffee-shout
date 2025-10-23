@@ -2,14 +2,12 @@ import { ReactNode, useRef, useEffect } from 'react';
 import * as S from './RacingGameOverlay.styled';
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 
 type Props = {
   children: ReactNode;
 };
 
 const RacingGameOverlay = ({ children }: Props) => {
-  const { racingGameState } = useRacingGame();
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
 
@@ -22,7 +20,6 @@ const RacingGameOverlay = ({ children }: Props) => {
 
   useEffect(() => {
     intervalRef.current = window.setInterval(() => {
-      if (racingGameState !== 'PLAYING') return;
       const currentTapCount = tapCountRef.current;
       tapCountRef.current = 0;
 
@@ -36,7 +33,7 @@ const RacingGameOverlay = ({ children }: Props) => {
         window.clearInterval(intervalRef.current);
       }
     };
-  }, [joinCode, myName, send, racingGameState]);
+  }, [joinCode, myName, send]);
 
   return <S.Overlay onPointerDown={handlePointerDown}>{children}</S.Overlay>;
 };

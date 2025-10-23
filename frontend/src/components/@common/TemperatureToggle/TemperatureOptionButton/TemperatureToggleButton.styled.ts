@@ -8,7 +8,7 @@ type Props = {
   $selected: boolean;
 };
 
-export const Container = styled.button<Props>`
+export const Container = styled.div<Props>`
   display: flex;
   align-items: center;
   justify-content: center;

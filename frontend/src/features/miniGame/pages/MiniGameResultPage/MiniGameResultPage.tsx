@@ -13,8 +13,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './MiniGameResultPage.styled';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { useWebSocketSubscription } from '@/apis/websocket/hooks/useWebSocketSubscription';
@@ -47,7 +46,7 @@ const SECONDS_FORMATTER = new Intl.NumberFormat('ko-KR', {
 });
 
 const MiniGameResultPage = () => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const miniGameType = useParams<{ miniGameType: MiniGameType }>().miniGameType;
   const { send } = useWebSocket();
   const { joinCode } = useIdentifier();

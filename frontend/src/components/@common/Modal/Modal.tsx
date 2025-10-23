@@ -49,6 +49,7 @@ const Modal = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby={title ? titleId : undefined}
+          aria-describedby={contentId}
         >
           {shouldRenderHeader && (
             <ModalHeader

@@ -17,17 +17,9 @@ const MenuList = ({ categoryId, onClickMenu }: Props) => {
       {loading ? (
         <MenuListItemSkeleton />
       ) : (
-        menus.map((menu, index) => {
-          const isLast = index === menus.length - 1;
-          return (
-            <MenuListItem
-              key={menu.id}
-              text={menu.name}
-              onClick={() => onClickMenu(menu)}
-              ariaLabel={`${menu.name} 선택, ${index + 1}번째 메뉴${isLast ? ', 마지막 메뉴입니다' : ''}`}
-            />
-          );
-        })
+        menus.map((menu) => (
+          <MenuListItem key={menu.id} text={menu.name} onClick={() => onClickMenu(menu)} />
+        ))
       )}
     </S.Container>
   );

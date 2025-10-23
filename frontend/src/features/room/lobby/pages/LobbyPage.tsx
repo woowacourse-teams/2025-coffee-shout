@@ -7,7 +7,6 @@ import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 import useModal from '@/components/@common/Modal/useModal';
-import ScreenReaderOnly from '@/components/@common/ScreenReaderOnly/ScreenReaderOnly';
 import useToast from '@/components/@common/Toast/useToast';
 import ToggleButton from '@/components/@common/ToggleButton/ToggleButton';
 import SectionTitle from '@/components/@composition/SectionTitle/SectionTitle';
@@ -16,23 +15,21 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useProbabilityHistory } from '@/contexts/ProbabilityHistory/ProbabilityHistoryContext';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { MiniGameType } from '@/types/miniGame/common';
 import { Player } from '@/types/player';
 import { QRCodeEvent } from '@/types/qrCode';
 import { STORAGE_KEYS, storageManager } from '@/utils/StorageManager';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
-import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
+import { useNavigate } from 'react-router-dom';
 import GameReadyButton from '../components/GameReadyButton/GameReadyButton';
 import GameStartButton from '../components/GameStartButton/GameStartButton';
 import GuideModal from '../components/GuideModal/GuideModal';
 import HostWaitingButton from '../components/HostWaitingButton/HostWaitingButton';
-import InvitationModal from '../components/InvitationModal/InvitationModal';
+import InvitationModal from '../components/JoinCodeModal/InvitationModal';
 import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
-import useGameAnnouncement from '../hooks/useGameAnnouncement';
 import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 
@@ -40,7 +37,7 @@ type SectionType = '참가자' | '룰렛' | '미니게임';
 type SectionComponents = Record<SectionType, ReactElement>;
 
 const LobbyPage = () => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const { send, isConnected } = useWebSocket();
   const { myName, joinCode, setQrCodeUrl } = useIdentifier();
   const { openModal, closeModal } = useModal();
@@ -56,12 +53,6 @@ const LobbyPage = () => {
     endpoint: `/rooms/${joinCode}/players/${myName}`,
     method: 'DELETE',
     errorDisplayMode: 'toast',
-  });
-  const announcement = useGameAnnouncement({
-    isAllReady,
-    participants,
-    playerType,
-    myName,
   });
 
   useParticipantValidation({ isConnected });
@@ -157,22 +148,9 @@ const LobbyPage = () => {
     }
   }, [playerType, joinCode, send, isConnected]);
 
-  const handleBackClick = () => {
-    openModal(
-      <ConfirmModal
-        message="방을 나가시겠습니까?"
-        onConfirm={async () => {
-          closeModal();
-          await leaveRoom.mutate();
-          navigate('/');
-        }}
-        onCancel={closeModal}
-      />,
-      {
-        title: '방 나가기',
-        showCloseButton: false,
-      }
-    );
+  const handleNavigateToHome = async () => {
+    await leaveRoom.mutate();
+    navigate('/');
   };
 
   const handleClickGameStartButton = () => {
@@ -216,7 +194,7 @@ const LobbyPage = () => {
 
     const updatedMiniGames = selectedMiniGames.includes(miniGameType)
       ? selectedMiniGames.filter((game) => game !== miniGameType)
-      : [...selectedMiniGames, miniGameType];
+      : [miniGameType];
 
     send(
       `/room/${joinCode}/update-minigames`,
@@ -289,7 +267,7 @@ const LobbyPage = () => {
 
   return (
     <Layout>
-      <Layout.TopBar left={<BackButton onClick={handleBackClick} text="방 나가기" />} />
+      <Layout.TopBar left={<BackButton onClick={handleNavigateToHome} />} />
       <Layout.Content>
         <S.Container>
           {SECTIONS[currentSection]}
@@ -305,11 +283,10 @@ const LobbyPage = () => {
 
       <Layout.ButtonBar flexRatios={[5.5, 1]}>
         {renderGameButton()}
-        <Button variant="primary" onClick={handleShare} aria-label="친구 초대하기">
-          <img src={ShareIcon} aria-hidden="true" alt="" />
+        <Button variant="primary" onClick={handleShare}>
+          <img src={ShareIcon} alt="공유" />
         </Button>
       </Layout.ButtonBar>
-      <ScreenReaderOnly aria-live="assertive">{announcement}</ScreenReaderOnly>
     </Layout>
   );
 };
