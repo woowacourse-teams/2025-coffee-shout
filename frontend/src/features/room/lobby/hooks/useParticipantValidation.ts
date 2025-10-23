@@ -3,7 +3,7 @@ import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 
 type Props = {
   isConnected: boolean;
@@ -13,7 +13,7 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
   const { myName, joinCode } = useIdentifier();
   const { participants } = useParticipants();
   const { playerType } = usePlayerType();
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
 
   const { execute: checkRoomExists } = useLazyFetch<{ exist: boolean }>({
     endpoint: `/rooms/check-joinCode?joinCode=${joinCode}`,
@@ -49,8 +49,8 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
 
     // 방 존재 여부 체크
     const response = await checkRoomExists();
-
-    if (!response?.exist) {
+    if (!response) return;
+    if (!response.exist) {
       navigateToHome('방이 존재하지 않음');
       return;
     }

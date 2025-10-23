@@ -9,6 +9,7 @@ type Props = {
   gameName: string;
   description: string[];
   icon: ReactElement;
+  orderNumber?: number;
 } & Omit<ComponentProps<'button'>, 'onClick'>;
 
 const GameActionButton = ({
@@ -18,6 +19,7 @@ const GameActionButton = ({
   gameName,
   description,
   icon,
+  orderNumber,
   ...rest
 }: Props) => {
   const handleClick = () => {
@@ -35,6 +37,7 @@ const GameActionButton = ({
         </S.DescriptionWrapper>
       </S.Wrapper>
       <S.GameIcon $isSelected={isSelected}>{icon}</S.GameIcon>
+      {isSelected && orderNumber && <S.NumberBadge>{orderNumber}</S.NumberBadge>}
     </S.Container>
   );
 };

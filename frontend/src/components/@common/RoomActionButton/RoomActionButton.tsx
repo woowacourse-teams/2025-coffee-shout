@@ -7,6 +7,7 @@ import Description from '../Description/Description';
 import Headline3 from '../Headline3/Headline3';
 
 import * as S from './RoomActionButton.styled';
+import ScreenReaderOnly from '../ScreenReaderOnly/ScreenReaderOnly';
 
 type Props = {
   title: string;
@@ -21,13 +22,14 @@ const RoomActionButton = ({ title, descriptions, onClick, ...rest }: Props) => {
     <S.Container {...pointerHandlers} $touchState={touchState} {...rest}>
       <Headline3>{title}</Headline3>
       <div>
+        <ScreenReaderOnly>,</ScreenReaderOnly>
         {descriptions.map((description, index) => (
           <S.DescriptionBox key={index}>
             <Description color="gray-400">{description}</Description>
           </S.DescriptionBox>
         ))}
       </div>
-      <S.NextStepIcon src={NextStepIcon} alt="next-step-icon" />
+      <S.NextStepIcon src={NextStepIcon} alt="next-step-icon" aria-hidden="true" />
     </S.Container>
   );
 };

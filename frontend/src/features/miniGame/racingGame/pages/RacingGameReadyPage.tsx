@@ -1,11 +1,11 @@
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import GameIntroSlides from '../../components/GameIntroSlides/GameIntroSlides';
 
 const RacingGameReadyPage = () => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const { joinCode } = useIdentifier();
   const { racingGameState } = useRacingGame();
 

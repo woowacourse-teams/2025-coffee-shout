@@ -1,30 +1,33 @@
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
-import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import Layout from '@/layouts/Layout';
-import { ChangeEvent, useEffect } from 'react';
-import SelectCategory from './components/SelectCategory/SelectCategory';
-import { CategoryWithColor, Menu } from '@/types/menu';
 import CustomMenuButton from '@/components/@common/CustomMenuButton/CustomMenuButton';
+import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
+import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
+import Headline3 from '@/components/@common/Headline3/Headline3';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import useAutoFocus from '@/hooks/useAutoFocus';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import Layout from '@/layouts/Layout';
+import { CategoryWithColor, Menu } from '@/types/menu';
+import { ChangeEvent, useEffect, useState } from 'react';
+import * as S from './EntryMenuPage.styled';
+import MenuList from './components/MenuList/MenuList';
+import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
+import SelectCategory from './components/SelectCategory/SelectCategory';
+import SelectTemperature from './components/SelectTemperature/SelectTemperature';
 import { useMenuFlow } from './hooks/useMenuFlow';
 import { useRoomManagement } from './hooks/useRoomManagement';
 import { useViewNavigation } from './hooks/useViewNavigation';
-import * as S from './EntryMenuPage.styled';
-import MenuSelectionLayout from './components/MenuSelectionLayout/MenuSelectionLayout';
-import SelectTemperature from './components/SelectTemperature/SelectTemperature';
-import MenuList from './components/MenuList/MenuList';
-import CustomMenuInput from '@/components/@common/CustomMenuInput/CustomMenuInput';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useNavigate } from 'react-router-dom';
-import Headline3 from '@/components/@common/Headline3/Headline3';
-import LocalErrorBoundary from '@/components/@common/ErrorBoundary/LocalErrorBoundary';
 
 const EntryMenuPage = () => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const { playerType } = usePlayerType();
   const { isConnected } = useWebSocket();
   const { joinCode } = useIdentifier();
+  const [isRoomLoading, setIsRoomLoading] = useState(false);
+  const liveRef = useAutoFocus<HTMLHeadingElement>();
 
   const {
     category,
@@ -45,7 +48,12 @@ const EntryMenuPage = () => {
     handleNavigateToBefore,
   } = useViewNavigation();
 
-  const { proceedToRoom, isLoading: isRoomLoading } = useRoomManagement();
+  const { proceedToRoom, isLoading, error } = useRoomManagement();
+
+  useEffect(() => {
+    if (isLoading) setIsRoomLoading(true);
+    if (error) setIsRoomLoading(false);
+  }, [isLoading, error]);
 
   useEffect(() => {
     const isReadyToNavigateLobby = joinCode && (menu.value || customMenu.value) && isConnected;
@@ -125,7 +133,9 @@ const EntryMenuPage = () => {
         <S.Container>
           {currentView === 'selectCategory' ? (
             <>
-              <Headline3>카테고리를 선택해주세요</Headline3>
+              <Headline3 ref={liveRef} tabIndex={0}>
+                카테고리를 선택해주세요
+              </Headline3>
               <LocalErrorBoundary>
                 <SelectCategory onClickCategory={handleCategorySelect} />
               </LocalErrorBoundary>
@@ -149,7 +159,9 @@ const EntryMenuPage = () => {
               방 만들러 가기
             </Button>
           ) : (
-            <Button onClick={handleProceedToRoom}>방 참가하기</Button>
+            <Button onClick={handleProceedToRoom} isLoading={isRoomLoading}>
+              방 참가하기
+            </Button>
           )}
         </Layout.ButtonBar>
       )}

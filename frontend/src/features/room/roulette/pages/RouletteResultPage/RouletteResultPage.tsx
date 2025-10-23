@@ -4,11 +4,12 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import Layout from '@/layouts/Layout';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './RouletteResultPage.styled';
 
 const RouletteResultPage = () => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const location = useLocation();
   const { joinCode } = useIdentifier();
   const winner = location.state?.winner ?? '알 수 없는 사용자';
