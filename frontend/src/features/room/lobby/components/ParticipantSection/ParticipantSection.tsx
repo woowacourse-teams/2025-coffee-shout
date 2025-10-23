@@ -33,7 +33,13 @@ export const ParticipantSection = ({ participants }: Props) => {
       <SectionTitle
         title="참가자"
         description="참가자 목록과 준비상태를 확인할 수 있습니다"
-        suffix={<ProgressCounter current={participants.length} total={TOTAL_PARTICIPANTS} />}
+        suffix={
+          <ProgressCounter
+            current={participants.length}
+            total={TOTAL_PARTICIPANTS}
+            ariaLabel={`${TOTAL_PARTICIPANTS}명 중 ${participants.length}명 참가중`}
+          />
+        }
       />
       <PlayerCard
         name={myName}

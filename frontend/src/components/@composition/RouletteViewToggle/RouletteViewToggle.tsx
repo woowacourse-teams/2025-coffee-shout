@@ -12,7 +12,8 @@ const TOGGLE_TEXT_MAP = {
 } as const;
 
 const RouletteViewToggle = ({ currentView, onViewChange }: Props) => {
-  return <TextButton text={TOGGLE_TEXT_MAP[currentView]} onClick={onViewChange} />;
+  const buttonText = TOGGLE_TEXT_MAP[currentView];
+  return <TextButton text={buttonText} onClick={onViewChange} aria-label={buttonText} />;
 };
 
 export default RouletteViewToggle;

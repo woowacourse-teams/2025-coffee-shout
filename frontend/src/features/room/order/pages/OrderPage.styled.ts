@@ -6,12 +6,12 @@ export const BannerContent = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  gap: 20px;
+  gap: 5px;
 `;
 
 export const Logo = styled.img`
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 50px;
   object-fit: contain;
 `;
 

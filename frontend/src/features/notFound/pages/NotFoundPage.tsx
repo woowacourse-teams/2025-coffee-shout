@@ -1,11 +1,11 @@
 import Headline2 from '@/components/@common/Headline2/Headline2';
 import Paragraph from '@/components/@common/Paragraph/Paragraph';
 import Layout from '@/layouts/Layout';
-import { useNavigate } from 'react-router-dom';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './NotFoundPage.styled';
 
 const NotFoundPage = () => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
 
   const handleClickHomeButton = () => {
     navigate('/');

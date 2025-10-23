@@ -20,6 +20,7 @@ export const COLOR_MAP = {
   'point-500': theme.color.point[500],
   white: theme.color.white,
   black: theme.color.black,
+  yellow: theme.color.yellow,
 } as const;
 
 export type ColorKey = keyof typeof COLOR_MAP;
