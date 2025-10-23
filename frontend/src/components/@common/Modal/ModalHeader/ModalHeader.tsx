@@ -22,7 +22,7 @@ const ModalHeader = ({ id, title, onClose, showCloseButton = true }: Props) => {
     <S.Container>
       <Headline3 id={id}>{title}</Headline3>
       {showCloseButton && (
-        <S.CloseButton aria-label="모달 닫기" {...pointerHandlers} $touchState={touchState}>
+        <S.CloseButton aria-label="close-icon" {...pointerHandlers} $touchState={touchState}>
           <CloseIcon stroke={theme.color.gray[600]} />
         </S.CloseButton>
       )}

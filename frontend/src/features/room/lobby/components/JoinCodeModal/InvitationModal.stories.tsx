@@ -25,6 +25,6 @@ export const Default: Story = {
       openModal(ModalContent());
     };
 
-    return <button onClick={handleOpen}>Invitation 모달 열기</button>;
+    return <button onClick={handleOpen}>JoinCode 모달 열기</button>;
   },
 };

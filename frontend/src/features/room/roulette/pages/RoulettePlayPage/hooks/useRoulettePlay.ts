@@ -2,12 +2,12 @@ import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { RouletteWinnerResponse } from '@/types/roulette';
 import { useEffect, useState } from 'react';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { useNavigate } from 'react-router-dom';
 
 const useRoulettePlay = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const [winner, setWinner] = useState<string | null>(null);
   const [randomAngle, setRandomAngle] = useState(0);
   const [isSpinStarted, setIsSpinStarted] = useState(false);

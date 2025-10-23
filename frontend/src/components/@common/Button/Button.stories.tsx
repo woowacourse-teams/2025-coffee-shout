@@ -59,7 +59,7 @@ export const Loading: Story = {
 export const LoadingWithText: Story = {
   args: {
     variant: 'loading',
-    loadingText: '대기 중',
+    children: '대기 중',
     width: '120px',
     height: 'large',
   },

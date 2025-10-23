@@ -17,19 +17,15 @@ const SelectCategory = ({ onClickCategory }: Props) => {
       {loading ? (
         <CafeCategoryCardSkeleton />
       ) : (
-        categories.map((category, index) => {
-          const isLast = index === categories.length - 1;
-          return (
-            <CafeCategoryCard
-              key={category.id}
-              imageUrl={category.imageUrl}
-              categoryName={category.name}
-              onClick={() => onClickCategory(category)}
-              color={categoryColorList[index % categoryColorList.length]}
-              ariaLabel={`${category.name} 선택, ${index + 1}번째 카테고리${isLast ? ', 마지막 카테고리입니다' : ''}`}
-            />
-          );
-        })
+        categories.map((category, index) => (
+          <CafeCategoryCard
+            key={category.id}
+            imageUrl={category.imageUrl}
+            categoryName={category.name}
+            onClick={() => onClickCategory(category)}
+            color={categoryColorList[index % categoryColorList.length]}
+          />
+        ))
       )}
     </S.CategoryList>
   );

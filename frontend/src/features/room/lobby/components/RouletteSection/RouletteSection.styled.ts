@@ -15,7 +15,7 @@ export const IconButtonWrapper = styled.div`
 export const RouletteWheelWrapper = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
-  margin-bottom: calc(1rem + 42px);
+  padding-top: 6rem;
 `;

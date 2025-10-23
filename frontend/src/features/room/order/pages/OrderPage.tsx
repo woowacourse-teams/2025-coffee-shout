@@ -7,8 +7,7 @@ import Headline3 from '@/components/@common/Headline3/Headline3';
 import TextButton from '@/components/@common/TextButton/TextButton';
 import Layout from '@/layouts/Layout';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MenuCount from '../components/MenuCount/MenuCount';
 import PlayerMenu from '../components/PlayerMenu/PlayerMenu';
 import * as S from './OrderPage.styled';
@@ -29,7 +28,7 @@ const VIEW_MODE_CONFIG = {
 } as const;
 
 const OrderPage = () => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const { stopSocket, isConnected } = useWebSocket();
   const winner = location.state?.winner ?? '알 수 없는 사용자';

@@ -3,8 +3,8 @@ import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import useToast from '@/components/@common/Toast/useToast';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { Menu, TemperatureOption } from '@/types/menu';
+import { useNavigate } from 'react-router-dom';
 import { createRoomRequestBody, createUrl } from '../utils/roomApiHelpers';
 
 export type RoomRequest = {
@@ -21,7 +21,8 @@ type RoomResponse = {
 };
 
 export const useRoomManagement = () => {
-  const navigate = useReplaceNavigate();
+  const navigate = useNavigate();
+
   //TODO: 웹소켓 관련 로직은 Lobby에서 관리하도록 수정해야함
   const { startSocket } = useWebSocket();
 
@@ -84,6 +85,5 @@ export const useRoomManagement = () => {
   return {
     proceedToRoom,
     isLoading: createOrJoinRoom.loading,
-    error: createOrJoinRoom.error,
   };
 };
