@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/3b8b30de-6647-4484-bae6-b620a5ecb2cf" alt="커피빵 로고" style="width: 100%; max-width: 100%;" />
+  <img src="https://github.com/user-attachments/assets/ab912632-5b02-4743-a6b0-dab08d6b15d3" alt="커피빵 로고" style="width: 100%; max-width: 100%;" />
 </div>
 
 # ☕ 커피빵 (CoffeeShout)
