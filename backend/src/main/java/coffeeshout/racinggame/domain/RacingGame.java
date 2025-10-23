@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class RacingGame implements Playable {
@@ -29,6 +30,8 @@ public class RacingGame implements Playable {
     private Instant startTime;
     private Runners runners;
     private RacingGameState state;
+
+    @Setter
     private ScheduledFuture<?> autoMoveFuture;
 
     @Override
@@ -37,10 +40,9 @@ public class RacingGame implements Playable {
         this.state = RacingGameState.DESCRIPTION;
     }
 
-    public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
+    public void setUpStart() {
         this.runners.initialSpeed();
         this.startTime = Instant.now();
-        this.autoMoveFuture = autoMoveFuture;
         this.runners.initialLastTapTime(startTime);
     }
 
