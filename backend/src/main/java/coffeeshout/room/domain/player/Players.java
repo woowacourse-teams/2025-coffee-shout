@@ -87,8 +87,14 @@ public class Players {
                 .anyMatch(player -> player.sameName(playerName));
     }
 
-    public Player getRandomPlayer() {
-        return players.get(RANDOM.nextInt(players.size()));
+    public Player getFirstPlayer() {
+        if (players.isEmpty()) {
+            throw new InvalidArgumentException(
+                    RoomErrorCode.NO_EXIST_PLAYER,
+                    "플레이어가 존재하지 않습니다."
+            );
+        }
+        return players.getFirst();
     }
 
     public boolean isEmpty() {

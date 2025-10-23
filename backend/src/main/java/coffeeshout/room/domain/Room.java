@@ -249,7 +249,7 @@ public class Room {
     }
 
     private void promoteNewHost() {
-        final Player newHost = players.getRandomPlayer();
+        final Player newHost = players.getFirstPlayer();
         newHost.promote();
         this.host = newHost;
     }
