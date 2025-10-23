@@ -20,18 +20,20 @@ export const useSelectedCard = (myName: string) => {
       const myCardInfo = cardInfoMessages.find((card) => card.playerName === myName);
       if (!myCardInfo) return;
 
-      if (shouldCheckAlreadySelected && selectedCardInfo[round].isSelected) return;
+      setSelectedCardInfo((prev) => {
+        if (shouldCheckAlreadySelected && prev[round].isSelected) return prev;
 
-      setSelectedCardInfo((prev) => ({
-        ...prev,
-        [round]: {
-          isSelected: true,
-          type: myCardInfo.cardType,
-          value: myCardInfo.value,
-        },
-      }));
+        return {
+          ...prev,
+          [round]: {
+            isSelected: true,
+            type: myCardInfo.cardType,
+            value: myCardInfo.value,
+          },
+        };
+      });
     },
-    [myName, selectedCardInfo]
+    [myName]
   );
 
   return {
