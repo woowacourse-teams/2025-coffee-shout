@@ -94,7 +94,8 @@ class RacingGameTest {
         // given
         racingGame.setUp(players);
         racingGame.updateState(RacingGameState.PLAYING);
-        racingGame.startAutoMove(null);
+        racingGame.setUpStart();
+        racingGame.setAutoMoveFuture(null);
 
         for (int i = 0; i < 100; i++) {
             racingGame.updateSpeed(players.get(1), 10, (lastTapedTime, now, tapCount) -> 30, Instant.now());

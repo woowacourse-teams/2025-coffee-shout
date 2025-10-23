@@ -73,8 +73,9 @@ public class RacingGameService implements MiniGameService {
     private void startAutoMove(RacingGame racingGame, String joinCode) {
         racingGame.updateState(RacingGameState.PLAYING);
         eventPublisher.publishEvent(RaceStateChangedEvent.of(racingGame, joinCode));
+        racingGame.setUpStart();
         final ScheduledFuture<?> autoMoveFuture = scheduleAutoMoveTask(racingGame, joinCode);
-        racingGame.startAutoMove(autoMoveFuture);
+        racingGame.setAutoMoveFuture(autoMoveFuture);
     }
 
     private void processDescription(String joinCode, RacingGame racingGame) {
