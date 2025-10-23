@@ -39,7 +39,7 @@ const RacingGamePage = () => {
     myName,
   });
 
-  const showGoal = useGoalDisplay({
+  const isGoal = useGoalDisplay({
     myPosition,
     endDistance: racingGameData.distance.end,
   });
@@ -67,8 +67,8 @@ const RacingGamePage = () => {
     <>
       {racingGameState === 'PREPARE' && <PrepareOverlay />}
       {racingGameState === 'DONE' && <Finish />}
-      {showGoal && <Goal />}
-      <RacingGameOverlay>
+      {isGoal && racingGameState === 'PLAYING' && <Goal />}
+      <RacingGameOverlay isGoal={isGoal}>
         <S.Container ref={containerRef}>
           <RacingRanks
             players={racingGameData.players}
