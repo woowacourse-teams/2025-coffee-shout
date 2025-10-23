@@ -64,7 +64,6 @@ public class RoomService {
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
 
-
     @Transactional
     public Room createRoom(String hostName, SelectedMenuRequest selectedMenuRequest) {
         final JoinCode joinCode = joinCodeGenerator.generate();

@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -189,7 +189,7 @@ class RoomRestControllerTest {
         }
 
         @Test
-        void 중복된_플레이어_이름으로_입장_시도_시_400_에러를_반환한다() throws Exception {
+        void 중복된_플레이어_이름으로_입장_시도_시_409_에러를_반환한다() throws Exception {
             // given - 먼저 방을 생성
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
@@ -217,12 +217,12 @@ class RoomRestControllerTest {
                     .andReturn();
 
             mockMvc.perform(asyncDispatch(result))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isConflict());
         }
 
 
         @Test
-        void 방이_가득_찬_경우_입장_시도_시_400_에러를_반환한다() throws Exception {
+        void 방이_가득_찬_경우_입장_시도_시_409_에러를_반환한다() throws Exception {
             // given - 먼저 방을 생성
             SelectedMenuRequest menuRequest = new SelectedMenuRequest(1L, "아메리카노", MenuTemperature.HOT);
             RoomEnterRequest createRequest = new RoomEnterRequest("호스트", menuRequest);
@@ -264,7 +264,7 @@ class RoomRestControllerTest {
                     .andReturn();
 
             mockMvc.perform(asyncDispatch(result))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isConflict());
         }
     }
 

@@ -75,8 +75,8 @@ public class RestExceptionHandler {
             InvalidStateException exception,
             HttpServletRequest request
     ) {
-        logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
+        logWarning(exception, request);
+        return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(NotExistElementException.class)
@@ -189,7 +189,7 @@ public class RestExceptionHandler {
                 e.getClass().getSimpleName(),
                 e.getMessage()
         );
-        log.warn(logMessage);
+        log.warn(logMessage, e);
     }
 }
 

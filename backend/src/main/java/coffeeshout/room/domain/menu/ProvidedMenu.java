@@ -9,7 +9,7 @@ public class ProvidedMenu extends Menu {
     @Setter
     private Long id;
 
-    private MenuCategory menuCategory;
+    private final MenuCategory menuCategory;
 
     public ProvidedMenu(
             Long id,

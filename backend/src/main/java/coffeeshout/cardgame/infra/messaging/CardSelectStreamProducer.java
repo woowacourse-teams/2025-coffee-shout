@@ -40,12 +40,12 @@ public class CardSelectStreamProducer {
             log.info("카드 선택 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
                     event.eventId(), recordId, redisStreamProperties.cardGameSelectKey());
         } catch (JsonProcessingException e) {
-            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}, error={}",
-                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e.getMessage(), e);
+            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
             throw new RuntimeException("SelectCardCommandEvent 직렬화 실패: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("카드 선택 이벤트 발송 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}, error={}",
-                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e.getMessage(), e);
+            log.error("카드 선택 이벤트 발송 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
+                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
             throw new RuntimeException("카드 선택 이벤트 발송 실패: " + e.getMessage(), e);
         }
     }
