@@ -1,30 +1,31 @@
-import RacingPlayer from '../components/RacingPlayer/RacingPlayer';
-import RacingLine from '../components/RacingLine/RacingLine';
-import * as S from './RacingGamePlayPage.styled';
+import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
+import { colorList } from '@/constants/color';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
+import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
 import Finish from '../components/Finish/Finish';
 import Goal from '../components/Goal/Goal';
-import { useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import RacingGameOverlay from '../components/RacingGameOverlay/RacingGameOverlay';
+import RacingLine from '../components/RacingLine/RacingLine';
+import RacingPlayer from '../components/RacingPlayer/RacingPlayer';
 import RacingProgressBar from '../components/RacingProgressBar/RacingProgressBar';
-import { useGoalDisplay } from '../hooks/useGoalDisplay';
+import RacingRanks from '../components/RacingRanks/RacingRanks';
 import { useBackgroundAnimation } from '../hooks/useBackgroundAnimation';
+import { useGoalDisplay } from '../hooks/useGoalDisplay';
 import { usePlayerData } from '../hooks/usePlayerData';
 import { getVisiblePlayers } from '../utils/getVisiblePlayers';
-import RacingGameOverlay from '../components/RacingGameOverlay/RacingGameOverlay';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
-import PrepareOverlay from '../../components/PrepareOverlay/PrepareOverlay';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
-import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
-import { colorList } from '@/constants/color';
-import RacingRanks from '../components/RacingRanks/RacingRanks';
+import * as S from './RacingGamePlayPage.styled';
 
 const FINISH_LINE_VISUAL_OFFSET = 30;
 
 const RacingGamePage = () => {
   const { joinCode, myName } = useIdentifier();
   const { send } = useWebSocket();
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const { miniGameType } = useParams();
   const { racingGameState, racingGameData } = useRacingGame();
   const { getParticipantColorIndex } = useParticipants();

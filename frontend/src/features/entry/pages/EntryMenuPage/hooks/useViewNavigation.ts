@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 
 type CurrentView = 'selectCategory' | 'selectMenu' | 'inputCustomMenu' | 'selectTemperature';
 
 export const useViewNavigation = () => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const [currentView, setCurrentView] = useState<CurrentView>('selectCategory');
 
   const navigateToCategory = () => {

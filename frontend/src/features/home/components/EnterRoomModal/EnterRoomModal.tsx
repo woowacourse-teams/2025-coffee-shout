@@ -1,12 +1,12 @@
-import Button from '@/components/@common/Button/Button';
-import Input from '@/components/@common/Input/Input';
-import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { ChangeEvent, KeyboardEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as S from './EnterRoomModal.styled';
 import useLazyFetch from '@/apis/rest/useLazyFetch';
-import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
+import Button from '@/components/@common/Button/Button';
 import Headline4 from '@/components/@common/Headline4/Headline4';
+import Input from '@/components/@common/Input/Input';
+import { JOIN_CODE_LENGTH } from '@/constants/joinCode';
+import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import * as S from './EnterRoomModal.styled';
 
 type JoinCodeCheckResponse = {
   exist: boolean;
@@ -17,7 +17,7 @@ type Props = {
 };
 
 const EnterRoomModal = ({ onClose }: Props) => {
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const { joinCode, setJoinCode } = useIdentifier();
   const [errorText, setErrorText] = useState<string | null>(null);
 

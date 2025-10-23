@@ -1,16 +1,16 @@
+import useLazyFetch from '@/apis/rest/useLazyFetch';
 import BackButton from '@/components/@common/BackButton/BackButton';
 import Button from '@/components/@common/Button/Button';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import Input from '@/components/@common/Input/Input';
 import ProgressCounter from '@/components/@common/ProgressCounter/ProgressCounter';
+import useToast from '@/components/@common/Toast/useToast';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useState } from 'react';
 import * as S from './EntryNamePage.styled';
-import useToast from '@/components/@common/Toast/useToast';
-import useLazyFetch from '@/apis/rest/useLazyFetch';
 
 const MAX_NAME_LENGTH = 10;
 
@@ -20,7 +20,7 @@ type PlayerNameCheckResponse = {
 
 const EntryNamePage = () => {
   const [name, setName] = useState('');
-  const navigate = useNavigate();
+  const navigate = useReplaceNavigate();
   const { setMyName, joinCode } = useIdentifier();
   const { playerType } = usePlayerType();
   const { showToast } = useToast();
