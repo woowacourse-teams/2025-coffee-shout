@@ -6,8 +6,8 @@ import { useWebSocketReconnection } from '../hooks/useWebSocketReconnection';
 import { WebSocketContext, WebSocketContextType } from './WebSocketContext';
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
-  const { client, isConnected, startSocket, stopSocket } = useWebSocketConnection();
-  const { sessionId } = useStompSessionWatcher(client);
+  const { client, isConnected, startSocket, stopSocket, connectFrame } = useWebSocketConnection();
+  const { sessionId } = useStompSessionWatcher(client, connectFrame);
 
   const { subscribe, send } = useWebSocketMessaging({ client, isConnected });
 

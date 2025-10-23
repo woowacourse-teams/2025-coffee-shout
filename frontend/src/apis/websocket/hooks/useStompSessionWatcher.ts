@@ -1,27 +1,24 @@
-import { Client } from '@stomp/stompjs';
+import { Client, IFrame } from '@stomp/stompjs';
 import { useEffect, useRef, useState } from 'react';
 
-export const useStompSessionWatcher = (client: Client | null) => {
+export const useStompSessionWatcher = (client: Client | null, connectFrame?: IFrame | null) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const prevSessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!client) return;
+    if (!client || !connectFrame) return;
 
-    const interval = setInterval(() => {
-      const currentSessionId = extractSessionId(client);
-      if (currentSessionId && currentSessionId !== prevSessionIdRef.current) {
-        console.log('🔄 SessionId 변경 감지', {
-          prev: prevSessionIdRef.current,
-          cur: currentSessionId,
-        });
-        setSessionId(currentSessionId);
-        prevSessionIdRef.current = currentSessionId;
-      }
-    }, 500);
+    const currentSessionId = extractSessionId(client);
 
-    return () => clearInterval(interval);
-  }, [client]);
+    if (currentSessionId && currentSessionId !== prevSessionIdRef.current) {
+      console.log('🔄 SessionId 변경 감지', {
+        prev: prevSessionIdRef.current,
+        cur: currentSessionId,
+      });
+      setSessionId(currentSessionId);
+      prevSessionIdRef.current = currentSessionId;
+    }
+  }, [client, connectFrame]);
 
   return { sessionId };
 };

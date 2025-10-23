@@ -6,9 +6,11 @@ import WebSocketErrorHandler from '../utils/WebSocketErrorHandler';
 export const useWebSocketConnection = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectFrame, setConnectFrame] = useState<IFrame | null>(null);
 
   const handleConnect = useCallback((frame: IFrame) => {
     setIsConnected(true);
+    setConnectFrame(frame);
     console.log('✅ WebSocket 연결 성공', { frame });
   }, []);
 
@@ -89,5 +91,6 @@ export const useWebSocketConnection = () => {
     isConnected,
     startSocket,
     stopSocket,
+    connectFrame,
   };
 };
