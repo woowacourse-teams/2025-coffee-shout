@@ -65,7 +65,7 @@ class QrCodeSubscriptionHandlerTest {
 
         // then
         then(roomService).should(times(1)).getQrCodeStatus(joinCode);
-        then(messagingTemplate).should(times(1))
+        then(messagingTemplate).should(timeout(500).times(1))
                 .convertAndSend(eq(destination), eq(WebSocketResponse.success(response)));
     }
 
