@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 public enum RoomErrorCode implements ErrorCode {
 
     JOIN_CODE_NULL("참여 코드는 null일 수 없습니다."),
-    JOIN_CODE_ILLEGAL_LENGTH("코드는 5자리여야 합니다."),
+    JOIN_CODE_ILLEGAL_LENGTH("코드는 4자리여야 합니다."),
     JOIN_CODE_ILLEGAL_CHARACTER("허용되지 않는 문자가 포함되어 있습니다."),
     PLAYER_NAME_BLANK("이름은 공백일 수 없습니다."),
     PLAYER_NAME_TOO_LONG("이름은 10자 이하여야 합니다."),
