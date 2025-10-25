@@ -1,11 +1,12 @@
 package coffeeshout.room.infra.messaging.handler;
 
+import coffeeshout.global.redis.BaseEvent;
+import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
-import coffeeshout.room.domain.event.RoomEventType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,31 +15,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSelectEvent> {
+public class MiniGameSelectEventHandler implements EventHandler {
 
     private final RoomService roomService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(MiniGameSelectEvent event) {
-        log.info("미니게임 선택 이벤트 수신: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
-                event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
-
+    public void handle(BaseEvent event) {
+        final MiniGameSelectEvent miniGameSelectEvent = (MiniGameSelectEvent) event;
         final List<MiniGameType> selectedMiniGames = roomService.updateMiniGamesInternal(
-                event.joinCode(),
-                event.hostName(),
-                event.miniGameTypes()
+                miniGameSelectEvent.joinCode(),
+                miniGameSelectEvent.hostName(),
+                miniGameSelectEvent.miniGameTypes()
         );
 
-        messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
+        messagingTemplate.convertAndSend("/topic/room/" + miniGameSelectEvent.joinCode() + "/minigame",
                 WebSocketResponse.success(selectedMiniGames));
-
-        log.info("미니게임 선택 이벤트 처리 완료: eventId={}, joinCode={}, selectedCount={}",
-                event.eventId(), event.joinCode(), selectedMiniGames.size());
     }
 
     @Override
-    public RoomEventType getSupportedEventType() {
-        return RoomEventType.MINI_GAME_SELECT;
+    public Class<?> eventType() {
+        return MiniGameSelectEvent.class;
     }
 }

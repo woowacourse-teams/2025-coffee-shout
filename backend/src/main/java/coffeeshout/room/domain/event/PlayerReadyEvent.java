@@ -1,5 +1,6 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.global.redis.UserEvent;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
@@ -8,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record PlayerReadyEvent(
-        String sessionId,
+        String userName,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
@@ -16,7 +17,7 @@ public record PlayerReadyEvent(
         String joinCode,
         String playerName,
         Boolean isReady
-) implements RoomBaseEvent, Traceable {
+) implements UserEvent, Traceable {
 
     public PlayerReadyEvent(String joinCode, String playerName, Boolean isReady) {
         this(
@@ -29,10 +30,5 @@ public record PlayerReadyEvent(
                 playerName,
                 isReady
         );
-    }
-
-    @Override
-    public TraceInfo getTraceInfo() {
-        return traceInfo;
     }
 }

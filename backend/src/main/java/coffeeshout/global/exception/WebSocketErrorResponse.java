@@ -6,8 +6,6 @@ import java.time.Instant;
 public record WebSocketErrorResponse(
         String error,
         String message,
-        String send,
-        String receive,
         String timestamp
 ) {
     public static WebSocketErrorResponse from(Exception exception) {
@@ -18,8 +16,6 @@ public record WebSocketErrorResponse(
         return new WebSocketErrorResponse(
                 errorType,
                 errorMessage,
-                "",
-                "",
                 currentTimestamp
         );
     }

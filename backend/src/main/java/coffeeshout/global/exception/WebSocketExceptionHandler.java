@@ -1,5 +1,6 @@
 package coffeeshout.global.exception;
 
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -15,12 +16,11 @@ public class WebSocketExceptionHandler {
     @MessageExceptionHandler(Exception.class)
     public void handleException(
             Exception e,
-            @Header("simpSessionId") String sessionId,
-            @Header("simpDestination") String destination
+            @Header("simpUser") Principal user
     ) {
 
         messagingTemplate.convertAndSendToUser(
-                sessionId,
+                user.getName(),
                 "/queue/errors",
                 WebSocketErrorResponse.from(e)
         );

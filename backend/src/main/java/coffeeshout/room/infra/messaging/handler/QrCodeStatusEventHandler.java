@@ -1,10 +1,11 @@
 package coffeeshout.room.infra.messaging.handler;
 
+import coffeeshout.global.redis.BaseEvent;
+import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
-import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import generator.annotaions.MessageResponse;
@@ -13,13 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/**
- * Redis pub/sub을 통해 다른 인스턴스로부터 QR 코드 생성 완료 이벤트를 받아 처리하는 핸들러
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEvent> {
+public class QrCodeStatusEventHandler implements EventHandler {
 
     private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
 
@@ -27,22 +25,22 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(QrCodeStatusEvent event) {
-        try {
-            log.info("QR 코드 완료 이벤트 수신: eventId={}, joinCode={}, status={}",
-                    event.eventId(), event.joinCode(), event.status());
+    public void handle(BaseEvent event) {
+        final QrCodeStatusEvent qrEvent = (QrCodeStatusEvent) event;
+        log.info("QR 코드 완료 이벤트 수신: eventId={}, joinCode={}, status={}",
+                qrEvent.eventId(), qrEvent.joinCode(), qrEvent.status());
 
-            switch (event.status()) {
-                case SUCCESS -> handleQrCodeSuccess(event);
-                case ERROR -> handleQrCodeError(event);
-                default -> log.warn("처리할 수 없는 QR 코드 상태: eventId={}, joinCode={}, status={}",
-                        event.eventId(), event.joinCode(), event.status());
-            }
-
-        } catch (Exception e) {
-            log.error("QR 코드 완료 이벤트 처리 실패: eventId={}, joinCode={}",
-                    event.eventId(), event.joinCode(), e);
+        switch (qrEvent.status()) {
+            case SUCCESS -> handleQrCodeSuccess(qrEvent);
+            case ERROR -> handleQrCodeError(qrEvent);
+            default -> log.warn("처리할 수 없는 QR 코드 상태: eventId={}, joinCode={}, status={}",
+                    qrEvent.eventId(), qrEvent.joinCode(), qrEvent.status());
         }
+    }
+
+    @Override
+    public Class<?> eventType() {
+        return QrCodeStatusEvent.class;
     }
 
     private void handleQrCodeError(QrCodeStatusEvent event) {
@@ -82,9 +80,4 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
                 destination, event.status(), event.qrCodeUrl());
     }
 
-
-    @Override
-    public RoomEventType getSupportedEventType() {
-        return RoomEventType.QR_CODE_COMPLETE;
-    }
 }

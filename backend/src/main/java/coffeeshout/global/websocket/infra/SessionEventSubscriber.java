@@ -1,11 +1,11 @@
 package coffeeshout.global.websocket.infra;
 
+import coffeeshout.global.redis.EventHandler;
+import coffeeshout.global.redis.EventHandlerMapping;
 import coffeeshout.global.websocket.event.session.SessionBaseEvent;
 import coffeeshout.global.websocket.event.session.SessionEventType;
 import coffeeshout.global.websocket.event.session.SessionRegisteredEvent;
 import coffeeshout.global.websocket.event.session.SessionRemovedEvent;
-import coffeeshout.global.websocket.infra.handler.SessionEventHandler;
-import coffeeshout.global.websocket.infra.handler.SessionEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +25,7 @@ public class SessionEventSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic sessionEventTopic;
-    private final SessionEventHandlerFactory handlerFactory;
+    private final EventHandlerMapping handlerFactory;
 
     @PostConstruct
     public void subscribe() {
@@ -38,14 +38,8 @@ public class SessionEventSubscriber implements MessageListener {
         try {
             final String body = new String(message.getBody());
             final SessionEventType eventType = extractEventType(body);
-
-            if (!handlerFactory.canHandle(eventType)) {
-                log.warn("처리할 수 없는 세션 이벤트 타입: {}", eventType);
-                return;
-            }
-
             final SessionBaseEvent event = deserializeEvent(body, eventType);
-            final SessionEventHandler<SessionBaseEvent> handler = handlerFactory.getHandler(eventType);
+            final EventHandler handler = handlerFactory.getHandler(event);
             handler.handle(event);
 
         } catch (Exception e) {

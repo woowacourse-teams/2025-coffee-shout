@@ -1,5 +1,6 @@
 package coffeeshout.room.domain.event;
 
+import coffeeshout.global.redis.UserEvent;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
@@ -9,7 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record RouletteSpinEvent(
-        String sessionId,
+        String userName,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
@@ -17,7 +18,7 @@ public record RouletteSpinEvent(
         String joinCode,
         String hostName,
         Winner winner
-) implements RoomBaseEvent, Traceable {
+) implements UserEvent, Traceable {
 
     public RouletteSpinEvent(String joinCode, String hostName, Winner winner) {
         this(
@@ -30,10 +31,5 @@ public record RouletteSpinEvent(
                 hostName,
                 winner
         );
-    }
-
-    @Override
-    public TraceInfo getTraceInfo() {
-        return traceInfo;
     }
 }

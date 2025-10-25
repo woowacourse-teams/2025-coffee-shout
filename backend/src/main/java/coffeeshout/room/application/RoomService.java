@@ -1,5 +1,6 @@
 package coffeeshout.room.application;
 
+import coffeeshout.global.redis.EventPublisher;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -25,7 +26,6 @@ import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
-import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
@@ -55,7 +55,7 @@ public class RoomService {
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
-    private final RoomEventPublisher roomEventPublisher;
+    private final EventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
     private final RoomEnterStreamProducer roomEnterStreamProducer;

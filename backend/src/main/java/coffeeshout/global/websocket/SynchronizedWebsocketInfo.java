@@ -20,10 +20,17 @@ public class SynchronizedWebsocketInfo {
     }
 
     public static String getUserName() {
+        Message<?> message = getWebsocketInfo();
+        if (message == null) {
+            return "none";
+        }
         return getPrincipal().getName();
     }
 
     public static Principal getPrincipal() {
+        if (SynchronizedWebsocketInfo.getWebsocketInfo() == null) {
+            return null;
+        }
         return SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpUser", Principal.class);
     }
 }

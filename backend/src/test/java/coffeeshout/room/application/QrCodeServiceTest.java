@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
+import coffeeshout.global.redis.EventPublisher;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.service.QrCodeGenerator;
-import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class QrCodeServiceTest {
     StorageService storageService;
 
     @Mock
-    RoomEventPublisher roomEventPublisher;
+    EventPublisher roomEventPublisher;
 
     MeterRegistry meterRegistry = new SimpleMeterRegistry();
 

@@ -1,9 +1,7 @@
 package coffeeshout.global.websocket.event.session;
 
-import java.time.LocalDateTime;
+import coffeeshout.global.redis.BaseEvent;
 
-public interface SessionBaseEvent {
-    String eventId();
+public interface SessionBaseEvent extends BaseEvent {
     SessionEventType eventType();
-    LocalDateTime timestamp();
 }
