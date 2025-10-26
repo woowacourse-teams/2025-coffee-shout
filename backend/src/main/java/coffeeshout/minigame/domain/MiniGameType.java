@@ -16,14 +16,12 @@ public enum MiniGameType {
 
     public Playable createMiniGame(String joinCode) {
         Objects.requireNonNull(joinCode, "joinCode는 null이 아니어야 합니다.");
-        switch (this) {
-            case CARD_GAME:
+        return switch (this) {
+            case CARD_GAME -> {
                 final long seed = Integer.toUnsignedLong(joinCode.hashCode());
-                return new CardGame(new CardGameRandomDeckGenerator(), seed);
-            case RACING_GAME:
-                return new RacingGame();
-        }
-
-        throw new IllegalArgumentException("선택한 게임이 존재하지 않습니다.");
+                yield new CardGame(new CardGameRandomDeckGenerator(), seed);
+            }
+            case RACING_GAME -> new RacingGame();
+        };
     }
 }

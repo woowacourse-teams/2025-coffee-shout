@@ -4,6 +4,7 @@ import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
 import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.domain.menu.SelectedMenu;
@@ -11,16 +12,12 @@ import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.player.Players;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.domain.roulette.Probability;
 import coffeeshout.room.domain.roulette.ProbabilityCalculator;
 import coffeeshout.room.domain.roulette.Roulette;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -117,13 +114,8 @@ public class Room {
         players.join(player);
     }
 
-    public Map<Player, Probability> getProbabilities() {
-        return players.getPlayers().stream()
-                .collect(Collectors.toMap(player -> player, Player::getProbability));
-    }
-
     public List<Playable> getAllMiniGame() {
-        return Collections.unmodifiableList(new ArrayList<>(miniGames));
+        return List.copyOf(miniGames);
     }
 
     public List<MiniGameType> getSelectedMiniGameTypes() {
@@ -231,7 +223,7 @@ public class Room {
 
     private void validateRoomReady() {
         if (roomState != RoomState.READY) {
-            throw new InvalidArgumentException(
+            throw new InvalidStateException(
                     RoomErrorCode.ROOM_NOT_READY_TO_JOIN,
                     "READY 상태에서만 참여 가능합니다. 현재 상태: " + roomState
             );
@@ -240,7 +232,7 @@ public class Room {
 
     private void validateCanJoin() {
         if (!canJoin()) {
-            throw new InvalidArgumentException(
+            throw new InvalidStateException(
                     RoomErrorCode.ROOM_FULL,
                     "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount()
             );
@@ -249,7 +241,7 @@ public class Room {
 
     private void validatePlayerNameNotDuplicate(PlayerName guestName) {
         if (hasDuplicatePlayerName(guestName)) {
-            throw new InvalidArgumentException(
+            throw new InvalidStateException(
                     RoomErrorCode.DUPLICATE_PLAYER_NAME,
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );
@@ -257,7 +249,7 @@ public class Room {
     }
 
     private void promoteNewHost() {
-        final Player newHost = players.getRandomPlayer();
+        final Player newHost = players.getFirstPlayer();
         newHost.promote();
         this.host = newHost;
     }

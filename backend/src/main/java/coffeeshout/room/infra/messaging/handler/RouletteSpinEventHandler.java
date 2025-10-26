@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class RouletteSpinEventHandler implements EventHandler {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
-    private final RouletteEventDbService rouletteEventDbService;
+    private final RoulettePersistenceService roulettePersistenceService;
 
     @Override
     public void handle(BaseEvent event) {
@@ -28,7 +28,7 @@ public class RouletteSpinEventHandler implements EventHandler {
         messagingTemplate.convertAndSend("/topic/room/" + rouletteSpinEvent.joinCode() + "/winner",
                 WebSocketResponse.success(response));
 
-        rouletteEventDbService.saveRouletteResult(rouletteSpinEvent);
+        roulettePersistenceService.saveRouletteResult(rouletteSpinEvent);
     }
 
     @Override

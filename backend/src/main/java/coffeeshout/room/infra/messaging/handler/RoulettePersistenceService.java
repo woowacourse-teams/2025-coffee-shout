@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RouletteEventDbService {
+public class RoulettePersistenceService {
 
     private final RouletteService rouletteService;
 

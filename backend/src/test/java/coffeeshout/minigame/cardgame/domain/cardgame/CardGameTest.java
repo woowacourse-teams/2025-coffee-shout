@@ -11,6 +11,8 @@ import coffeeshout.cardgame.domain.card.CardGameDeckGenerator;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.PlayersFixture;
+import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
@@ -102,8 +104,7 @@ class CardGameTest {
 
             // when & then
             assertThatThrownBy(() -> cardGame.selectCard(player, 0))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("현재 게임이 진행중인 상태가 아닙니다.");
+                    .isInstanceOf(InvalidStateException.class);
         }
 
         @Test
@@ -279,9 +280,10 @@ class CardGameTest {
             // given
             String nonExistentName = "존재하지않는플레이어";
 
+            PlayerName playerName = new PlayerName(nonExistentName);
             // when & then
-            assertThatThrownBy(() -> cardGame.findPlayerByName(new PlayerName(nonExistentName)))
-                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> cardGame.findPlayerByName(playerName))
+                    .isInstanceOf(InvalidArgumentException.class);
         }
     }
 
@@ -363,7 +365,7 @@ class CardGameTest {
             cardGame.startPlay();
             Player player = players.getPlayer(new PlayerName("꾹이"));
             cardGame.selectCard(player, 0);
-            Card selectedCard = cardGame.getDeck().getCards().get(0);
+            Card selectedCard = cardGame.getDeck().getCards().getFirst();
 
             // when
             Optional<Player> cardOwner = cardGame.findCardOwnerInCurrentRound(selectedCard);

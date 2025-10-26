@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class RouletteShowEventHandler implements EventHandler {
 
     private final RoomService roomService;
-    private final RouletteEventDbService rouletteEventDbService;
+    private final RoulettePersistenceService roulettePersistenceService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -30,7 +30,7 @@ public class RouletteShowEventHandler implements EventHandler {
         messagingTemplate.convertAndSend("/topic/room/" + rouletteShowEvent.joinCode() + "/roulette",
                 WebSocketResponse.success(response));
 
-        rouletteEventDbService.saveRoomStatus(rouletteShowEvent);
+        roulettePersistenceService.saveRoomStatus(rouletteShowEvent);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package coffeeshout.racinggame.domain;
 
+import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class RacingGame implements Playable {
@@ -28,6 +30,8 @@ public class RacingGame implements Playable {
     private Instant startTime;
     private Runners runners;
     private RacingGameState state;
+
+    @Setter
     private ScheduledFuture<?> autoMoveFuture;
 
     @Override
@@ -36,10 +40,9 @@ public class RacingGame implements Playable {
         this.state = RacingGameState.DESCRIPTION;
     }
 
-    public void startAutoMove(ScheduledFuture<?> autoMoveFuture) {
+    public void setUpStart() {
         this.runners.initialSpeed();
         this.startTime = Instant.now();
-        this.autoMoveFuture = autoMoveFuture;
         this.runners.initialLastTapTime(startTime);
     }
 
@@ -64,7 +67,10 @@ public class RacingGame implements Playable {
 
     private void validatePlaying() {
         if (state != RacingGameState.PLAYING) {
-            throw new IllegalStateException("게임이 진행 중이 아닙니다.");
+            throw new InvalidStateException(
+                    RacingGameErrorCode.NOT_PLAYING_STATE,
+                    "현재 게임 상태가 플레이 중이 아닙니다: " + state
+            );
         }
     }
 

@@ -2,7 +2,6 @@ package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
-import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomJoinEvent;
