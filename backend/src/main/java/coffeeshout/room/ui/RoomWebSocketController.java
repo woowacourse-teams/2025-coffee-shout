@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.redis.EventPublisher;
+import coffeeshout.global.redis.pubsub.EventPublisher;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;

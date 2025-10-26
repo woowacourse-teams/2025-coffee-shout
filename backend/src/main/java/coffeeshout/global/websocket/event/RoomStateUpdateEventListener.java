@@ -1,6 +1,6 @@
 package coffeeshout.global.websocket.event;
 
-import coffeeshout.global.redis.EventPublisher;
+import coffeeshout.global.redis.pubsub.EventPublisher;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package coffeeshout.racinggame.application;
 
-import coffeeshout.global.redis.EventPublisher;
+import coffeeshout.global.redis.pubsub.EventPublisher;
 import coffeeshout.racinggame.domain.event.TapCommandEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

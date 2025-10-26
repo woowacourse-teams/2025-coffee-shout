@@ -2,7 +2,6 @@ package coffeeshout.global.exception;
 
 import static coffeeshout.global.log.LogAspect.NOTIFICATION_MARKER;
 
-import coffeeshout.global.exception.custom.ConflictException;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
@@ -30,12 +29,12 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, new ErrorCode() {
-            @Override
-            public String getCode() {
-                return "INTERNAL_SERVER_ERROR";
-            }
-        }, "서버 오류가 발생했습니다.");
+        return getProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception,
+                () -> "INTERNAL_SERVER_ERROR",
+                "서버에서 오류가 발생했습니다."
+        );
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -44,12 +43,12 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.NOT_FOUND, exception, new ErrorCode() {
-            @Override
-            public String getCode() {
-                return "RESOURCE_NOT_FOUND";
-            }
-        }, "요청한 리소스를 찾을 수 없습니다.");
+        return getProblemDetail(
+                HttpStatus.NOT_FOUND,
+                exception,
+                () -> "RESOURCE_NOT_FOUND",
+                "요청한 리소스를 찾을 수 없습니다."
+        );
     }
 
     @ExceptionHandler(InvalidArgumentException.class)
@@ -58,7 +57,7 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode(), exception.getMessage());
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(InvalidStateException.class)
@@ -66,17 +65,8 @@ public class RestExceptionHandler {
             InvalidStateException exception,
             HttpServletRequest request
     ) {
-        logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode(), exception.getMessage());
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ProblemDetail handleConflictException(
-            ConflictException exception,
-            HttpServletRequest request
-    ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode(), exception.getMessage());
+        return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(NotExistElementException.class)
@@ -85,21 +75,21 @@ public class RestExceptionHandler {
             HttpServletRequest request
     ) {
         logWarning(exception, request);
-        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode(), exception.getMessage());
+        return getProblemDetail(HttpStatus.NOT_FOUND, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(QRCodeGenerationException.class)
     public ProblemDetail handleQRCodeGenerationException(QRCodeGenerationException exception,
                                                          HttpServletRequest request) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode(), exception.getMessage());
+        return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(StorageServiceException.class)
     public ProblemDetail handleStorageServiceException(StorageServiceException exception,
                                                        HttpServletRequest request) {
         logError(exception, request);
-        return getProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, exception, exception.getErrorCode(), exception.getMessage());
+        return getProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, exception, exception.getErrorCode());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -116,12 +106,7 @@ public class RestExceptionHandler {
                 .reduce((msg1, msg2) -> msg1 + ", " + msg2)
                 .orElse("유효하지 않은 요청입니다.");
 
-        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
-            @Override
-            public String getCode() {
-                return "VALIDATION_ERROR";
-            }
-        }, errorMessage);
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, () -> "VALIDATION_ERROR", errorMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -136,18 +121,26 @@ public class RestExceptionHandler {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining(", "));
 
-        String message = errorMessage.isBlank() ? "요청 파라미터가 유효하지 않습니다." : errorMessage;
-
-        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, new ErrorCode() {
-            @Override
-            public String getCode() {
-                return "CONSTRAINT_VIOLATION";
-            }
-        }, message);
+        return getProblemDetail(HttpStatus.BAD_REQUEST, exception, () -> "CONSTRAINT_VIOLATION", errorMessage);
     }
 
-    private static ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode, String message) {
-        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, message);
+    private ProblemDetail getProblemDetail(HttpStatus status, Exception exception, ErrorCode errorCode) {
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, exception.getMessage());
+
+        problemDetail.setProperty("errorCode", errorCode.getCode());
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("exception", exception.getClass().getSimpleName());
+
+        return problemDetail;
+    }
+
+    private ProblemDetail getProblemDetail(
+            HttpStatus status,
+            Exception exception,
+            ErrorCode errorCode,
+            String errorMessage
+    ) {
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorMessage);
 
         problemDetail.setProperty("errorCode", errorCode.getCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());
@@ -181,7 +174,7 @@ public class RestExceptionHandler {
                 e.getClass().getSimpleName(),
                 e.getMessage()
         );
-        log.warn(logMessage);
+        log.warn(logMessage, e);
     }
 }
 

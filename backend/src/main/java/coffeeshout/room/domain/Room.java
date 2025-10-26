@@ -3,7 +3,6 @@ package coffeeshout.room.domain;
 import static org.springframework.util.Assert.isTrue;
 import static org.springframework.util.Assert.state;
 
-import coffeeshout.global.exception.custom.ConflictException;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.minigame.domain.MiniGameResult;
@@ -233,7 +232,7 @@ public class Room {
 
     private void validateCanJoin() {
         if (!canJoin()) {
-            throw new ConflictException(
+            throw new InvalidStateException(
                     RoomErrorCode.ROOM_FULL,
                     "방에는 최대 9명만 입장가능합니다. 현재 인원: " + players.getPlayerCount()
             );
@@ -242,7 +241,7 @@ public class Room {
 
     private void validatePlayerNameNotDuplicate(PlayerName guestName) {
         if (hasDuplicatePlayerName(guestName)) {
-            throw new ConflictException(
+            throw new InvalidStateException(
                     RoomErrorCode.DUPLICATE_PLAYER_NAME,
                     "중복된 닉네임은 들어올 수 없습니다. 닉네임: " + guestName.value()
             );

@@ -1,5 +1,6 @@
-package coffeeshout.global.redis;
+package coffeeshout.global.redis.pubsub;
 
+import coffeeshout.global.redis.BaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
