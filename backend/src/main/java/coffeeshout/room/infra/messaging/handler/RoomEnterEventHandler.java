@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomEnterEventHandler implements EventHandler {
 
-    private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
