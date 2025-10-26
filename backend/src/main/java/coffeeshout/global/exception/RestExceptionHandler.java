@@ -2,6 +2,7 @@ package coffeeshout.global.exception;
 
 import static coffeeshout.global.log.LogAspect.NOTIFICATION_MARKER;
 
+import coffeeshout.global.exception.custom.ConflictException;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
@@ -67,6 +68,15 @@ public class RestExceptionHandler {
     ) {
         logError(exception, request);
         return getProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception, exception.getErrorCode(), exception.getMessage());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ProblemDetail handleConflictException(
+            ConflictException exception,
+            HttpServletRequest request
+    ) {
+        logWarning(exception, request);
+        return getProblemDetail(HttpStatus.CONFLICT, exception, exception.getErrorCode(), exception.getMessage());
     }
 
     @ExceptionHandler(NotExistElementException.class)

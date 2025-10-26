@@ -28,6 +28,8 @@ public class StreamPublisher {
             );
         } catch (JsonProcessingException e) {
             throw new RuntimeException("직렬화 실패: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw e;
         }
     }
 }
