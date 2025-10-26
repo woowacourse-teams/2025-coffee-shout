@@ -1,6 +1,7 @@
 package coffeeshout.room.application;
 
 import coffeeshout.global.redis.EventPublisher;
+import coffeeshout.global.redis.stream.StreamPublishManager;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
 import coffeeshout.minigame.domain.MiniGameType;
@@ -25,7 +26,6 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
@@ -58,7 +58,7 @@ public class RoomService {
     private final EventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
-    private final RoomEnterStreamProducer roomEnterStreamProducer;
+    private final StreamPublishManager streamPublishManager;
     private final RoomJpaRepository roomJpaRepository;
 
     @Value("${room.event.timeout:PT5S}")
@@ -106,7 +106,7 @@ public class RoomService {
 
         return processEventAsync(
                 event.eventId(),
-                () -> roomEnterStreamProducer.broadcastEnterRoom(event),
+                () -> streamPublishManager.publishRoomChannel(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)

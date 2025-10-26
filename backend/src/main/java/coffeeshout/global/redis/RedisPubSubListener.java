@@ -1,5 +1,6 @@
 package coffeeshout.global.redis;
 
+import coffeeshout.global.redis.stream.EventHandlerFacade;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -12,17 +13,17 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @RequiredArgsConstructor
-public abstract class AbstractRedisListener implements MessageListener {
+@Component
+public class RedisPubSubListener implements MessageListener {
 
-    private final LoggingSimpMessagingTemplate loggingSimpMessagingTemplate;
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ChannelTopic roomEventTopic;
-    private final EventHandlerMapping handlerFactory;
-    private final TracerProvider tracerProvider;
+    private final EventHandlerFacade eventHandlerFacade;
 
     @PostConstruct
     public void subscribe() {
@@ -32,8 +33,7 @@ public abstract class AbstractRedisListener implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        final BaseEvent event = convertEvent(message);
-        handle(event);
+        eventHandlerFacade.handle(convertEvent(message));
     }
 
     private BaseEvent convertEvent(Message message) {
@@ -41,24 +41,6 @@ public abstract class AbstractRedisListener implements MessageListener {
             return objectMapper.readValue(new String(message.getBody()), BaseEvent.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void handle(BaseEvent event) {
-        try {
-            final EventHandler handler = handlerFactory.getHandler(event);
-            final Runnable handling = () -> handler.handle(event);
-
-            if (event instanceof Traceable traceable) {
-                tracerProvider.executeWithTraceContext(traceable.traceInfo(), handling, event);
-                return;
-            }
-            handling.run();
-        } catch (Exception e) {
-            log.error("이벤트 처리 실패: message={}", event, e);
-            if (event instanceof UserEvent userEvent) {
-                loggingSimpMessagingTemplate.convertAndSendError(userEvent.userName(), e);
-            }
         }
     }
 }
