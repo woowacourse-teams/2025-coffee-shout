@@ -5,7 +5,7 @@ import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
 import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { useCallback, useEffect } from 'react';
 
-export const useParticipantValidation = () => {
+export const useRoomAccessGuard = () => {
   const { myName, joinCode } = useIdentifier();
   const { participants } = useParticipants();
   const { playerType } = usePlayerType();
@@ -22,7 +22,7 @@ export const useParticipantValidation = () => {
   const navigateToHome = useCallback(
     (reason: string) => {
       console.log(`${reason} - 홈으로 리디렉션`);
-      navigate('/', { replace: true });
+      navigate('/');
     },
     [navigate]
   );

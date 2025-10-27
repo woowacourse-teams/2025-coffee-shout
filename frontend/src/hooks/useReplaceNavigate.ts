@@ -11,7 +11,11 @@ export const useReplaceNavigate = () => {
         return;
       }
 
-      navigate(to, { ...options, replace: true });
+      navigate(to, {
+        replace: true,
+        state: { fromInternal: true },
+        ...options,
+      });
     },
     [navigate]
   );

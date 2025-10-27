@@ -33,7 +33,6 @@ const RoulettePlayPage = () => {
     endpoint: `/rooms/${joinCode}/miniGames/remaining`,
     enabled: !!joinCode,
   });
-
   useRouletteProbabilities(isFirstLoadRef);
 
   const handleWinnerData = useCallback(
