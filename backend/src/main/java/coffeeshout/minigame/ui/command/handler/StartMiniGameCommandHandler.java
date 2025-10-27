@@ -1,6 +1,6 @@
 package coffeeshout.minigame.ui.command.handler;
 
-import coffeeshout.global.redis.pubsub.EventPublisher;
+import coffeeshout.global.redis.pubsub.PubSubPublishManager;
 import coffeeshout.minigame.event.StartMiniGameCommandEvent;
 import coffeeshout.minigame.ui.command.MiniGameCommandHandler;
 import coffeeshout.minigame.ui.request.command.StartMiniGameCommand;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StartMiniGameCommandHandler implements MiniGameCommandHandler<StartMiniGameCommand> {
 
-    private final EventPublisher eventPublisher;
+    private final PubSubPublishManager publishManager;
 
     @Override
     public void handle(String joinCode, StartMiniGameCommand command) {
         final StartMiniGameCommandEvent event = new StartMiniGameCommandEvent(joinCode, command.hostName());
-        eventPublisher.publishEvent(event);
+        publishManager.publishMiniGame(event);
         log.info("미니게임 시작 이벤트 발행: joinCode={}, hostName={}, eventId={}",
                 joinCode, command.hostName(), event.eventId());
     }

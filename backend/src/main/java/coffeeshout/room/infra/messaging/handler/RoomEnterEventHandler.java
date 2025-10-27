@@ -49,7 +49,7 @@ public class RoomEnterEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<RoomJoinEvent> eventType() {
         return RoomJoinEvent.class;
     }
 }

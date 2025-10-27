@@ -29,12 +29,11 @@ public class RouletteShowEventHandler implements EventHandler {
 
         messagingTemplate.convertAndSend("/topic/room/" + rouletteShowEvent.joinCode() + "/roulette",
                 WebSocketResponse.success(response));
-
         roulettePersistenceService.saveRoomStatus(rouletteShowEvent);
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<RouletteShowEvent> eventType() {
         return RouletteShowEvent.class;
     }
 }

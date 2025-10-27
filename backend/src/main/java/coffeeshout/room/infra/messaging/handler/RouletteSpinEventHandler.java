@@ -27,12 +27,11 @@ public class RouletteSpinEventHandler implements EventHandler {
 
         messagingTemplate.convertAndSend("/topic/room/" + rouletteSpinEvent.joinCode() + "/winner",
                 WebSocketResponse.success(response));
-
         roulettePersistenceService.saveRouletteResult(rouletteSpinEvent);
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<RouletteSpinEvent> eventType() {
         return RouletteSpinEvent.class;
     }
 }

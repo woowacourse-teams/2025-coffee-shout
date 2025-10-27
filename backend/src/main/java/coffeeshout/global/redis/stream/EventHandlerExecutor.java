@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EventHandlerFacade {
+public class EventHandlerExecutor {
 
     private final EventHandlerMapping handlerFactory;
     private final TracerProvider tracerProvider;

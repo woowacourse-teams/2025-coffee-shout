@@ -1,10 +1,11 @@
 package coffeeshout.global.redis.pubsub;
 
 import coffeeshout.global.redis.BaseEvent;
-import coffeeshout.global.redis.stream.EventHandlerFacade;
+import coffeeshout.global.redis.stream.EventHandlerExecutor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -16,22 +17,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RedisPubSubListener implements MessageListener {
+public class AbstractRedisPubSubListener implements MessageListener {
 
     private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final ChannelTopic roomEventTopic;
-    private final EventHandlerFacade eventHandlerFacade;
+    private final EventHandlerExecutor eventHandlerExecutor;
 
     @PostConstruct
     public void subscribe() {
-        redisMessageListenerContainer.addMessageListener(this, roomEventTopic);
-        log.info("방 이벤트 구독 시작: topic={}", roomEventTopic.getTopic());
+        Arrays.stream(PubSubChannelTopic.values())
+                .forEach(channelTopic -> redisMessageListenerContainer.addMessageListener(
+                        this,
+                        channelTopic.convert()
+                ));
     }
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        eventHandlerFacade.handle(convertEvent(message));
+        eventHandlerExecutor.handle(convertEvent(message));
     }
 
     private BaseEvent convertEvent(Message message) {

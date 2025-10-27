@@ -22,7 +22,7 @@ public class TapCommandEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<TapCommandEvent> eventType() {
         return TapCommandEvent.class;
     }
 }

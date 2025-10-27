@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.global.redis.pubsub.EventPublisher;
+import coffeeshout.global.redis.pubsub.PubSubPublishManager;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final EventPublisher eventPublisher;
+    private final PubSubPublishManager publishManager;
     private final RoomService roomService;
 
     @MessageMapping("/room/{joinCode}/update-players")
@@ -48,7 +48,7 @@ public class RoomWebSocketController {
     )
     public void broadcastPlayers(@DestinationVariable String joinCode) {
         final PlayerListUpdateEvent event = new PlayerListUpdateEvent(joinCode);
-        eventPublisher.publishEvent(event);
+        publishManager.publishPlayer(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-ready")
@@ -67,7 +67,7 @@ public class RoomWebSocketController {
     )
     public void broadcastReady(@DestinationVariable String joinCode, ReadyChangeMessage message) {
         final PlayerReadyEvent event = new PlayerReadyEvent(joinCode, message.playerName(), message.isReady());
-        eventPublisher.publishEvent(event);
+        publishManager.publishPlayer(event);
     }
 
     @MessageMapping("/room/{joinCode}/update-minigames")
@@ -90,7 +90,7 @@ public class RoomWebSocketController {
     ) {
         final MiniGameSelectEvent event = new MiniGameSelectEvent(joinCode, message.hostName(),
                 message.miniGameTypes());
-        eventPublisher.publishEvent(event);
+        publishManager.publishRoom(event);
     }
 
     @MessageMapping("/room/{joinCode}/show-roulette")
@@ -106,7 +106,7 @@ public class RoomWebSocketController {
     )
     public void broadcastShowRoulette(@DestinationVariable String joinCode) {
         final RouletteShowEvent event = new RouletteShowEvent(joinCode);
-        eventPublisher.publishEvent(event);
+        publishManager.publishRoom(event);
     }
 
     @MessageMapping("/room/{joinCode}/spin-roulette")
@@ -124,6 +124,6 @@ public class RoomWebSocketController {
         final Room room = roomService.getRoomByJoinCode(joinCode);
         final Winner winner = room.spinRoulette(room.getHost(), new Roulette(new RoulettePicker()));
         final RouletteSpinEvent event = new RouletteSpinEvent(joinCode, message.hostName(), winner);
-        eventPublisher.publishEvent(event);
+        publishManager.publishRoom(event);
     }
 }

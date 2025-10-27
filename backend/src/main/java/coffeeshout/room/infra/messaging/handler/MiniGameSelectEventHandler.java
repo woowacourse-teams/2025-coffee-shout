@@ -34,7 +34,7 @@ public class MiniGameSelectEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<MiniGameSelectEvent> eventType() {
         return MiniGameSelectEvent.class;
     }
 }

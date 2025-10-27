@@ -38,7 +38,7 @@ public class PlayerReadyEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<PlayerReadyEvent> eventType() {
         return PlayerReadyEvent.class;
     }
 }

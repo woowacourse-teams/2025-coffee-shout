@@ -62,7 +62,7 @@ public class StartMiniGameCommandEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<StartMiniGameCommandEvent> eventType() {
         return StartMiniGameCommandEvent.class;
     }
 }

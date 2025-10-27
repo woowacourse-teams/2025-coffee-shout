@@ -60,6 +60,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         executor.setCorePoolSize(8);
         executor.setMaxPoolSize(16);
         executor.setThreadNamePrefix("inbound-");
+        executor.setQueueCapacity(2048);
+        executor.setKeepAliveSeconds(60);
         executor.initialize();
         registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor, messageMappingExecutorChannelInterceptor)
                 .executor(executor);

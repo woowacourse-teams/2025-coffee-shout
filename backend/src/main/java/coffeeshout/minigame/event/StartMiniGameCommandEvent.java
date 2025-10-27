@@ -19,7 +19,7 @@ public record StartMiniGameCommandEvent(
 
     public StartMiniGameCommandEvent(String joinCode, String hostName) {
         this(
-                SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpSessionId", String.class),
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),

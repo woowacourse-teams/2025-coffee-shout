@@ -38,7 +38,7 @@ public class PlayerKickEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<PlayerKickEvent> eventType() {
         return PlayerKickEvent.class;
     }
 }

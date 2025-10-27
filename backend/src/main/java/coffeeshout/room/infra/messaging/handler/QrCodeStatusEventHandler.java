@@ -39,7 +39,7 @@ public class QrCodeStatusEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<QrCodeStatusEvent> eventType() {
         return QrCodeStatusEvent.class;
     }
 

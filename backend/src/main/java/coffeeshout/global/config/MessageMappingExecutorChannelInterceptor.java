@@ -15,4 +15,9 @@ public class MessageMappingExecutorChannelInterceptor implements ExecutorChannel
         SynchronizedWebsocketInfo.bindWebsocketInfo(message);
         return message;
     }
+
+    @Override
+    public void afterMessageHandled(Message<?> message, MessageChannel channel, MessageHandler handler, Exception ex) {
+        SynchronizedWebsocketInfo.unbindWebsocketInfo();
+    }
 }

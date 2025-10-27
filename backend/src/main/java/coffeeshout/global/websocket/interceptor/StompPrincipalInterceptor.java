@@ -2,6 +2,7 @@ package coffeeshout.global.websocket.interceptor;
 
 import coffeeshout.global.domain.PlayerPrincipal;
 import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -24,8 +25,8 @@ public class StompPrincipalInterceptor implements ChannelInterceptor {
             return message;
         }
 
-        switch (accessor.getCommand()) {
-            case CONNECT -> registerPrincipal(accessor);
+        if (accessor.getCommand() == StompCommand.CONNECT) {
+            registerPrincipal(accessor);
         }
 
         return message;

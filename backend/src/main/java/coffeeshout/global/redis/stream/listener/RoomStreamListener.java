@@ -1,10 +1,7 @@
 package coffeeshout.global.redis.stream.listener;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.global.redis.EventHandlerMapping;
-import coffeeshout.global.redis.stream.EventHandlerFacade;
-import coffeeshout.global.trace.TracerProvider;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.global.redis.stream.EventHandlerExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -21,9 +18,9 @@ public class RoomStreamListener extends AbstractStreamListener {
             @Qualifier("roomEnterStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamContainer,
             ObjectMapper objectMapper,
             RedisStreamProperties redisStreamProperties,
-            EventHandlerFacade eventHandlerFacade
+            EventHandlerExecutor eventHandlerExecutor
     ) {
-        super(streamContainer, objectMapper, eventHandlerFacade);
+        super(streamContainer, objectMapper, eventHandlerExecutor);
         this.redisStreamProperties = redisStreamProperties;
     }
 

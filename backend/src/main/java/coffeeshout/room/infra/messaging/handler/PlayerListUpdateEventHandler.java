@@ -34,7 +34,7 @@ public class PlayerListUpdateEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<PlayerListUpdateEvent> eventType() {
         return PlayerListUpdateEvent.class;
     }
 }

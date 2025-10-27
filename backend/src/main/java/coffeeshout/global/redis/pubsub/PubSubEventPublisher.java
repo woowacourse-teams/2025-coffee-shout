@@ -10,14 +10,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EventPublisher {
+public class PubSubEventPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic roomEventTopic;
 
-    public void publishEvent(BaseEvent event) {
+    public void publishEvent(BaseEvent event, ChannelTopic channelTopic) {
         try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            redisTemplate.convertAndSend(channelTopic.getTopic(), event);
             log.info("이벤트 발행됨: eventType={}, eventId={}", event.getClass().getSimpleName(), event.eventId());
         } catch (Exception e) {
             log.error("이벤트 발행 실패: eventType={}, eventId={}", event.getClass().getSimpleName(), event.eventId(), e);

@@ -1,7 +1,7 @@
 package coffeeshout.global.redis.stream.listener;
 
 import coffeeshout.global.redis.BaseEvent;
-import coffeeshout.global.redis.stream.EventHandlerFacade;
+import coffeeshout.global.redis.stream.EventHandlerExecutor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -18,7 +18,7 @@ public abstract class AbstractStreamListener implements StreamListener<String, O
 
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamContainer;
     private final ObjectMapper objectMapper;
-    private final EventHandlerFacade eventHandlerFacade;
+    private final EventHandlerExecutor eventHandlerExecutor;
 
     @PostConstruct
     public void registerListener() {
@@ -27,7 +27,7 @@ public abstract class AbstractStreamListener implements StreamListener<String, O
 
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
-        eventHandlerFacade.handle(convertEvent(message));
+        eventHandlerExecutor.handle(convertEvent(message));
     }
 
     private BaseEvent convertEvent(ObjectRecord<String, String> message) {

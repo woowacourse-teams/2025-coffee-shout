@@ -22,7 +22,7 @@ public class SelectCardCommandEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<SelectCardCommandEvent> eventType() {
         return SelectCardCommandEvent.class;
     }
 }

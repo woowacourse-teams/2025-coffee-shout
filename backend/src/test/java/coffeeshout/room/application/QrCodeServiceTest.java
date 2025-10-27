@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
-import coffeeshout.global.redis.pubsub.EventPublisher;
+import coffeeshout.global.redis.pubsub.PubSubPublishManager;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
@@ -33,7 +33,7 @@ class QrCodeServiceTest {
     StorageService storageService;
 
     @Mock
-    EventPublisher roomEventPublisher;
+    PubSubPublishManager publishManager;
 
     MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
@@ -49,7 +49,7 @@ class QrCodeServiceTest {
                 qrCodeGenerator,
                 storageService,
                 meterRegistry,
-                roomEventPublisher
+                publishManager
         );
     }
 
@@ -177,7 +177,7 @@ class QrCodeServiceTest {
         // then
 
         ArgumentCaptor<QrCodeStatusEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(successEventCaptor.capture());
+        verify(publishManager).publishRoom(successEventCaptor.capture());
 
         // 2. 두 번째 이벤트는 SUCCESS (roomEventPublisher를 통해 발행)
         QrCodeStatusEvent successEvent = successEventCaptor.getValue();
@@ -198,7 +198,7 @@ class QrCodeServiceTest {
 
         // then
         ArgumentCaptor<QrCodeStatusEvent> errorCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(errorCaptor.capture());
+        verify(publishManager).publishRoom(errorCaptor.capture());
 
         assertThat(errorCaptor.getValue().status()).isEqualTo(QrCodeStatus.ERROR);
     }

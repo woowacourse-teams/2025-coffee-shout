@@ -2,6 +2,8 @@ package coffeeshout.global.websocket;
 
 import java.security.Principal;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 
 public class SynchronizedWebsocketInfo {
 
@@ -24,13 +26,17 @@ public class SynchronizedWebsocketInfo {
         if (message == null) {
             return "none";
         }
-        return getPrincipal().getName();
+        Principal principal = getPrincipal();
+        return principal != null ? principal.getName() : "none";
     }
 
     public static Principal getPrincipal() {
-        if (SynchronizedWebsocketInfo.getWebsocketInfo() == null) {
+        Message<?> message = getWebsocketInfo();
+        if (message == null) {
             return null;
         }
-        return SynchronizedWebsocketInfo.getWebsocketInfo().getHeaders().get("simpUser", Principal.class);
+        SimpMessageHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message,
+                SimpMessageHeaderAccessor.class);
+        return accessor != null ? accessor.getUser() : null;
     }
 }

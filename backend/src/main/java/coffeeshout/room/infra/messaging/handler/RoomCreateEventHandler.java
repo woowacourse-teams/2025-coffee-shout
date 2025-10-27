@@ -40,7 +40,7 @@ public class RoomCreateEventHandler implements EventHandler {
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<RoomCreateEvent> eventType() {
         return RoomCreateEvent.class;
     }
 }

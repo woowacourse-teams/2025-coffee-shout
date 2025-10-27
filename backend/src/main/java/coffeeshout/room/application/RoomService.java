@@ -1,6 +1,6 @@
 package coffeeshout.room.application;
 
-import coffeeshout.global.redis.pubsub.EventPublisher;
+import coffeeshout.global.redis.pubsub.PubSubPublishManager;
 import coffeeshout.global.redis.stream.StreamPublishManager;
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;
@@ -55,7 +55,7 @@ public class RoomService {
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
-    private final EventPublisher roomEventPublisher;
+    private final PubSubPublishManager publishManager;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
     private final StreamPublishManager streamPublishManager;
@@ -80,7 +80,7 @@ public class RoomService {
                 joinCode.getValue()
         );
 
-        roomEventPublisher.publishEvent(event);
+        publishManager.publishRoom(event);
 
         // QR 코드 비동기 생성 시작
         qrCodeService.generateQrCodeAsync(joinCode.getValue());
@@ -307,7 +307,7 @@ public class RoomService {
 
         if (exists) {
             final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
-            roomEventPublisher.publishEvent(event);
+            publishManager.publishRoom(event);
         }
 
         return exists;
