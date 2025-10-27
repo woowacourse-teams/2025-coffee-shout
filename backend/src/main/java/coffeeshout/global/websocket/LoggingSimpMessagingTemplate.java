@@ -21,15 +21,15 @@ public class LoggingSimpMessagingTemplate {
     }
 
     @Observed(name = "websocket.send.toUser")
-    public void convertAndSendToUser(String sessionId, String destination, Object payload) {
-        messagingTemplate.convertAndSendToUser(sessionId, destination, payload);
+    public void convertAndSendToUser(String userName, String destination, Object payload) {
+        messagingTemplate.convertAndSendToUser(userName, destination, payload);
     }
 
     @MessageResponse(path = "/user/queue/errors", returnType = Object.class)
     @Observed(name = "websocket.send.error")
-    public void convertAndSendError(String sessionId, Exception exception) {
+    public void convertAndSendError(String userName, Exception exception) {
         messagingTemplate.convertAndSendToUser(
-                sessionId,
+                userName,
                 "/queue/errors",
                 WebSocketErrorResponse.from(exception)
         );

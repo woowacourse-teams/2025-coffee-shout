@@ -19,7 +19,7 @@ public class CardGameTaskSchedulerConfig {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         scheduler.setPoolSize(3);
-        scheduler.setThreadNamePrefix("card-game-task");
+        scheduler.setThreadNamePrefix("card-game-task-");
         scheduler.setDaemon(false);
         scheduler.setErrorHandler(t ->
                 log.error("스케줄 실행 중 예외가 발생했습니다.", t)
