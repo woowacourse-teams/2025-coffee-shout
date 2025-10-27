@@ -2,14 +2,10 @@ import useLazyFetch from '@/apis/rest/useLazyFetch';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 import { usePlayerType } from '@/contexts/PlayerType/PlayerTypeContext';
-import { useCallback, useEffect } from 'react';
 import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
+import { useCallback, useEffect } from 'react';
 
-type Props = {
-  isConnected: boolean;
-};
-
-export const useParticipantValidation = ({ isConnected }: Props) => {
+export const useParticipantValidation = () => {
   const { myName, joinCode } = useIdentifier();
   const { participants } = useParticipants();
   const { playerType } = usePlayerType();
@@ -47,7 +43,6 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
       return;
     }
 
-    // 방 존재 여부 체크
     const response = await checkRoomExists();
     if (!response) return;
     if (!response.exist) {
@@ -67,16 +62,11 @@ export const useParticipantValidation = ({ isConnected }: Props) => {
     }
   }, [joinCode, playerType, myName, participants, navigateToHome, checkRoomExists]);
 
-  /**
-   * 웹소켓 연결되고 participants가 로드된 후 유효성 검사
-   */
   useEffect(() => {
-    if (isConnected && participants.length > 0) {
-      const timeoutId = setTimeout(() => {
-        validateUserExistsAndRedirect();
-      }, 500);
+    const timeoutId = setTimeout(() => {
+      validateUserExistsAndRedirect();
+    }, 500);
 
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isConnected, participants.length, validateUserExistsAndRedirect]);
+    return () => clearTimeout(timeoutId);
+  }, [validateUserExistsAndRedirect]);
 };
