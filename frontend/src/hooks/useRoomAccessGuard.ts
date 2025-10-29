@@ -51,7 +51,7 @@ export const useRoomAccessGuard = () => {
     }
 
     if (!participants.length) {
-      console.log('participants가 아직 로드되지 않음 - 체크 건너뜀');
+      console.log('participants가 로드되지 않음 - 검증 건너뜀');
       return;
     }
 
