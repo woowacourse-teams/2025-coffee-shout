@@ -14,6 +14,7 @@ import { theme } from './styles/theme';
 
 const App = () => {
   const [showIframes, setShowIframes] = useState(false);
+  const isInIframe = window.self !== window.top;
 
   // 개발 모드에서 snippet 주입
   useEffect(() => {
@@ -24,12 +25,14 @@ const App = () => {
 
   return (
     <>
-      <button
-        onClick={() => setShowIframes(!showIframes)}
-        style={{ position: 'fixed', top: 10, left: 10, zIndex: 9999, padding: '8px 16px' }}
-      >
-        Toggle Iframes
-      </button>
+      {!isInIframe && (
+        <button
+          onClick={() => setShowIframes(!showIframes)}
+          style={{ position: 'fixed', top: 10, left: 10, zIndex: 9999, padding: '8px 16px' }}
+        >
+          Toggle Iframes
+        </button>
+      )}
 
       {showIframes ? (
         <div
