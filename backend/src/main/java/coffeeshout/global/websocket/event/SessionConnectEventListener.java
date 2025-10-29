@@ -2,7 +2,6 @@ package coffeeshout.global.websocket.event;
 
 import coffeeshout.global.metric.WebSocketMetricService;
 import coffeeshout.global.websocket.StompSessionManager;
-import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import coffeeshout.global.websocket.event.session.SessionRegisteredEvent;
 import coffeeshout.global.websocket.infra.SessionEventPublisher;
 import coffeeshout.room.domain.JoinCode;

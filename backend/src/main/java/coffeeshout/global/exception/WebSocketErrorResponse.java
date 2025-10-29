@@ -8,9 +8,9 @@ public record WebSocketErrorResponse(
         String message,
         String timestamp
 ) {
-    public static WebSocketErrorResponse from(Exception exception) {
-        final String errorType = extractErrorType(exception);
-        final String errorMessage = exception.getMessage() != null ? exception.getMessage() : "알수 없는 예외 발생";
+    public static WebSocketErrorResponse from(Throwable throwable) {
+        final String errorType = extractErrorType(throwable);
+        final String errorMessage = extractErrorMessage(throwable);
         final String currentTimestamp = Instant.now().toString();
 
         return new WebSocketErrorResponse(
@@ -20,7 +20,15 @@ public record WebSocketErrorResponse(
         );
     }
 
-    private static String extractErrorType(Exception exception) {
+    private static String extractErrorMessage(Throwable exception) {
+        if (exception instanceof CoffeeShoutException coffeeShoutException) {
+            return coffeeShoutException.getMessage();
+        }
+        return "알 수 없는 예외 발생";
+    }
+
+
+    private static String extractErrorType(Throwable exception) {
         if (exception instanceof CoffeeShoutException coffeeShoutException) {
             return coffeeShoutException.getErrorCode().getCode();
         }
