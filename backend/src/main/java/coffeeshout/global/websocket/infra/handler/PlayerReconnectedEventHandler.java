@@ -1,6 +1,5 @@
 package coffeeshout.global.websocket.infra.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.websocket.DelayedPlayerRemovalService;
 import coffeeshout.global.websocket.event.player.PlayerReconnectedEvent;
@@ -11,18 +10,17 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlayerReconnectedEventHandler implements EventHandler {
+public class PlayerReconnectedEventHandler implements EventHandler<PlayerReconnectedEvent> {
 
     private final DelayedPlayerRemovalService delayedPlayerRemovalService;
 
     @Override
-    public void handle(BaseEvent event) {
-        final PlayerReconnectedEvent playerReconnectedEvent = (PlayerReconnectedEvent) event;
-        delayedPlayerRemovalService.cancelScheduledRemoval(playerReconnectedEvent.playerKey());
+    public void handle(PlayerReconnectedEvent event) {
+        delayedPlayerRemovalService.cancelScheduledRemoval(event.playerKey());
     }
 
     @Override
-    public Class<?> eventType() {
+    public Class<PlayerReconnectedEvent> eventType() {
         return PlayerReconnectedEvent.class;
     }
 }

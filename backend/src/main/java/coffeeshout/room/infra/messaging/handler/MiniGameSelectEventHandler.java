@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -15,21 +14,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MiniGameSelectEventHandler implements EventHandler {
+public class MiniGameSelectEventHandler implements EventHandler<MiniGameSelectEvent> {
 
     private final RoomService roomService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(BaseEvent event) {
-        final MiniGameSelectEvent miniGameSelectEvent = (MiniGameSelectEvent) event;
+    public void handle(MiniGameSelectEvent event) {
         final List<MiniGameType> selectedMiniGames = roomService.updateMiniGamesInternal(
-                miniGameSelectEvent.joinCode(),
-                miniGameSelectEvent.hostName(),
-                miniGameSelectEvent.miniGameTypes()
+                event.joinCode(),
+                event.hostName(),
+                event.miniGameTypes()
         );
 
-        messagingTemplate.convertAndSend("/topic/room/" + miniGameSelectEvent.joinCode() + "/minigame",
+        messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
                 WebSocketResponse.success(selectedMiniGames));
     }
 

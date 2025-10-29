@@ -1,8 +1,8 @@
 package coffeeshout.global.redis;
 
-public interface EventHandler {
+public interface EventHandler <T> {
 
-    void handle(BaseEvent event);
+    void handle(T event);
 
-    Class<?> eventType();
+    Class<T> eventType();
 }

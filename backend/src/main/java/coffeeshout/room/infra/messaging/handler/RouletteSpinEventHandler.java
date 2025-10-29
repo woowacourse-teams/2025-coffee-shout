@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -14,20 +13,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RouletteSpinEventHandler implements EventHandler {
+public class RouletteSpinEventHandler implements EventHandler<RouletteSpinEvent> {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
     private final RoulettePersistenceService roulettePersistenceService;
 
     @Override
-    public void handle(BaseEvent event) {
-        final RouletteSpinEvent rouletteSpinEvent = (RouletteSpinEvent) event;
-        final Winner winner = rouletteSpinEvent.winner();
+    public void handle(RouletteSpinEvent event) {
+        final Winner winner = event.winner();
         final WinnerResponse response = WinnerResponse.from(winner);
 
-        messagingTemplate.convertAndSend("/topic/room/" + rouletteSpinEvent.joinCode() + "/winner",
+        messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/winner",
                 WebSocketResponse.success(response));
-        roulettePersistenceService.saveRouletteResult(rouletteSpinEvent);
+        roulettePersistenceService.saveRouletteResult(event);
     }
 
     @Override

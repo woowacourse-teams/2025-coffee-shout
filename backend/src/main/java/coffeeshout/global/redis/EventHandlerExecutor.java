@@ -1,9 +1,5 @@
-package coffeeshout.global.redis.stream;
+package coffeeshout.global.redis;
 
-import coffeeshout.global.redis.BaseEvent;
-import coffeeshout.global.redis.EventHandler;
-import coffeeshout.global.redis.EventHandlerMapping;
-import coffeeshout.global.redis.UserEvent;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.trace.TracerProvider;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -22,7 +18,7 @@ public class EventHandlerExecutor {
 
     public void handle(BaseEvent event) {
         try {
-            final EventHandler handler = handlerFactory.getHandler(event);
+            final EventHandler<BaseEvent> handler = handlerFactory.getHandler(event);
             final Runnable handling = () -> handler.handle(event);
 
             if (event instanceof Traceable traceable) {

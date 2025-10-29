@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
@@ -18,18 +17,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomEnterEventHandler implements EventHandler {
+public class RoomEnterEventHandler implements EventHandler<RoomJoinEvent> {
 
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
     private final RoomEventWaitManager roomEventWaitManager;
 
     @Override
-    public void handle(BaseEvent event) {
-        final RoomJoinEvent roomJoinEvent = (RoomJoinEvent) event;
-
+    public void handle(RoomJoinEvent event) {
         try {
-            final SelectedMenuRequest selectedMenuRequest = roomJoinEvent.selectedMenuRequest();
+            final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
 
             final Menu menu = menuCommandService.convertMenu(
                     selectedMenuRequest.id(),
@@ -37,8 +34,8 @@ public class RoomEnterEventHandler implements EventHandler {
             );
 
             final Room room = roomCommandService.joinGuest(
-                    new JoinCode(roomJoinEvent.joinCode()),
-                    new PlayerName(roomJoinEvent.guestName()),
+                    new JoinCode(event.joinCode()),
+                    new PlayerName(event.guestName()),
                     menu, selectedMenuRequest.temperature()
             );
             roomEventWaitManager.notifySuccess(event.eventId(), room);

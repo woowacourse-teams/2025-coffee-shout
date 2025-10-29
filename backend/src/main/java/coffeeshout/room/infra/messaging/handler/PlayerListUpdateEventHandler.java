@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -16,20 +15,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlayerListUpdateEventHandler implements EventHandler {
+public class PlayerListUpdateEventHandler implements EventHandler<PlayerListUpdateEvent> {
 
     private final RoomService roomService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(BaseEvent event) {
-        final PlayerListUpdateEvent playerListUpdateEvent = (PlayerListUpdateEvent) event;
-        final List<Player> players = roomService.getPlayersInternal(playerListUpdateEvent.joinCode());
+    public void handle(PlayerListUpdateEvent event) {
+        final List<Player> players = roomService.getPlayersInternal(event.joinCode());
         final List<PlayerResponse> responses = players.stream()
                 .map(PlayerResponse::from)
                 .toList();
 
-        messagingTemplate.convertAndSend("/topic/room/" + playerListUpdateEvent.joinCode(),
+        messagingTemplate.convertAndSend("/topic/room/" + event.joinCode(),
                 WebSocketResponse.success(responses));
     }
 

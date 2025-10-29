@@ -1,7 +1,7 @@
 package coffeeshout.global.redis.pubsub;
 
 import coffeeshout.global.redis.BaseEvent;
-import coffeeshout.global.redis.stream.EventHandlerExecutor;
+import coffeeshout.global.redis.EventHandlerExecutor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 

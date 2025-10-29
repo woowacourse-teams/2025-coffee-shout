@@ -1,7 +1,7 @@
 package coffeeshout.global.redis.stream.listener;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import coffeeshout.global.redis.stream.EventHandlerExecutor;
+import coffeeshout.global.redis.EventHandlerExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.ObjectRecord;

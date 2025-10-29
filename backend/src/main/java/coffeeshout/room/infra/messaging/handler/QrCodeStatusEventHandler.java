@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QrCodeStatusEventHandler implements EventHandler {
+public class QrCodeStatusEventHandler implements EventHandler<QrCodeStatusEvent> {
 
     private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
 
@@ -25,16 +24,15 @@ public class QrCodeStatusEventHandler implements EventHandler {
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void handle(BaseEvent event) {
-        final QrCodeStatusEvent qrEvent = (QrCodeStatusEvent) event;
+    public void handle(QrCodeStatusEvent event) {
         log.info("QR 코드 완료 이벤트 수신: eventId={}, joinCode={}, status={}",
-                qrEvent.eventId(), qrEvent.joinCode(), qrEvent.status());
+                event.eventId(), event.joinCode(), event.status());
 
-        switch (qrEvent.status()) {
-            case SUCCESS -> handleQrCodeSuccess(qrEvent);
-            case ERROR -> handleQrCodeError(qrEvent);
+        switch (event.status()) {
+            case SUCCESS -> handleQrCodeSuccess(event);
+            case ERROR -> handleQrCodeError(event);
             default -> log.warn("처리할 수 없는 QR 코드 상태: eventId={}, joinCode={}, status={}",
-                    qrEvent.eventId(), qrEvent.joinCode(), qrEvent.status());
+                    event.eventId(), event.joinCode(), event.status());
         }
     }
 

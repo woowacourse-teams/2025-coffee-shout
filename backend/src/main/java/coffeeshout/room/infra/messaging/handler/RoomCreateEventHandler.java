@@ -1,6 +1,5 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.domain.JoinCode;
@@ -17,26 +16,25 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomCreateEventHandler implements EventHandler {
+public class RoomCreateEventHandler implements EventHandler<RoomCreateEvent> {
 
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
 
     @Override
-    public void handle(BaseEvent event) {
-        final RoomCreateEvent roomCreateEvent = (RoomCreateEvent) event;
-        final SelectedMenuRequest selectedMenuRequest = roomCreateEvent.selectedMenuRequest();
+    public void handle(RoomCreateEvent event) {
+        final SelectedMenuRequest selectedMenuRequest = event.selectedMenuRequest();
         final Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
         roomCommandService.saveIfAbsentRoom(
-                new JoinCode(roomCreateEvent.joinCode()),
-                new PlayerName(roomCreateEvent.hostName()),
+                new JoinCode(event.joinCode()),
+                new PlayerName(event.hostName()),
                 menu,
                 selectedMenuRequest.temperature()
         );
 
-        delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(roomCreateEvent.joinCode()));
+        delayedRoomRemovalService.scheduleRemoveRoom(new JoinCode(event.joinCode()));
     }
 
     @Override

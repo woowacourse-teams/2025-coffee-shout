@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class StartMiniGameCommandEventHandler implements EventHandler {
+public class StartMiniGameCommandEventHandler implements EventHandler<StartMiniGameCommandEvent> {
 
     private final Map<MiniGameType, MiniGameService> miniGameServiceMap;
     private final RoomQueryService roomQueryService;
@@ -44,12 +44,11 @@ public class StartMiniGameCommandEventHandler implements EventHandler {
     }
 
     @Override
-    public void handle(BaseEvent event) {
-        final StartMiniGameCommandEvent startEvent = (StartMiniGameCommandEvent) event;
+    public void handle(StartMiniGameCommandEvent event) {
         log.info("미니게임 시작 이벤트 수신: eventId={}, joinCode={}, hostName={}",
-                startEvent.eventId(), startEvent.joinCode(), startEvent.hostName());
+                event.eventId(), event.joinCode(), event.hostName());
 
-        updateRoomStateAndStartGame(startEvent);
+        updateRoomStateAndStartGame(event);
     }
 
     private void updateRoomStateAndStartGame(StartMiniGameCommandEvent event) {

@@ -10,17 +10,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventHandlerMapping {
 
-    private final Map<Class<?>, EventHandler> handlerMap = new HashMap<>();
+    private final Map<Class<? extends BaseEvent>, EventHandler<? extends BaseEvent>> handlerMap = new HashMap<>();
 
-    public EventHandlerMapping(List<EventHandler> handlers) {
+    public EventHandlerMapping(List<EventHandler<? extends BaseEvent>> handlers) {
         handlers.forEach(handler -> handlerMap.put(handler.eventType(), handler));
-        log.info("이벤트 핸들러 팩토리 초기화: 핸들러 수={}, 지원 타입={}", handlers.size(), handlerMap.keySet());
     }
 
-    public EventHandler getHandler(BaseEvent event) {
+    public <T extends BaseEvent> EventHandler<T> getHandler(T event) {
         if (!handlerMap.containsKey(event.getClass())) {
             throw new IllegalArgumentException("지원하지 않는 이벤트 타입: " + event.getClass());
         }
-        return handlerMap.get(event.getClass());
+        //noinspection unchecked
+        return (EventHandler<T>) handlerMap.get(event.getClass());
     }
 }

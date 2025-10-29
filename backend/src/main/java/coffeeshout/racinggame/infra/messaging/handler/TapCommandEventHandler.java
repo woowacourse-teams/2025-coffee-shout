@@ -1,6 +1,5 @@
 package coffeeshout.racinggame.infra.messaging.handler;
 
-import coffeeshout.global.redis.BaseEvent;
 import coffeeshout.global.redis.EventHandler;
 import coffeeshout.racinggame.application.RacingGameService;
 import coffeeshout.racinggame.domain.event.TapCommandEvent;
@@ -11,14 +10,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TapCommandEventHandler implements EventHandler {
+public class TapCommandEventHandler implements EventHandler<TapCommandEvent> {
 
     private final RacingGameService racingGameService;
 
     @Override
-    public void handle(BaseEvent event) {
-        final TapCommandEvent tapCommandEvent = (TapCommandEvent) event;
-        racingGameService.tap(tapCommandEvent.joinCode(), tapCommandEvent.playerName(), tapCommandEvent.tapCount());
+    public void handle(TapCommandEvent event) {
+        racingGameService.tap(event.joinCode(), event.playerName(), event.tapCount());
     }
 
     @Override
