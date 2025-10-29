@@ -9,6 +9,9 @@ public class SynchronizedWebsocketInfo {
 
     private static final ThreadLocal<Message<?>> threadLocal = new ThreadLocal<>();
 
+    private SynchronizedWebsocketInfo() {
+    }
+
     public static void bindWebsocketInfo(Message<?> message) {
         threadLocal.set(message);
     }
