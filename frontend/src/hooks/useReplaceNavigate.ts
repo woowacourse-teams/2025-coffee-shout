@@ -12,12 +12,12 @@ export const useReplaceNavigate = () => {
       }
 
       navigate(to, {
-        replace: true,
         ...options,
         state: {
           ...options?.state,
           fromInternal: true,
         },
+        replace: options?.replace !== undefined ? options.replace : true,
       });
     },
     [navigate]
