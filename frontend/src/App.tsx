@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@emotion/react';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { WebSocketProvider } from './apis/websocket/contexts/WebSocketProvider';
 import GlobalErrorBoundary from './components/@common/ErrorBoundary/GlobalErrorBoundary';
@@ -9,20 +9,12 @@ import { IdentifierProvider } from './contexts/Identifier/IdentifierProvider';
 import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvider';
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
-import { injectSnippet } from './devtools/injectSnippetToIframes';
 import { DebuggerPanel } from './devtools/DebuggerPanel/DebuggerPanel';
 import { theme } from './styles/theme';
 
 const App = () => {
   const [showIframes, setShowIframes] = useState(false);
   const isInIframe = window.self !== window.top;
-
-  // 개발 모드에서 snippet 주입 및 디버거 패널 표시
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      injectSnippet();
-    }
-  }, []);
 
   return (
     <>

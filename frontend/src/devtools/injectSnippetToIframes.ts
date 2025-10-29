@@ -1,25 +1,41 @@
 import { networkCollector, getCollectorScript } from './networkCollector';
 
-// 이미 주입했는지 확인하는 플래그
+// 중복 주입 방지
 let isInjected = false;
 let observer: MutationObserver | null = null;
 
+// window 또는 iframe 로드 완료 후 주입
+const injectWhenReady = (target: Window | HTMLIFrameElement): void => {
+  const document = getDocument(target);
+
+  // 이미 로드된 경우 바로 주입
+  if (document && document.readyState === 'complete') {
+    injectScript(target);
+    return;
+  }
+
+  // 로드 완료 대기
+  target.addEventListener('load', () => {
+    injectScript(target);
+  });
+};
+
 // snippet 자동 주입 시작 (iframe + 현재 페이지)
 export const injectSnippet = (): void => {
-  // 이미 주입했으면 스킵 (Strict Mode 중복 방지)
+  // 이미 주입했으면 스킵
   if (isInjected) return;
 
   // window에 collector 노출
   (window as Window & { __networkCollector__?: typeof networkCollector }).__networkCollector__ =
     networkCollector;
 
-  // 현재 페이지는 이미 로드되었으므로 바로 주입
-  injectScript(window);
+  // window 로드 완료 후 주입
+  injectWhenReady(window);
 
   // iframe 감지 및 주입
   observer = new MutationObserver(() => {
     document.querySelectorAll('iframe').forEach((iframe) => {
-      injectScript(iframe);
+      injectWhenReady(iframe);
     });
   });
 
@@ -47,21 +63,11 @@ const injectScript = (target: Window | HTMLIFrameElement): void => {
   // collector 전달 스크립트
   const collectorScript = document.createElement('script');
   collectorScript.textContent = `
-    window.__networkCollector__ = window.parent.__networkCollector__ || window.__networkCollector__;
+    if (!window.__networkCollector__) {
+      window.__networkCollector__ = window.parent?.__networkCollector__ || null;
+    }
     ${getCollectorScript()}
   `;
-
-  // collector가 없는 경우 빈 객체로 초기화 (iframe에서)
-  const targetWindow = target as Window & { __networkCollector__?: typeof networkCollector };
-  if (!targetWindow.__networkCollector__) {
-    const initScript = document.createElement('script');
-    initScript.textContent = `
-      if (!window.__networkCollector__) {
-        window.__networkCollector__ = window.parent?.__networkCollector__ || null;
-      }
-    `;
-    document.head.appendChild(initScript);
-  }
 
   document.head.appendChild(collectorScript);
   injectedTargets.add(target);
