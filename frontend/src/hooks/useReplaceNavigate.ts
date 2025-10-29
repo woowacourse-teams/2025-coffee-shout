@@ -1,23 +1,23 @@
 import { useCallback } from 'react';
-import { useNavigate, NavigateOptions } from 'react-router-dom';
+import { NavigateOptions, To, useNavigate } from 'react-router-dom';
 
 export const useReplaceNavigate = () => {
   const navigate = useNavigate();
 
   return useCallback(
-    (to: string | number, options?: NavigateOptions) => {
+    (to: To | number, options?: NavigateOptions) => {
       if (typeof to === 'number') {
         navigate(to);
         return;
       }
 
       navigate(to, {
+        replace: true,
         ...options,
         state: {
-          ...options?.state,
           fromInternal: true,
+          ...options?.state,
         },
-        replace: options?.replace !== undefined ? options.replace : true,
       });
     },
     [navigate]
