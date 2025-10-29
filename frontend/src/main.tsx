@@ -5,7 +5,7 @@ import router from './router';
 import './styles/global.css';
 import './styles/reset.css';
 import * as Sentry from '@sentry/react';
-import { injectSnippetToIframes } from './utils/injectScriptToIframes';
+import { injectSnippet } from './devtools/injectSnippetToIframes';
 
 if (process.env.NODE_ENV === 'production') {
   Sentry.init({
@@ -25,10 +25,10 @@ if (process.env.NODE_ENV === 'production') {
 if (process.env.NODE_ENV === 'development') {
   // DOM이 준비된 후 실행
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectSnippetToIframes);
+    document.addEventListener('DOMContentLoaded', injectSnippet);
   } else {
     // 이미 로드된 경우 즉시 실행
-    injectSnippetToIframes();
+    injectSnippet();
   }
 }
 
