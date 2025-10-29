@@ -106,7 +106,7 @@ const LobbyPage = () => {
   const handleGameStart = useCallback(
     (data: { miniGameType: MiniGameType }) => {
       const { miniGameType: nextMiniGame } = data;
-      navigate(`/room/${joinCode}/${nextMiniGame}/ready`);
+      navigate(`/room/${joinCode}/${nextMiniGame}/ready`, { replace: false });
     },
 
     [joinCode, navigate]

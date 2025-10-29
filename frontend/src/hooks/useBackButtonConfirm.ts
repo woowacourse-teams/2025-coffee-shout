@@ -3,14 +3,18 @@ import { useBlocker } from 'react-router-dom';
 
 type Props = {
   onConfirm?: () => void;
+  message?: string;
 };
 
-export const useBackButtonConfirm = ({ onConfirm }: Props = {}) => {
+export const useBackButtonConfirm = ({
+  onConfirm,
+  message = '정말 페이지를 나가시겠습니까?',
+}: Props = {}) => {
   const blocker = useBlocker(({ historyAction }) => historyAction === 'POP');
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      const confirmed = window.confirm('정말 페이지를 나가시겠습니까?');
+      const confirmed = window.confirm(message);
       if (confirmed) {
         blocker.proceed();
         if (onConfirm) onConfirm();
@@ -18,5 +22,5 @@ export const useBackButtonConfirm = ({ onConfirm }: Props = {}) => {
         blocker.reset();
       }
     }
-  }, [blocker, onConfirm]);
+  }, [blocker, onConfirm, message]);
 };
