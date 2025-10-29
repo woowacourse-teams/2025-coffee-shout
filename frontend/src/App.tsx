@@ -10,13 +10,14 @@ import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvid
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { injectSnippet } from './devtools/injectSnippetToIframes';
+import { DebuggerPanel } from './devtools/DebuggerPanel/DebuggerPanel';
 import { theme } from './styles/theme';
 
 const App = () => {
   const [showIframes, setShowIframes] = useState(false);
   const isInIframe = window.self !== window.top;
 
-  // 개발 모드에서 snippet 주입
+  // 개발 모드에서 snippet 주입 및 디버거 패널 표시
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       injectSnippet();
@@ -25,6 +26,7 @@ const App = () => {
 
   return (
     <>
+      {process.env.NODE_ENV === 'development' && !isInIframe && <DebuggerPanel />}
       {!isInIframe && (
         <button
           onClick={() => setShowIframes(!showIframes)}
