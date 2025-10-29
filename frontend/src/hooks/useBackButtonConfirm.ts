@@ -16,8 +16,12 @@ export const useBackButtonConfirm = ({
     if (blocker.state === 'blocked') {
       const confirmed = window.confirm(message);
       if (confirmed) {
-        blocker.proceed();
-        onConfirm?.();
+        if (onConfirm) {
+          blocker.proceed();
+          onConfirm();
+        } else {
+          blocker.proceed();
+        }
       } else {
         blocker.reset();
       }
