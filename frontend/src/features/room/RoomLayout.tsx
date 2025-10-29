@@ -14,7 +14,10 @@ const RoomLayout = () => {
   const isRouletteOrOrderPath = /(roulette|order)/.test(location.pathname);
 
   useBackButtonConfirm({
-    onConfirm: () => navigate('/'),
+    onConfirm: () => {
+      navigate('/');
+      navigate(-1);
+    },
     message: isRouletteOrOrderPath
       ? '정말 방에서 나가시겠습니까?'
       : '게임 방에서 나가시겠습니까?\n방에서 나가도 게임은 계속 진행됩니다.',
