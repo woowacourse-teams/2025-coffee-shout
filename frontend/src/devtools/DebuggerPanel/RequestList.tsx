@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { NetworkRequest } from '../networkCollector';
 import { ListContainer, RequestItem } from './DebuggerPanel.styled';
+import { RequestDetail } from './RequestDetail';
 
 interface RequestListProps {
   requests: NetworkRequest[];
 }
 
 export const RequestList = ({ requests }: RequestListProps) => {
+  const [selectedRequest, setSelectedRequest] = useState<NetworkRequest | null>(null);
+
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString();
   };
@@ -17,13 +21,27 @@ export const RequestList = ({ requests }: RequestListProps) => {
     return '#F44336';
   };
 
+  const displayUrl = (request: NetworkRequest) => {
+    if (request.type === 'fetch' && request.queryParams) {
+      return request.url + request.queryParams;
+    }
+    return request.url;
+  };
+
   return (
-    <ListContainer>
+    <ListContainer style={{ position: 'relative' }}>
+      {selectedRequest && (
+        <RequestDetail request={selectedRequest} onClose={() => setSelectedRequest(null)} />
+      )}
       {requests.length === 0 ? (
         <div style={{ padding: '16px', textAlign: 'center', color: '#999' }}>No requests found</div>
       ) : (
         requests.map((request, index) => (
-          <RequestItem key={`${request.id}-${index}`}>
+          <RequestItem
+            key={`${request.id}-${index}`}
+            onClick={() => setSelectedRequest(request)}
+            style={{ display: selectedRequest ? 'none' : 'block' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <span
                 style={{
@@ -52,31 +70,8 @@ export const RequestList = ({ requests }: RequestListProps) => {
             </div>
             <div style={{ fontSize: '12px', color: '#333', wordBreak: 'break-all' }}>
               {request.method && `${request.method} `}
-              {request.url}
+              {displayUrl(request)}
             </div>
-            {request.direction && (
-              <div style={{ fontSize: '10px', color: '#999', marginTop: '2px' }}>
-                {request.direction === 'sent' ? '→' : '←'}
-              </div>
-            )}
-            {request.data != null && (
-              <div
-                style={{
-                  fontSize: '11px',
-                  color: '#666',
-                  marginTop: '4px',
-                  padding: '4px',
-                  background: '#f5f5f5',
-                  borderRadius: '2px',
-                  maxHeight: '100px',
-                  overflow: 'auto',
-                }}
-              >
-                {typeof request.data === 'string'
-                  ? request.data
-                  : String(JSON.stringify(request.data, null, 2) || '')}
-              </div>
-            )}
           </RequestItem>
         ))
       )}

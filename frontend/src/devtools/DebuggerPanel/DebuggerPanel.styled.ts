@@ -84,8 +84,81 @@ export const RequestItem = styled.div`
   border: 1px solid #ddd;
   border-radius: 4px;
   background: transparent;
+  cursor: pointer;
 
   &:hover {
     background: #f9f9f9;
   }
+`;
+
+export const DetailContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+`;
+
+export const TabBar = styled.div`
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  background: transparent;
+`;
+
+export const Tab = styled.button<{ $active: boolean }>`
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 2px solid ${({ $active }) => ($active ? '#1976D2' : 'transparent')};
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: ${({ $active }) => ($active ? '#1976D2' : '#666')};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+export const TabContent = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: transparent;
+`;
+
+export const HeaderRow = styled.div`
+  display: flex;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px solid #f0f0f0;
+`;
+
+export const HeaderKey = styled.div`
+  min-width: 180px;
+  color: #666;
+  font-weight: 500;
+`;
+
+export const HeaderValue = styled.div`
+  flex: 1;
+  color: #333;
+  word-break: break-all;
+`;
+
+export const CodeBlock = styled.pre`
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #333;
 `;
