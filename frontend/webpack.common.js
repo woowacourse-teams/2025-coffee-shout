@@ -1,11 +1,11 @@
-import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import webpack from 'webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import webpack from 'webpack';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import WebpackBundleAnalyzer from 'webpack-bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,6 +67,10 @@ export default (_, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
+        inject: 'head',
+        templateParameters: {
+          DEV_SNIPPET: argv.mode === 'development' ? `<script src="/dev-snippet.js"></script>` : '',
+        },
       }),
       new CopyWebpackPlugin({
         patterns: [
@@ -82,6 +86,7 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
+          { from: 'src/devtools/dev-snippet.ts', to: 'dev-snippet.js' },
         ],
       }),
       new webpack.DefinePlugin(envKeys),
@@ -99,12 +104,16 @@ export default (_, argv) => {
       }),
     ],
     devServer: {
+      static: {
+        directory: path.resolve(__dirname, 'dist'),
+      },
       compress: true,
       port: 3000,
       hot: true,
       open: true,
       historyApiFallback: true,
     },
+
     optimization: {
       usedExports: true,
       sideEffects: false,
