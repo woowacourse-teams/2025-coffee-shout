@@ -10,6 +10,7 @@ import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvid
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
+import IframePreviewToggle from './devtools/components/IframePreviewToggle';
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
                 <GlobalErrorBoundary>
                   <ToastProvider>
                     <ModalProvider>
+                      <IframePreviewToggle />
                       <Suspense fallback={<div>Loading...</div>}>
                         <Outlet />
                       </Suspense>
