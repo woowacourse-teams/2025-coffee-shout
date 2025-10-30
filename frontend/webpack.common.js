@@ -86,7 +86,7 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          { from: 'src/devtools/dev-snippet.ts', to: 'dev-snippet.js' },
+          { from: 'src/devtools/dev-snippet.js', to: 'dev-snippet.js' },
         ],
       }),
       new webpack.DefinePlugin(envKeys),
