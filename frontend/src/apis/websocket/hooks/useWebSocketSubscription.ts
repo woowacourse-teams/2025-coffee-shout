@@ -13,7 +13,7 @@ export const useWebSocketSubscription = <T>(
   const { subscribe, isConnected, sessionId } = useWebSocket();
 
   const subscriptionRef = useRef<StompSubscription | null>(null);
-  const lastSessionIdRef = useRef<string | null>(null);
+  const prevSessionIdRef = useRef<string | null>(null);
   const retryCountRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -43,7 +43,7 @@ export const useWebSocketSubscription = <T>(
     try {
       const sub = subscribe<T>(destination, onData, onError);
       subscriptionRef.current = sub;
-      lastSessionIdRef.current = sessionId;
+      prevSessionIdRef.current = sessionId;
       retryCountRef.current = 0;
       console.log(`✅ 구독 성공: ${destination}`, { sessionId });
     } catch (error) {
@@ -65,7 +65,7 @@ export const useWebSocketSubscription = <T>(
   }, [enabled, isVisible, isConnected, destination, onData, onError, sessionId, subscribe]);
 
   const doSubscribe = useCallback(() => {
-    const sessionChanged = sessionId !== lastSessionIdRef.current;
+    const sessionChanged = sessionId !== prevSessionIdRef.current;
     if (sessionChanged || !subscriptionRef.current) {
       if (sessionChanged) {
         console.log(`🔄 세션 변경으로 인한 구독 해제: ${destination}`);
