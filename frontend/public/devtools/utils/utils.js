@@ -19,3 +19,20 @@ export const extractRequestInfo = (input, init) => {
 export const generateRequestId = () => {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 };
+
+/**
+ * 민감한 헤더 마스킹 유틸리티
+ */
+const SENSITIVE_HEADERS = ['authorization', 'cookie', 'set-cookie'];
+
+export const maskHeaders = (headers = {}) => {
+  try {
+    const masked = {};
+    for (const k of Object.keys(headers)) {
+      masked[k] = SENSITIVE_HEADERS.includes(k.toLowerCase()) ? 'REDACTED' : headers[k];
+    }
+    return masked;
+  } catch {
+    return headers;
+  }
+};
