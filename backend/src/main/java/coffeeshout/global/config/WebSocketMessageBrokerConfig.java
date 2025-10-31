@@ -2,6 +2,7 @@ package coffeeshout.global.config;
 
 
 import coffeeshout.global.websocket.interceptor.ShutdownAwareHandshakeInterceptor;
+import coffeeshout.global.websocket.interceptor.StompPrincipalInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketInboundMetricInterceptor;
 import coffeeshout.global.websocket.interceptor.WebSocketOutboundMetricInterceptor;
 import io.micrometer.context.ContextSnapshot;
@@ -24,10 +25,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketInboundMetricInterceptor webSocketInboundMetricInterceptor;
+    private final StompPrincipalInterceptor stompPrincipalInterceptor;
     private final WebSocketOutboundMetricInterceptor webSocketOutboundMetricInterceptor;
     private final ShutdownAwareHandshakeInterceptor shutdownAwareHandshakeInterceptor;
     private final ObservationRegistry observationRegistry;
     private final ContextSnapshotFactory snapshotFactory;
+    private final MessageMappingExecutorChannelInterceptor messageMappingExecutorChannelInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -53,12 +56,15 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(webSocketInboundMetricInterceptor)
-                .taskExecutor()
-                .corePoolSize(32)
-                .maxPoolSize(32)
-                .queueCapacity(2048)
-                .keepAliveSeconds(60);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(32);
+        executor.setMaxPoolSize(32);
+        executor.setThreadNamePrefix("inbound-");
+        executor.setQueueCapacity(2048);
+        executor.setKeepAliveSeconds(60);
+        executor.initialize();
+        registration.interceptors(webSocketInboundMetricInterceptor, stompPrincipalInterceptor, messageMappingExecutorChannelInterceptor)
+                .executor(executor);
     }
 
     @Override

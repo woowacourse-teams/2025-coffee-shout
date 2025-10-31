@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
 import coffeeshout.global.exception.custom.StorageServiceException;
+import coffeeshout.global.redis.pubsub.PubSubPublishManager;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.service.QrCodeGenerator;
-import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class QrCodeServiceTest {
     StorageService storageService;
 
     @Mock
-    RoomEventPublisher roomEventPublisher;
+    PubSubPublishManager publishManager;
 
     MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
@@ -49,7 +49,7 @@ class QrCodeServiceTest {
                 qrCodeGenerator,
                 storageService,
                 meterRegistry,
-                roomEventPublisher
+                publishManager
         );
     }
 
@@ -86,7 +86,7 @@ class QrCodeServiceTest {
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(QRCodeGenerationException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_GENERATION_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 생성에 실패했습니다.");
     }
 
     @Test
@@ -97,12 +97,12 @@ class QrCodeServiceTest {
 
         when(qrCodeGenerator.generate(anyString())).thenReturn(qrCodeImage);
         when(storageService.upload(contents, qrCodeImage))
-                .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage()));
+                .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, "QR 코드 업로드에 실패했습니다."));
 
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(StorageServiceException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 업로드에 실패했습니다.");
     }
 
     @Test
@@ -116,12 +116,12 @@ class QrCodeServiceTest {
         when(storageService.upload(contents, qrCodeImage)).thenReturn(storageKey);
         when(storageService.getUrl(storageKey))
                 .thenThrow(new StorageServiceException(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED,
-                        RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage()));
+                        "QR 코드 URL 생성에 실패했습니다."));
 
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(StorageServiceException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 URL 생성에 실패했습니다.");
     }
 
     @Test
@@ -153,7 +153,7 @@ class QrCodeServiceTest {
         // when & then
         assertThatThrownBy(() -> qrCodeService.getQrCodeUrl(contents))
                 .isInstanceOf(QRCodeGenerationException.class)
-                .hasMessageContaining(RoomErrorCode.QR_CODE_GENERATION_FAILED.getMessage());
+                .hasMessageContaining("QR 코드 생성에 실패했습니다.");
     }
 
     // ===== 비동기 QR 코드 생성 테스트 =====
@@ -177,7 +177,7 @@ class QrCodeServiceTest {
         // then
 
         ArgumentCaptor<QrCodeStatusEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(successEventCaptor.capture());
+        verify(publishManager).publishRoom(successEventCaptor.capture());
 
         // 2. 두 번째 이벤트는 SUCCESS (roomEventPublisher를 통해 발행)
         QrCodeStatusEvent successEvent = successEventCaptor.getValue();
@@ -198,7 +198,7 @@ class QrCodeServiceTest {
 
         // then
         ArgumentCaptor<QrCodeStatusEvent> errorCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(errorCaptor.capture());
+        verify(publishManager).publishRoom(errorCaptor.capture());
 
         assertThat(errorCaptor.getValue().status()).isEqualTo(QrCodeStatus.ERROR);
     }

@@ -63,7 +63,7 @@ public class S3Service implements StorageService {
             meterRegistry.counter("s3.qr.upload.failed",
                     "error", e.getClass().getSimpleName()).increment();
             log.error("S3 QR 코드 업로드 실패: contents={}, error={}", contents, e.getMessage(), e);
-            throw new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage(), e);
+            throw new StorageServiceException(RoomErrorCode.QR_CODE_UPLOAD_FAILED, "QR 코드 업로드에 실패했습니다.", e);
         }
     }
 
@@ -75,8 +75,7 @@ public class S3Service implements StorageService {
             meterRegistry.counter("s3.qr.url.signing.failed",
                     "error", e.getClass().getSimpleName()).increment();
             log.error("S3 Presigned URL 생성 실패: storageKey={}, error={}", storageKey, e.getMessage(), e);
-            throw new StorageServiceException(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED,
-                    RoomErrorCode.QR_CODE_URL_SIGNING_FAILED.getMessage());
+            throw new StorageServiceException(RoomErrorCode.QR_CODE_URL_SIGNING_FAILED, "QR 코드 URL 생성에 실패했습니다.");
         }
     }
 

@@ -104,7 +104,7 @@ class S3ServiceSimpleTest {
         byte[] data = "test image data".getBytes();
 
         when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
-                .thenThrow(new RuntimeException(RoomErrorCode.QR_CODE_UPLOAD_FAILED.getMessage()));
+                .thenThrow(new RuntimeException("QR 코드 업로드에 실패했습니다."));
 
         // when & then
         assertThatThrownBy(() -> s3Service.upload(contents, data))

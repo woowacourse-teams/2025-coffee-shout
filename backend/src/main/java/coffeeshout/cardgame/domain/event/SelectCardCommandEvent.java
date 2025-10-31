@@ -1,37 +1,32 @@
 package coffeeshout.cardgame.domain.event;
 
+import coffeeshout.global.redis.UserEvent;
 import coffeeshout.global.trace.TraceInfo;
 import coffeeshout.global.trace.TraceInfoExtractor;
 import coffeeshout.global.trace.Traceable;
-import coffeeshout.minigame.event.MiniGameBaseEvent;
-import coffeeshout.minigame.event.MiniGameEventType;
+import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import java.time.Instant;
 import java.util.UUID;
 
 public record SelectCardCommandEvent(
+        String userName,
         String eventId,
         TraceInfo traceInfo,
         Instant timestamp,
-        MiniGameEventType eventType,
         String joinCode,
         String playerName,
         Integer cardIndex
-) implements MiniGameBaseEvent, Traceable {
+) implements UserEvent, Traceable {
 
     public SelectCardCommandEvent(String joinCode, String playerName, Integer cardIndex) {
         this(
+                SynchronizedWebsocketInfo.getUserName(),
                 UUID.randomUUID().toString(),
                 TraceInfoExtractor.extract(),
                 Instant.now(),
-                MiniGameEventType.SELECT_CARD_COMMAND,
                 joinCode,
                 playerName,
                 cardIndex
         );
-    }
-
-    @Override
-    public TraceInfo getTraceInfo() {
-        return traceInfo;
     }
 }

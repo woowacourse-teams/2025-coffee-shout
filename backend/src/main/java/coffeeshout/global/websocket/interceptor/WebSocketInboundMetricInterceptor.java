@@ -1,6 +1,7 @@
 package coffeeshout.global.websocket.interceptor;
 
 import coffeeshout.global.metric.WebSocketMetricService;
+import coffeeshout.global.websocket.SynchronizedWebsocketInfo;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class WebSocketInboundMetricInterceptor implements ExecutorChannelInterce
         if (!(commandObj instanceof StompCommand)) {
             return message;
         }
+        SynchronizedWebsocketInfo.bindWebsocketInfo(message);
 
         final StompCommand command = (StompCommand) commandObj;
 

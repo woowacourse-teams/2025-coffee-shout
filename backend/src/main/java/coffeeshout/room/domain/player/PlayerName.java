@@ -14,6 +14,7 @@ public record PlayerName(String value) {
     private void validatePlayerName(String value) {
         validateNotBlank(value);
         validateLength(value);
+        validateNoDelimiter(value);
     }
 
     private void validateNotBlank(String value) {
@@ -27,6 +28,12 @@ public record PlayerName(String value) {
         if (value.length() > MAX_NAME_LENGTH) {
             throw new InvalidArgumentException(RoomErrorCode.PLAYER_NAME_TOO_LONG,
                     "이름은 10자 이하여야 합니다. 현재 길이: " + value.length());
+        }
+    }
+
+    private void validateNoDelimiter(String value) {
+        if (value.contains(":")) {
+            throw new InvalidArgumentException(RoomErrorCode.PLAYER_NAME_NOT_ALLOW_COLON, "이름에 콜론(:)은 포함될 수 없습니다");
         }
     }
 }

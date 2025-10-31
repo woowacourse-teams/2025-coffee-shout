@@ -1,6 +1,7 @@
 package coffeeshout.global.websocket;
 
-import coffeeshout.global.ui.WebSocketResponse;
+import coffeeshout.global.exception.WebSocketErrorResponse;
+import generator.annotaions.MessageResponse;
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,17 @@ public class LoggingSimpMessagingTemplate {
     }
 
     @Observed(name = "websocket.send.toUser")
-    public void convertAndSendToUser(String sessionId, String destination, Object payload) {
-        messagingTemplate.convertAndSendToUser(sessionId, destination, payload);
+    public void convertAndSendToUser(String userName, String destination, Object payload) {
+        messagingTemplate.convertAndSendToUser(userName, destination, payload);
     }
 
+    @MessageResponse(path = "/user/queue/errors", returnType = Object.class)
     @Observed(name = "websocket.send.error")
-    public void convertAndSendError(String sessionId, String errorMessage) {
-        messagingTemplate.convertAndSendToUser(sessionId, "/queue/errors", WebSocketResponse.error(errorMessage));
+    public void convertAndSendError(String userName, Exception exception) {
+        messagingTemplate.convertAndSendToUser(
+                userName,
+                "/queue/errors",
+                WebSocketErrorResponse.from(exception)
+        );
     }
 }
