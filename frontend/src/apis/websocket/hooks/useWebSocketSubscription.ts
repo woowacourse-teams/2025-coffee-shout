@@ -49,15 +49,17 @@ export const useWebSocketSubscription = <T>(
     } catch (error) {
       console.error(`❌ 구독 실패 (시도 ${retryCountRef.current + 1})`, error);
 
-      if (retryCountRef.current < 5) {
-        const delay = Math.min(1000 * 2 ** retryCountRef.current, 10000);
+      const MAX_RETRY_COUNT = 5;
+      const BACKOFF_BASE = 2;
+      if (retryCountRef.current < MAX_RETRY_COUNT) {
+        const delay = Math.min(1000 * BACKOFF_BASE ** retryCountRef.current, 10000);
         retryCountRef.current += 1;
         retryTimerRef.current = setTimeout(() => {
           console.log(`⏳ ${destination} 재시도 (${retryCountRef.current}회차)...`);
           trySubscribe();
         }, delay);
       } else {
-        console.error(`🚫 ${destination} 구독 재시도 횟수 초과 (5회)`);
+        console.error(`🚫 ${destination} 구독 재시도 횟수 초과 (${MAX_RETRY_COUNT}회)`);
       }
     }
   }, [enabled, isVisible, isConnected, destination, onData, onError, sessionId, subscribe]);
