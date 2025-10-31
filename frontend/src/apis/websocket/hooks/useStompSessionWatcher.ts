@@ -35,8 +35,8 @@ const extractSessionId = (stompClient: Client): string | null => {
       return ws.sessionId as string;
     }
     return null;
-  } catch (err) {
-    console.warn('⚠️ SessionId 추출 실패', err);
+  } catch (error) {
+    console.warn('⚠️ SessionId 추출 실패', error);
     return null;
   }
 };
