@@ -67,7 +67,7 @@ public class RacingGameService implements MiniGameService {
         final Player player = room.findPlayer(new PlayerName(playerName));
         racingGame.updateSpeed(player, tapCount, speedCalculator, Instant.now());
 
-        log.debug("탭 처리 완료: joinCode={}, playerName={}, tapCount={}", joinCode, playerName, tapCount);
+//        log.debug("탭 처리 완료: joinCode={}, playerName={}, tapCount={}", joinCode, playerName, tapCount);
     }
 
     private void startAutoMove(RacingGame racingGame, String joinCode) {
