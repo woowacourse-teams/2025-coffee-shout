@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import * as S from './IframePreviewToggle.styled';
 
+const IFRAME_NAMES = ['host', 'guest1'];
+
 const IframePreviewToggle = () => {
   const location = useLocation();
   const [open, setOpen] = useState<boolean>(false);
@@ -33,8 +35,14 @@ const IframePreviewToggle = () => {
       </S.ToggleBar>
       {open && (
         <S.IframePanel>
-          <S.PreviewIframe title="preview-left" src="/" />
-          <S.PreviewIframe title="preview-right" src="/" />
+          {IFRAME_NAMES.map((name, index) => (
+            <S.PreviewIframe
+              key={name}
+              name={name}
+              title={`preview-${index === 0 ? 'left' : 'right'}`}
+              src="/"
+            />
+          ))}
         </S.IframePanel>
       )}
     </S.Container>
