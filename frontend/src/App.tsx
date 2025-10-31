@@ -11,6 +11,7 @@ import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
 import IframePreviewToggle from './devtools/components/IframePreviewToggle';
+import NetworkDebuggerPanel from './devtools/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
                   <ToastProvider>
                     <ModalProvider>
                       <IframePreviewToggle />
+                      <NetworkDebuggerPanel />
                       <Suspense fallback={<div>Loading...</div>}>
                         <Outlet />
                       </Suspense>

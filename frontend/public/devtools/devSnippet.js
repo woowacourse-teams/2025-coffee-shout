@@ -25,17 +25,6 @@ if (!w.__networkCollector__) {
   }
 }
 
-// simple console subscriber
-if (!w.__networkCollectorConsoleSub__) {
-  w.__networkCollectorConsoleSub__ = w.__networkCollector__.subscribe((req) => {
-    try {
-      w.console && w.console.log('[NET]', req.type, req);
-    } catch {
-      /* noop */
-    }
-  });
-}
-
 const context = w.self === w.top ? 'MAIN' : w.name || 'IFRAME';
 
 // Setup hooks
