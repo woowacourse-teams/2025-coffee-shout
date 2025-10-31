@@ -69,7 +69,10 @@ export default (_, argv) => {
         favicon: './public/favicon.ico',
         inject: 'head',
         templateParameters: {
-          DEV_SNIPPET: argv.mode === 'development' ? `<script src="/dev-snippet.js"></script>` : '',
+          DEV_SNIPPET:
+            argv.mode === 'development'
+              ? `<script type="module" src="/devtools/dev-snippet.js"></script>`
+              : '',
         },
       }),
       new CopyWebpackPlugin({
@@ -86,7 +89,15 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          { from: 'src/devtools/dev-snippet.js', to: 'dev-snippet.js' },
+          // devtools 폴더는 개발 모드에서만 복사
+          ...(argv.mode === 'development'
+            ? [
+                {
+                  from: 'public/devtools',
+                  to: 'devtools',
+                },
+              ]
+            : []),
         ],
       }),
       new webpack.DefinePlugin(envKeys),
