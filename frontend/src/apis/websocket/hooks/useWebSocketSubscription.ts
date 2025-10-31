@@ -66,7 +66,7 @@ export const useWebSocketSubscription = <T>(
     const sessionChanged = sessionId !== lastSessionIdRef.current;
     if (sessionChanged || !subscriptionRef.current) {
       if (sessionChanged) {
-        console.log(`🔄 SessionId 변경 감지: ${destination}`);
+        console.log(`🔄 세션 변경으로 인한 구독 해제: ${destination}`);
         unsubscribe();
       }
       trySubscribe();
