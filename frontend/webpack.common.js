@@ -71,7 +71,7 @@ export default (_, argv) => {
         templateParameters: {
           DEV_SNIPPET:
             argv.mode === 'development'
-              ? `<script type="module" src="/devtools/dev-snippet.js"></script>`
+              ? `<script type="module" src="/devtools/devSnippet.js"></script>`
               : '',
         },
       }),
