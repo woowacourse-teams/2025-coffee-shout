@@ -16,18 +16,21 @@ export const useWebSocketConnection = () => {
 
   const handleDisconnect = useCallback(() => {
     setIsConnected(false);
+    setConnectFrame(null);
     console.log('❌ WebSocket 연결 해제');
   }, []);
 
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
+    setConnectFrame(null);
     console.error('❌ StompError 발생');
   }, []);
 
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
+    setConnectFrame(null);
     console.error('❌ WebSocketError 발생');
   }, []);
 
@@ -83,6 +86,7 @@ export const useWebSocketConnection = () => {
     console.log('🛑 WebSocket 연결 종료...');
     client.deactivate();
     setIsConnected(false);
+    setConnectFrame(null);
     setClient(null);
   }, [client]);
 
