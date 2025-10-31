@@ -106,9 +106,17 @@ type Props = {
 };
 
 const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Props) => {
-  const getStatusColor = (status?: number | string): string => {
+  const getStatusColor = (request: NetworkRequest): string => {
+    const status = request.status;
     if (!status) return '#999';
     if (status === 'NETWORK_ERROR') return '#d93025';
+    if (request.type === 'websocket') {
+      // WebSocket Status 101은 성공적으로 연결됨을 의미
+      if (status === 101 || request.connectionStatus === 'open') return '#0f9d58';
+      if (request.connectionStatus === 'error') return '#d93025';
+      if (request.connectionStatus === 'closed') return '#999';
+      return '#0f9d58';
+    }
     if (typeof status === 'number') {
       if (status >= 200 && status < 300) return '#0f9d58';
       if (status >= 300 && status < 400) return '#f4b400';
@@ -119,10 +127,15 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
 
   const getStatusText = (request: NetworkRequest): string => {
     if (request.type === 'websocket') {
-      if (request.data === '[open]') return 'Open';
-      if (request.data === '[close]') return 'Close';
-      if (request.data === '[error]') return 'Error';
-      return 'Message';
+      // WebSocket은 Status 101로 표시 (구글 개발자 도구와 동일)
+      if (request.status === 101) {
+        return '101';
+      }
+      // fallback
+      if (request.connectionStatus === 'open') return '101';
+      if (request.connectionStatus === 'closed') return 'Closed';
+      if (request.connectionStatus === 'error') return 'Error';
+      return '101';
     }
     if (request.status === 'NETWORK_ERROR') return 'Error';
     return String(request.status || '-');
@@ -171,9 +184,7 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
               <UrlText>{request.url}</UrlText>
             </RequestCell>
             <RequestCell style={{ width: '80px' }}>
-              <StatusText color={getStatusColor(request.status)}>
-                {getStatusText(request)}
-              </StatusText>
+              <StatusText color={getStatusColor(request)}>{getStatusText(request)}</StatusText>
             </RequestCell>
             <RequestCell style={{ width: '100px' }}>{formatTime(request.timestamp)}</RequestCell>
           </RequestRow>

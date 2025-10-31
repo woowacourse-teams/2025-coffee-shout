@@ -1,3 +1,9 @@
+export type WebSocketMessage = {
+  type: 'received' | 'sent';
+  data: string;
+  timestamp: number;
+};
+
 export type NetworkRequest = {
   id: string;
   type: 'fetch' | 'websocket';
@@ -10,6 +16,9 @@ export type NetworkRequest = {
   durationMs?: number;
   data?: string;
   errorMessage?: string;
+  // WebSocket 관련
+  messages?: WebSocketMessage[];
+  connectionStatus?: 'connecting' | 'open' | 'error' | 'closed';
 };
 
 export type NetworkCollector = {

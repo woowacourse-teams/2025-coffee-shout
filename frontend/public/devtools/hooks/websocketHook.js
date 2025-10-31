@@ -17,17 +17,31 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     value: OriginalWebSocket,
   };
 
+  // WebSocket 연결 추적을 위한 맵 (URL+컨텍스트를 키로 사용)
+  const wsConnectionMap = new Map();
+
   const addEventListeners = (ws, url, collector, context) => {
+    const connectionKey = `${context}:${url}`;
+    const connectionId = generateRequestId();
+    const messages = [];
+    let connectionStartTime = Date.now();
+
     ws.addEventListener('open', () => {
       try {
-        collector.add({
-          id: generateRequestId(),
+        connectionStartTime = Date.now();
+        const request = {
+          id: connectionId,
           type: 'websocket',
           context,
           url: String(url),
-          timestamp: Date.now(),
-          data: '[open]',
-        });
+          status: 101,
+          timestamp: connectionStartTime,
+          messages: messages,
+          connectionStatus: 'open',
+        };
+        // messages 배열을 직접 참조로 공유하여 업데이트가 반영되도록 함
+        wsConnectionMap.set(connectionKey, request);
+        collector.add(request);
       } catch {
         /* noop */
       }
@@ -46,14 +60,13 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
           data = '[Binary data]';
         }
 
-        collector.add({
-          id: generateRequestId(),
-          type: 'websocket',
-          context,
-          url: String(url),
+        const message = {
+          type: 'received',
           data,
           timestamp: Date.now(),
-        });
+        };
+        // messages 배열에 직접 추가 (객체 참조가 공유되므로 collector에도 반영됨)
+        messages.push(message);
       } catch {
         /* noop */
       }
@@ -61,14 +74,10 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
 
     ws.addEventListener('error', () => {
       try {
-        collector.add({
-          id: generateRequestId(),
-          type: 'websocket',
-          context,
-          url: String(url),
-          timestamp: Date.now(),
-          data: '[error]',
-        });
+        const connection = wsConnectionMap.get(connectionKey);
+        if (connection) {
+          connection.connectionStatus = 'error';
+        }
       } catch {
         /* noop */
       }
@@ -76,14 +85,12 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
 
     ws.addEventListener('close', () => {
       try {
-        collector.add({
-          id: generateRequestId(),
-          type: 'websocket',
-          context,
-          url: String(url),
-          timestamp: Date.now(),
-          data: '[close]',
-        });
+        const connection = wsConnectionMap.get(connectionKey);
+        if (connection) {
+          connection.connectionStatus = 'closed';
+          const duration = Date.now() - connectionStartTime;
+          connection.durationMs = duration;
+        }
       } catch {
         /* noop */
       }

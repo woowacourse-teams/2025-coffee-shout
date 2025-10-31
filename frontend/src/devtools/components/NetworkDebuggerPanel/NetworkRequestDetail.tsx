@@ -170,7 +170,17 @@ const NetworkRequestDetail = ({ request }: Props) => {
           {request.status && (
             <DetailRow>
               <DetailLabel>Status:</DetailLabel>
-              <DetailValue>{request.status}</DetailValue>
+              <DetailValue>
+                {request.type === 'websocket' && request.status === 101
+                  ? '101 (Switching Protocols)'
+                  : request.status}
+              </DetailValue>
+            </DetailRow>
+          )}
+          {request.type === 'websocket' && request.connectionStatus && (
+            <DetailRow>
+              <DetailLabel>Connection Status:</DetailLabel>
+              <DetailValue>{request.connectionStatus}</DetailValue>
             </DetailRow>
           )}
           {request.durationMs !== undefined && (
@@ -195,12 +205,29 @@ const NetworkRequestDetail = ({ request }: Props) => {
         </Section>
       )}
 
-      {request.data && request.type === 'websocket' && (
+      {request.type === 'websocket' && request.messages && request.messages.length > 0 && (
         <Section>
           <SectionTitle>Message Data</SectionTitle>
-          <CodeBlock>
-            <pre>{formatJSON(request.data)}</pre>
-          </CodeBlock>
+          {request.messages.map((message, index) => (
+            <Section key={index} style={{ marginBottom: '16px' }}>
+              <DetailRow style={{ marginBottom: '8px' }}>
+                <DetailLabel>
+                  {(() => {
+                    const date = new Date(message.timestamp);
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const seconds = date.getSeconds().toString().padStart(2, '0');
+                    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                    const timeStr = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+                    return `${message.type === 'received' ? 'Received' : 'Sent'} (${timeStr}):`;
+                  })()}
+                </DetailLabel>
+              </DetailRow>
+              <CodeBlock>
+                <pre>{formatJSON(message.data)}</pre>
+              </CodeBlock>
+            </Section>
+          ))}
         </Section>
       )}
 
