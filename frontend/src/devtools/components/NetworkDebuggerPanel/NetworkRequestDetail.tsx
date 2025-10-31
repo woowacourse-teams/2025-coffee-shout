@@ -208,26 +208,103 @@ const NetworkRequestDetail = ({ request }: Props) => {
       {request.type === 'websocket' && request.messages && request.messages.length > 0 && (
         <Section>
           <SectionTitle>Message Data</SectionTitle>
-          {request.messages.map((message, index) => (
-            <Section key={index} style={{ marginBottom: '16px' }}>
-              <DetailRow style={{ marginBottom: '8px' }}>
-                <DetailLabel>
-                  {(() => {
-                    const date = new Date(message.timestamp);
-                    const hours = date.getHours().toString().padStart(2, '0');
-                    const minutes = date.getMinutes().toString().padStart(2, '0');
-                    const seconds = date.getSeconds().toString().padStart(2, '0');
-                    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                    const timeStr = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-                    return `${message.type === 'received' ? 'Received' : 'Sent'} (${timeStr}):`;
-                  })()}
-                </DetailLabel>
-              </DetailRow>
-              <CodeBlock>
-                <pre>{formatJSON(message.data)}</pre>
-              </CodeBlock>
-            </Section>
-          ))}
+          {request.messages.map((message, index) => {
+            const date = new Date(message.timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+            const timeStr = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+
+            return (
+              <Section key={index} style={{ marginBottom: '24px' }}>
+                <DetailRow style={{ marginBottom: '12px' }}>
+                  <DetailLabel>
+                    {message.type === 'received' ? 'Received' : 'Sent'} ({timeStr})
+                  </DetailLabel>
+                </DetailRow>
+
+                {/* STOMP MESSAGE인 경우 헤더와 바디 분리 표시 */}
+                {message.isStompMessage && message.stompHeaders && (
+                  <>
+                    <SectionTitle
+                      style={{
+                        margin: '0 0 12px 0',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: '#222',
+                        border: 'none',
+                        padding: 0,
+                      }}
+                    >
+                      WebSocket MESSAGE
+                    </SectionTitle>
+
+                    {/* 헤더 */}
+                    <div style={{ marginBottom: '16px' }}>
+                      {Object.entries(message.stompHeaders).map(([key, value]) => (
+                        <DetailRow
+                          key={key}
+                          style={{ marginBottom: '8px', alignItems: 'flex-start' }}
+                        >
+                          <DetailLabel
+                            style={{
+                              fontSize: '12px',
+                              color: '#666',
+                              minWidth: '140px',
+                              fontWeight: '600',
+                            }}
+                          >
+                            {key}:
+                          </DetailLabel>
+                          <DetailValue
+                            style={{
+                              fontSize: '12px',
+                              color: '#222',
+                              fontFamily: "'Monaco', 'Menlo', 'Consolas', monospace",
+                              wordBreak: 'break-all',
+                            }}
+                          >
+                            {value}
+                          </DetailValue>
+                        </DetailRow>
+                      ))}
+                    </div>
+
+                    {/* 구분선 */}
+                    <div
+                      style={{
+                        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+                        margin: '16px 0',
+                      }}
+                    />
+
+                    {/* Payload 섹션 */}
+                    <SectionTitle
+                      style={{
+                        margin: '0 0 12px 0',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: '#222',
+                        border: 'none',
+                        padding: 0,
+                      }}
+                    >
+                      Payload{' '}
+                      {message.stompHeaders['content-type'] === 'application/json' ? '(JSON)' : ''}
+                    </SectionTitle>
+                  </>
+                )}
+
+                {/* 본문 */}
+                <CodeBlock>
+                  <pre>
+                    {message.isStompMessage && message.stompBody ? message.stompBody : message.data}
+                  </pre>
+                </CodeBlock>
+              </Section>
+            );
+          })}
         </Section>
       )}
 

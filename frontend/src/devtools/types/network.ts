@@ -2,6 +2,10 @@ export type WebSocketMessage = {
   type: 'received' | 'sent';
   data: string;
   timestamp: number;
+  // STOMP MESSAGE 관련
+  isStompMessage?: boolean;
+  stompHeaders?: Record<string, string>;
+  stompBody?: string;
 };
 
 export type NetworkRequest = {
