@@ -29,11 +29,9 @@ const extractSessionId = (stompClient: Client): string | null => {
     if (!ws) return null;
     if (ws._transport?.url) {
       const match = ws._transport.url.match(/\/([a-zA-Z0-9_-]+)\/[^/]+$/);
-      console.log('_transport?.url: ', match[1]);
       if (match) return match[1];
     }
     if ('sessionId' in ws) {
-      console.log('ws.sessionId: ', ws.sessionId);
       return ws.sessionId as string;
     }
     return null;

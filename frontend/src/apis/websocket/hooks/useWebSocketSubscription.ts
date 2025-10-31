@@ -29,7 +29,6 @@ export const useWebSocketSubscription = <T>(
       }
     }
 
-    // 재시도 타이머 정리
     if (retryTimerRef.current) {
       clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
@@ -38,9 +37,6 @@ export const useWebSocketSubscription = <T>(
 
   const trySubscribe = useCallback(() => {
     if (!enabled || !isVisible || !isConnected) {
-      console.log(
-        `🚫 구독 조건 불충족 (enabled=${enabled}, visible=${isVisible}, connected=${isConnected})`
-      );
       return;
     }
 
@@ -48,13 +44,13 @@ export const useWebSocketSubscription = <T>(
       const sub = subscribe<T>(destination, onData, onError);
       subscriptionRef.current = sub;
       lastSessionIdRef.current = sessionId;
-      retryCountRef.current = 0; // 성공 시 재시도 카운트 초기화
+      retryCountRef.current = 0;
       console.log(`✅ 구독 성공: ${destination}`, { sessionId });
     } catch (error) {
       console.error(`❌ 구독 실패 (시도 ${retryCountRef.current + 1})`, error);
 
       if (retryCountRef.current < 5) {
-        const delay = Math.min(1000 * 2 ** retryCountRef.current, 10000); // 1s → 2s → 4s → 8s → 10s
+        const delay = Math.min(1000 * 2 ** retryCountRef.current, 10000);
         retryCountRef.current += 1;
         retryTimerRef.current = setTimeout(() => {
           console.log(`⏳ ${destination} 재시도 (${retryCountRef.current}회차)...`);

@@ -77,27 +77,27 @@ export const useWebSocketReconnection = ({ isConnected, startSocket, stopSocket 
   /**
    * 온라인/오프라인 감지
    */
-  useEffect(() => {
-    const handleOnline = () => {
-      if (!isConnected) {
-        console.log('🌐 온라인 감지 - 소켓 재연결');
-        scheduleReconnect();
-      }
-    };
-    const handleOffline = () => {
-      if (isConnected) {
-        console.log('🌐 오프라인 감지 - 소켓 연결 해제');
-        stopSocket();
-      }
-    };
+  // useEffect(() => {
+  //   const handleOnline = () => {
+  //     if (!isConnected) {
+  //       console.log('🌐 온라인 감지 - 소켓 재연결');
+  //       scheduleReconnect();
+  //     }
+  //   };
+  //   const handleOffline = () => {
+  //     if (isConnected) {
+  //       console.log('🌐 오프라인 감지 - 소켓 연결 해제');
+  //       stopSocket();
+  //     }
+  //   };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+  //   window.addEventListener('online', handleOnline);
+  //   window.addEventListener('offline', handleOffline);
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      clearReconnectTimer();
-    };
-  }, [isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
+  //   return () => {
+  //     window.removeEventListener('online', handleOnline);
+  //     window.removeEventListener('offline', handleOffline);
+  //     clearReconnectTimer();
+  //   };
+  // }, [isConnected, stopSocket, scheduleReconnect, clearReconnectTimer]);
 };
