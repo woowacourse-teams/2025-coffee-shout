@@ -1,5 +1,9 @@
-import { Client, IFrame } from '@stomp/stompjs';
+import { Client, IFrame, IStompSocket } from '@stomp/stompjs';
 import { useEffect, useRef, useState } from 'react';
+
+type StompInternalSocket = {
+  _transport?: { url?: string };
+} & IStompSocket;
 
 export const useStompSessionWatcher = (client: Client | null, connectFrame?: IFrame | null) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -25,7 +29,7 @@ export const useStompSessionWatcher = (client: Client | null, connectFrame?: IFr
 
 const extractSessionId = (stompClient: Client): string | null => {
   try {
-    const ws = stompClient.webSocket as any;
+    const ws = stompClient.webSocket as StompInternalSocket;
     if (!ws) return null;
     if (ws._transport?.url) {
       const match = ws._transport.url.match(/\/([a-zA-Z0-9_-]+)\/[^/]+$/);
