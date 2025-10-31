@@ -31,9 +31,6 @@ const extractSessionId = (stompClient: Client): string | null => {
       const match = ws._transport.url.match(/\/([a-zA-Z0-9_-]+)\/[^/]+$/);
       if (match) return match[1];
     }
-    if ('sessionId' in ws) {
-      return ws.sessionId as string;
-    }
     return null;
   } catch (error) {
     console.warn('⚠️ SessionId 추출 실패', error);
