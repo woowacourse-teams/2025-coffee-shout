@@ -2,10 +2,10 @@ import BreadLogoWhiteIcon from '@/assets/logo/bread-logo-white.png';
 import Headline1 from '@/components/@common/Headline1/Headline1';
 import Headline3 from '@/components/@common/Headline3/Headline3';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
+import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import Layout from '@/layouts/Layout';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import * as S from './RouletteResultPage.styled';
 
 const RouletteResultPage = () => {

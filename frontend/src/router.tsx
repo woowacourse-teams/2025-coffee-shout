@@ -1,8 +1,9 @@
+import { lazy } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import App from './App';
-import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
-import { lazy } from 'react';
 import MiniGameProviders from './features/miniGame/context/MiniGameProviders';
+import RoomLayout from './features/room/RoomLayout';
+import { EntryMenuPage, EntryNamePage, HomePage } from './pages';
 
 const LobbyPage = lazy(
   /*webpackChunkName: "lobbyPage"*/ () => import('./features/room/lobby/pages/LobbyPage')
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'room/:joinCode',
+        element: <RoomLayout />,
         children: [
           { path: 'lobby', element: <LobbyPage /> },
           { path: 'roulette/play', element: <RoulettePlayPage /> },

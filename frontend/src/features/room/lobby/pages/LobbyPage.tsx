@@ -33,7 +33,6 @@ import { MiniGameSection } from '../components/MiniGameSection/MiniGameSection';
 import { ParticipantSection } from '../components/ParticipantSection/ParticipantSection';
 import { RouletteSection } from '../components/RouletteSection/RouletteSection';
 import useGameAnnouncement from '../hooks/useGameAnnouncement';
-import { useParticipantValidation } from '../hooks/useParticipantValidation';
 import * as S from './LobbyPage.styled';
 
 type SectionType = '참가자' | '룰렛' | '미니게임';
@@ -63,8 +62,6 @@ const LobbyPage = () => {
     playerType,
     myName,
   });
-
-  useParticipantValidation({ isConnected });
 
   const handleParticipant = useCallback(
     (data: Player[]) => {

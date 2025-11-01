@@ -131,6 +131,10 @@ table {
   box-sizing: border-box;
 }
 
+body {
+  touch-action: pan-x pan-y;
+}
+
 /* Button reset */
 button {
   padding: 0;
