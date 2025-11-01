@@ -22,7 +22,7 @@ export const ToggleButton = styled.button`
 
 export const HiddenTrigger = styled.div`
   position: fixed;
-  bottom: 0;
+  top: 0;
   right: 0;
   width: 60px;
   height: 60px;

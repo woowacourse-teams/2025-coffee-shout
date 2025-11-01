@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, PointerEvent } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useNetworkCollector } from '../../hooks/useNetworkCollector';
 import { usePanelResize } from '../../hooks/usePanelResize';
 import { useVerticalResize } from '../../hooks/useVerticalResize';
@@ -81,10 +81,7 @@ const NetworkDebuggerPanel = () => {
   /**
    * 길게 누르기 시작 핸들러입니다.
    */
-  const handleLongPressStart = (e: PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+  const handleLongPressStart = () => {
     longPressTimerRef.current = window.setTimeout(() => {
       setOpen(true);
       longPressTimerRef.current = null;
