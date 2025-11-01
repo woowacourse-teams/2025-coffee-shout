@@ -1,5 +1,4 @@
 /* eslint-env browser */
-/* global console */
 
 import { generateRequestId } from '../utils/utils.js';
 import { createWebSocketMessage } from '../utils/websocketMessageHandler.js';
@@ -95,12 +94,6 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     ws.send = function (data) {
       try {
         const message = createWebSocketMessage(data, 'sent');
-        console.log('[WebSocket Hook] SEND 메시지 객체 생성:', {
-          type: message.type,
-          isStompMessage: message.isStompMessage,
-          hasStompHeaders: !!message.stompHeaders,
-          hasStompBody: message.stompBody !== undefined,
-        });
         // messages 배열에 직접 추가 (객체 참조가 공유되므로 collector에도 반영됨)
         messages.push(message);
       } catch {
