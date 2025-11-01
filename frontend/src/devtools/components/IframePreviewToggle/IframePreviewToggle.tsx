@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
 import * as S from './IframePreviewToggle.styled';
 
 const IFRAME_NAMES = ['host', 'guest1'];
@@ -17,6 +18,7 @@ const IframePreviewToggle = () => {
     }
   }, []);
 
+  const isTouchDevice = useMemo(() => checkIsTouchDevice(), []);
   const isRootPath = location.pathname === '/';
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const IframePreviewToggle = () => {
     setOpen(false);
   }, [location.pathname]);
 
-  if (!isTopWindow || !isRootPath) return null;
+  if (!isTopWindow || !isRootPath || isTouchDevice) return null;
 
   return (
     <S.Container>
