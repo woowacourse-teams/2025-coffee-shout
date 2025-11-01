@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, PointerEvent } from 'react';
 import { useNetworkCollector } from '../../hooks/useNetworkCollector';
 import { usePanelResize } from '../../hooks/usePanelResize';
 import { useVerticalResize } from '../../hooks/useVerticalResize';
@@ -75,13 +75,50 @@ const NetworkDebuggerPanel = () => {
     return requests.find((req) => req.id === selectedRequest) || null;
   }, [requests, selectedRequest]);
 
+  const longPressTimerRef = useRef<number | null>(null);
+  const LONG_PRESS_DURATION = 2000;
+
+  /**
+   * 길게 누르기 시작 핸들러입니다.
+   */
+  const handleLongPressStart = (e: PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    longPressTimerRef.current = window.setTimeout(() => {
+      setOpen(true);
+      longPressTimerRef.current = null;
+    }, LONG_PRESS_DURATION);
+  };
+
+  /**
+   * 길게 누르기 종료 핸들러입니다.
+   */
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
   if (!isTopWindow) return null;
 
   if (!open) {
     return (
-      <S.ToggleButton type="button" onClick={() => setOpen(true)}>
-        Network
-      </S.ToggleButton>
+      <>
+        {!isMobile && (
+          <S.ToggleButton type="button" onClick={() => setOpen(true)}>
+            Network
+          </S.ToggleButton>
+        )}
+        {isMobile && (
+          <S.HiddenTrigger
+            onPointerDown={handleLongPressStart}
+            onPointerUp={handleLongPressEnd}
+            onPointerCancel={handleLongPressEnd}
+          />
+        )}
+      </>
     );
   }
 

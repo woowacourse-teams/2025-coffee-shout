@@ -20,6 +20,18 @@ export const ToggleButton = styled.button`
   }
 `;
 
+export const HiddenTrigger = styled.div`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  z-index: 1001;
+  background: transparent;
+  touch-action: none;
+  user-select: none;
+`;
+
 export const Panel = styled.div<{ height: number }>`
   position: fixed;
   bottom: 0;
