@@ -7,7 +7,6 @@ const COLUMN_WIDTHS = {
   TYPE: '80px',
   CONTEXT: '70px',
   STATUS: '50px',
-  TIME: '90px',
 } as const;
 
 type Props = {
@@ -76,18 +75,6 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
     return String(request.status || '-');
   };
 
-  /**
-   * 타임스탬프를 포맷팅합니다.
-   */
-  const formatTime = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-    return `${hours}:${minutes}:${seconds}.${milliseconds}`;
-  };
-
   if (requests.length === 0) {
     return (
       <S.EmptyState>
@@ -103,7 +90,6 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
         {!isMobile && <S.HeaderCell $width={COLUMN_WIDTHS.CONTEXT}>Context</S.HeaderCell>}
         <S.HeaderCell $flex={1}>URL</S.HeaderCell>
         <S.HeaderCell $width={COLUMN_WIDTHS.STATUS}>Status</S.HeaderCell>
-        <S.HeaderCell $width={COLUMN_WIDTHS.TIME}>Time</S.HeaderCell>
       </S.ListHeader>
       <S.ListBody>
         {requests.map((request) => (
@@ -125,9 +111,6 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
             </S.RequestCell>
             <S.RequestCell $width={COLUMN_WIDTHS.STATUS}>
               <S.StatusText color={getStatusColor(request)}>{getStatusText(request)}</S.StatusText>
-            </S.RequestCell>
-            <S.RequestCell $width={COLUMN_WIDTHS.TIME}>
-              {formatTime(request.timestamp)}
             </S.RequestCell>
           </S.RequestRow>
         ))}
