@@ -45,9 +45,14 @@ export const ResizeHandle = styled.div`
   z-index: 1001;
   background: transparent;
   user-select: none;
+  touch-action: none;
 
   &:hover {
     background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (hover: none) {
+    height: 12px;
   }
 `;
 
@@ -117,14 +122,23 @@ export const CloseButton = styled.button`
   }
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{ $isMobile: boolean }>`
   flex: 1;
   display: flex;
+  flex-direction: ${({ $isMobile }) => ($isMobile ? 'column' : 'row')};
   overflow: hidden;
 `;
 
-export const RequestListSection = styled.div<{ detailWidthPercent: number }>`
-  width: ${({ detailWidthPercent }) => 100 - detailWidthPercent}%;
+export const RequestListSection = styled.div<{
+  detailWidthPercent: number;
+  $isMobile: boolean;
+  $hasDetail: boolean;
+  $topHeightPercent: number;
+}>`
+  width: ${({ detailWidthPercent, $isMobile }) =>
+    $isMobile ? '100%' : `${100 - detailWidthPercent}%`};
+  height: ${({ $isMobile, $hasDetail, $topHeightPercent }) =>
+    $isMobile && $hasDetail ? `${$topHeightPercent}%` : 'auto'};
   min-width: 0;
   overflow-y: auto;
   position: relative;
@@ -146,9 +160,36 @@ export const VerticalResizeHandle = styled.div`
   }
 `;
 
-export const DetailSection = styled.div<{ widthPercent: number }>`
-  width: ${({ widthPercent }) => widthPercent}%;
-  min-width: 300px;
+export const MobileResizeHandle = styled.div`
+  width: 100%;
+  height: 5px;
+  cursor: ns-resize;
+  z-index: 1002;
+  background: transparent;
+  user-select: none;
+  touch-action: none;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  @media (hover: none) {
+    height: 12px;
+  }
+`;
+
+export const DetailSection = styled.div<{
+  widthPercent: number;
+  $isMobile: boolean;
+  $topHeightPercent: number;
+}>`
+  width: ${({ widthPercent, $isMobile }) => ($isMobile ? '100%' : `${widthPercent}%`)};
+  height: ${({ $isMobile, $topHeightPercent }) =>
+    $isMobile ? `${100 - $topHeightPercent}%` : 'auto'};
+  min-width: ${({ $isMobile }) => ($isMobile ? '0' : '300px')};
   overflow-y: auto;
   background: #ffffff;
+  border-top: ${({ $isMobile }) => ($isMobile ? '1px solid rgba(0, 0, 0, 0.1)' : 'none')};
+  flex-shrink: 0;
 `;

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, PointerEvent } from 'react';
 
 /**
  * 패널의 수평(세로) 리사이즈를 관리하는 커스텀 훅입니다.
@@ -18,12 +18,15 @@ export const useVerticalResize = (
    * 리사이즈 시작 핸들러 (React용)
    */
   const handleVerticalResizeStart = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
       setIsResizingVertical(true);
       resizeStartXRef.current = e.clientX;
       resizeStartWidthPercentRef.current = detailWidthPercent;
+      if (e.target instanceof HTMLElement) {
+        e.target.setPointerCapture(e.pointerId);
+      }
     },
     [detailWidthPercent]
   );
@@ -32,7 +35,7 @@ export const useVerticalResize = (
    * 리사이즈 중 (브라우저 DOM 이벤트용)
    */
   const handleVerticalResizeMove = useCallback(
-    (e: globalThis.MouseEvent) => {
+    (e: globalThis.PointerEvent) => {
       if (
         !isResizingVertical ||
         resizeStartXRef.current === null ||
@@ -61,31 +64,34 @@ export const useVerticalResize = (
   /**
    * 리사이즈 종료 핸들러 (브라우저 DOM 이벤트용)
    */
-  const handleVerticalResizeEnd = useCallback(() => {
+  const handleVerticalResizeEnd = useCallback((e: globalThis.PointerEvent) => {
     setIsResizingVertical(false);
     resizeStartXRef.current = null;
     resizeStartWidthPercentRef.current = null;
+    if (e.target instanceof HTMLElement) {
+      e.target.releasePointerCapture(e.pointerId);
+    }
   }, []);
 
   /**
-   * mousemove, mouseup 리스너 등록
+   * pointermove, pointerup 리스너 등록
    */
   useEffect(() => {
     if (!isResizingVertical) return;
 
-    const onMove = (e: globalThis.MouseEvent) => handleVerticalResizeMove(e);
-    const onUp = () => handleVerticalResizeEnd();
+    const onMove = (e: globalThis.PointerEvent) => handleVerticalResizeMove(e);
+    const onUp = (e: globalThis.PointerEvent) => handleVerticalResizeEnd(e);
 
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
     document.body.style.userSelect = 'none';
-    document.body.style.cursor = 'ew-resize';
+    document.body.style.touchAction = 'none';
 
     return () => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
       document.body.style.userSelect = '';
-      document.body.style.cursor = '';
+      document.body.style.touchAction = '';
     };
   }, [isResizingVertical, handleVerticalResizeMove, handleVerticalResizeEnd]);
 

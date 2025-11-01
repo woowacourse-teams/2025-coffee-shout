@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, MouseEvent } from 'react';
+import { useState, useRef, useCallback, useEffect, PointerEvent } from 'react';
 
 /**
  * 패널의 수직 리사이즈를 관리하는 커스텀 훅입니다.
@@ -17,11 +17,14 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
    * 리사이즈 시작 핸들러입니다.
    */
   const handleResizeStart = useCallback(
-    (e: MouseEvent) => {
+    (e: PointerEvent) => {
       e.preventDefault();
       setIsResizing(true);
       resizeStartYRef.current = e.clientY;
       resizeStartHeightRef.current = panelHeight;
+      if (e.target instanceof HTMLElement) {
+        e.target.setPointerCapture(e.pointerId);
+      }
     },
     [panelHeight]
   );
@@ -30,7 +33,7 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
    * 리사이즈 중 핸들러입니다.
    */
   const handleResizeMove = useCallback(
-    (e: globalThis.MouseEvent) => {
+    (e: globalThis.PointerEvent) => {
       if (
         !isResizing ||
         resizeStartYRef.current === null ||
@@ -57,24 +60,27 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
   /**
    * 리사이즈 종료 핸들러입니다.
    */
-  const handleResizeEnd = useCallback(() => {
+  const handleResizeEnd = useCallback((e: globalThis.PointerEvent) => {
     setIsResizing(false);
     resizeStartYRef.current = null;
     resizeStartHeightRef.current = null;
+    if (e.target instanceof HTMLElement) {
+      e.target.releasePointerCapture(e.pointerId);
+    }
   }, []);
 
   useEffect(() => {
     if (isResizing) {
-      document.addEventListener('mousemove', handleResizeMove);
-      document.addEventListener('mouseup', handleResizeEnd);
+      document.addEventListener('pointermove', handleResizeMove);
+      document.addEventListener('pointerup', handleResizeEnd);
       document.body.style.userSelect = 'none';
-      document.body.style.cursor = 'ns-resize';
+      document.body.style.touchAction = 'none';
 
       return () => {
-        document.removeEventListener('mousemove', handleResizeMove);
-        document.removeEventListener('mouseup', handleResizeEnd);
+        document.removeEventListener('pointermove', handleResizeMove);
+        document.removeEventListener('pointerup', handleResizeEnd);
         document.body.style.userSelect = '';
-        document.body.style.cursor = '';
+        document.body.style.touchAction = '';
       };
     }
   }, [isResizing, handleResizeMove, handleResizeEnd]);

@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { useNetworkCollector } from '../../hooks/useNetworkCollector';
 import { usePanelResize } from '../../hooks/usePanelResize';
 import { useVerticalResize } from '../../hooks/useVerticalResize';
+import { useMobileSplitResize } from '../../hooks/useMobileSplitResize';
+import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
 import NetworkFilterBar from './NetworkFilterBar/NetworkFilterBar';
 import NetworkRequestList from './NetworkRequestList/NetworkRequestList';
 import NetworkRequestDetail from './NetworkRequestDetail/NetworkRequestDetail';
@@ -21,6 +23,8 @@ const NetworkDebuggerPanel = () => {
     }
   }, []);
 
+  const isMobile = useMemo(() => checkIsTouchDevice(), []);
+
   const [open, setOpen] = useState(false);
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'fetch' | 'websocket' | null>(null);
@@ -29,6 +33,11 @@ const NetworkDebuggerPanel = () => {
   const { requests, clearRequests, refreshRequests } = useNetworkCollector();
   const { panelHeight, handleResizeStart } = usePanelResize(400);
   const { detailWidthPercent, handleVerticalResizeStart, contentRef } = useVerticalResize();
+  const {
+    topHeightPercent,
+    handleResizeStart: handleMobileSplitResizeStart,
+    contentRef: mobileContentRef,
+  } = useMobileSplitResize();
 
   /**
    * 고유한 context 목록을 추출합니다.
@@ -78,7 +87,7 @@ const NetworkDebuggerPanel = () => {
 
   return (
     <S.Panel height={panelHeight}>
-      <S.ResizeHandle onMouseDown={handleResizeStart} />
+      <S.ResizeHandle onPointerDown={handleResizeStart} />
       <S.Header>
         <S.Title>Network</S.Title>
         <S.HeaderActions>
@@ -104,19 +113,31 @@ const NetworkDebuggerPanel = () => {
         onTypeChange={setSelectedType}
       />
 
-      <S.Content ref={contentRef}>
-        <S.RequestListSection detailWidthPercent={selectedRequestData ? detailWidthPercent : 0}>
+      <S.Content ref={isMobile ? mobileContentRef : contentRef} $isMobile={isMobile}>
+        <S.RequestListSection
+          detailWidthPercent={selectedRequestData && !isMobile ? detailWidthPercent : 0}
+          $isMobile={isMobile}
+          $hasDetail={!!selectedRequestData}
+          $topHeightPercent={isMobile && selectedRequestData ? topHeightPercent : 0}
+        >
           <NetworkRequestList
             requests={filteredRequests}
             selectedRequestId={selectedRequest}
             onSelectRequest={setSelectedRequest}
           />
-          {selectedRequestData && (
-            <S.VerticalResizeHandle onMouseDown={handleVerticalResizeStart} />
+          {selectedRequestData && !isMobile && (
+            <S.VerticalResizeHandle onPointerDown={handleVerticalResizeStart} />
           )}
         </S.RequestListSection>
+        {selectedRequestData && isMobile && (
+          <S.MobileResizeHandle onPointerDown={handleMobileSplitResizeStart} />
+        )}
         {selectedRequestData && (
-          <S.DetailSection widthPercent={detailWidthPercent}>
+          <S.DetailSection
+            widthPercent={isMobile ? 100 : detailWidthPercent}
+            $isMobile={isMobile}
+            $topHeightPercent={isMobile ? topHeightPercent : 0}
+          >
             <NetworkRequestDetail request={selectedRequestData} />
           </S.DetailSection>
         )}
