@@ -1,5 +1,4 @@
 /* eslint-env browser */
-/* global console */
 
 import { parseStompMessage } from './stompParser.js';
 
@@ -41,15 +40,6 @@ export const createWebSocketMessage = (rawData, type) => {
   // STOMP 메시지 파싱 시도
   const stompParsed = parseStompMessage(sendData);
 
-  if (type === 'sent') {
-    console.log('[WebSocket Hook] SEND 메시지 파싱 시도:', {
-      sendData: typeof sendData === 'string' ? sendData.substring(0, 200) : sendData,
-      sendDataLength: typeof sendData === 'string' ? sendData.length : 'N/A',
-      parsed: stompParsed,
-    });
-  }
-
-  // 파싱 성공 (객체 반환) 또는 실패 (문자열 '파싱 실패!' 반환)
   if (stompParsed && typeof stompParsed === 'object' && stompParsed.headers) {
     return {
       type,
