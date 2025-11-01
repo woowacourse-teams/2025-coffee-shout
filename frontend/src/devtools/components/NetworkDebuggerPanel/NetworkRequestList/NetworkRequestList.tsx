@@ -75,11 +75,11 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
   return (
     <S.List>
       <S.ListHeader>
-        <S.HeaderCell style={{ width: '80px' }}>Type</S.HeaderCell>
-        <S.HeaderCell style={{ width: '100px' }}>Context</S.HeaderCell>
-        <S.HeaderCell style={{ flex: 1 }}>URL</S.HeaderCell>
-        <S.HeaderCell style={{ width: '80px' }}>Status</S.HeaderCell>
-        <S.HeaderCell style={{ width: '100px' }}>Time</S.HeaderCell>
+        <S.HeaderCell $width="80px">Type</S.HeaderCell>
+        <S.HeaderCell $width="100px">Context</S.HeaderCell>
+        <S.HeaderCell $flex={1}>URL</S.HeaderCell>
+        <S.HeaderCell $width="80px">Status</S.HeaderCell>
+        <S.HeaderCell $width="100px">Time</S.HeaderCell>
       </S.ListHeader>
       <S.ListBody>
         {requests.map((request) => (
@@ -88,21 +88,19 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
             selected={selectedRequestId === request.id}
             onClick={() => onSelectRequest(request.id)}
           >
-            <S.RequestCell style={{ width: '80px' }}>
+            <S.RequestCell $width="80px">
               <S.TypeBadge type={request.type}>{request.type}</S.TypeBadge>
             </S.RequestCell>
-            <S.RequestCell style={{ width: '100px' }}>
+            <S.RequestCell $width="100px">
               <S.ContextBadge>{request.context}</S.ContextBadge>
             </S.RequestCell>
-            <S.RequestCell style={{ flex: 1 }} title={request.url}>
+            <S.RequestCell $flex={1} title={request.url}>
               <S.UrlText>{request.url}</S.UrlText>
             </S.RequestCell>
-            <S.RequestCell style={{ width: '80px' }}>
+            <S.RequestCell $width="80px">
               <S.StatusText color={getStatusColor(request)}>{getStatusText(request)}</S.StatusText>
             </S.RequestCell>
-            <S.RequestCell style={{ width: '100px' }}>
-              {formatTime(request.timestamp)}
-            </S.RequestCell>
+            <S.RequestCell $width="100px">{formatTime(request.timestamp)}</S.RequestCell>
           </S.RequestRow>
         ))}
       </S.ListBody>

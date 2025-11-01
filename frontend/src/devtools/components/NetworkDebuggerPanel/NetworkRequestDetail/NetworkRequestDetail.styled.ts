@@ -156,3 +156,37 @@ export const ExpandedMessageDetail = styled.div`
   background: #f8f9fa;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 `;
+
+export const PayloadSectionTitle = styled(SectionTitle)`
+  margin: 16px 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  border: none;
+  padding: 0;
+`;
+
+export const DetailRowWithMargin = styled(DetailRow)<{ $marginBottom?: string }>`
+  margin-bottom: ${({ $marginBottom }) => $marginBottom || '0'};
+`;
+
+export const DetailLabelStyled = styled(DetailLabel)`
+  font-size: 12px;
+  color: #666;
+  min-width: 140px;
+  font-weight: 600;
+`;
+
+export const DetailValueStyled = styled(DetailValue)<{ $color?: string }>`
+  font-size: 12px;
+  color: ${({ $color }) => $color || '#222'};
+  font-weight: 600;
+`;
+
+export const CodeBlockWithMargin = styled(CodeBlock)`
+  margin-top: 4px;
+`;
+
+export const ErrorMessageWrapper = styled.div`
+  margin-top: 12px;
+`;

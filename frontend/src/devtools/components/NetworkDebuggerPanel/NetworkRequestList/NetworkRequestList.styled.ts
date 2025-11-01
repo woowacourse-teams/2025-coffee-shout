@@ -20,10 +20,12 @@ export const ListHeader = styled.div`
   z-index: 1;
 `;
 
-export const HeaderCell = styled.div`
+export const HeaderCell = styled.div<{ $width?: string; $flex?: number }>`
   padding: 0 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  ${({ $width }) => ($width ? `width: ${$width};` : '')}
+  ${({ $flex }) => ($flex !== undefined ? `flex: ${$flex};` : '')}
 `;
 
 export const ListBody = styled.div`
@@ -45,13 +47,15 @@ export const RequestRow = styled.div<{ selected: boolean }>`
   }
 `;
 
-export const RequestCell = styled.div`
+export const RequestCell = styled.div<{ $width?: string; $flex?: number }>`
   padding: 0 8px;
   font-size: 12px;
   color: #222;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  ${({ $width }) => ($width ? `width: ${$width};` : '')}
+  ${({ $flex }) => ($flex !== undefined ? `flex: ${$flex};` : '')}
 `;
 
 export const TypeBadge = styled.span<{ type: 'fetch' | 'websocket' }>`

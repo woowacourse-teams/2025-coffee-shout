@@ -58,85 +58,43 @@ const NetworkRequestDetail = ({ request }: Props) => {
           <>
             {(message.stompBody || message.stompBody === '') && (
               <>
-                <S.SectionTitle
-                  style={{
-                    margin: '16px 0 12px 0',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    color: '#222',
-                    border: 'none',
-                    padding: 0,
-                  }}
-                >
+                <S.PayloadSectionTitle>
                   Payload{' '}
                   {message.stompHeaders['content-type'] === 'application/json' ? '(JSON)' : ''}
                   {stompPayload ? ' (Structured: {success, data, errorMessage})' : ''}
-                </S.SectionTitle>
+                </S.PayloadSectionTitle>
 
                 {stompPayload ? (
                   <>
                     {typeof stompPayload.success !== 'undefined' && (
-                      <S.DetailRow style={{ marginBottom: '12px' }}>
-                        <S.DetailLabel
-                          style={{
-                            fontSize: '12px',
-                            color: '#666',
-                            minWidth: '140px',
-                            fontWeight: '600',
-                          }}
-                        >
-                          Success:
-                        </S.DetailLabel>
-                        <S.DetailValue
-                          style={{
-                            fontSize: '12px',
-                            color: stompPayload.success ? '#0f9d58' : '#d93025',
-                            fontWeight: '600',
-                          }}
-                        >
+                      <S.DetailRowWithMargin $marginBottom="12px">
+                        <S.DetailLabelStyled>Success:</S.DetailLabelStyled>
+                        <S.DetailValueStyled $color={stompPayload.success ? '#0f9d58' : '#d93025'}>
                           {String(stompPayload.success)}
-                        </S.DetailValue>
-                      </S.DetailRow>
+                        </S.DetailValueStyled>
+                      </S.DetailRowWithMargin>
                     )}
 
                     {stompPayload.data !== undefined && (
                       <>
-                        <S.DetailRow style={{ marginBottom: '8px' }}>
-                          <S.DetailLabel
-                            style={{
-                              fontSize: '12px',
-                              color: '#666',
-                              minWidth: '140px',
-                              fontWeight: '600',
-                            }}
-                          >
-                            Data:
-                          </S.DetailLabel>
-                        </S.DetailRow>
-                        <S.CodeBlock style={{ marginTop: '4px' }}>
+                        <S.DetailRowWithMargin $marginBottom="8px">
+                          <S.DetailLabelStyled>Data:</S.DetailLabelStyled>
+                        </S.DetailRowWithMargin>
+                        <S.CodeBlockWithMargin>
                           <pre>{formatJSON(JSON.stringify(stompPayload.data))}</pre>
-                        </S.CodeBlock>
+                        </S.CodeBlockWithMargin>
                       </>
                     )}
 
                     {stompPayload.errorMessage && (
-                      <div style={{ marginTop: '12px' }}>
-                        <S.DetailRow style={{ marginBottom: '8px' }}>
-                          <S.DetailLabel
-                            style={{
-                              fontSize: '12px',
-                              color: '#666',
-                              minWidth: '140px',
-                              fontWeight: '600',
-                            }}
-                          >
-                            Error Message:
-                          </S.DetailLabel>
-                        </S.DetailRow>
+                      <S.ErrorMessageWrapper>
+                        <S.DetailRowWithMargin $marginBottom="8px">
+                          <S.DetailLabelStyled>Error Message:</S.DetailLabelStyled>
+                        </S.DetailRowWithMargin>
                         <S.ErrorBlock>
                           <pre>{stompPayload.errorMessage}</pre>
                         </S.ErrorBlock>
-                      </div>
+                      </S.ErrorMessageWrapper>
                     )}
                   </>
                 ) : (
