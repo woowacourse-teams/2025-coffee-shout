@@ -138,6 +138,118 @@ const NetworkRequestDetail = ({ request }: Props) => {
     }
   };
 
+  // STOMP payload 파싱 함수 ({success, data, errorMessage})
+  const parseStompPayload = (bodyText: string) => {
+    if (!bodyText || typeof bodyText !== 'string') return null;
+
+    // JSON이 끝나는 정확한 위치 찾기 (중괄호 카운팅)
+    const findJsonEnd = (text: string, startIndex: number): number => {
+      let braceCount = 0;
+      let bracketCount = 0;
+      let inString = false;
+      let escapeNext = false;
+
+      for (let i = startIndex; i < text.length; i++) {
+        const char = text[i];
+        const charCode = text.charCodeAt(i);
+
+        // null 문자를 만나면 JSON이 끝난 것으로 간주
+        if (charCode === 0) {
+          if (braceCount === 0 && bracketCount === 0) {
+            return i;
+          }
+        }
+
+        if (escapeNext) {
+          escapeNext = false;
+          continue;
+        }
+
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+
+        if (inString) continue;
+
+        if (char === '{') {
+          braceCount++;
+        } else if (char === '}') {
+          braceCount--;
+          if (braceCount === 0 && bracketCount === 0) {
+            return i + 1;
+          }
+        } else if (char === '[') {
+          bracketCount++;
+        } else if (char === ']') {
+          bracketCount--;
+          if (braceCount === 0 && bracketCount === 0) {
+            return i + 1;
+          }
+        }
+      }
+
+      return -1;
+    };
+
+    // JSON 시작 위치 찾기
+    const firstBrace = bodyText.indexOf('{');
+    const firstBracket = bodyText.indexOf('[');
+    let jsonStart = -1;
+
+    if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+      jsonStart = firstBrace;
+    } else if (firstBracket !== -1) {
+      jsonStart = firstBracket;
+    }
+
+    if (jsonStart === -1) return null;
+
+    // JSON 끝 위치 찾기
+    const jsonEnd = findJsonEnd(bodyText, jsonStart);
+    if (jsonEnd === -1) return null;
+
+    // 유효한 JSON 부분만 추출
+    const extractedJson = bodyText.substring(jsonStart, jsonEnd).trimEnd();
+    // 끝의 null 문자 제거
+    let cleanedJson = extractedJson;
+    while (cleanedJson.length > 0 && cleanedJson.charCodeAt(cleanedJson.length - 1) === 0) {
+      cleanedJson = cleanedJson.substring(0, cleanedJson.length - 1);
+    }
+
+    try {
+      // 추출한 JSON 파싱
+      const parsed = JSON.parse(cleanedJson);
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        ('success' in parsed || 'data' in parsed || 'errorMessage' in parsed)
+      ) {
+        return parsed;
+      }
+    } catch (error) {
+      // 디버깅: 파싱 실패 원인 분석
+      console.warn('[STOMP Payload Parse] JSON 파싱 실패:', {
+        error: error instanceof Error ? error.message : String(error),
+        bodyLength: bodyText.length,
+        jsonStart,
+        jsonEnd,
+        extractedJsonLength: cleanedJson.length,
+        extractedJsonEnd: cleanedJson.substring(Math.max(0, cleanedJson.length - 50)),
+        bodyEnd: bodyText.substring(Math.max(0, bodyText.length - 100)),
+        hasDevtools: bodyText.includes('@devtools'),
+      });
+      return null;
+    }
+
+    return null;
+  };
+
   return (
     <DetailContainer>
       <Section>
@@ -216,6 +328,12 @@ const NetworkRequestDetail = ({ request }: Props) => {
             const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
             const timeStr = `${hours}:${minutes}:${seconds}.${milliseconds}`;
 
+            // STOMP payload 파싱
+            const stompPayload =
+              message.isStompMessage && message.stompBody
+                ? parseStompPayload(message.stompBody)
+                : null;
+
             return (
               <Section key={index} style={{ marginBottom: '24px' }}>
                 <DetailRow style={{ marginBottom: '12px' }}>
@@ -292,16 +410,98 @@ const NetworkRequestDetail = ({ request }: Props) => {
                     >
                       Payload{' '}
                       {message.stompHeaders['content-type'] === 'application/json' ? '(JSON)' : ''}
+                      {stompPayload ? ' (Structured: {success, data, errorMessage})' : ''}
                     </SectionTitle>
+
+                    {/* 구조화된 Payload 표시 */}
+                    {stompPayload ? (
+                      <>
+                        {/* Success 상태 */}
+                        {typeof stompPayload.success !== 'undefined' && (
+                          <DetailRow style={{ marginBottom: '12px' }}>
+                            <DetailLabel
+                              style={{
+                                fontSize: '12px',
+                                color: '#666',
+                                minWidth: '140px',
+                                fontWeight: '600',
+                              }}
+                            >
+                              Success:
+                            </DetailLabel>
+                            <DetailValue
+                              style={{
+                                fontSize: '12px',
+                                color: stompPayload.success ? '#0f9d58' : '#d93025',
+                                fontWeight: '600',
+                              }}
+                            >
+                              {String(stompPayload.success)}
+                            </DetailValue>
+                          </DetailRow>
+                        )}
+
+                        {/* Data */}
+                        {stompPayload.data !== undefined && (
+                          <>
+                            <DetailRow style={{ marginBottom: '8px' }}>
+                              <DetailLabel
+                                style={{
+                                  fontSize: '12px',
+                                  color: '#666',
+                                  minWidth: '140px',
+                                  fontWeight: '600',
+                                }}
+                              >
+                                Data:
+                              </DetailLabel>
+                            </DetailRow>
+                            <CodeBlock style={{ marginTop: '4px' }}>
+                              <pre>{formatJSON(JSON.stringify(stompPayload.data))}</pre>
+                            </CodeBlock>
+                          </>
+                        )}
+
+                        {/* Error Message */}
+                        {stompPayload.errorMessage && (
+                          <div style={{ marginTop: '12px' }}>
+                            <DetailRow style={{ marginBottom: '8px' }}>
+                              <DetailLabel
+                                style={{
+                                  fontSize: '12px',
+                                  color: '#666',
+                                  minWidth: '140px',
+                                  fontWeight: '600',
+                                }}
+                              >
+                                Error Message:
+                              </DetailLabel>
+                            </DetailRow>
+                            <ErrorBlock>
+                              <pre>{stompPayload.errorMessage}</pre>
+                            </ErrorBlock>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      /* 구조화된 payload가 아니면 일반 JSON으로 표시 */
+                      <CodeBlock>
+                        <pre>
+                          {message.isStompMessage && message.stompBody
+                            ? formatJSON(message.stompBody)
+                            : formatJSON(message.data)}
+                        </pre>
+                      </CodeBlock>
+                    )}
                   </>
                 )}
 
-                {/* 본문 */}
-                <CodeBlock>
-                  <pre>
-                    {message.isStompMessage && message.stompBody ? message.stompBody : message.data}
-                  </pre>
-                </CodeBlock>
+                {/* STOMP MESSAGE가 아닌 경우 일반 표시 */}
+                {!message.isStompMessage && (
+                  <CodeBlock>
+                    <pre>{formatJSON(message.data)}</pre>
+                  </CodeBlock>
+                )}
               </Section>
             );
           })}

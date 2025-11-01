@@ -122,20 +122,10 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
           }
         }
 
-        // 본문 포맷팅 (JSON인 경우)
-        let formattedBody = bodyPart;
-        if (headers['content-type'] === 'application/json' && bodyPart) {
-          try {
-            const parsed = JSON.parse(bodyPart);
-            formattedBody = JSON.stringify(parsed, null, 2);
-          } catch {
-            // JSON 파싱 실패 시 원본 유지
-          }
-        }
-
+        // 본문은 원본 그대로 저장 (포맷팅은 UI에서만)
         return {
           headers,
-          body: formattedBody,
+          body: bodyPart, // 원본 본문 저장
           rawData,
         };
       } catch {
@@ -157,15 +147,11 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
         if (stompParsed) {
           isStompMessage = true;
           stompHeaders = stompParsed.headers;
-          stompBody = stompParsed.body;
-          data = stompParsed.body; // 표시용 데이터는 포맷팅된 본문
+          stompBody = stompParsed.body; // 원본 본문 저장
+          data = event.data; // 원본 데이터 저장
         } else if (typeof data === 'string') {
-          // 일반 JSON 파싱 시도
-          try {
-            data = JSON.stringify(JSON.parse(data), null, 2);
-          } catch {
-            /* noop */
-          }
+          // 일반 메시지는 원본 그대로 저장
+          // 포맷팅은 UI에서만 할 것
         } else {
           data = '[Binary data]';
         }
