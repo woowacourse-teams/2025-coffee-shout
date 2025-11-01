@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* global console */
 
 import { generateRequestId } from '../utils/utils.js';
 
@@ -52,38 +53,64 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
       try {
         if (typeof rawData !== 'string') return null;
 
-        // STOMP over WebSocket 형식 확인 (예: a["MESSAGE\n..."] 또는 a['MESSAGE\n...'])
+        // STOMP over WebSocket 형식 확인 (예: a["MESSAGE\n..."] 또는 a['MESSAGE\n...'] 또는 ["MESSAGE\n..."])
         let stompFrame = null;
 
-        // a["..."] 형식
-        const doubleQuotePattern = /^a\["((?:[^"\\]|\\.)*)"\]$/;
-        // a['...'] 형식
-        const singleQuotePattern = /^a\['((?:[^'\\]|\\.)*)'\]$/;
-
-        let match = rawData.match(doubleQuotePattern);
-        if (match) {
-          // 이스케이프 문자 처리
-          stompFrame = match[1].replace(/\\(.)/g, (match, char) => {
+        // 이스케이프 문자 처리 함수
+        const unescapeString = (str) => {
+          return str.replace(/\\(.)/g, (match, char) => {
             if (char === 'n') return '\n';
             if (char === 'r') return '\r';
             if (char === 't') return '\t';
             if (char === '\\') return '\\';
             if (char === '"') return '"';
-            if (char === "'") return "'";
+            if (char === "'") return String.fromCharCode(39);
+            if (char === 'u') {
+              // 유니코드 이스케이프 처리 (\u0000 등)
+              const unicodeMatch = match.match(/\\u([0-9a-fA-F]{4})/);
+              if (unicodeMatch) {
+                return String.fromCharCode(parseInt(unicodeMatch[1], 16));
+              }
+            }
             return char;
           });
+        };
+
+        // a["..."] 형식
+        const doubleQuotePattern = /^a\["((?:[^"\\]|\\.)*)"\]$/;
+        // a['...'] 형식
+        const singleQuotePattern = /^a\['((?:[^'\\]|\\.)*)'\]$/;
+        // ["..."] 형식 (배열 문자열)
+        const arrayDoubleQuotePattern = /^\["((?:[^"\\]|\\.)*)"\]$/;
+        // ['...'] 형식 (배열 문자열)
+        const arraySingleQuotePattern = /^\['((?:[^'\\]|\\.)*)'\]$/;
+
+        let match = rawData.match(doubleQuotePattern);
+        if (match) {
+          console.log('[parseStompMessage] a["..."] 패턴 매칭 성공');
+          stompFrame = unescapeString(match[1]);
         } else {
           match = rawData.match(singleQuotePattern);
           if (match) {
-            stompFrame = match[1].replace(/\\(.)/g, (match, char) => {
-              if (char === 'n') return '\n';
-              if (char === 'r') return '\r';
-              if (char === 't') return '\t';
-              if (char === '\\') return '\\';
-              if (char === "'") return "'";
-              if (char === '"') return '"';
-              return char;
-            });
+            console.log("[parseStompMessage] a['...'] 패턴 매칭 성공");
+            stompFrame = unescapeString(match[1]);
+          } else {
+            match = rawData.match(arrayDoubleQuotePattern);
+            if (match) {
+              console.log('[parseStompMessage] ["..."] 패턴 매칭 성공');
+              stompFrame = unescapeString(match[1]);
+            } else {
+              match = rawData.match(arraySingleQuotePattern);
+              if (match) {
+                console.log("[parseStompMessage] ['...'] 패턴 매칭 성공");
+                stompFrame = unescapeString(match[1]);
+              } else {
+                console.log('[parseStompMessage] 배열 패턴 매칭 실패', {
+                  rawDataStart: rawData.substring(0, 50),
+                  rawDataLength: rawData.length,
+                });
+              }
+            }
           }
         }
 
@@ -264,10 +291,22 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
 
         // STOMP 메시지 파싱 시도
         const stompParsed = parseStompMessage(sendData);
+        console.log('[WebSocket Hook] SEND 메시지 파싱 시도:', {
+          sendData: typeof sendData === 'string' ? sendData.substring(0, 200) : sendData,
+          sendDataLength: typeof sendData === 'string' ? sendData.length : 'N/A',
+          parsed: stompParsed,
+        });
         if (stompParsed) {
           isStompMessage = true;
           stompHeaders = stompParsed.headers;
           stompBody = stompParsed.body;
+          console.log('[WebSocket Hook] SEND 메시지 파싱 성공:', {
+            isStompMessage,
+            stompHeaders,
+            stompBody: stompBody ? stompBody.substring(0, 200) : stompBody,
+          });
+        } else {
+          console.log('[WebSocket Hook] SEND 메시지 파싱 실패 - 일반 메시지로 처리');
         }
 
         // 보낸 메시지를 messages 배열에 추가
@@ -279,6 +318,12 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
           stompHeaders,
           stompBody,
         };
+        console.log('[WebSocket Hook] SEND 메시지 객체 생성:', {
+          type: message.type,
+          isStompMessage: message.isStompMessage,
+          hasStompHeaders: !!message.stompHeaders,
+          hasStompBody: message.stompBody !== undefined,
+        });
         // messages 배열에 직접 추가 (객체 참조가 공유되므로 collector에도 반영됨)
         messages.push(message);
       } catch {
