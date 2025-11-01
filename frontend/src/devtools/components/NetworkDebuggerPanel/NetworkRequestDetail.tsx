@@ -71,12 +71,6 @@ const ContextBadge = styled.span`
   color: #1976d2;
 `;
 
-const UrlText = styled.span`
-  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-  font-size: 11px;
-  word-break: break-all;
-`;
-
 const CodeBlock = styled.div`
   background: #f5f5f5;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -165,18 +159,6 @@ type Props = {
 
 const NetworkRequestDetail = ({ request }: Props) => {
   const [expandedMessageIndex, setExpandedMessageIndex] = useState<number | null>(null);
-
-  const formatTimestamp = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-    return `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}.${milliseconds}`;
-  };
 
   const formatJSON = (text: string): string => {
     try {
@@ -329,55 +311,6 @@ const NetworkRequestDetail = ({ request }: Props) => {
         {/* STOMP MESSAGE인 경우 헤더와 바디 분리 표시 */}
         {message.isStompMessage && message.stompHeaders && (
           <>
-            <SectionTitle
-              style={{
-                margin: '0 0 12px 0',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#222',
-                border: 'none',
-                padding: 0,
-              }}
-            >
-              WebSocket {message.stompHeaders['command'] || 'MESSAGE'}
-            </SectionTitle>
-
-            {/* 헤더 */}
-            <div style={{ marginBottom: '16px' }}>
-              {Object.entries(message.stompHeaders).map(([key, value]) => (
-                <DetailRow key={key} style={{ marginBottom: '8px', alignItems: 'flex-start' }}>
-                  <DetailLabel
-                    style={{
-                      fontSize: '12px',
-                      color: '#666',
-                      minWidth: '140px',
-                      fontWeight: '600',
-                    }}
-                  >
-                    {key}:
-                  </DetailLabel>
-                  <DetailValue
-                    style={{
-                      fontSize: '12px',
-                      color: '#222',
-                      fontFamily: "'Monaco', 'Menlo', 'Consolas', monospace",
-                      wordBreak: 'break-all',
-                    }}
-                  >
-                    {String(value)}
-                  </DetailValue>
-                </DetailRow>
-              ))}
-            </div>
-
-            {/* 구분선 */}
-            <div
-              style={{
-                borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-                margin: '16px 0',
-              }}
-            />
-
             {/* Payload 섹션 */}
             {message.stompBody && (
               <>
@@ -508,12 +441,6 @@ const NetworkRequestDetail = ({ request }: Props) => {
               <ContextBadge>{request.context}</ContextBadge>
             </DetailValue>
           </DetailRow>
-          <DetailRow>
-            <DetailLabel>URL:</DetailLabel>
-            <DetailValue>
-              <UrlText>{request.url}</UrlText>
-            </DetailValue>
-          </DetailRow>
           {request.method && (
             <DetailRow>
               <DetailLabel>Method:</DetailLabel>
@@ -542,10 +469,6 @@ const NetworkRequestDetail = ({ request }: Props) => {
               <DetailValue>{request.durationMs}ms</DetailValue>
             </DetailRow>
           )}
-          <DetailRow>
-            <DetailLabel>Timestamp:</DetailLabel>
-            <DetailValue>{formatTimestamp(request.timestamp)}</DetailValue>
-          </DetailRow>
         </DetailGrid>
       </Section>
 
