@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useNetworkCollector } from '../../hooks/useNetworkCollector';
-import { usePanelResize } from '../../hooks/usePanelResize';
-import { useVerticalResize } from '../../hooks/useVerticalResize';
-import NetworkFilterBar from './NetworkFilterBar/NetworkFilterBar';
-import NetworkRequestList from './NetworkRequestList/NetworkRequestList';
-import NetworkRequestDetail from './NetworkRequestDetail/NetworkRequestDetail';
-import * as S from './NetworkDebuggerPanel.styled';
+import { useNetworkCollector } from '../../../hooks/useNetworkCollector';
+import { usePanelResize } from '../../../hooks/usePanelResize';
+import { useVerticalResize } from '../../../hooks/useVerticalResize';
+import NetworkFilterBar from '../NetworkFilterBar/NetworkFilterBar';
+import NetworkRequestList from '../NetworkRequestList/NetworkRequestList';
+import NetworkRequestDetail from '../NetworkRequestDetail/NetworkRequestDetail';
+import * as S from '../NetworkDebuggerPanel.styled';
 
 /**
  * 네트워크 디버거 패널 컴포넌트입니다.

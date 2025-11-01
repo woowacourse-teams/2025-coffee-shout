@@ -1,43 +1,4 @@
-import styled from '@emotion/styled';
-
-const FilterBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background: #f8f9fa;
-  flex-wrap: wrap;
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-const FilterLabel = styled.span`
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
-  margin-right: 4px;
-`;
-
-const FilterButton = styled.button<{ active: boolean }>`
-  appearance: none;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: ${({ active }) => (active ? '#1a73e8' : '#ffffff')};
-  color: ${({ active }) => (active ? '#ffffff' : '#222')};
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-
-  &:hover {
-    background: ${({ active }) => (active ? '#1557b0' : '#f0f0f0')};
-  }
-`;
+import * as S from './NetworkFilterBar.styled';
 
 type Props = {
   contexts: string[];
@@ -55,53 +16,53 @@ const NetworkFilterBar = ({
   onTypeChange,
 }: Props) => {
   return (
-    <FilterBar>
-      <FilterGroup>
-        <FilterLabel>Context:</FilterLabel>
-        <FilterButton
+    <S.FilterBar>
+      <S.FilterGroup>
+        <S.FilterLabel>Context:</S.FilterLabel>
+        <S.FilterButton
           type="button"
           active={selectedContext === null}
           onClick={() => onContextChange(null)}
         >
           All
-        </FilterButton>
+        </S.FilterButton>
         {contexts.map((context) => (
-          <FilterButton
+          <S.FilterButton
             key={context}
             type="button"
             active={selectedContext === context}
             onClick={() => onContextChange(context)}
           >
             {context === 'MAIN' ? 'Main' : context}
-          </FilterButton>
+          </S.FilterButton>
         ))}
-      </FilterGroup>
+      </S.FilterGroup>
 
-      <FilterGroup>
-        <FilterLabel>Type:</FilterLabel>
-        <FilterButton
+      <S.FilterGroup>
+        <S.FilterLabel>Type:</S.FilterLabel>
+        <S.FilterButton
           type="button"
           active={selectedType === null}
           onClick={() => onTypeChange(null)}
         >
           All
-        </FilterButton>
-        <FilterButton
+        </S.FilterButton>
+        <S.FilterButton
           type="button"
           active={selectedType === 'fetch'}
           onClick={() => onTypeChange(selectedType === 'fetch' ? null : 'fetch')}
         >
           Fetch
-        </FilterButton>
-        <FilterButton
+        </S.FilterButton>
+        <S.FilterButton
           type="button"
           active={selectedType === 'websocket'}
           onClick={() => onTypeChange(selectedType === 'websocket' ? null : 'websocket')}
         >
           WebSocket
-        </FilterButton>
-      </FilterGroup>
-    </FilterBar>
+        </S.FilterButton>
+      </S.FilterGroup>
+    </S.FilterBar>
   );
 };
 

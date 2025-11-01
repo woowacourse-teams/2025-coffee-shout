@@ -1,0 +1,83 @@
+/* eslint-env browser */
+/* global console */
+
+import { parseStompMessage } from './stompParser.js';
+
+/**
+ * WebSocket 데이터를 문자열로 변환합니다.
+ * Blob, ArrayBuffer 등의 바이너리 데이터는 설명 문자열로 변환합니다.
+ *
+ * @param {string|Blob|ArrayBuffer} data - 변환할 데이터
+ * @returns {string} 문자열로 변환된 데이터
+ */
+export const convertDataToString = (data) => {
+  if (typeof data === 'string') {
+    return data;
+  }
+
+  // eslint-disable-next-line no-undef
+  if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    return '[Blob data]';
+  }
+
+  if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
+    return '[ArrayBuffer data]';
+  }
+
+  return String(data);
+};
+
+/**
+ * WebSocket 메시지 객체를 생성합니다.
+ * STOMP 메시지인 경우 파싱하여 구조화된 형태로 저장합니다.
+ *
+ * @param {string|Blob|ArrayBuffer} rawData - 원본 메시지 데이터
+ * @param {'sent'|'received'} type - 메시지 타입 (송신/수신)
+ * @returns {{type: 'sent'|'received', data: string, timestamp: number, isStompMessage: boolean, stompHeaders?: Record<string, string>, stompBody?: string}} 생성된 메시지 객체
+ */
+export const createWebSocketMessage = (rawData, type) => {
+  const sendData = convertDataToString(rawData);
+
+  // STOMP 메시지 파싱 시도
+  const stompParsed = parseStompMessage(sendData);
+
+  if (type === 'sent') {
+    console.log('[WebSocket Hook] SEND 메시지 파싱 시도:', {
+      sendData: typeof sendData === 'string' ? sendData.substring(0, 200) : sendData,
+      sendDataLength: typeof sendData === 'string' ? sendData.length : 'N/A',
+      parsed: stompParsed,
+    });
+  }
+
+  if (stompParsed) {
+    if (type === 'sent') {
+      console.log('[WebSocket Hook] SEND 메시지 파싱 성공:', {
+        isStompMessage: true,
+        stompHeaders: stompParsed.headers,
+        stompBody: stompParsed.body ? stompParsed.body.substring(0, 200) : stompParsed.body,
+      });
+    }
+
+    return {
+      type,
+      data: sendData,
+      timestamp: Date.now(),
+      isStompMessage: true,
+      stompHeaders: stompParsed.headers,
+      stompBody: stompParsed.body,
+    };
+  }
+
+  if (type === 'sent') {
+    console.log('[WebSocket Hook] SEND 메시지 파싱 실패 - 일반 메시지로 처리');
+  }
+
+  return {
+    type,
+    data: sendData,
+    timestamp: Date.now(),
+    isStompMessage: false,
+    stompHeaders: undefined,
+    stompBody: undefined,
+  };
+};
