@@ -89,7 +89,12 @@ export const apiRequest = async <T, TData>(
         return {} as T;
       }
 
-      return await response.json();
+      const text = await response.text();
+      if (!text) {
+        return {} as T;
+      }
+
+      return JSON.parse(text);
     } catch (error) {
       if (retryCount < retry.count) {
         console.warn(`재시도 중 (${retryCount + 1}/${retry.count})`);
