@@ -30,14 +30,21 @@ const NetworkDebuggerPanel = () => {
   const [selectedType, setSelectedType] = useState<'fetch' | 'websocket' | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
 
+  const initialPanelHeight = useMemo(() => {
+    if (isMobile && typeof window !== 'undefined') {
+      return window.innerHeight * 0.8;
+    }
+    return 400;
+  }, [isMobile]);
+
   const { requests, clearRequests, refreshRequests } = useNetworkCollector();
-  const { panelHeight, handleResizeStart } = usePanelResize(400);
+  const { panelHeight, handleResizeStart } = usePanelResize(initialPanelHeight);
   const { detailWidthPercent, handleVerticalResizeStart, contentRef } = useVerticalResize();
   const {
     topHeightPercent,
     handleResizeStart: handleMobileSplitResizeStart,
     contentRef: mobileContentRef,
-  } = useMobileSplitResize();
+  } = useMobileSplitResize(20);
 
   /**
    * 고유한 context 목록을 추출합니다.
