@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useNetworkCollector } from '../../hooks/useNetworkCollector';
 import NetworkFilterBar from './NetworkFilterBar';
@@ -25,12 +25,12 @@ const ToggleButton = styled.button`
   }
 `;
 
-const Panel = styled.div`
+const Panel = styled.div<{ height: number }>`
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 400px;
+  height: ${({ height }) => height}px;
   z-index: 1000;
   background: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -38,6 +38,22 @@ const Panel = styled.div`
   flex-direction: column;
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 12px;
+`;
+
+const ResizeHandle = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  cursor: ns-resize;
+  z-index: 1001;
+  background: transparent;
+  user-select: none;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
 `;
 
 const Header = styled.div`
@@ -104,15 +120,31 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
-const RequestListSection = styled.div`
-  flex: 1;
+const RequestListSection = styled.div<{ detailWidthPercent: number }>`
+  width: ${({ detailWidthPercent }) => 100 - detailWidthPercent}%;
   min-width: 0;
   overflow-y: auto;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
 `;
 
-const DetailSection = styled.div`
-  width: 50%;
+const VerticalResizeHandle = styled.div`
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 1002;
+  background: transparent;
+  user-select: none;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const DetailSection = styled.div<{ widthPercent: number }>`
+  width: ${({ widthPercent }) => widthPercent}%;
   min-width: 300px;
   overflow-y: auto;
   background: #ffffff;
@@ -133,8 +165,143 @@ const NetworkDebuggerPanel = () => {
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'fetch' | 'websocket' | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
+  const [panelHeight, setPanelHeight] = useState(400);
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartYRef = useRef<number | null>(null);
+  const resizeStartHeightRef = useRef<number | null>(null);
+
+  const [detailWidthPercent, setDetailWidthPercent] = useState(50);
+  const [isResizingVertical, setIsResizingVertical] = useState(false);
+  const resizeStartXRef = useRef<number | null>(null);
+  const resizeStartWidthPercentRef = useRef<number | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const { requests, clearRequests } = useNetworkCollector();
+
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsResizing(true);
+      resizeStartYRef.current = e.clientY;
+      resizeStartHeightRef.current = panelHeight;
+    },
+    [panelHeight]
+  );
+
+  const handleResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (
+        !isResizing ||
+        resizeStartYRef.current === null ||
+        resizeStartHeightRef.current === null
+      ) {
+        return;
+      }
+
+      const deltaY = resizeStartYRef.current - e.clientY;
+      const newHeight = resizeStartHeightRef.current + deltaY;
+      const minHeight = 400;
+      const maxHeight = window.innerHeight;
+
+      if (newHeight >= minHeight && newHeight <= maxHeight) {
+        setPanelHeight(newHeight);
+      } else if (newHeight < minHeight) {
+        setPanelHeight(minHeight);
+      } else if (newHeight > maxHeight) {
+        setPanelHeight(maxHeight);
+      }
+    },
+    [isResizing]
+  );
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    resizeStartYRef.current = null;
+    resizeStartHeightRef.current = null;
+  }, []);
+
+  const handleVerticalResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsResizingVertical(true);
+      resizeStartXRef.current = e.clientX;
+      resizeStartWidthPercentRef.current = detailWidthPercent;
+    },
+    [detailWidthPercent]
+  );
+
+  const handleVerticalResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (
+        !isResizingVertical ||
+        resizeStartXRef.current === null ||
+        resizeStartWidthPercentRef.current === null ||
+        !contentRef.current
+      ) {
+        return;
+      }
+
+      const contentWidth = contentRef.current.offsetWidth;
+      const deltaX = e.clientX - resizeStartXRef.current;
+      // 오른쪽으로 드래그하면 왼쪽 영역이 커지도록 detailWidthPercent 감소
+      // 왼쪽으로 드래그하면 오른쪽 영역이 커지도록 detailWidthPercent 증가
+      const deltaPercent = (deltaX / contentWidth) * 100;
+      const newWidthPercent = resizeStartWidthPercentRef.current - deltaPercent;
+
+      const maxWidthPercent = 80;
+      // 오른쪽 영역 최소: 300px 또는 전체의 20% 중 큰 값
+      // 왼쪽 영역 최소 20% 유지를 위해 오른쪽은 최대 80%
+      const minWidthPercent = Math.max((300 / contentWidth) * 100, 20);
+
+      if (newWidthPercent >= minWidthPercent && newWidthPercent <= maxWidthPercent) {
+        setDetailWidthPercent(newWidthPercent);
+      } else if (newWidthPercent < minWidthPercent) {
+        setDetailWidthPercent(minWidthPercent);
+      } else if (newWidthPercent > maxWidthPercent) {
+        setDetailWidthPercent(maxWidthPercent);
+      }
+    },
+    [isResizingVertical]
+  );
+
+  const handleVerticalResizeEnd = useCallback(() => {
+    setIsResizingVertical(false);
+    resizeStartXRef.current = null;
+    resizeStartWidthPercentRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'ns-resize';
+
+      return () => {
+        document.removeEventListener('mousemove', handleResizeMove);
+        document.removeEventListener('mouseup', handleResizeEnd);
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+      };
+    }
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
+
+  useEffect(() => {
+    if (isResizingVertical) {
+      document.addEventListener('mousemove', handleVerticalResizeMove);
+      document.addEventListener('mouseup', handleVerticalResizeEnd);
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'ew-resize';
+
+      return () => {
+        document.removeEventListener('mousemove', handleVerticalResizeMove);
+        document.removeEventListener('mouseup', handleVerticalResizeEnd);
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+      };
+    }
+  }, [isResizingVertical, handleVerticalResizeMove, handleVerticalResizeEnd]);
 
   if (!isTopWindow) return null;
 
@@ -182,7 +349,8 @@ const NetworkDebuggerPanel = () => {
   }
 
   return (
-    <Panel>
+    <Panel height={panelHeight}>
+      <ResizeHandle onMouseDown={handleResizeStart} />
       <Header>
         <Title>Network</Title>
         <HeaderActions>
@@ -203,16 +371,17 @@ const NetworkDebuggerPanel = () => {
         onTypeChange={setSelectedType}
       />
 
-      <Content>
-        <RequestListSection>
+      <Content ref={contentRef}>
+        <RequestListSection detailWidthPercent={selectedRequestData ? detailWidthPercent : 0}>
           <NetworkRequestList
             requests={filteredRequests}
             selectedRequestId={selectedRequest}
             onSelectRequest={setSelectedRequest}
           />
+          {selectedRequestData && <VerticalResizeHandle onMouseDown={handleVerticalResizeStart} />}
         </RequestListSection>
         {selectedRequestData && (
-          <DetailSection>
+          <DetailSection widthPercent={detailWidthPercent}>
             <NetworkRequestDetail request={selectedRequestData} />
           </DetailSection>
         )}
