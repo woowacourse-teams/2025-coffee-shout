@@ -1,5 +1,14 @@
+import { useMemo } from 'react';
 import { NetworkRequest } from '../../../types/network';
+import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
 import * as S from './NetworkRequestList.styled';
+
+const COLUMN_WIDTHS = {
+  TYPE: '80px',
+  CONTEXT: '70px',
+  STATUS: '50px',
+  TIME: '90px',
+} as const;
 
 type Props = {
   requests: NetworkRequest[];
@@ -7,10 +16,25 @@ type Props = {
   onSelectRequest: (id: string) => void;
 };
 
+const API_URL = process.env.API_URL || '';
+
 /**
  * 네트워크 요청 목록을 표시하는 컴포넌트입니다.
  */
 const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Props) => {
+  const isMobile = useMemo(() => checkIsTouchDevice(), []);
+
+  /**
+   * 모바일에서 URL에서 API_URL을 제거한 경로를 반환합니다.
+   */
+  const formatUrlForMobile = (url: string): string => {
+    if (!isMobile || !API_URL) return url;
+    if (url.startsWith(API_URL)) {
+      return url.substring(API_URL.length);
+    }
+    return url;
+  };
+
   /**
    * 요청의 상태에 따른 색상을 반환합니다.
    */
@@ -75,11 +99,11 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
   return (
     <S.List>
       <S.ListHeader>
-        <S.HeaderCell $width="80px">Type</S.HeaderCell>
-        <S.HeaderCell $width="100px">Context</S.HeaderCell>
+        <S.HeaderCell $width={COLUMN_WIDTHS.TYPE}>Type</S.HeaderCell>
+        {!isMobile && <S.HeaderCell $width={COLUMN_WIDTHS.CONTEXT}>Context</S.HeaderCell>}
         <S.HeaderCell $flex={1}>URL</S.HeaderCell>
-        <S.HeaderCell $width="80px">Status</S.HeaderCell>
-        <S.HeaderCell $width="100px">Time</S.HeaderCell>
+        <S.HeaderCell $width={COLUMN_WIDTHS.STATUS}>Status</S.HeaderCell>
+        <S.HeaderCell $width={COLUMN_WIDTHS.TIME}>Time</S.HeaderCell>
       </S.ListHeader>
       <S.ListBody>
         {requests.map((request) => (
@@ -88,19 +112,23 @@ const NetworkRequestList = ({ requests, selectedRequestId, onSelectRequest }: Pr
             selected={selectedRequestId === request.id}
             onClick={() => onSelectRequest(request.id)}
           >
-            <S.RequestCell $width="80px">
+            <S.RequestCell $width={COLUMN_WIDTHS.TYPE}>
               <S.TypeBadge type={request.type}>{request.type}</S.TypeBadge>
             </S.RequestCell>
-            <S.RequestCell $width="100px">
-              <S.ContextBadge>{request.context}</S.ContextBadge>
-            </S.RequestCell>
+            {!isMobile && (
+              <S.RequestCell $width={COLUMN_WIDTHS.CONTEXT}>
+                <S.ContextBadge>{request.context}</S.ContextBadge>
+              </S.RequestCell>
+            )}
             <S.RequestCell $flex={1} title={request.url}>
-              <S.UrlText>{request.url}</S.UrlText>
+              <S.UrlText>{formatUrlForMobile(request.url)}</S.UrlText>
             </S.RequestCell>
-            <S.RequestCell $width="80px">
+            <S.RequestCell $width={COLUMN_WIDTHS.STATUS}>
               <S.StatusText color={getStatusColor(request)}>{getStatusText(request)}</S.StatusText>
             </S.RequestCell>
-            <S.RequestCell $width="100px">{formatTime(request.timestamp)}</S.RequestCell>
+            <S.RequestCell $width={COLUMN_WIDTHS.TIME}>
+              {formatTime(request.timestamp)}
+            </S.RequestCell>
           </S.RequestRow>
         ))}
       </S.ListBody>

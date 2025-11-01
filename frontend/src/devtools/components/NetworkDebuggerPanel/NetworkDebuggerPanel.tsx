@@ -134,10 +134,10 @@ const NetworkDebuggerPanel = () => {
         <S.HeaderActions>
           <S.HeaderButtonWrapper>
             <S.ClearButton type="button" onClick={clearRequests}>
-              Clear
+              🚫
             </S.ClearButton>
             <S.ClearButton type="button" onClick={refreshRequests}>
-              Refresh
+              갱신
             </S.ClearButton>
           </S.HeaderButtonWrapper>
           <S.CloseButton type="button" onClick={() => setOpen(false)}>
