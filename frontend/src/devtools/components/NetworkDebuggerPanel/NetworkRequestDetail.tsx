@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { NetworkRequest } from '../../types/network';
+import { useState } from 'react';
+import { NetworkRequest, WebSocketMessage } from '../../types/network';
 
 const DetailContainer = styled.div`
   padding: 16px;
@@ -112,11 +113,59 @@ const ErrorBlock = styled.div`
   }
 `;
 
+const MessageRow = styled.div<{ isExpanded: boolean }>`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  background: ${({ isExpanded }) => (isExpanded ? '#e8f0fe' : '#ffffff')};
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: ${({ isExpanded }) => (isExpanded ? '#e8f0fe' : '#f8f9fa')};
+  }
+`;
+
+const MessageArrow = styled.span<{ type: 'sent' | 'received' }>`
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 12px;
+  color: ${({ type }) => (type === 'sent' ? '#0f9d58' : '#d93025')};
+  font-weight: 600;
+  user-select: none;
+`;
+
+const MessageSummary = styled.span`
+  flex: 1;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  color: #222;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const MessageTime = styled.span`
+  font-size: 11px;
+  color: #666;
+  margin-left: 8px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+`;
+
+const ExpandedMessageDetail = styled.div`
+  padding: 16px;
+  background: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+`;
+
 type Props = {
   request: NetworkRequest;
 };
 
 const NetworkRequestDetail = ({ request }: Props) => {
+  const [expandedMessageIndex, setExpandedMessageIndex] = useState<number | null>(null);
+
   const formatTimestamp = (timestamp: number): string => {
     const date = new Date(timestamp);
     const year = date.getFullYear();
@@ -250,6 +299,198 @@ const NetworkRequestDetail = ({ request }: Props) => {
     return null;
   };
 
+  // 메시지 요약 생성 함수
+  const getMessageSummary = (message: WebSocketMessage): string => {
+    if (message.isStompMessage && message.stompHeaders) {
+      const command = message.stompHeaders['command'] || 'STOMP';
+      const destination = message.stompHeaders['destination'] || '';
+      if (destination) {
+        return `${command} ${destination}`;
+      }
+      return command;
+    }
+    // 일반 메시지인 경우 데이터 일부 표시
+    const maxLength = 100;
+    const data = message.data || '';
+    if (data.length > maxLength) {
+      return data.substring(0, maxLength) + '...';
+    }
+    return data;
+  };
+
+  // 메시지 상세 정보 렌더링
+  const renderMessageDetail = (message: WebSocketMessage) => {
+    // STOMP payload 파싱
+    const stompPayload =
+      message.isStompMessage && message.stompBody ? parseStompPayload(message.stompBody) : null;
+
+    return (
+      <ExpandedMessageDetail>
+        {/* STOMP MESSAGE인 경우 헤더와 바디 분리 표시 */}
+        {message.isStompMessage && message.stompHeaders && (
+          <>
+            <SectionTitle
+              style={{
+                margin: '0 0 12px 0',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#222',
+                border: 'none',
+                padding: 0,
+              }}
+            >
+              WebSocket {message.stompHeaders['command'] || 'MESSAGE'}
+            </SectionTitle>
+
+            {/* 헤더 */}
+            <div style={{ marginBottom: '16px' }}>
+              {Object.entries(message.stompHeaders).map(([key, value]) => (
+                <DetailRow key={key} style={{ marginBottom: '8px', alignItems: 'flex-start' }}>
+                  <DetailLabel
+                    style={{
+                      fontSize: '12px',
+                      color: '#666',
+                      minWidth: '140px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {key}:
+                  </DetailLabel>
+                  <DetailValue
+                    style={{
+                      fontSize: '12px',
+                      color: '#222',
+                      fontFamily: "'Monaco', 'Menlo', 'Consolas', monospace",
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {String(value)}
+                  </DetailValue>
+                </DetailRow>
+              ))}
+            </div>
+
+            {/* 구분선 */}
+            <div
+              style={{
+                borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+                margin: '16px 0',
+              }}
+            />
+
+            {/* Payload 섹션 */}
+            {message.stompBody && (
+              <>
+                <SectionTitle
+                  style={{
+                    margin: '0 0 12px 0',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#222',
+                    border: 'none',
+                    padding: 0,
+                  }}
+                >
+                  Payload{' '}
+                  {message.stompHeaders['content-type'] === 'application/json' ? '(JSON)' : ''}
+                  {stompPayload ? ' (Structured: {success, data, errorMessage})' : ''}
+                </SectionTitle>
+
+                {/* 구조화된 Payload 표시 */}
+                {stompPayload ? (
+                  <>
+                    {/* Success 상태 */}
+                    {typeof stompPayload.success !== 'undefined' && (
+                      <DetailRow style={{ marginBottom: '12px' }}>
+                        <DetailLabel
+                          style={{
+                            fontSize: '12px',
+                            color: '#666',
+                            minWidth: '140px',
+                            fontWeight: '600',
+                          }}
+                        >
+                          Success:
+                        </DetailLabel>
+                        <DetailValue
+                          style={{
+                            fontSize: '12px',
+                            color: stompPayload.success ? '#0f9d58' : '#d93025',
+                            fontWeight: '600',
+                          }}
+                        >
+                          {String(stompPayload.success)}
+                        </DetailValue>
+                      </DetailRow>
+                    )}
+
+                    {/* Data */}
+                    {stompPayload.data !== undefined && (
+                      <>
+                        <DetailRow style={{ marginBottom: '8px' }}>
+                          <DetailLabel
+                            style={{
+                              fontSize: '12px',
+                              color: '#666',
+                              minWidth: '140px',
+                              fontWeight: '600',
+                            }}
+                          >
+                            Data:
+                          </DetailLabel>
+                        </DetailRow>
+                        <CodeBlock style={{ marginTop: '4px' }}>
+                          <pre>{formatJSON(JSON.stringify(stompPayload.data))}</pre>
+                        </CodeBlock>
+                      </>
+                    )}
+
+                    {/* Error Message */}
+                    {stompPayload.errorMessage && (
+                      <div style={{ marginTop: '12px' }}>
+                        <DetailRow style={{ marginBottom: '8px' }}>
+                          <DetailLabel
+                            style={{
+                              fontSize: '12px',
+                              color: '#666',
+                              minWidth: '140px',
+                              fontWeight: '600',
+                            }}
+                          >
+                            Error Message:
+                          </DetailLabel>
+                        </DetailRow>
+                        <ErrorBlock>
+                          <pre>{stompPayload.errorMessage}</pre>
+                        </ErrorBlock>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* 구조화된 payload가 아니면 일반 JSON으로 표시 */
+                  <CodeBlock>
+                    <pre>
+                      {message.isStompMessage && message.stompBody
+                        ? formatJSON(message.stompBody)
+                        : formatJSON(message.data)}
+                    </pre>
+                  </CodeBlock>
+                )}
+              </>
+            )}
+          </>
+        )}
+
+        {/* STOMP MESSAGE가 아닌 경우 일반 표시 */}
+        {!message.isStompMessage && (
+          <CodeBlock>
+            <pre>{formatJSON(message.data)}</pre>
+          </CodeBlock>
+        )}
+      </ExpandedMessageDetail>
+    );
+  };
+
   return (
     <DetailContainer>
       <Section>
@@ -328,181 +569,23 @@ const NetworkRequestDetail = ({ request }: Props) => {
             const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
             const timeStr = `${hours}:${minutes}:${seconds}.${milliseconds}`;
 
-            // STOMP payload 파싱
-            const stompPayload =
-              message.isStompMessage && message.stompBody
-                ? parseStompPayload(message.stompBody)
-                : null;
+            const isExpanded = expandedMessageIndex === index;
+            const summary = getMessageSummary(message);
 
             return (
-              <Section key={index} style={{ marginBottom: '24px' }}>
-                <DetailRow style={{ marginBottom: '12px' }}>
-                  <DetailLabel>
-                    {message.type === 'received' ? 'Received' : 'Sent'} ({timeStr})
-                  </DetailLabel>
-                </DetailRow>
-
-                {/* STOMP MESSAGE인 경우 헤더와 바디 분리 표시 */}
-                {message.isStompMessage && message.stompHeaders && (
-                  <>
-                    <SectionTitle
-                      style={{
-                        margin: '0 0 12px 0',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        color: '#222',
-                        border: 'none',
-                        padding: 0,
-                      }}
-                    >
-                      WebSocket MESSAGE
-                    </SectionTitle>
-
-                    {/* 헤더 */}
-                    <div style={{ marginBottom: '16px' }}>
-                      {Object.entries(message.stompHeaders).map(([key, value]) => (
-                        <DetailRow
-                          key={key}
-                          style={{ marginBottom: '8px', alignItems: 'flex-start' }}
-                        >
-                          <DetailLabel
-                            style={{
-                              fontSize: '12px',
-                              color: '#666',
-                              minWidth: '140px',
-                              fontWeight: '600',
-                            }}
-                          >
-                            {key}:
-                          </DetailLabel>
-                          <DetailValue
-                            style={{
-                              fontSize: '12px',
-                              color: '#222',
-                              fontFamily: "'Monaco', 'Menlo', 'Consolas', monospace",
-                              wordBreak: 'break-all',
-                            }}
-                          >
-                            {value}
-                          </DetailValue>
-                        </DetailRow>
-                      ))}
-                    </div>
-
-                    {/* 구분선 */}
-                    <div
-                      style={{
-                        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-                        margin: '16px 0',
-                      }}
-                    />
-
-                    {/* Payload 섹션 */}
-                    <SectionTitle
-                      style={{
-                        margin: '0 0 12px 0',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        color: '#222',
-                        border: 'none',
-                        padding: 0,
-                      }}
-                    >
-                      Payload{' '}
-                      {message.stompHeaders['content-type'] === 'application/json' ? '(JSON)' : ''}
-                      {stompPayload ? ' (Structured: {success, data, errorMessage})' : ''}
-                    </SectionTitle>
-
-                    {/* 구조화된 Payload 표시 */}
-                    {stompPayload ? (
-                      <>
-                        {/* Success 상태 */}
-                        {typeof stompPayload.success !== 'undefined' && (
-                          <DetailRow style={{ marginBottom: '12px' }}>
-                            <DetailLabel
-                              style={{
-                                fontSize: '12px',
-                                color: '#666',
-                                minWidth: '140px',
-                                fontWeight: '600',
-                              }}
-                            >
-                              Success:
-                            </DetailLabel>
-                            <DetailValue
-                              style={{
-                                fontSize: '12px',
-                                color: stompPayload.success ? '#0f9d58' : '#d93025',
-                                fontWeight: '600',
-                              }}
-                            >
-                              {String(stompPayload.success)}
-                            </DetailValue>
-                          </DetailRow>
-                        )}
-
-                        {/* Data */}
-                        {stompPayload.data !== undefined && (
-                          <>
-                            <DetailRow style={{ marginBottom: '8px' }}>
-                              <DetailLabel
-                                style={{
-                                  fontSize: '12px',
-                                  color: '#666',
-                                  minWidth: '140px',
-                                  fontWeight: '600',
-                                }}
-                              >
-                                Data:
-                              </DetailLabel>
-                            </DetailRow>
-                            <CodeBlock style={{ marginTop: '4px' }}>
-                              <pre>{formatJSON(JSON.stringify(stompPayload.data))}</pre>
-                            </CodeBlock>
-                          </>
-                        )}
-
-                        {/* Error Message */}
-                        {stompPayload.errorMessage && (
-                          <div style={{ marginTop: '12px' }}>
-                            <DetailRow style={{ marginBottom: '8px' }}>
-                              <DetailLabel
-                                style={{
-                                  fontSize: '12px',
-                                  color: '#666',
-                                  minWidth: '140px',
-                                  fontWeight: '600',
-                                }}
-                              >
-                                Error Message:
-                              </DetailLabel>
-                            </DetailRow>
-                            <ErrorBlock>
-                              <pre>{stompPayload.errorMessage}</pre>
-                            </ErrorBlock>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      /* 구조화된 payload가 아니면 일반 JSON으로 표시 */
-                      <CodeBlock>
-                        <pre>
-                          {message.isStompMessage && message.stompBody
-                            ? formatJSON(message.stompBody)
-                            : formatJSON(message.data)}
-                        </pre>
-                      </CodeBlock>
-                    )}
-                  </>
-                )}
-
-                {/* STOMP MESSAGE가 아닌 경우 일반 표시 */}
-                {!message.isStompMessage && (
-                  <CodeBlock>
-                    <pre>{formatJSON(message.data)}</pre>
-                  </CodeBlock>
-                )}
-              </Section>
+              <div key={index}>
+                <MessageRow
+                  isExpanded={isExpanded}
+                  onClick={() => setExpandedMessageIndex(isExpanded ? null : index)}
+                >
+                  <MessageArrow type={message.type}>
+                    {message.type === 'sent' ? '▲' : '▼'}
+                  </MessageArrow>
+                  <MessageSummary title={message.data}>{summary}</MessageSummary>
+                  <MessageTime>{timeStr}</MessageTime>
+                </MessageRow>
+                {isExpanded && renderMessageDetail(message)}
+              </div>
             );
           })}
         </Section>
