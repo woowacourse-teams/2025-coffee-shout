@@ -30,8 +30,6 @@ const NetworkDebuggerPanel = () => {
   const { panelHeight, handleResizeStart } = usePanelResize(400);
   const { detailWidthPercent, handleVerticalResizeStart, contentRef } = useVerticalResize();
 
-  if (!isTopWindow) return null;
-
   /**
    * 고유한 context 목록을 추출합니다.
    * MAIN이 있으면 첫 번째로 배치하고, 나머지는 정렬합니다.
@@ -67,6 +65,8 @@ const NetworkDebuggerPanel = () => {
     if (!selectedRequest) return null;
     return requests.find((req) => req.id === selectedRequest) || null;
   }, [requests, selectedRequest]);
+
+  if (!isTopWindow) return null;
 
   if (!open) {
     return (
