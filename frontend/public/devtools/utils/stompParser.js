@@ -1,5 +1,4 @@
 /* eslint-env browser */
-/* global console */
 
 /**
  * 지원하는 STOMP 명령어 목록
@@ -59,25 +58,21 @@ const extractServerToClientFrame = (rawData) => {
 
   let match = rawData.match(doubleQuotePattern);
   if (match) {
-    console.log('[parseStompMessage] a["..."] 패턴 매칭 성공');
     return unescapeString(match[1]);
   }
 
   match = rawData.match(singleQuotePattern);
   if (match) {
-    console.log("[parseStompMessage] a['...'] 패턴 매칭 성공");
     return unescapeString(match[1]);
   }
 
   match = rawData.match(arrayDoubleQuotePattern);
   if (match) {
-    console.log('[parseStompMessage] ["..."] 패턴 매칭 성공');
     return unescapeString(match[1]);
   }
 
   match = rawData.match(arraySingleQuotePattern);
   if (match) {
-    console.log("[parseStompMessage] ['...'] 패턴 매칭 성공");
     return unescapeString(match[1]);
   }
 
@@ -188,10 +183,6 @@ export const parseStompMessage = (rawData) => {
     if (!stompFrame) {
       stompFrame = extractClientToServerFrame(rawData);
       if (!stompFrame) {
-        console.log('[parseStompMessage] 배열 패턴 매칭 실패', {
-          rawDataStart: rawData.substring(0, 50),
-          rawDataLength: rawData.length,
-        });
         return null;
       }
     }
