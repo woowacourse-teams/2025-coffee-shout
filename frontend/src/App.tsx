@@ -10,7 +10,7 @@ import { ParticipantsProvider } from './contexts/Participants/ParticipantsProvid
 import { PlayerTypeProvider } from './contexts/PlayerType/PlayerTypeProvider';
 import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/ProbabilityHistoryProvider';
 import { theme } from './styles/theme';
-import IframePreviewToggle from './devtools/components/IframePreviewToggle';
+import IframePreviewToggle from './devtools/components/IframePreviewToggle/IframePreviewToggle';
 import NetworkDebuggerPanel from './devtools/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
 
 const App = () => {
