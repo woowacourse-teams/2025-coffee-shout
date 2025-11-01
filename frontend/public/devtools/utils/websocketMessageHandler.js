@@ -49,15 +49,8 @@ export const createWebSocketMessage = (rawData, type) => {
     });
   }
 
-  if (stompParsed) {
-    if (type === 'sent') {
-      console.log('[WebSocket Hook] SEND 메시지 파싱 성공:', {
-        isStompMessage: true,
-        stompHeaders: stompParsed.headers,
-        stompBody: stompParsed.body ? stompParsed.body.substring(0, 200) : stompParsed.body,
-      });
-    }
-
+  // 파싱 성공 (객체 반환) 또는 실패 (문자열 '파싱 실패!' 반환)
+  if (stompParsed && typeof stompParsed === 'object' && stompParsed.headers) {
     return {
       type,
       data: sendData,
@@ -66,10 +59,6 @@ export const createWebSocketMessage = (rawData, type) => {
       stompHeaders: stompParsed.headers,
       stompBody: stompParsed.body,
     };
-  }
-
-  if (type === 'sent') {
-    console.log('[WebSocket Hook] SEND 메시지 파싱 실패 - 일반 메시지로 처리');
   }
 
   return {
