@@ -9,7 +9,7 @@ import { parseStompMessage } from './stompParser.js';
  * @param {string|Blob|ArrayBuffer} data - 변환할 데이터
  * @returns {string} 문자열로 변환된 데이터
  */
-export const convertDataToString = (data) => {
+const convertDataToString = (data) => {
   if (typeof data === 'string') {
     return data;
   }
