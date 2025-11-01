@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, MouseEvent } from 'react';
 
 /**
  * 패널의 수직 리사이즈를 관리하는 커스텀 훅입니다.
@@ -17,7 +17,7 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
    * 리사이즈 시작 핸들러입니다.
    */
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent) => {
+    (e: MouseEvent) => {
       e.preventDefault();
       setIsResizing(true);
       resizeStartYRef.current = e.clientY;
@@ -30,7 +30,7 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
    * 리사이즈 중 핸들러입니다.
    */
   const handleResizeMove = useCallback(
-    (e: MouseEvent) => {
+    (e: globalThis.MouseEvent) => {
       if (
         !isResizing ||
         resizeStartYRef.current === null ||
