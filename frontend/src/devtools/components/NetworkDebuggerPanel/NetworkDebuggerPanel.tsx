@@ -179,7 +179,10 @@ const NetworkDebuggerPanel = () => {
             $isMobile={isMobile}
             $topHeightPercent={isMobile ? topHeightPercent : 0}
           >
-            <NetworkRequestDetail request={selectedRequestData} />
+            <NetworkRequestDetail
+              request={selectedRequestData}
+              onClose={() => setSelectedRequest(null)}
+            />
           </S.DetailSection>
         )}
       </S.Content>

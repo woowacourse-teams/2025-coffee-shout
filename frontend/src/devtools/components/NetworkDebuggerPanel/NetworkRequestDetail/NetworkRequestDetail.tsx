@@ -8,12 +8,13 @@ import * as S from './NetworkRequestDetail.styled';
 
 type Props = {
   request: NetworkRequest;
+  onClose?: () => void;
 };
 
 /**
  * 네트워크 요청의 상세 정보를 표시하는 컴포넌트입니다.
  */
-const NetworkRequestDetail = ({ request }: Props) => {
+const NetworkRequestDetail = ({ request, onClose }: Props) => {
   const [expandedMessageIndex, setExpandedMessageIndex] = useState<number | null>(null);
 
   /**
@@ -124,6 +125,11 @@ const NetworkRequestDetail = ({ request }: Props) => {
 
   return (
     <S.DetailContainer>
+      {onClose && (
+        <S.CloseButton type="button" onClick={onClose}>
+          ✕
+        </S.CloseButton>
+      )}
       <S.Section>
         <S.SectionTitle>General</S.SectionTitle>
         <S.DetailGrid>
