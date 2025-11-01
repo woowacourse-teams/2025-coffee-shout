@@ -16,6 +16,8 @@ import NetworkDebuggerPanel from './devtools/components/NetworkDebuggerPanel/Net
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
+      <IframePreviewToggle />
+      <NetworkDebuggerPanel />
       <IdentifierProvider>
         <ParticipantsProvider>
           <WebSocketProvider>
@@ -24,8 +26,6 @@ const App = () => {
                 <GlobalErrorBoundary>
                   <ToastProvider>
                     <ModalProvider>
-                      <IframePreviewToggle />
-                      <NetworkDebuggerPanel />
                       <Suspense fallback={<div>Loading...</div>}>
                         <Outlet />
                       </Suspense>
