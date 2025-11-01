@@ -26,7 +26,7 @@ const NetworkDebuggerPanel = () => {
   const [selectedType, setSelectedType] = useState<'fetch' | 'websocket' | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
 
-  const { requests, clearRequests } = useNetworkCollector();
+  const { requests, clearRequests, refreshRequests } = useNetworkCollector();
   const { panelHeight, handleResizeStart } = usePanelResize(400);
   const { detailWidthPercent, handleVerticalResizeStart, contentRef } = useVerticalResize();
 
@@ -82,9 +82,14 @@ const NetworkDebuggerPanel = () => {
       <S.Header>
         <S.Title>Network</S.Title>
         <S.HeaderActions>
-          <S.ClearButton type="button" onClick={clearRequests}>
-            Clear
-          </S.ClearButton>
+          <S.HeaderButtonWrapper>
+            <S.ClearButton type="button" onClick={clearRequests}>
+              Clear
+            </S.ClearButton>
+            <S.ClearButton type="button" onClick={refreshRequests}>
+              Refresh
+            </S.ClearButton>
+          </S.HeaderButtonWrapper>
           <S.CloseButton type="button" onClick={() => setOpen(false)}>
             ✕
           </S.CloseButton>

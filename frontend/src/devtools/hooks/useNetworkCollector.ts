@@ -180,9 +180,39 @@ export const useNetworkCollector = () => {
     setRequests([]);
   }, [isTopWindow]);
 
+  /**
+   * 모든 collector에서 최신 요청 목록을 다시 가져와서 상태를 갱신합니다.
+   */
+  const refreshRequests = useCallback(() => {
+    if (!isTopWindow) return;
+
+    const allCollectors = getAllCollectors();
+    const allRequests: NetworkRequest[] = [];
+
+    allCollectors.forEach((collector) => {
+      try {
+        const collectorRequests = collector.getRequests();
+        allRequests.push(...collectorRequests);
+      } catch {
+        // 무시
+      }
+    });
+
+    // 타임스탬프 순으로 정렬 (최신순)
+    allRequests.sort((a, b) => b.timestamp - a.timestamp);
+    setRequests(allRequests);
+
+    // 초기 요청 ID 업데이트
+    initialRequestIdsRef.current = new Set(allRequests.map((r) => r.id));
+
+    // collector 재설정 (새로운 collector가 있을 수 있음)
+    setupCollectors(allCollectors);
+  }, [isTopWindow, setupCollectors]);
+
   return {
     requests,
     clearRequests,
+    refreshRequests,
     collectors: collectorsRef.current,
   };
 };

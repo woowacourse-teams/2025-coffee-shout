@@ -58,6 +58,13 @@ export const Header = styled.div`
   padding: 8px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   background: #f8f9fa;
+  gap: 12px;
+`;
+
+export const HeaderButtonWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
 `;
 
 export const Title = styled.h3`
@@ -71,6 +78,7 @@ export const HeaderActions = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+  flex: 1;
 `;
 
 export const ClearButton = styled.button`
