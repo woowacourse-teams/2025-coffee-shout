@@ -54,6 +54,27 @@ export const PlayButton = styled.button`
   }
 `;
 
+export const StopButton = styled.button`
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #f44336;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-right: 8px;
+
+  &:hover {
+    background: #d32f2f;
+  }
+
+  &:active {
+    background: #b71c1c;
+  }
+`;
+
 export const IframePanel = styled.div`
   position: fixed;
   inset: 0;

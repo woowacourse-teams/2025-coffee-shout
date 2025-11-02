@@ -7,6 +7,7 @@ type TestMessage =
   | { type: 'GUEST_READY'; iframeName?: string }
   | { type: 'CLICK_GAME_START' }
   | { type: 'TEST_COMPLETED' }
+  | { type: 'STOP_TEST' }
   | { type: 'RESET_TO_HOME' };
 
 // 플로우 실행 상태 추적 (각 역할별로)
@@ -158,6 +159,11 @@ export const setupAutoTestListener = () => {
     } else if (event.data.type === 'TEST_COMPLETED') {
       console.log('[AutoTest] Test completed, stopping all flows');
       // 모든 플로우 종료
+      flowRunningState.host = false;
+      flowRunningState.guest = false;
+    } else if (event.data.type === 'STOP_TEST') {
+      console.log('[AutoTest] Test stopped by user, stopping all flows');
+      // 모든 플로우 즉시 종료
       flowRunningState.host = false;
       flowRunningState.guest = false;
     } else if (event.data.type === 'RESET_TO_HOME') {

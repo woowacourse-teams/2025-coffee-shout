@@ -10,6 +10,7 @@ type TestMessage =
   | { type: 'CLICK_GAME_START' }
   | { type: 'PATH_CHANGE'; iframeName: string; path: string }
   | { type: 'TEST_COMPLETED' }
+  | { type: 'STOP_TEST' }
   | { type: 'RESET_TO_HOME' };
 
 const IframePreviewToggle = () => {
@@ -180,15 +181,33 @@ const IframePreviewToggle = () => {
     }, 500);
   };
 
+  const handleStopTest = () => {
+    setIsRunning(false);
+
+    iframeNames.forEach((name) => {
+      const iframe = iframeRefs.current[name];
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'STOP_TEST' }, '*');
+      }
+    });
+  };
+
   if (!isTopWindow || !isRootPath || isTouchDevice) return null;
 
   return (
     <S.Container>
       <S.ToggleBar>
         {open && (
-          <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
-            {isRunning ? '테스트 실행 중...' : '재생'}
-          </S.PlayButton>
+          <>
+            <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
+              {isRunning ? '테스트 실행 중...' : '재생'}
+            </S.PlayButton>
+            {isRunning && (
+              <S.StopButton type="button" onClick={handleStopTest}>
+                테스트 중단
+              </S.StopButton>
+            )}
+          </>
         )}
         <S.ToggleButton type="button" onClick={() => setOpen((v) => !v)}>
           {open ? 'Hide iframes' : 'Show iframes'}
