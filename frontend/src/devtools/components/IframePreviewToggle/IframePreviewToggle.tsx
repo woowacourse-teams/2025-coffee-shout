@@ -38,12 +38,14 @@ const IframePreviewToggle = () => {
       {open && (
         <S.IframePanel>
           {IFRAME_NAMES.map((name, index) => (
-            <S.PreviewIframe
-              key={name}
-              name={name}
-              title={`preview-${index === 0 ? 'left' : 'right'}`}
-              src="/"
-            />
+            <S.IframeWrapper key={name}>
+              <S.IframeLabel>{name}</S.IframeLabel>
+              <S.PreviewIframe
+                name={name}
+                title={`preview-${index === 0 ? 'left' : 'right'}`}
+                src="/"
+              />
+            </S.IframeWrapper>
           ))}
         </S.IframePanel>
       )}

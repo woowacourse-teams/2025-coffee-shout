@@ -45,10 +45,34 @@ export const IframePanel = styled.div`
   height: 100%;
 `;
 
-export const PreviewIframe = styled.iframe`
+export const IframeWrapper = styled.div`
+  position: relative;
   width: 320px;
+  height: 100%;
+`;
+
+export const PreviewIframe = styled.iframe`
+  width: 100%;
   height: 100%;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   background: #fff;
+`;
+
+export const IframeLabel = styled.div`
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  pointer-events: none;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 `;
