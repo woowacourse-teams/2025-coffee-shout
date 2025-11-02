@@ -21,6 +21,7 @@ const CafeCategoryCard = ({ imageUrl, categoryName, onClick, color, ariaLabel }:
       {...pointerHandlers}
       $touchState={touchState}
       aria-label={ariaLabel || `${categoryName} 선택 버튼`}
+      data-testid={`category-card-${categoryName}`}
     >
       <IconTextItem
         iconContent={<CircleIcon imageUrl={imageUrl} color={color} />}

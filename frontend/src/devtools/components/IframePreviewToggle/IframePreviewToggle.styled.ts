@@ -31,6 +31,29 @@ export const ToggleButton = styled.button`
   }
 `;
 
+export const PlayButton = styled.button`
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #4caf50;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-right: 8px;
+
+  &:hover:not(:disabled) {
+    background: #45a049;
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`;
+
 export const IframePanel = styled.div`
   position: fixed;
   inset: 0;
@@ -75,4 +98,8 @@ export const IframeLabel = styled.div`
     system-ui,
     -apple-system,
     sans-serif;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
