@@ -197,6 +197,9 @@ const IframePreviewToggle = () => {
   return (
     <S.Container>
       <S.ToggleBar>
+        <S.ToggleButton type="button" onClick={() => setOpen((v) => !v)}>
+          {open ? 'Hide iframes' : 'Show iframes'}
+        </S.ToggleButton>
         {open && (
           <>
             <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
@@ -209,9 +212,6 @@ const IframePreviewToggle = () => {
             )}
           </>
         )}
-        <S.ToggleButton type="button" onClick={() => setOpen((v) => !v)}>
-          {open ? 'Hide iframes' : 'Show iframes'}
-        </S.ToggleButton>
       </S.ToggleBar>
       {open && (
         <S.IframePanel>

@@ -10,7 +10,9 @@ export const ToggleBar = styled.div`
   right: 12px;
   z-index: 1001;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
   padding: 0;
   background: transparent;
 `;
@@ -41,7 +43,6 @@ export const PlayButton = styled.button`
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s ease;
-  margin-right: 8px;
 
   &:hover:not(:disabled) {
     background: #45a049;
@@ -64,7 +65,6 @@ export const StopButton = styled.button`
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s ease;
-  margin-right: 8px;
 
   &:hover {
     background: #d32f2f;
