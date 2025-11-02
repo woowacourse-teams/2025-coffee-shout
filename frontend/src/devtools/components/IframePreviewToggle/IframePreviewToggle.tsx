@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
 import * as S from './IframePreviewToggle.styled';
@@ -98,19 +98,66 @@ const IframePreviewToggle = () => {
     }
   }, [open, iframeNames, guestReadyState]);
 
+  const iframeHeight = useMemo(() => {
+    return iframeNames.length <= 4 ? '100%' : 'auto';
+  }, [iframeNames.length]);
+
+  const useMinHeight = useMemo(() => {
+    return iframeNames.length > 4;
+  }, [iframeNames.length]);
+
+  const canAddMore = useMemo(() => {
+    return iframeNames.length < 9;
+  }, [iframeNames.length]);
+
   const handleAddIframe = () => {
+    if (!canAddMore) return;
+
     const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
-    const maxGuestNumber = guestNames.reduce((max, name) => {
+    const usedNumbers = new Set<number>();
+    guestNames.forEach((name) => {
       const match = name.match(/^guest(\d+)$/);
       if (match) {
         const num = parseInt(match[1], 10);
-        return Math.max(max, num);
+        if (num >= 1 && num <= 8) {
+          usedNumbers.add(num);
+        }
       }
-      return max;
-    }, 0);
-    const nextGuestNumber = maxGuestNumber + 1;
+    });
+
+    // 1~8 중 사용 가능한 가장 작은 번호 찾기
+    let nextGuestNumber: number | null = null;
+    for (let i = 1; i <= 8; i++) {
+      if (!usedNumbers.has(i)) {
+        nextGuestNumber = i;
+        break;
+      }
+    }
+
+    if (nextGuestNumber === null) {
+      // 1~8이 모두 사용 중
+      return;
+    }
+
     const newGuestName = `guest${nextGuestNumber}`;
     setIframeNames((prev) => [...prev, newGuestName]);
+  };
+
+  const handleDeleteIframe = (name: string) => {
+    if (name === 'host' || name === 'guest1') return;
+
+    // 맨 마지막 iframe만 삭제 가능
+    const lastIndex = iframeNames.length - 1;
+    const lastIframeName = iframeNames[lastIndex];
+    if (name !== lastIframeName) return;
+
+    setIframeNames((prev) => prev.filter((n) => n !== name));
+    delete iframeRefs.current[name];
+    setGuestReadyState((prev) => {
+      const newState = { ...prev };
+      delete newState[name];
+      return newState;
+    });
   };
 
   const handleStartTest = () => {
@@ -152,10 +199,27 @@ const IframePreviewToggle = () => {
           {iframeNames.map((name, index) => {
             const path = iframePaths[name] || '';
             const labelText = path ? `${name} - ${path}` : name;
+            // 맨 마지막 iframe만 삭제 가능 (host와 guest1은 항상 삭제 불가)
+            const lastIndex = iframeNames.length - 1;
+            const isLastIframe = index === lastIndex;
+            const canDelete = name !== 'host' && name !== 'guest1' && isLastIframe;
 
             return (
-              <S.IframeWrapper key={name}>
+              <S.IframeWrapper key={name} $height={iframeHeight} $useMinHeight={useMinHeight}>
                 <S.IframeLabel>{labelText}</S.IframeLabel>
+                {canDelete && (
+                  <S.DeleteButton
+                    type="button"
+                    data-delete-button
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      handleDeleteIframe(name);
+                    }}
+                    aria-label={`Remove ${name}`}
+                  >
+                    ×
+                  </S.DeleteButton>
+                )}
                 <S.PreviewIframe
                   ref={(el) => {
                     if (el) iframeRefs.current[name] = el;
@@ -167,11 +231,13 @@ const IframePreviewToggle = () => {
               </S.IframeWrapper>
             );
           })}
-          <S.IframeWrapper>
-            <S.AddIframeButton type="button" onClick={handleAddIframe}>
-              +
-            </S.AddIframeButton>
-          </S.IframeWrapper>
+          {canAddMore && (
+            <S.IframeWrapper $height={iframeHeight} $useMinHeight={useMinHeight}>
+              <S.AddIframeButton type="button" onClick={handleAddIframe}>
+                +
+              </S.AddIframeButton>
+            </S.IframeWrapper>
+          )}
         </S.IframePanel>
       )}
     </S.Container>
