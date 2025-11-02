@@ -12,7 +12,7 @@ import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/Probabilit
 import { theme } from './styles/theme';
 import IframePreviewToggle from './devtools/components/IframePreviewToggle/IframePreviewToggle';
 import NetworkDebuggerPanel from './devtools/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
-import { setupAutoTestListener } from './devtools/utils/autoTestFlow';
+import { setupAutoTestListener } from './devtools/autoFlowTest/autoTestFlow';
 
 const App = () => {
   const location = useLocation();
