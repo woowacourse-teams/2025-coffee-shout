@@ -219,29 +219,11 @@ export const handleHostGameStart = async () => {
   await clickElement(gameStartButton);
   console.log('[AutoTest] Host clicked game start button');
 
-  await wait(DELAY_AFTER_API);
+  // 게임 결과 페이지는 페이지 기반 플로우가 처리하도록 함
+};
 
-  const joinCode = extractJoinCode();
-  if (!joinCode) {
-    console.warn('[AutoTest] Could not extract joinCode from path');
-    return;
-  }
-
-  const gameResultPathPattern = new RegExp(`^/room/${joinCode}/[^/]+/result$`);
-
-  let gameResultPathMatched = gameResultPathPattern.test(window.location.pathname);
-  let pathAttempts = 0;
-  while (!gameResultPathMatched && pathAttempts < 300) {
-    await wait(100);
-    gameResultPathMatched = gameResultPathPattern.test(window.location.pathname);
-    pathAttempts++;
-  }
-
-  if (!gameResultPathMatched) {
-    console.warn('[AutoTest] Game result page not reached within timeout');
-    return;
-  }
-
+// 게임 결과 페이지 - 호스트 액션
+const gameResultPageHostAction = async (context: PageActionContext) => {
   await wait(500);
   await wait(DELAY_BETWEEN_ACTIONS);
 
@@ -255,14 +237,10 @@ export const handleHostGameStart = async () => {
   await clickElement(rouletteResultButton);
 
   await wait(DELAY_AFTER_API);
+};
 
-  const roulettePlayPath = `/room/${joinCode}/roulette/play`;
-  const roulettePathMatched = await waitForPathChange(roulettePlayPath, 10000);
-  if (!roulettePathMatched) {
-    console.warn('[AutoTest] Roulette play page not reached');
-    return;
-  }
-
+// 룰렛 플레이 페이지 - 호스트 액션
+const roulettePlayPageHostAction = async (context: PageActionContext) => {
   await wait(DELAY_BETWEEN_ACTIONS * 2);
 
   let rouletteSpinButton = findElement('roulette-spin-button');
@@ -333,6 +311,16 @@ export const pageActions: PageAction[] = [
     pathPattern: /^\/room\/[^/]+\/lobby$/,
     role: 'guest',
     execute: lobbyPageGuestAction,
+  },
+  {
+    pathPattern: /^\/room\/[^/]+\/[^/]+\/result$/, // /room/:joinCode/:miniGameType/result
+    role: 'host',
+    execute: gameResultPageHostAction,
+  },
+  {
+    pathPattern: /^\/room\/[^/]+\/roulette\/play$/,
+    role: 'host',
+    execute: roulettePlayPageHostAction,
   },
 ];
 
