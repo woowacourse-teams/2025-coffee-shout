@@ -103,3 +103,30 @@ export const IframeLabel = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+
+export const AddIframeButton = styled.button`
+  width: 100%;
+  height: 100%;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  background: #f8f8f8;
+  color: #666;
+  font-size: 48px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  &:hover {
+    background: #e8e8e8;
+    border-color: rgba(0, 0, 0, 0.3);
+    color: #333;
+  }
+
+  &:active {
+    background: #d8d8d8;
+  }
+`;

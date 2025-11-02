@@ -48,7 +48,7 @@ const NetworkDebuggerPanel = () => {
 
   /**
    * 고유한 context 목록을 추출합니다.
-   * MAIN이 있으면 첫 번째로 배치하고, 나머지는 정렬합니다.
+   * 순서: MAIN → HOST → GUEST1, GUEST2... (숫자 순서로 정렬)
    */
   const availableContexts = useMemo(() => {
     const contexts = new Set<string>();
@@ -56,14 +56,44 @@ const NetworkDebuggerPanel = () => {
       if (req.context) contexts.add(req.context);
     });
 
-    const sorted = Array.from(contexts).sort();
-    const mainIndex = sorted.indexOf('MAIN');
-    if (mainIndex > 0) {
-      sorted.splice(mainIndex, 1);
-      sorted.unshift('MAIN');
-    }
+    const contextArray = Array.from(contexts);
+    const contextUpper = contextArray.map((ctx) => ctx.toUpperCase());
 
-    return sorted;
+    // MAIN, HOST, GUEST 계열로 분류
+    const mainContexts: string[] = [];
+    const hostContexts: string[] = [];
+    const guestContexts: { original: string; number: number }[] = [];
+    const otherContexts: string[] = [];
+
+    contextArray.forEach((ctx, index) => {
+      const upper = contextUpper[index];
+      if (upper === 'MAIN') {
+        mainContexts.push(ctx);
+      } else if (upper === 'HOST') {
+        hostContexts.push(ctx);
+      } else if (upper.startsWith('GUEST')) {
+        const match = upper.match(/^GUEST(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          guestContexts.push({ original: ctx, number: num });
+        } else {
+          guestContexts.push({ original: ctx, number: Infinity });
+        }
+      } else {
+        otherContexts.push(ctx);
+      }
+    });
+
+    // GUEST 계열을 숫자 순서로 정렬
+    guestContexts.sort((a, b) => a.number - b.number);
+
+    // 순서: MAIN → HOST → GUEST1, GUEST2... → 기타
+    return [
+      ...mainContexts,
+      ...hostContexts,
+      ...guestContexts.map((g) => g.original),
+      ...otherContexts.sort(),
+    ];
   }, [requests]);
 
   /**

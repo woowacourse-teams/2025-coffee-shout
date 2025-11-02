@@ -3,12 +3,10 @@ import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
 import * as S from './IframePreviewToggle.styled';
 
-const IFRAME_NAMES = ['host', 'guest1'] as const;
-
 type TestMessage =
   | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string }
   | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
-  | { type: 'GUEST_READY' }
+  | { type: 'GUEST_READY'; iframeName?: string }
   | { type: 'CLICK_GAME_START' }
   | { type: 'PATH_CHANGE'; iframeName: string; path: string }
   | { type: 'TEST_COMPLETED' }
@@ -18,7 +16,9 @@ const IframePreviewToggle = () => {
   const location = useLocation();
   const [open, setOpen] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [iframeNames, setIframeNames] = useState<string[]>(['host', 'guest1']);
   const [iframePaths, setIframePaths] = useState<{ [key: string]: string }>({});
+  const [guestReadyState, setGuestReadyState] = useState<{ [guestName: string]: boolean }>({});
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
   const joinCodeRef = useRef<string | null>(null);
 
@@ -47,17 +47,23 @@ const IframePreviewToggle = () => {
         const { joinCode } = event.data;
         joinCodeRef.current = joinCode;
 
-        const guestIframe = iframeRefs.current.guest1;
-        if (guestIframe?.contentWindow) {
-          guestIframe.contentWindow.postMessage(
-            { type: 'START_TEST', role: 'guest', joinCode },
-            '*'
-          );
-        }
+        const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
+        guestNames.forEach((guestName) => {
+          const guestIframe = iframeRefs.current[guestName];
+          if (guestIframe?.contentWindow) {
+            guestIframe.contentWindow.postMessage(
+              { type: 'START_TEST', role: 'guest', joinCode, iframeName: guestName },
+              '*'
+            );
+          }
+        });
       } else if (event.data.type === 'GUEST_READY') {
-        const hostIframe = iframeRefs.current.host;
-        if (hostIframe?.contentWindow) {
-          hostIframe.contentWindow.postMessage({ type: 'CLICK_GAME_START' }, '*');
+        const { iframeName } = event.data;
+        if (iframeName) {
+          setGuestReadyState((prev) => ({
+            ...prev,
+            [iframeName]: true,
+          }));
         }
       } else if (event.data.type === 'PATH_CHANGE') {
         const { iframeName, path } = event.data;
@@ -75,13 +81,44 @@ const IframePreviewToggle = () => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [open]);
+  }, [open, iframeNames]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
+    const allGuestsReady =
+      guestNames.length > 0 && guestNames.every((guestName) => guestReadyState[guestName] === true);
+
+    if (allGuestsReady) {
+      const hostIframe = iframeRefs.current.host;
+      if (hostIframe?.contentWindow) {
+        hostIframe.contentWindow.postMessage({ type: 'CLICK_GAME_START' }, '*');
+      }
+    }
+  }, [open, iframeNames, guestReadyState]);
+
+  const handleAddIframe = () => {
+    const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
+    const maxGuestNumber = guestNames.reduce((max, name) => {
+      const match = name.match(/^guest(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        return Math.max(max, num);
+      }
+      return max;
+    }, 0);
+    const nextGuestNumber = maxGuestNumber + 1;
+    const newGuestName = `guest${nextGuestNumber}`;
+    setIframeNames((prev) => [...prev, newGuestName]);
+  };
 
   const handleStartTest = () => {
     setIsRunning(true);
     joinCodeRef.current = null;
+    setGuestReadyState({});
 
-    IFRAME_NAMES.forEach((name) => {
+    iframeNames.forEach((name) => {
       const iframe = iframeRefs.current[name];
       if (iframe?.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'RESET_TO_HOME' }, '*');
@@ -112,7 +149,7 @@ const IframePreviewToggle = () => {
       </S.ToggleBar>
       {open && (
         <S.IframePanel>
-          {IFRAME_NAMES.map((name, index) => {
+          {iframeNames.map((name, index) => {
             const path = iframePaths[name] || '';
             const labelText = path ? `${name} - ${path}` : name;
 
@@ -130,6 +167,11 @@ const IframePreviewToggle = () => {
               </S.IframeWrapper>
             );
           })}
+          <S.IframeWrapper>
+            <S.AddIframeButton type="button" onClick={handleAddIframe}>
+              +
+            </S.AddIframeButton>
+          </S.IframeWrapper>
         </S.IframePanel>
       )}
     </S.Container>

@@ -26,16 +26,36 @@ const NetworkFilterBar = ({
         >
           All
         </S.FilterButton>
-        {contexts.map((context) => (
-          <S.FilterButton
-            key={context}
-            type="button"
-            active={selectedContext === context}
-            onClick={() => onContextChange(context)}
-          >
-            {context === 'MAIN' ? 'Main' : context}
-          </S.FilterButton>
-        ))}
+        {contexts.map((context) => {
+          const upperContext = context.toUpperCase();
+          let displayName = context;
+
+          if (upperContext === 'MAIN') {
+            displayName = 'Main';
+          } else if (upperContext === 'HOST') {
+            displayName = 'Host';
+          } else if (upperContext.startsWith('GUEST')) {
+            const match = context.match(/^guest(\d+)$/i);
+            if (match) {
+              displayName = `Guest${match[1]}`;
+            } else {
+              displayName = context.charAt(0).toUpperCase() + context.slice(1).toLowerCase();
+            }
+          } else {
+            displayName = context.charAt(0).toUpperCase() + context.slice(1).toLowerCase();
+          }
+
+          return (
+            <S.FilterButton
+              key={context}
+              type="button"
+              active={selectedContext === context}
+              onClick={() => onContextChange(context)}
+            >
+              {displayName}
+            </S.FilterButton>
+          );
+        })}
       </S.FilterGroup>
 
       <S.FilterGroup>

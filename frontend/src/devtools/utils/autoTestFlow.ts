@@ -1,7 +1,7 @@
 type TestMessage =
-  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string }
+  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string; iframeName?: string }
   | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
-  | { type: 'GUEST_READY' }
+  | { type: 'GUEST_READY'; iframeName?: string }
   | { type: 'CLICK_GAME_START' }
   | { type: 'TEST_COMPLETED' }
   | { type: 'RESET_TO_HOME' };
@@ -382,8 +382,9 @@ const handleHostGameStart = async () => {
   console.log('[AutoTest] Host clicked roulette spin button');
 };
 
-const runGuestFlow = async (joinCode: string) => {
-  console.log('[AutoTest] Guest flow started, joinCode:', joinCode);
+const runGuestFlow = async (joinCode: string, iframeName?: string) => {
+  const guestName = iframeName || 'guest1';
+  console.log('[AutoTest] Guest flow started, joinCode:', joinCode, 'name:', guestName);
 
   await wait(DELAY_BETWEEN_ACTIONS);
 
@@ -425,7 +426,7 @@ const runGuestFlow = async (joinCode: string) => {
     console.warn('[AutoTest] Name input not found');
     return;
   }
-  await typeInInput(nameInput, 'guest1');
+  await typeInInput(nameInput, guestName);
 
   const goToMenuButton = await waitForElement('go-to-menu-button', 10000);
   if (!goToMenuButton) {
@@ -504,7 +505,8 @@ const runGuestFlow = async (joinCode: string) => {
     console.log('[AutoTest] Guest clicked ready button');
 
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ type: 'GUEST_READY' }, '*');
+      const iframeName = window.frameElement?.getAttribute('name') || '';
+      window.parent.postMessage({ type: 'GUEST_READY', iframeName }, '*');
     }
   }
 
@@ -518,14 +520,14 @@ export const setupAutoTestListener = () => {
 
   const messageHandler = async (event: MessageEvent<TestMessage>) => {
     if (event.data.type === 'START_TEST') {
-      const { role, joinCode } = event.data;
+      const { role, joinCode, iframeName } = event.data;
 
       if (role === 'host') {
         runHostFlow();
       } else if (role === 'guest') {
         if (joinCode) {
           guestJoinCode = joinCode;
-          runGuestFlow(joinCode);
+          runGuestFlow(joinCode, iframeName);
         } else {
           console.log('[AutoTest] Guest waiting for joinCode...');
         }
@@ -534,7 +536,8 @@ export const setupAutoTestListener = () => {
       const { joinCode } = event.data;
       if (guestJoinCode === null) {
         guestJoinCode = joinCode;
-        runGuestFlow(joinCode);
+        const iframeName = window.frameElement?.getAttribute('name') || '';
+        runGuestFlow(joinCode, iframeName);
       }
     } else if (event.data.type === 'CLICK_GAME_START') {
       await handleHostGameStart();
