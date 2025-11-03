@@ -5,12 +5,12 @@ type StompInternalSocket = {
   _transport?: { url?: string };
 } & IStompSocket;
 
-export const useStompSessionWatcher = (client: Client | null, connectFrame?: IFrame | null) => {
+export const useStompSessionWatcher = (client: Client | null, connectedFrame?: IFrame | null) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const prevSessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!client || !connectFrame) return;
+    if (!client || !connectedFrame) return;
 
     const currentSessionId = extractSessionId(client);
 
@@ -22,7 +22,7 @@ export const useStompSessionWatcher = (client: Client | null, connectFrame?: IFr
       setSessionId(currentSessionId);
       prevSessionIdRef.current = currentSessionId;
     }
-  }, [client, connectFrame]);
+  }, [client, connectedFrame]);
 
   return { sessionId };
 };

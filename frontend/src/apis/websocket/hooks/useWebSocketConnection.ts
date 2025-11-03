@@ -6,31 +6,31 @@ import WebSocketErrorHandler from '../utils/WebSocketErrorHandler';
 export const useWebSocketConnection = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [connectFrame, setConnectFrame] = useState<IFrame | null>(null);
+  const [connectedFrame, setConnectedFrame] = useState<IFrame | null>(null);
 
   const handleConnect = useCallback((frame: IFrame) => {
     setIsConnected(true);
-    setConnectFrame(frame);
+    setConnectedFrame(frame);
     console.log('✅ WebSocket 연결 성공', { frame });
   }, []);
 
   const handleDisconnect = useCallback(() => {
     setIsConnected(false);
-    setConnectFrame(null);
+    setConnectedFrame(null);
     console.log('❌ WebSocket 연결 해제');
   }, []);
 
   const handleStompError = useCallback((frame: IFrame) => {
     WebSocketErrorHandler.handleStompError(frame);
     setIsConnected(false);
-    setConnectFrame(null);
+    setConnectedFrame(null);
     console.error('❌ StompError 발생');
   }, []);
 
   const handleWebSocketError = useCallback((event: Event, stompClient: Client) => {
     WebSocketErrorHandler.handleWebSocketError(event, stompClient);
     setIsConnected(false);
-    setConnectFrame(null);
+    setConnectedFrame(null);
     console.error('❌ WebSocketError 발생');
   }, []);
 
@@ -86,7 +86,7 @@ export const useWebSocketConnection = () => {
     console.log('🛑 WebSocket 연결 종료...');
     client.deactivate();
     setIsConnected(false);
-    setConnectFrame(null);
+    setConnectedFrame(null);
     setClient(null);
   }, [client]);
 
@@ -95,6 +95,6 @@ export const useWebSocketConnection = () => {
     isConnected,
     startSocket,
     stopSocket,
-    connectFrame,
+    connectedFrame,
   };
 };
