@@ -11,7 +11,8 @@ type TestMessage =
   | { type: 'PATH_CHANGE'; iframeName: string; path: string }
   | { type: 'TEST_COMPLETED' }
   | { type: 'STOP_TEST' }
-  | { type: 'RESET_TO_HOME' };
+  | { type: 'RESET_TO_HOME' }
+  | { type: 'READY'; iframeName: string };
 
 const IframePreviewToggle = () => {
   const location = useLocation();
@@ -20,8 +21,12 @@ const IframePreviewToggle = () => {
   const [iframeNames, setIframeNames] = useState<string[]>(['host', 'guest1']);
   const [iframePaths, setIframePaths] = useState<{ [key: string]: string }>({});
   const [guestReadyState, setGuestReadyState] = useState<{ [guestName: string]: boolean }>({});
+  // readyState는 READY 신호 추적용 (디버깅/로깅 목적)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [readyState, setReadyState] = useState<{ [iframeName: string]: boolean }>({});
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
   const joinCodeRef = useRef<string | null>(null);
+  const pendingStartTest = useRef<boolean>(false);
 
   const isTopWindow = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -58,6 +63,38 @@ const IframePreviewToggle = () => {
             );
           }
         });
+      } else if (event.data.type === 'READY') {
+        const { iframeName } = event.data;
+        console.log('[AutoTest] Received READY from iframe:', iframeName);
+        console.log('[AutoTest] pendingStartTest.current:', pendingStartTest.current);
+        setReadyState((prev) => ({
+          ...prev,
+          [iframeName]: true,
+        }));
+
+        // READY 신호를 받고 START_TEST가 대기 중이면 즉시 전송
+        if (pendingStartTest.current && iframeName === 'host') {
+          console.log('[AutoTest] Conditions met, sending START_TEST');
+          setTimeout(() => {
+            const hostIframe = iframeRefs.current.host;
+            console.log('[AutoTest] Host iframe check:', {
+              exists: !!hostIframe,
+              hasContentWindow: !!hostIframe?.contentWindow,
+            });
+            if (hostIframe?.contentWindow) {
+              const message = { type: 'START_TEST', role: 'host' as const };
+              console.log('[AutoTest] Sending START_TEST to host after READY');
+              hostIframe.contentWindow.postMessage(message, '*');
+              pendingStartTest.current = false;
+            }
+          }, 0);
+        } else {
+          console.log('[AutoTest] Not sending START_TEST:', {
+            pendingStartTest: pendingStartTest.current,
+            iframeName,
+            isHost: iframeName === 'host',
+          });
+        }
       } else if (event.data.type === 'GUEST_READY') {
         const { iframeName } = event.data;
         if (iframeName) {
@@ -162,23 +199,25 @@ const IframePreviewToggle = () => {
   };
 
   const handleStartTest = () => {
+    console.log('[AutoTest] handleStartTest called');
     setIsRunning(true);
     joinCodeRef.current = null;
     setGuestReadyState({});
+    setReadyState({}); // RESET_TO_HOME 후 새로운 READY 신호를 기다리기 위해 초기화
+    pendingStartTest.current = true; // START_TEST 전송 대기 플래그
+    console.log('[AutoTest] pendingStartTest set to true');
 
+    // 모든 iframe에 RESET_TO_HOME 전송
     iframeNames.forEach((name) => {
       const iframe = iframeRefs.current[name];
       if (iframe?.contentWindow) {
+        console.log(`[AutoTest] Sending RESET_TO_HOME to ${name}`);
         iframe.contentWindow.postMessage({ type: 'RESET_TO_HOME' }, '*');
       }
     });
 
-    setTimeout(() => {
-      const hostIframe = iframeRefs.current.host;
-      if (hostIframe?.contentWindow) {
-        hostIframe.contentWindow.postMessage({ type: 'START_TEST', role: 'host' }, '*');
-      }
-    }, 500);
+    // RESET 후 새로운 READY 신호를 기다림 (handleMessage에서 처리)
+    // READY 신호가 이미 와있어도 RESET 후 다시 올 것이므로 대기
   };
 
   const handleStopTest = () => {
@@ -241,11 +280,22 @@ const IframePreviewToggle = () => {
                 )}
                 <S.PreviewIframe
                   ref={(el) => {
-                    if (el) iframeRefs.current[name] = el;
+                    if (el) {
+                      console.log(`[AutoTest Debug] Iframe ref set for "${name}"`);
+                      iframeRefs.current[name] = el;
+                    }
                   }}
                   name={name}
                   title={`preview-${index === 0 ? 'left' : 'right'}`}
                   src="/"
+                  onLoad={() => {
+                    console.log(`[AutoTest Debug] Iframe "${name}" loaded`);
+                    const iframe = iframeRefs.current[name];
+                    console.log(
+                      `[AutoTest Debug] Iframe "${name}" onLoad - has contentWindow:`,
+                      !!iframe?.contentWindow
+                    );
+                  }}
                 />
               </S.IframeWrapper>
             );

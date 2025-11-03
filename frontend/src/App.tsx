@@ -29,6 +29,20 @@ const App = () => {
 
     if (!isTopWindow) {
       const cleanup = setupAutoTestListener();
+
+      // 렌더링 완료 후 ready 신호 전송 (host만)
+      const sendReady = () => {
+        const iframeName = window.frameElement?.getAttribute('name') || '';
+        // host만 READY 신호를 보냄
+        if (iframeName === 'host' && window.parent && window.parent !== window) {
+          console.log('[AutoTest] Rendering complete, sending READY signal', { iframeName });
+          window.parent.postMessage({ type: 'READY', iframeName }, '*');
+        }
+      };
+
+      // DOM 렌더링이 완료된 후 ready 신호 전송
+      setTimeout(sendReady, 100);
+
       return cleanup;
     }
   }, []);
