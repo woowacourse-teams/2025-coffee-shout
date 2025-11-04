@@ -47,12 +47,12 @@
 
 | <img src="https://github.com/user-attachments/assets/c0694fc2-3078-4417-ba7b-2f7a66af1cc8" width="130" height="130"> | <img src ="https://github.com/user-attachments/assets/f95731c4-2cd3-41f4-9d9b-b695bc48b372" width="130" height="130"> | <img src ="https://github.com/user-attachments/assets/b2325a15-4771-48c2-b1a8-52217f4ee92b" width="130" height="130"> |
 | :---------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
-|                         [니야](https://github.com/dladncks1217)                         |                          [메리](https://github.com/ashleysyheo)                          |                             [다이앤](https://github.com/Dahyeeee)                             |
+|                         [니야](https://github.com/sooyeoniya)                         |                          [메리](https://github.com/rosielsh)                          |                             [다이앤](https://github.com/Daeun-100)                             |
 
 ### 백엔드
 
 | <img src="https://github.com/user-attachments/assets/431c8211-6ca8-4599-a5d0-46d292c1abe4" width="130" height="130"> | <img src="https://github.com/user-attachments/assets/1336fce2-2faf-4eee-ba7c-d2a4a99e06e0" width="130" height="130"> | <img src="https://github.com/user-attachments/assets/7819232f-1029-40b4-bca8-19a895df4123" width="130" height="130"> | <img src="https://github.com/user-attachments/assets/ec37aec0-c270-47af-817d-18f30edb504a" width="130" height="130"> |
 | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-|                             [한스](https://github.com/LJW25)                              |                            [엠제이](https://github.com/jjongwa)                             |                            [꾹이](https://github.com/mcodnjs)                             |                             [루키](https://github.com/hgo641)                             |
+|                             [한스](https://github.com/20HyeonsuLee)                              |                            [엠제이](https://github.com/theminjunchoi)                             |                            [꾹이](https://github.com/kiwoook)                             |                             [루키](https://github.com/junhaa)                             |
 
 
