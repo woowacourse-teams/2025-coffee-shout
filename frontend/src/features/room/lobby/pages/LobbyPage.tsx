@@ -65,7 +65,6 @@ const LobbyPage = () => {
 
   const handleParticipant = useCallback(
     (data: Player[]) => {
-      console.log('📌📌📌📌📌📌📌📌📌📌📌📌data participants: ', data);
       setParticipants(data);
 
       const currentPlayer = data.find((player) => player.playerName === myName);
