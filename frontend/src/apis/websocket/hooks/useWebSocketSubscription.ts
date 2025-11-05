@@ -1,7 +1,7 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { StompSubscription } from '@stomp/stompjs';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useWebSocketSubscription = <T>(
   destination: string,
@@ -12,6 +12,7 @@ export const useWebSocketSubscription = <T>(
   const { isVisible } = usePageVisibility();
   const { subscribe, isConnected, sessionId } = useWebSocket();
 
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevSessionIdRef = useRef<string | null>(null);
   const retryCountRef = useRef(0);
@@ -26,6 +27,7 @@ export const useWebSocketSubscription = <T>(
         console.error(`❌ 구독 해제 실패: ${destination}`, error);
       } finally {
         subscriptionRef.current = null;
+        setIsSubscribed(false);
       }
     }
 
@@ -45,6 +47,7 @@ export const useWebSocketSubscription = <T>(
       subscriptionRef.current = sub;
       prevSessionIdRef.current = sessionId;
       retryCountRef.current = 0;
+      setIsSubscribed(true);
       console.log(`✅ 구독 성공: ${destination}`, { sessionId });
     } catch (error) {
       console.error(`❌ 구독 실패 (시도 ${retryCountRef.current + 1})`, error);
@@ -81,4 +84,6 @@ export const useWebSocketSubscription = <T>(
 
     return unsubscribe;
   }, [isConnected, doSubscribe, unsubscribe]);
+
+  return { isSubscribed };
 };

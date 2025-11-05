@@ -135,7 +135,10 @@ const LobbyPage = () => {
     [setQrCodeUrl, showToast]
   );
 
-  useWebSocketSubscription<Player[]>(`/room/${joinCode}`, handleParticipant);
+  const { isSubscribed: isParticipantsSubscribed } = useWebSocketSubscription<Player[]>(
+    `/room/${joinCode}`,
+    handleParticipant
+  );
   useWebSocketSubscription<MiniGameType[]>(
     `/room/${joinCode}/minigame`,
     handleMiniGameData,
@@ -150,14 +153,10 @@ const LobbyPage = () => {
   );
 
   useEffect(() => {
-    if (joinCode && isConnected) {
-      const timeoutId = setTimeout(() => {
-        send(`/room/${joinCode}/update-players`);
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
+    if (joinCode && isConnected && isParticipantsSubscribed) {
+      send(`/room/${joinCode}/update-players`);
     }
-  }, [playerType, joinCode, send, isConnected]);
+  }, [playerType, joinCode, send, isConnected, isParticipantsSubscribed]);
 
   const handleBackClick = () => {
     openModal(
