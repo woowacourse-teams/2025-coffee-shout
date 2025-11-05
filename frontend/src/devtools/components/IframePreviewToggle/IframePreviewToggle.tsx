@@ -28,7 +28,7 @@ const IframePreviewToggle = () => {
   // readyState는 READY 신호 추적용 (디버깅/로깅 목적)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [readyState, setReadyState] = useState<{ [iframeName: string]: boolean }>({});
-  const [gameSequence, setGameSequence] = useState<MiniGameType[]>([]);
+  const [gameSequence, setGameSequence] = useState<MiniGameType[]>(['CARD_GAME']);
   const [isGameSelectionExpanded, setIsGameSelectionExpanded] = useState<boolean>(false);
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
   const joinCodeRef = useRef<string | null>(null);
