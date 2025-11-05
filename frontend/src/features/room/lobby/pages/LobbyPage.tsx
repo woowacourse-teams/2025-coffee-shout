@@ -65,6 +65,7 @@ const LobbyPage = () => {
 
   const handleParticipant = useCallback(
     (data: Player[]) => {
+      console.log('📌📌📌📌📌📌📌📌📌📌📌📌data participants: ', data);
       setParticipants(data);
 
       const currentPlayer = data.find((player) => player.playerName === myName);
@@ -150,7 +151,11 @@ const LobbyPage = () => {
 
   useEffect(() => {
     if (joinCode && isConnected) {
-      send(`/room/${joinCode}/update-players`);
+      const timeoutId = setTimeout(() => {
+        send(`/room/${joinCode}/update-players`);
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [playerType, joinCode, send, isConnected]);
 
