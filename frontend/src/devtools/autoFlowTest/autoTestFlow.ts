@@ -1,8 +1,15 @@
 import { wait, DELAY_BETWEEN_ACTIONS } from './domUtils';
 import { findPageAction, handleHostGameStart, type PageActionContext } from './pageActions';
+import { MiniGameType } from '@/types/miniGame/common';
 
 type TestMessage =
-  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string; iframeName?: string }
+  | {
+      type: 'START_TEST';
+      role: 'host' | 'guest';
+      joinCode?: string;
+      iframeName?: string;
+      gameSequence: MiniGameType[];
+    }
   | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
   | { type: 'GUEST_READY'; iframeName?: string }
   | { type: 'CLICK_GAME_START' }
@@ -134,11 +141,12 @@ const waitForPathChangeWithTimeout = async (
 };
 
 // 호스트 플로우 실행
-const runHostFlow = async () => {
-  console.log('[AutoTest Debug] runHostFlow called');
+const runHostFlow = async (gameSequence?: MiniGameType[]) => {
+  console.log('[AutoTest Debug] runHostFlow called', { gameSequence });
   const context: PageActionContext = {
     role: 'host',
     playerName: 'host',
+    gameSequence,
   };
   console.log('[AutoTest Debug] Creating host context:', context);
   await runFlow('host', context);
@@ -170,10 +178,10 @@ export const setupAutoTestListener = () => {
     }
 
     if (event.data.type === 'START_TEST') {
-      const { role, joinCode, iframeName } = event.data;
+      const { role, joinCode, iframeName, gameSequence } = event.data;
 
       if (role === 'host') {
-        runHostFlow();
+        runHostFlow(gameSequence);
       } else if (role === 'guest') {
         if (joinCode) {
           guestJoinCode = joinCode;

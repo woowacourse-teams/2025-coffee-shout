@@ -196,3 +196,81 @@ export const AddIframeButton = styled.button`
     background: #d8d8d8;
   }
 `;
+
+export const GameSelectionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  min-width: 150px;
+`;
+
+export const GameSelectionLabel = styled.div`
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 4px;
+`;
+
+export const GameSelectionButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+type GameSelectionButtonProps = {
+  $selected: boolean;
+};
+
+export const GameSelectionButton = styled.button<GameSelectionButtonProps>`
+  appearance: none;
+  border: 1px solid ${(props) => (props.$selected ? '#4caf50' : 'rgba(0, 0, 0, 0.12)')};
+  background: ${(props) => (props.$selected ? '#4caf50' : '#ffffff')};
+  color: ${(props) => (props.$selected ? '#ffffff' : '#222')};
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-width: 120px;
+  box-sizing: border-box;
+
+  &:hover {
+    background: ${(props) => (props.$selected ? '#45a049' : '#f6f6f6')};
+    border-color: ${(props) => (props.$selected ? '#45a049' : 'rgba(0, 0, 0, 0.2)')};
+  }
+
+  &:active {
+    background: ${(props) => (props.$selected ? '#3d8b40' : '#e8e8e8')};
+  }
+`;
+
+type GameOrderBadgeProps = {
+  $visible: boolean;
+};
+
+export const GameOrderBadge = styled.span<GameOrderBadgeProps>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  width: 20px;
+  height: 20px;
+  background: ${(props) => (props.$visible ? 'rgba(255, 255, 255, 0.3)' : 'transparent')};
+  color: ${(props) => (props.$visible ? '#ffffff' : 'transparent')};
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 0;
+  margin-left: auto;
+  flex-shrink: 0;
+`;

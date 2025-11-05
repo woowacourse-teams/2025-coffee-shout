@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
+import { MiniGameType, MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
 import * as S from './IframePreviewToggle.styled';
 
 type TestMessage =
-  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string }
+  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string; gameSequence: MiniGameType[] }
   | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
   | { type: 'GUEST_READY'; iframeName?: string }
   | { type: 'CLICK_GAME_START' }
@@ -24,9 +25,15 @@ const IframePreviewToggle = () => {
   // readyState는 READY 신호 추적용 (디버깅/로깅 목적)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [readyState, setReadyState] = useState<{ [iframeName: string]: boolean }>({});
+  const [gameSequence, setGameSequence] = useState<MiniGameType[]>([]);
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
   const joinCodeRef = useRef<string | null>(null);
   const pendingStartTest = useRef<boolean>(false);
+
+  // 사용 가능한 게임 목록 (하드코딩, fetch 없이)
+  const availableGames = useMemo(() => {
+    return Object.keys(MINI_GAME_NAME_MAP) as MiniGameType[];
+  }, []);
 
   const isTopWindow = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -58,7 +65,13 @@ const IframePreviewToggle = () => {
           const guestIframe = iframeRefs.current[guestName];
           if (guestIframe?.contentWindow) {
             guestIframe.contentWindow.postMessage(
-              { type: 'START_TEST', role: 'guest', joinCode, iframeName: guestName },
+              {
+                type: 'START_TEST',
+                role: 'guest',
+                joinCode,
+                iframeName: guestName,
+                gameSequence,
+              },
               '*'
             );
           }
@@ -82,8 +95,12 @@ const IframePreviewToggle = () => {
               hasContentWindow: !!hostIframe?.contentWindow,
             });
             if (hostIframe?.contentWindow) {
-              const message = { type: 'START_TEST', role: 'host' as const };
-              console.log('[AutoTest] Sending START_TEST to host after READY');
+              const message = {
+                type: 'START_TEST' as const,
+                role: 'host' as const,
+                gameSequence,
+              };
+              console.log('[AutoTest] Sending START_TEST to host after READY', { gameSequence });
               hostIframe.contentWindow.postMessage(message, '*');
               pendingStartTest.current = false;
             }
@@ -119,7 +136,7 @@ const IframePreviewToggle = () => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [open, iframeNames]);
+  }, [open, iframeNames, gameSequence]);
 
   useEffect(() => {
     if (!open) return;
@@ -198,6 +215,18 @@ const IframePreviewToggle = () => {
     });
   };
 
+  const handleGameToggle = (gameType: MiniGameType) => {
+    setGameSequence((prev) => {
+      if (prev.includes(gameType)) {
+        // 이미 선택된 게임이면 제거
+        return prev.filter((g) => g !== gameType);
+      } else {
+        // 선택되지 않은 게임이면 추가
+        return [...prev, gameType];
+      }
+    });
+  };
+
   const handleStartTest = () => {
     console.log('[AutoTest] handleStartTest called');
     setIsRunning(true);
@@ -241,6 +270,28 @@ const IframePreviewToggle = () => {
         </S.ToggleButton>
         {open && (
           <>
+            <S.GameSelectionContainer>
+              <S.GameSelectionLabel>게임 선택</S.GameSelectionLabel>
+              <S.GameSelectionButtons>
+                {availableGames.map((game) => {
+                  const isSelected = gameSequence.includes(game);
+                  const order = gameSequence.indexOf(game) + 1; // 선택 순서 (1부터 시작)
+                  return (
+                    <S.GameSelectionButton
+                      key={game}
+                      type="button"
+                      $selected={isSelected}
+                      onClick={() => handleGameToggle(game)}
+                    >
+                      {MINI_GAME_NAME_MAP[game]}
+                      <S.GameOrderBadge $visible={isSelected && order > 0}>
+                        {order > 0 ? order : ''}
+                      </S.GameOrderBadge>
+                    </S.GameSelectionButton>
+                  );
+                })}
+              </S.GameSelectionButtons>
+            </S.GameSelectionContainer>
             <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
               {isRunning ? '테스트 실행 중...' : '재생'}
             </S.PlayButton>

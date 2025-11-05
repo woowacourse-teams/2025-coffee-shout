@@ -6,18 +6,22 @@ import {
   typeInInput,
   wait,
   waitForElement,
-  waitForPathChange,
-  waitForPathPattern,
   extractJoinCode,
   DELAY_BETWEEN_ACTIONS,
   DELAY_AFTER_API,
 } from './domUtils';
+import { MiniGameType } from '@/types/miniGame/common';
+
+// 기본 게임 순서 상수
+export const DEFAULT_SINGLE_GAME: readonly MiniGameType[] = ['CARD_GAME'] as const;
+export const DEFAULT_DOUBLE_GAMES: readonly MiniGameType[] = ['CARD_GAME', 'RACING_GAME'] as const;
 
 export type PageActionContext = {
   role: 'host' | 'guest';
   joinCode?: string;
   playerName: string;
   iframeName?: string;
+  gameSequence?: MiniGameType[];
 };
 
 export type PageAction = {
@@ -162,29 +166,50 @@ const lobbyPageHostAction = async (context: PageActionContext) => {
 
   await wait(DELAY_BETWEEN_ACTIONS * 2);
 
-  let cardGameButton = findElement('game-action-CARD_GAME');
-  let cardGameAttempts = 0;
-  while (!cardGameButton && cardGameAttempts < 50) {
-    await wait(200);
-    cardGameButton = findElement('game-action-CARD_GAME');
-    cardGameAttempts++;
-  }
+  // 게임 순서 결정
+  const gameSequence = context.gameSequence || DEFAULT_SINGLE_GAME;
+  console.log('[AutoTest] Game sequence to select:', gameSequence);
 
-  if (!cardGameButton) {
-    console.warn('[AutoTest] Card game button not found after waiting');
-    return;
-  }
+  // 각 게임을 순서대로 선택
+  for (const gameType of gameSequence) {
+    const gameButton = findElement(`game-action-${gameType}`);
+    let attempts = 0;
+    let button = gameButton;
 
-  console.log('[AutoTest] Card game button found');
-  await clickElementWithClickEvent(cardGameButton);
+    // 버튼이 나타날 때까지 대기
+    while (!button && attempts < 50) {
+      await wait(200);
+      button = findElement(`game-action-${gameType}`);
+      attempts++;
+    }
+
+    if (!button) {
+      console.warn(`[AutoTest] ${gameType} button not found after waiting`);
+      continue;
+    }
+
+    // 이미 선택된 게임인지 확인 (토글 동작 고려)
+    const isSelected =
+      button.getAttribute('aria-selected') === 'true' ||
+      button.classList.contains('selected') ||
+      button.getAttribute('data-selected') === 'true';
+
+    if (!isSelected) {
+      console.log(`[AutoTest] Selecting ${gameType}`);
+      await clickElementWithClickEvent(button);
+      await wait(DELAY_BETWEEN_ACTIONS);
+    } else {
+      console.log(`[AutoTest] ${gameType} is already selected, skipping`);
+    }
+  }
 
   await wait(DELAY_AFTER_API);
 
-  console.log('[AutoTest] Host selected card game, waiting for guest to be ready...');
+  console.log('[AutoTest] Host selected games, waiting for guest to be ready...');
 };
 
 // 로비 페이지 - 게스트 액션
-const lobbyPageGuestAction = async (context: PageActionContext) => {
+const lobbyPageGuestAction = async () => {
   await wait(DELAY_BETWEEN_ACTIONS);
 
   const readyButton = await waitForElement('game-ready-button', 10000);
@@ -223,7 +248,7 @@ export const handleHostGameStart = async () => {
 };
 
 // 게임 결과 페이지 - 호스트 액션
-const gameResultPageHostAction = async (context: PageActionContext) => {
+const gameResultPageHostAction = async () => {
   await wait(500);
   await wait(DELAY_BETWEEN_ACTIONS);
 
@@ -240,7 +265,7 @@ const gameResultPageHostAction = async (context: PageActionContext) => {
 };
 
 // 룰렛 플레이 페이지 - 호스트 액션
-const roulettePlayPageHostAction = async (context: PageActionContext) => {
+const roulettePlayPageHostAction = async () => {
   await wait(DELAY_BETWEEN_ACTIONS * 2);
 
   let rouletteSpinButton = findElement('roulette-spin-button');
@@ -256,25 +281,27 @@ const roulettePlayPageHostAction = async (context: PageActionContext) => {
     return;
   }
 
-  const buttonText = rouletteSpinButton.textContent?.trim();
-  if (buttonText !== '룰렛 돌리기') {
-    console.log(`[AutoTest] Roulette button text is "${buttonText}", waiting for "룰렛 돌리기"...`);
-
-    let buttonTextMatches = false;
-    let textAttempts = 0;
-    while (!buttonTextMatches && textAttempts < 100) {
-      await wait(200);
-      rouletteSpinButton = findElement('roulette-spin-button');
-      if (rouletteSpinButton?.textContent?.trim() === '룰렛 돌리기') {
-        buttonTextMatches = true;
-      }
-      textAttempts++;
+  // 버튼이 활성화될 때까지 대기 (disabled 상태가 아닐 때까지)
+  let isDisabled =
+    rouletteSpinButton.hasAttribute('disabled') ||
+    rouletteSpinButton.classList.contains('disabled') ||
+    rouletteSpinButton.getAttribute('aria-disabled') === 'true';
+  let disabledAttempts = 0;
+  while (isDisabled && disabledAttempts < 100) {
+    await wait(200);
+    rouletteSpinButton = findElement('roulette-spin-button');
+    if (rouletteSpinButton) {
+      isDisabled =
+        rouletteSpinButton.hasAttribute('disabled') ||
+        rouletteSpinButton.classList.contains('disabled') ||
+        rouletteSpinButton.getAttribute('aria-disabled') === 'true';
     }
+    disabledAttempts++;
+  }
 
-    if (!buttonTextMatches) {
-      console.warn('[AutoTest] Roulette button text did not become "룰렛 돌리기"');
-      return;
-    }
+  if (!rouletteSpinButton) {
+    console.warn('[AutoTest] Roulette spin button not found after waiting for enabled state');
+    return;
   }
 
   console.log('[AutoTest] Roulette spin button found and ready');
