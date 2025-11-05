@@ -12,6 +12,8 @@ type TestMessage =
   | { type: 'PATH_CHANGE'; iframeName: string; path: string }
   | { type: 'TEST_COMPLETED' }
   | { type: 'STOP_TEST' }
+  | { type: 'PAUSE_TEST' }
+  | { type: 'RESUME_TEST' }
   | { type: 'RESET_TO_HOME' }
   | { type: 'READY'; iframeName: string };
 
@@ -19,6 +21,7 @@ const IframePreviewToggle = () => {
   const location = useLocation();
   const [open, setOpen] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [iframeNames, setIframeNames] = useState<string[]>(['host', 'guest1']);
   const [iframePaths, setIframePaths] = useState<{ [key: string]: string }>({});
   const [guestReadyState, setGuestReadyState] = useState<{ [guestName: string]: boolean }>({});
@@ -129,6 +132,7 @@ const IframePreviewToggle = () => {
         }));
       } else if (event.data.type === 'TEST_COMPLETED') {
         setIsRunning(false);
+        setIsPaused(false);
       }
     };
 
@@ -252,11 +256,34 @@ const IframePreviewToggle = () => {
 
   const handleStopTest = () => {
     setIsRunning(false);
+    setIsPaused(false);
 
     iframeNames.forEach((name) => {
       const iframe = iframeRefs.current[name];
       if (iframe?.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'STOP_TEST' }, '*');
+      }
+    });
+  };
+
+  const handlePauseTest = () => {
+    setIsPaused(true);
+
+    iframeNames.forEach((name) => {
+      const iframe = iframeRefs.current[name];
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'PAUSE_TEST' }, '*');
+      }
+    });
+  };
+
+  const handleResumeTest = () => {
+    setIsPaused(false);
+
+    iframeNames.forEach((name) => {
+      const iframe = iframeRefs.current[name];
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'RESUME_TEST' }, '*');
       }
     });
   };
@@ -304,6 +331,16 @@ const IframePreviewToggle = () => {
             <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
               {isRunning ? '테스트 실행 중...' : '재생'}
             </S.PlayButton>
+            {isRunning && !isPaused && (
+              <S.PauseButton type="button" onClick={handlePauseTest}>
+                일시 중지
+              </S.PauseButton>
+            )}
+            {isRunning && isPaused && (
+              <S.ResumeButton type="button" onClick={handleResumeTest}>
+                재개
+              </S.ResumeButton>
+            )}
             {isRunning && (
               <S.StopButton type="button" onClick={handleStopTest}>
                 테스트 중단

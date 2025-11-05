@@ -55,6 +55,46 @@ export const PlayButton = styled.button`
   }
 `;
 
+export const PauseButton = styled.button`
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ff9800;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f57c00;
+  }
+
+  &:active {
+    background: #e65100;
+  }
+`;
+
+export const ResumeButton = styled.button`
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #2196f3;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #1976d2;
+  }
+
+  &:active {
+    background: #1565c0;
+  }
+`;
+
 export const StopButton = styled.button`
   appearance: none;
   border: 1px solid rgba(0, 0, 0, 0.12);

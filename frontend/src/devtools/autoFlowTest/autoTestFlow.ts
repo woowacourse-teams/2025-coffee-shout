@@ -15,10 +15,22 @@ type TestMessage =
   | { type: 'CLICK_GAME_START' }
   | { type: 'TEST_COMPLETED' }
   | { type: 'STOP_TEST' }
+  | { type: 'PAUSE_TEST' }
+  | { type: 'RESUME_TEST' }
   | { type: 'RESET_TO_HOME' };
 
-// 플로우 실행 상태 추적 (각 역할별로)
-const flowRunningState: { [role: string]: boolean } = {};
+// 플로우 상태 추적 (각 역할별로)
+type FlowState = 'idle' | 'running' | 'paused';
+const flowState: Record<'host' | 'guest', FlowState> = {
+  host: 'idle',
+  guest: 'idle',
+};
+
+// 역할별 상태 접근 헬퍼 함수 (타입 추론 개선)
+const getFlowState = (role: 'host' | 'guest'): FlowState => flowState[role];
+const setFlowState = (role: 'host' | 'guest', state: FlowState): void => {
+  flowState[role] = state;
+};
 
 // 페이지 기반 플로우 실행
 const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
@@ -26,17 +38,18 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
     role,
     context,
     currentPath: window.location.pathname,
-    flowRunningState: flowRunningState[role],
+    flowState: getFlowState(role),
   });
 
   // 이미 실행 중이면 무시
-  if (flowRunningState[role]) {
+  const currentState = getFlowState(role);
+  if (currentState === 'running' || currentState === 'paused') {
     console.log(`[AutoTest Debug] Flow already running for ${role}, skipping`);
     return;
   }
 
-  flowRunningState[role] = true;
-  console.log(`[AutoTest Debug] ${role} flow started, flowRunningState updated`);
+  setFlowState(role, 'running');
+  console.log(`[AutoTest Debug] ${role} flow started, flowState updated`);
 
   try {
     console.log(`[AutoTest Debug] Waiting initial delay: ${DELAY_BETWEEN_ACTIONS}ms`);
@@ -57,7 +70,12 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
     // 플로우 실행 루프
     console.log(`[AutoTest Debug] Entering flow loop for ${role}`);
     let loopIteration = 0;
-    while (flowRunningState[role]) {
+    while (true) {
+      const currentFlowState = getFlowState(role);
+      if (currentFlowState !== 'running' && currentFlowState !== 'paused') {
+        break;
+      }
+
       loopIteration++;
       console.log(`[AutoTest Debug] Flow loop iteration ${loopIteration} for ${role}`);
       // joinCode 업데이트 (경로에서 추출)
@@ -85,9 +103,20 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
         console.log(`[AutoTest Debug] No action found for path: ${currentPath}, role: ${role}`);
       }
 
+      // 일시 중지 상태 체크 (페이지 액션 실행 후)
+      // 상태가 변경되었을 수 있으므로 다시 확인
+      const checkPausedState = getFlowState(role);
+      if (checkPausedState === 'paused') {
+        console.log(
+          `[AutoTest Debug] Flow paused for ${role} after page action, waiting for resume...`
+        );
+        await waitForResume(role);
+        console.log(`[AutoTest Debug] Flow resumed for ${role}`);
+      }
+
       // 경로 변경 대기 (타임아웃 없음)
       console.log(`[AutoTest Debug] Waiting for path change from: ${currentPath}`);
-      await waitForPathChange(currentPath);
+      await waitForPathChange(currentPath, role);
 
       const newPath = window.location.pathname;
       console.log(`[AutoTest Debug] Path changed: ${currentPath} -> ${newPath}`);
@@ -95,14 +124,14 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       // 주문 페이지에 도달하면 완료
       if (/^\/room\/[^/]+\/order$/.test(newPath)) {
         console.log('[AutoTest Debug] Reached order page, test completed');
-        flowRunningState[role] = false;
+        setFlowState(role, 'idle');
         break;
       }
 
       // 홈으로 리셋된 경우 플로우 종료 (테스트 완료 후 리셋)
       if (newPath === '/') {
         console.log('[AutoTest Debug] Reset to home, flow completed');
-        flowRunningState[role] = false;
+        setFlowState(role, 'idle');
         break;
       }
 
@@ -113,17 +142,30 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
     console.error(`[AutoTest Debug] Error in ${role} flow:`, error);
     throw error;
   } finally {
-    flowRunningState[role] = false;
-    console.log(`[AutoTest Debug] ${role} flow completed, flowRunningState reset`);
+    setFlowState(role, 'idle');
+    console.log(`[AutoTest Debug] ${role} flow completed, flowState reset`);
   }
 };
 
 // 경로 변경 대기 (타임아웃 없음)
-const waitForPathChange = async (currentPath: string): Promise<void> => {
+const waitForPathChange = async (currentPath: string, role: 'host' | 'guest'): Promise<void> => {
   while (window.location.pathname === currentPath) {
+    // 일시 중지 상태 체크
+    if (getFlowState(role) === 'paused') {
+      console.log(`[AutoTest Debug] Path change wait paused for ${role}`);
+      await waitForResume(role);
+      console.log(`[AutoTest Debug] Path change wait resumed for ${role}`);
+    }
     await wait(100);
   }
   await wait(500); // 경로 변경 후 안정화 대기
+};
+
+// 재개 신호 대기
+const waitForResume = async (role: 'host' | 'guest'): Promise<void> => {
+  while (getFlowState(role) === 'paused') {
+    await wait(100);
+  }
 };
 
 // 호스트 플로우 실행
@@ -185,12 +227,30 @@ export const setupAutoTestListener = () => {
       await handleHostGameStart();
     } else if (event.data.type === 'TEST_COMPLETED') {
       // 모든 플로우 종료
-      flowRunningState.host = false;
-      flowRunningState.guest = false;
+      setFlowState('host', 'idle');
+      setFlowState('guest', 'idle');
     } else if (event.data.type === 'STOP_TEST') {
       // 모든 플로우 즉시 종료
-      flowRunningState.host = false;
-      flowRunningState.guest = false;
+      setFlowState('host', 'idle');
+      setFlowState('guest', 'idle');
+    } else if (event.data.type === 'PAUSE_TEST') {
+      // 모든 플로우 일시 중지
+      if (getFlowState('host') === 'running') {
+        setFlowState('host', 'paused');
+      }
+      if (getFlowState('guest') === 'running') {
+        setFlowState('guest', 'paused');
+      }
+      console.log('[AutoTest Debug] Test paused for all roles');
+    } else if (event.data.type === 'RESUME_TEST') {
+      // 모든 플로우 재개
+      if (getFlowState('host') === 'paused') {
+        setFlowState('host', 'running');
+      }
+      if (getFlowState('guest') === 'paused') {
+        setFlowState('guest', 'running');
+      }
+      console.log('[AutoTest Debug] Test resumed for all roles');
     } else if (event.data.type === 'RESET_TO_HOME') {
       window.location.href = '/';
     }
