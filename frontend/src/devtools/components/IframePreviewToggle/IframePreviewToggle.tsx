@@ -26,6 +26,7 @@ const IframePreviewToggle = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [readyState, setReadyState] = useState<{ [iframeName: string]: boolean }>({});
   const [gameSequence, setGameSequence] = useState<MiniGameType[]>([]);
+  const [isGameSelectionExpanded, setIsGameSelectionExpanded] = useState<boolean>(false);
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
   const joinCodeRef = useRef<string | null>(null);
   const pendingStartTest = useRef<boolean>(false);
@@ -270,27 +271,35 @@ const IframePreviewToggle = () => {
         </S.ToggleButton>
         {open && (
           <>
-            <S.GameSelectionContainer>
-              <S.GameSelectionLabel>게임 선택</S.GameSelectionLabel>
-              <S.GameSelectionButtons>
-                {availableGames.map((game) => {
-                  const isSelected = gameSequence.includes(game);
-                  const order = gameSequence.indexOf(game) + 1; // 선택 순서 (1부터 시작)
-                  return (
-                    <S.GameSelectionButton
-                      key={game}
-                      type="button"
-                      $selected={isSelected}
-                      onClick={() => handleGameToggle(game)}
-                    >
-                      {MINI_GAME_NAME_MAP[game]}
-                      <S.GameOrderBadge $visible={isSelected && order > 0}>
-                        {order > 0 ? order : ''}
-                      </S.GameOrderBadge>
-                    </S.GameSelectionButton>
-                  );
-                })}
-              </S.GameSelectionButtons>
+            <S.GameSelectionContainer $isExpanded={isGameSelectionExpanded}>
+              <S.GameSelectionLabel
+                type="button"
+                onClick={() => setIsGameSelectionExpanded((prev) => !prev)}
+              >
+                게임 선택
+              </S.GameSelectionLabel>
+              {isGameSelectionExpanded && (
+                <S.GameSelectionButtons>
+                  {availableGames.map((game) => {
+                    const isSelected = gameSequence.includes(game);
+                    const order = gameSequence.indexOf(game) + 1; // 선택 순서 (1부터 시작)
+                    return (
+                      <S.GameSelectionButton
+                        key={game}
+                        type="button"
+                        $selected={isSelected}
+                        disabled={isRunning}
+                        onClick={() => handleGameToggle(game)}
+                      >
+                        {MINI_GAME_NAME_MAP[game]}
+                        <S.GameOrderBadge $visible={isSelected && order > 0}>
+                          {order > 0 ? order : ''}
+                        </S.GameOrderBadge>
+                      </S.GameSelectionButton>
+                    );
+                  })}
+                </S.GameSelectionButtons>
+              )}
             </S.GameSelectionContainer>
             <S.PlayButton type="button" onClick={handleStartTest} disabled={isRunning}>
               {isRunning ? '테스트 실행 중...' : '재생'}

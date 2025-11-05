@@ -197,7 +197,11 @@ export const AddIframeButton = styled.button`
   }
 `;
 
-export const GameSelectionContainer = styled.div`
+type GameSelectionContainerProps = {
+  $isExpanded: boolean;
+};
+
+export const GameSelectionContainer = styled.div<GameSelectionContainerProps>`
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -205,20 +209,49 @@ export const GameSelectionContainer = styled.div`
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 8px;
-  min-width: 150px;
+  ${({ $isExpanded }) => ($isExpanded ? 'min-width: 150px;' : 'width: fit-content;')}
 `;
 
-export const GameSelectionLabel = styled.div`
+export const GameSelectionLabel = styled.button`
+  appearance: none;
+  border: none;
+  background: transparent;
   font-size: 12px;
   font-weight: 500;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+  line-height: 1.2;
+
+  &:hover {
+    color: #222;
+  }
+
+  &:active {
+    color: #000;
+  }
 `;
 
 export const GameSelectionButtons = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+  animation: slideDown 0.2s ease-out;
+  overflow: hidden;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 500px;
+    }
+  }
 `;
 
 type GameSelectionButtonProps = {
@@ -244,13 +277,18 @@ export const GameSelectionButton = styled.button<GameSelectionButtonProps>`
   min-width: 120px;
   box-sizing: border-box;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: ${(props) => (props.$selected ? '#45a049' : '#f6f6f6')};
     border-color: ${(props) => (props.$selected ? '#45a049' : 'rgba(0, 0, 0, 0.2)')};
   }
 
-  &:active {
+  &:active:not(:disabled) {
     background: ${(props) => (props.$selected ? '#3d8b40' : '#e8e8e8')};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `;
 
