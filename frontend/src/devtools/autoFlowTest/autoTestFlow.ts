@@ -85,15 +85,9 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
         console.log(`[AutoTest Debug] No action found for path: ${currentPath}, role: ${role}`);
       }
 
-      // 경로 변경 대기 (최대 30초)
+      // 경로 변경 대기 (타임아웃 없음)
       console.log(`[AutoTest Debug] Waiting for path change from: ${currentPath}`);
-      const pathChanged = await waitForPathChangeWithTimeout(currentPath, 30000);
-      if (!pathChanged) {
-        // 경로가 변경되지 않았으면 종료
-        console.log('[AutoTest Debug] Path did not change after timeout, stopping flow');
-        flowRunningState[role] = false;
-        break;
-      }
+      await waitForPathChange(currentPath);
 
       const newPath = window.location.pathname;
       console.log(`[AutoTest Debug] Path changed: ${currentPath} -> ${newPath}`);
@@ -124,20 +118,12 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
   }
 };
 
-// 경로 변경 대기 (타임아웃 포함)
-const waitForPathChangeWithTimeout = async (
-  currentPath: string,
-  maxWait: number
-): Promise<boolean> => {
-  const startTime = Date.now();
-  while (Date.now() - startTime < maxWait) {
-    if (window.location.pathname !== currentPath) {
-      await wait(500);
-      return true;
-    }
+// 경로 변경 대기 (타임아웃 없음)
+const waitForPathChange = async (currentPath: string): Promise<void> => {
+  while (window.location.pathname === currentPath) {
     await wait(100);
   }
-  return false;
+  await wait(500); // 경로 변경 후 안정화 대기
 };
 
 // 호스트 플로우 실행
