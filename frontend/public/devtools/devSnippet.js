@@ -3,23 +3,34 @@
 import { NetworkCollector } from './core/networkCollector.js';
 import { setupFetchHook } from './hooks/fetchHook.js';
 import { setupWebSocketHook } from './hooks/websocketHook.js';
+import { getSafeWindow } from './utils/getSafeWindow.js';
 
-const w = typeof globalThis !== 'undefined' && globalThis.window ? globalThis.window : undefined;
+const MAX_REQUESTS = 1000;
+
+const MARKERS = {
+  SNIPPET: '__DEV_SNIPPET__',
+  COLLECTOR: '__networkCollector__',
+};
+
+const w = getSafeWindow();
+
 if (!w) {
   // non-browser guard
   throw new Error('dev-snippet.js requires browser environment');
 }
-if (w.__DEV_SNIPPET__) {
+
+if (w[MARKERS.SNIPPET]) {
   // Already initialized
   throw new Error('dev-snippet.js already initialized');
 }
-w.__DEV_SNIPPET__ = true;
+
+w[MARKERS.SNIPPET] = true;
 w.console && w.console.log('[DEV SNIPPET] active');
 
 // Initialize collector
-if (!w.__networkCollector__) {
+if (!w[MARKERS.COLLECTOR]) {
   try {
-    w.__networkCollector__ = new NetworkCollector(1000);
+    w[MARKERS.COLLECTOR] = new NetworkCollector(MAX_REQUESTS);
   } catch {
     /* noop */
   }
@@ -28,5 +39,5 @@ if (!w.__networkCollector__) {
 const context = w.self === w.top ? 'MAIN' : w.name || 'IFRAME';
 
 // Setup hooks
-setupFetchHook(w, w.__networkCollector__, context);
-setupWebSocketHook(w, w.__networkCollector__, context);
+setupFetchHook(w, w[MARKERS.COLLECTOR], context);
+setupWebSocketHook(w, w[MARKERS.COLLECTOR], context);
