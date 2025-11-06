@@ -1,7 +1,7 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
 import { StompSubscription } from '@stomp/stompjs';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useWebSocketSubscription = <T>(
   destination: string,
@@ -12,6 +12,7 @@ export const useWebSocketSubscription = <T>(
   const { isVisible } = usePageVisibility();
   const { subscribe, isConnected, sessionId } = useWebSocket();
 
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevSessionIdRef = useRef<string | null>(null);
   const retryCountRef = useRef(0);
@@ -26,6 +27,7 @@ export const useWebSocketSubscription = <T>(
         console.error(`❌ 구독 해제 실패: ${destination}`, error);
       } finally {
         subscriptionRef.current = null;
+        setIsSubscribed(false);
       }
     }
 
@@ -42,9 +44,13 @@ export const useWebSocketSubscription = <T>(
 
     try {
       const sub = subscribe<T>(destination, onData, onError);
+
       subscriptionRef.current = sub;
       prevSessionIdRef.current = sessionId;
       retryCountRef.current = 0;
+
+      setIsSubscribed(true);
+
       console.log(`✅ 구독 성공: ${destination}`, { sessionId });
     } catch (error) {
       console.error(`❌ 구독 실패 (시도 ${retryCountRef.current + 1})`, error);
@@ -65,15 +71,14 @@ export const useWebSocketSubscription = <T>(
   }, [enabled, isVisible, isConnected, destination, onData, onError, sessionId, subscribe]);
 
   const doSubscribe = useCallback(() => {
+    if (!sessionId) return;
+
     const sessionChanged = sessionId !== prevSessionIdRef.current;
     if (sessionChanged || !subscriptionRef.current) {
-      if (sessionChanged) {
-        console.log(`🔄 세션 변경으로 인한 구독 해제: ${destination}`);
-        unsubscribe();
-      }
+      if (sessionChanged) unsubscribe();
       trySubscribe();
     }
-  }, [sessionId, destination, unsubscribe, trySubscribe]);
+  }, [sessionId, unsubscribe, trySubscribe]);
 
   useEffect(() => {
     if (isConnected) doSubscribe();
@@ -81,4 +86,6 @@ export const useWebSocketSubscription = <T>(
 
     return unsubscribe;
   }, [isConnected, doSubscribe, unsubscribe]);
+
+  return { isSubscribed };
 };
