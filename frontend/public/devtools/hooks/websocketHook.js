@@ -2,21 +2,19 @@
 
 import { addRequest } from '../utils/utils.js';
 import { createWebSocketMessage } from '../utils/websocketMessageHandler.js';
+import { getSafeWindow } from '../utils/getSafeWindow.js';
+import { checkAlreadyHooked } from '../utils/checkAlreadyHooked.js';
+import { defineHookedProperty } from '../utils/defineHookedProperty.js';
 
 export const setupWebSocketHook = (win, collector, context = {}) => {
-  win =
-    win || (typeof globalThis !== 'undefined' && globalThis.window ? globalThis.window : undefined);
-  if (!win?.WebSocket || win.__DEV_WS_WRAPPED__) {
-    return win?.__DEV_WS_WRAPPED__ || null;
+  win = getSafeWindow(win);
+  if (!win) return null;
+
+  if (checkAlreadyHooked(win, 'WebSocket', '__DEV_WS_WRAPPED__')) {
+    return null;
   }
 
   const OriginalWebSocket = win.WebSocket;
-  const originalDescriptor = Object.getOwnPropertyDescriptor(win, 'WebSocket') || {
-    configurable: true,
-    enumerable: false,
-    writable: true,
-    value: OriginalWebSocket,
-  };
 
   // WebSocket 연결 추적을 위한 맵 (URL+컨텍스트를 키로 사용)
   const wsConnectionMap = new Map();
@@ -48,8 +46,6 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
 
     /**
      * 수신된 WebSocket 메시지를 처리하고 messages 배열에 추가합니다.
-     *
-     * @param {MessageEvent} event - WebSocket 메시지 이벤트
      */
     ws.addEventListener('message', (event) => {
       try {
@@ -117,24 +113,5 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     },
   });
 
-  Object.defineProperty(win, 'WebSocket', {
-    configurable: true,
-    enumerable: originalDescriptor.enumerable,
-    writable: originalDescriptor.writable,
-    value: ProxiedWebSocket,
-  });
-
-  const handle = {
-    restore() {
-      try {
-        Object.defineProperty(win, 'WebSocket', originalDescriptor);
-        delete win.__DEV_WS_WRAPPED__;
-      } catch {
-        /* noop */
-      }
-    },
-  };
-
-  win.__DEV_WS_WRAPPED__ = handle;
-  return handle;
+  defineHookedProperty(win, 'WebSocket', ProxiedWebSocket, '__DEV_WS_WRAPPED__');
 };
