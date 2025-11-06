@@ -7,15 +7,7 @@ import {
   getAutoTestLogger,
 } from '@/devtools/autoTest/utils/autoTestLogger';
 import NetworkDebuggerPanel from '@/devtools/networkDebug/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
-
-const isTopWindow = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.self === window.top;
-  } catch {
-    return false;
-  }
-};
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 
 export const DevToolsWrapper = () => {
   const location = useLocation();

@@ -4,6 +4,7 @@ import { usePanelResize } from '@/devtools/common/hooks/usePanelResize';
 import { useVerticalResize } from '@/devtools/common/hooks/useVerticalResize';
 import { useMobileSplitResize } from '@/devtools/common/hooks/useMobileSplitResize';
 import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 import NetworkFilterBar from './NetworkFilterBar/NetworkFilterBar';
 import NetworkRequestList from './NetworkRequestList/NetworkRequestList';
 import NetworkRequestDetail from './NetworkRequestDetail/NetworkRequestDetail';
@@ -14,14 +15,7 @@ import * as S from './NetworkDebuggerPanel.styled';
  * Fetch 및 WebSocket 요청을 모니터링하고 디버깅할 수 있는 도구를 제공합니다.
  */
 const NetworkDebuggerPanel = () => {
-  const isTopWindow = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return window.self === window.top;
-    } catch {
-      return false;
-    }
-  }, []);
+  const topWindow = isTopWindow();
 
   const isMobile = useMemo(() => checkIsTouchDevice(), []);
 
@@ -135,7 +129,7 @@ const NetworkDebuggerPanel = () => {
     }
   };
 
-  if (!isTopWindow) return null;
+  if (!topWindow) return null;
 
   if (!open) {
     return (

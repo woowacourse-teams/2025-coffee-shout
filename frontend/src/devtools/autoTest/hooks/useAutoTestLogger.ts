@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { AutoTestLog, AutoTestLogger } from '../types/autoTest';
 import { AutoTestLoggerInstance } from '../utils/autoTestLogger';
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 
 declare global {
   interface Window {
@@ -16,7 +17,7 @@ const getAllLoggers = (): AutoTestLogger[] => {
 
   // 메인 윈도우의 logger
   try {
-    if (window.self === window.top && window.__autoTestLogger__) {
+    if (isTopWindow() && window.__autoTestLogger__) {
       loggers.push(window.__autoTestLogger__);
     }
   } catch {
@@ -71,7 +72,7 @@ export const useAutoTestLogger = () => {
   const initialLogIdsRef = useRef<Set<string>>(new Set());
 
   // 메인 윈도우에서만 동작
-  const isTopWindow = typeof window !== 'undefined' && window.self === window.top;
+  const topWindow = isTopWindow();
 
   // logger 구독 설정
   const setupLoggers = useCallback((loggers: AutoTestLogger[]) => {
@@ -132,7 +133,7 @@ export const useAutoTestLogger = () => {
   }, []);
 
   useEffect(() => {
-    if (!isTopWindow) return;
+    if (!topWindow) return;
 
     // 초기 logger 수집 및 구독
     const initialLoggers = getAllLoggers();
@@ -163,10 +164,10 @@ export const useAutoTestLogger = () => {
       });
       clearInterval(intervalId);
     };
-  }, [isTopWindow, setupLoggers]);
+  }, [topWindow, setupLoggers]);
 
   const refreshLogs = useCallback(() => {
-    if (!isTopWindow) return;
+    if (!topWindow) return;
 
     const allLoggers = getAllLoggers();
     const allLogs: AutoTestLog[] = [];
@@ -189,7 +190,7 @@ export const useAutoTestLogger = () => {
 
     // logger 재설정 (새로운 logger가 있을 수 있음)
     setupLoggers(allLoggers);
-  }, [isTopWindow, setupLoggers]);
+  }, [topWindow, setupLoggers]);
 
   return {
     logs,

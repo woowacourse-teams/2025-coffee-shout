@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAutoTestLogger } from '@/devtools/autoTest/hooks/useAutoTestLogger';
 import { usePanelResize } from '@/devtools/common/hooks/usePanelResize';
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import AutoTestLogList from './AutoTestLogList/AutoTestLogList';
 import AutoTestLogFilterBar from './AutoTestLogFilterBar/AutoTestLogFilterBar';
@@ -15,15 +16,7 @@ type Props = {
  * 오토테스트 디버깅 로그를 표시합니다.
  */
 const AutoTestLogPanel = ({ isIframeOpen = false }: Props) => {
-  const isTopWindow = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return window.self === window.top;
-    } catch {
-      return false;
-    }
-  }, []);
-
+  const topWindow = isTopWindow();
   const isTouchDevice = useMemo(() => checkIsTouchDevice(), []);
 
   const [open, setOpen] = useState(false);
@@ -55,7 +48,7 @@ const AutoTestLogPanel = ({ isIframeOpen = false }: Props) => {
     return Array.from(contexts);
   }, [logs]);
 
-  if (!isTopWindow || isTouchDevice) return null;
+  if (!topWindow || isTouchDevice) return null;
 
   // IframePreviewToggle이 열려있지 않으면 토글 버튼도 표시하지 않음
   if (!isIframeOpen) {

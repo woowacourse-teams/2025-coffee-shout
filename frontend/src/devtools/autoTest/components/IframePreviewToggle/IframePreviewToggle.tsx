@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
 import { MiniGameType, MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
 import { getAutoTestLogger } from '../../utils/autoTestLogger';
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 import AutoTestLogPanel from '../AutoTestLogPanel/AutoTestLogPanel';
 import * as S from './IframePreviewToggle.styled';
 
@@ -41,15 +42,7 @@ const IframePreviewToggle = () => {
     return Object.keys(MINI_GAME_NAME_MAP) as MiniGameType[];
   }, []);
 
-  const isTopWindow = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return window.self === window.top;
-    } catch {
-      return false;
-    }
-  }, []);
-
+  const topWindow = isTopWindow();
   const isTouchDevice = useMemo(() => checkIsTouchDevice(), []);
   const isRootPath = location.pathname === '/';
 
@@ -311,7 +304,7 @@ const IframePreviewToggle = () => {
     });
   };
 
-  if (!isTopWindow || !isRootPath || isTouchDevice) return null;
+  if (!topWindow || !isRootPath || isTouchDevice) return null;
 
   return (
     <S.Container>

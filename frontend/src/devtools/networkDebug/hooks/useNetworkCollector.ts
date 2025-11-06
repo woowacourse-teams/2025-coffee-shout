@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { NetworkRequest, NetworkCollector } from '../types/network';
+import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 
 declare global {
   interface Window {
@@ -15,7 +16,7 @@ const getAllCollectors = (): NetworkCollector[] => {
 
   // 메인 윈도우의 collector
   try {
-    if (window.self === window.top && window.__networkCollector__) {
+    if (isTopWindow() && window.__networkCollector__) {
       collectors.push(window.__networkCollector__);
     }
   } catch {
@@ -72,7 +73,7 @@ export const useNetworkCollector = () => {
   const initialRequestIdsRef = useRef<Set<string>>(new Set());
 
   // 메인 윈도우에서만 동작
-  const isTopWindow = typeof window !== 'undefined' && window.self === window.top;
+  const topWindow = isTopWindow();
 
   // collector 구독 설정
   const setupCollectors = useCallback((collectors: NetworkCollector[]) => {
@@ -133,7 +134,7 @@ export const useNetworkCollector = () => {
   }, []);
 
   useEffect(() => {
-    if (!isTopWindow) return;
+    if (!topWindow) return;
 
     // 초기 collector 수집 및 구독
     const initialCollectors = getAllCollectors();
@@ -164,10 +165,10 @@ export const useNetworkCollector = () => {
       });
       clearInterval(intervalId);
     };
-  }, [isTopWindow, setupCollectors]);
+  }, [topWindow, setupCollectors]);
 
   const clearRequests = useCallback(() => {
-    if (!isTopWindow) return;
+    if (!topWindow) return;
 
     const allCollectors = getAllCollectors();
     allCollectors.forEach((collector) => {
@@ -178,13 +179,13 @@ export const useNetworkCollector = () => {
       }
     });
     setRequests([]);
-  }, [isTopWindow]);
+  }, [topWindow]);
 
   /**
    * 모든 collector에서 최신 요청 목록을 다시 가져와서 상태를 갱신합니다.
    */
   const refreshRequests = useCallback(() => {
-    if (!isTopWindow) return;
+    if (!topWindow) return;
 
     const allCollectors = getAllCollectors();
     const allRequests: NetworkRequest[] = [];
@@ -207,7 +208,7 @@ export const useNetworkCollector = () => {
 
     // collector 재설정 (새로운 collector가 있을 수 있음)
     setupCollectors(allCollectors);
-  }, [isTopWindow, setupCollectors]);
+  }, [topWindow, setupCollectors]);
 
   return {
     requests,
@@ -216,4 +217,3 @@ export const useNetworkCollector = () => {
     collectors: collectorsRef.current,
   };
 };
-
