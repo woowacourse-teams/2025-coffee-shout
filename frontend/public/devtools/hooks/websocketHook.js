@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { generateRequestId } from '../utils/utils.js';
+import { addRequest } from '../utils/utils.js';
 import { createWebSocketMessage } from '../utils/websocketMessageHandler.js';
 
 export const setupWebSocketHook = (win, collector, context = {}) => {
@@ -23,26 +23,24 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
 
   const addEventListeners = (ws, url, collector, context) => {
     const connectionKey = `${context}:${url}`;
-    const connectionId = generateRequestId();
     const messages = [];
     let connectionStartTime = Date.now();
 
     ws.addEventListener('open', () => {
       try {
         connectionStartTime = Date.now();
-        const request = {
-          id: connectionId,
+        const requestData = {
           type: 'websocket',
           context,
           url: String(url),
           status: 101,
-          timestamp: connectionStartTime,
+          startedAt: connectionStartTime,
           messages: messages,
           connectionStatus: 'open',
         };
-        // messages 배열을 직접 참조로 공유하여 업데이트가 반영되도록 함
+        // addRequest를 사용하여 공통 필드 보장하고 생성된 request 객체 반환
+        const request = addRequest(collector, requestData);
         wsConnectionMap.set(connectionKey, request);
-        collector.add(request);
       } catch {
         /* noop */
       }
@@ -79,8 +77,7 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
         const connection = wsConnectionMap.get(connectionKey);
         if (connection) {
           connection.connectionStatus = 'closed';
-          const duration = Date.now() - connectionStartTime;
-          connection.durationMs = duration;
+          connection.durationMs = Date.now() - connectionStartTime;
         }
       } catch {
         /* noop */

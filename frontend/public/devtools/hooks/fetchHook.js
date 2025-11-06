@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { extractRequestInfo, generateRequestId } from '../utils/utils.js';
+import { extractRequestInfo, addRequest } from '../utils/utils.js';
 
 export const setupFetchHook = (win, collector, context = {}) => {
   win =
@@ -40,16 +40,14 @@ export const setupFetchHook = (win, collector, context = {}) => {
             }
           }
 
-          collector.add({
-            id: generateRequestId(),
+          addRequest(collector, {
             type: 'fetch',
             context,
             method,
             url,
             status: res.status,
-            timestamp: Date.now(),
+            startedAt,
             responseBody,
-            durationMs: Date.now() - startedAt,
           });
         } catch {
           /* noop */
@@ -58,15 +56,13 @@ export const setupFetchHook = (win, collector, context = {}) => {
       })
       .catch((err) => {
         try {
-          collector.add({
-            id: generateRequestId(),
+          addRequest(collector, {
             type: 'fetch',
             context,
             method,
             url,
             status: 'NETWORK_ERROR',
-            timestamp: Date.now(),
-            durationMs: Date.now() - startedAt,
+            startedAt,
             errorMessage: String(err).slice(0, 512),
           });
         } catch {
