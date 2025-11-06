@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { addRequest } from '../utils/utils.js';
+import { addRequest } from '../utils/addRequest.js';
 import { createWebSocketMessage } from '../utils/websocketMessageHandler.js';
 import { getSafeWindow } from '../utils/getSafeWindow.js';
 import { checkAlreadyHooked } from '../utils/checkAlreadyHooked.js';

@@ -1,6 +1,7 @@
 /* eslint-env browser */
 
-import { extractRequestInfo, addRequest } from '../utils/utils.js';
+import { extractRequestInfo } from '../utils/extractRequestInfo.js';
+import { addRequest } from '../utils/addRequest.js';
 import { getSafeWindow } from '../utils/getSafeWindow.js';
 import { checkAlreadyHooked } from '../utils/checkAlreadyHooked.js';
 import { defineHookedProperty } from '../utils/defineHookedProperty.js';
