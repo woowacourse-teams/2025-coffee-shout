@@ -1,9 +1,9 @@
 import { useState, useMemo, useRef } from 'react';
 import { useNetworkCollector } from '../../hooks/useNetworkCollector';
-import { usePanelResize } from '../../common/hooks/usePanelResize';
-import { useVerticalResize } from '../../common/hooks/useVerticalResize';
-import { useMobileSplitResize } from '../../common/hooks/useMobileSplitResize';
-import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
+import { usePanelResize } from '@/devtools/common/hooks/usePanelResize';
+import { useVerticalResize } from '@/devtools/common/hooks/useVerticalResize';
+import { useMobileSplitResize } from '@/devtools/common/hooks/useMobileSplitResize';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import NetworkFilterBar from './NetworkFilterBar/NetworkFilterBar';
 import NetworkRequestList from './NetworkRequestList/NetworkRequestList';
 import NetworkRequestDetail from './NetworkRequestDetail/NetworkRequestDetail';

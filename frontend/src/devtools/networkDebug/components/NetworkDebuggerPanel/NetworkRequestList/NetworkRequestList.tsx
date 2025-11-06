@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { NetworkRequest } from '../../../types/network';
-import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
+import { NetworkRequest } from '@/devtools/networkDebug/types/network';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import * as S from './NetworkRequestList.styled';
 
 const COLUMN_WIDTHS = {

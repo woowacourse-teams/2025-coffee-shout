@@ -38,4 +38,3 @@ export const FilterButton = styled.button<{ $active: boolean }>`
     background: ${({ $active }) => ($active ? '#1557b0' : '#f0f0f0')};
   }
 `;
-

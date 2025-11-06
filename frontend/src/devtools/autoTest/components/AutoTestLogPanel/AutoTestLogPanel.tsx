@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import { useAutoTestLogger } from '../../hooks/useAutoTestLogger';
-import { usePanelResize } from '../../../common/hooks/usePanelResize';
-import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
+import { useAutoTestLogger } from '@/devtools/autoTest/hooks/useAutoTestLogger';
+import { usePanelResize } from '@/devtools/common/hooks/usePanelResize';
+import { checkIsTouchDevice } from '@/utils/checkIsTouchDevice';
 import AutoTestLogList from './AutoTestLogList/AutoTestLogList';
 import AutoTestLogFilterBar from './AutoTestLogFilterBar/AutoTestLogFilterBar';
 import * as S from './AutoTestLogPanel.styled';
@@ -97,4 +97,3 @@ const AutoTestLogPanel = ({ isIframeOpen = false }: Props) => {
 };
 
 export default AutoTestLogPanel;
-

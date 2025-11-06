@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import type { NetworkRequest, WebSocketMessage } from '../../../types/network';
-import { formatJSON } from '../../../utils/formatJSON';
-import { parseStompPayload } from '../../../utils/parseStompPayload';
-import { getMessageSummary } from '../../../utils/getMessageSummary';
-import { STOMP_COMMAND } from '../../../utils/stompMessageConstants';
+import type { NetworkRequest, WebSocketMessage } from '@/devtools/networkDebug/types/network';
+import { formatJSON } from '@/devtools/networkDebug/utils/formatJSON';
+import { parseStompPayload } from '@/devtools/networkDebug/utils/parseStompPayload';
+import { getMessageSummary } from '@/devtools/networkDebug/utils/getMessageSummary';
+import { STOMP_COMMAND } from '@/devtools/networkDebug/utils/stompMessageConstants';
 import * as S from './NetworkRequestDetail.styled';
 
 type Props = {
@@ -233,4 +233,3 @@ const NetworkRequestDetail = ({ request, onClose }: Props) => {
 };
 
 export default NetworkRequestDetail;
-

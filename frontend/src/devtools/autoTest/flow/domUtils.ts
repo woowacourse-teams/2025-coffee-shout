@@ -156,4 +156,3 @@ export const extractJoinCode = (): string | null => {
   const match = window.location.pathname.match(/^\/room\/([^/]+)/);
   return match ? match[1] : null;
 };
-

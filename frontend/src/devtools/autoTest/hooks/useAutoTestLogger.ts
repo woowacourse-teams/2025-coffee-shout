@@ -197,4 +197,3 @@ export const useAutoTestLogger = () => {
     loggers: loggersRef.current,
   };
 };
-

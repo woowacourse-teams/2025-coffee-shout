@@ -83,4 +83,3 @@ const AutoTestLogFilterBar = ({ contexts, selectedContext, onContextChange }: Pr
 };
 
 export default AutoTestLogFilterBar;
-

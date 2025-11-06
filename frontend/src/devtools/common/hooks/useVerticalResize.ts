@@ -102,4 +102,3 @@ export const useVerticalResize = (
     contentRef,
   };
 };
-

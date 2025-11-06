@@ -510,4 +510,3 @@ export const findPageAction = (pathname: string, role: 'host' | 'guest'): PageAc
 
   return patternMatch || null;
 };
-

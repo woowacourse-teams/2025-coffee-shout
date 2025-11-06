@@ -201,4 +201,3 @@ export const DetailSection = styled.div<{
   border-top: ${({ $isMobile }) => ($isMobile ? '1px solid rgba(0, 0, 0, 0.1)' : 'none')};
   flex-shrink: 0;
 `;
-

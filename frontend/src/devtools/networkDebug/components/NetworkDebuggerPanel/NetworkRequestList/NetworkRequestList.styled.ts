@@ -104,4 +104,3 @@ export const EmptyText = styled.p`
   margin: 0;
   font-size: 13px;
 `;
-

@@ -352,4 +352,3 @@ export const GameOrderBadge = styled.span<GameOrderBadgeProps>`
   margin-left: auto;
   flex-shrink: 0;
 `;
-

@@ -11,4 +11,3 @@ export type AutoTestLogger = {
   subscribe: (listener: (log: AutoTestLog) => void) => () => void;
   addLog: (log: Omit<AutoTestLog, 'id' | 'timestamp'>) => void;
 };
-

@@ -95,4 +95,3 @@ export const Content = styled.div`
   flex: 1;
   overflow-y: auto;
 `;
-

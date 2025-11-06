@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import IframePreviewToggle from '../../../autoTest/components/IframePreviewToggle/IframePreviewToggle';
-
-import { setupAutoTestListener } from '../../../autoTest/flow/autoTestFlow';
+import IframePreviewToggle from '@/devtools/autoTest/components/IframePreviewToggle/IframePreviewToggle';
+import { setupAutoTestListener } from '@/devtools/autoTest/flow/autoTestFlow';
 import {
   initializeAutoTestLogger,
   getAutoTestLogger,
-} from '../../../autoTest/utils/autoTestLogger';
+} from '@/devtools/autoTest/utils/autoTestLogger';
 import NetworkDebuggerPanel from '@/devtools/networkDebug/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
 
 const isTopWindow = (): boolean => {

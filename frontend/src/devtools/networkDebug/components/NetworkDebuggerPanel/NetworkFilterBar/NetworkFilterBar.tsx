@@ -87,4 +87,3 @@ const NetworkFilterBar = ({
 };
 
 export default NetworkFilterBar;
-

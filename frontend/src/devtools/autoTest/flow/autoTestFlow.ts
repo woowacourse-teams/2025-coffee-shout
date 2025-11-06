@@ -401,4 +401,3 @@ export const setupAutoTestListener = () => {
     window.removeEventListener('message', messageHandler);
   };
 };
-

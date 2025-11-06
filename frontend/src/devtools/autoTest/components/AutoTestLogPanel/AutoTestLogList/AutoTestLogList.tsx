@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { AutoTestLog } from '../../../types/autoTest';
+import { AutoTestLog } from '@/devtools/autoTest/types/autoTest';
 import * as S from './AutoTestLogList.styled';
 
 type Props = {
@@ -70,4 +70,3 @@ const AutoTestLogList = ({ logs }: Props) => {
 };
 
 export default AutoTestLogList;
-

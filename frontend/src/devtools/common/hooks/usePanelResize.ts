@@ -91,4 +91,3 @@ export const usePanelResize = (initialHeight: number, minHeight: number = 400) =
     isResizing,
   };
 };
-
