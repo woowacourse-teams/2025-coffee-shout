@@ -17,14 +17,18 @@ const appVersion = packageJson.version;
 export default (_, argv) => {
   const mode = argv.mode || 'development';
 
-  const dotenvEnv = dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+  const dotenvEnv =
+    dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
   const mergedEnv = { ...process.env, ...dotenvEnv };
 
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
+    'process.env.ENABLE_DEVTOOLS': JSON.stringify(mergedEnv.ENABLE_DEVTOOLS === 'true'),
     ...Object.fromEntries(
-      Object.entries(mergedEnv).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
+      Object.entries(mergedEnv)
+        .filter(([k]) => k !== 'ENABLE_DEVTOOLS')
+        .map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
     ),
   };
 
