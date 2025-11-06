@@ -16,7 +16,7 @@ export const setupFetchHook = (win, collector, context = {}) => {
 
   const originalFetch = win.fetch;
 
-  const wrapper = function (input, init = {}) {
+  const hookedFetch = function (input, init = {}) {
     const startedAt = Date.now();
     const { method, url } = extractRequestInfo(input, init) || {
       method: 'GET',
@@ -72,5 +72,5 @@ export const setupFetchHook = (win, collector, context = {}) => {
     return originalPromise;
   };
 
-  defineHookedProperty(win, 'fetch', wrapper);
+  defineHookedProperty(win, 'fetch', hookedFetch);
 };

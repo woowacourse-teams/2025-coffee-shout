@@ -98,7 +98,7 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     };
   };
 
-  const ProxiedWebSocket = new Proxy(OriginalWebSocket, {
+  const HookedWebSocket = new Proxy(OriginalWebSocket, {
     construct(target, args) {
       const [url] = args;
       const ws = new target(...args);
@@ -113,5 +113,5 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     },
   });
 
-  defineHookedProperty(win, 'WebSocket', ProxiedWebSocket);
+  defineHookedProperty(win, 'WebSocket', HookedWebSocket);
 };
