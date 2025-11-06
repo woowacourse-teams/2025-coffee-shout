@@ -12,4 +12,3 @@ export const isTopWindow = (): boolean => {
     return false;
   }
 };
-
