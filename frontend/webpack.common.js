@@ -67,6 +67,13 @@ export default (_, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
+        inject: 'head',
+        templateParameters: {
+          DEV_SNIPPET:
+            mergedEnv.ENABLE_DEVTOOLS === 'true'
+              ? `<script type="module" src="/devtools/devSnippet.js"></script>`
+              : '',
+        },
       }),
       new CopyWebpackPlugin({
         patterns: [
@@ -82,6 +89,12 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
+          ...(mergedEnv.ENABLE_DEVTOOLS === 'true' && [
+            {
+              from: 'public/devtools',
+              to: 'devtools',
+            },
+          ]),
         ],
       }),
       new webpack.DefinePlugin(envKeys),
