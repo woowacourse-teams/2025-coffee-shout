@@ -408,10 +408,6 @@ const IframePreviewToggle = () => {
                   name={name}
                   title={`preview-${index === 0 ? 'left' : 'right'}`}
                   src="/"
-                  onLoad={() => {
-                    const iframe = iframeRefs.current[name];
-                    // onLoad는 로그에 기록하지 않음 (너무 많음)
-                  }}
                 />
               </S.IframeWrapper>
             );
