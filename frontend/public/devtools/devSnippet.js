@@ -3,7 +3,7 @@
 import { NetworkCollector } from './core/networkCollector.js';
 import { setupFetchHook } from './hooks/fetchHook.js';
 import { setupWebSocketHook } from './hooks/websocketHook.js';
-import { getSafeWindow } from './utils/getSafeWindow.js';
+import { getSafeWindow } from './utils/common/getSafeWindow.js';
 
 const MAX_REQUESTS = 1000;
 

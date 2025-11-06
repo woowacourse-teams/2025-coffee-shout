@@ -15,3 +15,4 @@ export const getSafeWindow = (win) => {
   }
   return undefined;
 };
+

@@ -1,10 +1,10 @@
 /* eslint-env browser */
 
-import { extractRequestInfo } from '../utils/extractRequestInfo.js';
-import { addRequest } from '../utils/addRequest.js';
-import { getSafeWindow } from '../utils/getSafeWindow.js';
-import { checkAlreadyHooked } from '../utils/checkAlreadyHooked.js';
-import { defineHookedProperty } from '../utils/defineHookedProperty.js';
+import { extractRequestInfo } from '../utils/fetch/extractRequestInfo.js';
+import { addRequest } from '../utils/common/addRequest.js';
+import { getSafeWindow } from '../utils/common/getSafeWindow.js';
+import { checkAlreadyHooked } from '../utils/common/checkAlreadyHooked.js';
+import { defineHookedProperty } from '../utils/common/defineHookedProperty.js';
 
 export const setupFetchHook = (win, collector, context = {}) => {
   win = getSafeWindow(win);
