@@ -11,6 +11,7 @@ import {
   DELAY_AFTER_API,
 } from './domUtils';
 import { MiniGameType } from '@/types/miniGame/common';
+import { getAutoTestLogger } from '../utils/autoTestLogger';
 
 // 기본 게임 순서 상수
 export const DEFAULT_SINGLE_GAME: readonly MiniGameType[] = ['CARD_GAME'] as const;
@@ -141,15 +142,33 @@ const entryMenuPageAction = async (context: PageActionContext) => {
   await wait(DELAY_AFTER_API);
 };
 
+// 컨텍스트 추출 헬퍼
+const getContext = (): string => {
+  if (typeof window === 'undefined') return 'MAIN';
+  try {
+    const iframeName = window.frameElement?.getAttribute('name') || '';
+    return iframeName || 'MAIN';
+  } catch {
+    return 'MAIN';
+  }
+};
+
 // 로비 페이지 - 호스트 액션
 const lobbyPageHostAction = async (context: PageActionContext) => {
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
   const joinCode = extractJoinCode();
   if (!joinCode) {
     console.warn('[AutoTest] Could not extract joinCode from path');
     return;
   }
 
-  console.log('[AutoTest] Host room created, joinCode:', joinCode);
+  logger.addLog({
+    message: 'Host room created',
+    context: currentContext,
+    data: { joinCode },
+  });
 
   if (window.parent && window.parent !== window) {
     window.parent.postMessage({ type: 'JOIN_CODE_RECEIVED', joinCode }, '*');
@@ -168,7 +187,11 @@ const lobbyPageHostAction = async (context: PageActionContext) => {
 
   // 게임 순서 결정
   const gameSequence = context.gameSequence || DEFAULT_SINGLE_GAME;
-  console.log('[AutoTest] Game sequence to select:', gameSequence);
+  logger.addLog({
+    message: 'Game sequence to select',
+    context: currentContext,
+    data: { gameSequence },
+  });
 
   // 각 게임을 순서대로 선택
   for (const gameType of gameSequence) {
@@ -195,21 +218,33 @@ const lobbyPageHostAction = async (context: PageActionContext) => {
       button.getAttribute('data-selected') === 'true';
 
     if (!isSelected) {
-      console.log(`[AutoTest] Selecting ${gameType}`);
+      logger.addLog({
+        message: `Selecting ${gameType}`,
+        context: currentContext,
+      });
       await clickElementWithClickEvent(button);
       await wait(DELAY_BETWEEN_ACTIONS);
     } else {
-      console.log(`[AutoTest] ${gameType} is already selected, skipping`);
+      logger.addLog({
+        message: `${gameType} is already selected, skipping`,
+        context: currentContext,
+      });
     }
   }
 
   await wait(DELAY_AFTER_API);
 
-  console.log('[AutoTest] Host selected games, waiting for guest to be ready...');
+  logger.addLog({
+    message: 'Host selected games, waiting for guest to be ready...',
+    context: currentContext,
+  });
 };
 
 // 로비 페이지 - 게스트 액션
 const lobbyPageGuestAction = async () => {
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
   await wait(DELAY_BETWEEN_ACTIONS);
 
   const readyButton = await waitForElement('game-ready-button', 10000);
@@ -221,7 +256,10 @@ const lobbyPageGuestAction = async () => {
 
   await wait(DELAY_AFTER_API);
 
-  console.log('[AutoTest] Guest clicked ready button');
+  logger.addLog({
+    message: 'Guest clicked ready button',
+    context: currentContext,
+  });
 
   if (window.parent && window.parent !== window) {
     const iframeName = window.frameElement?.getAttribute('name') || '';
@@ -231,7 +269,13 @@ const lobbyPageGuestAction = async () => {
 
 // 게임 시작 버튼 클릭 (메시지 수신 시)
 export const handleHostGameStart = async () => {
-  console.log('[AutoTest] Host received signal to start game');
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: 'Host received signal to start game',
+    context: currentContext,
+  });
 
   const gameStartButton = await waitForElement('game-start-button', 10000);
   if (!gameStartButton) {
@@ -239,16 +283,25 @@ export const handleHostGameStart = async () => {
     return;
   }
 
-  console.log('[AutoTest] All players are ready! Game start button appeared.');
+  logger.addLog({
+    message: 'All players are ready! Game start button appeared.',
+    context: currentContext,
+  });
   await wait(DELAY_BETWEEN_ACTIONS);
   await clickElement(gameStartButton);
-  console.log('[AutoTest] Host clicked game start button');
+  logger.addLog({
+    message: 'Host clicked game start button',
+    context: currentContext,
+  });
 
   // 게임 결과 페이지는 페이지 기반 플로우가 처리하도록 함
 };
 
 // 게임 결과 페이지 - 호스트 액션
 const gameResultPageHostAction = async () => {
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
   await wait(500);
   await wait(DELAY_BETWEEN_ACTIONS);
 
@@ -258,7 +311,10 @@ const gameResultPageHostAction = async () => {
     return;
   }
 
-  console.log('[AutoTest] Roulette result button found');
+  logger.addLog({
+    message: 'Roulette result button found',
+    context: currentContext,
+  });
   await clickElement(rouletteResultButton);
 
   await wait(DELAY_AFTER_API);
@@ -304,9 +360,18 @@ const roulettePlayPageHostAction = async () => {
     return;
   }
 
-  console.log('[AutoTest] Roulette spin button found and ready');
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: 'Roulette spin button found and ready',
+    context: currentContext,
+  });
   await clickElement(rouletteSpinButton);
-  console.log('[AutoTest] Host clicked roulette spin button');
+  logger.addLog({
+    message: 'Host clicked roulette spin button',
+    context: currentContext,
+  });
 };
 
 // 레이싱 게임 플레이 페이지 - 연속 클릭 관리
@@ -316,7 +381,11 @@ export const clearRacingGameClickInterval = () => {
   if (racingGameClickIntervalId !== null) {
     clearInterval(racingGameClickIntervalId);
     racingGameClickIntervalId = null;
-    console.log('[AutoTest] Racing game click interval cleared');
+    const logger = getAutoTestLogger();
+    logger.addLog({
+      message: 'Racing game click interval cleared',
+      context: getContext(),
+    });
   }
 };
 
@@ -327,7 +396,13 @@ const racingGamePlayPageAction = async () => {
 
   await wait(DELAY_BETWEEN_ACTIONS);
 
-  console.log('[AutoTest] Starting racing game auto-click (5 clicks per second)');
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: 'Starting racing game auto-click (5 clicks per second)',
+    context: currentContext,
+  });
 
   // 1초에 5번 클릭 = 200ms마다 클릭
   const CLICK_INTERVAL_MS = 100;
@@ -352,7 +427,10 @@ const racingGamePlayPageAction = async () => {
     targetElement.dispatchEvent(pointerDownEvent);
   }, CLICK_INTERVAL_MS);
 
-  console.log('[AutoTest] Racing game auto-click interval started');
+  logger.addLog({
+    message: 'Racing game auto-click interval started',
+    context: currentContext,
+  });
 };
 
 // 페이지 액션 목록

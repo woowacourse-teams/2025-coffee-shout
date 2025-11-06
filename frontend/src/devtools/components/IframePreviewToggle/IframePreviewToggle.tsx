@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../utils/checkIsTouchDevice';
 import { MiniGameType, MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
+import { getAutoTestLogger } from '../../utils/autoTestLogger';
+import AutoTestLogPanel from '../AutoTestLogPanel/AutoTestLogPanel';
 import * as S from './IframePreviewToggle.styled';
 
 type TestMessage =
@@ -82,8 +84,12 @@ const IframePreviewToggle = () => {
         });
       } else if (event.data.type === 'READY') {
         const { iframeName } = event.data;
-        console.log('[AutoTest] Received READY from iframe:', iframeName);
-        console.log('[AutoTest] pendingStartTest.current:', pendingStartTest.current);
+        const logger = getAutoTestLogger();
+        logger.addLog({
+          message: 'Received READY from iframe',
+          context: 'MAIN',
+          data: { iframeName, pendingStartTest: pendingStartTest.current },
+        });
         setReadyState((prev) => ({
           ...prev,
           [iframeName]: true,
@@ -91,29 +97,36 @@ const IframePreviewToggle = () => {
 
         // READY 신호를 받고 START_TEST가 대기 중이면 즉시 전송
         if (pendingStartTest.current && iframeName === 'host') {
-          console.log('[AutoTest] Conditions met, sending START_TEST');
+          logger.addLog({
+            message: 'Conditions met, sending START_TEST',
+            context: 'MAIN',
+          });
           setTimeout(() => {
             const hostIframe = iframeRefs.current.host;
-            console.log('[AutoTest] Host iframe check:', {
-              exists: !!hostIframe,
-              hasContentWindow: !!hostIframe?.contentWindow,
-            });
             if (hostIframe?.contentWindow) {
               const message = {
                 type: 'START_TEST' as const,
                 role: 'host' as const,
                 gameSequence,
               };
-              console.log('[AutoTest] Sending START_TEST to host after READY', { gameSequence });
+              logger.addLog({
+                message: 'Sending START_TEST to host after READY',
+                context: 'MAIN',
+                data: { gameSequence },
+              });
               hostIframe.contentWindow.postMessage(message, '*');
               pendingStartTest.current = false;
             }
           }, 0);
         } else {
-          console.log('[AutoTest] Not sending START_TEST:', {
-            pendingStartTest: pendingStartTest.current,
-            iframeName,
-            isHost: iframeName === 'host',
+          logger.addLog({
+            message: 'Not sending START_TEST',
+            context: 'MAIN',
+            data: {
+              pendingStartTest: pendingStartTest.current,
+              iframeName,
+              isHost: iframeName === 'host',
+            },
           });
         }
       } else if (event.data.type === 'GUEST_READY') {
@@ -233,19 +246,29 @@ const IframePreviewToggle = () => {
   };
 
   const handleStartTest = () => {
-    console.log('[AutoTest] handleStartTest called');
+    const logger = getAutoTestLogger();
+    logger.addLog({
+      message: 'handleStartTest called',
+      context: 'MAIN',
+    });
     setIsRunning(true);
     joinCodeRef.current = null;
     setGuestReadyState({});
     setReadyState({}); // RESET_TO_HOME 후 새로운 READY 신호를 기다리기 위해 초기화
     pendingStartTest.current = true; // START_TEST 전송 대기 플래그
-    console.log('[AutoTest] pendingStartTest set to true');
+    logger.addLog({
+      message: 'pendingStartTest set to true',
+      context: 'MAIN',
+    });
 
     // 모든 iframe에 RESET_TO_HOME 전송
     iframeNames.forEach((name) => {
       const iframe = iframeRefs.current[name];
       if (iframe?.contentWindow) {
-        console.log(`[AutoTest] Sending RESET_TO_HOME to ${name}`);
+        logger.addLog({
+          message: `Sending RESET_TO_HOME to ${name}`,
+          context: 'MAIN',
+        });
         iframe.contentWindow.postMessage({ type: 'RESET_TO_HOME' }, '*');
       }
     });
@@ -346,6 +369,7 @@ const IframePreviewToggle = () => {
                 테스트 중단
               </S.StopButton>
             )}
+            <AutoTestLogPanel isIframeOpen={open} />
           </>
         )}
       </S.ToggleBar>
@@ -378,7 +402,6 @@ const IframePreviewToggle = () => {
                 <S.PreviewIframe
                   ref={(el) => {
                     if (el) {
-                      console.log(`[AutoTest Debug] Iframe ref set for "${name}"`);
                       iframeRefs.current[name] = el;
                     }
                   }}
@@ -386,12 +409,8 @@ const IframePreviewToggle = () => {
                   title={`preview-${index === 0 ? 'left' : 'right'}`}
                   src="/"
                   onLoad={() => {
-                    console.log(`[AutoTest Debug] Iframe "${name}" loaded`);
                     const iframe = iframeRefs.current[name];
-                    console.log(
-                      `[AutoTest Debug] Iframe "${name}" onLoad - has contentWindow:`,
-                      !!iframe?.contentWindow
-                    );
+                    // onLoad는 로그에 기록하지 않음 (너무 많음)
                   }}
                 />
               </S.IframeWrapper>

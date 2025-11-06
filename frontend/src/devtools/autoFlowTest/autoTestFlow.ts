@@ -6,6 +6,7 @@ import {
   type PageActionContext,
 } from './pageActions';
 import { MiniGameType } from '@/types/miniGame/common';
+import { getAutoTestLogger } from '../utils/autoTestLogger';
 
 type TestMessage =
   | {
@@ -37,43 +38,77 @@ const setFlowState = (role: 'host' | 'guest', state: FlowState): void => {
   flowState[role] = state;
 };
 
+// 컨텍스트 추출 헬퍼
+const getContext = (): string => {
+  if (typeof window === 'undefined') return 'MAIN';
+  try {
+    const iframeName = window.frameElement?.getAttribute('name') || '';
+    return iframeName || 'MAIN';
+  } catch {
+    return 'MAIN';
+  }
+};
+
 // 페이지 기반 플로우 실행
 const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
-  console.log(`[AutoTest Debug] runFlow called for ${role}`, {
-    role,
-    context,
-    currentPath: window.location.pathname,
-    flowState: getFlowState(role),
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: `runFlow called for ${role}`,
+    context: currentContext,
+    data: {
+      currentPath: window.location.pathname,
+      flowState: getFlowState(role),
+    },
   });
 
   // 이미 실행 중이면 무시
   const currentState = getFlowState(role);
   if (currentState === 'running' || currentState === 'paused') {
-    console.log(`[AutoTest Debug] Flow already running for ${role}, skipping`);
+    logger.addLog({
+      message: `Flow already running for ${role}, skipping`,
+      context: currentContext,
+    });
     return;
   }
 
   setFlowState(role, 'running');
-  console.log(`[AutoTest Debug] ${role} flow started, flowState updated`);
+  logger.addLog({
+    message: `${role} flow started, flowState updated`,
+    context: currentContext,
+  });
 
   try {
-    console.log(`[AutoTest Debug] Waiting initial delay: ${DELAY_BETWEEN_ACTIONS}ms`);
+    logger.addLog({
+      message: `Waiting initial delay: ${DELAY_BETWEEN_ACTIONS}ms`,
+      context: currentContext,
+    });
     await wait(DELAY_BETWEEN_ACTIONS);
 
     // 현재 경로에서 시작
     let currentPath = window.location.pathname;
     let joinCode: string | null = null;
-    console.log(`[AutoTest Debug] Starting flow from path: ${currentPath}`);
+    logger.addLog({
+      message: `Starting flow from path: ${currentPath}`,
+      context: currentContext,
+    });
 
     // 게스트의 경우 joinCode를 사용해야 하는 페이지 처리
     if (role === 'guest' && currentPath === '/') {
-      console.log('[AutoTest Debug] Guest at home page, may need to wait for joinCode');
+      logger.addLog({
+        message: 'Guest at home page, may need to wait for joinCode',
+        context: currentContext,
+      });
       // joinCode 입력 페이지로 이동해야 함 (이미 homePageGuestAction에서 처리됨)
       // 하지만 joinCode는 나중에 받을 수 있으므로 대기
     }
 
     // 플로우 실행 루프
-    console.log(`[AutoTest Debug] Entering flow loop for ${role}`);
+    logger.addLog({
+      message: `Entering flow loop for ${role}`,
+      context: currentContext,
+    });
     let loopIteration = 0;
     while (true) {
       const currentFlowState = getFlowState(role);
@@ -82,49 +117,78 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       }
 
       loopIteration++;
-      console.log(`[AutoTest Debug] Flow loop iteration ${loopIteration} for ${role}`);
+      logger.addLog({
+        message: `Flow loop iteration ${loopIteration} for ${role}`,
+        context: currentContext,
+      });
       // joinCode 업데이트 (경로에서 추출)
       const pathJoinCodeMatch = currentPath.match(/^\/room\/([^/]+)/);
       if (pathJoinCodeMatch) {
         joinCode = pathJoinCodeMatch[1];
         context.joinCode = joinCode;
-        console.log(`[AutoTest Debug] Extracted joinCode from path: ${joinCode}`);
+        logger.addLog({
+          message: `Extracted joinCode from path: ${joinCode}`,
+          context: currentContext,
+        });
       }
 
       // 현재 경로에 맞는 액션 찾기
-      console.log(`[AutoTest Debug] Finding page action for path: ${currentPath}, role: ${role}`);
+      logger.addLog({
+        message: `Finding page action for path: ${currentPath}, role: ${role}`,
+        context: currentContext,
+      });
       const pageAction = findPageAction(currentPath, role);
 
       if (pageAction) {
-        console.log(`[AutoTest Debug] Found page action, executing...`, {
-          currentPath,
-          role,
-          actionName: pageAction.constructor?.name || 'unknown',
+        logger.addLog({
+          message: 'Found page action, executing...',
+          context: currentContext,
+          data: {
+            currentPath,
+            role,
+            actionName: pageAction.constructor?.name || 'unknown',
+          },
         });
         await pageAction.execute(context);
-        console.log(`[AutoTest Debug] Page action executed successfully`);
+        logger.addLog({
+          message: 'Page action executed successfully',
+          context: currentContext,
+        });
       } else {
         // 액션이 없으면 현재 경로에서 대기 (다른 이벤트 처리 대기)
-        console.log(`[AutoTest Debug] No action found for path: ${currentPath}, role: ${role}`);
+        logger.addLog({
+          message: `No action found for path: ${currentPath}, role: ${role}`,
+          context: currentContext,
+        });
       }
 
       // 일시 중지 상태 체크 (페이지 액션 실행 후)
       // 상태가 변경되었을 수 있으므로 다시 확인
       const checkPausedState = getFlowState(role);
       if (checkPausedState === 'paused') {
-        console.log(
-          `[AutoTest Debug] Flow paused for ${role} after page action, waiting for resume...`
-        );
+        logger.addLog({
+          message: `Flow paused for ${role} after page action, waiting for resume...`,
+          context: currentContext,
+        });
         await waitForResume(role);
-        console.log(`[AutoTest Debug] Flow resumed for ${role}`);
+        logger.addLog({
+          message: `Flow resumed for ${role}`,
+          context: currentContext,
+        });
       }
 
       // 경로 변경 대기 (타임아웃 없음)
-      console.log(`[AutoTest Debug] Waiting for path change from: ${currentPath}`);
+      logger.addLog({
+        message: `Waiting for path change from: ${currentPath}`,
+        context: currentContext,
+      });
       await waitForPathChange(currentPath, role);
 
       const newPath = window.location.pathname;
-      console.log(`[AutoTest Debug] Path changed: ${currentPath} -> ${newPath}`);
+      logger.addLog({
+        message: `Path changed: ${currentPath} -> ${newPath}`,
+        context: currentContext,
+      });
 
       // 레이싱 게임 페이지를 벗어나면 클릭 인터벌 정리
       if (currentPath.match(/^\/room\/[^/]+\/RACING_GAME\/play$/)) {
@@ -133,14 +197,20 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
 
       // 주문 페이지에 도달하면 완료
       if (/^\/room\/[^/]+\/order$/.test(newPath)) {
-        console.log('[AutoTest Debug] Reached order page, test completed');
+        logger.addLog({
+          message: 'Reached order page, test completed',
+          context: currentContext,
+        });
         setFlowState(role, 'idle');
         break;
       }
 
       // 홈으로 리셋된 경우 플로우 종료 (테스트 완료 후 리셋)
       if (newPath === '/') {
-        console.log('[AutoTest Debug] Reset to home, flow completed');
+        logger.addLog({
+          message: 'Reset to home, flow completed',
+          context: currentContext,
+        });
         clearRacingGameClickInterval();
         setFlowState(role, 'idle');
         break;
@@ -148,24 +218,44 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
 
       currentPath = newPath;
     }
-    console.log(`[AutoTest Debug] Flow loop exited for ${role}`);
+    logger.addLog({
+      message: `Flow loop exited for ${role}`,
+      context: currentContext,
+    });
   } catch (error) {
     console.error(`[AutoTest Debug] Error in ${role} flow:`, error);
+    logger.addLog({
+      message: `Error in ${role} flow: ${error instanceof Error ? error.message : String(error)}`,
+      context: currentContext,
+      data: error,
+    });
     throw error;
   } finally {
     setFlowState(role, 'idle');
-    console.log(`[AutoTest Debug] ${role} flow completed, flowState reset`);
+    logger.addLog({
+      message: `${role} flow completed, flowState reset`,
+      context: currentContext,
+    });
   }
 };
 
 // 경로 변경 대기 (타임아웃 없음)
 const waitForPathChange = async (currentPath: string, role: 'host' | 'guest'): Promise<void> => {
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
   while (window.location.pathname === currentPath) {
     // 일시 중지 상태 체크
     if (getFlowState(role) === 'paused') {
-      console.log(`[AutoTest Debug] Path change wait paused for ${role}`);
+      logger.addLog({
+        message: `Path change wait paused for ${role}`,
+        context: currentContext,
+      });
       await waitForResume(role);
-      console.log(`[AutoTest Debug] Path change wait resumed for ${role}`);
+      logger.addLog({
+        message: `Path change wait resumed for ${role}`,
+        context: currentContext,
+      });
     }
     await wait(100);
   }
@@ -181,19 +271,41 @@ const waitForResume = async (role: 'host' | 'guest'): Promise<void> => {
 
 // 호스트 플로우 실행
 const runHostFlow = async (gameSequence?: MiniGameType[]) => {
-  console.log('[AutoTest Debug] runHostFlow called', { gameSequence });
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: 'runHostFlow called',
+    context: currentContext,
+    data: { gameSequence },
+  });
+
   const context: PageActionContext = {
     role: 'host',
     playerName: 'host',
     gameSequence,
   };
-  console.log('[AutoTest Debug] Creating host context:', context);
+
+  logger.addLog({
+    message: 'Creating host context',
+    context: currentContext,
+    data: context,
+  });
+
   await runFlow('host', context);
 };
 
 // 게스트 플로우 실행
 const runGuestFlow = async (joinCode: string, iframeName?: string) => {
-  console.log('[AutoTest Debug] runGuestFlow called', { joinCode, iframeName });
+  const logger = getAutoTestLogger();
+  const currentContext = getContext();
+
+  logger.addLog({
+    message: 'runGuestFlow called',
+    context: currentContext,
+    data: { joinCode, iframeName },
+  });
+
   const guestName = iframeName || 'guest1';
   const context: PageActionContext = {
     role: 'guest',
@@ -201,7 +313,13 @@ const runGuestFlow = async (joinCode: string, iframeName?: string) => {
     playerName: guestName,
     iframeName,
   };
-  console.log('[AutoTest Debug] Creating guest context:', context);
+
+  logger.addLog({
+    message: 'Creating guest context',
+    context: currentContext,
+    data: context,
+  });
+
   await runFlow('guest', context);
 };
 
@@ -254,7 +372,11 @@ export const setupAutoTestListener = () => {
       if (getFlowState('guest') === 'running') {
         setFlowState('guest', 'paused');
       }
-      console.log('[AutoTest Debug] Test paused for all roles');
+      const logger = getAutoTestLogger();
+      logger.addLog({
+        message: 'Test paused for all roles',
+        context: getContext(),
+      });
     } else if (event.data.type === 'RESUME_TEST') {
       // 모든 플로우 재개
       if (getFlowState('host') === 'paused') {
@@ -263,7 +385,11 @@ export const setupAutoTestListener = () => {
       if (getFlowState('guest') === 'paused') {
         setFlowState('guest', 'running');
       }
-      console.log('[AutoTest Debug] Test resumed for all roles');
+      const logger = getAutoTestLogger();
+      logger.addLog({
+        message: 'Test resumed for all roles',
+        context: getContext(),
+      });
     } else if (event.data.type === 'RESET_TO_HOME') {
       window.location.href = '/';
     }

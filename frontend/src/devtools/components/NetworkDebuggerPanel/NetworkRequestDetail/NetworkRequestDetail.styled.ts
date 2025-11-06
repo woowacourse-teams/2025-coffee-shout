@@ -5,6 +5,7 @@ export const DetailContainer = styled.div`
   height: 100%;
   overflow-y: auto;
   position: relative;
+  user-select: none;
 `;
 
 export const CloseButton = styled.button`
@@ -72,6 +73,7 @@ export const DetailValue = styled.span`
   font-size: 12px;
   flex: 1;
   word-break: break-all;
+  user-select: none;
 `;
 
 export const TypeBadge = styled.span<{ type: 'fetch' | 'websocket' }>`
@@ -99,6 +101,7 @@ export const UrlText = styled.span`
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 11px;
   word-break: break-all;
+  user-select: none;
 `;
 
 export const CodeBlock = styled.div`
@@ -107,6 +110,7 @@ export const CodeBlock = styled.div`
   border-radius: 4px;
   padding: 12px;
   overflow-x: auto;
+  user-select: none;
 
   pre {
     margin: 0;
@@ -116,6 +120,7 @@ export const CodeBlock = styled.div`
     color: #222;
     white-space: pre-wrap;
     word-wrap: break-word;
+    user-select: none;
   }
 `;
 
@@ -125,6 +130,7 @@ export const ErrorBlock = styled.div`
   border-radius: 4px;
   padding: 12px;
   overflow-x: auto;
+  user-select: none;
 
   pre {
     margin: 0;
@@ -134,6 +140,7 @@ export const ErrorBlock = styled.div`
     color: #c62828;
     white-space: pre-wrap;
     word-wrap: break-word;
+    user-select: none;
   }
 `;
 
@@ -157,7 +164,6 @@ export const MessageArrow = styled.span<{ type: 'sent' | 'received' }>`
   font-size: 12px;
   color: ${({ type }) => (type === 'sent' ? '#0f9d58' : '#d93025')};
   font-weight: 600;
-  user-select: none;
 `;
 
 export const MessageSummary = styled.span`
@@ -168,6 +174,7 @@ export const MessageSummary = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  user-select: none;
 `;
 
 export const MessageTime = styled.span`
@@ -175,12 +182,14 @@ export const MessageTime = styled.span`
   color: #666;
   margin-left: 8px;
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  user-select: none;
 `;
 
 export const ExpandedMessageDetail = styled.div`
   padding: 16px;
   background: #f8f9fa;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  user-select: none;
 `;
 
 export const PayloadSectionTitle = styled(SectionTitle)`

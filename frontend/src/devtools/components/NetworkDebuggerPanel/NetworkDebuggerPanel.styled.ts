@@ -29,7 +29,6 @@ export const HiddenTrigger = styled.div`
   z-index: 1001;
   background: transparent;
   touch-action: none;
-  user-select: none;
 `;
 
 export const Panel = styled.div<{ height: number }>`
@@ -56,7 +55,6 @@ export const ResizeHandle = styled.div`
   cursor: ns-resize;
   z-index: 1001;
   background: transparent;
-  user-select: none;
   touch-action: none;
 
   &:hover {
@@ -165,7 +163,6 @@ export const VerticalResizeHandle = styled.div`
   cursor: ew-resize;
   z-index: 1002;
   background: transparent;
-  user-select: none;
 
   &:hover {
     background: rgba(0, 0, 0, 0.1);
@@ -178,7 +175,6 @@ export const MobileResizeHandle = styled.div`
   cursor: ns-resize;
   z-index: 1002;
   background: transparent;
-  user-select: none;
   touch-action: none;
   flex-shrink: 0;
 

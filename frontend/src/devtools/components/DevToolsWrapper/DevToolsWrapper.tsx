@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import IframePreviewToggle from '../IframePreviewToggle/IframePreviewToggle';
 import NetworkDebuggerPanel from '../NetworkDebuggerPanel/NetworkDebuggerPanel';
 import { setupAutoTestListener } from '../../autoFlowTest/autoTestFlow';
+import { initializeAutoTestLogger, getAutoTestLogger } from '../../utils/autoTestLogger';
 
 const isTopWindow = (): boolean => {
   if (typeof window === 'undefined') return false;
@@ -16,6 +17,13 @@ const isTopWindow = (): boolean => {
 export const DevToolsWrapper = () => {
   const location = useLocation();
 
+  // AutoTestLogger 초기화
+  useEffect(() => {
+    if (process.env.ENABLE_DEVTOOLS) {
+      initializeAutoTestLogger();
+    }
+  }, []);
+
   // Auto test listener 설정
   useEffect(() => {
     if (!isTopWindow()) {
@@ -24,7 +32,12 @@ export const DevToolsWrapper = () => {
       const sendReady = () => {
         const iframeName = window.frameElement?.getAttribute('name') || '';
         if (iframeName === 'host' && window.parent && window.parent !== window) {
-          console.log('[AutoTest] Rendering complete, sending READY signal', { iframeName });
+          const logger = getAutoTestLogger();
+          logger.addLog({
+            message: 'Rendering complete, sending READY signal',
+            context: iframeName,
+            data: { iframeName },
+          });
           window.parent.postMessage({ type: 'READY', iframeName }, '*');
         }
       };
@@ -63,4 +76,3 @@ export const DevToolsWrapper = () => {
     </>
   );
 };
-

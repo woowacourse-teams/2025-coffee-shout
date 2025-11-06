@@ -1,5 +1,18 @@
 import styled from '@emotion/styled';
 
+export const EmptyState = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+`;
+
+export const EmptyText = styled.span`
+  font-size: 13px;
+  color: #999;
+`;
+
 export const List = styled.div`
   display: flex;
   flex-direction: column;
@@ -34,22 +47,21 @@ export const ListBody = styled.div`
   user-select: none;
 `;
 
-export const RequestRow = styled.div<{ selected: boolean }>`
+export const LogRow = styled.div`
   display: flex;
   align-items: center;
   padding: 8px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  background: ${({ selected }) => (selected ? '#e8f0fe' : '#ffffff')};
+  cursor: default;
   transition: background 0.1s ease;
   user-select: none;
 
   &:hover {
-    background: ${({ selected }) => (selected ? '#e8f0fe' : '#f8f9fa')};
+    background: #f8f9fa;
   }
 `;
 
-export const RequestCell = styled.div<{ $width?: string; $flex?: number }>`
+export const LogCell = styled.div<{ $width?: string; $flex?: number }>`
   padding: 0 8px;
   font-size: 12px;
   color: #222;
@@ -61,15 +73,11 @@ export const RequestCell = styled.div<{ $width?: string; $flex?: number }>`
   ${({ $flex }) => ($flex !== undefined ? `flex: ${$flex};` : '')}
 `;
 
-export const TypeBadge = styled.span<{ type: 'fetch' | 'websocket' }>`
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  background: ${({ type }) => (type === 'fetch' ? '#e8f5e9' : '#fff3e0')};
-  color: ${({ type }) => (type === 'fetch' ? '#2e7d32' : '#e65100')};
+export const TimeText = styled.span`
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
 `;
 
 export const ContextBadge = styled.span`
@@ -82,25 +90,11 @@ export const ContextBadge = styled.span`
   color: #1976d2;
 `;
 
-export const UrlText = styled.span`
-  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-  font-size: 11px;
+export const MessageText = styled.span`
+  font-size: 12px;
+  color: #222;
+  word-break: break-word;
+  white-space: normal;
+  user-select: none;
 `;
 
-export const StatusText = styled.span<{ color: string }>`
-  color: ${({ color }) => color};
-  font-weight: 500;
-`;
-
-export const EmptyState = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #999;
-`;
-
-export const EmptyText = styled.p`
-  margin: 0;
-  font-size: 13px;
-`;
