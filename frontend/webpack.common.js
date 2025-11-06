@@ -71,7 +71,6 @@ export default (_, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
-        inject: 'head',
         templateParameters: {
           DEV_SNIPPET:
             mergedEnv.ENABLE_DEVTOOLS === 'true'
