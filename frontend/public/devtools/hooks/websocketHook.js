@@ -10,7 +10,7 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
   win = getSafeWindow(win);
   if (!win) return null;
 
-  if (checkAlreadyHooked(win, 'WebSocket', '__DEV_WS_WRAPPED__')) {
+  if (checkAlreadyHooked(win, 'WebSocket')) {
     return null;
   }
 
@@ -113,5 +113,5 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
     },
   });
 
-  defineHookedProperty(win, 'WebSocket', ProxiedWebSocket, '__DEV_WS_WRAPPED__');
+  defineHookedProperty(win, 'WebSocket', ProxiedWebSocket);
 };

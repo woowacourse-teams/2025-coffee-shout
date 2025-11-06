@@ -1,8 +1,6 @@
 /* eslint-env browser */
 
-export const checkAlreadyHooked = (win, key, marker) => {
-  if (!win?.[key]) {
-    return false;
-  }
+export const checkAlreadyHooked = (win, key) => {
+  const marker = `__DEV_${key.toUpperCase()}_WRAPPED__`;
   return !!win[marker];
 };

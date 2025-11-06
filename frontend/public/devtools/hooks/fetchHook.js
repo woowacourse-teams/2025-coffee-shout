@@ -9,7 +9,7 @@ export const setupFetchHook = (win, collector, context = {}) => {
   win = getSafeWindow(win);
   if (!win) return null;
 
-  if (checkAlreadyHooked(win, 'fetch', '__DEV_FETCH_WRAPPED__')) {
+  if (checkAlreadyHooked(win, 'fetch')) {
     return null;
   }
 
@@ -71,5 +71,5 @@ export const setupFetchHook = (win, collector, context = {}) => {
     return originalPromise;
   };
 
-  defineHookedProperty(win, 'fetch', wrapper, '__DEV_FETCH_WRAPPED__');
+  defineHookedProperty(win, 'fetch', wrapper);
 };
