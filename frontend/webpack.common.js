@@ -70,7 +70,7 @@ export default (_, argv) => {
         inject: 'head',
         templateParameters: {
           DEV_SNIPPET:
-            argv.mode === 'development'
+            mergedEnv.ENABLE_DEVTOOLS === 'true'
               ? `<script type="module" src="/devtools/devSnippet.js"></script>`
               : '',
         },
@@ -89,15 +89,12 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          // devtools 폴더는 개발 모드에서만 복사
-          ...(argv.mode === 'development'
-            ? [
-                {
-                  from: 'public/devtools',
-                  to: 'devtools',
-                },
-              ]
-            : []),
+          ...(mergedEnv.ENABLE_DEVTOOLS === 'true' && [
+            {
+              from: 'public/devtools',
+              to: 'devtools',
+            },
+          ]),
         ],
       }),
       new webpack.DefinePlugin(envKeys),
