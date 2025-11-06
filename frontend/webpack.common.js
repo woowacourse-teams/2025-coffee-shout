@@ -1,11 +1,11 @@
-import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import webpack from 'webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import webpack from 'webpack';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import WebpackBundleAnalyzer from 'webpack-bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,14 +17,18 @@ const appVersion = packageJson.version;
 export default (_, argv) => {
   const mode = argv.mode || 'development';
 
-  const dotenvEnv = dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) });
+  const dotenvEnv =
+    dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
   const mergedEnv = { ...process.env, ...dotenvEnv };
 
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
+    'process.env.ENABLE_DEVTOOLS': JSON.stringify(mergedEnv.ENABLE_DEVTOOLS === 'true'),
     ...Object.fromEntries(
-      Object.entries(mergedEnv).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
+      Object.entries(mergedEnv)
+        .filter(([k]) => k !== 'ENABLE_DEVTOOLS')
+        .map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
     ),
   };
 
@@ -89,12 +93,14 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          ...(mergedEnv.ENABLE_DEVTOOLS === 'true' && [
-            {
-              from: 'public/devtools',
-              to: 'devtools',
-            },
-          ]),
+          ...(mergedEnv.ENABLE_DEVTOOLS === 'true'
+            ? [
+                {
+                  from: 'public/devtools',
+                  to: 'devtools',
+                },
+              ]
+            : []),
         ],
       }),
       new webpack.DefinePlugin(envKeys),
@@ -118,6 +124,7 @@ export default (_, argv) => {
       open: true,
       historyApiFallback: true,
     },
+
     optimization: {
       usedExports: true,
       sideEffects: false,
