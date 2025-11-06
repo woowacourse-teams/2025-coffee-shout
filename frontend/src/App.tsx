@@ -12,6 +12,10 @@ import ProbabilityHistoryProvider from './contexts/ProbabilityHistory/Probabilit
 import { theme } from './styles/theme';
 
 const App = () => {
+  if (process.env.ENABLE_DEVTOOLS) {
+    console.log('ENABLE_DEVTOOLS', process.env.ENABLE_DEVTOOLS);
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <IdentifierProvider>
