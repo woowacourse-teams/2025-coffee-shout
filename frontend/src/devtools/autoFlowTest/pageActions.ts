@@ -309,6 +309,52 @@ const roulettePlayPageHostAction = async () => {
   console.log('[AutoTest] Host clicked roulette spin button');
 };
 
+// 레이싱 게임 플레이 페이지 - 연속 클릭 관리
+let racingGameClickIntervalId: number | null = null;
+
+export const clearRacingGameClickInterval = () => {
+  if (racingGameClickIntervalId !== null) {
+    clearInterval(racingGameClickIntervalId);
+    racingGameClickIntervalId = null;
+    console.log('[AutoTest] Racing game click interval cleared');
+  }
+};
+
+// 레이싱 게임 플레이 페이지 - 공통 액션 (호스트/게스트 모두)
+const racingGamePlayPageAction = async () => {
+  // 기존 인터벌이 있으면 먼저 정리
+  clearRacingGameClickInterval();
+
+  await wait(DELAY_BETWEEN_ACTIONS);
+
+  console.log('[AutoTest] Starting racing game auto-click (5 clicks per second)');
+
+  // 1초에 5번 클릭 = 200ms마다 클릭
+  const CLICK_INTERVAL_MS = 100;
+
+  racingGameClickIntervalId = window.setInterval(() => {
+    // RacingGameOverlay 요소 찾기 (data-testid 사용)
+    const overlayElement = findElement('racing-game-overlay');
+
+    // Overlay를 찾지 못한 경우 body에 이벤트 발생 (fallback)
+    const targetElement = overlayElement || document.body;
+
+    // pointerdown 이벤트 발생
+    const pointerDownEvent = new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+      clientX: window.innerWidth / 2,
+      clientY: window.innerHeight / 2,
+    });
+
+    targetElement.dispatchEvent(pointerDownEvent);
+  }, CLICK_INTERVAL_MS);
+
+  console.log('[AutoTest] Racing game auto-click interval started');
+};
+
 // 페이지 액션 목록
 export const pageActions: PageAction[] = [
   {
@@ -348,6 +394,10 @@ export const pageActions: PageAction[] = [
     pathPattern: /^\/room\/[^/]+\/roulette\/play$/,
     role: 'host',
     execute: roulettePlayPageHostAction,
+  },
+  {
+    pathPattern: /^\/room\/[^/]+\/RACING_GAME\/play$/,
+    execute: racingGamePlayPageAction,
   },
 ];
 

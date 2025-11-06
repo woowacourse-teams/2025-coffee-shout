@@ -1,5 +1,10 @@
 import { wait, DELAY_BETWEEN_ACTIONS } from './domUtils';
-import { findPageAction, handleHostGameStart, type PageActionContext } from './pageActions';
+import {
+  findPageAction,
+  handleHostGameStart,
+  clearRacingGameClickInterval,
+  type PageActionContext,
+} from './pageActions';
 import { MiniGameType } from '@/types/miniGame/common';
 
 type TestMessage =
@@ -121,6 +126,11 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       const newPath = window.location.pathname;
       console.log(`[AutoTest Debug] Path changed: ${currentPath} -> ${newPath}`);
 
+      // 레이싱 게임 페이지를 벗어나면 클릭 인터벌 정리
+      if (currentPath.match(/^\/room\/[^/]+\/RACING_GAME\/play$/)) {
+        clearRacingGameClickInterval();
+      }
+
       // 주문 페이지에 도달하면 완료
       if (/^\/room\/[^/]+\/order$/.test(newPath)) {
         console.log('[AutoTest Debug] Reached order page, test completed');
@@ -131,6 +141,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       // 홈으로 리셋된 경우 플로우 종료 (테스트 완료 후 리셋)
       if (newPath === '/') {
         console.log('[AutoTest Debug] Reset to home, flow completed');
+        clearRacingGameClickInterval();
         setFlowState(role, 'idle');
         break;
       }
@@ -227,10 +238,12 @@ export const setupAutoTestListener = () => {
       await handleHostGameStart();
     } else if (event.data.type === 'TEST_COMPLETED') {
       // 모든 플로우 종료
+      clearRacingGameClickInterval();
       setFlowState('host', 'idle');
       setFlowState('guest', 'idle');
     } else if (event.data.type === 'STOP_TEST') {
       // 모든 플로우 즉시 종료
+      clearRacingGameClickInterval();
       setFlowState('host', 'idle');
       setFlowState('guest', 'idle');
     } else if (event.data.type === 'PAUSE_TEST') {
