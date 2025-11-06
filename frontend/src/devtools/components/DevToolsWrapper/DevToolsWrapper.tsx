@@ -34,7 +34,7 @@ export const DevToolsWrapper = () => {
         if (iframeName === 'host' && window.parent && window.parent !== window) {
           const logger = getAutoTestLogger();
           logger.addLog({
-            message: 'Rendering complete, sending READY signal',
+            message: '렌더링 완료, READY 신호 전송',
             context: iframeName,
             data: { iframeName },
           });

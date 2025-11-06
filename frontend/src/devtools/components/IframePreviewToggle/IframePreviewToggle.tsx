@@ -86,7 +86,7 @@ const IframePreviewToggle = () => {
         const { iframeName } = event.data;
         const logger = getAutoTestLogger();
         logger.addLog({
-          message: 'Received READY from iframe',
+          message: 'iframe에서 READY 신호 수신',
           context: 'MAIN',
           data: { iframeName, pendingStartTest: pendingStartTest.current },
         });
@@ -98,7 +98,7 @@ const IframePreviewToggle = () => {
         // READY 신호를 받고 START_TEST가 대기 중이면 즉시 전송
         if (pendingStartTest.current && iframeName === 'host') {
           logger.addLog({
-            message: 'Conditions met, sending START_TEST',
+            message: '조건 충족, START_TEST 전송',
             context: 'MAIN',
           });
           setTimeout(() => {
@@ -110,7 +110,7 @@ const IframePreviewToggle = () => {
                 gameSequence,
               };
               logger.addLog({
-                message: 'Sending START_TEST to host after READY',
+                message: 'READY 후 host에 START_TEST 전송',
                 context: 'MAIN',
                 data: { gameSequence },
               });
@@ -120,7 +120,7 @@ const IframePreviewToggle = () => {
           }, 0);
         } else {
           logger.addLog({
-            message: 'Not sending START_TEST',
+            message: 'START_TEST 전송하지 않음',
             context: 'MAIN',
             data: {
               pendingStartTest: pendingStartTest.current,
@@ -248,7 +248,7 @@ const IframePreviewToggle = () => {
   const handleStartTest = () => {
     const logger = getAutoTestLogger();
     logger.addLog({
-      message: 'handleStartTest called',
+      message: 'handleStartTest 호출됨',
       context: 'MAIN',
     });
     setIsRunning(true);
@@ -257,7 +257,7 @@ const IframePreviewToggle = () => {
     setReadyState({}); // RESET_TO_HOME 후 새로운 READY 신호를 기다리기 위해 초기화
     pendingStartTest.current = true; // START_TEST 전송 대기 플래그
     logger.addLog({
-      message: 'pendingStartTest set to true',
+      message: 'pendingStartTest를 true로 설정',
       context: 'MAIN',
     });
 
@@ -266,7 +266,7 @@ const IframePreviewToggle = () => {
       const iframe = iframeRefs.current[name];
       if (iframe?.contentWindow) {
         logger.addLog({
-          message: `Sending RESET_TO_HOME to ${name}`,
+          message: `${name}에 RESET_TO_HOME 전송`,
           context: 'MAIN',
         });
         iframe.contentWindow.postMessage({ type: 'RESET_TO_HOME' }, '*');

@@ -55,7 +55,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
   const currentContext = getContext();
 
   logger.addLog({
-    message: `runFlow called for ${role}`,
+    message: `${role} 플로우 실행 호출`,
     context: currentContext,
     data: {
       currentPath: window.location.pathname,
@@ -67,7 +67,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
   const currentState = getFlowState(role);
   if (currentState === 'running' || currentState === 'paused') {
     logger.addLog({
-      message: `Flow already running for ${role}, skipping`,
+      message: `${role} 플로우가 이미 실행 중, 건너뜀`,
       context: currentContext,
     });
     return;
@@ -75,13 +75,13 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
 
   setFlowState(role, 'running');
   logger.addLog({
-    message: `${role} flow started, flowState updated`,
+    message: `${role} 플로우 시작, flowState 업데이트됨`,
     context: currentContext,
   });
 
   try {
     logger.addLog({
-      message: `Waiting initial delay: ${DELAY_BETWEEN_ACTIONS}ms`,
+      message: `초기 대기 시간: ${DELAY_BETWEEN_ACTIONS}ms`,
       context: currentContext,
     });
     await wait(DELAY_BETWEEN_ACTIONS);
@@ -90,14 +90,14 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
     let currentPath = window.location.pathname;
     let joinCode: string | null = null;
     logger.addLog({
-      message: `Starting flow from path: ${currentPath}`,
+      message: `경로에서 플로우 시작: ${currentPath}`,
       context: currentContext,
     });
 
     // 게스트의 경우 joinCode를 사용해야 하는 페이지 처리
     if (role === 'guest' && currentPath === '/') {
       logger.addLog({
-        message: 'Guest at home page, may need to wait for joinCode',
+        message: '게스트가 홈 페이지에 있음, joinCode 대기 중일 수 있음',
         context: currentContext,
       });
       // joinCode 입력 페이지로 이동해야 함 (이미 homePageGuestAction에서 처리됨)
@@ -106,7 +106,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
 
     // 플로우 실행 루프
     logger.addLog({
-      message: `Entering flow loop for ${role}`,
+      message: `${role} 플로우 루프 진입`,
       context: currentContext,
     });
     let loopIteration = 0;
@@ -118,7 +118,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
 
       loopIteration++;
       logger.addLog({
-        message: `Flow loop iteration ${loopIteration} for ${role}`,
+        message: `${role} 플로우 루프 반복 ${loopIteration}`,
         context: currentContext,
       });
       // joinCode 업데이트 (경로에서 추출)
@@ -127,21 +127,21 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
         joinCode = pathJoinCodeMatch[1];
         context.joinCode = joinCode;
         logger.addLog({
-          message: `Extracted joinCode from path: ${joinCode}`,
+          message: `경로에서 joinCode 추출: ${joinCode}`,
           context: currentContext,
         });
       }
 
       // 현재 경로에 맞는 액션 찾기
       logger.addLog({
-        message: `Finding page action for path: ${currentPath}, role: ${role}`,
+        message: `경로에 대한 페이지 액션 찾는 중: ${currentPath}, 역할: ${role}`,
         context: currentContext,
       });
       const pageAction = findPageAction(currentPath, role);
 
       if (pageAction) {
         logger.addLog({
-          message: 'Found page action, executing...',
+          message: '페이지 액션 찾음, 실행 중...',
           context: currentContext,
           data: {
             currentPath,
@@ -151,13 +151,13 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
         });
         await pageAction.execute(context);
         logger.addLog({
-          message: 'Page action executed successfully',
+          message: '페이지 액션 실행 완료',
           context: currentContext,
         });
       } else {
         // 액션이 없으면 현재 경로에서 대기 (다른 이벤트 처리 대기)
         logger.addLog({
-          message: `No action found for path: ${currentPath}, role: ${role}`,
+          message: `경로에 대한 액션 없음: ${currentPath}, 역할: ${role}`,
           context: currentContext,
         });
       }
@@ -167,26 +167,26 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       const checkPausedState = getFlowState(role);
       if (checkPausedState === 'paused') {
         logger.addLog({
-          message: `Flow paused for ${role} after page action, waiting for resume...`,
+          message: `${role} 플로우 일시 중지됨 (페이지 액션 후), 재개 대기 중...`,
           context: currentContext,
         });
         await waitForResume(role);
         logger.addLog({
-          message: `Flow resumed for ${role}`,
+          message: `${role} 플로우 재개됨`,
           context: currentContext,
         });
       }
 
       // 경로 변경 대기 (타임아웃 없음)
       logger.addLog({
-        message: `Waiting for path change from: ${currentPath}`,
+        message: `경로 변경 대기 중: ${currentPath}`,
         context: currentContext,
       });
       await waitForPathChange(currentPath, role);
 
       const newPath = window.location.pathname;
       logger.addLog({
-        message: `Path changed: ${currentPath} -> ${newPath}`,
+        message: `경로 변경됨: ${currentPath} -> ${newPath}`,
         context: currentContext,
       });
 
@@ -198,7 +198,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       // 주문 페이지에 도달하면 완료
       if (/^\/room\/[^/]+\/order$/.test(newPath)) {
         logger.addLog({
-          message: 'Reached order page, test completed',
+          message: '주문 페이지 도달, 테스트 완료',
           context: currentContext,
         });
         setFlowState(role, 'idle');
@@ -208,7 +208,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       // 홈으로 리셋된 경우 플로우 종료 (테스트 완료 후 리셋)
       if (newPath === '/') {
         logger.addLog({
-          message: 'Reset to home, flow completed',
+          message: '홈으로 리셋, 플로우 완료',
           context: currentContext,
         });
         clearRacingGameClickInterval();
@@ -219,13 +219,13 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
       currentPath = newPath;
     }
     logger.addLog({
-      message: `Flow loop exited for ${role}`,
+      message: `${role} 플로우 루프 종료`,
       context: currentContext,
     });
   } catch (error) {
     console.error(`[AutoTest Debug] Error in ${role} flow:`, error);
     logger.addLog({
-      message: `Error in ${role} flow: ${error instanceof Error ? error.message : String(error)}`,
+      message: `${role} 플로우 오류: ${error instanceof Error ? error.message : String(error)}`,
       context: currentContext,
       data: error,
     });
@@ -233,7 +233,7 @@ const runFlow = async (role: 'host' | 'guest', context: PageActionContext) => {
   } finally {
     setFlowState(role, 'idle');
     logger.addLog({
-      message: `${role} flow completed, flowState reset`,
+      message: `${role} 플로우 완료, flowState 리셋됨`,
       context: currentContext,
     });
   }
@@ -248,12 +248,12 @@ const waitForPathChange = async (currentPath: string, role: 'host' | 'guest'): P
     // 일시 중지 상태 체크
     if (getFlowState(role) === 'paused') {
       logger.addLog({
-        message: `Path change wait paused for ${role}`,
+        message: `${role} 경로 변경 대기 일시 중지됨`,
         context: currentContext,
       });
       await waitForResume(role);
       logger.addLog({
-        message: `Path change wait resumed for ${role}`,
+        message: `${role} 경로 변경 대기 재개됨`,
         context: currentContext,
       });
     }
@@ -275,7 +275,7 @@ const runHostFlow = async (gameSequence?: MiniGameType[]) => {
   const currentContext = getContext();
 
   logger.addLog({
-    message: 'runHostFlow called',
+    message: '호스트 플로우 실행 호출',
     context: currentContext,
     data: { gameSequence },
   });
@@ -287,7 +287,7 @@ const runHostFlow = async (gameSequence?: MiniGameType[]) => {
   };
 
   logger.addLog({
-    message: 'Creating host context',
+    message: '호스트 컨텍스트 생성',
     context: currentContext,
     data: context,
   });
@@ -301,7 +301,7 @@ const runGuestFlow = async (joinCode: string, iframeName?: string) => {
   const currentContext = getContext();
 
   logger.addLog({
-    message: 'runGuestFlow called',
+    message: '게스트 플로우 실행 호출',
     context: currentContext,
     data: { joinCode, iframeName },
   });
@@ -315,7 +315,7 @@ const runGuestFlow = async (joinCode: string, iframeName?: string) => {
   };
 
   logger.addLog({
-    message: 'Creating guest context',
+    message: '게스트 컨텍스트 생성',
     context: currentContext,
     data: context,
   });
@@ -374,7 +374,7 @@ export const setupAutoTestListener = () => {
       }
       const logger = getAutoTestLogger();
       logger.addLog({
-        message: 'Test paused for all roles',
+        message: '모든 역할의 테스트 일시 중지됨',
         context: getContext(),
       });
     } else if (event.data.type === 'RESUME_TEST') {
@@ -387,7 +387,7 @@ export const setupAutoTestListener = () => {
       }
       const logger = getAutoTestLogger();
       logger.addLog({
-        message: 'Test resumed for all roles',
+        message: '모든 역할의 테스트 재개됨',
         context: getContext(),
       });
     } else if (event.data.type === 'RESET_TO_HOME') {
