@@ -12,18 +12,6 @@ const MARKERS = {
   COLLECTOR: '__networkCollector__',
 };
 
-const w = getSafeWindow();
-
-validateWindow(w);
-initializeSnippet(w);
-
-const collector = initializeCollector(w);
-const context = w.self === w.top ? 'MAIN' : w.name || 'IFRAME';
-
-// Setup hooks
-setupFetchHook(w, collector, context);
-setupWebSocketHook(w, collector, context);
-
 const validateWindow = (win) => {
   if (!win) {
     // non-browser guard
@@ -50,3 +38,15 @@ const initializeCollector = (win) => {
   }
   return win[MARKERS.COLLECTOR];
 };
+
+const w = getSafeWindow();
+
+validateWindow(w);
+initializeSnippet(w);
+
+const collector = initializeCollector(w);
+const context = w.self === w.top ? 'MAIN' : w.name || 'IFRAME';
+
+// Setup hooks
+setupFetchHook(w, collector, context);
+setupWebSocketHook(w, collector, context);
