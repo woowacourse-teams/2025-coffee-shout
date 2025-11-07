@@ -23,7 +23,7 @@ export const setupFetchHook = (win, collector, context = {}) => {
       url: String(input),
     };
 
-    const originalPromise = Reflect.apply(originalFetch, this, [input, init]);
+    const originalPromise = originalFetch(input, init);
 
     originalPromise
       .then(async (res) => {
