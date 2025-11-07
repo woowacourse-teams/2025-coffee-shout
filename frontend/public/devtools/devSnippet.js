@@ -7,11 +7,6 @@ import { validateWindow } from './utils/snippet/validateWindow.js';
 import { initializeSnippet } from './utils/snippet/initializeSnippet.js';
 import { initializeCollector } from './utils/snippet/initializeCollector.js';
 
-export const MARKERS = {
-  SNIPPET: '__DEV_SNIPPET__',
-  COLLECTOR: '__networkCollector__',
-};
-
 const w = getSafeWindow();
 
 validateWindow(w);

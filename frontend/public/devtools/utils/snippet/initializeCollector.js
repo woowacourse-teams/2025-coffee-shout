@@ -19,4 +19,3 @@ export const initializeCollector = (win) => {
   }
   return win[MARKERS.COLLECTOR];
 };
-
