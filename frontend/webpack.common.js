@@ -22,13 +22,15 @@ export default (_, argv) => {
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
+    'process.env.API_URL': JSON.stringify(process.env.API_URL),
     'process.env.ENABLE_DEVTOOLS': JSON.stringify(process.env.ENABLE_DEVTOOLS === 'true'),
-    ...Object.fromEntries(
-      Object.entries(process.env)
-        .filter(([k]) => k !== 'ENABLE_DEVTOOLS')
-        .map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
-    ),
   };
+  if (process.env.DSN_KEY) {
+    envKeys['process.env.DSN_KEY'] = JSON.stringify(process.env.DSN_KEY);
+  }
+  if (process.env.SENTRY_AUTH_TOKEN) {
+    envKeys['process.env.SENTRY_AUTH_TOKEN'] = JSON.stringify(process.env.SENTRY_AUTH_TOKEN);
+  }
 
   return {
     mode,
