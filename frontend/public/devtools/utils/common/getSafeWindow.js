@@ -10,9 +10,5 @@
 export const getSafeWindow = (win) => {
   if (win) return win;
   if (typeof globalThis !== 'undefined' && globalThis.window) return globalThis.window;
-  if (typeof globalThis !== 'undefined' && typeof globalThis.window !== 'undefined') {
-    return globalThis.window;
-  }
   return undefined;
 };
-
