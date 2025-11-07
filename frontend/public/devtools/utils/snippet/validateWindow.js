@@ -16,4 +16,3 @@ export const validateWindow = (win) => {
     throw new Error('dev-snippet.js already initialized');
   }
 };
-
