@@ -17,16 +17,14 @@ const appVersion = packageJson.version;
 export default (_, argv) => {
   const mode = argv.mode || 'development';
 
-  const dotenvEnv =
-    dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
-  const mergedEnv = { ...process.env, ...dotenvEnv };
+  dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
 
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
-    'process.env.ENABLE_DEVTOOLS': JSON.stringify(mergedEnv.ENABLE_DEVTOOLS === 'true'),
+    'process.env.ENABLE_DEVTOOLS': JSON.stringify(process.env.ENABLE_DEVTOOLS === 'true'),
     ...Object.fromEntries(
-      Object.entries(mergedEnv)
+      Object.entries(process.env)
         .filter(([k]) => k !== 'ENABLE_DEVTOOLS')
         .map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
     ),
@@ -73,7 +71,7 @@ export default (_, argv) => {
         favicon: './public/favicon.ico',
         templateParameters: {
           DEV_SNIPPET:
-            mergedEnv.ENABLE_DEVTOOLS === 'true'
+            process.env.ENABLE_DEVTOOLS === 'true'
               ? `<script type="module" src="/devtools/devSnippet.js"></script>`
               : '',
         },
@@ -92,7 +90,7 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          ...(mergedEnv.ENABLE_DEVTOOLS === 'true'
+          ...(process.env.ENABLE_DEVTOOLS === 'true'
             ? [
                 {
                   from: 'public/devtools',
