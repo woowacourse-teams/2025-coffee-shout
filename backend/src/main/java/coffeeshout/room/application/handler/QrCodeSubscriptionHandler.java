@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.messaging.handler;
+package coffeeshout.room.application.handler;
 
 import coffeeshout.global.exception.custom.NotExistElementException;
 import coffeeshout.global.ui.WebSocketResponse;

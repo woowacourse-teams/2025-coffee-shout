@@ -1,10 +1,11 @@
 package coffeeshout.global.websocket.infra;
 
+import coffeeshout.global.config.redis.EventTopicRegistry;
+import coffeeshout.global.config.redis.TopicManager;
 import coffeeshout.global.websocket.event.player.PlayerBaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -13,11 +14,12 @@ import org.springframework.stereotype.Component;
 public class PlayerEventPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic playerEventTopic;
+    private final TopicManager topicManager;
 
     public <T extends PlayerBaseEvent> void publishEvent(T event) {
         try {
-            redisTemplate.convertAndSend(playerEventTopic.getTopic(), event);
+            final String topic = topicManager.getTopic(EventTopicRegistry.PLAYER).getTopic();
+            redisTemplate.convertAndSend(topic, event);
             log.info("플레이어 이벤트 발행됨: eventType={}, eventId={}",
                     event.eventType(), event.eventId());
         } catch (Exception e) {

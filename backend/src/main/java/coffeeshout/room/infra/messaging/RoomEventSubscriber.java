@@ -1,7 +1,10 @@
 package coffeeshout.room.infra.messaging;
 
+import coffeeshout.global.config.redis.EventSubscriber;
+import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.trace.TracerProvider;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
@@ -13,34 +16,26 @@ import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
-import coffeeshout.room.infra.messaging.handler.RoomEventHandler;
 import coffeeshout.room.infra.messaging.handler.RoomEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomEventSubscriber implements MessageListener {
+public class RoomEventSubscriber implements EventSubscriber {
 
     private final ObjectMapper objectMapper;
-    private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final ChannelTopic roomEventTopic;
     private final RoomEventHandlerFactory handlerFactory;
     private final TracerProvider tracerProvider;
 
-    @PostConstruct
-    public void subscribe() {
-        redisMessageListenerContainer.addMessageListener(this, roomEventTopic);
-        log.info("방 이벤트 구독 시작: topic={}", roomEventTopic.getTopic());
+    @Override
+    public EventTopicRegistry getTopicRegistry() {
+        return EventTopicRegistry.ROOM;
     }
 
     @Override

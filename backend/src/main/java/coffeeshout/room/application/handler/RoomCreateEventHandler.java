@@ -1,7 +1,7 @@
-package coffeeshout.room.infra.messaging.handler;
+package coffeeshout.room.application.handler;
 
 import coffeeshout.room.application.DelayedRoomRemovalService;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;
@@ -23,7 +23,6 @@ public class RoomCreateEventHandler implements RoomEventHandler<RoomCreateEvent>
     private final DelayedRoomRemovalService delayedRoomRemovalService;
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
-    private final RoomService roomService;
 
     @Override
     public void handle(RoomCreateEvent event) {

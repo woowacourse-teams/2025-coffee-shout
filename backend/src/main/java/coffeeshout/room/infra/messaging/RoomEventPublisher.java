@@ -1,10 +1,11 @@
 package coffeeshout.room.infra.messaging;
 
+import coffeeshout.global.config.redis.EventTopicRegistry;
+import coffeeshout.global.config.redis.TopicManager;
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -13,11 +14,12 @@ import org.springframework.stereotype.Component;
 public class RoomEventPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic roomEventTopic;
+    private final TopicManager topicManager;
 
     public <T extends RoomBaseEvent> void publishEvent(T event) {
         try {
-            redisTemplate.convertAndSend(roomEventTopic.getTopic(), event);
+            final String topic = topicManager.getTopic(EventTopicRegistry.ROOM).getTopic();
+            redisTemplate.convertAndSend(topic, event);
             log.info("이벤트 발행됨: eventType={}, eventId={}",
                     event.eventType(), event.eventId());
         } catch (Exception e) {

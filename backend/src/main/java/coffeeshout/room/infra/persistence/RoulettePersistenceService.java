@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.messaging.handler;
+package coffeeshout.room.infra.persistence;
 
 import coffeeshout.global.lock.RedisLock;
 import coffeeshout.room.application.RouletteService;

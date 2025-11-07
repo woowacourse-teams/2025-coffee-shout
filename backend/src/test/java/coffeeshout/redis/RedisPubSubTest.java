@@ -34,12 +34,9 @@ class RedisPubSubTest extends ServiceTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<String> receivedMessage = new AtomicReference<>();
 
-        final MessageListener listener = new MessageListener() {
-            @Override
-            public void onMessage(Message message, byte[] pattern) {
-                receivedMessage.set(new String(message.getBody()));
-                latch.countDown();
-            }
+        final MessageListener listener = (message, pattern) -> {
+            receivedMessage.set(new String(message.getBody()));
+            latch.countDown();
         };
 
         // when

@@ -1,5 +1,7 @@
 package coffeeshout.global.websocket.infra;
 
+import coffeeshout.global.config.redis.EventSubscriber;
+import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.websocket.event.session.SessionBaseEvent;
 import coffeeshout.global.websocket.event.session.SessionEventType;
 import coffeeshout.global.websocket.event.session.SessionRegisteredEvent;
@@ -8,29 +10,22 @@ import coffeeshout.global.websocket.infra.handler.SessionEventHandler;
 import coffeeshout.global.websocket.infra.handler.SessionEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SessionEventSubscriber implements MessageListener {
+public class SessionEventSubscriber implements EventSubscriber {
 
     private final ObjectMapper objectMapper;
-    private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final ChannelTopic sessionEventTopic;
     private final SessionEventHandlerFactory handlerFactory;
 
-    @PostConstruct
-    public void subscribe() {
-        redisMessageListenerContainer.addMessageListener(this, sessionEventTopic);
-        log.info("세션 이벤트 구독 시작: topic={}", sessionEventTopic.getTopic());
+    @Override
+    public EventTopicRegistry getTopicRegistry() {
+        return EventTopicRegistry.SESSION;
     }
 
     @Override

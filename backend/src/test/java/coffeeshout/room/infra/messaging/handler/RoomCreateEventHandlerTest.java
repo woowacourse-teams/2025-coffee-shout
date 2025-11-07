@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 
 import coffeeshout.global.ServiceTest;
 import coffeeshout.room.application.DelayedRoomRemovalService;
+import coffeeshout.room.application.handler.RoomCreateEventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;

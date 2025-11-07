@@ -1,7 +1,8 @@
-package coffeeshout.room.infra.messaging.handler;
+package coffeeshout.room.application.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomEventType;
@@ -56,4 +57,5 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
     public RoomEventType getSupportedEventType() {
         return RoomEventType.PLAYER_KICK;
     }
+
 }
