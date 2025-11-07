@@ -19,14 +19,13 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
   // WebSocket 연결 추적을 위한 맵 (URL+컨텍스트를 키로 사용)
   const wsConnectionMap = new Map();
 
-  const addEventListeners = (ws, url, collector, context) => {
+  const setupWebSocketTracking = (ws, url, collector, context) => {
     const connectionKey = `${context}:${url}`;
     const messages = [];
-    let connectionStartTime = Date.now();
 
     ws.addEventListener('open', () => {
       try {
-        connectionStartTime = Date.now();
+        const connectionStartTime = Date.now();
         const requestData = {
           type: 'websocket',
           context,
@@ -73,7 +72,7 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
         const connection = wsConnectionMap.get(connectionKey);
         if (connection) {
           connection.connectionStatus = 'closed';
-          connection.durationMs = Date.now() - connectionStartTime;
+          connection.durationMs = Date.now() - connection.startedAt;
         }
       } catch {
         /* noop */
@@ -104,7 +103,7 @@ export const setupWebSocketHook = (win, collector, context = {}) => {
       const ws = new target(...args);
 
       try {
-        addEventListeners(ws, url, collector, context);
+        setupWebSocketTracking(ws, url, collector, context);
       } catch {
         /* noop */
       }
