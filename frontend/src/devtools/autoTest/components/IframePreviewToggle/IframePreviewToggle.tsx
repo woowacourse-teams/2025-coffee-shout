@@ -1,308 +1,62 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
-import { MiniGameType, MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
-import { getAutoTestLogger } from '../../utils/autoTestLogger';
+import { MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
 import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 import AutoTestLogPanel from '../AutoTestLogPanel/AutoTestLogPanel';
+import { useIframeRegistry } from '@/devtools/autoTest/hooks/useIframeRegistry';
+import { useGameSequenceSelector } from '@/devtools/autoTest/hooks/useGameSequenceSelector';
+import { useIframeTestMessaging } from '@/devtools/autoTest/hooks/useIframeTestMessaging';
 import * as S from './IframePreviewToggle.styled';
-
-type TestMessage =
-  | { type: 'START_TEST'; role: 'host' | 'guest'; joinCode?: string; gameSequence: MiniGameType[] }
-  | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
-  | { type: 'GUEST_READY'; iframeName?: string }
-  | { type: 'CLICK_GAME_START' }
-  | { type: 'PATH_CHANGE'; iframeName: string; path: string }
-  | { type: 'TEST_COMPLETED' }
-  | { type: 'STOP_TEST' }
-  | { type: 'PAUSE_TEST' }
-  | { type: 'RESUME_TEST' }
-  | { type: 'RESET_TO_HOME' }
-  | { type: 'READY'; iframeName: string };
 
 const IframePreviewToggle = () => {
   const location = useLocation();
   const [open, setOpen] = useState<boolean>(false);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [iframeNames, setIframeNames] = useState<string[]>(['host', 'guest1']);
-  const [iframePaths, setIframePaths] = useState<{ [key: string]: string }>({});
-  const [guestReadyState, setGuestReadyState] = useState<{ [guestName: string]: boolean }>({});
-  // readyState는 READY 신호 추적용 (디버깅/로깅 목적)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [readyState, setReadyState] = useState<{ [iframeName: string]: boolean }>({});
-  const [gameSequence, setGameSequence] = useState<MiniGameType[]>(['CARD_GAME']);
-  const [isGameSelectionExpanded, setIsGameSelectionExpanded] = useState<boolean>(false);
-  const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
-  const joinCodeRef = useRef<string | null>(null);
-  const pendingStartTest = useRef<boolean>(false);
-
-  // 사용 가능한 게임 목록 (하드코딩, fetch 없이)
-  const availableGames = useMemo(() => {
-    return Object.keys(MINI_GAME_NAME_MAP) as MiniGameType[];
-  }, []);
 
   const topWindow = isTopWindow();
   const isTouchDevice = useMemo(() => checkIsTouchDevice(), []);
   const isRootPath = location.pathname === '/';
 
+  const {
+    iframeNames,
+    iframeRefs,
+    iframeHeight,
+    useMinHeight,
+    canAddMore,
+    handleAddIframe,
+    handleDeleteIframe,
+    setIframeRef,
+  } = useIframeRegistry();
+
+  const {
+    gameSequence,
+    availableGames,
+    isGameSelectionExpanded,
+    toggleGameSelectionExpanded,
+    setGameSelectionExpanded,
+    handleGameToggle,
+  } = useGameSequenceSelector();
+
+  const {
+    isRunning,
+    isPaused,
+    iframePaths,
+    handleStartTest,
+    handleStopTest,
+    handlePauseTest,
+    handleResumeTest,
+  } = useIframeTestMessaging({
+    isOpen: open,
+    iframeNames,
+    gameSequence,
+    iframeRefs,
+  });
+
   useEffect(() => {
     // 경로가 바뀌면 닫아준다 (예상치 못한 잔상 방지)
     setOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleMessage = (event: MessageEvent<TestMessage>) => {
-      if (event.data.type === 'JOIN_CODE_RECEIVED') {
-        const { joinCode } = event.data;
-        joinCodeRef.current = joinCode;
-
-        const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
-        guestNames.forEach((guestName) => {
-          const guestIframe = iframeRefs.current[guestName];
-          if (guestIframe?.contentWindow) {
-            guestIframe.contentWindow.postMessage(
-              {
-                type: 'START_TEST',
-                role: 'guest',
-                joinCode,
-                iframeName: guestName,
-                gameSequence,
-              },
-              '*'
-            );
-          }
-        });
-      } else if (event.data.type === 'READY') {
-        const { iframeName } = event.data;
-        const logger = getAutoTestLogger();
-        logger.addLog({
-          message: 'iframe에서 READY 신호 수신',
-          context: 'MAIN',
-          data: { iframeName, pendingStartTest: pendingStartTest.current },
-        });
-        setReadyState((prev) => ({
-          ...prev,
-          [iframeName]: true,
-        }));
-
-        // READY 신호를 받고 START_TEST가 대기 중이면 즉시 전송
-        if (pendingStartTest.current && iframeName === 'host') {
-          logger.addLog({
-            message: '조건 충족, START_TEST 전송',
-            context: 'MAIN',
-          });
-          setTimeout(() => {
-            const hostIframe = iframeRefs.current.host;
-            if (hostIframe?.contentWindow) {
-              const message = {
-                type: 'START_TEST' as const,
-                role: 'host' as const,
-                gameSequence,
-              };
-              logger.addLog({
-                message: 'READY 후 host에 START_TEST 전송',
-                context: 'MAIN',
-                data: { gameSequence },
-              });
-              hostIframe.contentWindow.postMessage(message, '*');
-              pendingStartTest.current = false;
-            }
-          }, 0);
-        } else {
-          logger.addLog({
-            message: 'START_TEST 전송하지 않음',
-            context: 'MAIN',
-            data: {
-              pendingStartTest: pendingStartTest.current,
-              iframeName,
-              isHost: iframeName === 'host',
-            },
-          });
-        }
-      } else if (event.data.type === 'GUEST_READY') {
-        const { iframeName } = event.data;
-        if (iframeName) {
-          setGuestReadyState((prev) => ({
-            ...prev,
-            [iframeName]: true,
-          }));
-        }
-      } else if (event.data.type === 'PATH_CHANGE') {
-        const { iframeName, path } = event.data;
-        setIframePaths((prev) => ({
-          ...prev,
-          [iframeName]: path,
-        }));
-      } else if (event.data.type === 'TEST_COMPLETED') {
-        setIsRunning(false);
-        setIsPaused(false);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [open, iframeNames, gameSequence]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
-    const allGuestsReady =
-      guestNames.length > 0 && guestNames.every((guestName) => guestReadyState[guestName] === true);
-
-    if (allGuestsReady) {
-      const hostIframe = iframeRefs.current.host;
-      if (hostIframe?.contentWindow) {
-        hostIframe.contentWindow.postMessage({ type: 'CLICK_GAME_START' }, '*');
-      }
-    }
-  }, [open, iframeNames, guestReadyState]);
-
-  const iframeHeight = useMemo(() => {
-    return iframeNames.length <= 4 ? '100%' : 'auto';
-  }, [iframeNames.length]);
-
-  const useMinHeight = useMemo(() => {
-    return iframeNames.length > 4;
-  }, [iframeNames.length]);
-
-  const canAddMore = useMemo(() => {
-    return iframeNames.length < 9;
-  }, [iframeNames.length]);
-
-  const handleAddIframe = () => {
-    if (!canAddMore) return;
-
-    const guestNames = iframeNames.filter((name) => name.startsWith('guest'));
-    const usedNumbers = new Set<number>();
-    guestNames.forEach((name) => {
-      const match = name.match(/^guest(\d+)$/);
-      if (match) {
-        const num = parseInt(match[1], 10);
-        if (num >= 1 && num <= 8) {
-          usedNumbers.add(num);
-        }
-      }
-    });
-
-    // 1~8 중 사용 가능한 가장 작은 번호 찾기
-    let nextGuestNumber: number | null = null;
-    for (let i = 1; i <= 8; i++) {
-      if (!usedNumbers.has(i)) {
-        nextGuestNumber = i;
-        break;
-      }
-    }
-
-    if (nextGuestNumber === null) {
-      // 1~8이 모두 사용 중
-      return;
-    }
-
-    const newGuestName = `guest${nextGuestNumber}`;
-    setIframeNames((prev) => [...prev, newGuestName]);
-  };
-
-  const handleDeleteIframe = (name: string) => {
-    if (name === 'host' || name === 'guest1') return;
-
-    // 맨 마지막 iframe만 삭제 가능
-    const lastIndex = iframeNames.length - 1;
-    const lastIframeName = iframeNames[lastIndex];
-    if (name !== lastIframeName) return;
-
-    setIframeNames((prev) => prev.filter((n) => n !== name));
-    delete iframeRefs.current[name];
-    setGuestReadyState((prev) => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-  };
-
-  const handleGameToggle = (gameType: MiniGameType) => {
-    setGameSequence((prev) => {
-      if (prev.includes(gameType)) {
-        // 이미 선택된 게임이면 제거
-        return prev.filter((g) => g !== gameType);
-      } else {
-        // 선택되지 않은 게임이면 추가
-        return [...prev, gameType];
-      }
-    });
-  };
-
-  const handleStartTest = () => {
-    const logger = getAutoTestLogger();
-    logger.addLog({
-      message: 'handleStartTest 호출됨',
-      context: 'MAIN',
-    });
-    setIsRunning(true);
-    joinCodeRef.current = null;
-    setGuestReadyState({});
-    setReadyState({}); // RESET_TO_HOME 후 새로운 READY 신호를 기다리기 위해 초기화
-    pendingStartTest.current = true; // START_TEST 전송 대기 플래그
-    logger.addLog({
-      message: 'pendingStartTest를 true로 설정',
-      context: 'MAIN',
-    });
-
-    // 모든 iframe에 RESET_TO_HOME 전송
-    iframeNames.forEach((name) => {
-      const iframe = iframeRefs.current[name];
-      if (iframe?.contentWindow) {
-        logger.addLog({
-          message: `${name}에 RESET_TO_HOME 전송`,
-          context: 'MAIN',
-        });
-        iframe.contentWindow.postMessage({ type: 'RESET_TO_HOME' }, '*');
-      }
-    });
-
-    // RESET 후 새로운 READY 신호를 기다림 (handleMessage에서 처리)
-    // READY 신호가 이미 와있어도 RESET 후 다시 올 것이므로 대기
-  };
-
-  const handleStopTest = () => {
-    setIsRunning(false);
-    setIsPaused(false);
-
-    iframeNames.forEach((name) => {
-      const iframe = iframeRefs.current[name];
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'STOP_TEST' }, '*');
-      }
-    });
-  };
-
-  const handlePauseTest = () => {
-    setIsPaused(true);
-
-    iframeNames.forEach((name) => {
-      const iframe = iframeRefs.current[name];
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'PAUSE_TEST' }, '*');
-      }
-    });
-  };
-
-  const handleResumeTest = () => {
-    setIsPaused(false);
-
-    iframeNames.forEach((name) => {
-      const iframe = iframeRefs.current[name];
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'RESUME_TEST' }, '*');
-      }
-    });
-  };
+    setGameSelectionExpanded(false);
+  }, [location.pathname, setGameSelectionExpanded]);
 
   if (!topWindow || !isRootPath || isTouchDevice) return null;
 
@@ -315,10 +69,7 @@ const IframePreviewToggle = () => {
         {open && (
           <>
             <S.GameSelectionContainer $isExpanded={isGameSelectionExpanded}>
-              <S.GameSelectionLabel
-                type="button"
-                onClick={() => setIsGameSelectionExpanded((prev) => !prev)}
-              >
+              <S.GameSelectionLabel type="button" onClick={toggleGameSelectionExpanded}>
                 게임 선택
               </S.GameSelectionLabel>
               {isGameSelectionExpanded && (
@@ -393,11 +144,7 @@ const IframePreviewToggle = () => {
                   </S.DeleteButton>
                 )}
                 <S.PreviewIframe
-                  ref={(el) => {
-                    if (el) {
-                      iframeRefs.current[name] = el;
-                    }
-                  }}
+                  ref={(el) => setIframeRef(name, el)}
                   name={name}
                   title={`preview-${index === 0 ? 'left' : 'right'}`}
                   src="/"

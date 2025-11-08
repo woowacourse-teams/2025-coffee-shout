@@ -29,11 +29,11 @@ export const DevToolsWrapper = () => {
         if (iframeName === 'host' && window.parent && window.parent !== window) {
           const logger = getAutoTestLogger();
           logger.addLog({
-            message: '렌더링 완료, READY 신호 전송',
+            message: '렌더링 완료, IFRAME_READY 신호 전송',
             context: iframeName,
             data: { iframeName },
           });
-          window.parent.postMessage({ type: 'READY', iframeName }, '*');
+          window.parent.postMessage({ type: 'IFRAME_READY', iframeName }, '*');
         }
       };
 

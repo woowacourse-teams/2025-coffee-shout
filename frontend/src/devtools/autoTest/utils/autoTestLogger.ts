@@ -67,4 +67,3 @@ export const initializeAutoTestLogger = (): void => {
   if (typeof window === 'undefined') return;
   getAutoTestLogger();
 };
-

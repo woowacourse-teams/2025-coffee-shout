@@ -7,23 +7,7 @@ import {
 } from './pageActions';
 import { MiniGameType } from '@/types/miniGame/common';
 import { getAutoTestLogger } from '../utils/autoTestLogger';
-
-type TestMessage =
-  | {
-      type: 'START_TEST';
-      role: 'host' | 'guest';
-      joinCode?: string;
-      iframeName?: string;
-      gameSequence: MiniGameType[];
-    }
-  | { type: 'JOIN_CODE_RECEIVED'; joinCode: string }
-  | { type: 'GUEST_READY'; iframeName?: string }
-  | { type: 'CLICK_GAME_START' }
-  | { type: 'TEST_COMPLETED' }
-  | { type: 'STOP_TEST' }
-  | { type: 'PAUSE_TEST' }
-  | { type: 'RESUME_TEST' }
-  | { type: 'RESET_TO_HOME' };
+import { TestMessage } from '@/devtools/autoTest/types/testMessage';
 
 // 플로우 상태 추적 (각 역할별로)
 type FlowState = 'idle' | 'running' | 'paused';
