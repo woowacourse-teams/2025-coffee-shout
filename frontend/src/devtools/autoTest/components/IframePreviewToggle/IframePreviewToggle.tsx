@@ -22,6 +22,7 @@ const IframePreviewToggle = () => {
     layout: registryLayout,
     actions: { addGuestIframe, removeIframe, setIframeRef },
   } = useIframeRegistry();
+  const { iframeHeight, useMinHeight, canAddMore } = registryLayout;
 
   const { state: gameSelectionState, actions: gameSelectionActions } = useGameSequenceSelector();
   const { gameSequence } = gameSelectionState;
@@ -44,8 +45,6 @@ const IframePreviewToggle = () => {
     pause: handlePauseTest,
     resume: handleResumeTest,
   } = autoTestControls;
-
-  const { iframeHeight, useMinHeight, canAddMore } = registryLayout;
 
   useEffect(() => {
     // 경로가 바뀌면 닫아준다 (예상치 못한 잔상 방지)
