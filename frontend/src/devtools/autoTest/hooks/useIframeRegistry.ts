@@ -51,15 +51,27 @@ const computeLayoutState = (iframeCount: number) => {
   };
 };
 
-export type UseIframeRegistryResult = {
+type RegistryData = {
   iframeNames: string[];
   iframeRefs: RefObject<IframeRefMap>;
+};
+
+type RegistryLayout = {
   iframeHeight: string;
   useMinHeight: boolean;
   canAddMore: boolean;
+};
+
+type RegistryActions = {
   addGuestIframe: () => void;
   removeIframe: (name: string) => void;
   setIframeRef: (name: string, iframe: HTMLIFrameElement | null) => void;
+};
+
+export type UseIframeRegistryResult = {
+  data: RegistryData;
+  layout: RegistryLayout;
+  actions: RegistryActions;
 };
 
 export const useIframeRegistry = (
@@ -105,13 +117,19 @@ export const useIframeRegistry = (
   }, [iframeNames.length]);
 
   return {
-    iframeNames,
-    iframeRefs,
-    iframeHeight,
-    useMinHeight,
-    canAddMore,
-    addGuestIframe,
-    removeIframe,
-    setIframeRef,
+    data: {
+      iframeNames,
+      iframeRefs,
+    },
+    layout: {
+      iframeHeight,
+      useMinHeight,
+      canAddMore,
+    },
+    actions: {
+      addGuestIframe,
+      removeIframe,
+      setIframeRef,
+    },
   };
 };

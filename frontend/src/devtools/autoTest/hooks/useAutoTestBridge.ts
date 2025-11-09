@@ -7,31 +7,69 @@ import { createIframeMessenger } from '../utils/iframeMessenger';
 type MessageHandler = (message: TestMessage) => void;
 type MessageHandlers = Partial<Record<TestMessage['type'], MessageHandler>>;
 
-type UseIframeTestPostMessageParams = {
+type UseAutoTestBridgeParams = {
   isOpen: boolean;
   iframeNames: string[];
   gameSequence: MiniGameType[];
   iframeRefs: RefObject<Record<string, HTMLIFrameElement | null>>;
 };
 
-export type UseIframeTestPostMessageResult = {
+type RunState = {
   isRunning: boolean;
   isPaused: boolean;
-  guestReadyState: Record<string, boolean>;
-  readyState: Record<string, boolean>;
-  iframePaths: Record<string, string>;
-  handleStartTest: () => void;
-  handleStopTest: () => void;
-  handlePauseTest: () => void;
-  handleResumeTest: () => void;
 };
 
-export const useIframeTestPostMessage = ({
+type ReadinessState = {
+  guests: Record<string, boolean>;
+  iframes: Record<string, boolean>;
+};
+
+type BridgeControls = {
+  start: () => void;
+  stop: () => void;
+  pause: () => void;
+  resume: () => void;
+};
+
+export type UseAutoTestBridgeResult = {
+  runState: RunState;
+  readiness: ReadinessState;
+  iframePaths: Record<string, string>;
+  controls: BridgeControls;
+};
+
+type UseStartHostOnGuestsReadyParams = {
+  isOpen: boolean;
+  guestIframeNames: string[];
+  guestReadyState: Record<string, boolean>;
+  sendToIframe: (iframeName: string, message: TestMessage) => void;
+};
+
+const useStartHostOnGuestsReady = ({
+  isOpen,
+  guestIframeNames,
+  guestReadyState,
+  sendToIframe,
+}: UseStartHostOnGuestsReadyParams) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    if (guestIframeNames.length === 0) return;
+
+    const allGuestsReady = guestIframeNames.every((guestName) => guestReadyState[guestName]);
+    if (allGuestsReady) {
+      sendToIframe('host', { type: 'CLICK_GAME_START' });
+    }
+  }, [guestIframeNames, guestReadyState, isOpen, sendToIframe]);
+};
+
+type SimpleCommandType = 'RESET_TO_HOME' | 'STOP_TEST' | 'PAUSE_TEST' | 'RESUME_TEST';
+
+export const useAutoTestBridge = ({
   isOpen,
   iframeNames,
   gameSequence,
   iframeRefs,
-}: UseIframeTestPostMessageParams): UseIframeTestPostMessageResult => {
+}: UseAutoTestBridgeParams): UseAutoTestBridgeResult => {
   // 상태
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -56,34 +94,49 @@ export const useIframeTestPostMessage = ({
   }, [iframeRefs]);
 
   // 명령 핸들러
-  const handleStartTest = useCallback(() => {
+  const initializeRunState = useCallback(() => {
     setIsRunning(true);
     setIsPaused(false);
     joinCodeRef.current = null;
+    pendingStartTest.current = true;
     setGuestReadyState({});
     setReadyState({});
-    pendingStartTest.current = true;
+  }, []);
 
-    broadcastToIframes(iframeNames, () => ({ type: 'RESET_TO_HOME' }));
-  }, [broadcastToIframes, iframeNames]);
-
-  const handleStopTest = useCallback(() => {
+  const finalizeRunState = useCallback(() => {
     setIsRunning(false);
     setIsPaused(false);
     pendingStartTest.current = false;
+  }, []);
 
-    broadcastToIframes(iframeNames, () => ({ type: 'STOP_TEST' }));
-  }, [broadcastToIframes, iframeNames]);
+  const broadcastCommandToAll = useCallback(
+    (type: SimpleCommandType) => {
+      broadcastToIframes(iframeNames, () => ({ type }));
+    },
+    [broadcastToIframes, iframeNames]
+  );
+
+  const handleStartTest = useCallback(() => {
+    initializeRunState();
+
+    broadcastCommandToAll('RESET_TO_HOME');
+  }, [broadcastCommandToAll, initializeRunState]);
+
+  const handleStopTest = useCallback(() => {
+    finalizeRunState();
+
+    broadcastCommandToAll('STOP_TEST');
+  }, [broadcastCommandToAll, finalizeRunState]);
 
   const handlePauseTest = useCallback(() => {
     setIsPaused(true);
-    broadcastToIframes(iframeNames, () => ({ type: 'PAUSE_TEST' }));
-  }, [broadcastToIframes, iframeNames]);
+    broadcastCommandToAll('PAUSE_TEST');
+  }, [broadcastCommandToAll]);
 
   const handleResumeTest = useCallback(() => {
     setIsPaused(false);
-    broadcastToIframes(iframeNames, () => ({ type: 'RESUME_TEST' }));
-  }, [broadcastToIframes, iframeNames]);
+    broadcastCommandToAll('RESUME_TEST');
+  }, [broadcastCommandToAll]);
 
   // 메시지 처리
   useEffect(() => {
@@ -172,26 +225,28 @@ export const useIframeTestPostMessage = ({
     };
   }, [broadcastToIframes, gameSequence, guestIframeNames, isOpen, sendToIframe]);
 
-  // 게스트 준비 상태 감시
-  useEffect(() => {
-    if (!isOpen) return;
-    if (guestIframeNames.length === 0) return;
-
-    const allGuestsReady = guestIframeNames.every((guestName) => guestReadyState[guestName]);
-    if (allGuestsReady) {
-      sendToIframe('host', { type: 'CLICK_GAME_START' });
-    }
-  }, [guestIframeNames, guestReadyState, isOpen, sendToIframe]);
+  useStartHostOnGuestsReady({
+    isOpen,
+    guestIframeNames,
+    guestReadyState,
+    sendToIframe,
+  });
 
   return {
-    isRunning,
-    isPaused,
-    guestReadyState,
-    readyState,
+    runState: {
+      isRunning,
+      isPaused,
+    },
+    readiness: {
+      guests: guestReadyState,
+      iframes: readyState,
+    },
     iframePaths,
-    handleStartTest,
-    handleStopTest,
-    handlePauseTest,
-    handleResumeTest,
+    controls: {
+      start: handleStartTest,
+      stop: handleStopTest,
+      pause: handlePauseTest,
+      resume: handleResumeTest,
+    },
   };
 };

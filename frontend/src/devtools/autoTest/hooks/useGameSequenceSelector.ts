@@ -1,13 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
 import { MiniGameType, MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
 
-export type UseGameSequenceSelectorResult = {
+type SelectionState = {
   gameSequence: MiniGameType[];
   availableGames: MiniGameType[];
-  isGameSelectionExpanded: boolean;
-  toggleGameSelectionExpanded: () => void;
-  setGameSelectionExpanded: (isExpanded: boolean) => void;
-  handleGameToggle: (gameType: MiniGameType) => void;
+  isExpanded: boolean;
+};
+
+type SelectionActions = {
+  toggleExpanded: () => void;
+  setExpanded: (isExpanded: boolean) => void;
+  toggleGame: (gameType: MiniGameType) => void;
+};
+
+export type UseGameSequenceSelectorResult = {
+  state: SelectionState;
+  actions: SelectionActions;
 };
 
 const DEFAULT_GAME_SEQUENCE: MiniGameType[] = ['CARD_GAME'];
@@ -34,11 +42,15 @@ export const useGameSequenceSelector = (): UseGameSequenceSelectorResult => {
   }, []);
 
   return {
-    gameSequence,
-    availableGames,
-    isGameSelectionExpanded,
-    toggleGameSelectionExpanded,
-    setGameSelectionExpanded,
-    handleGameToggle,
+    state: {
+      gameSequence,
+      availableGames,
+      isExpanded: isGameSelectionExpanded,
+    },
+    actions: {
+      toggleExpanded: toggleGameSelectionExpanded,
+      setExpanded: setGameSelectionExpanded,
+      toggleGame: handleGameToggle,
+    },
   };
 };

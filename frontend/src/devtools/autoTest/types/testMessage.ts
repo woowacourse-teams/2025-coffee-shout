@@ -18,5 +18,3 @@ export type TestMessage =
   | { type: 'RESUME_TEST' }
   | { type: 'RESET_TO_HOME' }
   | { type: 'IFRAME_READY'; iframeName: string };
-
-
