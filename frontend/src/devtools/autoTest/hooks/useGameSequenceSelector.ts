@@ -42,5 +42,3 @@ export const useGameSequenceSelector = (): UseGameSequenceSelectorResult => {
     handleGameToggle,
   };
 };
-
-

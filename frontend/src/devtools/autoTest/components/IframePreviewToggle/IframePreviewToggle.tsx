@@ -3,10 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { checkIsTouchDevice } from '../../../../utils/checkIsTouchDevice';
 import { MINI_GAME_NAME_MAP } from '@/types/miniGame/common';
 import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
-import AutoTestLogPanel from '../AutoTestLogPanel/AutoTestLogPanel';
-import { useIframeRegistry } from '@/devtools/autoTest/hooks/useIframeRegistry';
+import {
+  HOST_IFRAME_NAME,
+  PRIMARY_GUEST_IFRAME_NAME,
+  useIframeRegistry,
+} from '@/devtools/autoTest/hooks/useIframeRegistry';
 import { useGameSequenceSelector } from '@/devtools/autoTest/hooks/useGameSequenceSelector';
-import { useIframeTestMessaging } from '@/devtools/autoTest/hooks/useIframeTestMessaging';
+import { useIframeTestPostMessage } from '@/devtools/autoTest/hooks/useIframeTestPostMessage';
 import * as S from './IframePreviewToggle.styled';
 
 const IframePreviewToggle = () => {
@@ -23,8 +26,8 @@ const IframePreviewToggle = () => {
     iframeHeight,
     useMinHeight,
     canAddMore,
-    handleAddIframe,
-    handleDeleteIframe,
+    addGuestIframe,
+    removeIframe,
     setIframeRef,
   } = useIframeRegistry();
 
@@ -45,7 +48,7 @@ const IframePreviewToggle = () => {
     handleStopTest,
     handlePauseTest,
     handleResumeTest,
-  } = useIframeTestMessaging({
+  } = useIframeTestPostMessage({
     isOpen: open,
     iframeNames,
     gameSequence,
@@ -113,7 +116,6 @@ const IframePreviewToggle = () => {
                 테스트 중단
               </S.StopButton>
             )}
-            <AutoTestLogPanel isIframeOpen={open} />
           </>
         )}
       </S.ToggleBar>
@@ -125,7 +127,8 @@ const IframePreviewToggle = () => {
             // 맨 마지막 iframe만 삭제 가능 (host와 guest1은 항상 삭제 불가)
             const lastIndex = iframeNames.length - 1;
             const isLastIframe = index === lastIndex;
-            const canDelete = name !== 'host' && name !== 'guest1' && isLastIframe;
+            const canDelete =
+              name !== HOST_IFRAME_NAME && name !== PRIMARY_GUEST_IFRAME_NAME && isLastIframe;
 
             return (
               <S.IframeWrapper key={name} $height={iframeHeight} $useMinHeight={useMinHeight}>
@@ -136,7 +139,7 @@ const IframePreviewToggle = () => {
                     data-delete-button
                     onClick={(e: MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
-                      handleDeleteIframe(name);
+                      removeIframe(name);
                     }}
                     aria-label={`Remove ${name}`}
                   >
@@ -154,7 +157,7 @@ const IframePreviewToggle = () => {
           })}
           {canAddMore && (
             <S.IframeWrapper $height={iframeHeight} $useMinHeight={useMinHeight}>
-              <S.AddIframeButton type="button" onClick={handleAddIframe}>
+              <S.AddIframeButton type="button" onClick={addGuestIframe}>
                 +
               </S.AddIframeButton>
             </S.IframeWrapper>

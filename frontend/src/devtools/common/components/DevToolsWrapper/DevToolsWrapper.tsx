@@ -2,10 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import IframePreviewToggle from '@/devtools/autoTest/components/IframePreviewToggle/IframePreviewToggle';
 import { setupAutoTestListener } from '@/devtools/autoTest/flow/autoTestFlow';
-import {
-  initializeAutoTestLogger,
-  getAutoTestLogger,
-} from '@/devtools/autoTest/utils/autoTestLogger';
+import { initializeAutoTestLogger } from '@/devtools/autoTest/utils/autoTestLogger';
 import NetworkDebuggerPanel from '@/devtools/networkDebug/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
 import { isTopWindow } from '@/devtools/common/utils/isTopWindow';
 
@@ -27,12 +24,6 @@ export const DevToolsWrapper = () => {
       const sendReady = () => {
         const iframeName = window.frameElement?.getAttribute('name') || '';
         if (iframeName === 'host' && window.parent && window.parent !== window) {
-          const logger = getAutoTestLogger();
-          logger.addLog({
-            message: '렌더링 완료, IFRAME_READY 신호 전송',
-            context: iframeName,
-            data: { iframeName },
-          });
           window.parent.postMessage({ type: 'IFRAME_READY', iframeName }, '*');
         }
       };
