@@ -17,20 +17,20 @@ const appVersion = packageJson.version;
 export default (_, argv) => {
   const mode = argv.mode || 'development';
 
-  const dotenvEnv =
-    dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
-  const mergedEnv = { ...process.env, ...dotenvEnv };
+  dotenv.config({ path: path.resolve(process.cwd(), `.env.${mode}`) }).parsed || {};
 
   const envKeys = {
     'process.env.NODE_ENV': JSON.stringify(mode),
     'process.env.VERSION': JSON.stringify(appVersion),
-    'process.env.ENABLE_DEVTOOLS': JSON.stringify(mergedEnv.ENABLE_DEVTOOLS === 'true'),
-    ...Object.fromEntries(
-      Object.entries(mergedEnv)
-        .filter(([k]) => k !== 'ENABLE_DEVTOOLS')
-        .map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
-    ),
+    'process.env.API_URL': JSON.stringify(process.env.API_URL),
+    'process.env.ENABLE_DEVTOOLS': JSON.stringify(process.env.ENABLE_DEVTOOLS === 'true'),
   };
+  if (process.env.DSN_KEY) {
+    envKeys['process.env.DSN_KEY'] = JSON.stringify(process.env.DSN_KEY);
+  }
+  if (process.env.SENTRY_AUTH_TOKEN) {
+    envKeys['process.env.SENTRY_AUTH_TOKEN'] = JSON.stringify(process.env.SENTRY_AUTH_TOKEN);
+  }
 
   return {
     mode,
@@ -71,10 +71,9 @@ export default (_, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
         favicon: './public/favicon.ico',
-        inject: 'head',
         templateParameters: {
           DEV_SNIPPET:
-            mergedEnv.ENABLE_DEVTOOLS === 'true'
+            process.env.ENABLE_DEVTOOLS === 'true'
               ? `<script type="module" src="/devtools/devSnippet.js"></script>`
               : '',
         },
@@ -93,7 +92,7 @@ export default (_, argv) => {
             from: 'public/sitemap.xml',
             to: 'sitemap.xml',
           },
-          ...(mergedEnv.ENABLE_DEVTOOLS === 'true'
+          ...(process.env.ENABLE_DEVTOOLS === 'true'
             ? [
                 {
                   from: 'public/devtools',
