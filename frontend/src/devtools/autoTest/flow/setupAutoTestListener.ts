@@ -129,10 +129,84 @@ const runGuestFlow = async (joinCode: string, iframeName?: string) => {
   await runFlow('guest', context);
 };
 
+type MessageHandlers = {
+  [K in TestMessage['type']]?: (payload: Extract<TestMessage, { type: K }>) => Promise<void> | void;
+};
+
+type MessageHandlerContext = {
+  getGuestJoinCode: () => string | null;
+  setGuestJoinCode: (value: string | null) => void;
+};
+
+const createMessageHandlers = ({
+  getGuestJoinCode,
+  setGuestJoinCode,
+}: MessageHandlerContext): MessageHandlers => ({
+  START_TEST: async ({ role, joinCode, iframeName, gameSequence }) => {
+    if (role === 'host') {
+      runHostFlow(gameSequence);
+      return;
+    }
+
+    if (role === 'guest' && joinCode) {
+      setGuestJoinCode(joinCode);
+      await runGuestFlow(joinCode, iframeName);
+    }
+  },
+  JOIN_CODE_RECEIVED: async ({ joinCode }) => {
+    if (getGuestJoinCode() !== null) {
+      return;
+    }
+
+    setGuestJoinCode(joinCode);
+    const iframeName = window.frameElement?.getAttribute('name') || '';
+    await runGuestFlow(joinCode, iframeName);
+  },
+  CLICK_GAME_START: async () => {
+    await handleHostGameStart();
+  },
+  TEST_COMPLETED: () => {
+    clearRacingGameClickInterval();
+    setFlowState('host', 'idle');
+    setFlowState('guest', 'idle');
+  },
+  STOP_TEST: () => {
+    clearRacingGameClickInterval();
+    setFlowState('host', 'idle');
+    setFlowState('guest', 'idle');
+  },
+  PAUSE_TEST: () => {
+    if (getFlowState('host') === 'running') {
+      setFlowState('host', 'paused');
+    }
+    if (getFlowState('guest') === 'running') {
+      setFlowState('guest', 'paused');
+    }
+  },
+  RESUME_TEST: () => {
+    if (getFlowState('host') === 'paused') {
+      setFlowState('host', 'running');
+    }
+    if (getFlowState('guest') === 'paused') {
+      setFlowState('guest', 'running');
+    }
+  },
+  RESET_TO_HOME: () => {
+    window.location.href = '/';
+  },
+});
+
 export const setupAutoTestListener = () => {
   if (typeof window === 'undefined') return;
 
   let guestJoinCode: string | null = null;
+
+  const getGuestJoinCode = () => guestJoinCode;
+  const setGuestJoinCode = (value: string | null) => {
+    guestJoinCode = value;
+  };
+
+  const handlers = createMessageHandlers({ getGuestJoinCode, setGuestJoinCode });
 
   const messageHandler = async (event: MessageEvent<TestMessage>) => {
     // TestMessage 타입 체크
@@ -140,55 +214,13 @@ export const setupAutoTestListener = () => {
       return;
     }
 
-    if (event.data.type === 'START_TEST') {
-      const { role, joinCode, iframeName, gameSequence } = event.data;
-
-      if (role === 'host') {
-        runHostFlow(gameSequence);
-      } else if (role === 'guest') {
-        if (joinCode) {
-          guestJoinCode = joinCode;
-          runGuestFlow(joinCode, iframeName);
-        }
-      }
-    } else if (event.data.type === 'JOIN_CODE_RECEIVED') {
-      const { joinCode } = event.data;
-      if (guestJoinCode === null) {
-        guestJoinCode = joinCode;
-        const iframeName = window.frameElement?.getAttribute('name') || '';
-        runGuestFlow(joinCode, iframeName);
-      }
-    } else if (event.data.type === 'CLICK_GAME_START') {
-      await handleHostGameStart();
-    } else if (event.data.type === 'TEST_COMPLETED') {
-      // 모든 플로우 종료
-      clearRacingGameClickInterval();
-      setFlowState('host', 'idle');
-      setFlowState('guest', 'idle');
-    } else if (event.data.type === 'STOP_TEST') {
-      // 모든 플로우 즉시 종료
-      clearRacingGameClickInterval();
-      setFlowState('host', 'idle');
-      setFlowState('guest', 'idle');
-    } else if (event.data.type === 'PAUSE_TEST') {
-      // 모든 플로우 일시 중지
-      if (getFlowState('host') === 'running') {
-        setFlowState('host', 'paused');
-      }
-      if (getFlowState('guest') === 'running') {
-        setFlowState('guest', 'paused');
-      }
-    } else if (event.data.type === 'RESUME_TEST') {
-      // 모든 플로우 재개
-      if (getFlowState('host') === 'paused') {
-        setFlowState('host', 'running');
-      }
-      if (getFlowState('guest') === 'paused') {
-        setFlowState('guest', 'running');
-      }
-    } else if (event.data.type === 'RESET_TO_HOME') {
-      window.location.href = '/';
+    const { type } = event.data;
+    const handler = handlers[type];
+    if (!handler) {
+      return;
     }
+
+    await handler(event.data as never);
   };
 
   window.addEventListener('message', messageHandler);

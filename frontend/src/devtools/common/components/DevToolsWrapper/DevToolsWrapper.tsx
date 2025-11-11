@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import IframePreviewToggle from '@/devtools/autoTest/components/IframePreviewToggle/IframePreviewToggle';
-import { setupAutoTestListener } from '@/devtools/autoTest/flow/autoTestFlow';
+import { setupAutoTestListener } from '@/devtools/autoTest/flow/setupAutoTestListener';
 import { initializeAutoTestLogger } from '@/devtools/autoTest/utils/autoTestLogger';
 import NetworkDebuggerPanel from '@/devtools/networkDebug/components/NetworkDebuggerPanel/NetworkDebuggerPanel';
 import { isTopWindow } from '@/devtools/common/utils/isTopWindow';

@@ -125,33 +125,6 @@ export const findFirstElementByTestIdPrefix = (prefix: string): HTMLElement | nu
   return (elements[0] as HTMLElement) || null;
 };
 
-export const waitForPathChange = async (
-  expectedPath: string,
-  maxWait = 10000
-): Promise<boolean> => {
-  const startTime = Date.now();
-  while (Date.now() - startTime < maxWait) {
-    if (window.location.pathname === expectedPath) {
-      await wait(500);
-      return true;
-    }
-    await wait(100);
-  }
-  return false;
-};
-
-export const waitForPathPattern = async (pattern: RegExp, maxWait = 10000): Promise<boolean> => {
-  const startTime = Date.now();
-  while (Date.now() - startTime < maxWait) {
-    if (pattern.test(window.location.pathname)) {
-      await wait(500);
-      return true;
-    }
-    await wait(100);
-  }
-  return false;
-};
-
 export const extractJoinCode = (): string | null => {
   const match = window.location.pathname.match(/^\/room\/([^/]+)/);
   return match ? match[1] : null;
