@@ -72,6 +72,7 @@ const EntryNamePage = () => {
                   buttonRef.current?.focus();
                 }
               }}
+              data-testid="player-name-input"
             />
             <S.ProgressWrapper>
               <ProgressCounter
@@ -88,6 +89,7 @@ const EntryNamePage = () => {
           ref={buttonRef}
           variant={isButtonDisabled ? 'disabled' : 'primary'}
           onClick={handleNavigateToMenu}
+          data-testid="go-to-menu-button"
         >
           메뉴 선택하러 가기
         </Button>

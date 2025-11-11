@@ -14,7 +14,13 @@ const MenuListItem = ({ text, onClick, ariaLabel, ...rest }: Props) => {
   const { touchState, pointerHandlers } = useButtonInteraction({ onClick });
 
   return (
-    <S.Container {...pointerHandlers} $touchState={touchState} aria-label={ariaLabel} {...rest}>
+    <S.Container
+      {...pointerHandlers}
+      $touchState={touchState}
+      aria-label={ariaLabel}
+      data-testid={`menu-item-${text}`}
+      {...rest}
+    >
       <Paragraph>{text}</Paragraph>
     </S.Container>
   );

@@ -16,6 +16,7 @@ const TemperatureOptionButton = ({ option, position, selected, onClick }: Props)
       $option={option}
       onClick={onClick}
       aria-label={option}
+      data-testid={`temperature-option-${option}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
