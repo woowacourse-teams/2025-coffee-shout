@@ -13,4 +13,3 @@ export const formatJSON = (text: string): string => {
     return text;
   }
 };
-

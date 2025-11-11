@@ -30,4 +30,3 @@ export type NetworkCollector = {
   clear: () => void;
   subscribe: (listener: (request: NetworkRequest) => void) => () => void;
 };
-

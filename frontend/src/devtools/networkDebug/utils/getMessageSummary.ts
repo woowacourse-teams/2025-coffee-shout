@@ -42,4 +42,3 @@ export const getMessageSummary = (message: WebSocketMessage): string => {
   const summary = data.length > maxLength ? data.substring(0, maxLength) + '...' : data;
   return summary;
 };
-

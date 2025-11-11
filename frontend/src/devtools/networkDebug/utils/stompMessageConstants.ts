@@ -17,4 +17,3 @@ export const STOMP_COMMAND = {
  * 일반 메시지 요약의 최대 길이
  */
 export const MESSAGE_SUMMARY_MAX_LENGTH = 100;
-
