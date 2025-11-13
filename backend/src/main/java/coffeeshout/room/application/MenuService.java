@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MenuApplicationService {
+public class MenuService {
 
     private final MenuQueryService menuQueryService;
     private final MenuCategoryQueryService menuCategoryQueryService;

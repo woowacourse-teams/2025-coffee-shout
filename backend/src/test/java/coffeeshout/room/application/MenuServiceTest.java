@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class MenuApplicationServiceTest extends ServiceTest {
+class MenuServiceTest extends ServiceTest {
 
     @Autowired
     private MenuRepository menuRepository;
@@ -35,7 +35,7 @@ class MenuApplicationServiceTest extends ServiceTest {
     private MenuCategoryQueryService menuCategoryQueryService;
 
     @Autowired
-    private MenuApplicationService menuApplicationService;
+    private MenuService menuService;
 
     private ProvidedMenu 아메리카노;
     private ProvidedMenu 라떼;
@@ -63,7 +63,7 @@ class MenuApplicationServiceTest extends ServiceTest {
         // given
 
         // when
-        List<ProvidedMenu> result = menuApplicationService.getAllMenus();
+        List<ProvidedMenu> result = menuService.getAllMenus();
 
         // then
         assertThat(result).hasSize(3);
@@ -77,7 +77,7 @@ class MenuApplicationServiceTest extends ServiceTest {
         Long categoryId = 1L;
 
         // when
-        List<ProvidedMenu> result = menuApplicationService.getMenusByCategory(categoryId);
+        List<ProvidedMenu> result = menuService.getMenusByCategory(categoryId);
 
         // then
         assertThat(result).hasSize(2);
@@ -90,7 +90,7 @@ class MenuApplicationServiceTest extends ServiceTest {
         // given
 
         // when
-        List<MenuCategory> result = menuApplicationService.getAllCategories();
+        List<MenuCategory> result = menuService.getAllCategories();
 
         // then
         assertThat(result).hasSize(2);
