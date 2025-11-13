@@ -11,13 +11,13 @@ public enum EventTopicRegistry {
     SESSION("session.events"),
     RACING_GAME("racinggame.events");
 
-    private final String topicName;
+    private final ChannelTopic channelTopic;
 
     EventTopicRegistry(String topicName) {
-        this.topicName = topicName;
+        this.channelTopic = new ChannelTopic(topicName);
     }
 
     public ChannelTopic toChannelTopic() {
-        return new ChannelTopic(topicName);
+        return channelTopic;
     }
 }

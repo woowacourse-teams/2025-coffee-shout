@@ -3,4 +3,4 @@
 /dist/
 
 *.env
-/backend/src/main/generated/
+/backend/build/
