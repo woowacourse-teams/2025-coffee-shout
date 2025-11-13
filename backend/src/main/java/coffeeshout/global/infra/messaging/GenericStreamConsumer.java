@@ -10,43 +10,8 @@ import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 
 /**
- * Redis Stream 이벤트를 소비하는 제너릭 Consumer
- * <p>
- * 메시징 인프라(메시지 수신, 파싱, 에러 처리)를 담당하고,
- * 비즈니스 로직은 {@link StreamEventHandler}에 위임합니다.
- * </p>
- *
- * <p><b>책임:</b></p>
- * <ul>
- *   <li>Redis Stream 리스너 등록</li>
- *   <li>메시지 수신 및 파싱</li>
- *   <li>Handler에 비즈니스 로직 위임</li>
- *   <li>공통 에러 처리 및 로깅</li>
- * </ul>
- *
- * <p><b>사용 방법:</b></p>
- * <pre>
- * // Configuration에서 빈 등록
- * &#64;Bean
- * public GenericStreamConsumer&lt;RoomJoinEvent&gt; roomJoinConsumer(
- *     RoomJoinEventHandler handler,
- *     &#64;Qualifier("roomEnterStreamContainer") StreamMessageListenerContainer container,
- *     RedisStreamProperties properties,
- *     ObjectMapper objectMapper
- * ) {
- *     return new GenericStreamConsumer&lt;&gt;(
- *         handler,
- *         RoomJoinEvent.class,
- *         container,
- *         properties.roomJoinKey(),
- *         "방 입장",
- *         objectMapper
- *     );
- * }
- * </pre>
- *
- * @param <T> 처리할 이벤트 타입
- * @see StreamEventHandler
+ * 제너릭 Stream Consumer - 메시징 인프라 담당
+ * 메시지 수신/파싱/에러처리 후 Handler에 비즈니스 로직 위임
  */
 @Slf4j
 public class GenericStreamConsumer<T> implements StreamListener<String, ObjectRecord<String, String>> {
@@ -58,16 +23,6 @@ public class GenericStreamConsumer<T> implements StreamListener<String, ObjectRe
     private final String eventName;
     private final ObjectMapper objectMapper;
 
-    /**
-     * GenericStreamConsumer 생성자
-     *
-     * @param handler     비즈니스 로직을 처리할 Handler
-     * @param eventType   이벤트 타입 (역직렬화용)
-     * @param container   Redis Stream 리스너 컨테이너
-     * @param streamKey   Redis Stream 키
-     * @param eventName   로깅용 이벤트 이름 (예: "방 입장")
-     * @param objectMapper JSON 변환용 ObjectMapper
-     */
     public GenericStreamConsumer(
             StreamEventHandler<T> handler,
             Class<T> eventType,
@@ -84,26 +39,12 @@ public class GenericStreamConsumer<T> implements StreamListener<String, ObjectRe
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * Redis Stream 리스너를 등록합니다.
-     * <p>
-     * 애플리케이션 시작 시 자동으로 호출되어 Stream 구독을 시작합니다.
-     * </p>
-     */
     @PostConstruct
     public void registerListener() {
         container.receive(StreamOffset.fromStart(streamKey), this);
         log.info("{} 이벤트 스트림 리스너 등록 완료: streamKey={}", eventName, streamKey);
     }
 
-    /**
-     * Redis Stream 메시지를 수신하고 처리합니다.
-     * <p>
-     * 메시지를 파싱하여 Handler에 위임하고, 발생한 예외를 처리합니다.
-     * </p>
-     *
-     * @param message 수신한 Redis Stream 메시지
-     */
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
         log.info("{} 이벤트 메시지 수신: messageId={}, streamKey={}",
@@ -129,13 +70,6 @@ public class GenericStreamConsumer<T> implements StreamListener<String, ObjectRe
         }
     }
 
-    /**
-     * Redis Stream 메시지를 이벤트 객체로 파싱합니다.
-     *
-     * @param message Redis Stream 메시지
-     * @return 파싱된 이벤트 객체
-     * @throws IllegalArgumentException JSON 파싱 실패 시
-     */
     private T parseEvent(ObjectRecord<String, String> message) {
         try {
             String value = message.getValue();
