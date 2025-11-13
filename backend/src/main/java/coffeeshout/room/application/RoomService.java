@@ -5,6 +5,7 @@ import coffeeshout.room.domain.QrCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
+import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import coffeeshout.room.domain.menu.Menu;
 import coffeeshout.room.domain.player.PlayerName;
@@ -12,7 +13,6 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
@@ -136,17 +136,6 @@ public class RoomService {
 
     public boolean roomExists(String joinCode) {
         return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
-    }
-
-    public boolean removePlayer(String joinCode, String playerName) {
-        final JoinCode code = new JoinCode(joinCode);
-        final Room room = roomQueryService.getByJoinCode(code);
-
-        boolean isRemoved = room.removePlayer(new PlayerName(playerName));
-        if (room.isEmpty()) {
-            roomCommandService.delete(code);
-        }
-        return isRemoved;
     }
 
     public boolean kickPlayer(String joinCode, String playerName) {

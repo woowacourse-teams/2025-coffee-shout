@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.RoomPlayerService;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     private PlayerDisconnectionService playerDisconnectionService;
 
     @Mock
-    private RoomService roomService;
+    private RoomPlayerService roomService;
 
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
@@ -160,18 +160,18 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     /**
      * 테스트용 DelayedPlayerRemovalService 실제 15초 대신 짧은 시간으로 테스트할 수 있도록 오버라이드
      */
-    private static class TestDelayedPlayerRemovalService extends DelayedPlayerRemovalService {
-        private static final Duration TEST_REMOVAL_DELAY = Duration.ofMillis(500); // 500ms로 단축
-
-        public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
-                                               PlayerDisconnectionService playerDisconnectionService,
-                                               StompSessionManager stompSessionManager,
-                                               RoomService roomService) {
-            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomService);
-        }
-
-        // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능
-        // 하지만 현재 구조상 REMOVAL_DELAY가 private static final이라 어렵다
-        // 실제로는 설정으로 빼거나 생성자 주입으로 받는 게 좋을 듯
-    }
+//    private static class TestDelayedPlayerRemovalService extends DelayedPlayerRemovalService {
+//        private static final Duration TEST_REMOVAL_DELAY = Duration.ofMillis(500); // 500ms로 단축
+//
+//        public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
+//                                               PlayerDisconnectionService playerDisconnectionService,
+//                                               StompSessionManager stompSessionManager,
+//                                               RoomService roomService) {
+//            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomService);
+//        }
+//
+//        // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능
+//        // 하지만 현재 구조상 REMOVAL_DELAY가 private static final이라 어렵다
+//        // 실제로는 설정으로 빼거나 생성자 주입으로 받는 게 좋을 듯
+//    }
 }

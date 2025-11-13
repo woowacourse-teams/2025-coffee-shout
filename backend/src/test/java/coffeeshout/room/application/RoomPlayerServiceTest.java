@@ -13,10 +13,9 @@ import coffeeshout.room.domain.menu.SelectedMenu;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 class RoomPlayerServiceTest extends ServiceTest {
 
@@ -112,7 +111,7 @@ class RoomPlayerServiceTest extends ServiceTest {
                 .filter(p -> p.getName().value().equals(guestName))
                 .findFirst()
                 .orElseThrow();
-        assertThat(guest.isReady()).isTrue();
+        assertThat(guest.getIsReady()).isTrue();
     }
 
     @Test
@@ -135,7 +134,7 @@ class RoomPlayerServiceTest extends ServiceTest {
                 .findFirst()
                 .orElseThrow();
         // 호스트는 항상 준비 상태이므로 변경되지 않음
-        assertThat(host.isReady()).isTrue();
+        assertThat(host.getIsReady()).isTrue();
     }
 
     @Test
@@ -178,5 +177,36 @@ class RoomPlayerServiceTest extends ServiceTest {
 
         // then
         assertThat(roomPlayerService.isReadyState(createdRoom.getJoinCode().getValue())).isFalse();
+    }
+
+    @Test
+    void 플레이어를_제거할_때_플레이어가_없다면_방을_제거한다() {
+        // given
+        String hostName = "호스트";
+        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
+        JoinCode joinCode = createdRoom.getJoinCode();
+
+        // when
+        roomPlayerService.removePlayer(joinCode.getValue(), hostName);
+
+        // then
+        assertThat(roomService.roomExists(joinCode.getValue())).isFalse();
+    }
+
+    @Test
+    void 플레이어를_제거할_때_플레이어가_있다면_방을_제거하지_않는다() {
+        String hostName = "호스트";
+        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
+        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
+        JoinCode joinCode = createdRoom.getJoinCode();
+        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1",
+                new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
+
+        // when
+        roomPlayerService.removePlayer(joinCode.getValue(), hostName);
+
+        // then
+        assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
     }
 }

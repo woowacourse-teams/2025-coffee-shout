@@ -1,7 +1,7 @@
 package coffeeshout.global.websocket;
 
 import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.RoomPlayerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class PlayerDisconnectionService {
 
     private final StompSessionManager sessionManager;
-    private final RoomService roomService;
+    private final RoomPlayerService roomService;
     private final ApplicationEventPublisher eventPublisher;
 
     public void cancelReady(String playerKey) {

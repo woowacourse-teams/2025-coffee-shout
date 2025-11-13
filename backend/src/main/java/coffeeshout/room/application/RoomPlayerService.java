@@ -60,4 +60,15 @@ public class RoomPlayerService {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.isReadyState();
     }
+
+    public boolean removePlayer(String joinCode, String playerName) {
+        final JoinCode code = new JoinCode(joinCode);
+        final Room room = roomQueryService.getByJoinCode(code);
+
+        boolean isRemoved = room.removePlayer(new PlayerName(playerName));
+        if (room.isEmpty()) {
+            roomCommandService.delete(code);
+        }
+        return isRemoved;
+    }
 }

@@ -1,10 +1,11 @@
 package coffeeshout.room.application;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
+import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
@@ -18,7 +19,6 @@ import coffeeshout.room.domain.service.JoinCodeGenerator;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
-import coffeeshout.fixture.TestDataHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -218,37 +218,6 @@ class RoomServiceTest extends ServiceTest {
         // when & then
         assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
         assertThat(roomService.roomExists("TRAS")).isFalse();
-    }
-
-    @Test
-    void 플레이어를_제거할_때_플레이어가_없다면_방을_제거한다() {
-        // given
-        String hostName = "호스트";
-        SelectedMenuRequest selectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
-
-        // when
-        roomService.removePlayer(joinCode.getValue(), hostName);
-
-        // then
-        assertThat(roomService.roomExists(joinCode.getValue())).isFalse();
-    }
-
-    @Test
-    void 플레이어를_제거할_때_플레이어가_있다면_방을_제거하지_않는다() {
-        String hostName = "호스트";
-        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        JoinCode joinCode = createdRoom.getJoinCode();
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트1",
-                new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-
-        // when
-        roomService.removePlayer(joinCode.getValue(), hostName);
-
-        // then
-        assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
     }
 
     @Test
