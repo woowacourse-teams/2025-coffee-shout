@@ -42,7 +42,7 @@ public class RedisRoomEventPublisher implements RoomEventPublisher {
     }
 
     private void publishToPubSub(RoomBaseEvent event) {
-        String topic = topicManager.getTopic(EventTopicRegistry.ROOM).getTopic();
+        String topic = topicManager.getTopicName(EventTopicRegistry.ROOM);
         redisTemplate.convertAndSend(topic, event);
 
         log.debug("Redis Pub/Sub로 이벤트 발행: topic={}, eventType={}",

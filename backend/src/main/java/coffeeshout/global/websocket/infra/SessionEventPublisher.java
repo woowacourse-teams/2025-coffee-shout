@@ -18,7 +18,7 @@ public class SessionEventPublisher {
 
     public <T extends SessionBaseEvent> void publishEvent(T event) {
         try {
-            final String topic = topicManager.getTopic(EventTopicRegistry.SESSION).getTopic();
+            final String topic = topicManager.getTopicName(EventTopicRegistry.SESSION);
             redisTemplate.convertAndSend(topic, event);
             log.info("세션 이벤트 발행됨: eventType={}, eventId={}",
                     event.eventType(), event.eventId());

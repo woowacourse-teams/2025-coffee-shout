@@ -22,4 +22,8 @@ public class TopicManager {
             throw new IllegalStateException("토픽 생성 중 오류 발생: " + registry, e);
         }
     }
+
+    public String getTopicName(EventTopicRegistry registry) {
+        return getTopic(registry).getTopic();
+    }
 }

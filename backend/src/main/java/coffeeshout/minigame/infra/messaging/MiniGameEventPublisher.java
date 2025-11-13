@@ -18,7 +18,7 @@ public class MiniGameEventPublisher {
 
     public <T extends MiniGameBaseEvent> void publishEvent(T event) {
         try {
-            final String topic = topicManager.getTopic(EventTopicRegistry.MINI_GAME).getTopic();
+            final String topic = topicManager.getTopicName(EventTopicRegistry.MINI_GAME);
             redisTemplate.convertAndSend(topic, event);
             log.info("미니게임 이벤트 발행됨: eventType={}, eventId={}",
                     event.eventType(), event.eventId());

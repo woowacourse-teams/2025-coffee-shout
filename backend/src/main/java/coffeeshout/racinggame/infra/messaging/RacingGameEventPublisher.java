@@ -17,7 +17,7 @@ public class RacingGameEventPublisher {
 
     public <T> void publishEvent(T event) {
         try {
-            final String topic = topicManager.getTopic(EventTopicRegistry.RACING_GAME).getTopic();
+            final String topic = topicManager.getTopicName(EventTopicRegistry.RACING_GAME);
             redisTemplate.convertAndSend(topic, event);
             log.info("레이싱 게임 이벤트 발행됨: event={}", event);
         } catch (Exception e) {

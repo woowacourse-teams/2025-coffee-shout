@@ -18,7 +18,7 @@ public class PlayerEventPublisher {
 
     public <T extends PlayerBaseEvent> void publishEvent(T event) {
         try {
-            final String topic = topicManager.getTopic(EventTopicRegistry.PLAYER).getTopic();
+            final String topic = topicManager.getTopicName(EventTopicRegistry.PLAYER);
             redisTemplate.convertAndSend(topic, event);
             log.info("플레이어 이벤트 발행됨: eventType={}, eventId={}",
                     event.eventType(), event.eventId());
