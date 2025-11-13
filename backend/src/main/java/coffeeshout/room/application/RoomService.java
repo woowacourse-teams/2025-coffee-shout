@@ -24,7 +24,7 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.domain.event.EventPublisher;
+import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
@@ -54,7 +54,7 @@ public class RoomService {
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
-    private final EventPublisher eventPublisher;
+    private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
     private final RoomJpaRepository roomJpaRepository;
@@ -78,7 +78,7 @@ public class RoomService {
                 joinCode.getValue()
         );
 
-        eventPublisher.publish(event);
+        roomEventPublisher.publish(event);
 
         // QR 코드 비동기 생성 시작
         qrCodeService.generateQrCodeAsync(joinCode.getValue());
@@ -103,7 +103,7 @@ public class RoomService {
 
         return processEventAsync(
                 event.eventId(),
-                () -> eventPublisher.publish(event),
+                () -> roomEventPublisher.publish(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
@@ -305,7 +305,7 @@ public class RoomService {
 
         if (exists) {
             final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
-            roomEventPublisher.publishEvent(event);
+            roomEventPublisher.publish(event);
         }
 
         return exists;

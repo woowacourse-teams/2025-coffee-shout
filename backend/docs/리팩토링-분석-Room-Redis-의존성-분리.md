@@ -71,7 +71,7 @@ package coffeeshout.room.infra.messaging;
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.config.redis.TopicManager;
-import coffeeshout.room.domain.event.EventPublisher;
+import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -168,7 +168,7 @@ public class RedisEventPublisher implements EventPublisher {
 public class RoomService {
 
     // ✅ 하나의 인터페이스만 의존
-    private final EventPublisher eventPublisher;
+    private final EventPublisher roomEventPublisher;
 
     // ❌ 제거됨
     // private final RoomEventPublisher roomEventPublisher;
@@ -179,7 +179,7 @@ public class RoomService {
         // 비즈니스 로직...
 
         RoomCreateEvent event = new RoomCreateEvent(...);
-        eventPublisher.publish(event);  // ✅ 단순하게 발행만!
+        roomEventPublisher.publish(event);  // ✅ 단순하게 발행만!
 
         return room;
     }
@@ -188,7 +188,7 @@ public class RoomService {
         // 비즈니스 로직...
 
         RoomJoinEvent event = new RoomJoinEvent(...);
-        eventPublisher.publish(event);  // ✅ 동일한 인터페이스 사용!
+        roomEventPublisher.publish(event);  // ✅ 동일한 인터페이스 사용!
 
         return future;
     }
@@ -224,12 +224,12 @@ Infra Layer
 ### 1. ✅ 단순성
 ```java
 // Before: 두 개의 Publisher
-eventPublisher.publish(event1);
+roomEventPublisher.publish(event1);
 roomJoinEventPublisher.publishRoomJoinEvent(event2);
 
 // After: 하나의 Publisher
-eventPublisher.publish(event1);
-eventPublisher.publish(event2);
+roomEventPublisher.publish(event1);
+roomEventPublisher.publish(event2);
 ```
 
 ### 2. ✅ 관심사 분리

@@ -461,14 +461,14 @@ public class RedisEventPublisher implements EventPublisher {
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final ApplicationEventPublisher eventPublisher;  // ⭐ Spring 제공
+    private final ApplicationEventPublisher roomEventPublisher;  // ⭐ Spring 제공
 
     @Transactional
     public Room createRoom(String hostName, SelectedMenuRequest request) {
         // 비즈니스 로직...
 
         RoomCreateEvent event = new RoomCreateEvent(...);
-        eventPublisher.publishEvent(event);  // ⭐ Spring Event 발행
+        roomEventPublisher.publishEvent(event);  // ⭐ Spring Event 발행
 
         return room;
     }
@@ -571,7 +571,7 @@ public void handleForRedis(RoomCreateEvent event) {
 // Application Layer
 @Service
 public class RoomService {
-    private final ApplicationEventPublisher eventPublisher;  // ⚠️ Spring 프레임워크 의존
+    private final ApplicationEventPublisher roomEventPublisher;  // ⚠️ Spring 프레임워크 의존
 }
 ```
 - 도메인/애플리케이션이 Spring에 강하게 결합
@@ -579,7 +579,7 @@ public class RoomService {
 
 ❌ **암시적 동작**
 ```java
-eventPublisher.publishEvent(event);
+roomEventPublisher.publishEvent(event);
 // 어떤 리스너가 실행되는지 코드만 보고 알기 어려움
 // IDE 지원으로 어느 정도 해결 가능
 ```
@@ -587,7 +587,7 @@ eventPublisher.publishEvent(event);
 ❌ **타입 안전성 부족**
 ```java
 // 리스너가 없어도 컴파일 오류 없음
-eventPublisher.publishEvent(new SomeEvent());  // 리스너 없으면 조용히 무시됨
+roomEventPublisher.publishEvent(new SomeEvent());  // 리스너 없으면 조용히 무시됨
 ```
 
 ---
@@ -610,12 +610,12 @@ public interface EventPublisher {
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final EventPublisher eventPublisher;  // ⭐ 커스텀 인터페이스
+    private final EventPublisher roomEventPublisher;  // ⭐ 커스텀 인터페이스
 
     @Transactional
     public Room createRoom(...) {
         RoomCreateEvent event = new RoomCreateEvent(...);
-        eventPublisher.publish(event);  // ⭐ 명시적 발행
+        roomEventPublisher.publish(event);  // ⭐ 명시적 발행
         return room;
     }
 }
@@ -643,7 +643,7 @@ public class RedisEventPublisher implements EventPublisher {
 ✅ **명시적 의존성**
 ```java
 // Application이 자신만의 인터페이스에 의존
-private final EventPublisher eventPublisher;  // 도메인/애플리케이션 계층 인터페이스
+private final EventPublisher roomEventPublisher;  // 도메인/애플리케이션 계층 인터페이스
 ```
 
 ✅ **타입 안전성**
@@ -653,12 +653,12 @@ public interface EventPublisher {
 }
 
 // ❌ 컴파일 에러
-eventPublisher.publish(new String("invalid"));
+roomEventPublisher.publish(new String("invalid"));
 ```
 
 ✅ **명확한 제어 흐름**
 ```java
-eventPublisher.publish(event);
+roomEventPublisher.publish(event);
 // → RedisEventPublisher.publish() 호출
 // → StreamPublishStrategy 또는 PubSubPublishStrategy 실행
 // 추적 가능
@@ -728,7 +728,7 @@ public void recordMetrics(RoomCreateEvent event) {
 
 ```java
 // 명확하고 단순
-eventPublisher.publish(new RoomCreateEvent(...));
+roomEventPublisher.publish(new RoomCreateEvent(...));
 ```
 
 ### Case 3: 트랜잭션과 긴밀한 통합 필요
@@ -755,7 +755,7 @@ public void handleAfterCommit(RoomCreateEvent event) {
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final EventPublisher eventPublisher;              // 원격 발행
+    private final EventPublisher roomEventPublisher;              // 원격 발행
     private final ApplicationEventPublisher springPublisher;  // 로컬 이벤트
 
     @Transactional
@@ -766,7 +766,7 @@ public class RoomService {
         springPublisher.publishEvent(event);
 
         // 2. 원격 발행 (Redis)
-        eventPublisher.publish(event);
+        roomEventPublisher.publish(event);
 
         return room;
     }

@@ -15,7 +15,7 @@ package coffeeshout.room.domain.event;
  *   <li>이벤트 발행 방식(Pub/Sub, Stream 등)은 구현체가 결정</li>
  * </ul>
  */
-public interface EventPublisher {
+public interface RoomEventPublisher {
 
     /**
      * 이벤트를 발행한다
