@@ -3,10 +3,11 @@ package coffeeshout.room.application.handler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteShowEvent;
+import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.infra.persistence.RoulettePersistenceService;
 import coffeeshout.room.ui.response.RoomStatusResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEvent> {
 
-    private final RoomService roomService;
+    private final RoomQueryService roomQueryService;
     private final RoulettePersistenceService roulettePersistenceService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
@@ -27,7 +28,9 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
         try {
             log.info("룰렛 전환 이벤트 수신: eventId={}, joinCode={}", event.eventId(), event.joinCode());
 
-            final Room room = roomService.showRoulette(event.joinCode());
+            final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
+            room.showRoulette();
+
             final RoomStatusResponse response = RoomStatusResponse.of(room.getJoinCode(), room.getRoomState());
 
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/roulette",

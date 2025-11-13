@@ -3,10 +3,15 @@ package coffeeshout.room.application.handler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.player.PlayerName;
+import coffeeshout.room.domain.player.PlayerType;
+import coffeeshout.room.domain.service.RoomCommandService;
+import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.ui.response.PlayerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +23,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlayerReadyEventHandler implements RoomEventHandler<PlayerReadyEvent> {
 
-    private final RoomService roomService;
+    private final RoomCommandService roomCommandService;
+    private final RoomQueryService roomQueryService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -27,12 +33,15 @@ public class PlayerReadyEventHandler implements RoomEventHandler<PlayerReadyEven
             log.info("플레이어 ready 이벤트 수신: eventId={}, joinCode={}, playerName={}, isReady={}",
                     event.eventId(), event.joinCode(), event.playerName(), event.isReady());
 
-            final List<Player> players = roomService.changePlayerReadyStateInternal(
-                    event.joinCode(),
-                    event.playerName(),
-                    event.isReady()
-            );
-            final List<PlayerResponse> responses = players.stream()
+            final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
+            final Player player = room.findPlayer(new PlayerName(event.playerName()));
+
+            if (player.getPlayerType() != PlayerType.HOST) {
+                player.updateReadyState(event.isReady());
+                roomCommandService.save(room);
+            }
+
+            final List<PlayerResponse> responses = room.getPlayers().stream()
                     .map(PlayerResponse::from)
                     .toList();
 

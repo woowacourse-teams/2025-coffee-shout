@@ -26,8 +26,7 @@ import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
 import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
-import coffeeshout.room.infra.persistence.RoomEntity;
-import coffeeshout.room.infra.persistence.RoomJpaRepository;
+import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import coffeeshout.room.ui.request.SelectedMenuRequest;
 import coffeeshout.room.ui.response.ProbabilityResponse;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
@@ -57,7 +56,7 @@ public class RoomService {
     private final RoomEventPublisher roomEventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
-    private final RoomJpaRepository roomJpaRepository;
+    private final RoomPersistenceService roomPersistenceService;
 
     @Value("${room.event.timeout:PT5S}")
     private Duration eventTimeout;
@@ -83,7 +82,7 @@ public class RoomService {
         // QR 코드 비동기 생성 시작
         qrCodeService.generateQrCodeAsync(joinCode.getValue());
 
-        saveRoomEntity(joinCode.getValue());
+        roomPersistenceService.saveRoomSession(joinCode.getValue());
 
         log.info("방 생성 이벤트 처리 완료 (DB 저장): eventId={}, joinCode={}",
                 event.eventId(), event.joinCode());
@@ -140,7 +139,16 @@ public class RoomService {
     }
 
     public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        return changePlayerReadyStateInternal(joinCode, playerName, isReady);
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        final Player player = room.findPlayer(new PlayerName(playerName));
+
+        if (player.getPlayerType() == PlayerType.HOST) {
+            return room.getPlayers();
+        }
+
+        player.updateReadyState(isReady);
+        roomCommandService.save(room);
+        return room.getPlayers();
     }
 
     public Winner spinRoulette(String joinCode, String hostName) {
@@ -154,16 +162,6 @@ public class RoomService {
         return roomQueryService.getByJoinCode(new JoinCode(joinCode));
     }
 
-    public List<Player> getPlayersInternal(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.getPlayers();
-    }
-
-    public void saveRoomEntity(String joinCodeValue) {
-        final RoomEntity roomEntity = new RoomEntity(joinCodeValue);
-        roomJpaRepository.save(roomEntity);
-    }
-
     public Room enterRoom(String joinCode, String guestName, SelectedMenuRequest selectedMenuRequest) {
         Menu menu = menuCommandService.convertMenu(selectedMenuRequest.id(), selectedMenuRequest.customName());
 
@@ -175,21 +173,7 @@ public class RoomService {
         );
     }
 
-    public List<Player> changePlayerReadyStateInternal(String joinCode, String playerName, Boolean isReady) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        final Player player = room.findPlayer(new PlayerName(playerName));
-
-        if (player.getPlayerType() == PlayerType.HOST) {
-            return room.getPlayers();
-        }
-
-        player.updateReadyState(isReady);
-        roomCommandService.save(room);
-        return room.getPlayers();
-    }
-
-    public List<MiniGameType> updateMiniGamesInternal(String joinCode, String hostName,
-                                                      List<MiniGameType> miniGameTypes) {
+    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         room.clearMiniGames();
 
@@ -221,10 +205,6 @@ public class RoomService {
         player.selectMenu(new SelectedMenu(menu, MenuTemperature.ICE));
 
         return room.getPlayers();
-    }
-
-    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        return updateMiniGamesInternal(joinCode, hostName, miniGameTypes);
     }
 
     public List<MiniGameType> getAllMiniGames() {
