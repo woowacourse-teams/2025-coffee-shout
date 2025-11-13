@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CardSelectEventHandler implements StreamEventHandler<SelectCardCommandEvent> {
+public class CardSelectStreamHandler implements StreamEventHandler<SelectCardCommandEvent> {
 
     private final CardGameCommandService cardGameCommandService;
 

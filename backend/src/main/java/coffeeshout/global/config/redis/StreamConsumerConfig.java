@@ -1,11 +1,11 @@
 package coffeeshout.global.config.redis;
 
 import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
-import coffeeshout.cardgame.infra.messaging.CardSelectEventHandler;
+import coffeeshout.cardgame.infra.messaging.CardSelectStreamHandler;
 import coffeeshout.global.config.properties.RedisStreamProperties;
 import coffeeshout.global.infra.messaging.GenericStreamConsumer;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import coffeeshout.room.infra.messaging.RoomJoinEventHandler;
+import coffeeshout.room.infra.messaging.RoomJoinStreamHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ public class StreamConsumerConfig {
 
     @Bean
     public GenericStreamConsumer<RoomJoinEvent> roomJoinConsumer(
-            RoomJoinEventHandler handler,
+            RoomJoinStreamHandler handler,
             @Qualifier("roomEnterStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> roomEnterStreamContainer,
             RedisStreamProperties properties,
             ObjectMapper objectMapper
@@ -35,7 +35,7 @@ public class StreamConsumerConfig {
 
     @Bean
     public GenericStreamConsumer<SelectCardCommandEvent> cardSelectConsumer(
-            CardSelectEventHandler handler,
+            CardSelectStreamHandler handler,
             @Qualifier("cardSelectStreamContainer") StreamMessageListenerContainer<String, ObjectRecord<String, String>> cardSelectStreamContainer,
             RedisStreamProperties properties,
             ObjectMapper objectMapper

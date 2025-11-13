@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomJoinEventHandler implements StreamEventHandler<RoomJoinEvent> {
+public class RoomJoinStreamHandler implements StreamEventHandler<RoomJoinEvent> {
 
     private final RoomCommandService roomCommandService;
     private final MenuCommandService menuCommandService;
