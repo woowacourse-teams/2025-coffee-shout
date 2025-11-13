@@ -1,13 +1,23 @@
 package coffeeshout.room.domain.event;
 
 public enum RoomEventType {
-    ROOM_CREATE,
-    ROOM_JOIN,
-    PLAYER_READY,
-    PLAYER_LIST_UPDATE,
-    PLAYER_KICK,
-    MINI_GAME_SELECT,
-    ROULETTE_SHOW,
-    ROULETTE_SPIN,
-    QR_CODE_COMPLETE,
+    ROOM_CREATE(RoomCreateEvent.class),
+    ROOM_JOIN(RoomJoinEvent.class),
+    PLAYER_READY(PlayerReadyEvent.class),
+    PLAYER_LIST_UPDATE(PlayerListUpdateEvent.class),
+    PLAYER_KICK(PlayerKickEvent.class),
+    MINI_GAME_SELECT(MiniGameSelectEvent.class),
+    ROULETTE_SHOW(RouletteShowEvent.class),
+    ROULETTE_SPIN(RouletteSpinEvent.class),
+    QR_CODE_COMPLETE(QrCodeStatusEvent.class);
+
+    private final Class<? extends RoomBaseEvent> eventClass;
+
+    RoomEventType(Class<? extends RoomBaseEvent> eventClass) {
+        this.eventClass = eventClass;
+    }
+
+    public Class<? extends RoomBaseEvent> getEventClass() {
+        return eventClass;
+    }
 }
