@@ -138,48 +138,6 @@ class RoomPlayerServiceTest extends ServiceTest {
     }
 
     @Test
-    void 모든_게스트가_준비_상태일_때_isReadyState는_true를_반환한다() {
-        // given
-        String hostName = "호스트";
-        String guest1 = "게스트1";
-        String guest2 = "게스트2";
-        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guest1,
-                new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guest2,
-                new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-
-        // when
-        roomPlayerService.changePlayerReadyState(createdRoom.getJoinCode().getValue(), guest1, true);
-        roomPlayerService.changePlayerReadyState(createdRoom.getJoinCode().getValue(), guest2, true);
-
-        // then
-        assertThat(roomService.isReadyState(createdRoom.getJoinCode().getValue())).isTrue();
-    }
-
-    @Test
-    void 게스트_중_한_명이라도_준비_상태가_아니면_isReadyState는_false를_반환한다() {
-        // given
-        String hostName = "호스트";
-        String guest1 = "게스트1";
-        String guest2 = "게스트2";
-        SelectedMenuRequest hostSelectedMenuRequest = new SelectedMenuRequest(1L, null, MenuTemperature.ICE);
-        Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guest1,
-                new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
-        roomService.enterRoom(createdRoom.getJoinCode().getValue(), guest2,
-                new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-
-        // when
-        roomPlayerService.changePlayerReadyState(createdRoom.getJoinCode().getValue(), guest1, true);
-        // guest2는 준비하지 않음
-
-        // then
-        assertThat(roomService.isReadyState(createdRoom.getJoinCode().getValue())).isFalse();
-    }
-
-    @Test
     void 플레이어를_제거할_때_플레이어가_없다면_방을_제거한다() {
         // given
         String hostName = "호스트";

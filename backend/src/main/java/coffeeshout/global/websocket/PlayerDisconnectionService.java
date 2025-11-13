@@ -2,7 +2,6 @@ package coffeeshout.global.websocket;
 
 import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import coffeeshout.room.application.RoomPlayerService;
-import coffeeshout.room.application.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class PlayerDisconnectionService {
 
     private final StompSessionManager sessionManager;
-    private final RoomService roomService;
     private final RoomPlayerService roomPlayerService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -56,7 +54,7 @@ public class PlayerDisconnectionService {
     private void removePlayerFromRoom(String joinCode, String playerName) {
         try {
             // 방에서 플레이어 제거
-            boolean removed = roomService.removePlayer(joinCode, playerName);
+            boolean removed = roomPlayerService.removePlayer(joinCode, playerName);
 
             if (removed) {
                 eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_REMOVED"));
