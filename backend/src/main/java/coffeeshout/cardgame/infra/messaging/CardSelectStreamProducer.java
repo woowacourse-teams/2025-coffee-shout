@@ -2,51 +2,44 @@ package coffeeshout.cardgame.infra.messaging;
 
 import coffeeshout.cardgame.domain.event.SelectCardCommandEvent;
 import coffeeshout.global.config.properties.RedisStreamProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import coffeeshout.global.infra.messaging.RedisStreamPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
-import org.springframework.data.redis.connection.stream.Record;
-import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * CardGame 도메인 카드 선택 이벤트를 Redis Stream으로 발행하는 Producer
+ * <p>
+ * {@link RedisStreamPublisher}를 합성(composition)하여 공통 발행 로직을 재사용합니다.
+ * 이 클래스는 CardGame 도메인에 특화된 로깅과 Stream 키 설정을 담당합니다.
+ * </p>
+ *
+ * @see RedisStreamPublisher
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class CardSelectStreamProducer {
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisStreamPublisher redisStreamPublisher;
     private final RedisStreamProperties redisStreamProperties;
-    private final ObjectMapper objectMapper;
 
+    /**
+     * 카드 선택 이벤트를 Redis Stream으로 브로드캐스트합니다.
+     *
+     * @param event 카드 선택 명령 이벤트
+     * @throws RuntimeException Stream 발행 실패 시
+     */
     public void broadcastCardSelect(SelectCardCommandEvent event) {
-        log.info("카드 선택 이벤트 발송 시작: eventId={}, joinCode={}, playerName={}, cardIndex={}",
+        log.debug("카드 선택 이벤트 발송 준비: eventId={}, joinCode={}, playerName={}, cardIndex={}",
                 event.eventId(), event.joinCode(), event.playerName(), event.cardIndex());
 
-        try {
-            final String value = objectMapper.writeValueAsString(event);
+        redisStreamPublisher.publish(
+                redisStreamProperties.cardGameSelectKey(),
+                event,
+                "카드 선택 이벤트"
+        );
 
-            final Record<String, Object> objectRecord = StreamRecords.newRecord()
-                    .in(redisStreamProperties.cardGameSelectKey())
-                    .ofObject(value);
-
-            final var recordId = stringRedisTemplate.opsForStream().add(
-                    objectRecord,
-                    XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
-            );
-
-            log.info("카드 선택 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
-                    event.eventId(), recordId, redisStreamProperties.cardGameSelectKey());
-        } catch (JsonProcessingException e) {
-            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
-                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
-            throw new RuntimeException("SelectCardCommandEvent 직렬화 실패: " + e.getMessage(), e);
-        } catch (Exception e) {
-            log.error("카드 선택 이벤트 발송 실패: eventId={}, joinCode={}, playerName={}, cardIndex={}",
-                    event.eventId(), event.joinCode(), event.playerName(), event.cardIndex(), e);
-            throw new RuntimeException("카드 선택 이벤트 발송 실패: " + e.getMessage(), e);
-        }
+        log.debug("카드 선택 이벤트 발송 완료: eventId={}", event.eventId());
     }
 }

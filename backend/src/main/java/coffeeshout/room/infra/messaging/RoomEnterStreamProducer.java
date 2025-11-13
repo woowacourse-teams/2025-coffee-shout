@@ -1,51 +1,45 @@
 package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.properties.RedisStreamProperties;
+import coffeeshout.global.infra.messaging.RedisStreamPublisher;
 import coffeeshout.room.domain.event.RoomJoinEvent;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
-import org.springframework.data.redis.connection.stream.Record;
-import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Room 도메인 입장 이벤트를 Redis Stream으로 발행하는 Producer
+ * <p>
+ * {@link RedisStreamPublisher}를 합성(composition)하여 공통 발행 로직을 재사용합니다.
+ * 이 클래스는 Room 도메인에 특화된 로깅과 Stream 키 설정을 담당합니다.
+ * </p>
+ *
+ * @see RedisStreamPublisher
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RoomEnterStreamProducer {
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisStreamPublisher redisStreamPublisher;
     private final RedisStreamProperties redisStreamProperties;
-    private final ObjectMapper objectMapper;
 
+    /**
+     * 방 입장 이벤트를 Redis Stream으로 브로드캐스트합니다.
+     *
+     * @param event 방 입장 이벤트
+     * @throws RuntimeException Stream 발행 실패 시
+     */
     public void broadcastEnterRoom(RoomJoinEvent event) {
-        log.info("방 입장 이벤트 발송 시작: eventId={}, joinCode={}, guestName={}",
+        log.debug("방 입장 이벤트 발송 준비: eventId={}, joinCode={}, guestName={}",
                 event.eventId(), event.joinCode(), event.guestName());
 
-        try {
-            final String eventJson = objectMapper.writeValueAsString(event);
-            final Record<String, String> objectRecord = StreamRecords.newRecord()
-                    .in(redisStreamProperties.roomJoinKey())
-                    .ofObject(eventJson);
+        redisStreamPublisher.publish(
+                redisStreamProperties.roomJoinKey(),
+                event,
+                "방 입장 이벤트"
+        );
 
-            final var recordId = stringRedisTemplate.opsForStream().add(
-                    objectRecord,
-                    XAddOptions.maxlen(redisStreamProperties.maxLength()).approximateTrimming(true)
-            );
-
-            log.info("방 입장 이벤트 발송 성공: eventId={}, recordId={}, streamKey={}",
-                    event.eventId(), recordId, redisStreamProperties.roomJoinKey());
-        } catch (JsonProcessingException e){
-            log.error("이벤트 직렬화 실패: eventId={}, joinCode={}, guestName={}",
-                    event.eventId(), event.joinCode(), event.guestName(), e);
-            throw new RuntimeException("RoomJoinEvent 직렬화 실패: " + e.getMessage(), e);
-        } catch (Exception e) {
-            log.error("방 입장 이벤트 발송 실패: eventId={}, joinCode={}, guestName={}",
-                    event.eventId(), event.joinCode(), event.guestName(), e);
-            throw new RuntimeException("방 입장 이벤트 발송 실패: " + e.getMessage(), e);
-        }
+        log.debug("방 입장 이벤트 발송 완료: eventId={}", event.eventId());
     }
 }
