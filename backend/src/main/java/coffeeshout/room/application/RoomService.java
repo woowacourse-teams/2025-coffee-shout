@@ -24,8 +24,7 @@ import coffeeshout.room.domain.service.MenuCommandService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.messaging.RoomEnterStreamProducer;
-import coffeeshout.room.infra.messaging.RoomEventPublisher;
+import coffeeshout.room.domain.event.EventPublisher;
 import coffeeshout.room.infra.messaging.RoomEventWaitManager;
 import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RoomJpaRepository;
@@ -55,10 +54,9 @@ public class RoomService {
     private final MenuQueryService menuQueryService;
     private final QrCodeService qrCodeService;
     private final JoinCodeGenerator joinCodeGenerator;
-    private final RoomEventPublisher roomEventPublisher;
+    private final EventPublisher eventPublisher;
     private final RoomEventWaitManager roomEventWaitManager;
     private final MenuCommandService menuCommandService;
-    private final RoomEnterStreamProducer roomEnterStreamProducer;
     private final RoomJpaRepository roomJpaRepository;
 
     @Value("${room.event.timeout:PT5S}")
@@ -80,7 +78,7 @@ public class RoomService {
                 joinCode.getValue()
         );
 
-        roomEventPublisher.publishEvent(event);
+        eventPublisher.publish(event);
 
         // QR 코드 비동기 생성 시작
         qrCodeService.generateQrCodeAsync(joinCode.getValue());
@@ -105,7 +103,7 @@ public class RoomService {
 
         return processEventAsync(
                 event.eventId(),
-                () -> roomEnterStreamProducer.broadcastEnterRoom(event),
+                () -> eventPublisher.publish(event),
                 "방 참가",
                 String.format("joinCode=%s, guestName=%s", joinCode, guestName),
                 room -> String.format("joinCode=%s, guestName=%s", joinCode, guestName)
