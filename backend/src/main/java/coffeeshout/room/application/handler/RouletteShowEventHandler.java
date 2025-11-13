@@ -8,7 +8,7 @@ import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.service.RoomQueryService;
-import coffeeshout.room.infra.persistence.RoulettePersistenceService;
+import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import coffeeshout.room.ui.response.RoomStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEvent> {
 
     private final RoomQueryService roomQueryService;
-    private final RoulettePersistenceService roulettePersistenceService;
+    private final RoomPersistenceService roomPersistenceService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -37,7 +37,7 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
                     WebSocketResponse.success(response));
 
             // DB 저장 (락으로 보호 - 중복 저장 방지)
-            roulettePersistenceService.saveRoomStatus(event);
+            roomPersistenceService.saveRoomStatus(event);
 
             log.info("룰렛 전환 이벤트 처리 완료: eventId={}, joinCode={}",
                     event.eventId(), event.joinCode());

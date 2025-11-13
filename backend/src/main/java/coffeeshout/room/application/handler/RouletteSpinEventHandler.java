@@ -6,7 +6,7 @@ import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
 import coffeeshout.room.application.RoomEventHandler;
-import coffeeshout.room.infra.persistence.RoulettePersistenceService;
+import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import coffeeshout.room.ui.response.WinnerResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEvent> {
 
     private final LoggingSimpMessagingTemplate messagingTemplate;
-    private final RoulettePersistenceService roulettePersistenceService;
+    private final RoomPersistenceService roomPersistenceService;
 
     @Override
     public void handle(RouletteSpinEvent event) {
@@ -32,7 +32,7 @@ public class RouletteSpinEventHandler implements RoomEventHandler<RouletteSpinEv
             broadcastWinner(event.joinCode(), winner);
 
             // DB 저장 (락으로 보호 - 중복 저장 방지)
-            roulettePersistenceService.saveRouletteResult(event);
+            roomPersistenceService.saveRouletteResult(event);
 
             log.info("룰렛 스핀 이벤트 처리 완료: eventId={}, joinCode={}, winner={}",
                     event.eventId(), event.joinCode(), winner.name().value());
