@@ -155,7 +155,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         roomPlayerService.changePlayerReadyState(createdRoom.getJoinCode().getValue(), guest2, true);
 
         // then
-        assertThat(roomPlayerService.isReadyState(createdRoom.getJoinCode().getValue())).isTrue();
+        assertThat(roomService.isReadyState(createdRoom.getJoinCode().getValue())).isTrue();
     }
 
     @Test
@@ -176,7 +176,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         // guest2는 준비하지 않음
 
         // then
-        assertThat(roomPlayerService.isReadyState(createdRoom.getJoinCode().getValue())).isFalse();
+        assertThat(roomService.isReadyState(createdRoom.getJoinCode().getValue())).isFalse();
     }
 
     @Test

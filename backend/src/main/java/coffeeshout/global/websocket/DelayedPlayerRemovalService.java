@@ -1,6 +1,6 @@
 package coffeeshout.global.websocket;
 
-import coffeeshout.room.application.RoomPlayerService;
+import coffeeshout.room.application.RoomService;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,25 +19,25 @@ public class DelayedPlayerRemovalService {
     private final TaskScheduler taskScheduler;
     private final PlayerDisconnectionService playerDisconnectionService;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> scheduledTasks;
-    private final RoomPlayerService roomPlayerService;
+    private final RoomService roomService;
     private final StompSessionManager stompSessionManager;
 
     public DelayedPlayerRemovalService(
             @Qualifier("delayRemovalScheduler") TaskScheduler taskScheduler,
             PlayerDisconnectionService playerDisconnectionService,
             StompSessionManager stompSessionManager,
-            RoomPlayerService roomPlayerService
+            RoomService roomService
     ) {
         this.taskScheduler = taskScheduler;
         this.playerDisconnectionService = playerDisconnectionService;
         this.scheduledTasks = new ConcurrentHashMap<>();
-        this.roomPlayerService = roomPlayerService;
+        this.roomService = roomService;
         this.stompSessionManager = stompSessionManager;
     }
 
     public void schedulePlayerRemoval(String playerKey, String sessionId, String reason) {
         final String joinCode = playerKey.split(":")[0];
-        if (!roomPlayerService.isReadyState(joinCode)) {
+        if (!roomService.isReadyState(joinCode)) {
             return;
         }
 

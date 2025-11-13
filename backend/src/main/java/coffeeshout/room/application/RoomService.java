@@ -138,6 +138,11 @@ public class RoomService {
         return roomQueryService.existsByJoinCode(new JoinCode(joinCode));
     }
 
+    public boolean isReadyState(String joinCode) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.isReadyState();
+    }
+
     public boolean kickPlayer(String joinCode, String playerName) {
         final boolean exists = hasPlayer(joinCode, playerName);
 

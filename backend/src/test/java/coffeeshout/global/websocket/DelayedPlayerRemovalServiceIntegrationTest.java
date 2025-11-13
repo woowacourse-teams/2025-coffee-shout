@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-import coffeeshout.room.application.RoomPlayerService;
+import coffeeshout.room.application.RoomService;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
     private PlayerDisconnectionService playerDisconnectionService;
 
     @Mock
-    private RoomPlayerService roomPlayerService;
+    private RoomService roomService;
 
     private ThreadPoolTaskScheduler taskScheduler;
     private DelayedPlayerRemovalService delayedPlayerRemovalService;
@@ -45,7 +45,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         stompSessionManager = new StompSessionManager();
 
         delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
-                stompSessionManager, roomPlayerService);
+                stompSessionManager, roomService);
     }
 
     @Nested
@@ -54,7 +54,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         @Test
         void 지연시간_후_실제로_PlayerDisconnectionService가_호출된다() {
             // given
-            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
+            given(roomService.isReadyState("ABC23")).willReturn(true);
 
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
@@ -71,7 +71,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         @Test
         void 지연시간_내에_취소하면_실행되지_않는다() {
             // given
-            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
+            given(roomService.isReadyState("ABC23")).willReturn(true);
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
             // when - 즉시 취소
@@ -97,9 +97,9 @@ class DelayedPlayerRemovalServiceIntegrationTest {
             String player2 = "DEF56:박영희";
             String player3 = "GHI89:이민수";
 
-            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
-            given(roomPlayerService.isReadyState("DEF56")).willReturn(true);
-            given(roomPlayerService.isReadyState("GHI89")).willReturn(true);
+            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomService.isReadyState("DEF56")).willReturn(true);
+            given(roomService.isReadyState("GHI89")).willReturn(true);
 
             // when - 동시에 여러 플레이어 스케줄링
             delayedPlayerRemovalService.schedulePlayerRemoval(player1, "session-1", reason);
@@ -125,7 +125,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         @Test
         void 실행_완료된_태스크는_맵에서_자동_제거된다() {
             // given
-            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
+            given(roomService.isReadyState("ABC23")).willReturn(true);
 
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
@@ -141,7 +141,7 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         @Test
         void 취소된_태스크는_PlayerDisconnectionService를_호출하지_않는다() {
             // given
-            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
+            given(roomService.isReadyState("ABC23")).willReturn(true);
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
 
             // when
@@ -166,8 +166,8 @@ class DelayedPlayerRemovalServiceIntegrationTest {
         public TestDelayedPlayerRemovalService(ThreadPoolTaskScheduler taskScheduler,
                                                PlayerDisconnectionService playerDisconnectionService,
                                                StompSessionManager stompSessionManager,
-                                               RoomPlayerService roomPlayerService) {
-            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomPlayerService);
+                                               RoomService roomService) {
+            super(taskScheduler, playerDisconnectionService, stompSessionManager, roomService);
         }
 
         // 테스트에서는 더 짧은 지연시간 사용하고 싶다면 이런 식으로 오버라이드 가능

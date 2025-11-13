@@ -56,11 +56,6 @@ public class RoomPlayerService {
         return room.hasDuplicatePlayerName(new PlayerName(guestName));
     }
 
-    public boolean isReadyState(String joinCode) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.isReadyState();
-    }
-
     public boolean removePlayer(String joinCode, String playerName) {
         final JoinCode code = new JoinCode(joinCode);
         final Room room = roomQueryService.getByJoinCode(code);
