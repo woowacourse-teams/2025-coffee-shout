@@ -2,6 +2,7 @@ package coffeeshout.global.websocket;
 
 import coffeeshout.global.websocket.event.RoomStateUpdateEvent;
 import coffeeshout.room.application.RoomPlayerService;
+import coffeeshout.room.application.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,14 +17,15 @@ import org.springframework.stereotype.Service;
 public class PlayerDisconnectionService {
 
     private final StompSessionManager sessionManager;
-    private final RoomPlayerService roomService;
+    private final RoomService roomService;
+    private final RoomPlayerService roomPlayerService;
     private final ApplicationEventPublisher eventPublisher;
 
     public void cancelReady(String playerKey) {
         final String joinCode = sessionManager.extractJoinCode(playerKey);
         final String playerName = sessionManager.extractPlayerName(playerKey);
 
-        roomService.changePlayerReadyState(joinCode, playerName, false);
+        roomPlayerService.changePlayerReadyState(joinCode, playerName, false);
 
         eventPublisher.publishEvent(new RoomStateUpdateEvent(joinCode, "PLAYER_SET_READY_FALSE"));
         log.info("삭제 대기된 플레이어 ready 상태 변경 완료: joinCode={}, playerName={}", joinCode, playerName);

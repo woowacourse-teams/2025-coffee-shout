@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.RoomPlayerService;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ class DelayedPlayerRemovalServiceTest {
     private PlayerDisconnectionService playerDisconnectionService;
 
     @Mock
-    private RoomService roomService;
+    private RoomPlayerService roomPlayerService;
 
     @Mock
     private StompSessionManager sessionManager;
@@ -46,7 +46,7 @@ class DelayedPlayerRemovalServiceTest {
     @BeforeEach
     void setUp() {
         delayedPlayerRemovalService = new DelayedPlayerRemovalService(taskScheduler, playerDisconnectionService,
-                sessionManager, roomService);
+                sessionManager, roomPlayerService);
     }
 
     @Nested
@@ -56,7 +56,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void 정상적으로_지연_삭제를_스케줄링한다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
 
@@ -71,7 +71,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void 게임중이면_지연_삭제를_스케줄링_안한다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(false);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(false);
 
             // when
             delayedPlayerRemovalService.schedulePlayerRemoval(playerKey, sessionId, reason);
@@ -86,8 +86,8 @@ class DelayedPlayerRemovalServiceTest {
         void 서로_다른_플레이어는_독립적으로_스케줄링된다() {
             // given
             String anotherPlayerKey = "DEF456:박영희";
-            given(roomService.isReadyState("ABC23")).willReturn(true);
-            given(roomService.isReadyState("DEF456")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("DEF456")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
 
@@ -107,7 +107,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void 스케줄된_삭제를_정상적으로_취소한다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
             given(scheduledFuture.isDone()).willReturn(false);
@@ -125,7 +125,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void 이미_완료된_스케줄은_취소하지_않는다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
             given(scheduledFuture.isDone()).willReturn(true);
@@ -157,7 +157,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void PlayerDisconnectionService가_정상_호출된다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willAnswer(invocation -> {
                         Runnable task = invocation.getArgument(0);
@@ -178,7 +178,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void PlayerDisconnectionService에서_예외_발생해도_안전하게_처리한다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             willThrow(new RuntimeException("플레이어 삭제 실패"))
                     .given(playerDisconnectionService)
                     .handlePlayerDisconnection(any(), any(), any());
@@ -206,7 +206,7 @@ class DelayedPlayerRemovalServiceTest {
         @SuppressWarnings("unchecked")
         void 스케줄링_중_취소_요청이_와도_안전하게_처리한다() {
             // given
-            given(roomService.isReadyState("ABC23")).willReturn(true);
+            given(roomPlayerService.isReadyState("ABC23")).willReturn(true);
             given(taskScheduler.schedule(any(Runnable.class), any(Instant.class)))
                     .willReturn(scheduledFuture);
             given(scheduledFuture.isDone()).willReturn(false);
