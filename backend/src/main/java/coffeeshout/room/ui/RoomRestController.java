@@ -1,6 +1,9 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.room.application.RoomMiniGameService;
+import coffeeshout.room.application.RoomPlayerService;
+import coffeeshout.room.application.RoomRouletteService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -33,10 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController implements RoomApi {
 
     private final RoomService roomService;
+    private final RoomPlayerService roomPlayerService;
+    private final RoomMiniGameService roomMiniGameService;
+    private final RoomRouletteService roomRouletteService;
 
     @GetMapping("/{joinCode}/miniGames/remaining")
     public ResponseEntity<RemainingMiniGameResponse> getRemainingMiniGames(@PathVariable String joinCode) {
-        final List<Playable> miniGames = roomService.getRemainingMiniGames(joinCode);
+        final List<Playable> miniGames = roomMiniGameService.getRemainingMiniGames(joinCode);
 
         return ResponseEntity.ok(RemainingMiniGameResponse.from(miniGames));
     }
@@ -77,28 +83,28 @@ public class RoomRestController implements RoomApi {
             @RequestParam String joinCode,
             @RequestParam String guestName
     ) {
-        final boolean isDuplicated = roomService.isGuestNameDuplicated(joinCode, guestName);
+        final boolean isDuplicated = roomPlayerService.isGuestNameDuplicated(joinCode, guestName);
 
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
 
     @GetMapping("/{joinCode}/probabilities")
     public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@PathVariable String joinCode) {
-        final List<ProbabilityResponse> responses = roomService.getProbabilities(joinCode);
+        final List<ProbabilityResponse> responses = roomRouletteService.getProbabilities(joinCode);
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/minigames")
     public ResponseEntity<List<MiniGameType>> getMiniGames() {
-        final List<MiniGameType> responses = roomService.getAllMiniGames();
+        final List<MiniGameType> responses = roomMiniGameService.getAllMiniGames();
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/minigames/selected")
     public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
-        final List<MiniGameType> result = roomService.getSelectedMiniGames(joinCode);
+        final List<MiniGameType> result = roomMiniGameService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
     }
