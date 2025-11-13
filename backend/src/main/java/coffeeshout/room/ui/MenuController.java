@@ -1,6 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.room.application.MenuService;
+import coffeeshout.room.application.MenuApplicationService;
 import coffeeshout.room.ui.response.MenuResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MenuController implements MenuApi {
 
-    private final MenuService menuService;
+    private final MenuApplicationService menuApplicationService;
 
     @GetMapping("/menus")
     public ResponseEntity<List<MenuResponse>> getAllMenus() {
-        final List<MenuResponse> responses = menuService.getAll().stream()
+        final List<MenuResponse> responses = menuApplicationService.getAllMenus().stream()
                 .map(MenuResponse::from)
                 .toList();
 

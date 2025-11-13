@@ -2,10 +2,14 @@ package coffeeshout.room.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.global.ServiceTest;
+import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
+import coffeeshout.room.domain.repository.MenuCategoryRepository;
 import coffeeshout.room.domain.repository.MenuRepository;
+import coffeeshout.room.domain.service.MenuCategoryQueryService;
 import coffeeshout.room.domain.service.MenuQueryService;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,25 +20,38 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class MenuServiceTest extends ServiceTest {
+class MenuApplicationServiceTest extends ServiceTest {
 
     @Autowired
     private MenuRepository menuRepository;
 
     @Autowired
+    private MenuCategoryRepository menuCategoryRepository;
+
+    @Autowired
     private MenuQueryService menuQueryService;
 
     @Autowired
-    private MenuService menuService;
+    private MenuCategoryQueryService menuCategoryQueryService;
+
+    @Autowired
+    private MenuApplicationService menuApplicationService;
 
     private ProvidedMenu 아메리카노;
     private ProvidedMenu 라떼;
     private ProvidedMenu 아이스티;
+    private MenuCategory 커피;
+    private MenuCategory 티;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(menuRepository, "menus", new ConcurrentHashMap<>());
         ReflectionTestUtils.setField(menuRepository, "idGenerator", new AtomicLong(1));
+        ReflectionTestUtils.setField(menuCategoryRepository, "menuCategories", new ConcurrentHashMap<>());
+        ReflectionTestUtils.setField(menuCategoryRepository, "idGenerator", new AtomicLong(1));
+
+        커피 = menuCategoryRepository.save(MenuCategoryFixture.커피());
+        티 = menuCategoryRepository.save(MenuCategoryFixture.티());
         아메리카노 = menuRepository.save((ProvidedMenu) MenuFixture.아메리카노());
         라떼 = menuRepository.save((ProvidedMenu) MenuFixture.라떼());
         아이스티 = menuRepository.save((ProvidedMenu) MenuFixture.아이스티());
@@ -46,7 +63,7 @@ class MenuServiceTest extends ServiceTest {
         // given
 
         // when
-        List<ProvidedMenu> result = menuService.getAll();
+        List<ProvidedMenu> result = menuApplicationService.getAllMenus();
 
         // then
         assertThat(result).hasSize(3);
@@ -60,10 +77,23 @@ class MenuServiceTest extends ServiceTest {
         Long categoryId = 1L;
 
         // when
-        List<ProvidedMenu> result = menuService.getAllMenuByCategoryId(categoryId);
+        List<ProvidedMenu> result = menuApplicationService.getMenusByCategory(categoryId);
 
         // then
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(아메리카노, 라떼);
+    }
+
+    @Test
+    @DisplayName("모든 메뉴 카테고리를 조회한다")
+    void 모든_메뉴_카테고리를_조회한다() {
+        // given
+
+        // when
+        List<MenuCategory> result = menuApplicationService.getAllCategories();
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(커피, 티);
     }
 }

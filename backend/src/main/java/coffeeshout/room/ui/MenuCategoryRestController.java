@@ -1,7 +1,6 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.room.application.MenuCategoryService;
-import coffeeshout.room.application.MenuService;
+import coffeeshout.room.application.MenuApplicationService;
 import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.ui.response.MenuCategoryResponse;
@@ -19,18 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MenuCategoryRestController implements MenuCategoryApi {
 
-    private final MenuService menuService;
-    private final MenuCategoryService menuCategoryService;
+    private final MenuApplicationService menuApplicationService;
 
     @GetMapping
     public ResponseEntity<List<MenuCategoryResponse>> getAllMenuCategories() {
-        final List<MenuCategory> menuCategories = menuCategoryService.getAll();
+        final List<MenuCategory> menuCategories = menuApplicationService.getAllCategories();
         return ResponseEntity.ok(MenuCategoryResponse.from(menuCategories));
     }
 
     @GetMapping("/{categoryId}/menus")
     public ResponseEntity<List<SelectableMenuResponse>> getMenusByCategory(@PathVariable("categoryId") Long categoryId) {
-        final List<ProvidedMenu> menus = menuService.getAllMenuByCategoryId(categoryId);
+        final List<ProvidedMenu> menus = menuApplicationService.getMenusByCategory(categoryId);
         return ResponseEntity.ok(SelectableMenuResponse.from(menus));
     }
 }
