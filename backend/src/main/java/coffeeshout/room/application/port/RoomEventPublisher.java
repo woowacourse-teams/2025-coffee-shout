@@ -1,4 +1,6 @@
-package coffeeshout.room.domain.event;
+package coffeeshout.room.application.port;
+
+import coffeeshout.room.domain.event.RoomBaseEvent;
 
 /**
  * 도메인 이벤트 발행 인터페이스

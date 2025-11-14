@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.initializer;
 
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.menu.TemperatureAvailability;

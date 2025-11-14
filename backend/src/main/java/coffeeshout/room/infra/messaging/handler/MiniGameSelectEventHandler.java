@@ -1,7 +1,7 @@
 package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.application.RoomEventHandler;
+import coffeeshout.room.application.port.RoomEventHandler;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.broadcast.MiniGameListChangedEvent;

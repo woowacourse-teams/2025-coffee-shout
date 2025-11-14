@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.service;
 
 import coffeeshout.room.domain.service.RouletteCommandService;
 import coffeeshout.room.ui.response.ProbabilityResponse;

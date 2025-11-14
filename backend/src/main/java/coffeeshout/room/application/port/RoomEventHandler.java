@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.port;
 
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomEventType;

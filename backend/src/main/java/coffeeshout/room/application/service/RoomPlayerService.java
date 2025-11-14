@@ -1,9 +1,9 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.service;
 
+import coffeeshout.room.application.port.RoomEventPublisher;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerKickEvent;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.PlayerCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;

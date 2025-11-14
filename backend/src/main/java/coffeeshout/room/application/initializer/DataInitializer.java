@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.initializer;
 
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;

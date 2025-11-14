@@ -22,7 +22,7 @@ public class LogAspect {
     public static final Marker NOTIFICATION_MARKER = MarkerFactory.getMarker("[NOTIFICATION]");
 
     @AfterReturning(
-            value = "execution(* coffeeshout.room.application.RoomService.createRoom(..))",
+            value = "execution(* coffeeshout.room.application.service.RoomService.createRoom(..))",
             returning = "room"
     )
     public void logRoomCreation(Room room) {
@@ -33,7 +33,7 @@ public class LogAspect {
     }
 
     @After(
-            value = "execution(* coffeeshout.room.application.RoomService.changePlayerReadyState(..)) && args(joinCode, playerName, isReady)",
+            value = "execution(* coffeeshout.room.application.service.RoomService.changePlayerReadyState(..)) && args(joinCode, playerName, isReady)",
             argNames = "joinCode,playerName,isReady"
     )
     public void logPlayerReadyState(String joinCode, String playerName, Boolean isReady) {
@@ -41,7 +41,7 @@ public class LogAspect {
     }
 
     @AfterReturning(
-            value = "execution(* coffeeshout.room.application.RoomService.spinRoulette(..)) && args(joinCode, hostName)",
+            value = "execution(* coffeeshout.room.application.service.RoomService.spinRoulette(..)) && args(joinCode, hostName)",
             returning = "winner",
             argNames = "joinCode,hostName,winner"
     )
@@ -59,7 +59,7 @@ public class LogAspect {
     }
 
     @AfterReturning(
-            value = "execution(* coffeeshout.room.application.RoomService.enterRoom(..)) && args(joinCode, guestName, selectedMenuRequest)",
+            value = "execution(* coffeeshout.room.application.service.RoomService.enterRoom(..)) && args(joinCode, guestName, selectedMenuRequest)",
             returning = "room",
             argNames = "joinCode,guestName,selectedMenuRequest,room"
     )
@@ -73,7 +73,7 @@ public class LogAspect {
     }
 
     @After(
-            value = "execution(* coffeeshout.room.application.RoomService.selectMenu(..)) && args(joinCode, guestName, menuId)",
+            value = "execution(* coffeeshout.room.application.service.RoomService.selectMenu(..)) && args(joinCode, guestName, menuId)",
             argNames = "joinCode,guestName,menuId"
     )
     public void logSelectMenu(String joinCode, String guestName, Long menuId) {

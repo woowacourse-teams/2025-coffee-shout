@@ -9,6 +9,8 @@ import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.exception.custom.NotExistElementException;
+import coffeeshout.room.application.service.DelayedRoomRemovalService;
+import coffeeshout.room.application.service.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.Room;

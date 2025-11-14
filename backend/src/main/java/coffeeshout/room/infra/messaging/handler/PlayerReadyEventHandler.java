@@ -1,6 +1,6 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.room.application.RoomEventHandler;
+import coffeeshout.room.application.port.RoomEventHandler;
 import coffeeshout.room.domain.event.PlayerReadyEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.broadcast.PlayerListChangedEvent;

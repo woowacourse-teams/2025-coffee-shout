@@ -5,12 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import coffeeshout.fixture.MenuCategoryFixture;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.global.ServiceTest;
+import coffeeshout.room.application.service.MenuService;
 import coffeeshout.room.domain.menu.MenuCategory;
 import coffeeshout.room.domain.menu.ProvidedMenu;
 import coffeeshout.room.domain.repository.MenuCategoryRepository;
 import coffeeshout.room.domain.repository.MenuRepository;
-import coffeeshout.room.domain.service.MenuCategoryQueryService;
-import coffeeshout.room.domain.service.MenuQueryService;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,12 +26,6 @@ class MenuServiceTest extends ServiceTest {
 
     @Autowired
     private MenuCategoryRepository menuCategoryRepository;
-
-    @Autowired
-    private MenuQueryService menuQueryService;
-
-    @Autowired
-    private MenuCategoryQueryService menuCategoryQueryService;
 
     @Autowired
     private MenuService menuService;

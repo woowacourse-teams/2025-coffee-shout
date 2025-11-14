@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.initializer;
 
 import java.io.IOException;
 

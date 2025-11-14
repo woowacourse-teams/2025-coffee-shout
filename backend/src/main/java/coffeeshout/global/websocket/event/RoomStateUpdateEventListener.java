@@ -1,8 +1,8 @@
 package coffeeshout.global.websocket.event;
 
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.port.RoomEventPublisher;
+import coffeeshout.room.application.service.RoomService;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

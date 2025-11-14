@@ -1,8 +1,8 @@
 package coffeeshout.global.config;
 
-import coffeeshout.room.application.DataInitializer;
-import coffeeshout.room.application.MenuCategoryInitializer;
-import coffeeshout.room.application.MenuInitializer;
+import coffeeshout.room.application.initializer.DataInitializer;
+import coffeeshout.room.application.initializer.MenuCategoryInitializer;
+import coffeeshout.room.application.initializer.MenuInitializer;
 import coffeeshout.room.domain.service.MenuCategoryCommandService;
 import coffeeshout.room.domain.service.MenuCategoryQueryService;
 import coffeeshout.room.domain.service.MenuCommandService;

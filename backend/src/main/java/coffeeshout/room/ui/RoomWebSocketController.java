@@ -1,8 +1,8 @@
 package coffeeshout.room.ui;
 
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.port.RoomEventPublisher;
+import coffeeshout.room.application.service.RoomService;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.PlayerReadyEvent;

@@ -1,10 +1,10 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.application.RoomMiniGameService;
-import coffeeshout.room.application.RoomPlayerService;
-import coffeeshout.room.application.RoomRouletteService;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.service.RoomMiniGameService;
+import coffeeshout.room.application.service.RoomPlayerService;
+import coffeeshout.room.application.service.RoomRouletteService;
+import coffeeshout.room.application.service.RoomService;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.ui.request.RoomEnterRequest;

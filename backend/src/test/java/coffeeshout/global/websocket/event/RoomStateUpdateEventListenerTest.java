@@ -6,10 +6,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.room.domain.service.PlayerCommandService;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.port.RoomEventPublisher;
+import coffeeshout.room.application.service.RoomService;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
-import coffeeshout.room.domain.event.RoomEventPublisher;
+import coffeeshout.room.domain.service.PlayerCommandService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -4,12 +4,13 @@ import coffeeshout.global.config.redis.EventSubscriber;
 import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.trace.Traceable;
 import coffeeshout.global.trace.TracerProvider;
-import coffeeshout.room.application.RoomEventHandler;
+import coffeeshout.room.application.port.RoomEventHandler;
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.infra.messaging.handler.RoomEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -30,7 +31,7 @@ public class RoomEventSubscriber implements EventSubscriber {
     }
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {
+    public void onMessage(@NonNull Message message, byte[] pattern) {
         try {
             final String body = new String(message.getBody());
             final RoomEventType eventType = extractEventType(body);

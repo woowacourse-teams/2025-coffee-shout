@@ -2,8 +2,8 @@ package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.config.redis.TopicManager;
+import coffeeshout.room.application.port.RoomEventPublisher;
 import coffeeshout.room.domain.event.RoomBaseEvent;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.RoomJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

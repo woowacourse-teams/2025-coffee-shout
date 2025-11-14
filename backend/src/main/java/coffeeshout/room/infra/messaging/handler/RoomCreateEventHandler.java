@@ -1,7 +1,7 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.room.application.DelayedRoomRemovalService;
-import coffeeshout.room.application.RoomEventHandler;
+import coffeeshout.room.application.port.RoomEventHandler;
+import coffeeshout.room.application.service.DelayedRoomRemovalService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomCreateEvent;

@@ -3,7 +3,7 @@ package coffeeshout.room.infra;
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.config.properties.S3Properties;
 import coffeeshout.global.exception.custom.StorageServiceException;
-import coffeeshout.room.application.StorageService;
+import coffeeshout.room.application.port.StorageService;
 import coffeeshout.room.domain.RoomErrorCode;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;

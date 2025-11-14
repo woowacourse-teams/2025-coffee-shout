@@ -1,10 +1,11 @@
-package coffeeshout.room.application;
+package coffeeshout.room.application.service;
 
 import coffeeshout.global.config.properties.QrProperties;
 import coffeeshout.global.exception.custom.QRCodeGenerationException;
+import coffeeshout.room.application.port.RoomEventPublisher;
+import coffeeshout.room.application.port.StorageService;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
-import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.service.QrCodeGenerator;
 import io.micrometer.core.instrument.MeterRegistry;
