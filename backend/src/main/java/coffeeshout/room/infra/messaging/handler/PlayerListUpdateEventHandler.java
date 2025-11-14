@@ -3,11 +3,10 @@ package coffeeshout.room.infra.messaging.handler;
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
-import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.RoomEventType;
-import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.service.PlayerCommandService;
 import coffeeshout.room.ui.response.PlayerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlayerListUpdateEventHandler implements RoomEventHandler<PlayerListUpdateEvent> {
 
-    private final RoomQueryService roomQueryService;
+    private final PlayerCommandService playerCommandService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -28,8 +27,8 @@ public class PlayerListUpdateEventHandler implements RoomEventHandler<PlayerList
             log.info("플레이어 목록 업데이트 이벤트 수신: eventId={}, joinCode={}",
                     event.eventId(), event.joinCode());
 
-            final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-            final List<PlayerResponse> responses = room.getPlayers().stream()
+            final List<Player> players = playerCommandService.getAllPlayers(event.joinCode());
+            final List<PlayerResponse> responses = players.stream()
                     .map(PlayerResponse::from)
                     .toList();
 

@@ -4,14 +4,9 @@ import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomEventHandler;
-import coffeeshout.room.domain.JoinCode;
-import coffeeshout.room.domain.Playable;
-import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.RoomEventType;
-import coffeeshout.room.domain.player.PlayerName;
-import coffeeshout.room.domain.service.RoomCommandService;
-import coffeeshout.room.domain.service.RoomQueryService;
+import coffeeshout.room.domain.service.MiniGameCommandService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSelectEvent> {
 
-    private final RoomCommandService roomCommandService;
-    private final RoomQueryService roomQueryService;
+    private final MiniGameCommandService miniGameCommandService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -32,19 +26,8 @@ public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSele
             log.info("미니게임 선택 이벤트 수신: eventId={}, joinCode={}, hostName={}, miniGameTypes={}",
                     event.eventId(), event.joinCode(), event.hostName(), event.miniGameTypes());
 
-            final Room room = roomQueryService.getByJoinCode(new JoinCode(event.joinCode()));
-            room.clearMiniGames();
-
-            event.miniGameTypes().forEach(miniGameType -> {
-                final Playable miniGame = miniGameType.createMiniGame(event.joinCode());
-                room.addMiniGame(new PlayerName(event.hostName()), miniGame);
-            });
-
-            roomCommandService.save(room);
-
-            final List<MiniGameType> selectedMiniGames = room.getAllMiniGame().stream()
-                    .map(Playable::getMiniGameType)
-                    .toList();
+            final List<MiniGameType> selectedMiniGames = miniGameCommandService.updateMiniGames(
+                    event.joinCode(), event.hostName(), event.miniGameTypes());
 
             messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
                     WebSocketResponse.success(selectedMiniGames));
