@@ -1,16 +1,15 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomEventType;
+import coffeeshout.room.domain.event.broadcast.PlayerListChangedEvent;
 import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.service.PlayerCommandService;
-import coffeeshout.room.ui.response.PlayerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent> {
 
     private final PlayerCommandService playerCommandService;
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handle(PlayerKickEvent event) {
@@ -37,14 +36,9 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
             // removePlayer가 방을 삭제했다면 (empty room) getAllPlayers가 실패할 수 있으므로 확인
             try {
                 final List<Player> players = playerCommandService.getAllPlayers(event.joinCode());
-                final List<PlayerResponse> responses = players.stream()
-                        .map(PlayerResponse::from)
-                        .toList();
 
-                messagingTemplate.convertAndSend(
-                        "/topic/room/" + event.joinCode(),
-                        WebSocketResponse.success(responses)
-                );
+                // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
+                eventPublisher.publishEvent(new PlayerListChangedEvent(event.joinCode(), players));
             } catch (Exception e) {
                 log.info("방이 비어 있어 삭제됨: joinCode={}", event.joinCode());
                 return;

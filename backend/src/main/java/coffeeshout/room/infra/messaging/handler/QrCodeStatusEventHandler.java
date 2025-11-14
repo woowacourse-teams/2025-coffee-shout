@@ -1,17 +1,14 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomEventType;
+import coffeeshout.room.domain.event.broadcast.QrCodeStatusChangedEvent;
 import coffeeshout.room.domain.service.RoomCommandService;
-import coffeeshout.room.ui.response.QrCodeStatusResponse;
-import generator.annotaions.MessageResponse;
-import generator.annotaions.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,10 +19,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEvent> {
 
-    private static final String QR_CODE_TOPIC_TEMPLATE = "/topic/room/%s/qr-code";
-
     private final RoomCommandService roomCommandService;
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handle(QrCodeStatusEvent event) {
@@ -52,7 +47,10 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
 
         roomCommandService.assignQrCodeError(new JoinCode(event.joinCode()));
 
-        sendQrCode(event);
+        // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
+        eventPublisher.publishEvent(
+                new QrCodeStatusChangedEvent(event.joinCode(), event.status(), event.qrCodeUrl())
+        );
     }
 
     private void handleQrCodeSuccess(QrCodeStatusEvent event) {
@@ -61,26 +59,10 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
 
         roomCommandService.assignQrCode(new JoinCode(event.joinCode()), event.qrCodeUrl());
 
-        sendQrCode(event);
-    }
-
-    @MessageResponse(
-            path = "/room/{joinCode}/qr-code",
-            returnType = QrCodeStatusResponse.class
-    )
-    @Operation(
-            summary = "QR 코드 완료 이벤트 처리",
-            description = "QR 코드 처리가 완료되면 클라이언트에게 상태와 URL을 전송합니다."
-    )
-    private void sendQrCode(QrCodeStatusEvent event) {
-
-        final QrCodeStatusResponse response = new QrCodeStatusResponse(event.status(), event.qrCodeUrl());
-
-        final String destination = String.format(QR_CODE_TOPIC_TEMPLATE, event.joinCode());
-        messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
-
-        log.debug("QR 코드 이벤트 전송 완료: destination={}, status={}, url={}",
-                destination, event.status(), event.qrCodeUrl());
+        // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
+        eventPublisher.publishEvent(
+                new QrCodeStatusChangedEvent(event.joinCode(), event.status(), event.qrCodeUrl())
+        );
     }
 
     @Override

@@ -1,16 +1,14 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteShowEvent;
 import coffeeshout.room.domain.service.RouletteCommandService;
 import coffeeshout.room.infra.persistence.RoomPersistenceService;
-import coffeeshout.room.ui.response.RoomStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,7 +18,7 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
 
     private final RouletteCommandService rouletteCommandService;
     private final RoomPersistenceService roomPersistenceService;
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handle(RouletteShowEvent event) {
@@ -29,10 +27,12 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
 
             final Room room = rouletteCommandService.showRoulette(event.joinCode());
 
-            final RoomStatusResponse response = RoomStatusResponse.of(room.getJoinCode(), room.getRoomState());
-
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/roulette",
-                    WebSocketResponse.success(response));
+            // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
+            eventPublisher.publishEvent(
+                    new coffeeshout.room.domain.event.broadcast.RouletteShownEvent(
+                            room.getJoinCode(), room.getRoomState()
+                    )
+            );
 
             // DB 저장 (락으로 보호 - 중복 저장 방지)
             roomPersistenceService.saveRoomStatus(event);

@@ -1,15 +1,15 @@
 package coffeeshout.room.infra.messaging.handler;
 
-import coffeeshout.global.ui.WebSocketResponse;
-import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.MiniGameSelectEvent;
 import coffeeshout.room.domain.event.RoomEventType;
+import coffeeshout.room.domain.event.broadcast.MiniGameListChangedEvent;
 import coffeeshout.room.domain.service.MiniGameCommandService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSelectEvent> {
 
     private final MiniGameCommandService miniGameCommandService;
-    private final LoggingSimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handle(MiniGameSelectEvent event) {
@@ -29,8 +29,8 @@ public class MiniGameSelectEventHandler implements RoomEventHandler<MiniGameSele
             final List<MiniGameType> selectedMiniGames = miniGameCommandService.updateMiniGames(
                     event.joinCode(), event.hostName(), event.miniGameTypes());
 
-            messagingTemplate.convertAndSend("/topic/room/" + event.joinCode() + "/minigame",
-                    WebSocketResponse.success(selectedMiniGames));
+            // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
+            eventPublisher.publishEvent(new MiniGameListChangedEvent(event.joinCode(), selectedMiniGames));
 
             log.info("미니게임 선택 이벤트 처리 완료: eventId={}, joinCode={}, selectedCount={}",
                     event.eventId(), event.joinCode(), selectedMiniGames.size());
