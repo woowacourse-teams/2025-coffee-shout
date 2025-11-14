@@ -66,27 +66,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic roomEventTopic() {
-        return new ChannelTopic("room.events");
-    }
-
-    @Bean
-    public ChannelTopic miniGameEventTopic() {
-        return new ChannelTopic("minigame.events");
-    }
-
-    @Bean
-    public ChannelTopic playerEventTopic() {
-        return new ChannelTopic("player.events");
-    }
-
-    @Bean
-    public ChannelTopic sessionEventTopic() {
-        return new ChannelTopic("session.events");
-    }
-
-    @Bean
-    public ChannelTopic racingGameEventTopic() {
-        return new ChannelTopic("racinggame.events");
+    public TopicManager topicManager() {
+        return new TopicManager();
     }
 }

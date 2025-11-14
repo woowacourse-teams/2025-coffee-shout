@@ -16,7 +16,7 @@ public class MenuController implements MenuApi {
 
     @GetMapping("/menus")
     public ResponseEntity<List<MenuResponse>> getAllMenus() {
-        final List<MenuResponse> responses = menuService.getAll().stream()
+        final List<MenuResponse> responses = menuService.getAllMenus().stream()
                 .map(MenuResponse::from)
                 .toList();
 

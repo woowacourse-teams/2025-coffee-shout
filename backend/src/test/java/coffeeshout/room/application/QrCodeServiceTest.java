@@ -12,8 +12,8 @@ import coffeeshout.global.exception.custom.StorageServiceException;
 import coffeeshout.room.domain.QrCodeStatus;
 import coffeeshout.room.domain.RoomErrorCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
+import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.service.QrCodeGenerator;
-import coffeeshout.room.infra.messaging.RoomEventPublisher;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -177,7 +177,7 @@ class QrCodeServiceTest {
         // then
 
         ArgumentCaptor<QrCodeStatusEvent> successEventCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(successEventCaptor.capture());
+        verify(roomEventPublisher).publish(successEventCaptor.capture());
 
         // 2. 두 번째 이벤트는 SUCCESS (roomEventPublisher를 통해 발행)
         QrCodeStatusEvent successEvent = successEventCaptor.getValue();
@@ -198,7 +198,7 @@ class QrCodeServiceTest {
 
         // then
         ArgumentCaptor<QrCodeStatusEvent> errorCaptor = ArgumentCaptor.forClass(QrCodeStatusEvent.class);
-        verify(roomEventPublisher).publishEvent(errorCaptor.capture());
+        verify(roomEventPublisher).publish(errorCaptor.capture());
 
         assertThat(errorCaptor.getValue().status()).isEqualTo(QrCodeStatus.ERROR);
     }

@@ -1,5 +1,6 @@
 package coffeeshout.room.infra.messaging.handler;
 
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import java.util.List;

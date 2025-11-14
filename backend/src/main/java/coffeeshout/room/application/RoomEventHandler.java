@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.messaging.handler;
+package coffeeshout.room.application;
 
 import coffeeshout.room.domain.event.RoomBaseEvent;
 import coffeeshout.room.domain.event.RoomEventType;

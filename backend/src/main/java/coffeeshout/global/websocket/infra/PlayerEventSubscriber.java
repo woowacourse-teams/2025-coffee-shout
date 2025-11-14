@@ -1,5 +1,7 @@
 package coffeeshout.global.websocket.infra;
 
+import coffeeshout.global.config.redis.EventSubscriber;
+import coffeeshout.global.config.redis.EventTopicRegistry;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
 import coffeeshout.global.exception.custom.InvalidStateException;
 import coffeeshout.global.websocket.event.player.PlayerBaseEvent;
@@ -10,29 +12,22 @@ import coffeeshout.global.websocket.infra.handler.PlayerEventHandler;
 import coffeeshout.global.websocket.infra.handler.PlayerEventHandlerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlayerEventSubscriber implements MessageListener {
+public class PlayerEventSubscriber implements EventSubscriber {
 
     private final ObjectMapper objectMapper;
-    private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final ChannelTopic playerEventTopic;
     private final PlayerEventHandlerFactory handlerFactory;
 
-    @PostConstruct
-    public void subscribe() {
-        redisMessageListenerContainer.addMessageListener(this, playerEventTopic);
-        log.info("플레이어 이벤트 구독 시작: topic={}", playerEventTopic.getTopic());
+    @Override
+    public EventTopicRegistry getTopicRegistry() {
+        return EventTopicRegistry.PLAYER;
     }
 
     @Override

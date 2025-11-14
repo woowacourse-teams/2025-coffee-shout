@@ -2,10 +2,11 @@ package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
-import coffeeshout.room.application.RoomService;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.service.PlayerCommandService;
 import coffeeshout.room.ui.response.PlayerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent> {
 
+    private final PlayerCommandService playerCommandService;
     private final LoggingSimpMessagingTemplate messagingTemplate;
-    private final RoomService roomService;
 
     @Override
     public void handle(PlayerKickEvent event) {
@@ -26,23 +27,29 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
             log.info("플레이어 강퇴 이벤트 수신: eventId={}, joinCode={}, playerName={}",
                     event.eventId(), event.joinCode(), event.playerName());
 
-            final boolean removed = roomService.removePlayer(event.joinCode(), event.playerName());
+            final boolean removed = playerCommandService.removePlayer(event.joinCode(), event.playerName());
             if (!removed) {
                 log.warn("플레이어 강퇴 실패 - 플레이어 없음: eventId={}, joinCode={}, playerName={}",
                         event.eventId(), event.joinCode(), event.playerName());
-                // 실패 응답 보내거나, 아니면 그냥 리턴
                 return;
             }
 
-            final List<Player> players = roomService.getPlayersInternal(event.joinCode());
-            final List<PlayerResponse> responses = players.stream()
-                    .map(PlayerResponse::from)
-                    .toList();
+            // removePlayer가 방을 삭제했다면 (empty room) getAllPlayers가 실패할 수 있으므로 확인
+            try {
+                final List<Player> players = playerCommandService.getAllPlayers(event.joinCode());
+                final List<PlayerResponse> responses = players.stream()
+                        .map(PlayerResponse::from)
+                        .toList();
 
-            messagingTemplate.convertAndSend(
-                    "/topic/room/" + event.joinCode(),
-                    WebSocketResponse.success(responses)
-            );
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + event.joinCode(),
+                        WebSocketResponse.success(responses)
+                );
+            } catch (Exception e) {
+                log.info("방이 비어 있어 삭제됨: joinCode={}", event.joinCode());
+                return;
+            }
+
             log.info("플레이어 강퇴 이벤트 처리 완료: eventId={}, joinCode={}, playerName={}",
                     event.eventId(), event.joinCode(), event.playerName());
 
@@ -56,4 +63,5 @@ public class PlayerKickEventHandler implements RoomEventHandler<PlayerKickEvent>
     public RoomEventType getSupportedEventType() {
         return RoomEventType.PLAYER_KICK;
     }
+
 }

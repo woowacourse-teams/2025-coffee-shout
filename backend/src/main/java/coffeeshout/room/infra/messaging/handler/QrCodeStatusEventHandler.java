@@ -2,6 +2,7 @@ package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomEventType;
@@ -81,7 +82,6 @@ public class QrCodeStatusEventHandler implements RoomEventHandler<QrCodeStatusEv
         log.debug("QR 코드 이벤트 전송 완료: destination={}, status={}, url={}",
                 destination, event.status(), event.qrCodeUrl());
     }
-
 
     @Override
     public RoomEventType getSupportedEventType() {
