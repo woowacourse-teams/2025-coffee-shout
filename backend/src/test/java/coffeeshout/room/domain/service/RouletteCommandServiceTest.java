@@ -3,6 +3,7 @@ package coffeeshout.room.domain.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.global.ServiceTest;
+import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.menu.MenuTemperature;

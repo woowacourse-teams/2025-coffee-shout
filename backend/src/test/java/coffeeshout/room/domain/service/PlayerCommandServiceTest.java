@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import coffeeshout.fixture.MenuFixture;
 import coffeeshout.global.ServiceTest;
 import coffeeshout.global.exception.custom.InvalidArgumentException;
+import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.menu.MenuTemperature;
