@@ -1,4 +1,4 @@
-package coffeeshout.room.infra.messaging;
+package coffeeshout.room.ui.messaging;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -27,7 +27,8 @@ import org.springframework.stereotype.Component;
  * Handler와 브로드캐스트 로직을 분리하고 단일 책임 원칙을 준수합니다.
  * </p>
  * <p>
- * 이 클래스는 Infrastructure Layer에 위치하며, WebSocket 기술에 대한 의존성을 캡슐화합니다.
+ * 이 클래스는 Presentation Layer (UI)에 위치하며, 사용자에게 보여지는 WebSocket 응답을 관리합니다.
+ * Response 객체 생성과 API 문서화를 함께 담당하여 일관성을 유지합니다.
  * </p>
  */
 @Slf4j
