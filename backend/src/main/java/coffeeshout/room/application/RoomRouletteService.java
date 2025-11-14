@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RoomRouletteApplicationService {
+public class RoomRouletteService {
 
     private final RouletteCommandService rouletteCommandService;
 
