@@ -3,7 +3,6 @@ package coffeeshout.room.application;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.QrCode;
 import coffeeshout.room.domain.Room;
-import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomCreateEvent;
 import coffeeshout.room.domain.event.RoomEventPublisher;
 import coffeeshout.room.domain.event.RoomJoinEvent;
@@ -141,22 +140,6 @@ public class RoomService {
     public boolean isReadyState(String joinCode) {
         final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
         return room.isReadyState();
-    }
-
-    public boolean kickPlayer(String joinCode, String playerName) {
-        final boolean exists = hasPlayer(joinCode, playerName);
-
-        if (exists) {
-            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
-            roomEventPublisher.publish(event);
-        }
-
-        return exists;
-    }
-
-    private boolean hasPlayer(String joinCode, String playerName) {
-        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
-        return room.hasPlayer(new PlayerName(playerName));
     }
 
     public QrCodeStatusResponse getQrCodeStatus(String joinCode) {

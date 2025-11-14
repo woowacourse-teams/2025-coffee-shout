@@ -17,10 +17,6 @@ public class RoomMiniGameApplicationService {
 
     private final MiniGameCommandService miniGameCommandService;
 
-    public List<MiniGameType> updateMiniGames(String joinCode, String hostName, List<MiniGameType> miniGameTypes) {
-        return miniGameCommandService.updateMiniGames(joinCode, hostName, miniGameTypes);
-    }
-
     public List<MiniGameType> getAllMiniGames() {
         return miniGameCommandService.getAllMiniGames();
     }

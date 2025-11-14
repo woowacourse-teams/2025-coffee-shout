@@ -1,8 +1,12 @@
 package coffeeshout.room.application;
 
-import coffeeshout.room.domain.player.Player;
+import coffeeshout.room.domain.JoinCode;
+import coffeeshout.room.domain.Room;
+import coffeeshout.room.domain.event.PlayerKickEvent;
+import coffeeshout.room.domain.event.RoomEventPublisher;
+import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.PlayerCommandService;
-import java.util.List;
+import coffeeshout.room.domain.service.RoomQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,25 +14,27 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RoomPlayerApplicationService {
 
+    private final RoomQueryService roomQueryService;
     private final PlayerCommandService playerCommandService;
-
-    public List<Player> changePlayerReadyState(String joinCode, String playerName, Boolean isReady) {
-        return playerCommandService.changePlayerReadyState(joinCode, playerName, isReady);
-    }
-
-    public List<Player> getAllPlayers(String joinCode) {
-        return playerCommandService.getAllPlayers(joinCode);
-    }
-
-    public List<Player> selectMenu(String joinCode, String playerName, Long menuId) {
-        return playerCommandService.selectMenu(joinCode, playerName, menuId);
-    }
+    private final RoomEventPublisher roomEventPublisher;
 
     public boolean isGuestNameDuplicated(String joinCode, String guestName) {
         return playerCommandService.isGuestNameDuplicated(joinCode, guestName);
     }
 
-    public boolean removePlayer(String joinCode, String playerName) {
-        return playerCommandService.removePlayer(joinCode, playerName);
+    public boolean kickPlayer(String joinCode, String playerName) {
+        final boolean exists = hasPlayer(joinCode, playerName);
+
+        if (exists) {
+            final PlayerKickEvent event = new PlayerKickEvent(joinCode, playerName);
+            roomEventPublisher.publish(event);
+        }
+
+        return exists;
+    }
+
+    private boolean hasPlayer(String joinCode, String playerName) {
+        final Room room = roomQueryService.getByJoinCode(new JoinCode(joinCode));
+        return room.hasPlayer(new PlayerName(playerName));
     }
 }
