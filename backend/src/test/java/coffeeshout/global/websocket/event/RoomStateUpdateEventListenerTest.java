@@ -6,7 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import coffeeshout.room.domain.service.RoomPlayerService;
+import coffeeshout.room.domain.service.PlayerCommandService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.event.PlayerListUpdateEvent;
 import coffeeshout.room.domain.event.RoomEventPublisher;
@@ -23,7 +23,7 @@ class RoomStateUpdateEventListenerTest {
     private RoomService roomService;
 
     @Mock
-    private RoomPlayerService roomPlayerService;
+    private PlayerCommandService playerCommandService;
 
     @Mock
     private RoomEventPublisher roomEventPublisher;
@@ -60,7 +60,7 @@ class RoomStateUpdateEventListenerTest {
 
         // then
         verify(roomService).roomExists(joinCode);
-        verify(roomPlayerService, never()).getAllPlayers(anyString());
+        verify(playerCommandService, never()).getAllPlayers(anyString());
         verify(roomEventPublisher, never()).publish(any());
     }
 }

@@ -1,9 +1,9 @@
 package coffeeshout.room.ui;
 
 import coffeeshout.minigame.domain.MiniGameType;
-import coffeeshout.room.domain.service.RoomMiniGameService;
-import coffeeshout.room.domain.service.RoomPlayerService;
-import coffeeshout.room.domain.service.RoomRouletteService;
+import coffeeshout.room.application.RoomMiniGameApplicationService;
+import coffeeshout.room.application.RoomPlayerApplicationService;
+import coffeeshout.room.application.RoomRouletteApplicationService;
 import coffeeshout.room.application.RoomService;
 import coffeeshout.room.domain.Playable;
 import coffeeshout.room.domain.Room;
@@ -36,13 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomRestController implements RoomApi {
 
     private final RoomService roomService;
-    private final RoomPlayerService roomPlayerService;
-    private final RoomMiniGameService roomMiniGameService;
-    private final RoomRouletteService roomRouletteService;
+    private final RoomPlayerApplicationService roomPlayerApplicationService;
+    private final RoomMiniGameApplicationService roomMiniGameApplicationService;
+    private final RoomRouletteApplicationService roomRouletteApplicationService;
 
     @GetMapping("/{joinCode}/miniGames/remaining")
     public ResponseEntity<RemainingMiniGameResponse> getRemainingMiniGames(@PathVariable String joinCode) {
-        final List<Playable> miniGames = roomMiniGameService.getRemainingMiniGames(joinCode);
+        final List<Playable> miniGames = roomMiniGameApplicationService.getRemainingMiniGames(joinCode);
 
         return ResponseEntity.ok(RemainingMiniGameResponse.from(miniGames));
     }
@@ -83,28 +83,28 @@ public class RoomRestController implements RoomApi {
             @RequestParam String joinCode,
             @RequestParam String guestName
     ) {
-        final boolean isDuplicated = roomPlayerService.isGuestNameDuplicated(joinCode, guestName);
+        final boolean isDuplicated = roomPlayerApplicationService.isGuestNameDuplicated(joinCode, guestName);
 
         return ResponseEntity.ok(GuestNameExistResponse.from(isDuplicated));
     }
 
     @GetMapping("/{joinCode}/probabilities")
     public ResponseEntity<List<ProbabilityResponse>> getProbabilities(@PathVariable String joinCode) {
-        final List<ProbabilityResponse> responses = roomRouletteService.getProbabilities(joinCode);
+        final List<ProbabilityResponse> responses = roomRouletteApplicationService.getProbabilities(joinCode);
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/minigames")
     public ResponseEntity<List<MiniGameType>> getMiniGames() {
-        final List<MiniGameType> responses = roomMiniGameService.getAllMiniGames();
+        final List<MiniGameType> responses = roomMiniGameApplicationService.getAllMiniGames();
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/minigames/selected")
     public ResponseEntity<List<MiniGameType>> getSelectedMiniGames(@RequestParam String joinCode) {
-        final List<MiniGameType> result = roomMiniGameService.getSelectedMiniGames(joinCode);
+        final List<MiniGameType> result = roomMiniGameApplicationService.getSelectedMiniGames(joinCode);
 
         return ResponseEntity.ok(result);
     }

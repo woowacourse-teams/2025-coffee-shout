@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RoomRouletteService {
+public class RouletteCommandService {
 
     private final RoomQueryService roomQueryService;
 

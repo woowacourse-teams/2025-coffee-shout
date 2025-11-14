@@ -21,18 +21,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class RoomMiniGameServiceTest extends ServiceTest {
+class MiniGameCommandServiceTest extends ServiceTest {
 
     @Autowired
     RoomService roomService;
 
     @Autowired
-    RoomMiniGameService roomMiniGameService;
+    MiniGameCommandService miniGameCommandService;
 
     @Test
     void 모든_미니게임_목록을_조회한다() {
         // when
-        List<MiniGameType> miniGames = roomMiniGameService.getAllMiniGames();
+        List<MiniGameType> miniGames = miniGameCommandService.getAllMiniGames();
 
         // then
         assertThat(miniGames).containsExactlyInAnyOrder(MiniGameType.values());
@@ -46,7 +46,7 @@ class RoomMiniGameServiceTest extends ServiceTest {
         Room createdRoom = roomService.createRoom(hostName, selectedMenuRequest);
 
         // when
-        List<MiniGameType> selectedMiniGames = roomMiniGameService.updateMiniGames(
+        List<MiniGameType> selectedMiniGames = miniGameCommandService.updateMiniGames(
                 createdRoom.getJoinCode().getValue(),
                 hostName,
                 List.of(MiniGameType.CARD_GAME)
@@ -70,7 +70,7 @@ class RoomMiniGameServiceTest extends ServiceTest {
         List<MiniGameType> miniGameTypes = List.of(MiniGameType.CARD_GAME);
         // when & then
         assertThatThrownBy(
-                () -> roomMiniGameService.updateMiniGames(
+                () -> miniGameCommandService.updateMiniGames(
                         createdRoom.getJoinCode().getValue(),
                         guestName,
                         miniGameTypes))
@@ -86,14 +86,14 @@ class RoomMiniGameServiceTest extends ServiceTest {
         SelectedMenuRequest guestSelectedMenuRequest = new SelectedMenuRequest(2L, null, MenuTemperature.ICE);
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
-        roomMiniGameService.updateMiniGames(
+        miniGameCommandService.updateMiniGames(
                 createdRoom.getJoinCode().getValue(),
                 hostName,
                 List.of(MiniGameType.CARD_GAME)
         );
 
         // when & then
-        assertThatThrownBy(() -> roomMiniGameService.updateMiniGames(
+        assertThatThrownBy(() -> miniGameCommandService.updateMiniGames(
                 createdRoom.getJoinCode().getValue(),
                 guestName,
                 List.of(MiniGameType.CARD_GAME)))
@@ -116,7 +116,7 @@ class RoomMiniGameServiceTest extends ServiceTest {
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
 
         // when
-        Map<Player, MiniGameScore> miniGameScores = roomMiniGameService.getMiniGameScores(
+        Map<Player, MiniGameScore> miniGameScores = miniGameCommandService.getMiniGameScores(
                 joinCode.getValue(),
                 MiniGameType.CARD_GAME
         );
@@ -144,7 +144,7 @@ class RoomMiniGameServiceTest extends ServiceTest {
         ReflectionTestUtils.setField(createdRoom, "finishedGames", miniGames);
 
         // when
-        MiniGameResult miniGameRanks = roomMiniGameService.getMiniGameRanks(
+        MiniGameResult miniGameRanks = miniGameCommandService.getMiniGameRanks(
                 joinCode.getValue(),
                 MiniGameType.CARD_GAME
         );
@@ -167,14 +167,14 @@ class RoomMiniGameServiceTest extends ServiceTest {
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), "게스트2",
                 new SelectedMenuRequest(3L, null, MenuTemperature.ICE));
-        roomMiniGameService.updateMiniGames(
+        miniGameCommandService.updateMiniGames(
                 createdRoom.getJoinCode().getValue(),
                 hostName,
                 List.of(MiniGameType.CARD_GAME)
         );
 
         // when
-        List<MiniGameType> selectedMiniGames = roomMiniGameService.getSelectedMiniGames(joinCode.getValue());
+        List<MiniGameType> selectedMiniGames = miniGameCommandService.getSelectedMiniGames(joinCode.getValue());
 
         // then
         SoftAssertions.assertSoftly(softly -> {

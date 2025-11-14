@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class RoomRouletteServiceTest extends ServiceTest {
+class RouletteCommandServiceTest extends ServiceTest {
 
     @Autowired
     RoomService roomService;
 
     @Autowired
-    RoomRouletteService roomRouletteService;
+    RouletteCommandService rouletteCommandService;
 
     @Test
     void 플레이어들의_확률을_조회한다() {
@@ -34,7 +34,7 @@ class RoomRouletteServiceTest extends ServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when
-        List<ProbabilityResponse> probabilities = roomRouletteService.getProbabilities(
+        List<ProbabilityResponse> probabilities = rouletteCommandService.getProbabilities(
                 createdRoom.getJoinCode().getValue()
         );
 
@@ -59,7 +59,7 @@ class RoomRouletteServiceTest extends ServiceTest {
         ReflectionTestUtils.setField(createdRoom, "roomState", RoomState.ROULETTE);
 
         // when
-        Winner winner = roomRouletteService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
+        Winner winner = rouletteCommandService.spinRoulette(createdRoom.getJoinCode().getValue(), hostName);
 
         // then
         assertThat(winner).isNotNull();
@@ -76,7 +76,7 @@ class RoomRouletteServiceTest extends ServiceTest {
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
         // when
-        Room room = roomRouletteService.showRoulette(createdRoom.getJoinCode().getValue());
+        Room room = rouletteCommandService.showRoulette(createdRoom.getJoinCode().getValue());
 
         // then
         assertThat(room.getRoomState()).isEqualTo(RoomState.ROULETTE);

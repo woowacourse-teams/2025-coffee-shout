@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RoomPlayerService {
+public class PlayerCommandService {
 
     private final RoomQueryService roomQueryService;
     private final RoomCommandService roomCommandService;

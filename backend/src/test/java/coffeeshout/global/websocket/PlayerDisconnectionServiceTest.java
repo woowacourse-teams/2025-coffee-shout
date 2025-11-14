@@ -3,7 +3,7 @@ package coffeeshout.global.websocket;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import coffeeshout.room.domain.service.RoomPlayerService;
+import coffeeshout.room.domain.service.PlayerCommandService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ class PlayerDisconnectionServiceTest {
     private StompSessionManager sessionManager;
 
     @Mock
-    private RoomPlayerService roomPlayerService;
+    private PlayerCommandService playerCommandService;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -40,6 +40,6 @@ class PlayerDisconnectionServiceTest {
         playerDisconnectionService.cancelReady(playerKey);
 
         // then
-        then(roomPlayerService).should().changePlayerReadyState(joinCode, playerName, false);
+        then(playerCommandService).should().changePlayerReadyState(joinCode, playerName, false);
     }
 }

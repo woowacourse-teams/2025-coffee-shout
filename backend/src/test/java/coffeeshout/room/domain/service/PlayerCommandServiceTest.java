@@ -17,13 +17,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class RoomPlayerServiceTest extends ServiceTest {
+class PlayerCommandServiceTest extends ServiceTest {
 
     @Autowired
     RoomService roomService;
 
     @Autowired
-    RoomPlayerService roomPlayerService;
+    PlayerCommandService playerCommandService;
 
     @Test
     void 방에_있는_모든_플레이어를_조회한다() {
@@ -36,7 +36,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when
-        List<Player> players = roomPlayerService.getAllPlayers(createdRoom.getJoinCode().getValue());
+        List<Player> players = playerCommandService.getAllPlayers(createdRoom.getJoinCode().getValue());
 
         // then
         assertThat(players).hasSize(2);
@@ -52,7 +52,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         Room createdRoom = roomService.createRoom(hostName, initialSelectedMenuRequest);
 
         // when
-        List<Player> players = roomPlayerService.selectMenu(createdRoom.getJoinCode().getValue(), hostName, 1L);
+        List<Player> players = playerCommandService.selectMenu(createdRoom.getJoinCode().getValue(), hostName, 1L);
         Player host = players.getFirst();
 
         // then
@@ -69,7 +69,7 @@ class RoomPlayerServiceTest extends ServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> roomPlayerService.selectMenu(createdRoom.getJoinCode().getValue(), invalidPlayerName, 3L))
+                () -> playerCommandService.selectMenu(createdRoom.getJoinCode().getValue(), invalidPlayerName, 3L))
                 .isInstanceOf(InvalidArgumentException.class);
     }
 
@@ -85,8 +85,8 @@ class RoomPlayerServiceTest extends ServiceTest {
         createdRoom.joinGuest(guestName, new SelectedMenu(MenuFixture.아메리카노(), MenuTemperature.ICE));
 
         // when & then
-        assertThat(roomPlayerService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();
-        assertThat(roomPlayerService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
+        assertThat(playerCommandService.isGuestNameDuplicated(joinCode.getValue(), guestName.value())).isTrue();
+        assertThat(playerCommandService.isGuestNameDuplicated(joinCode.getValue(), "uniqueName")).isFalse();
     }
 
     @Test
@@ -100,7 +100,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         roomService.enterRoom(createdRoom.getJoinCode().getValue(), guestName, guestSelectedMenuRequest);
 
         // when
-        List<Player> players = roomPlayerService.changePlayerReadyState(
+        List<Player> players = playerCommandService.changePlayerReadyState(
                 createdRoom.getJoinCode().getValue(),
                 guestName,
                 true
@@ -122,7 +122,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         Room createdRoom = roomService.createRoom(hostName, hostSelectedMenuRequest);
 
         // when
-        List<Player> players = roomPlayerService.changePlayerReadyState(
+        List<Player> players = playerCommandService.changePlayerReadyState(
                 createdRoom.getJoinCode().getValue(),
                 hostName,
                 true
@@ -146,7 +146,7 @@ class RoomPlayerServiceTest extends ServiceTest {
         JoinCode joinCode = createdRoom.getJoinCode();
 
         // when
-        roomPlayerService.removePlayer(joinCode.getValue(), hostName);
+        playerCommandService.removePlayer(joinCode.getValue(), hostName);
 
         // then
         assertThat(roomService.roomExists(joinCode.getValue())).isFalse();
@@ -162,7 +162,7 @@ class RoomPlayerServiceTest extends ServiceTest {
                 new SelectedMenuRequest(2L, null, MenuTemperature.ICE));
 
         // when
-        roomPlayerService.removePlayer(joinCode.getValue(), hostName);
+        playerCommandService.removePlayer(joinCode.getValue(), hostName);
 
         // then
         assertThat(roomService.roomExists(joinCode.getValue())).isTrue();
