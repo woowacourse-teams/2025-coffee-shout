@@ -54,8 +54,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
+        executor.setCorePoolSize(14);
+        executor.setMaxPoolSize(14);
         executor.setThreadNamePrefix("inbound-");
         executor.setQueueCapacity(2048);
         executor.setKeepAliveSeconds(60);
