@@ -4,6 +4,7 @@ import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteShowEvent;
+import coffeeshout.room.domain.event.broadcast.RouletteShownEvent;
 import coffeeshout.room.domain.service.RouletteCommandService;
 import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,8 @@ public class RouletteShowEventHandler implements RoomEventHandler<RouletteShowEv
 
             // Spring Domain Event 발행 - RoomMessagePublisher가 브로드캐스트 처리
             eventPublisher.publishEvent(
-                    new coffeeshout.room.domain.event.broadcast.RouletteShownEvent(
-                            room.getJoinCode(), room.getRoomState()
+                    new RouletteShownEvent(
+                            room.getJoinCode().getValue(), room.getRoomState()
                     )
             );
 

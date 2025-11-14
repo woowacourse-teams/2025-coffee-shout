@@ -2,6 +2,7 @@ package coffeeshout.room.infra.messaging;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.event.broadcast.MiniGameListChangedEvent;
 import coffeeshout.room.domain.event.broadcast.PlayerListChangedEvent;
 import coffeeshout.room.domain.event.broadcast.QrCodeStatusChangedEvent;
@@ -108,7 +109,7 @@ public class RoomMessagePublisher {
         log.debug("룰렛 화면 표시 이벤트 수신: joinCode={}, roomState={}",
                 event.joinCode(), event.roomState());
 
-        final RoomStatusResponse response = RoomStatusResponse.of(event.joinCode(), event.roomState());
+        final RoomStatusResponse response = RoomStatusResponse.of(new JoinCode(event.joinCode()), event.roomState());
         final String destination = String.format(ROULETTE_TOPIC_FORMAT, event.joinCode());
         messagingTemplate.convertAndSend(destination, WebSocketResponse.success(response));
 

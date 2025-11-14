@@ -1,6 +1,6 @@
 package coffeeshout.room.domain.event.broadcast;
 
-import coffeeshout.room.ui.response.QrCodeStatus;
+import coffeeshout.room.domain.QrCodeStatus;
 
 /**
  * QR 코드 상태가 변경되었음을 알리는 Spring Domain Event
