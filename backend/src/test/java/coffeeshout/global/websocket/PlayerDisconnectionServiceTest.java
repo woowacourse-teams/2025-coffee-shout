@@ -3,7 +3,7 @@ package coffeeshout.global.websocket;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import coffeeshout.room.application.RoomPlayerService;
+import coffeeshout.room.domain.service.RoomPlayerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

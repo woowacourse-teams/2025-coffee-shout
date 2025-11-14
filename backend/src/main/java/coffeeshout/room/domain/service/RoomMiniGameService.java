@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.domain.service;
 
 import coffeeshout.minigame.domain.MiniGameResult;
 import coffeeshout.minigame.domain.MiniGameScore;

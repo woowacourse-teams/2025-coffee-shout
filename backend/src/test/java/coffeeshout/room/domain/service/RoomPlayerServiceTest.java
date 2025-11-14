@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

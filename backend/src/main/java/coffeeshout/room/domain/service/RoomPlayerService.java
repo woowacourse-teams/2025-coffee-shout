@@ -1,4 +1,4 @@
-package coffeeshout.room.application;
+package coffeeshout.room.domain.service;
 
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
