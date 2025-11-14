@@ -27,12 +27,12 @@ public class RacingGameMessagePublisher {
             returnType = RacingGameRunnersStateResponse.class
     )
     public void publishRunnersPosition(RunnersMovedEvent runnersMovedEvent) {
-        loggingSimpMessagingTemplate.convertAndSend(
-                String.format(RACING_GAME_PLAYERS_POSITION_DESTINATION_FORMAT, runnersMovedEvent.joinCode()),
-                WebSocketResponse.success(new RacingGameRunnersStateResponse(
-                        runnersMovedEvent.racingRange(), runnersMovedEvent.runnerPositions()
-                ))
-        );
+//        loggingSimpMessagingTemplate.convertAndSend(
+//                String.format(RACING_GAME_PLAYERS_POSITION_DESTINATION_FORMAT, runnersMovedEvent.joinCode()),
+//                WebSocketResponse.success(new RacingGameRunnersStateResponse(
+//                        runnersMovedEvent.racingRange(), runnersMovedEvent.runnerPositions()
+//                ))
+//        );
     }
 
     @EventListener
