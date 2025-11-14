@@ -1,5 +1,6 @@
 package coffeeshout.racinggame.infra.messaging;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,6 +15,7 @@ public class RacingGameEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic racingGameEventTopic;
 
+    @Observed(name = "redis.racing.tap")
     public <T> void publishEvent(T event) {
         try {
             redisTemplate.convertAndSend(racingGameEventTopic.getTopic(), event);
