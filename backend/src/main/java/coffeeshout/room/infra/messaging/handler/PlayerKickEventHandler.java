@@ -1,4 +1,4 @@
-package coffeeshout.room.application.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
@@ -7,7 +7,6 @@ import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.Room;
 import coffeeshout.room.domain.event.PlayerKickEvent;
 import coffeeshout.room.domain.event.RoomEventType;
-import coffeeshout.room.domain.player.Player;
 import coffeeshout.room.domain.player.PlayerName;
 import coffeeshout.room.domain.service.RoomCommandService;
 import coffeeshout.room.domain.service.RoomQueryService;

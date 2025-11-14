@@ -1,11 +1,11 @@
-package coffeeshout.room.application.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.event.RouletteSpinEvent;
 import coffeeshout.room.domain.player.Winner;
-import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.infra.persistence.RoomPersistenceService;
 import coffeeshout.room.ui.response.WinnerResponse;
 import lombok.RequiredArgsConstructor;

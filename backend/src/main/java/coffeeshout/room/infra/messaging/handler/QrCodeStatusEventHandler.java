@@ -1,12 +1,12 @@
-package coffeeshout.room.application.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.global.ui.WebSocketResponse;
 import coffeeshout.global.websocket.LoggingSimpMessagingTemplate;
+import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.domain.JoinCode;
 import coffeeshout.room.domain.event.QrCodeStatusEvent;
 import coffeeshout.room.domain.event.RoomEventType;
 import coffeeshout.room.domain.service.RoomCommandService;
-import coffeeshout.room.application.RoomEventHandler;
 import coffeeshout.room.ui.response.QrCodeStatusResponse;
 import generator.annotaions.MessageResponse;
 import generator.annotaions.Operation;

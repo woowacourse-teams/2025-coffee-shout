@@ -1,4 +1,4 @@
-package coffeeshout.room.application.handler;
+package coffeeshout.room.infra.messaging.handler;
 
 import coffeeshout.room.application.DelayedRoomRemovalService;
 import coffeeshout.room.application.RoomEventHandler;
