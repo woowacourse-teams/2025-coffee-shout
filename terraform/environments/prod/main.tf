@@ -1,0 +1,171 @@
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = var.common_tags
+  }
+}
+
+# ========================================
+# Network
+# ========================================
+
+module "network" {
+  source = "../../modules/network"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = [] # PROD도 Public Subnet만 사용 (비용 절감)
+  availability_zones   = var.availability_zones
+  enable_nat_gateway   = false # 비용 절감
+  common_tags          = var.common_tags
+}
+
+# ========================================
+# Security Groups
+# ========================================
+
+module "security_groups" {
+  source = "../../modules/security-groups"
+
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_id       = module.network.vpc_id
+  common_tags  = var.common_tags
+}
+
+# ========================================
+# S3
+# ========================================
+
+module "s3" {
+  source = "../../modules/s3"
+
+  project_name = var.project_name
+  environment  = var.environment
+  common_tags  = var.common_tags
+}
+
+# ========================================
+# RDS (PROD 전용)
+# ========================================
+
+module "rds" {
+  source = "../../modules/rds"
+
+  project_name          = var.project_name
+  environment           = var.environment
+  instance_class        = var.rds_instance_class
+  allocated_storage     = var.rds_allocated_storage
+  database_name         = var.rds_database_name
+  master_username       = var.rds_username
+  subnet_ids            = module.network.public_subnet_ids
+  security_group_id     = module.security_groups.rds_security_group_id
+  backup_retention_period = var.rds_backup_retention_period
+  log_retention_days    = var.log_retention_days
+  common_tags           = var.common_tags
+}
+
+# ========================================
+# ElastiCache (PROD 전용)
+# ========================================
+
+module "elasticache" {
+  source = "../../modules/elasticache"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  node_type         = var.elasticache_node_type
+  engine_version    = var.elasticache_engine_version
+  subnet_ids        = module.network.public_subnet_ids
+  security_group_id = module.security_groups.elasticache_security_group_id
+  common_tags       = var.common_tags
+}
+
+# ========================================
+# Secrets Manager
+# ========================================
+
+module "secrets" {
+  source = "../../modules/secrets"
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  s3_bucket_name              = module.s3.bucket_name
+  redis_host                  = module.elasticache.endpoint
+  tempo_url                   = var.tempo_url
+  trace_sampling_probability  = var.trace_sampling_probability
+  mysql_url                   = "jdbc:mysql://${module.rds.endpoint}/${var.rds_database_name}"
+  mysql_username              = var.rds_username
+  mysql_password              = module.rds.password
+  common_tags                 = var.common_tags
+}
+
+# ========================================
+# IAM
+# ========================================
+
+module "iam" {
+  source = "../../modules/iam"
+
+  project_name        = var.project_name
+  environment         = var.environment
+  secrets_manager_arn = module.secrets.secret_arn
+  s3_bucket_arn       = module.s3.bucket_arn
+  common_tags         = var.common_tags
+}
+
+# ========================================
+# EC2
+# ========================================
+
+module "ec2" {
+  source = "../../modules/ec2"
+
+  project_name              = var.project_name
+  environment               = var.environment
+  instance_name             = "backend-prod"
+  instance_type             = var.instance_type
+  subnet_id                 = module.network.public_subnet_ids[0]
+  security_group_id         = module.security_groups.ec2_security_group_id
+  iam_instance_profile_name = module.iam.ec2_instance_profile_name
+  secrets_manager_name      = module.secrets.secret_name
+  root_volume_size          = var.root_volume_size
+  assign_eip                = var.assign_eip
+  common_tags               = var.common_tags
+}
+
+# ========================================
+# ALB
+# ========================================
+
+module "alb" {
+  source = "../../modules/alb"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.network.vpc_id
+  subnet_ids         = module.network.public_subnet_ids
+  security_group_id  = module.security_groups.alb_security_group_id
+  target_instance_id = module.ec2.instance_id
+  certificate_arn    = var.certificate_arn
+  enable_https       = var.enable_https
+  common_tags        = var.common_tags
+}
