@@ -27,27 +27,8 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7.2-alpine
-    container_name: coffeeshout-redis-dev
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
-    volumes:
-      - redis-data:/data
-    networks:
-      - coffeeshout-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   mysql-data:
-    driver: local
-  redis-data:
     driver: local
 
 networks:

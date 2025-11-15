@@ -64,6 +64,22 @@ module "s3" {
 }
 
 # ========================================
+# ElastiCache (DEV 환경)
+# ========================================
+
+module "elasticache" {
+  source = "../../modules/elasticache"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  node_type         = var.elasticache_node_type
+  engine_version    = var.elasticache_engine_version
+  subnet_ids        = module.network.public_subnet_ids
+  security_group_id = module.security_groups.elasticache_security_group_id
+  common_tags       = var.common_tags
+}
+
+# ========================================
 # Secrets Manager
 # ========================================
 
@@ -73,7 +89,7 @@ module "secrets" {
   project_name                = var.project_name
   environment                 = var.environment
   s3_bucket_name              = module.s3.bucket_name
-  redis_host                  = "${var.redis_host}:${var.redis_port}"
+  redis_host                  = module.elasticache.endpoint
   tempo_url                   = var.tempo_url
   trace_sampling_probability  = var.trace_sampling_probability
   mysql_url                   = "jdbc:mysql://${var.mysql_host}:${var.mysql_port}/${var.mysql_database}"

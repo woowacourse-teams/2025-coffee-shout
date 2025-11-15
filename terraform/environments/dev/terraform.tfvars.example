@@ -38,9 +38,9 @@ mysql_database = "coffeeshout_dev"
 mysql_username = "coffeeshout"
 mysql_password = "your-secure-password-here" # 실제 비밀번호로 변경
 
-# Docker Redis (DEV 전용)
-redis_host = "localhost"
-redis_port = "6379"
+# ElastiCache (DEV)
+elasticache_node_type      = "cache.t3.micro"
+elasticache_engine_version = "8.0"
 
 # CloudWatch Logs
 log_retention_days = 7

@@ -60,6 +60,25 @@ output "s3_bucket_arn" {
 }
 
 # ========================================
+# ElastiCache Outputs (DEV)
+# ========================================
+
+output "elasticache_endpoint" {
+  description = "ElastiCache 엔드포인트"
+  value       = module.elasticache.endpoint
+}
+
+output "elasticache_address" {
+  description = "ElastiCache 주소"
+  value       = module.elasticache.address
+}
+
+output "elasticache_port" {
+  description = "ElastiCache 포트"
+  value       = module.elasticache.port
+}
+
+# ========================================
 # Secrets Manager Outputs
 # ========================================
 
@@ -74,17 +93,12 @@ output "secrets_manager_arn" {
 }
 
 # ========================================
-# Docker MySQL/Redis 정보 (DEV 전용)
+# Docker MySQL 정보 (DEV 전용)
 # ========================================
 
 output "docker_mysql_host" {
   description = "Docker MySQL 호스트 (localhost)"
   value       = "localhost:3306"
-}
-
-output "docker_redis_host" {
-  description = "Docker Redis 호스트 (localhost)"
-  value       = "localhost:6379"
 }
 
 output "docker_compose_location" {

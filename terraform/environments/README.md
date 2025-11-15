@@ -5,10 +5,10 @@
 ### DEV 환경
 - **EC2**: t4g.small
 - **MySQL**: Docker 컨테이너 (localhost:3306)
-- **Redis**: Docker 컨테이너 (localhost:6379)
+- **ElastiCache**: Valkey 8.0 (cache.t3.micro)
 - **S3**: 공용 버킷 (dev/ 경로)
 - **ALB**: HTTP만
-- **비용**: 100% 프리티어
+- **비용**: ElastiCache 프리티어 초과 시 ~$11/월
 
 ### PROD 환경
 - **EC2**: t4g.small + Elastic IP
@@ -16,7 +16,9 @@
 - **ElastiCache**: Valkey 8.0 (cache.t3.micro)
 - **S3**: 공용 버킷 (prod/ 경로)
 - **ALB**: HTTPS (ACM 인증서 필요)
-- **비용**: 100% 프리티어
+- **비용**: ElastiCache 프리티어 초과 시 ~$11/월
+
+**참고**: ElastiCache 프리티어는 월 750시간이므로, DEV + PROD 두 개 사용 시 약 690시간 초과됩니다.
 
 ---
 
@@ -82,7 +84,7 @@ MYSQL_USERNAME=coffeeshout
 MYSQL_PASSWORD=your-password
 EOF
 
-# MySQL/Redis 컨테이너 시작
+# MySQL 컨테이너 시작
 docker compose up -d
 
 # 상태 확인
@@ -104,7 +106,14 @@ docker compose restart
 
 # 로그 확인
 docker compose logs -f mysql
-docker compose logs -f redis
+```
+
+### 2.5 ElastiCache 엔드포인트 확인
+
+```bash
+# Terraform으로 ElastiCache 엔드포인트 확인
+terraform output elasticache_endpoint
+terraform output elasticache_address
 ```
 
 ---
@@ -236,16 +245,20 @@ docker compose up -d
    aws ec2 stop-instances --instance-ids i-xxxxx
    ```
 
-2. **Docker 컨테이너**: 사용하지 않을 때 중지
+2. **ElastiCache**: DEV 환경을 자주 사용하지 않는다면 ElastiCache 제거 고려
+   - DEV에서 Docker Redis 사용 시 프리티어 초과 비용 없음
+   - PROD만 ElastiCache 사용 시 100% 프리티어
+
+3. **Docker MySQL**: 사용하지 않을 때 중지
    ```bash
    docker compose down
    ```
 
-3. **CloudWatch Logs**: 주기적으로 로그 정리
+4. **CloudWatch Logs**: 주기적으로 로그 정리
    - DEV: 7일 자동 삭제
    - PROD: 30일 자동 삭제
 
-4. **S3**: 오래된 파일 정리 (Lifecycle 정책 자동 적용)
+5. **S3**: 오래된 파일 정리 (Lifecycle 정책 자동 적용)
 
 ---
 

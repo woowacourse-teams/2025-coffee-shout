@@ -74,7 +74,7 @@ variable "trace_sampling_probability" {
   default     = "0.1"
 }
 
-# Docker MySQL/Redis (DEV 환경)
+# Docker MySQL (DEV 환경)
 variable "mysql_host" {
   description = "MySQL 호스트 (Docker 사용 시 localhost)"
   type        = string
@@ -105,16 +105,17 @@ variable "mysql_password" {
   sensitive   = true
 }
 
-variable "redis_host" {
-  description = "Redis 호스트 (Docker 사용 시 localhost)"
+# ElastiCache (DEV 환경)
+variable "elasticache_node_type" {
+  description = "ElastiCache 노드 타입"
   type        = string
-  default     = "localhost"
+  default     = "cache.t3.micro"
 }
 
-variable "redis_port" {
-  description = "Redis 포트"
+variable "elasticache_engine_version" {
+  description = "ElastiCache 엔진 버전 (Valkey)"
   type        = string
-  default     = "6379"
+  default     = "8.0"
 }
 
 # CloudWatch Logs
