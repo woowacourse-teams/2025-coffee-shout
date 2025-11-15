@@ -42,6 +42,12 @@ variable "backup_retention_period" {
   default     = 7
 }
 
+variable "log_retention_days" {
+  description = "CloudWatch Logs 보관 기간 (일)"
+  type        = number
+  default     = 7  # 개발: 7일, 운영: 30일 권장
+}
+
 variable "common_tags" {
   description = "모든 리소스에 적용될 공통 태그"
   type        = map(string)
