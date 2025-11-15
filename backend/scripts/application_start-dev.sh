@@ -40,12 +40,13 @@ fi
 
 # JVM 옵션 설정
 JVM_OPTS=(
-  -Xms256m
-  -Xmx512m
-  -XX:+UseParallelGC
-  -XX:+PrintGCDetails
-  -Xloggc:logs/gc.log
+  -Xms512m
+  -Xmx1024m
+  -XX:+UseG1GC
+  -Xlog:gc*:file=logs/gc.log:time,tags:filecount=5,filesize=10M
   -Duser.timezone=Asia/Seoul
+  -XX:+HeapDumpOnOutOfMemoryError
+  -XX:HeapDumpPath=logs/heapdump.hprof
 )
 
 # 환경 프로파일 설정
