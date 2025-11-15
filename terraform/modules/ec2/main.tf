@@ -78,23 +78,41 @@ locals {
       --query SecretString \
       --output text > /tmp/secrets.json
 
-    # JSON을 환경 변수 형식으로 변환
+    # JSON을 환경 변수 형식으로 변환하여 저장
+    mkdir -p /etc/environment.d
     cat /tmp/secrets.json | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > /etc/environment.d/app-secrets.conf
 
-    # 현재 세션에도 적용
-    export $(cat /etc/environment.d/app-secrets.conf | xargs)
+    # 환경 변수 파일을 /opt/coffee-shout/.env에도 복사 (애플리케이션용)
+    cp /etc/environment.d/app-secrets.conf /opt/coffee-shout/.env
 
     rm /tmp/secrets.json
+    echo "Secrets loaded successfully!"
     SCRIPT
 
     chmod +x /usr/local/bin/load-secrets.sh
 
-    # jq 설치 (JSON 파싱용)
-    apt-get install -y jq
+    # 애플리케이션 디렉토리 생성 (be/prod 구조와 동일)
+    mkdir -p /opt/coffee-shout/app /opt/coffee-shout/scripts /opt/coffee-shout/logs
+    chown -R ubuntu:ubuntu /opt/coffee-shout
 
-    # 애플리케이션 디렉토리 생성
-    mkdir -p /opt/app
-    chown ubuntu:ubuntu /opt/app
+    # 부팅 시 자동으로 Secrets 로드하도록 systemd 서비스 생성
+    cat > /etc/systemd/system/load-secrets.service <<'SERVICE'
+    [Unit]
+    Description=Load secrets from AWS Secrets Manager
+    After=network.target
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/local/bin/load-secrets.sh
+    RemainAfterExit=yes
+
+    [Install]
+    WantedBy=multi-user.target
+    SERVICE
+
+    systemctl daemon-reload
+    systemctl enable load-secrets.service
+    systemctl start load-secrets.service
 
     echo "User data script completed successfully!"
     EOF
