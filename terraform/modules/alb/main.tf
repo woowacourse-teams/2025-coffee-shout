@@ -67,7 +67,7 @@ resource "aws_lb_target_group" "backend" {
   }
 
   # Connection Draining
-  deregistration_delay = 30
+  deregistration_delay = 310
 
   tags = merge(
     var.common_tags,
