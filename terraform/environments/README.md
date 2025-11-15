@@ -113,7 +113,7 @@ docker compose logs -f mysql
 ```bash
 # Terraform으로 ElastiCache 엔드포인트 확인
 terraform output elasticache_endpoint
-terraform output elasticache_address
+terraform output elasticache_host
 ```
 
 ---

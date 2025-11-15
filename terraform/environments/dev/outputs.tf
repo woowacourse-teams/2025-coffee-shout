@@ -64,13 +64,13 @@ output "s3_bucket_arn" {
 # ========================================
 
 output "elasticache_endpoint" {
-  description = "ElastiCache 엔드포인트"
+  description = "ElastiCache 엔드포인트 (호스트:포트)"
   value       = module.elasticache.endpoint
 }
 
-output "elasticache_address" {
-  description = "ElastiCache 주소"
-  value       = module.elasticache.address
+output "elasticache_host" {
+  description = "ElastiCache 호스트 주소"
+  value       = module.elasticache.host
 }
 
 output "elasticache_port" {
