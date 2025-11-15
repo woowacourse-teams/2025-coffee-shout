@@ -53,7 +53,8 @@ else
 fi
 
 # 포트 8080 사용 프로세스 강제 종료 (혹시 모를 좀비 프로세스)
-JAVA_PROCESS=$(lsof -ti:8080 2>/dev/null || true)
+# ss 명령어로 포트 확인 (lsof 대체)
+JAVA_PROCESS=$(ss -tlnp 2>/dev/null | grep :8080 | grep -oP 'pid=\K[0-9]+' | head -1 || true)
 if [ -n "$JAVA_PROCESS" ]; then
     echo "   🔫 포트 8080을 사용하는 좀비 프로세스 강제 종료 (PID: $JAVA_PROCESS)"
     kill -9 "$JAVA_PROCESS" 2>/dev/null || true

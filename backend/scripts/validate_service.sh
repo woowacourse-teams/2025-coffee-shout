@@ -54,6 +54,15 @@ if health_check; then
     echo "🎉 커피빵 게임 서버 배포 완료!"
     echo ""
     echo "=== 서비스 정보 ==="
+    echo "포트: 8080"
+    echo "프로파일: ${SPRING_PROFILES_ACTIVE:-unknown}"
+    if [ -f "app/coffee-shout.pid" ]; then
+        PID=$(cat app/coffee-shout.pid)
+        echo "PID: $PID"
+    fi
+    echo ""
+    echo "=== 프로세스 정보 ==="
+    ps aux | grep coffee-shout-backend.jar | grep -v grep || echo "프로세스 정보를 찾을 수 없습니다"
 else
     echo "💥 헬스체크 실패!"
     exit 1
