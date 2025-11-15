@@ -80,8 +80,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 }
             });
         });
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
         executor.setQueueCapacity(4096);
         executor.setKeepAliveSeconds(60);
         executor.initialize();
