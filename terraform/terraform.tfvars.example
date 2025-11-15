@@ -1,0 +1,22 @@
+# 커피빵 프로젝트 Terraform 변수 설정 예시
+# 이 파일을 복사해서 terraform.tfvars 파일을 만들고 실제 값을 입력하세요
+# cp terraform.tfvars.example terraform.tfvars
+
+# AWS 기본 설정
+aws_region  = "ap-northeast-2"  # 서울 리전
+environment = "dev"              # dev, staging, production 중 선택
+project_name = "coffeeshout"
+
+# 네트워크 설정
+vpc_cidr = "10.0.0.0/16"
+availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
+
+# EC2 인스턴스 타입
+backend_instance_type  = "t3.small"   # 개발: t3.small, 운영: t3.medium 이상 권장
+frontend_instance_type = "t3.micro"   # 개발: t3.micro, 운영: t3.small 이상 권장
+
+# 데이터베이스 설정
+db_instance_class = "db.t3.micro"     # 개발: db.t3.micro, 운영: db.t3.small 이상 권장
+db_name           = "coffeeshout"
+db_username       = "admin"
+db_password       = "YOUR_SECURE_PASSWORD_HERE"  # 실제 안전한 비밀번호로 변경하세요!
