@@ -24,12 +24,6 @@ variable "cache_security_group_id" {
   type        = string
 }
 
-variable "snapshot_retention_limit" {
-  description = "스냅샷 보관 기간 (일), 0이면 비활성화"
-  type        = number
-  default     = 0  # 프리티어에서는 비활성화 권장
-}
-
 variable "common_tags" {
   description = "모든 리소스에 적용될 공통 태그"
   type        = map(string)

@@ -57,12 +57,6 @@ variable "mysql_password" {
   sensitive   = true
 }
 
-variable "jdbc_url" {
-  description = "JDBC 연결 URL"
-  type        = string
-  sensitive   = true
-}
-
 variable "common_tags" {
   description = "모든 리소스에 적용될 공통 태그"
   type        = map(string)

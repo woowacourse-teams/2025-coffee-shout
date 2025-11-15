@@ -35,8 +35,5 @@ resource "aws_secretsmanager_secret_version" "app_config" {
     MYSQL_URL      = var.mysql_url
     MYSQL_USERNAME = var.mysql_username
     MYSQL_PASSWORD = var.mysql_password
-
-    # Spring Boot JDBC URL (선택적)
-    JDBC_URL = var.jdbc_url
   })
 }

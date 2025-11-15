@@ -208,24 +208,3 @@ resource "aws_iam_role_policy" "codebuild_s3" {
     ]
   })
 }
-
-# CodeBuild 정책: CloudWatch Logs (빌드 로그)
-resource "aws_iam_role_policy" "codebuild_logs" {
-  name = "cloudwatch-logs"
-  role = aws_iam_role.codebuild.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
-}

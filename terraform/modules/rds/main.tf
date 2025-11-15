@@ -148,9 +148,6 @@ resource "aws_db_instance" "main" {
   # 마이너 버전 자동 업그레이드
   auto_minor_version_upgrade = true
 
-  # 성능 인사이트 (프리티어: 7일 무료)
-  enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
-
   tags = merge(
     var.common_tags,
     {

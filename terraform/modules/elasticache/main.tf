@@ -13,8 +13,8 @@ resource "aws_elasticache_subnet_group" "main" {
 
 # ElastiCache Parameter Group (Valkey 설정)
 resource "aws_elasticache_parameter_group" "main" {
-  name   = "${var.project_name}-${var.environment}-valkey7"
-  family = "valkey7"
+  name   = "${var.project_name}-${var.environment}-valkey8"
+  family = "valkey8"
 
   # 메모리 정책 (maxmemory-policy)
   parameter {
@@ -40,7 +40,7 @@ resource "aws_elasticache_parameter_group" "main" {
 resource "aws_elasticache_cluster" "main" {
   cluster_id           = "${var.project_name}-${var.environment}-valkey"
   engine               = "valkey"
-  engine_version       = "7.2"
+  engine_version       = "8.0"
   node_type            = var.cache_node_type
   num_cache_nodes      = 1  # Single node (프리티어)
   parameter_group_name = aws_elasticache_parameter_group.main.name
@@ -49,10 +49,6 @@ resource "aws_elasticache_cluster" "main" {
   # 네트워크 설정
   subnet_group_name  = aws_elasticache_subnet_group.main.name
   security_group_ids = [var.cache_security_group_id]
-
-  # 스냅샷 설정
-  snapshot_retention_limit = var.snapshot_retention_limit
-  snapshot_window          = "03:00-04:00"  # 새벽 3-4시 (한국 시간 기준)
 
   # 유지보수 윈도우
   maintenance_window = "mon:04:00-mon:05:00"

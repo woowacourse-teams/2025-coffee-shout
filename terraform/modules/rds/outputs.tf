@@ -44,10 +44,3 @@ output "db_password" {
   value       = random_password.db_password.result
   sensitive   = true
 }
-
-# Spring Boot 연결 URL 형식
-output "jdbc_url" {
-  description = "JDBC 연결 URL"
-  value       = "jdbc:mysql://${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?useSSL=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8"
-  sensitive   = true
-}
