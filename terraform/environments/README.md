@@ -28,7 +28,7 @@ VPC (10.0.0.0/16 for DEV, 10.1.0.0/16 for PROD)
 - **EC2**: t4g.small (Public Subnet)
 - **MySQL**: Docker 컨테이너 (localhost:3306)
 - **ElastiCache**: Valkey 8.0 (cache.t3.micro, Private Subnet)
-- **S3**: 공용 버킷 (dev/ 경로)
+- **S3**: 자동 생성 버킷 (`coffeeshout-dev-bucket`)
 - **ALB**: HTTP만 (Public Subnet)
 - **비용**: ElastiCache 프리티어 초과 시 ~$11/월
 
@@ -39,11 +39,67 @@ VPC (10.0.0.0/16 for DEV, 10.1.0.0/16 for PROD)
 - **EC2**: t4g.small + Elastic IP (Public Subnet)
 - **RDS**: MySQL 8.0.43 (db.t3.micro, Private Subnet)
 - **ElastiCache**: Valkey 8.0 (cache.t3.micro, Private Subnet)
-- **S3**: 공용 버킷 (prod/ 경로)
+- **S3**: 자동 생성 버킷 (`coffeeshout-prod-bucket`)
 - **ALB**: HTTPS (ACM 인증서 필요, Public Subnet)
 - **비용**: ElastiCache 프리티어 초과 시 ~$11/월
 
 **참고**: ElastiCache 프리티어는 월 750시간이므로, DEV + PROD 두 개 사용 시 약 690시간 초과됩니다.
+
+---
+
+## 모듈 구조
+
+```
+terraform/
+├── bootstrap/               # S3/DynamoDB 백엔드 초기화
+├── modules/                 # 재사용 가능한 모듈
+│   ├── network/            # VPC, Subnet, IGW, Route Table
+│   ├── security-groups/    # Security Groups (계층별 분리)
+│   ├── ec2/                # EC2 인스턴스 + user-data
+│   ├── alb/                # Application Load Balancer
+│   ├── rds/                # RDS MySQL
+│   ├── elasticache/        # ElastiCache Valkey
+│   ├── s3/                 # S3 버킷 (자동 이름 생성)
+│   ├── iam/                # IAM 역할 및 정책
+│   └── secrets/            # Secrets Manager
+└── environments/
+    ├── dev/                # DEV 환경 설정
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   ├── outputs.tf
+    │   ├── backend.tf
+    │   ├── terraform.tfvars.example
+    │   └── docker-compose.yml
+    └── prod/               # PROD 환경 설정
+        ├── main.tf
+        ├── variables.tf
+        ├── outputs.tf
+        ├── backend.tf
+        └── terraform.tfvars.example
+```
+
+---
+
+## 주요 특징
+
+### 자동 생성 기능
+- **S3 버킷 이름**: `{project_name}-{environment}-bucket` 형식으로 자동 생성
+  - DEV: `coffeeshout-dev-bucket`
+  - PROD: `coffeeshout-prod-bucket`
+- **RDS 비밀번호**: Terraform의 `random_password` 리소스로 자동 생성 후 Secrets Manager에 저장
+
+### 네트워크 설계
+- **Public Subnet**: ALB, EC2 배치 (인터넷 접근 가능)
+- **Private Subnet**: RDS, ElastiCache 배치 (인터넷 차단, VPC 내부만)
+- **NAT Gateway 미사용**: 비용 절감 (~$35/월)
+  - RDS/ElastiCache는 인터넷 접근 불필요
+  - VPC 내부 통신만 사용
+
+### 보안
+- **계층별 Security Group 분리**: ALB → EC2 → RDS/ElastiCache
+- **최소 권한 원칙**: 필요한 포트만 오픈
+- **Private Subnet 격리**: 데이터베이스는 인터넷에서 완전 차단
+- **암호화**: S3, RDS, EBS 모두 암호화 활성화
 
 ---
 
@@ -84,13 +140,30 @@ vim terraform.tfvars  # 실제 값으로 수정
 **필수 수정 항목:**
 - `mysql_password`: MySQL 비밀번호 설정
 
-### 2.2 Terraform 실행
+### 2.2 Terraform 검증 및 실행
 
 ```bash
+# 1. 코드 포맷 확인 및 자동 수정
+terraform fmt -recursive
+
+# 2. 문법 검증
+terraform validate
+
+# 3. 초기화
 terraform init
+
+# 4. 실행 계획 확인 (변경사항 미리보기)
 terraform plan
+
+# 5. 인프라 생성
 terraform apply
 ```
+
+**검증 체크리스트:**
+- ✅ `terraform fmt`: 코드 포맷팅 정상
+- ✅ `terraform validate`: 문법 오류 없음
+- ✅ `terraform init`: Provider 플러그인 설치 완료
+- ✅ `terraform plan`: 생성될 리소스 확인 (오류 없음)
 
 ### 2.3 Docker Compose 파일 배포
 
@@ -156,13 +229,30 @@ vim terraform.tfvars  # 실제 값으로 수정
 **필수 수정 항목:**
 - `certificate_arn`: ACM Certificate ARN (HTTPS용)
 
-### 3.2 Terraform 실행
+### 3.2 Terraform 검증 및 실행
 
 ```bash
+# 1. 코드 포맷 확인 및 자동 수정
+terraform fmt -recursive
+
+# 2. 문법 검증
+terraform validate
+
+# 3. 초기화
 terraform init
+
+# 4. 실행 계획 확인 (변경사항 미리보기)
 terraform plan
+
+# 5. 인프라 생성
 terraform apply
 ```
+
+**검증 체크리스트:**
+- ✅ `terraform fmt`: 코드 포맷팅 정상
+- ✅ `terraform validate`: 문법 오류 없음
+- ✅ `terraform init`: Provider 플러그인 설치 완료
+- ✅ `terraform plan`: 생성될 리소스 확인 (오류 없음)
 
 ### 3.3 배포 완료 후 확인
 
