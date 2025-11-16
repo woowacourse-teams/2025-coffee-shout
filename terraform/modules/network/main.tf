@@ -1,74 +1,112 @@
-# VPC (Virtual Private Cloud) - 가상 네트워크 공간
+# ========================================
+# VPC
+# ========================================
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-vpc"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-vpc"
+    }
+  )
 }
 
-# Internet Gateway - VPC와 인터넷 연결
+# ========================================
+# Internet Gateway
+# ========================================
+
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-igw"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-igw"
+    }
+  )
 }
 
-# Public Subnet - 인터넷에 직접 접근 가능한 서브넷 (프론트엔드, 백엔드 API용)
+# ========================================
+# Public Subnets
+# ========================================
+
 resource "aws_subnet" "public" {
-  count                   = length(var.availability_zones)
+  count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
+  cidr_block              = var.public_subnet_cidrs[count.index]
   availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-public-subnet-${count.index + 1}"
-    Type = "Public"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-public-subnet-${count.index + 1}"
+      Type = "Public"
+    }
+  )
 }
 
-# Private Subnet - 인터넷에 직접 노출되지 않는 서브넷 (데이터베이스용)
+# ========================================
+# Private Subnets (Optional)
+# ========================================
+
 resource "aws_subnet" "private" {
-  count             = length(var.availability_zones)
+  count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = var.availability_zones[count.index]
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-private-subnet-${count.index + 1}"
-    Type = "Private"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-private-subnet-${count.index + 1}"
+      Type = "Private"
+    }
+  )
 }
 
-# NAT Gateway용 Elastic IP
+# ========================================
+# NAT Gateway (Optional, for cost saving)
+# ========================================
+
 resource "aws_eip" "nat" {
+  count  = var.enable_nat_gateway ? 1 : 0
   domain = "vpc"
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-nat-eip"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-nat-eip"
+    }
+  )
 
   depends_on = [aws_internet_gateway.main]
 }
 
-# NAT Gateway - Private 서브넷에서 인터넷 접근용
 resource "aws_nat_gateway" "main" {
-  allocation_id = aws_eip.nat.id
+  count         = var.enable_nat_gateway ? 1 : 0
+  allocation_id = aws_eip.nat[0].id
   subnet_id     = aws_subnet.public[0].id
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-nat-gateway"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-nat-gateway"
+    }
+  )
 
   depends_on = [aws_internet_gateway.main]
 }
 
-# Public Route Table - Public 서브넷용 라우팅 테이블
+# ========================================
+# Route Tables
+# ========================================
+
+# Public Route Table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -77,35 +115,46 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-public-rt"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-public-rt"
+    }
+  )
 }
 
-# Private Route Table - Private 서브넷용 라우팅 테이블
+# Private Route Table (only if NAT Gateway enabled)
 resource "aws_route_table" "private" {
+  count  = var.enable_nat_gateway && length(var.private_subnet_cidrs) > 0 ? 1 : 0
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main.id
+    nat_gateway_id = aws_nat_gateway.main[0].id
   }
 
-  tags = {
-    Name = "${var.project_name}-${var.environment}-private-rt"
-  }
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-${var.environment}-private-rt"
+    }
+  )
 }
 
-# Public Subnet과 Public Route Table 연결
+# ========================================
+# Route Table Associations
+# ========================================
+
+# Public Subnet Associations
 resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
-# Private Subnet과 Private Route Table 연결
+# Private Subnet Associations
 resource "aws_route_table_association" "private" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[0].id
 }
