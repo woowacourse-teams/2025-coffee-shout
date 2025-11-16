@@ -70,17 +70,17 @@ module "s3" {
 module "rds" {
   source = "../../modules/rds"
 
-  project_name          = var.project_name
-  environment           = var.environment
-  instance_class        = var.rds_instance_class
-  allocated_storage     = var.rds_allocated_storage
-  database_name         = var.rds_database_name
-  master_username       = var.rds_username
-  subnet_ids            = module.network.private_subnet_ids # Private Subnet에 배치
-  security_group_id     = module.security_groups.rds_security_group_id
+  project_name            = var.project_name
+  environment             = var.environment
+  instance_class          = var.rds_instance_class
+  allocated_storage       = var.rds_allocated_storage
+  database_name           = var.rds_database_name
+  master_username         = var.rds_username
+  subnet_ids              = module.network.private_subnet_ids # Private Subnet에 배치
+  security_group_id       = module.security_groups.rds_security_group_id
   backup_retention_period = var.rds_backup_retention_period
-  log_retention_days    = var.log_retention_days
-  common_tags           = var.common_tags
+  log_retention_days      = var.log_retention_days
+  common_tags             = var.common_tags
 }
 
 # ========================================
@@ -106,16 +106,16 @@ module "elasticache" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  project_name                = var.project_name
-  environment                 = var.environment
-  s3_bucket_name              = module.s3.bucket_name
-  redis_host                  = module.elasticache.endpoint
-  tempo_url                   = var.tempo_url
-  trace_sampling_probability  = var.trace_sampling_probability
-  mysql_url                   = "jdbc:mysql://${module.rds.endpoint}/${var.rds_database_name}"
-  mysql_username              = var.rds_username
-  mysql_password              = module.rds.password
-  common_tags                 = var.common_tags
+  project_name               = var.project_name
+  environment                = var.environment
+  s3_bucket_name             = module.s3.bucket_name
+  redis_host                 = module.elasticache.endpoint
+  tempo_url                  = var.tempo_url
+  trace_sampling_probability = var.trace_sampling_probability
+  mysql_url                  = "jdbc:mysql://${module.rds.endpoint}/${var.rds_database_name}"
+  mysql_username             = var.rds_username
+  mysql_password             = module.rds.password
+  common_tags                = var.common_tags
 }
 
 # ========================================

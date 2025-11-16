@@ -25,7 +25,7 @@ resource "aws_elasticache_parameter_group" "main" {
   # 메모리 정책 (maxmemory-policy)
   parameter {
     name  = "maxmemory-policy"
-    value = "allkeys-lru"  # LRU 방식으로 메모리 관리
+    value = "allkeys-lru" # LRU 방식으로 메모리 관리
   }
 
   # 타임아웃 설정
@@ -51,7 +51,7 @@ resource "aws_elasticache_cluster" "main" {
   engine               = "valkey"
   engine_version       = var.engine_version
   node_type            = var.node_type
-  num_cache_nodes      = 1  # Single node (프리티어)
+  num_cache_nodes      = 1 # Single node (프리티어)
   parameter_group_name = aws_elasticache_parameter_group.main.name
   port                 = 6379
 

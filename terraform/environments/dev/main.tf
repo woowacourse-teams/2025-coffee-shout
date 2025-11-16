@@ -86,16 +86,16 @@ module "elasticache" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  project_name                = var.project_name
-  environment                 = var.environment
-  s3_bucket_name              = module.s3.bucket_name
-  redis_host                  = module.elasticache.endpoint
-  tempo_url                   = var.tempo_url
-  trace_sampling_probability  = var.trace_sampling_probability
-  mysql_url                   = "jdbc:mysql://${var.mysql_host}:${var.mysql_port}/${var.mysql_database}"
-  mysql_username              = var.mysql_username
-  mysql_password              = var.mysql_password
-  common_tags                 = var.common_tags
+  project_name               = var.project_name
+  environment                = var.environment
+  s3_bucket_name             = module.s3.bucket_name
+  redis_host                 = module.elasticache.endpoint
+  tempo_url                  = var.tempo_url
+  trace_sampling_probability = var.trace_sampling_probability
+  mysql_url                  = "jdbc:mysql://${var.mysql_host}:${var.mysql_port}/${var.mysql_database}"
+  mysql_username             = var.mysql_username
+  mysql_password             = var.mysql_password
+  common_tags                = var.common_tags
 }
 
 # ========================================
