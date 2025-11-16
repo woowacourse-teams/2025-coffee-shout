@@ -251,7 +251,7 @@ resource "aws_iam_role_policy" "codebuild_sns" {
         Action = [
           "sns:Publish"
         ]
-        Resource = "*"
+        Resource = var.sns_topic_arn
       }
     ]
   })

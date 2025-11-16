@@ -61,58 +61,9 @@ locals {
     systemctl start codedeploy-agent
     systemctl enable codedeploy-agent
 
-    # AWS CLI 설치 (Secrets Manager 접근용)
-    apt-get install -y awscli
-
-    # Secrets Manager에서 환경 변수 가져오는 헬퍼 스크립트 생성
-    cat > /usr/local/bin/load-secrets.sh <<'SCRIPT'
-    #!/bin/bash
-    # Secrets Manager에서 환경 변수를 가져와 파일로 저장
-    SECRET_NAME="${secret_name}"
-    REGION="ap-northeast-2"
-
-    # Secrets Manager에서 JSON 가져오기
-    aws secretsmanager get-secret-value \
-      --secret-id "$SECRET_NAME" \
-      --region "$REGION" \
-      --query SecretString \
-      --output text > /tmp/secrets.json
-
-    # JSON을 환경 변수 형식으로 변환하여 저장
-    mkdir -p /etc/environment.d
-    cat /tmp/secrets.json | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > /etc/environment.d/app-secrets.conf
-
-    # 환경 변수 파일을 /opt/coffee-shout/.env에도 복사 (애플리케이션용)
-    cp /etc/environment.d/app-secrets.conf /opt/coffee-shout/.env
-
-    rm /tmp/secrets.json
-    echo "Secrets loaded successfully!"
-    SCRIPT
-
-    chmod +x /usr/local/bin/load-secrets.sh
-
-    # 애플리케이션 디렉토리 생성 (be/prod 구조와 동일)
+    # 애플리케이션 디렉토리 생성 (CodeDeploy 배포용)
     mkdir -p /opt/coffee-shout/app /opt/coffee-shout/scripts /opt/coffee-shout/logs
     chown -R ubuntu:ubuntu /opt/coffee-shout
-
-    # 부팅 시 자동으로 Secrets 로드하도록 systemd 서비스 생성
-    cat > /etc/systemd/system/load-secrets.service <<'SERVICE'
-    [Unit]
-    Description=Load secrets from AWS Secrets Manager
-    After=network.target
-
-    [Service]
-    Type=oneshot
-    ExecStart=/usr/local/bin/load-secrets.sh
-    RemainAfterExit=yes
-
-    [Install]
-    WantedBy=multi-user.target
-    SERVICE
-
-    systemctl daemon-reload
-    systemctl enable load-secrets.service
-    systemctl start load-secrets.service
 
     echo "User data script completed successfully!"
     EOF
@@ -132,7 +83,6 @@ resource "aws_instance" "backend" {
 
   # User Data
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-    secret_name = var.secrets_manager_name
     environment = var.environment
   }))
 

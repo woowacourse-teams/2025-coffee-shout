@@ -1,27 +1,9 @@
-# RDS용 랜덤 비밀번호 생성
+# RDS용 랜덤 비밀번호 생성 (SSM Parameter Store에 저장)
 resource "random_password" "db_password" {
   length  = 16
   special = true
   # 특수문자 제한 (RDS에서 문제 일으킬 수 있는 문자 제외)
   override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-# RDS 비밀번호를 Secrets Manager에 저장
-resource "aws_secretsmanager_secret" "db_password" {
-  name        = "${var.project_name}/${var.environment}/rds-password"
-  description = "RDS MySQL master password for ${var.environment}"
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-rds-password"
-    }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id     = aws_secretsmanager_secret.db_password.id
-  secret_string = random_password.db_password.result
 }
 
 # DB Subnet Group (Private Subnet에 배치)

@@ -135,6 +135,7 @@ module "iam" {
   environment        = var.environment
   ssm_parameter_arns = module.secrets.parameter_arns
   s3_bucket_arn      = module.s3.bucket_arn
+  sns_topic_arn      = module.sns.topic_arn
   common_tags        = var.common_tags
 }
 

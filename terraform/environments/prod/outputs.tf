@@ -101,17 +101,3 @@ output "elasticache_port" {
   description = "ElastiCache 포트"
   value       = module.elasticache.port
 }
-
-# ========================================
-# Secrets Manager Outputs
-# ========================================
-
-output "secrets_manager_name" {
-  description = "Secrets Manager Secret 이름"
-  value       = module.secrets.secret_name
-}
-
-output "secrets_manager_arn" {
-  description = "Secrets Manager Secret ARN"
-  value       = module.secrets.secret_arn
-}

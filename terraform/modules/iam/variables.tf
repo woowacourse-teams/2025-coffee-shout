@@ -18,6 +18,11 @@ variable "ssm_parameter_arns" {
   type        = list(string)
 }
 
+variable "sns_topic_arn" {
+  description = "SNS Topic ARN (빌드 실패 알림용)"
+  type        = string
+}
+
 variable "common_tags" {
   description = "모든 리소스에 적용될 공통 태그"
   type        = map(string)
