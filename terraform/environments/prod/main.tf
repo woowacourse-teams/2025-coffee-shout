@@ -219,3 +219,48 @@ module "monitoring" {
   sns_topic_arn               = module.sns.topic_arn
   common_tags                 = var.common_tags
 }
+
+# ========================================
+# CI/CD Pipeline
+# ========================================
+
+# CodeBuild (무료 티어: 월 100분)
+module "codebuild" {
+  source = "../../modules/codebuild"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  codebuild_role_arn = module.iam.codebuild_role_arn
+  s3_bucket_name     = module.s3.bucket_name
+  github_repo        = var.github_repo
+  github_branch      = var.github_branch
+  common_tags        = var.common_tags
+}
+
+# CodeDeploy (EC2 배포 무료)
+module "codedeploy" {
+  source = "../../modules/codedeploy"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  codedeploy_role_arn  = module.iam.codedeploy_role_arn
+  ec2_instance_ids     = [module.ec2.instance_id]
+  common_tags          = var.common_tags
+}
+
+# CodePipeline (무료 티어: 월 1개 파이프라인)
+module "codepipeline" {
+  source = "../../modules/codepipeline"
+
+  project_name                     = var.project_name
+  environment                      = var.environment
+  s3_bucket_name                   = module.s3.bucket_name
+  github_connection_arn            = var.github_connection_arn
+  github_repo                      = var.github_repo
+  github_branch                    = var.github_branch
+  codebuild_project_name           = module.codebuild.project_name
+  codedeploy_app_name              = module.codedeploy.app_name
+  codedeploy_deployment_group_name = module.codedeploy.deployment_group_name
+  common_tags                      = var.common_tags
+}
+

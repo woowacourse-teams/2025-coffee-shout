@@ -142,6 +142,24 @@ variable "slack_channel" {
   default     = "#aws-알림"
 }
 
+# CI/CD Pipeline
+variable "github_connection_arn" {
+  description = "GitHub CodeStar Connection ARN (AWS 콘솔에서 미리 생성 필요)"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "GitHub 리포지토리 (예: woowacourse-teams/2025-coffee-shout)"
+  type        = string
+  default     = "woowacourse-teams/2025-coffee-shout"
+}
+
+variable "github_branch" {
+  description = "GitHub 배포 브랜치"
+  type        = string
+  default     = "main"
+}
+
 # CloudWatch Logs
 variable "log_retention_days" {
   description = "CloudWatch Logs 보존 기간 (일)"
