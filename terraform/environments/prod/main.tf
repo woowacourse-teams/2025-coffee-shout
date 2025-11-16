@@ -32,9 +32,9 @@ module "network" {
   environment          = var.environment
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = [] # PROD도 Public Subnet만 사용 (비용 절감)
+  private_subnet_cidrs = var.private_subnet_cidrs # RDS, ElastiCache용 Private Subnet
   availability_zones   = var.availability_zones
-  enable_nat_gateway   = false # 비용 절감
+  enable_nat_gateway   = false # 비용 절감 (RDS/ElastiCache는 인터넷 접근 불필요)
   common_tags          = var.common_tags
 }
 
@@ -76,7 +76,7 @@ module "rds" {
   allocated_storage     = var.rds_allocated_storage
   database_name         = var.rds_database_name
   master_username       = var.rds_username
-  subnet_ids            = module.network.public_subnet_ids
+  subnet_ids            = module.network.private_subnet_ids # Private Subnet에 배치
   security_group_id     = module.security_groups.rds_security_group_id
   backup_retention_period = var.rds_backup_retention_period
   log_retention_days    = var.log_retention_days
@@ -94,7 +94,7 @@ module "elasticache" {
   environment       = var.environment
   node_type         = var.elasticache_node_type
   engine_version    = var.elasticache_engine_version
-  subnet_ids        = module.network.public_subnet_ids
+  subnet_ids        = module.network.private_subnet_ids # Private Subnet에 배치
   security_group_id = module.security_groups.elasticache_security_group_id
   common_tags       = var.common_tags
 }

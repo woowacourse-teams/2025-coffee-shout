@@ -2,20 +2,45 @@
 
 ## 환경 구성
 
+### 네트워크 아키텍처 (AWS Best Practice)
+
+```
+VPC (10.0.0.0/16 for DEV, 10.1.0.0/16 for PROD)
+│
+├─ Public Subnet (인터넷 접근 가능)
+│  ├─ ALB (80/443)
+│  └─ EC2 (8080)
+│
+└─ Private Subnet (인터넷 차단, VPC 내부만 통신)
+   ├─ RDS (3306) ← EC2에서만 접근 가능
+   └─ ElastiCache (6379) ← EC2에서만 접근 가능
+```
+
+**보안:**
+- RDS/ElastiCache는 Private Subnet에 격리
+- Security Group으로 EC2에서만 접근 가능
+- NAT Gateway 불필요 (RDS/ElastiCache는 인터넷 접근 안함)
+
 ### DEV 환경
-- **EC2**: t4g.small
+- **VPC**: 10.0.0.0/16
+- **Public Subnet**: 10.0.1.0/24, 10.0.2.0/24
+- **Private Subnet**: 10.0.10.0/24, 10.0.11.0/24
+- **EC2**: t4g.small (Public Subnet)
 - **MySQL**: Docker 컨테이너 (localhost:3306)
-- **ElastiCache**: Valkey 8.0 (cache.t3.micro)
+- **ElastiCache**: Valkey 8.0 (cache.t3.micro, Private Subnet)
 - **S3**: 공용 버킷 (dev/ 경로)
-- **ALB**: HTTP만
+- **ALB**: HTTP만 (Public Subnet)
 - **비용**: ElastiCache 프리티어 초과 시 ~$11/월
 
 ### PROD 환경
-- **EC2**: t4g.small + Elastic IP
-- **RDS**: MySQL 8.0.43 (db.t3.micro)
-- **ElastiCache**: Valkey 8.0 (cache.t3.micro)
+- **VPC**: 10.1.0.0/16
+- **Public Subnet**: 10.1.1.0/24, 10.1.2.0/24
+- **Private Subnet**: 10.1.10.0/24, 10.1.11.0/24
+- **EC2**: t4g.small + Elastic IP (Public Subnet)
+- **RDS**: MySQL 8.0.43 (db.t3.micro, Private Subnet)
+- **ElastiCache**: Valkey 8.0 (cache.t3.micro, Private Subnet)
 - **S3**: 공용 버킷 (prod/ 경로)
-- **ALB**: HTTPS (ACM 인증서 필요)
+- **ALB**: HTTPS (ACM 인증서 필요, Public Subnet)
 - **비용**: ElastiCache 프리티어 초과 시 ~$11/월
 
 **참고**: ElastiCache 프리티어는 월 750시간이므로, DEV + PROD 두 개 사용 시 약 690시간 초과됩니다.

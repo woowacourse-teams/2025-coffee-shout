@@ -15,9 +15,10 @@ project_name = "coffeeshout"
 environment  = "prod"
 
 # Network
-vpc_cidr            = "10.1.0.0/16"
-public_subnet_cidrs = ["10.1.1.0/24", "10.1.2.0/24"]
-availability_zones  = ["ap-northeast-2a", "ap-northeast-2c"]
+vpc_cidr             = "10.1.0.0/16"
+public_subnet_cidrs  = ["10.1.1.0/24", "10.1.2.0/24"]
+private_subnet_cidrs = ["10.1.10.0/24", "10.1.11.0/24"]
+availability_zones   = ["ap-northeast-2a", "ap-northeast-2c"]
 
 # EC2
 instance_type    = "t4g.small"

@@ -29,6 +29,12 @@ variable "public_subnet_cidrs" {
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
+variable "private_subnet_cidrs" {
+  description = "Private Subnet CIDR 블록 리스트"
+  type        = list(string)
+  default     = ["10.0.10.0/24", "10.0.11.0/24"]
+}
+
 variable "availability_zones" {
   description = "가용 영역 리스트"
   type        = list(string)
