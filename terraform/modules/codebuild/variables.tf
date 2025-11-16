@@ -38,7 +38,7 @@ variable "build_compute_type" {
 variable "build_image" {
   description = "빌드 이미지"
   type        = string
-  default     = "aws/codebuild/standard:7.0" # Ubuntu 22.04, Java 17
+  default     = "aws/codebuild/standard:7.0" # Ubuntu 22.04, Java 8/11/17/21 지원
 }
 
 variable "build_timeout" {
