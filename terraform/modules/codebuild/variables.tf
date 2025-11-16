@@ -18,6 +18,11 @@ variable "s3_bucket_name" {
   type        = string
 }
 
+variable "sns_topic_arn" {
+  description = "SNS Topic ARN (빌드 실패 알림용)"
+  type        = string
+}
+
 variable "github_repo" {
   description = "GitHub 리포지토리 (예: owner/repo)"
   type        = string

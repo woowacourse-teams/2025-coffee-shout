@@ -16,10 +16,10 @@ spring:
 
   data:
     redis:
-      port: 6379
+      port: ${REDIS_PORT}
       ssl:
         enabled: true
-      host: localhost
+      host: ${REDIS_HOST}
       stream:
         room-join-key: room:broadcast
         card-game-select-key: cardGame:select:broadcast

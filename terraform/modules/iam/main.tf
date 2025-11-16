@@ -237,3 +237,50 @@ resource "aws_iam_role_policy" "codebuild_logs" {
     ]
   })
 }
+
+# CodeBuild 정책: SNS Publish (빌드 실패 알림)
+resource "aws_iam_role_policy" "codebuild_sns" {
+  name = "sns-publish"
+  role = aws_iam_role.codebuild.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# CodeBuild 정책: SSM Parameter Store 읽기 (환경변수 주입용)
+resource "aws_iam_role_policy" "codebuild_ssm" {
+  name = "ssm-parameter-read"
+  role = aws_iam_role.codebuild.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        Resource = "arn:aws:ssm:*:*:parameter/${var.project_name}/${var.environment}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "*" # SSM SecureString은 기본 KMS 키 사용
+      }
+    ]
+  })
+}
