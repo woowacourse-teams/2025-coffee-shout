@@ -27,7 +27,7 @@ assign_eip       = true # PROD는 Elastic IP 사용
 
 # ALB
 enable_https    = true
-certificate_arn = "arn:aws:acm:ap-northeast-2:ACCOUNT_ID:certificate/CERTIFICATE_ID" # ACM Certificate ARN 입력 필수
+certificate_arn = "arn:aws:acm:ap-northeast-2:ACCOUNT_ID:certificate/CERTIFICATE_ID" # TODO ACM Certificate ARN 입력 필수
 
 # RDS
 rds_instance_class          = "db.t3.micro"
