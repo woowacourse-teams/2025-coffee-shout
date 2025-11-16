@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret_version" "db_password" {
 # DB Subnet Group (Private Subnet에 배치)
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-${var.environment}-db-subnet-group"
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = var.subnet_ids
 
   tags = merge(
     var.common_tags,
@@ -108,24 +108,24 @@ resource "aws_db_instance" "main" {
   identifier = "${var.project_name}-${var.environment}-mysql"
 
   # 엔진 설정
-  engine               = "mysql"
-  engine_version       = "8.0.43"
-  instance_class       = var.db_instance_class
+  engine         = "mysql"
+  engine_version = "8.0.43"
+  instance_class = var.instance_class
 
   # 스토리지 설정
-  allocated_storage     = 20  # 프리티어 한도
-  max_allocated_storage = 20  # Auto Scaling 비활성화 (비용 방지)
+  allocated_storage     = var.allocated_storage
+  max_allocated_storage = var.allocated_storage # Auto Scaling 비활성화 (비용 방지)
   storage_type          = "gp2"
   storage_encrypted     = true
 
   # 데이터베이스 설정
-  db_name  = var.db_name
-  username = var.db_username
+  db_name  = var.database_name
+  username = var.master_username
   password = random_password.db_password.result
 
   # 네트워크 설정
   db_subnet_group_name   = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [var.db_security_group_id]
+  vpc_security_group_ids = [var.security_group_id]
   publicly_accessible    = false
   port                   = 3306
 
@@ -134,7 +134,7 @@ resource "aws_db_instance" "main" {
 
   # 백업 설정
   backup_retention_period = var.backup_retention_period
-  backup_window           = "03:00-04:00"  # 새벽 3-4시 (한국 시간 기준)
+  backup_window           = "03:00-04:00" # 새벽 3-4시 (한국 시간 기준)
   maintenance_window      = "mon:04:00-mon:05:00"
 
   # 고가용성 설정 (프리티어에서는 Single-AZ)
