@@ -38,6 +38,61 @@ resource "aws_codebuild_project" "main" {
       name  = "SNS_TOPIC_ARN"
       value = var.sns_topic_arn
     }
+
+    # SSM Parameter Store에서 환경변수 자동 주입
+    environment_variable {
+      name  = "MYSQL_URL"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/mysql-url"
+    }
+
+    environment_variable {
+      name  = "MYSQL_USERNAME"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/mysql-username"
+    }
+
+    environment_variable {
+      name  = "MYSQL_PASSWORD"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/mysql-password"
+    }
+
+    environment_variable {
+      name  = "S3_BUCKET_NAME"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/s3-bucket-name"
+    }
+
+    environment_variable {
+      name  = "S3_QR_KEY_PREFIX"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/s3-qr-key-prefix"
+    }
+
+    environment_variable {
+      name  = "REDIS_HOST"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/redis-host"
+    }
+
+    environment_variable {
+      name  = "REDIS_PORT"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/redis-port"
+    }
+
+    environment_variable {
+      name  = "TEMPO_URL"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/tempo-url"
+    }
+
+    environment_variable {
+      name  = "TRACE_SAMPLING_PROBABILITY"
+      type  = "PARAMETER_STORE"
+      value = "/${var.project_name}/${var.environment}/trace-sampling-probability"
+    }
   }
 
   logs_config {
