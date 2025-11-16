@@ -46,7 +46,7 @@ AWS 인프라를 Terraform으로 관리합니다. 자세한 내용은 [Terraform
 - **데이터베이스**: RDS MySQL 8.0, ElastiCache Valkey 8.0
 - **CI/CD**: CodePipeline, CodeBuild, CodeDeploy
 - **모니터링**: CloudWatch Alarms, Lambda Slack 알림
-- **보안**: SSM Parameter Store, Secrets Manager, Security Groups
+- **보안**: SSM Parameter Store, IAM 권한 최소화, Security Groups
 - **스토리지**: S3 버킷
 
 ### 빠른 시작

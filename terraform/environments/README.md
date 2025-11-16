@@ -2,6 +2,11 @@
 
 ## 최근 변경사항 (2025-11-16)
 
+### ✨ Phase 6 완료: 인프라 보안 및 비용 최적화
+- ✅ **IAM 권한 최소화**: CodeBuild SNS Publish 권한을 특정 Topic ARN으로 제한
+- ✅ **Secrets Manager 제거**: RDS 비밀번호를 SSM Parameter Store로 완전 통합 (월 $0.40 절감)
+- ✅ **EC2 User Data 정리**: 사용하지 않는 Secrets Manager 코드 제거 (복잡도 감소)
+
 ### ✨ Phase 5 완료: Backend 배포 파일 통합
 - ✅ **Backend 배포 파일**: origin/be/prod에서 buildspec, appspec, scripts 병합
 - ✅ **Profile별 설정**: application-prod.yml, application-dev.yml, application-local.yml, application-test.yml 추가
@@ -26,11 +31,11 @@
 2. **security-groups** - 계층별 보안 그룹 (ALB, EC2, RDS, ElastiCache)
 3. **ec2** - Ubuntu 24.04 ARM64 백엔드 서버
 4. **alb** - Application Load Balancer
-5. **rds** - MySQL 8.0 (Private Subnet)
+5. **rds** - MySQL 8.0 (Private Subnet, 비밀번호 자동 생성)
 6. **elasticache** - Valkey 8.0 (Private Subnet)
 7. **s3** - S3 버킷 (자동 이름 생성) + CodePipeline Artifacts
 8. **iam** - IAM Role 및 정책 (EC2, CodeBuild, CodeDeploy, CodePipeline, Lambda)
-9. **secrets** - Secrets Manager (RDS 비밀번호 자동 생성)
+9. **secrets** - SSM Parameter Store (환경변수 중앙 관리, 완전 무료)
 10. **sns** - SNS Topic (Slack 알림용)
 11. **lambda** - Lambda Function (SNS → Slack 메시지 전송)
 12. **monitoring** - CloudWatch Alarms (CPU, 메모리, 디스크)
@@ -158,11 +163,11 @@ terraform/
 │   ├── security-groups/    # Security Groups (ALB, EC2, RDS, ElastiCache)
 │   ├── ec2/                # EC2 인스턴스 (Ubuntu 24.04 ARM64)
 │   ├── alb/                # Application Load Balancer
-│   ├── rds/                # RDS MySQL 8.0
+│   ├── rds/                # RDS MySQL 8.0 (비밀번호 자동 생성)
 │   ├── elasticache/        # ElastiCache Valkey 8.0
 │   ├── s3/                 # S3 버킷 (자동 이름 생성) + CodePipeline Artifacts
-│   ├── iam/                # IAM 역할 및 정책 (EC2, CodeBuild, CodeDeploy, CodePipeline, Lambda)
-│   ├── secrets/            # Secrets Manager (RDS 비밀번호 자동 생성)
+│   ├── iam/                # IAM 역할 및 정책 (최소 권한 원칙)
+│   ├── secrets/            # SSM Parameter Store (환경변수 중앙 관리, 무료)
 │   ├── sns/                # SNS Topic (Slack 알림용)
 │   ├── lambda/             # Lambda Function (SNS → Slack 메시지 전송)
 │   ├── monitoring/         # CloudWatch Alarms (CPU, 메모리, 디스크)
@@ -202,7 +207,7 @@ terraform/
 - **S3 버킷 이름**: `{project_name}-{environment}-bucket` 형식으로 자동 생성
   - DEV: `coffeeshout-dev-bucket`
   - PROD: `coffeeshout-prod-bucket`
-- **RDS 비밀번호**: Terraform의 `random_password` 리소스로 자동 생성 후 Secrets Manager에 저장
+- **RDS 비밀번호**: Terraform의 `random_password` 리소스로 자동 생성 후 SSM Parameter Store에 저장 (무료)
 
 ### 네트워크 설계
 - **Public Subnet**: ALB, EC2 배치 (인터넷 접근 가능)
@@ -213,9 +218,11 @@ terraform/
 
 ### 보안
 - **계층별 Security Group 분리**: ALB → EC2 → RDS/ElastiCache
+- **IAM 권한 최소화**: 각 서비스별 필요한 리소스에만 접근 가능
 - **최소 권한 원칙**: 필요한 포트만 오픈
 - **Private Subnet 격리**: 데이터베이스는 인터넷에서 완전 차단
 - **암호화**: S3, RDS, EBS 모두 암호화 활성화
+- **SSM Parameter Store**: 민감 정보를 SecureString으로 암호화 저장
 
 ---
 
@@ -621,6 +628,9 @@ docker compose up -d
 - Elastic IP: 인스턴스 중지 시 과금 ($3.6/월)
 - CodeBuild: 월 100분 초과 시 ($0.005/분)
 - CodePipeline: 2개 이상 파이프라인 사용 시 ($1/월)
+
+**Phase 6 개선으로 절감된 비용:**
+- ✅ Secrets Manager 제거: **월 $0.40 절감** (SSM Parameter Store로 대체)
 
 ### 6.2 일별/주별 절약 팁
 
