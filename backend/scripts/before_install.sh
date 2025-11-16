@@ -8,30 +8,23 @@ APP_HOME=/opt/coffee-shout
 echo "=== [BEFORE_INSTALL] 커피빵 게임 서버 배포 준비 ==="
 
 # 기존 애플리케이션 안전하게 종료
-# PID 파일이 있으면 우선 사용, 없으면 pgrep으로 찾기
-if [ -f "${APP_HOME}/app/coffee-shout.pid" ]; then
-    pid=$(cat ${APP_HOME}/app/coffee-shout.pid 2>/dev/null || echo "")
-else
-    pid=$(pgrep -f "coffee-shout-backend.jar" || echo "")
-fi
-
-if [ -n "$pid" ] && ps -p "$pid" > /dev/null 2>&1; then
-    echo "☕ 기존 애플리케이션을 안전하게 종료합니다... (PID: $pid)"
-    kill -SIGTERM "$pid" 2>/dev/null || true
+if pgrep -f "coffee-shout-backend.jar" > /dev/null; then
+    echo "☕ 기존 애플리케이션을 안전하게 종료합니다..."
+    pkill -SIGTERM -f "coffee-shout-backend.jar" || true
 
     # Graceful shutdown 대기 (최대 10초)
     for i in {1..10}; do
-        if ! ps -p "$pid" > /dev/null 2>&1; then
-            echo "   ✅ 기존 애플리케이션 종료 완료"
+        if ! pgrep -f "coffee-shout-backend.jar" > /dev/null; then
+            echo "   ✅ 기존 애플리케이션 종료 완료 (${i}초 소요)"
             break
         fi
         sleep 1
     done
 
     # 여전히 실행 중이면 강제 종료
-    if ps -p "$pid" > /dev/null 2>&1; then
+    if pgrep -f "coffee-shout-backend.jar" > /dev/null; then
         echo "   🔨 강제 종료를 진행합니다..."
-        kill -SIGKILL "$pid" 2>/dev/null || true
+        pkill -SIGKILL -f "coffee-shout-backend.jar" || true
         sleep 2
         echo "   ✅ 기존 애플리케이션 강제 종료 완료"
     fi
