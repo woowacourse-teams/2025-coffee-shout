@@ -19,6 +19,6 @@ output "internet_gateway_id" {
 }
 
 output "nat_gateway_id" {
-  description = "NAT 게이트웨이 ID"
-  value       = aws_nat_gateway.main.id
+  description = "NAT 게이트웨이 ID (비활성화 시 null)"
+  value       = var.enable_nat_gateway ? aws_nat_gateway.main[0].id : null
 }

@@ -60,14 +60,15 @@ resource "aws_security_group" "ec2" {
     security_groups = [aws_security_group.alb.id]
   }
 
-  # SSH 접근 (필요시 특정 IP로 제한)
-  ingress {
-    description = "SSH access"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # 운영 환경에서는 특정 IP로 제한 권장
-  }
+  # SSH 접근 (보안상 기본 비활성화 - AWS SSM Session Manager 사용 권장)
+  # 필요시 아래 주석을 해제하고 your_ip/32로 변경하여 사용
+  # ingress {
+  #   description = "SSH access from specific IP"
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["your_ip/32"]  # 예: ["1.2.3.4/32"]
+  # }
 
   # 모든 아웃바운드 허용
   egress {
