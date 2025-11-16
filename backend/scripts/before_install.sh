@@ -33,12 +33,12 @@ else
 fi
 
 # PID 파일 정리
-rm -f ${APP_HOME}/app/coffee-shout.pid 2>/dev/null || true
+rm -f "${APP_HOME}/app/coffee-shout.pid" 2>/dev/null || true
 
 # 배포 디렉토리 생성 및 정리
 echo "📁 배포 디렉토리 생성 및 권한 설정..."
-mkdir -p ${APP_HOME}/{app,scripts,logs}
-chown -R ubuntu:ubuntu ${APP_HOME}
+mkdir -p "${APP_HOME}"/{app,scripts,logs}
+chown -R ubuntu:ubuntu "${APP_HOME}"
 
 # jq 설치 확인 및 설치
 if ! command -v jq &> /dev/null; then
@@ -57,7 +57,7 @@ fi
 # 기존 JAR 파일 삭제 (새 인스턴스 대응)
 if [ -f "${APP_HOME}/app/coffee-shout-backend.jar" ]; then
     echo "🗑️  기존 JAR 파일 삭제..."
-    rm -f ${APP_HOME}/app/coffee-shout-backend.jar
+    rm -f "${APP_HOME}/app/coffee-shout-backend.jar"
 fi
 
 echo "=== [BEFORE_INSTALL] 완료 ==="
