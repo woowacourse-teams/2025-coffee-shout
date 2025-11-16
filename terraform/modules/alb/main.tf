@@ -26,7 +26,7 @@ resource "aws_lb" "main" {
   enable_http2 = true
 
   # Connection Draining
-  idle_timeout = 60
+  idle_timeout = 310
 
   tags = merge(
     var.common_tags,
