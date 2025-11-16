@@ -1,5 +1,72 @@
 # Terraform 환경별 설정 가이드
 
+## 최근 변경사항 (2024-11-16)
+
+### ✨ 주요 개선
+- ✅ **모듈 정리**: 사용하지 않는 compute, database 모듈 삭제
+- ✅ **변수 통일**: RDS 모듈 변수/output 이름 일관성 개선
+- ✅ **비용 절감**: RDS CloudWatch Logs에서 general 로그 제거 (프리티어 초과 방지)
+- ✅ **구조 간소화**: terraform 루트 디렉토리 초기 설정 파일 제거
+- ✅ **네이밍 일관성**: ElastiCache, RDS 모듈 output 이름 통일
+
+### 🎯 현재 모듈 구성 (9개)
+1. **network** - VPC, Subnet, IGW, Route Table
+2. **security-groups** - 계층별 보안 그룹 (ALB, EC2, RDS, ElastiCache)
+3. **ec2** - Ubuntu 24.04 ARM64 백엔드 서버
+4. **alb** - Application Load Balancer
+5. **rds** - MySQL 8.0 (Private Subnet)
+6. **elasticache** - Valkey 8.0 (Private Subnet)
+7. **s3** - S3 버킷 (자동 이름 생성)
+8. **iam** - IAM Role 및 정책
+9. **secrets** - Secrets Manager
+
+---
+
+## 🚀 빠른 시작
+
+### DEV 환경 (5분 안에 시작)
+
+```bash
+# 1. Bootstrap (최초 1회만)
+cd terraform/bootstrap
+terraform init && terraform apply
+
+# 2. DEV 환경 배포
+cd ../environments/dev
+cp terraform.tfvars.example terraform.tfvars
+vim terraform.tfvars  # mysql_password 설정
+
+# 3. 실행
+terraform init
+terraform plan    # 미리보기
+terraform apply   # 실제 생성 (yes 입력)
+
+# 4. 결과 확인
+terraform output
+```
+
+### PROD 환경 (ACM 인증서 필요)
+
+```bash
+# 1. ACM 인증서 생성 (AWS Console에서)
+# 2. ARN 복사
+
+# 3. PROD 환경 배포
+cd terraform/environments/prod
+cp terraform.tfvars.example terraform.tfvars
+vim terraform.tfvars  # certificate_arn 설정
+
+# 4. 실행
+terraform init
+terraform plan
+terraform apply
+
+# 5. 결과 확인
+terraform output alb_dns_name  # HTTPS로 접속
+```
+
+---
+
 ## 환경 구성
 
 ### 네트워크 아키텍처 (AWS Best Practice)
@@ -52,31 +119,41 @@ VPC (10.0.0.0/16 for DEV, 10.1.0.0/16 for PROD)
 ```
 terraform/
 ├── bootstrap/               # S3/DynamoDB 백엔드 초기화
-├── modules/                 # 재사용 가능한 모듈
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── modules/                 # 재사용 가능한 모듈 (9개)
 │   ├── network/            # VPC, Subnet, IGW, Route Table
-│   ├── security-groups/    # Security Groups (계층별 분리)
-│   ├── ec2/                # EC2 인스턴스 + user-data
+│   ├── security-groups/    # Security Groups (ALB, EC2, RDS, ElastiCache)
+│   ├── ec2/                # EC2 인스턴스 (Ubuntu 24.04 ARM64)
 │   ├── alb/                # Application Load Balancer
-│   ├── rds/                # RDS MySQL
-│   ├── elasticache/        # ElastiCache Valkey
+│   ├── rds/                # RDS MySQL 8.0
+│   ├── elasticache/        # ElastiCache Valkey 8.0
 │   ├── s3/                 # S3 버킷 (자동 이름 생성)
 │   ├── iam/                # IAM 역할 및 정책
-│   └── secrets/            # Secrets Manager
-└── environments/
-    ├── dev/                # DEV 환경 설정
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── outputs.tf
-    │   ├── backend.tf
+│   └── secrets/            # Secrets Manager (환경변수 통합 관리)
+└── environments/           # 환경별 설정 (실제 사용)
+    ├── dev/                # DEV 환경
+    │   ├── main.tf         # 모듈 조합
+    │   ├── variables.tf    # 변수 정의
+    │   ├── outputs.tf      # 출력값
+    │   ├── backend.tf      # S3 백엔드 설정
+    │   ├── provider.tf     # AWS Provider
     │   ├── terraform.tfvars.example
     │   └── docker-compose.yml
-    └── prod/               # PROD 환경 설정
+    └── prod/               # PROD 환경
         ├── main.tf
         ├── variables.tf
         ├── outputs.tf
         ├── backend.tf
+        ├── provider.tf
         └── terraform.tfvars.example
 ```
+
+**주요 특징:**
+- ✅ 환경별 격리: DEV/PROD 완전 분리
+- ✅ 모듈 재사용: 9개 모듈로 구성
+- ✅ 백엔드 분리: 각 환경별 S3 state 파일
 
 ---
 
@@ -105,9 +182,28 @@ terraform/
 
 ## 1. 사전 준비
 
-### 1.1 Terraform 백엔드 초기화
+### 1.1 필수 도구 설치
 
-먼저 S3와 DynamoDB를 생성해야 합니다:
+```bash
+# Terraform 설치
+brew install terraform  # macOS
+# 또는
+wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+
+# AWS CLI 설치
+brew install awscli  # macOS
+# 또는
+pip install awscli
+
+# AWS 자격증명 설정
+aws configure
+```
+
+### 1.2 Terraform 백엔드 초기화
+
+**중요**: 가장 먼저 실행해야 합니다!
+
+S3와 DynamoDB를 생성하여 Terraform state 파일을 관리합니다:
 
 ```bash
 cd terraform/bootstrap
@@ -115,15 +211,24 @@ terraform init
 terraform apply
 ```
 
-### 1.2 ACM 인증서 생성 (PROD만)
+생성되는 리소스:
+- S3 버킷: `coffeeshout-terraform-state-dev`, `coffeeshout-terraform-state-prod`
+- DynamoDB 테이블: `coffeeshout-terraform-lock-dev`, `coffeeshout-terraform-lock-prod`
+
+### 1.3 ACM 인증서 생성 (PROD만)
 
 PROD 환경에서 HTTPS를 사용하려면 ACM 인증서가 필요합니다:
 
-1. AWS Console → Certificate Manager
+1. AWS Console → Certificate Manager (ap-northeast-2 리전)
 2. 인증서 요청 → 공개 인증서 요청
-3. 도메인 이름 입력
+3. 도메인 이름 입력 (예: `*.coffeeshout.com`)
 4. DNS 또는 이메일 검증 완료
-5. 생성된 ARN을 `terraform.tfvars`에 입력
+5. 생성된 ARN을 복사 → `terraform.tfvars`의 `certificate_arn`에 입력
+
+**예시 ARN:**
+```
+arn:aws:acm:ap-northeast-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
+```
 
 ---
 
@@ -355,25 +460,48 @@ docker compose up -d
 
 ## 6. 비용 최적화 팁
 
-1. **DEV 환경**: 사용하지 않을 때 EC2 중지
+### 6.1 프리티어 유지 전략
+
+**완전 무료 유지 (월 $0):**
+- ✅ EC2: t4g.small (2025년 12월까지 무료)
+- ✅ RDS: db.t3.micro 750시간/월 + 20GB 스토리지
+- ✅ RDS 백업: allocated_storage만큼 무료 (20GB)
+- ✅ CloudWatch Logs: 5GB 수집/저장 무료 (general 로그 제거로 프리티어 내 유지)
+- ✅ S3: 5GB 스토리지 + 20,000 GET/2,000 PUT
+- ⚠️ ElastiCache: 750시간/월 초과 시 ~$11/월
+
+**비용 발생 항목:**
+- ElastiCache: DEV + PROD 동시 사용 시 월 690시간 초과 (~$11/월)
+- Elastic IP: 인스턴스 중지 시 과금 ($3.6/월)
+
+### 6.2 일별/주별 절약 팁
+
+1. **DEV 환경 중지 (사용하지 않을 때)**
    ```bash
+   # EC2 중지 (EIP 과금 주의!)
    aws ec2 stop-instances --instance-ids i-xxxxx
-   ```
 
-2. **ElastiCache**: DEV 환경을 자주 사용하지 않는다면 ElastiCache 제거 고려
-   - DEV에서 Docker Redis 사용 시 프리티어 초과 비용 없음
-   - PROD만 ElastiCache 사용 시 100% 프리티어
-
-3. **Docker MySQL**: 사용하지 않을 때 중지
-   ```bash
+   # Docker 컨테이너 중지
    docker compose down
    ```
 
-4. **CloudWatch Logs**: 주기적으로 로그 정리
+2. **ElastiCache 최적화**
+   - **옵션 A**: DEV에서 Docker Redis 사용 → 완전 무료
+   - **옵션 B**: DEV ElastiCache 제거 → PROD만 사용 시 100% 프리티어
+
+3. **RDS 백업 최적화**
+   - PROD: 7일 보관 (권장) - 백업 스토리지 20GB 내 유지 가능
+   - DEV: 백업 비활성화 고려 (복구 불가능하지만 비용 절감)
+
+4. **CloudWatch Logs 자동 정리**
    - DEV: 7일 자동 삭제
    - PROD: 30일 자동 삭제
+   - RDS: error + slowquery만 (general 제거로 비용 절감)
 
-5. **S3**: 오래된 파일 정리 (Lifecycle 정책 자동 적용)
+5. **S3 Lifecycle 정책** (자동 적용)
+   - 90일 경과: Standard-IA로 이동
+   - 180일 경과: Glacier로 이동
+   - 365일 경과: 자동 삭제
 
 ---
 
