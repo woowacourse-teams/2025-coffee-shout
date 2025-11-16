@@ -37,6 +37,30 @@
 ### Application
 <img width="1000" height="1692" alt="image" src="https://github.com/user-attachments/assets/52f80fd5-c77a-43b8-a988-159e0c8866c6" />
 
+## 🏗️ Infrastructure as Code (Terraform)
+
+AWS 인프라를 Terraform으로 관리합니다. 자세한 내용은 [Terraform 가이드](./terraform/environments/README.md)를 참고하세요.
+
+### 주요 구성 (15개 모듈)
+- **컴퓨팅**: EC2, ALB
+- **데이터베이스**: RDS MySQL 8.0, ElastiCache Valkey 8.0
+- **CI/CD**: CodePipeline, CodeBuild, CodeDeploy
+- **모니터링**: CloudWatch Alarms, Lambda Slack 알림
+- **보안**: SSM Parameter Store, Secrets Manager, Security Groups
+- **스토리지**: S3 버킷
+
+### 빠른 시작
+```bash
+# 1. GitHub CodeStar Connection 생성 (AWS Console)
+# 2. SSM Parameter Store에 환경변수 등록
+# 3. Terraform 배포
+cd terraform/environments/prod
+cp terraform.tfvars.example terraform.tfvars
+vim terraform.tfvars  # 실제 값으로 수정
+terraform init && terraform apply
+```
+
+자세한 배포 가이드는 [terraform/environments/README.md](./terraform/environments/README.md)를 참고하세요.
 
 ## 👥 멤버
 
