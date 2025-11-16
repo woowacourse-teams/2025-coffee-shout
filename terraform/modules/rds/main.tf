@@ -148,8 +148,8 @@ resource "aws_db_instance" "main" {
   # 마이너 버전 자동 업그레이드
   auto_minor_version_upgrade = true
 
-  # CloudWatch Logs 내보내기
-  enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
+  # CloudWatch Logs 내보내기 (general 제외: 비용 절감 + 성능 향상)
+  enabled_cloudwatch_logs_exports = ["error", "slowquery"]
 
   tags = merge(
     var.common_tags,
