@@ -1,11 +1,24 @@
+# ========================================
+# Local Variables
+# ========================================
+
+locals {
+  # bucket_name이 지정되지 않으면 자동 생성
+  bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.project_name}-${var.environment}-bucket"
+}
+
+# ========================================
+# S3 Bucket
+# ========================================
+
 # 메인 S3 버킷
 resource "aws_s3_bucket" "main" {
-  bucket = var.bucket_name
+  bucket = local.bucket_name
 
   tags = merge(
     var.common_tags,
     {
-      Name = var.bucket_name
+      Name = local.bucket_name
     }
   )
 }
@@ -19,7 +32,7 @@ resource "aws_s3_bucket_versioning" "main" {
   }
 }
 
-# 서버 측 암호화 (보안)
+# 서버 측 암호화 (SSE-S3)
 resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
   bucket = aws_s3_bucket.main.id
 
@@ -30,7 +43,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
   }
 }
 
-# 퍼블릭 액세스 차단
+# Public Access Block (보안 강화)
 resource "aws_s3_bucket_public_access_block" "main" {
   bucket = aws_s3_bucket.main.id
 
@@ -53,13 +66,27 @@ resource "aws_s3_bucket_cors_configuration" "main" {
   }
 }
 
-# 수명 주기 정책 (오래된 버전 삭제)
+# Lifecycle 정책 (오래된 파일 자동 삭제)
 resource "aws_s3_bucket_lifecycle_configuration" "main" {
   bucket = aws_s3_bucket.main.id
 
-  # CodeDeploy artifacts 정리 (30일 후 삭제)
+  # QR 코드 이미지 정리 (90일 후 삭제)
   rule {
-    id     = "cleanup-codedeploy-artifacts"
+    id     = "delete-old-qr-codes"
+    status = "Enabled"
+
+    filter {
+      prefix = "qr-code/"
+    }
+
+    expiration {
+      days = 90
+    }
+  }
+
+  # CodeDeploy 아티팩트 정리 (30일 후 삭제)
+  rule {
+    id     = "delete-old-codedeploy-artifacts"
     status = "Enabled"
 
     filter {
@@ -69,18 +96,15 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
     expiration {
       days = 30
     }
-
-    noncurrent_version_expiration {
-      noncurrent_days = 7
-    }
   }
 
-  # QR 코드는 유지 (삭제 정책 없음)
-}
+  # 미완료 멀티파트 업로드 정리 (7일 후)
+  rule {
+    id     = "abort-incomplete-multipart-upload"
+    status = "Enabled"
 
-# CloudWatch 메트릭 (선택적)
-# 프리티어: 10개 지표 무료
-resource "aws_s3_bucket_metric" "main" {
-  bucket = aws_s3_bucket.main.id
-  name   = "EntireBucket"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
 }

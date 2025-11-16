@@ -1,5 +1,5 @@
-variable "bucket_name" {
-  description = "S3 버킷 이름"
+variable "project_name" {
+  description = "프로젝트 이름"
   type        = string
 }
 
@@ -8,9 +8,10 @@ variable "environment" {
   type        = string
 }
 
-variable "project_name" {
-  description = "프로젝트 이름"
+variable "bucket_name" {
+  description = "S3 버킷 이름 (지정하지 않으면 자동 생성: {project_name}-{environment}-bucket)"
   type        = string
+  default     = ""
 }
 
 variable "cors_allowed_origins" {
