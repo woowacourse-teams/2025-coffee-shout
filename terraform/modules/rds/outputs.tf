@@ -39,8 +39,10 @@ output "password_secret_arn" {
   value       = aws_secretsmanager_secret.db_password.arn
 }
 
+# 내부 모듈 간 통신용 (Terraform State에만 저장, 외부 노출 안됨)
+# Secrets 모듈에서 앱 설정에 포함시키기 위해 필요
 output "password" {
-  description = "데이터베이스 비밀번호 (민감정보)"
+  description = "데이터베이스 비밀번호 (내부 모듈 통신 전용, Terraform State 내에서만 사용)"
   value       = random_password.db_password.result
   sensitive   = true
 }

@@ -37,3 +37,13 @@ output "https_listener_arn" {
   description = "HTTPS Listener ARN (활성화된 경우)"
   value       = var.enable_https ? aws_lb_listener.https[0].arn : null
 }
+
+output "alb_arn_suffix" {
+  description = "ALB ARN Suffix (CloudWatch 알람용)"
+  value       = aws_lb.main.arn_suffix
+}
+
+output "target_group_arn_suffix" {
+  description = "Target Group ARN Suffix (CloudWatch 알람용)"
+  value       = aws_lb_target_group.backend.arn_suffix
+}

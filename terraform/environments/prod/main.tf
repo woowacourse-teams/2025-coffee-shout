@@ -169,3 +169,20 @@ module "alb" {
   enable_https       = var.enable_https
   common_tags        = var.common_tags
 }
+
+# ========================================
+# CloudWatch 모니터링 (무료 티어 - 알람 8개)
+# ========================================
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  project_name                    = var.project_name
+  environment                     = var.environment
+  ec2_instance_id                 = module.ec2.instance_id
+  rds_instance_id                 = module.rds.instance_id
+  alb_arn_suffix                  = module.alb.alb_arn_suffix
+  alb_target_group_arn_suffix     = module.alb.target_group_arn_suffix
+  elasticache_cluster_id          = module.elasticache.cluster_id
+  common_tags                     = var.common_tags
+}
