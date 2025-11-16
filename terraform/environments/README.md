@@ -1,24 +1,42 @@
 # Terraform 환경별 설정 가이드
 
-## 최근 변경사항 (2024-11-16)
+## 최근 변경사항 (2025-11-16)
 
-### ✨ 주요 개선
-- ✅ **모듈 정리**: 사용하지 않는 compute, database 모듈 삭제
-- ✅ **변수 통일**: RDS 모듈 변수/output 이름 일관성 개선
+### ✨ Phase 5 완료: Backend 배포 파일 통합
+- ✅ **Backend 배포 파일**: origin/be/prod에서 buildspec, appspec, scripts 병합
+- ✅ **Profile별 설정**: application-prod.yml, application-dev.yml, application-local.yml, application-test.yml 추가
+- ✅ **환경변수 통합**: Redis 설정을 환경변수로 변경 (${REDIS_HOST}, ${REDIS_PORT})
+
+### ✨ Phase 4 완료: CI/CD Pipeline
+- ✅ **CodeBuild**: Java 21 빌드, SSM 환경변수 자동 주입, SNS 빌드 실패 알림
+- ✅ **CodeDeploy**: EC2 무중단 배포, Graceful Shutdown
+- ✅ **CodePipeline**: GitHub → Build → Deploy 자동화 (무료 티어 1개)
+
+### ✨ Phase 3 완료: 모니터링 및 알림
+- ✅ **SSM Parameter Store**: 환경변수 중앙 관리 (MySQL, Redis, S3, Tempo 등)
+- ✅ **Lambda + SNS**: Slack 알림 자동화 (빌드 실패, 배포 실패)
+- ✅ **완전 무료**: Lambda, SNS, SSM 모두 프리티어 내 무료
+
+### ✨ Phase 2 완료: CloudWatch 모니터링
+- ✅ **CloudWatch Alarms**: CPU, 메모리, 디스크 사용률 모니터링
 - ✅ **비용 절감**: RDS CloudWatch Logs에서 general 로그 제거 (프리티어 초과 방지)
-- ✅ **구조 간소화**: terraform 루트 디렉토리 초기 설정 파일 제거
-- ✅ **네이밍 일관성**: ElastiCache, RDS 모듈 output 이름 통일
 
-### 🎯 현재 모듈 구성 (9개)
+### 🎯 현재 모듈 구성 (15개)
 1. **network** - VPC, Subnet, IGW, Route Table
 2. **security-groups** - 계층별 보안 그룹 (ALB, EC2, RDS, ElastiCache)
 3. **ec2** - Ubuntu 24.04 ARM64 백엔드 서버
 4. **alb** - Application Load Balancer
 5. **rds** - MySQL 8.0 (Private Subnet)
 6. **elasticache** - Valkey 8.0 (Private Subnet)
-7. **s3** - S3 버킷 (자동 이름 생성)
-8. **iam** - IAM Role 및 정책
-9. **secrets** - Secrets Manager
+7. **s3** - S3 버킷 (자동 이름 생성) + CodePipeline Artifacts
+8. **iam** - IAM Role 및 정책 (EC2, CodeBuild, CodeDeploy, CodePipeline, Lambda)
+9. **secrets** - Secrets Manager (RDS 비밀번호 자동 생성)
+10. **sns** - SNS Topic (Slack 알림용)
+11. **lambda** - Lambda Function (SNS → Slack 메시지 전송)
+12. **monitoring** - CloudWatch Alarms (CPU, 메모리, 디스크)
+13. **codebuild** - CodeBuild Project (Java 21, SSM 환경변수 자동 주입)
+14. **codedeploy** - CodeDeploy (EC2 무중단 배포)
+15. **codepipeline** - CodePipeline (GitHub → Build → Deploy)
 
 ---
 
@@ -45,24 +63,37 @@ terraform apply   # 실제 생성 (yes 입력)
 terraform output
 ```
 
-### PROD 환경 (ACM 인증서 필요)
+### PROD 환경 (ACM 인증서 + GitHub Connection 필요)
 
 ```bash
 # 1. ACM 인증서 생성 (AWS Console에서)
-# 2. ARN 복사
+# 2. GitHub CodeStar Connection 생성 (AWS Console에서)
+#    - Developer Tools → CodePipeline → Settings → Connections
+#    - "Create connection" → Provider: GitHub → 인증 완료
+# 3. SSM Parameter Store에 환경변수 등록
+#    - /coffee-shout/prod/mysql-url
+#    - /coffee-shout/prod/mysql-username
+#    - /coffee-shout/prod/mysql-password
+#    - /coffee-shout/prod/redis-host
+#    - /coffee-shout/prod/redis-port
+#    - /coffee-shout/prod/s3-bucket-name
+#    - /coffee-shout/prod/s3-qr-key-prefix
+#    - /coffee-shout/prod/tempo-url
+#    - /coffee-shout/prod/trace-sampling-probability
 
-# 3. PROD 환경 배포
+# 4. PROD 환경 배포
 cd terraform/environments/prod
 cp terraform.tfvars.example terraform.tfvars
-vim terraform.tfvars  # certificate_arn 설정
+vim terraform.tfvars  # certificate_arn, github_connection_arn 설정
 
-# 4. 실행
+# 5. 실행
 terraform init
 terraform plan
 terraform apply
 
-# 5. 결과 확인
+# 6. 결과 확인
 terraform output alb_dns_name  # HTTPS로 접속
+terraform output codepipeline_name  # CI/CD 파이프라인 확인
 ```
 
 ---
@@ -122,16 +153,22 @@ terraform/
 │   ├── main.tf
 │   ├── variables.tf
 │   └── outputs.tf
-├── modules/                 # 재사용 가능한 모듈 (9개)
+├── modules/                 # 재사용 가능한 모듈 (15개)
 │   ├── network/            # VPC, Subnet, IGW, Route Table
 │   ├── security-groups/    # Security Groups (ALB, EC2, RDS, ElastiCache)
 │   ├── ec2/                # EC2 인스턴스 (Ubuntu 24.04 ARM64)
 │   ├── alb/                # Application Load Balancer
 │   ├── rds/                # RDS MySQL 8.0
 │   ├── elasticache/        # ElastiCache Valkey 8.0
-│   ├── s3/                 # S3 버킷 (자동 이름 생성)
-│   ├── iam/                # IAM 역할 및 정책
-│   └── secrets/            # Secrets Manager (환경변수 통합 관리)
+│   ├── s3/                 # S3 버킷 (자동 이름 생성) + CodePipeline Artifacts
+│   ├── iam/                # IAM 역할 및 정책 (EC2, CodeBuild, CodeDeploy, CodePipeline, Lambda)
+│   ├── secrets/            # Secrets Manager (RDS 비밀번호 자동 생성)
+│   ├── sns/                # SNS Topic (Slack 알림용)
+│   ├── lambda/             # Lambda Function (SNS → Slack 메시지 전송)
+│   ├── monitoring/         # CloudWatch Alarms (CPU, 메모리, 디스크)
+│   ├── codebuild/          # CodeBuild Project (Java 21, SSM 환경변수 자동 주입)
+│   ├── codedeploy/         # CodeDeploy (EC2 무중단 배포)
+│   └── codepipeline/       # CodePipeline (GitHub → Build → Deploy)
 └── environments/           # 환경별 설정 (실제 사용)
     ├── dev/                # DEV 환경
     │   ├── main.tf         # 모듈 조합
@@ -152,8 +189,10 @@ terraform/
 
 **주요 특징:**
 - ✅ 환경별 격리: DEV/PROD 완전 분리
-- ✅ 모듈 재사용: 9개 모듈로 구성
+- ✅ 모듈 재사용: 15개 모듈로 구성
 - ✅ 백엔드 분리: 각 환경별 S3 state 파일
+- ✅ CI/CD 자동화: CodePipeline으로 GitHub → Build → Deploy 자동화
+- ✅ 환경변수 관리: SSM Parameter Store로 중앙 관리
 
 ---
 
@@ -323,7 +362,63 @@ terraform output elasticache_host
 
 ## 3. PROD 환경 배포
 
-### 3.1 변수 파일 설정
+### 3.1 사전 준비 (AWS Console)
+
+**1. GitHub CodeStar Connection 생성**
+```bash
+# AWS Console → Developer Tools → CodePipeline → Settings → Connections
+# 1. "Create connection" 클릭
+# 2. Provider: GitHub 선택
+# 3. Connection name: coffee-shout-github
+# 4. GitHub 인증 완료 후 ARN 복사
+```
+
+**2. SSM Parameter Store 환경변수 등록**
+```bash
+# MySQL 설정
+aws ssm put-parameter --name "/coffee-shout/prod/mysql-url" \
+  --value "jdbc:mysql://RDS_ENDPOINT:3306/coffee_shout?characterEncoding=UTF-8&serverTimezone=Asia/Seoul" \
+  --type "SecureString" --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/mysql-username" \
+  --value "admin" \
+  --type "SecureString" --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/mysql-password" \
+  --value "YOUR_MYSQL_PASSWORD" \
+  --type "SecureString" --region ap-northeast-2
+
+# Redis 설정
+aws ssm put-parameter --name "/coffee-shout/prod/redis-host" \
+  --value "ELASTICACHE_ENDPOINT" \
+  --type "SecureString" --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/redis-port" \
+  --value "6379" \
+  --type "String" --region ap-northeast-2
+
+# S3 설정
+aws ssm put-parameter --name "/coffee-shout/prod/s3-bucket-name" \
+  --value "coffee-shout-prod-bucket" \
+  --type "String" --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/s3-qr-key-prefix" \
+  --value "qr/" \
+  --type "String" --region ap-northeast-2
+
+# Tempo 설정
+aws ssm put-parameter --name "/coffee-shout/prod/tempo-url" \
+  --value "http://TEMPO_ENDPOINT:4318/v1/traces" \
+  --type "String" --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/trace-sampling-probability" \
+  --value "0.1" \
+  --type "String" --region ap-northeast-2
+```
+
+**참고**: RDS/ElastiCache 엔드포인트는 Terraform apply 후 `terraform output`으로 확인 가능
+
+### 3.2 변수 파일 설정
 
 ```bash
 cd terraform/environments/prod
@@ -333,8 +428,11 @@ vim terraform.tfvars  # 실제 값으로 수정
 
 **필수 수정 항목:**
 - `certificate_arn`: ACM Certificate ARN (HTTPS용)
+- `github_connection_arn`: GitHub CodeStar Connection ARN
+- `github_repo`: "woowacourse-teams/2025-coffee-shout"
+- `github_branch`: 배포할 브랜치 (예: "main" 또는 "be/prod")
 
-### 3.2 Terraform 검증 및 실행
+### 3.3 Terraform 검증 및 실행
 
 ```bash
 # 1. 코드 포맷 확인 및 자동 수정
@@ -359,21 +457,63 @@ terraform apply
 - ✅ `terraform init`: Provider 플러그인 설치 완료
 - ✅ `terraform plan`: 생성될 리소스 확인 (오류 없음)
 
-### 3.3 배포 완료 후 확인
+### 3.4 배포 완료 후 확인
 
 ```bash
 # 출력값 확인
 terraform output
 
-# RDS 엔드포인트
+# RDS 엔드포인트 (SSM Parameter Store 업데이트 필요)
 terraform output rds_endpoint
 
-# ElastiCache 엔드포인트
+# ElastiCache 엔드포인트 (SSM Parameter Store 업데이트 필요)
 terraform output elasticache_endpoint
 
-# ALB DNS
+# ALB DNS (Route 53에 등록)
 terraform output alb_dns_name
+
+# CodePipeline 확인
+terraform output codepipeline_name
+terraform output codepipeline_url
 ```
+
+### 3.5 배포 후 SSM 파라미터 업데이트
+
+Terraform apply 후 RDS/ElastiCache 엔드포인트를 확인하여 SSM에 업데이트:
+
+```bash
+# RDS 엔드포인트 확인
+RDS_ENDPOINT=$(terraform output -raw rds_endpoint | cut -d: -f1)
+
+# ElastiCache 엔드포인트 확인
+REDIS_HOST=$(terraform output -raw elasticache_host)
+
+# SSM 파라미터 업데이트
+aws ssm put-parameter --name "/coffee-shout/prod/mysql-url" \
+  --value "jdbc:mysql://${RDS_ENDPOINT}:3306/coffee_shout?characterEncoding=UTF-8&serverTimezone=Asia/Seoul" \
+  --type "SecureString" --overwrite --region ap-northeast-2
+
+aws ssm put-parameter --name "/coffee-shout/prod/redis-host" \
+  --value "${REDIS_HOST}" \
+  --type "SecureString" --overwrite --region ap-northeast-2
+```
+
+### 3.6 CI/CD 파이프라인 실행
+
+GitHub에 코드를 푸시하면 자동으로 CodePipeline이 실행됩니다:
+
+```bash
+# GitHub 푸시 → CodePipeline 자동 실행
+git push origin main
+
+# AWS Console에서 파이프라인 진행 상황 확인:
+# Developer Tools → CodePipeline → coffee-shout-prod-pipeline
+```
+
+**파이프라인 단계:**
+1. **Source**: GitHub에서 코드 가져오기
+2. **Build**: CodeBuild로 Gradle 빌드 (Java 21, envsubst 환경변수 치환)
+3. **Deploy**: CodeDeploy로 EC2에 무중단 배포
 
 ---
 
@@ -468,11 +608,19 @@ docker compose up -d
 - ✅ RDS 백업: allocated_storage만큼 무료 (20GB)
 - ✅ CloudWatch Logs: 5GB 수집/저장 무료 (general 로그 제거로 프리티어 내 유지)
 - ✅ S3: 5GB 스토리지 + 20,000 GET/2,000 PUT
+- ✅ CodeBuild: 월 100분 무료 (build 시간만 과금)
+- ✅ CodeDeploy: EC2 배포 완전 무료
+- ✅ CodePipeline: 월 1개 파이프라인 무료
+- ✅ Lambda: 월 100만 요청 + 40만 GB-초 무료 (Slack 알림)
+- ✅ SNS: 월 1,000건 이메일 발행 무료
+- ✅ SSM Parameter Store: Standard 파라미터 무료
 - ⚠️ ElastiCache: 750시간/월 초과 시 ~$11/월
 
 **비용 발생 항목:**
 - ElastiCache: DEV + PROD 동시 사용 시 월 690시간 초과 (~$11/월)
 - Elastic IP: 인스턴스 중지 시 과금 ($3.6/월)
+- CodeBuild: 월 100분 초과 시 ($0.005/분)
+- CodePipeline: 2개 이상 파이프라인 사용 시 ($1/월)
 
 ### 6.2 일별/주별 절약 팁
 
