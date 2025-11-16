@@ -8,18 +8,24 @@ variable "environment" {
   type        = string
 }
 
-variable "cache_node_type" {
+variable "node_type" {
   description = "ElastiCache 노드 타입"
   type        = string
   default     = "cache.t3.micro"
 }
 
-variable "private_subnet_ids" {
-  description = "Private Subnet ID 목록 (ElastiCache 배치용)"
+variable "engine_version" {
+  description = "ElastiCache 엔진 버전 (Valkey)"
+  type        = string
+  default     = "8.0"
+}
+
+variable "subnet_ids" {
+  description = "Subnet ID 목록 (ElastiCache 배치용, Public 또는 Private)"
   type        = list(string)
 }
 
-variable "cache_security_group_id" {
+variable "security_group_id" {
   description = "ElastiCache Security Group ID"
   type        = string
 }

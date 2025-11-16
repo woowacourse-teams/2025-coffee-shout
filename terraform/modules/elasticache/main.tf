@@ -1,7 +1,10 @@
-# ElastiCache Subnet Group (Private Subnet에 배치)
+# ========================================
+# ElastiCache Subnet Group
+# ========================================
+
 resource "aws_elasticache_subnet_group" "main" {
   name       = "${var.project_name}-${var.environment}-cache-subnet-group"
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = var.subnet_ids
 
   tags = merge(
     var.common_tags,
@@ -11,10 +14,13 @@ resource "aws_elasticache_subnet_group" "main" {
   )
 }
 
-# ElastiCache Parameter Group (Valkey 설정)
+# ========================================
+# ElastiCache Parameter Group (Valkey)
+# ========================================
+
 resource "aws_elasticache_parameter_group" "main" {
-  name   = "${var.project_name}-${var.environment}-valkey8"
-  family = "valkey8"
+  name   = "${var.project_name}-${var.environment}-valkey${replace(var.engine_version, ".", "")}"
+  family = "valkey${split(".", var.engine_version)[0]}"
 
   # 메모리 정책 (maxmemory-policy)
   parameter {
@@ -31,24 +37,27 @@ resource "aws_elasticache_parameter_group" "main" {
   tags = merge(
     var.common_tags,
     {
-      Name = "${var.project_name}-${var.environment}-valkey7-params"
+      Name = "${var.project_name}-${var.environment}-valkey-params"
     }
   )
 }
 
+# ========================================
 # ElastiCache Cluster (Valkey)
+# ========================================
+
 resource "aws_elasticache_cluster" "main" {
   cluster_id           = "${var.project_name}-${var.environment}-valkey"
   engine               = "valkey"
-  engine_version       = "8.0"
-  node_type            = var.cache_node_type
+  engine_version       = var.engine_version
+  node_type            = var.node_type
   num_cache_nodes      = 1  # Single node (프리티어)
   parameter_group_name = aws_elasticache_parameter_group.main.name
   port                 = 6379
 
   # 네트워크 설정
   subnet_group_name  = aws_elasticache_subnet_group.main.name
-  security_group_ids = [var.cache_security_group_id]
+  security_group_ids = [var.security_group_id]
 
   # 유지보수 윈도우
   maintenance_window = "mon:04:00-mon:05:00"
