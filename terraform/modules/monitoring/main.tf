@@ -6,6 +6,7 @@
 # - RDS: 3개 (CPU, Storage, Connections)
 # - ALB: 1개 (UnhealthyHostCount)
 # - ElastiCache: 2개 (CPU, Memory)
+# 알람 발생 시 SNS → Lambda → Slack 알림
 # ========================================
 
 # ========================================
@@ -23,6 +24,10 @@ resource "aws_cloudwatch_metric_alarm" "ec2_status_check_instance" {
   statistic           = "Maximum"
   threshold           = var.ec2_status_check_threshold
   treat_missing_data  = "notBreaching"
+
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     InstanceId = var.ec2_instance_id
@@ -47,6 +52,10 @@ resource "aws_cloudwatch_metric_alarm" "ec2_status_check_system" {
   statistic           = "Maximum"
   threshold           = var.ec2_status_check_threshold
   treat_missing_data  = "notBreaching"
+
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     InstanceId = var.ec2_instance_id
@@ -76,6 +85,10 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   threshold           = var.rds_cpu_threshold
   treat_missing_data  = "notBreaching"
 
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
+
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
   }
@@ -100,6 +113,10 @@ resource "aws_cloudwatch_metric_alarm" "rds_storage_low" {
   threshold           = var.rds_storage_threshold
   treat_missing_data  = "notBreaching"
 
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
+
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
   }
@@ -123,6 +140,10 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_high" {
   statistic           = "Average"
   threshold           = var.rds_connections_threshold
   treat_missing_data  = "notBreaching"
+
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
@@ -151,6 +172,10 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_host" {
   statistic           = "Maximum"
   threshold           = var.alb_unhealthy_host_threshold
   treat_missing_data  = "notBreaching"
+
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     LoadBalancer = var.alb_arn_suffix
@@ -181,6 +206,10 @@ resource "aws_cloudwatch_metric_alarm" "elasticache_cpu_high" {
   threshold           = var.elasticache_cpu_threshold
   treat_missing_data  = "notBreaching"
 
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
+
   dimensions = {
     CacheClusterId = var.elasticache_cluster_id
   }
@@ -204,6 +233,10 @@ resource "aws_cloudwatch_metric_alarm" "elasticache_memory_high" {
   statistic           = "Average"
   threshold           = var.elasticache_memory_threshold
   treat_missing_data  = "notBreaching"
+
+  # SNS 알림
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     CacheClusterId = var.elasticache_cluster_id

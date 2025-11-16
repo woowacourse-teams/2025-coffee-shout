@@ -40,9 +40,13 @@ rds_backup_retention_period = 7
 elasticache_node_type      = "cache.t3.micro"
 elasticache_engine_version = "8.0"
 
-# Secrets Manager
+# SSM Parameter Store (Secrets Manager 대체, 무료)
 tempo_url                  = "http://43.202.22.216/tempo/v1/traces"
 trace_sampling_probability = "0.1"
+
+# Slack 알림 (Lambda → Slack)
+slack_bot_token = "xoxb-YOUR-SLACK-BOT-TOKEN-HERE" # TODO Slack Bot Token 입력 필수 (SSM에 SecureString으로 저장됨)
+slack_channel   = "#aws-알림"                        # Slack 채널명
 
 # CloudWatch Logs
 log_retention_days = 30

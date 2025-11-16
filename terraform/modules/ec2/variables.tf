@@ -34,8 +34,8 @@ variable "iam_instance_profile_name" {
   type        = string
 }
 
-variable "secrets_manager_name" {
-  description = "Secrets Manager Secret 이름"
+variable "parameter_path_prefix" {
+  description = "SSM Parameter Store 경로 프리픽스 (예: /coffeeshout/prod)"
   type        = string
 }
 

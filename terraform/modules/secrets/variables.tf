@@ -57,6 +57,19 @@ variable "mysql_password" {
   sensitive   = true
 }
 
+# Slack 알림 관련
+variable "slack_bot_token" {
+  description = "Slack Bot Token (Lambda 알림용)"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_channel" {
+  description = "Slack 채널 (예: #aws-알림)"
+  type        = string
+  default     = "#aws-알림"
+}
+
 variable "common_tags" {
   description = "모든 리소스에 적용될 공통 태그"
   type        = map(string)

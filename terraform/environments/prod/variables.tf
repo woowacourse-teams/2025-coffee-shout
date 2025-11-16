@@ -116,7 +116,7 @@ variable "elasticache_engine_version" {
   default     = "8.0"
 }
 
-# Secrets Manager
+# SSM Parameter Store (Secrets Manager 대체)
 variable "tempo_url" {
   description = "Tempo URL"
   type        = string
@@ -127,6 +127,19 @@ variable "trace_sampling_probability" {
   description = "Trace Sampling Probability"
   type        = string
   default     = "0.1"
+}
+
+# Slack 알림
+variable "slack_bot_token" {
+  description = "Slack Bot Token (Lambda 알림용)"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_channel" {
+  description = "Slack 채널 (알림 전송용, 예: #aws-알림)"
+  type        = string
+  default     = "#aws-알림"
 }
 
 # CloudWatch Logs

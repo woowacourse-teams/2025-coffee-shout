@@ -33,6 +33,11 @@ variable "elasticache_cluster_id" {
   type        = string
 }
 
+variable "sns_topic_arn" {
+  description = "SNS Topic ARN (알람 알림용)"
+  type        = string
+}
+
 variable "common_tags" {
   description = "공통 태그"
   type        = map(string)

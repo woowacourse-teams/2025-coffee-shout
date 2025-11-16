@@ -40,9 +40,9 @@ resource "aws_iam_instance_profile" "ec2" {
   )
 }
 
-# EC2 정책: Secrets Manager 읽기
-resource "aws_iam_role_policy" "ec2_secrets_manager" {
-  name = "secrets-manager-read"
+# EC2 정책: SSM Parameter Store 읽기 (Secrets Manager 대체, 무료)
+resource "aws_iam_role_policy" "ec2_ssm_parameters" {
+  name = "ssm-parameter-read"
   role = aws_iam_role.ec2_instance.id
 
   policy = jsonencode({
@@ -51,10 +51,18 @@ resource "aws_iam_role_policy" "ec2_secrets_manager" {
       {
         Effect = "Allow"
         Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
         ]
-        Resource = var.secrets_manager_arn
+        Resource = var.ssm_parameter_arns
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "*" # SSM SecureString은 기본 KMS 키 사용
       }
     ]
   })

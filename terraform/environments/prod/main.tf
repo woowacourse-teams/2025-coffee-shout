@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.5"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
   }
 }
 
@@ -100,7 +104,7 @@ module "elasticache" {
 }
 
 # ========================================
-# Secrets Manager
+# SSM Parameter Store (무료, Secrets Manager 대체)
 # ========================================
 
 module "secrets" {
@@ -109,12 +113,14 @@ module "secrets" {
   project_name               = var.project_name
   environment                = var.environment
   s3_bucket_name             = module.s3.bucket_name
-  redis_host                 = module.elasticache.endpoint
+  redis_host                 = module.elasticache.host
   tempo_url                  = var.tempo_url
   trace_sampling_probability = var.trace_sampling_probability
   mysql_url                  = "jdbc:mysql://${module.rds.endpoint}/${var.rds_database_name}"
   mysql_username             = var.rds_username
   mysql_password             = module.rds.password
+  slack_bot_token            = var.slack_bot_token
+  slack_channel              = var.slack_channel
   common_tags                = var.common_tags
 }
 
@@ -125,11 +131,11 @@ module "secrets" {
 module "iam" {
   source = "../../modules/iam"
 
-  project_name        = var.project_name
-  environment         = var.environment
-  secrets_manager_arn = module.secrets.secret_arn
-  s3_bucket_arn       = module.s3.bucket_arn
-  common_tags         = var.common_tags
+  project_name       = var.project_name
+  environment        = var.environment
+  ssm_parameter_arns = module.secrets.parameter_arns
+  s3_bucket_arn      = module.s3.bucket_arn
+  common_tags        = var.common_tags
 }
 
 # ========================================
@@ -146,7 +152,7 @@ module "ec2" {
   subnet_id                 = module.network.public_subnet_ids[0]
   security_group_id         = module.security_groups.ec2_security_group_id
   iam_instance_profile_name = module.iam.ec2_instance_profile_name
-  secrets_manager_name      = module.secrets.secret_name
+  parameter_path_prefix     = module.secrets.parameter_path_prefix
   root_volume_size          = var.root_volume_size
   assign_eip                = var.assign_eip
   common_tags               = var.common_tags
@@ -171,18 +177,45 @@ module "alb" {
 }
 
 # ========================================
+# SNS Topic (CloudWatch 알람용)
+# ========================================
+
+module "sns" {
+  source = "../../modules/sns"
+
+  project_name = var.project_name
+  environment  = var.environment
+  common_tags  = var.common_tags
+}
+
+# ========================================
+# Lambda (Slack 알림)
+# ========================================
+
+module "lambda" {
+  source = "../../modules/lambda"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  sns_topic_arn      = module.sns.topic_arn
+  ssm_parameter_arns = module.secrets.parameter_arns
+  common_tags        = var.common_tags
+}
+
+# ========================================
 # CloudWatch 모니터링 (무료 티어 - 알람 8개)
 # ========================================
 
 module "monitoring" {
   source = "../../modules/monitoring"
 
-  project_name                    = var.project_name
-  environment                     = var.environment
-  ec2_instance_id                 = module.ec2.instance_id
-  rds_instance_id                 = module.rds.instance_id
-  alb_arn_suffix                  = module.alb.alb_arn_suffix
-  alb_target_group_arn_suffix     = module.alb.target_group_arn_suffix
-  elasticache_cluster_id          = module.elasticache.cluster_id
-  common_tags                     = var.common_tags
+  project_name                = var.project_name
+  environment                 = var.environment
+  ec2_instance_id             = module.ec2.instance_id
+  rds_instance_id             = module.rds.instance_id
+  alb_arn_suffix              = module.alb.alb_arn_suffix
+  alb_target_group_arn_suffix = module.alb.target_group_arn_suffix
+  elasticache_cluster_id      = module.elasticache.cluster_id
+  sns_topic_arn               = module.sns.topic_arn
+  common_tags                 = var.common_tags
 }

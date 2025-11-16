@@ -13,9 +13,9 @@ variable "s3_bucket_arn" {
   type        = string
 }
 
-variable "secrets_manager_arn" {
-  description = "Secrets Manager ARN (환경별 시크릿)"
-  type        = string
+variable "ssm_parameter_arns" {
+  description = "SSM Parameter Store ARN 목록 (환경별 파라미터)"
+  type        = list(string)
 }
 
 variable "common_tags" {
