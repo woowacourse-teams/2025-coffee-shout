@@ -88,7 +88,7 @@ variable "rds_allocated_storage" {
 variable "rds_database_name" {
   description = "RDS 데이터베이스명"
   type        = string
-  default     = "coffeeshout_prod"
+  default     = "coffeeshout"
 }
 
 variable "rds_username" {
