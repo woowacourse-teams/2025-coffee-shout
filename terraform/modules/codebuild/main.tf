@@ -33,6 +33,11 @@ resource "aws_codebuild_project" "main" {
       name  = "S3_BUCKET"
       value = var.s3_bucket_name
     }
+
+    environment_variable {
+      name  = "SNS_TOPIC_ARN"
+      value = var.sns_topic_arn
+    }
   }
 
   logs_config {
@@ -44,7 +49,7 @@ resource "aws_codebuild_project" "main" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "buildspec.yml"
+    buildspec = "backend/buildspec-${var.environment}.yml"
   }
 
   tags = merge(

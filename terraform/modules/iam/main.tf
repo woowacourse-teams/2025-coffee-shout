@@ -237,3 +237,22 @@ resource "aws_iam_role_policy" "codebuild_logs" {
     ]
   })
 }
+
+# CodeBuild 정책: SNS Publish (빌드 실패 알림)
+resource "aws_iam_role_policy" "codebuild_sns" {
+  name = "sns-publish"
+  role = aws_iam_role.codebuild.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}

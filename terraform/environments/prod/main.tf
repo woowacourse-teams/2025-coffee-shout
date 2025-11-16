@@ -232,6 +232,7 @@ module "codebuild" {
   environment        = var.environment
   codebuild_role_arn = module.iam.codebuild_role_arn
   s3_bucket_name     = module.s3.bucket_name
+  sns_topic_arn      = module.sns.topic_arn
   github_repo        = var.github_repo
   github_branch      = var.github_branch
   common_tags        = var.common_tags
