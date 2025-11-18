@@ -79,17 +79,17 @@ output "elasticache_port" {
 }
 
 # ========================================
-# Secrets Manager Outputs
+# SSM Parameter Store Outputs
 # ========================================
 
-output "secrets_manager_name" {
-  description = "Secrets Manager Secret 이름"
-  value       = module.secrets.secret_name
+output "parameter_path_prefix" {
+  description = "SSM Parameter Store 경로 프리픽스"
+  value       = module.secrets.parameter_path_prefix
 }
 
-output "secrets_manager_arn" {
-  description = "Secrets Manager Secret ARN"
-  value       = module.secrets.secret_arn
+output "parameter_arns" {
+  description = "모든 SSM 파라미터 ARN 목록"
+  value       = module.secrets.parameter_arns
 }
 
 # ========================================

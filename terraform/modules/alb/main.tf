@@ -28,6 +28,9 @@ resource "aws_lb" "main" {
   # Connection Draining
   idle_timeout = 310
 
+  # XSS 공격 방지
+  drop_invalid_header_fields = true
+
   tags = merge(
     var.common_tags,
     {

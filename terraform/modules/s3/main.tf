@@ -103,6 +103,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
     id     = "abort-incomplete-multipart-upload"
     status = "Enabled"
 
+    filter {} # 모든 객체에 적용
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }

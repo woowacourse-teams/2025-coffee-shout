@@ -96,6 +96,7 @@ module "secrets" {
   mysql_username             = var.mysql_username
   mysql_password             = var.mysql_password
   common_tags                = var.common_tags
+  slack_bot_token = var.slack_bot_token
 }
 
 # ========================================
@@ -105,11 +106,16 @@ module "secrets" {
 module "iam" {
   source = "../../modules/iam"
 
-  project_name        = var.project_name
-  environment         = var.environment
-  secrets_manager_arn = module.secrets.secret_arn
-  s3_bucket_arn       = module.s3.bucket_arn
-  common_tags         = var.common_tags
+  project_name = var.project_name
+  environment  = var.environment
+  # SSM Parameter Store ARNs (환경별 설정)
+  ssm_parameter_arns = [
+    "arn:aws:ssm:${var.aws_region}:*:parameter/${var.project_name}/${var.environment}/*"
+  ]
+  # SNS Topic ARN (빌드 실패 알림용)
+  sns_topic_arn = "arn:aws:sns:${var.aws_region}:*:${var.project_name}-${var.environment}-alerts"
+  s3_bucket_arn = module.s3.bucket_arn
+  common_tags   = var.common_tags
 }
 
 # ========================================
@@ -126,7 +132,7 @@ module "ec2" {
   subnet_id                 = module.network.public_subnet_ids[0]
   security_group_id         = module.security_groups.ec2_security_group_id
   iam_instance_profile_name = module.iam.ec2_instance_profile_name
-  secrets_manager_name      = module.secrets.secret_name
+  parameter_path_prefix     = "/${var.project_name}/${var.environment}"
   root_volume_size          = var.root_volume_size
   assign_eip                = false # DEV는 EIP 미사용
   common_tags               = var.common_tags

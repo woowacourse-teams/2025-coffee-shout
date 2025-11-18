@@ -141,3 +141,9 @@ variable "common_tags" {
     ManagedBy   = "Terraform"
   }
 }
+
+variable "slack_bot_token" {
+  description = "슬랙 봇 토큰"
+  type        = string
+  sensitive   = true
+}

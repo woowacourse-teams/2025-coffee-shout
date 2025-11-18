@@ -37,7 +37,7 @@ mysql_host     = "localhost"
 mysql_port     = "3306"
 mysql_database = "coffeeshout_dev"
 mysql_username = "coffeeshout"
-mysql_password = "your-secure-password-here" # 실제 비밀번호로 변경
+mysql_password = "your-secure-password-here" # TODO 실제 비밀번호로 변경
 
 # ElastiCache (DEV)
 elasticache_node_type      = "cache.t3.micro"
@@ -52,3 +52,6 @@ common_tags = {
   Environment = "dev"
   ManagedBy   = "Terraform"
 }
+
+
+slack_bot_token = "실제 슬랙 봇 토큰 입력" # TODO Slack Bot Token 입력 필수
