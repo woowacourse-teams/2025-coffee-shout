@@ -24,6 +24,7 @@ spring:
     redis:
       ssl:
         enabled: false
+      port: 6379
   autoconfigure:
     exclude:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
