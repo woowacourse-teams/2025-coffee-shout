@@ -83,7 +83,8 @@ resource "aws_instance" "backend" {
 
   # User Data
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-    environment = var.environment
+    environment            = var.environment
+    parameter_path_prefix  = var.parameter_path_prefix
   }))
 
   # EBS 볼륨

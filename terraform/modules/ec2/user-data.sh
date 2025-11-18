@@ -42,32 +42,36 @@ chmod +x ./install
 systemctl start codedeploy-agent
 systemctl enable codedeploy-agent
 
-# AWS CLI 설치 (Secrets Manager 접근용)
+# AWS CLI 설치 (SSM Parameter Store 접근용)
 apt-get install -y awscli jq
 
-# Secrets Manager에서 환경 변수 가져오는 헬퍼 스크립트 생성
+# SSM Parameter Store에서 환경 변수 가져오는 헬퍼 스크립트 생성
 cat > /usr/local/bin/load-secrets.sh <<'SCRIPT'
 #!/bin/bash
-# Secrets Manager에서 환경 변수를 가져와 파일로 저장
-SECRET_NAME="${secret_name}"
+# SSM Parameter Store에서 환경 변수를 가져와 파일로 저장
+PARAMETER_PATH="${parameter_path_prefix}"
 REGION="ap-northeast-2"
 
-# Secrets Manager에서 JSON 가져오기
-aws secretsmanager get-secret-value \
-  --secret-id "$SECRET_NAME" \
-  --region "$REGION" \
-  --query SecretString \
-  --output text > /tmp/secrets.json
-
-# JSON을 환경 변수 형식으로 변환하여 저장
+# SSM Parameter Store에서 모든 파라미터 가져오기
 mkdir -p /etc/environment.d
-cat /tmp/secrets.json | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > /etc/environment.d/app-secrets.conf
+
+# 각 파라미터를 환경 변수 형식으로 저장
+aws ssm get-parameters-by-path \
+  --path "$PARAMETER_PATH" \
+  --with-decryption \
+  --region "$REGION" \
+  --query 'Parameters[*].[Name,Value]' \
+  --output text | while read -r name value; do
+    # 파라미터 경로에서 마지막 부분만 추출 (예: /app/dev/DB_HOST -> DB_HOST)
+    param_name=$(basename "$name" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+    echo "$param_name=$value" >> /etc/environment.d/app-secrets.conf
+done
 
 # 환경 변수 파일을 /opt/coffee-shout/.env에도 복사 (애플리케이션용)
+mkdir -p /opt/coffee-shout
 cp /etc/environment.d/app-secrets.conf /opt/coffee-shout/.env
 
-rm /tmp/secrets.json
-echo "Secrets loaded successfully!"
+echo "Parameters loaded successfully from SSM Parameter Store!"
 SCRIPT
 
 chmod +x /usr/local/bin/load-secrets.sh
@@ -76,10 +80,10 @@ chmod +x /usr/local/bin/load-secrets.sh
 mkdir -p /opt/coffee-shout/app /opt/coffee-shout/scripts /opt/coffee-shout/logs
 chown -R ubuntu:ubuntu /opt/coffee-shout
 
-# 부팅 시 자동으로 Secrets 로드하도록 systemd 서비스 생성
+# 부팅 시 자동으로 Parameters 로드하도록 systemd 서비스 생성
 cat > /etc/systemd/system/load-secrets.service <<'SERVICE'
 [Unit]
-Description=Load secrets from AWS Secrets Manager
+Description=Load parameters from AWS SSM Parameter Store
 After=network.target
 
 [Service]

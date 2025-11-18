@@ -43,15 +43,19 @@ resource "aws_elasticache_parameter_group" "main" {
 }
 
 # ========================================
-# ElastiCache Cluster (Valkey)
+# ElastiCache Replication Group (Valkey)
 # ========================================
+# Valkey는 CreateCacheCluster API를 지원하지 않으므로
+# Replication Group을 사용해야 합니다
 
-resource "aws_elasticache_cluster" "main" {
-  cluster_id           = "${var.project_name}-${var.environment}-valkey"
+resource "aws_elasticache_replication_group" "main" {
+  replication_group_id = "${var.project_name}-${var.environment}-valkey"
+  description          = "Valkey cluster for ${var.project_name}-${var.environment}"
+
   engine               = "valkey"
   engine_version       = var.engine_version
   node_type            = var.node_type
-  num_cache_nodes      = 1 # Single node (프리티어)
+  num_cache_clusters   = 1 # Single node (비용 절감)
   parameter_group_name = aws_elasticache_parameter_group.main.name
   port                 = 6379
 
@@ -64,6 +68,9 @@ resource "aws_elasticache_cluster" "main" {
 
   # 자동 마이너 버전 업그레이드
   auto_minor_version_upgrade = true
+
+  # 자동 장애 조치 (단일 노드에서는 비활성화)
+  automatic_failover_enabled = false
 
   tags = merge(
     var.common_tags,

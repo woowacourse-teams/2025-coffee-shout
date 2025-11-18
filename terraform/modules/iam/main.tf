@@ -137,10 +137,10 @@ resource "aws_iam_role" "codedeploy" {
   )
 }
 
-# CodeDeploy 기본 정책 (EC2 제어)
+# CodeDeploy 기본 정책 (EC2/On-Premises 제어)
 resource "aws_iam_role_policy_attachment" "codedeploy_service" {
   role       = aws_iam_role.codedeploy.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
 }
 
 # CodeDeploy 정책: S3 빌드 캐싱
