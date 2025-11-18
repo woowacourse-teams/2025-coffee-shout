@@ -17,3 +17,8 @@ output "public_dns" {
   description = "Public DNS name"
   value       = aws_instance.this.public_dns
 }
+
+output "availability_zone" {
+  description = "Availability zone"
+  value       = aws_instance.this.availability_zone
+}
