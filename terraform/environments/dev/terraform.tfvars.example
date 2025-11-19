@@ -1,0 +1,57 @@
+# ========================================
+# DEV 환경 변수 예시
+# ========================================
+# 이 파일을 복사하여 terraform.tfvars로 이름을 변경하고
+# 실제 값으로 수정하세요.
+#
+# cp terraform.tfvars.example terraform.tfvars
+# ========================================
+
+# AWS 리전
+aws_region = "ap-northeast-2"
+
+# 프로젝트 정보
+project_name = "coffeeshout"
+environment  = "dev"
+
+# Network
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
+availability_zones   = ["ap-northeast-2a", "ap-northeast-2c"]
+
+# EC2
+instance_type    = "t4g.small"
+root_volume_size = 15
+
+# ALB
+enable_https    = false
+certificate_arn = "" # HTTPS 사용 시 ACM Certificate ARN 입력
+
+# Secrets Manager
+tempo_url                   = "http://43.202.22.216/tempo/v1/traces"
+trace_sampling_probability  = "0.1"
+
+# Docker MySQL (DEV 전용)
+mysql_host     = "localhost"
+mysql_port     = "3306"
+mysql_database = "coffeeshout_dev"
+mysql_username = "coffeeshout"
+mysql_password = "your-secure-password-here" # TODO 실제 비밀번호로 변경
+
+# ElastiCache (DEV)
+elasticache_node_type      = "cache.t3.micro"
+elasticache_engine_version = "8.0"
+
+# CloudWatch Logs
+log_retention_days = 7
+
+# Common Tags
+common_tags = {
+  Project     = "CoffeeShout"
+  Environment = "dev"
+  ManagedBy   = "Terraform"
+}
+
+
+slack_bot_token = "실제 슬랙 봇 토큰 입력" # TODO Slack Bot Token 입력 필수

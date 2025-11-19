@@ -1,0 +1,64 @@
+# ========================================
+# PROD 환경 변수 예시
+# ========================================
+# 이 파일을 복사하여 terraform.tfvars로 이름을 변경하고
+# 실제 값으로 수정하세요.
+#
+# cp terraform.tfvars.example terraform.tfvars
+# ========================================
+
+# AWS 리전
+aws_region = "ap-northeast-2"
+
+# 프로젝트 정보
+project_name = "coffeeshout"
+environment  = "prod"
+
+# Network
+vpc_cidr             = "10.1.0.0/16"
+public_subnet_cidrs  = ["10.1.1.0/24", "10.1.2.0/24"]
+private_subnet_cidrs = ["10.1.10.0/24", "10.1.11.0/24"]
+availability_zones   = ["ap-northeast-2a", "ap-northeast-2c"]
+
+# EC2
+instance_type    = "t4g.small"
+root_volume_size = 15
+assign_eip       = true # PROD는 Elastic IP 사용
+
+# ALB
+enable_https    = true
+certificate_arn = "arn:aws:acm:ap-northeast-2:ACCOUNT_ID:certificate/CERTIFICATE_ID" # TODO ACM Certificate ARN 입력 필수
+
+# RDS
+rds_instance_class          = "db.t3.micro"
+rds_allocated_storage       = 20
+rds_database_name           = "coffeeshout_prod"
+rds_username                = "admin"
+rds_backup_retention_period = 7
+
+# ElastiCache
+elasticache_node_type      = "cache.t3.micro"
+elasticache_engine_version = "8.0"
+
+# SSM Parameter Store (Secrets Manager 대체, 무료)
+tempo_url                  = "http://43.202.22.216/tempo/v1/traces"
+trace_sampling_probability = "0.1"
+
+# Slack 알림 (Lambda → Slack)
+slack_bot_token = "xoxb-YOUR-SLACK-BOT-TOKEN-HERE" # TODO Slack Bot Token 입력 필수 (SSM에 SecureString으로 저장됨)
+slack_channel   = "#aws-알림"                        # Slack 채널명
+
+# CI/CD Pipeline (무료 티어)
+github_connection_arn = "arn:aws:codestar-connections:ap-northeast-2:ACCOUNT_ID:connection/CONNECTION_ID" # TODO GitHub Connection ARN 입력 필수
+github_repo           = "woowacourse-teams/2025-coffee-shout"
+github_branch         = "main"
+
+# CloudWatch Logs
+log_retention_days = 30
+
+# Common Tags
+common_tags = {
+  Project     = "CoffeeShout"
+  Environment = "prod"
+  ManagedBy   = "Terraform"
+}
