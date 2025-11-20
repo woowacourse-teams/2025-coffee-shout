@@ -135,7 +135,13 @@ const EntryMenuPage = () => {
       </Layout.Content>
       {shouldShowButtonBar && (
         <Layout.ButtonBar>
-          <Button onClick={handleProceedToRoom} isLoading={isLoading}>
+          <Button
+            onClick={handleProceedToRoom}
+            isLoading={isLoading}
+            data-testid={
+              playerType === 'HOST' ? 'create-room-submit-button' : 'join-room-submit-button'
+            }
+          >
             {playerType === 'HOST' ? '방 만들러 가기' : '방 참가하기'}
           </Button>
         </Layout.ButtonBar>
