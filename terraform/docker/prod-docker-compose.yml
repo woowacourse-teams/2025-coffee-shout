@@ -1,0 +1,159 @@
+version: '3.8'
+
+# PROD 환경용 Docker Compose
+# EC2 Instance: t4g.small (2 vCPU, 2GB RAM)
+# Services: MySQL 8.0 + Valkey (Redis)
+
+services:
+  mysql:
+    image: mysql:8.0.43
+    container_name: coffeeshout-mysql-prod
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-coffee_shout}
+      MYSQL_USER: ${MYSQL_USER:-coffeeshout}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+    command:
+      # Character set
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+09:00
+      # Performance tuning for t4g.small (2GB RAM)
+      - --max-connections=150
+      - --innodb-buffer-pool-size=512M
+      - --innodb-log-file-size=128M
+      - --innodb-flush-log-at-trx-commit=1
+      - --innodb-flush-method=O_DIRECT
+      - --innodb-file-per-table=1
+      # Query cache (disabled in MySQL 8.0+, but for documentation)
+      - --table-open-cache=2000
+      - --sort-buffer-size=2M
+      - --read-buffer-size=1M
+      - --read-rnd-buffer-size=2M
+      # Logging (error + slow query only)
+      - --log-error=/var/log/mysql/error.log
+      - --slow-query-log=1
+      - --slow-query-log-file=/var/log/mysql/slow.log
+      - --long-query-time=1
+      # Binary log for backup/recovery
+      - --log-bin=/var/log/mysql/mysql-bin.log
+      - --binlog-expire-logs-seconds=604800
+      - --max-binlog-size=100M
+      # Security
+      - --local-infile=0
+      - --skip-symbolic-links
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - mysql-logs:/var/log/mysql
+      - mysql-backup:/backup
+    networks:
+      - coffeeshout-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  valkey:
+    image: valkey/valkey:8.0
+    container_name: coffeeshout-valkey-prod
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Seoul
+    command:
+      - valkey-server
+      # Persistence
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - "everysec"
+      - --save
+      - "900 1"
+      - --save
+      - "300 10"
+      - --save
+      - "60 10000"
+      # Memory management
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+      # Security
+      - --rename-command
+      - "FLUSHALL"
+      - ""
+      - --rename-command
+      - "FLUSHDB"
+      - ""
+      - --rename-command
+      - "CONFIG"
+      - ""
+      - --rename-command
+      - "SHUTDOWN"
+      - ""
+      # Performance
+      - --tcp-backlog
+      - "511"
+      - --timeout
+      - "300"
+      - --tcp-keepalive
+      - "60"
+    volumes:
+      - valkey-data:/data
+      - valkey-backup:/backup
+    networks:
+      - coffeeshout-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql-data:
+    driver: local
+  mysql-logs:
+    driver: local
+  mysql-backup:
+    driver: local
+  valkey-data:
+    driver: local
+  valkey-backup:
+    driver: local
+
+networks:
+  coffeeshout-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

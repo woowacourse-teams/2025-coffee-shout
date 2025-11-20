@@ -1,6 +1,81 @@
 # Terraform 환경별 설정 가이드
 
-## 최근 변경사항 (2025-11-16)
+## 🔥 최신 변경사항 (2025-11-20) - Phase 7: 인프라 재설계
+
+### ⚠️ 중요: 아키텍처 대대적 변경
+
+AWS 프리티어 정책 변경 및 비용 최적화를 위해 인프라를 **완전히 재설계**했습니다.
+
+### 🎯 Phase 7 변경사항: Docker 기반 인프라로 전환
+
+#### ❌ 제거된 AWS 관리형 서비스
+- **RDS** → Docker MySQL로 대체
+- **ElastiCache** → Docker Valkey로 대체
+- **CodeBuild + CodeDeploy + CodePipeline** → GitHub Actions로 대체
+
+#### ✨ 새로운 아키텍처
+
+```
+3개 EC2 서버 구성:
+
+1️⃣ DEV 서버 (t4g.small)
+   - WAS (Spring Boot)
+   - Docker MySQL 8.0
+   - Docker Valkey 8.0
+
+2️⃣ PROD 서버 (t4g.small)
+   - WAS (Spring Boot)
+   - Docker MySQL 8.0
+   - Docker Valkey 8.0
+
+3️⃣ Monitoring 서버 (t4g.small)
+   - Grafana
+   - Prometheus
+   - Tempo
+```
+
+#### 💰 비용 효과
+
+**현재 (Phase 6):**
+- ElastiCache 2대: ~$11/월
+- 기타: $0 (프리티어)
+- **총: ~$11/월**
+
+**새 아키텍처 (Phase 7):**
+- EC2 3대: $0 (2025년 12월까지 t4g 무료)
+- Docker 서비스: $0
+- **총: $0/월** ✨
+
+**2026년 1월 이후:**
+- EC2 3대: ~$21/월
+- **절감: 관리형 서비스 비용 제거, 완전한 제어**
+
+#### 📦 새로 추가된 파일
+
+- `.github/workflows/deploy-dev.yml` - DEV 배포 워크플로우
+- `.github/workflows/deploy-prod.yml` - PROD 배포 워크플로우
+- `terraform/docker/dev-docker-compose.yml` - DEV 환경 Docker Compose
+- `terraform/docker/prod-docker-compose.yml` - PROD 환경 Docker Compose
+- `terraform/docker/monitoring-docker-compose.yml` - 모니터링 스택
+- `scripts/deploy.sh` - 배포 스크립트
+- `scripts/backup.sh` - 백업 스크립트
+- `scripts/healthcheck.sh` - 헬스체크 스크립트
+
+#### 📖 마이그레이션 가이드
+
+상세한 마이그레이션 가이드는 아래 문서를 참고하세요:
+- [Docker Compose 가이드](../docker/README.md)
+- [배포 스크립트 가이드](../../scripts/README.md)
+
+#### ⚠️ 주의사항
+
+- **데이터 마이그레이션 필수**: RDS → Docker MySQL 데이터 이관 필요
+- **백업 전략 변경**: 자동 백업 → 수동 백업 스크립트 (`scripts/backup.sh`)
+- **모니터링 변경**: CloudWatch RDS Insights → Prometheus + Grafana
+
+---
+
+## 이전 변경사항 (2025-11-16)
 
 ### ✨ Phase 6 완료: 인프라 보안 및 비용 최적화
 - ✅ **IAM 권한 최소화**: CodeBuild SNS Publish 권한을 특정 Topic ARN으로 제한

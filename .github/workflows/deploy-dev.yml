@@ -1,0 +1,150 @@
+name: Deploy to DEV
+
+on:
+  push:
+    branches:
+      - be/dev
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-dev.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-2
+  DEPLOY_PATH: /opt/coffee-shout
+  JAR_NAME: coffee-shout-backend.jar
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Java 21 설정
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: gradle
+
+      # 3. Gradle 권한 설정
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 4. 테스트 실행
+      - name: Run Tests
+        run: ./gradlew test
+
+      # 5. 빌드 (테스트 제외)
+        run: ./gradlew build -x test
+
+      # 6. JAR 파일 이름 변경
+      - name: Rename JAR file
+        run: |
+          cd build/libs
+          mv *.jar ${{ env.JAR_NAME }}
+
+      # 7. SSH 키 설정
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # 8. 서버에 배포 디렉토리 생성
+      - name: Create deploy directory
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            "mkdir -p ${{ env.DEPLOY_PATH }}/backup"
+
+      # 9. 기존 JAR 백업
+      - name: Backup existing JAR
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            "if [ -f ${{ env.DEPLOY_PATH }}/${{ env.JAR_NAME }} ]; then \
+              cp ${{ env.DEPLOY_PATH }}/${{ env.JAR_NAME }} \
+              ${{ env.DEPLOY_PATH }}/backup/${{ env.JAR_NAME }}.$(date +%Y%m%d_%H%M%S); \
+            fi"
+
+      # 10. JAR 파일 전송
+      - name: Copy JAR to server
+        run: |
+          scp build/libs/${{ env.JAR_NAME }} \
+            ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }}:${{ env.DEPLOY_PATH }}/
+
+      # 11. 애플리케이션 중지
+      - name: Stop application
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            "if pgrep -f ${{ env.JAR_NAME }} > /dev/null; then \
+              echo 'Stopping existing application...'; \
+              pkill -f ${{ env.JAR_NAME }} || true; \
+              sleep 5; \
+            fi"
+
+      # 12. 애플리케이션 시작
+      - name: Start application
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            "cd ${{ env.DEPLOY_PATH }} && \
+            nohup java -jar \
+              -Dspring.profiles.active=dev \
+              -Xms512m -Xmx1024m \
+              ${{ env.JAR_NAME }} \
+              > logs/application.log 2>&1 &"
+
+      # 13. 헬스체크
+      - name: Health check
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            'for i in {1..30}; do \
+              if curl -f http://localhost:8080/actuator/health > /dev/null 2>&1; then \
+                echo "Application is healthy!"; \
+                exit 0; \
+              fi; \
+              echo "Waiting for application to start... ($i/30)"; \
+              sleep 5; \
+            done; \
+            echo "Health check failed!"; \
+            exit 1'
+
+      # 14. 배포 성공 알림 (Slack - optional)
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ DEV 배포 성공!"
+          echo "브랜치: ${{ github.ref_name }}"
+          echo "커밋: ${{ github.sha }}"
+
+      # 15. 배포 실패 시 롤백
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} \
+            "LATEST_BACKUP=\$(ls -t ${{ env.DEPLOY_PATH }}/backup/*.jar 2>/dev/null | head -1); \
+            if [ -n \"\$LATEST_BACKUP\" ]; then \
+              echo 'Rolling back to previous version...'; \
+              pkill -f ${{ env.JAR_NAME }} || true; \
+              cp \$LATEST_BACKUP ${{ env.DEPLOY_PATH }}/${{ env.JAR_NAME }}; \
+              cd ${{ env.DEPLOY_PATH }} && \
+              nohup java -jar -Dspring.profiles.active=dev ${{ env.JAR_NAME }} > logs/application.log 2>&1 &; \
+              echo 'Rollback completed'; \
+            else \
+              echo 'No backup found, rollback skipped'; \
+            fi"
+
+      # 16. 배포 실패 알림
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ DEV 배포 실패!"
+          echo "브랜치: ${{ github.ref_name }}"
+          echo "커밋: ${{ github.sha }}"

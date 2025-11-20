@@ -1,0 +1,172 @@
+version: '3.8'
+
+# Monitoring 환경용 Docker Compose
+# EC2 Instance: t4g.small (2 vCPU, 2GB RAM)
+# Services: Grafana + Prometheus + Tempo
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: coffeeshout-grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Admin credentials
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      # Server settings
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-localhost}
+      # Database (use SQLite for simplicity)
+      GF_DATABASE_TYPE: sqlite3
+      # Auth
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      # Logging
+      GF_LOG_LEVEL: info
+      # Timezone
+      TZ: Asia/Seoul
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-logs:/var/log/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - monitoring-network
+    depends_on:
+      - prometheus
+      - tempo
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: coffeeshout-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts:/etc/prometheus/alerts:ro
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: coffeeshout-tempo
+    restart: always
+    ports:
+      - "3200:3200"   # Tempo HTTP
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "9411:9411"   # Zipkin
+      - "14268:14268" # Jaeger
+    command:
+      - "-config.file=/etc/tempo/tempo.yml"
+    volumes:
+      - tempo-data:/tmp/tempo
+      - ./tempo/tempo.yml:/etc/tempo/tempo.yml:ro
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3200/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: coffeeshout-node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - monitoring-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+volumes:
+  grafana-data:
+    driver: local
+  grafana-logs:
+    driver: local
+  prometheus-data:
+    driver: local
+  tempo-data:
+    driver: local
+
+networks:
+  monitoring-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

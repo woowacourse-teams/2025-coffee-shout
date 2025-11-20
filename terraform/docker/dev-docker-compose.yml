@@ -1,0 +1,113 @@
+version: '3.8'
+
+# DEV 환경용 Docker Compose
+# EC2 Instance: t4g.small (2 vCPU, 2GB RAM)
+# Services: MySQL 8.0 + Valkey (Redis)
+
+services:
+  mysql:
+    image: mysql:8.0.43
+    container_name: coffeeshout-mysql-dev
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dev_root_password_2025}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-coffee_shout_dev}
+      MYSQL_USER: ${MYSQL_USER:-coffeeshout}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev_password_2025}
+      TZ: Asia/Seoul
+    command:
+      # Character set
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+09:00
+      # Performance tuning for t4g.small (2GB RAM)
+      - --max-connections=100
+      - --innodb-buffer-pool-size=256M
+      - --innodb-log-file-size=64M
+      - --innodb-flush-log-at-trx-commit=2
+      - --innodb-flush-method=O_DIRECT
+      # Logging (error only for cost saving)
+      - --log-error=/var/log/mysql/error.log
+      - --slow-query-log=1
+      - --slow-query-log-file=/var/log/mysql/slow.log
+      - --long-query-time=2
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - mysql-logs:/var/log/mysql
+    networks:
+      - coffeeshout-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-dev_root_password_2025}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  valkey:
+    image: valkey/valkey:8.0
+    container_name: coffeeshout-valkey-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Seoul
+    command:
+      - valkey-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - "everysec"
+      # Memory management
+      - --maxmemory
+      - "128mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+      # Disable dangerous commands
+      - --rename-command
+      - "FLUSHALL"
+      - ""
+      - --rename-command
+      - "FLUSHDB"
+      - ""
+      - --rename-command
+      - "CONFIG"
+      - ""
+    volumes:
+      - valkey-data:/data
+    networks:
+      - coffeeshout-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+volumes:
+  mysql-data:
+    driver: local
+  mysql-logs:
+    driver: local
+  valkey-data:
+    driver: local
+
+networks:
+  coffeeshout-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

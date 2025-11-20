@@ -1,0 +1,81 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'coffee-shout'
+    environment: 'production'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "/etc/prometheus/alerts/*.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Node Exporter (모니터링 서버)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance: 'monitoring-server'
+          service: 'node-exporter'
+
+  # DEV Server - Spring Boot Actuator
+  - job_name: 'coffee-shout-dev'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['DEV_SERVER_IP:8080']
+        labels:
+          environment: 'dev'
+          service: 'coffee-shout-api'
+
+  # PROD Server - Spring Boot Actuator
+  - job_name: 'coffee-shout-prod'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['PROD_SERVER_IP:8080']
+        labels:
+          environment: 'prod'
+          service: 'coffee-shout-api'
+
+  # DEV Server - Node Exporter (별도 설치 필요)
+  - job_name: 'dev-node-exporter'
+    static_configs:
+      - targets: ['DEV_SERVER_IP:9100']
+        labels:
+          environment: 'dev'
+          instance: 'dev-server'
+
+  # PROD Server - Node Exporter (별도 설치 필요)
+  - job_name: 'prod-node-exporter'
+    static_configs:
+      - targets: ['PROD_SERVER_IP:9100']
+        labels:
+          environment: 'prod'
+          instance: 'prod-server'
+
+  # MySQL Exporter (optional, 별도 설치 필요)
+  # - job_name: 'mysql-exporter-dev'
+  #   static_configs:
+  #     - targets: ['DEV_SERVER_IP:9104']
+  #       labels:
+  #         environment: 'dev'
+  #         service: 'mysql'
+
+  # - job_name: 'mysql-exporter-prod'
+  #   static_configs:
+  #     - targets: ['PROD_SERVER_IP:9104']
+  #       labels:
+  #         environment: 'prod'
+  #         service: 'mysql'

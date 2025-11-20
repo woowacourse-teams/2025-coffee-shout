@@ -1,0 +1,34 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s
+      httpMethod: POST
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: Prometheus
+
+  # Prometheus와 Tempo 연결 (Exemplars)
+  - name: Prometheus-Tempo
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    editable: true
+    jsonData:
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: Tempo
