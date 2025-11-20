@@ -1,1 +1,2 @@
 spring.application.name=coffee-shout
+spring.jpa.open-in-view=false
