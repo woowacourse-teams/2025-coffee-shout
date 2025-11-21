@@ -55,4 +55,6 @@ const RacingRanks = () => {
   );
 };
 
+RacingRanks.displayName = 'RacingRanks';
+
 export default RacingRanks;
