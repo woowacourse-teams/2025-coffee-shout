@@ -5,6 +5,7 @@ const HALF_COUNT = 3;
 
 export const getVisiblePlayers = (players: RacingPlayer[], myName: string): RacingPlayer[] => {
   if (players.length === 0) return [];
+  console.log('getVisiblePlayers호출');
 
   const totalPlayers = players.length;
   const myIndex = players.findIndex((player) => player.playerName === myName);
