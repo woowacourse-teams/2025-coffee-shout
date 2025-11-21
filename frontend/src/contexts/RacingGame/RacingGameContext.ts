@@ -1,17 +1,19 @@
 import { RacingGameData, RacingGameState } from '@/types/miniGame/racingGame';
-import { createContext, useContext } from 'react';
+import { createContextSelector } from '@/utils/createContextSelector';
 
 type RacingGameContextType = {
   racingGameState: RacingGameState;
   racingGameData: RacingGameData;
 };
+const { Provider, useContextSelector } = createContextSelector<RacingGameContextType>();
 
-export const RacingGameContext = createContext<RacingGameContextType | null>(null);
+export const RacingGameProvider = Provider;
+
+export const useRacingGameState = () => useContextSelector((state) => state.racingGameState);
+export const useRacingGameData = () => useContextSelector((state) => state.racingGameData);
 
 export const useRacingGame = () => {
-  const context = useContext(RacingGameContext);
-  if (!context) {
-    throw new Error('useRacingGame는 RacingGameProvider 안에서 사용해야 합니다.');
-  }
-  return context;
+  const racingGameState = useRacingGameState();
+  const racingGameData = useRacingGameData();
+  return { racingGameState, racingGameData };
 };

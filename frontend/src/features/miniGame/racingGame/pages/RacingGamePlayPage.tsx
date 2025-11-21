@@ -1,6 +1,6 @@
 import { useWebSocket } from '@/apis/websocket/contexts/WebSocketContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useRacingGameState } from '@/contexts/RacingGame/RacingGameContext';
 import { useReplaceNavigate } from '@/hooks/useReplaceNavigate';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -16,7 +16,7 @@ const RacingGamePage = () => {
   const { send } = useWebSocket();
   const navigate = useReplaceNavigate();
   const { miniGameType } = useParams();
-  const { racingGameState } = useRacingGame();
+  const racingGameState = useRacingGameState();
 
   useEffect(() => {
     setTimeout(() => {
