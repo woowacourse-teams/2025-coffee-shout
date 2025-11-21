@@ -1,12 +1,12 @@
 import * as S from './RacingProgressBar.styled';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useRacingGameData } from '@/contexts/RacingGame/RacingGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import { usePlayersProgressData } from '../../hooks/usePlayersProgressData';
 import { colorList } from '@/constants/color';
 import { useParticipants } from '@/contexts/Participants/ParticipantsContext';
 
 const RacingProgressBar = () => {
-  const { racingGameData } = useRacingGame();
+  const racingGameData = useRacingGameData();
   const { myName } = useIdentifier();
   const { getParticipantColorIndex } = useParticipants();
 

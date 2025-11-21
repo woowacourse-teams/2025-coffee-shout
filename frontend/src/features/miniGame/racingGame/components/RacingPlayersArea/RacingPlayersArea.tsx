@@ -23,10 +23,7 @@ const RacingPlayersArea = () => {
 
   const visiblePlayers = useMemo(
     () => getVisiblePlayers(racingGameData.players, myName),
-    [
-      racingGameData.players.map((p) => `${p.playerName}:${p.position}`).join(','),
-      myName,
-    ]
+    [racingGameData.players.map((p) => `${p.playerName}:${p.position}`).join(','), myName]
   );
 
   const { myPosition, mySpeed } = usePlayerData({
@@ -70,4 +67,3 @@ const RacingPlayersArea = () => {
 };
 
 export default RacingPlayersArea;
-

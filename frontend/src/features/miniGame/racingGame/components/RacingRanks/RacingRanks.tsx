@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useRacingGame } from '@/contexts/RacingGame/RacingGameContext';
+import { useRacingGameData } from '@/contexts/RacingGame/RacingGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import RankItem from '../RankItem/RankItem';
 import * as S from './RacingRanks.styled';
@@ -10,7 +10,7 @@ type Player = {
 };
 
 const RacingRanks = () => {
-  const { racingGameData } = useRacingGame();
+  const racingGameData = useRacingGameData();
   const { myName } = useIdentifier();
   const finishOrderRef = useRef<Player[]>([]);
 
