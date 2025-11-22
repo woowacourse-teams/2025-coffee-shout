@@ -21,7 +21,7 @@ type RankedPlayer = {
   isFinished: boolean;
 };
 
-export const useRacingGameRanks = () => {
+export const useRacingGameRankedPlayers = () => {
   const finishOrderRef = useRef<RankedPlayer[]>([]);
   const previousResultRef = useRef<RankedPlayer[]>([]);
 
@@ -63,6 +63,8 @@ export const useRacingGameRanks = () => {
 
   return useContextSelector(selector);
 };
+
+//호환성을 위해 남겨둠
 export const useRacingGame = () => {
   const racingGameState = useRacingGameState();
   const racingGameData = useRacingGameData();

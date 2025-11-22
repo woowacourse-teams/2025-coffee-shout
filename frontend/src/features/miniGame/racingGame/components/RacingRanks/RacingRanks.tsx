@@ -1,10 +1,10 @@
-import { useRacingGameRanks } from '@/contexts/RacingGame/RacingGameContext';
+import { useRacingGameRankedPlayers } from '@/contexts/RacingGame/RacingGameContext';
 import { useIdentifier } from '@/contexts/Identifier/IdentifierContext';
 import RankItem from '../RankItem/RankItem';
 import * as S from './RacingRanks.styled';
 
 const RacingRanks = () => {
-  const rankedPlayers = useRacingGameRanks();
+  const rankedPlayers = useRacingGameRankedPlayers();
   const { myName } = useIdentifier();
 
   return (
