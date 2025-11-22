@@ -13,6 +13,7 @@ import { getVisiblePlayers } from '../../utils/getVisiblePlayers';
 import * as S from './RacingPlayersArea.styled';
 
 const FINISH_LINE_VISUAL_OFFSET = 30;
+const VISIBILITY_THRESHOLD = 230;
 
 const RacingPlayersArea = () => {
   const { racingGameData, racingGameState } = useRacingGame();
@@ -23,7 +24,7 @@ const RacingPlayersArea = () => {
 
   const visiblePlayers = useMemo(
     () => getVisiblePlayers(racingGameData.players, myName),
-    [racingGameData.players.map((p) => `${p.playerName}:${p.position}`).join(','), myName]
+    [racingGameData.players, myName]
   );
 
   const { myPosition, mySpeed } = usePlayerData({
@@ -41,15 +42,29 @@ const RacingPlayersArea = () => {
     mySpeed,
   });
 
+  const isStartLineVisible = isPositionVisible({
+    targetPosition: racingGameData.distance.start,
+    currentPosition: myPosition,
+  });
+
+  const isEndLineVisible = isPositionVisible({
+    targetPosition: racingGameData.distance.end - FINISH_LINE_VISUAL_OFFSET,
+    currentPosition: myPosition,
+  });
+
   return (
     <S.Container ref={containerRef}>
       <S.ContentWrapper>
         <S.PlayersWrapper>
-          <RacingLine position={racingGameData.distance.start} myPosition={myPosition} />
-          <RacingLine
-            position={racingGameData.distance.end - FINISH_LINE_VISUAL_OFFSET}
-            myPosition={myPosition}
-          />
+          {isStartLineVisible && (
+            <RacingLine position={racingGameData.distance.start} myPosition={myPosition} />
+          )}
+          {isEndLineVisible && (
+            <RacingLine
+              position={racingGameData.distance.end - FINISH_LINE_VISUAL_OFFSET}
+              myPosition={myPosition}
+            />
+          )}
           {visiblePlayers.map((player) => (
             <RacingPlayer
               key={player.playerName}
@@ -67,3 +82,16 @@ const RacingPlayersArea = () => {
 };
 
 export default RacingPlayersArea;
+
+export const isPositionVisible = ({
+  targetPosition,
+  currentPosition,
+  threshold = VISIBILITY_THRESHOLD,
+}: {
+  targetPosition: number;
+  currentPosition: number;
+  threshold?: number;
+}): boolean => {
+  const relativeX = targetPosition - currentPosition;
+  return Math.abs(relativeX) <= threshold;
+};
