@@ -5,20 +5,25 @@ const HALF_COUNT = 3;
 
 export const getVisiblePlayers = (players: RacingPlayer[], myName: string): RacingPlayer[] => {
   if (players.length === 0) return [];
-  console.log('getVisiblePlayers호출');
 
   const totalPlayers = players.length;
-  const myIndex = players.findIndex((player) => player.playerName === myName);
 
-  if (myIndex === -1) return [];
+  const playerIndexMap = new Map<string, number>();
+  for (let i = 0; i < totalPlayers; i++) {
+    playerIndexMap.set(players[i].playerName, i);
+  }
+
+  const myIndex = playerIndexMap.get(myName);
+  if (myIndex === undefined) return [];
 
   if (totalPlayers <= VISIBLE_PLAYER_COUNT) {
     const result: RacingPlayer[] = [];
+    const halfCount = Math.floor(totalPlayers / 2);
 
     for (let i = 0; i < totalPlayers; i++) {
-      const offset = i - Math.floor(totalPlayers / 2);
-      const playerIndex = (myIndex + offset + totalPlayers) % totalPlayers;
-      result.push({ ...players[playerIndex] });
+      const offset = i - halfCount;
+      const sourcePlayerIndex = (myIndex + offset + totalPlayers) % totalPlayers;
+      result.push({ ...players[sourcePlayerIndex] });
     }
 
     return result;
@@ -28,8 +33,8 @@ export const getVisiblePlayers = (players: RacingPlayer[], myName: string): Raci
 
   for (let i = 0; i < VISIBLE_PLAYER_COUNT; i++) {
     const offset = i - HALF_COUNT;
-    const playerIndex = (myIndex + offset + totalPlayers) % totalPlayers;
-    result.push({ ...players[playerIndex] });
+    const sourcePlayerIndex = (myIndex + offset + totalPlayers) % totalPlayers;
+    result.push({ ...players[sourcePlayerIndex] });
   }
 
   return result;
