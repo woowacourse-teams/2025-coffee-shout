@@ -11,9 +11,12 @@ import { IpBlocksPage } from '@/pages/IpBlocksPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProfanityPage } from '@/pages/ProfanityPage';
+import { PatchNotesPage } from '@/pages/PatchNotesPage';
 import { ReportsPage } from '@/pages/ReportsPage';
 import { RoomDetailPage } from '@/pages/RoomDetailPage';
 import { RoomsPage } from '@/pages/RoomsPage';
+import { UserDetailPage } from '@/pages/UserDetailPage';
+import { UsersPage } from '@/pages/UsersPage';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -55,6 +58,9 @@ export function App() {
                 <Route path="/ip-blocks" element={<IpBlocksPage />} />
                 <Route path="/rooms" element={<RoomsPage />} />
                 <Route path="/rooms/:roomId" element={<RoomDetailPage />} />
+                <Route path="/users" element={<UsersPage />} />
+                <Route path="/users/:userId" element={<UserDetailPage />} />
+                <Route path="/patch-notes" element={<PatchNotesPage />} />
                 <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/design" element={<DesignGalleryPage />} />
                 <Route path="*" element={<NotFoundPage />} />
