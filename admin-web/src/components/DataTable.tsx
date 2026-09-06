@@ -17,7 +17,7 @@ import { EmptyState, Skeleton } from '@/components/ui/EmptyState';
  */
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends unknown, TValue> {
+  interface ColumnMeta<TData, TValue> {
     align?: 'left' | 'right';
     /** 좁게 유지할 열(ID, 상태 등). 내용이 길어져도 늘어나지 않는다. */
     width?: string;

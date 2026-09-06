@@ -23,6 +23,15 @@ import { formatDurationMinutes, formatPercent } from '@/lib/format';
  * <p>내부 도구에 시각 회귀 테스트까지 붙이는 것은 과하다. 프리미티브를 한눈에 확인하고
  * 새로 만들 때 기존 것을 먼저 찾아보게 하는 목적이라면 이 한 페이지로 충분하다.
  */
+/*
+ * 갤러리에 보여줄 고정 시각. 렌더 중에 Date.now() 를 부르면 리렌더마다 값이 달라져
+ * "3일 전"이 슬금슬금 움직인다. 예시는 움직이지 않아야 비교가 된다.
+ */
+const SAMPLE_NOW = Date.now();
+const SAMPLE_RECENT = new Date(SAMPLE_NOW - 12 * 60_000);
+const SAMPLE_DAYS_AGO = new Date(SAMPLE_NOW - 3 * 24 * 3600_000);
+const SAMPLE_HOUR_AGO = new Date(SAMPLE_NOW - 3600_000);
+
 export function DesignGalleryPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -140,8 +149,8 @@ export function DesignGalleryPage() {
 
       <Section title="시각 표기" description="절대시각과 상대시각을 함께. 둘 다 필요하다.">
         <div className="flex flex-col gap-1">
-          <Timestamp value={new Date(Date.now() - 12 * 60_000)} />
-          <Timestamp value={new Date(Date.now() - 3 * 24 * 3600_000)} />
+          <Timestamp value={SAMPLE_RECENT} />
+          <Timestamp value={SAMPLE_DAYS_AGO} />
           <Timestamp value={null} />
           <p className="mt-2 text-xs text-ink-muted">
             소요 시간: {formatDurationMinutes(195)} / {formatDurationMinutes(2880)}
@@ -170,7 +179,7 @@ export function DesignGalleryPage() {
               items={[
                 { label: 'joinCode', value: <span className="font-mono">ABCDE</span> },
                 { label: '상태', value: <StatusBadge tone="muted">완주</StatusBadge> },
-                { label: '생성', value: <Timestamp value={new Date(Date.now() - 3600_000)} /> },
+                { label: '생성', value: <Timestamp value={SAMPLE_HOUR_AGO} /> },
                 { label: '참여자', value: '4명' },
                 { label: '메모', value: null, full: true },
               ]}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   usePatchNote,
@@ -33,33 +33,58 @@ const MAX_CONTENT = 5000;
  * <p>패치노트는 유저가 보는 글이다. 여기서 오타를 내면 서비스 화면에 그대로 나간다.
  * 그래서 저장 버튼 옆에 유저가 보게 될 모습을 그대로 붙여 둔다.
  */
+/**
+ * 바깥 껍데기. 수정이면 기존 글을 다 받은 뒤에야 폼을 마운트한다.
+ *
+ * <p>폼을 먼저 띄우고 이펙트로 서버 값을 채워 넣던 것을 걷어냈다. 그러면 렌더가 한 번
+ * 더 돌고, 무엇보다 "언제 덮어쓸지"를 플래그로 관리해야 한다. 플래그를 한 번이라도
+ * 잘못 두면 타이핑하던 내용이 응답 도착 시점에 지워진다. 데이터를 받은 뒤에 마운트하면
+ * 그 상태 자체가 없다.
+ */
 export function PatchNoteFormPage() {
   const params = useParams<{ id: string }>();
   const id = params.id ? Number(params.id) : null;
-  const navigate = useNavigate();
-
   const existing = usePatchNote(id);
-  const categories = usePatchNoteCategories();
-  const save = useSavePatchNote();
 
-  const [form, setForm] = useState<PatchNoteForm>({
-    category: 'NOTICE',
-    title: '',
-    content: '',
-  });
-  const [loaded, setLoaded] = useState(false);
+  if (id === null) {
+    return <PatchNoteForm id={null} initial={EMPTY_FORM} />;
+  }
 
-  // 수정이면 서버 값으로 한 번만 채운다. 매 렌더마다 덮으면 타이핑이 지워진다.
-  useEffect(() => {
-    if (!loaded && existing.data) {
-      setForm({
+  if (existing.isPending) {
+    return <Skeleton className="h-96" />;
+  }
+
+  if (existing.isError) {
+    return (
+      <Card>
+        <ErrorState
+          message={(existing.error as Error).message}
+          onRetry={() => existing.refetch()}
+        />
+      </Card>
+    );
+  }
+
+  return (
+    <PatchNoteForm
+      id={id}
+      initial={{
         category: existing.data.category,
         title: existing.data.title,
         content: existing.data.content,
-      });
-      setLoaded(true);
-    }
-  }, [existing.data, loaded]);
+      }}
+    />
+  );
+}
+
+const EMPTY_FORM: PatchNoteForm = { category: 'NOTICE', title: '', content: '' };
+
+function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteForm }) {
+  const navigate = useNavigate();
+  const categories = usePatchNoteCategories();
+  const save = useSavePatchNote();
+
+  const [form, setForm] = useState<PatchNoteForm>(initial);
 
   const titleOver = form.title.length > MAX_TITLE;
   const contentOver = form.content.length > MAX_CONTENT;
@@ -71,26 +96,8 @@ export function PatchNoteFormPage() {
     if (!submittable) {
       return;
     }
-    save.mutate(
-      { id, form },
-      { onSuccess: () => navigate('/patch-notes') },
-    );
+    save.mutate({ id, form }, { onSuccess: () => navigate('/patch-notes') });
   };
-
-  if (id !== null && existing.isPending) {
-    return <Skeleton className="h-96" />;
-  }
-
-  if (id !== null && existing.isError) {
-    return (
-      <Card>
-        <ErrorState
-          message={(existing.error as Error).message}
-          onRetry={() => existing.refetch()}
-        />
-      </Card>
-    );
-  }
 
   return (
     <form onSubmit={submit} className="mx-auto flex w-full max-w-[1100px] flex-col gap-6">

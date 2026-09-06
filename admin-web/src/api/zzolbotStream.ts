@@ -65,6 +65,18 @@ export async function askZzolBot(
     dataLines = [];
   };
 
+  const consume = (raw: string) => {
+    const line = raw.replace(/\r$/, '');
+    if (line === '') {
+      dispatch();
+    } else if (line.startsWith('event:')) {
+      eventName = line.slice(6).trim();
+    } else if (line.startsWith('data:')) {
+      // "data: x" 와 "data:x" 를 모두 받는다. 앞의 공백 하나만 규격상 제거 대상이다.
+      dataLines.push(line.slice(5).replace(/^ /, ''));
+    }
+  };
+
   for (;;) {
     const { done, value } = await reader.read();
     if (done) {
@@ -75,18 +87,16 @@ export async function askZzolBot(
     // 마지막 조각은 잘렸을 수 있으니 버퍼에 남긴다.
     const lines = buffer.split('\n');
     buffer = lines.pop() ?? '';
+    lines.forEach(consume);
+  }
 
-    for (const raw of lines) {
-      const line = raw.replace(/\r$/, '');
-      if (line === '') {
-        dispatch();
-      } else if (line.startsWith('event:')) {
-        eventName = line.slice(6).trim();
-      } else if (line.startsWith('data:')) {
-        // "data: x" 와 "data:x" 를 모두 받는다. 앞의 공백 하나만 규격상 제거 대상이다.
-        dataLines.push(line.slice(5).replace(/^ /, ''));
-      }
-    }
+  // 스트림이 끝났다. 남은 버퍼가 마지막 줄이다.
+  //
+  // 서버가 complete() 하면서 종료 개행을 붙이지 않는 경우가 있는데, 이걸 흘려보내면
+  // 답변 전체가 사라지고 화면은 "빈 답"을 받는다. 오류도 안 나서 원인을 찾기 어렵다.
+  buffer += decoder.decode();
+  if (buffer !== '') {
+    consume(buffer);
   }
   dispatch();
 }

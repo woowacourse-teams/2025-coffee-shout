@@ -22,7 +22,14 @@ type AuthContextValue = AuthState & {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({ status: 'loading' });
+  /*
+   * 토큰이 있는지는 첫 렌더 전에 이미 알 수 있다. 그래서 초기값에서 갈라 둔다.
+   * 무조건 loading 으로 시작하고 이펙트에서 anonymous 로 내리면, 토큰이 없는
+   * 사람에게 로딩 화면이 한 프레임 번쩍이고 렌더가 한 번 더 돈다.
+   */
+  const [state, setState] = useState<AuthState>(() =>
+    readToken() ? { status: 'loading' } : { status: 'anonymous' },
+  );
 
   /**
    * 새로고침할 때마다 저장된 토큰이 아직 살아 있는지 서버에 묻는다.
@@ -30,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   useEffect(() => {
     if (!readToken()) {
-      setState({ status: 'anonymous' });
       return;
     }
 
