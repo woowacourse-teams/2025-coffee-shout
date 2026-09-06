@@ -3,51 +3,44 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 /**
- * 상태 배지. <b>색 + 점 + 텍스트 3중 인코딩</b>이다.
+ * 상태 배지. 톤이 셋뿐이다.
  *
- * 색만으로 구분하지 않는 이유는 두 가지다. 색각 이상 대응이고, 흑백 스크린샷을 슬랙에
- * 붙였을 때도 읽혀야 하기 때문이다. 운영 대화는 대개 스크린샷으로 시작한다.
+ * <p>초록도 노랑도 파랑도 없다. 상태 색이 여럿이면 한 화면에 다 떠서 어느 것이 급한지가
+ * 흐려진다. 운영자가 색을 보고 손을 움직이는 순간은 "손이 필요하다" 하나뿐이고
+ * 그 자리를 브랜드 코랄이 맡는다. 나머지는 회색의 명암으로 가른다.
+ *
+ * <p>코랄 배지에는 점을 찍고 회색 배지에는 찍지 않는다. 색 + 점 + 텍스트 3중 인코딩이라
+ * 색각 이상에서도, 흑백 스크린샷에서도 "이것만 다르다"가 읽힌다. 운영 대화는 대개
+ * 스크린샷으로 시작한다.
  */
 const badge = cva(
   'inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-2xs font-medium',
   {
     variants: {
       tone: {
+        /** 끝난 것. 물러난다. 처리 완료, 정상, 이미 지난 일. */
+        muted: 'bg-subtle text-ink-muted',
+        /** 지금 상태. 기본값이다. */
         neutral: 'bg-subtle text-ink-secondary',
-        success: 'bg-success-bg text-success',
-        warning: 'bg-warning-bg text-warning',
-        info: 'bg-info-bg text-info',
-        danger: 'bg-danger-bg text-danger',
-        accent: 'bg-accent-subtle text-accent-ink',
+        /** 손이 필요하거나 막혔거나 되돌릴 수 없는 것. 화면에서 유일하게 색이 붙는다. */
+        attention: 'bg-attention-bg text-attention',
       },
     },
     defaultVariants: { tone: 'neutral' },
   },
 );
 
-const dot = cva('size-1.5 rounded-full', {
-  variants: {
-    tone: {
-      neutral: 'bg-ink-muted',
-      success: 'bg-success-dot',
-      warning: 'bg-warning-dot',
-      info: 'bg-info',
-      danger: 'bg-danger',
-      accent: 'bg-accent',
-    },
-  },
-  defaultVariants: { tone: 'neutral' },
-});
-
 type StatusBadgeProps = VariantProps<typeof badge> & {
   children: ReactNode;
   className?: string;
 };
 
-export function StatusBadge({ tone, children, className }: StatusBadgeProps) {
+export function StatusBadge({ tone = 'neutral', children, className }: StatusBadgeProps) {
   return (
     <span className={cn(badge({ tone }), className)}>
-      <span className={dot({ tone })} aria-hidden />
+      {tone === 'attention' && (
+        <span className="size-1.5 rounded-full bg-attention" aria-hidden />
+      )}
       {children}
     </span>
   );

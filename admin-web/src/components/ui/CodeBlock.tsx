@@ -40,7 +40,7 @@ export function CodeBlock({ value, maxHeightClassName = 'max-h-96', className }:
         )}
       >
         {copied ? (
-          <Check className="size-3.5 text-success" aria-hidden />
+          <Check className="size-3.5 text-ink" aria-hidden />
         ) : (
           <Copy className="size-3.5" aria-hidden />
         )}

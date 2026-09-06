@@ -35,15 +35,13 @@ export function DesignGalleryPage() {
         </p>
       </header>
 
-      <Section title="색" description="원색이 아니라 역할 이름으로 쓴다. 팔레트가 바뀌면 별칭만 고친다.">
+      <Section title="색" description="회색과 브랜드 코랄, 둘뿐이다. 초록·노랑·파랑을 두지 않는다.">
         <div className="flex flex-wrap gap-3">
-          <Swatch name="action" className="bg-action" note="Primary 버튼, 레일" />
-          <Swatch name="accent" className="bg-accent" note="브랜드. 텍스트 불가" />
-          <Swatch name="accent-ink" className="bg-accent-ink" note="브랜드 텍스트" />
-          <Swatch name="success" className="bg-success" />
-          <Swatch name="warning" className="bg-warning" />
-          <Swatch name="info" className="bg-info" />
-          <Swatch name="danger" className="bg-danger" />
+          <Swatch name="action" className="bg-action" note="Primary 버튼" />
+          <Swatch name="accent" className="bg-accent" note="아이덴티티. 텍스트 불가" />
+          <Swatch name="attention" className="bg-attention" note="유일한 신호색" />
+          <Swatch name="attention-solid" className="bg-attention-solid" note="채움 + 흰 텍스트" />
+          <Swatch name="attention-bg" className="bg-attention-bg" note="틴트" />
         </div>
         {/* 클래스명을 문자열로 조립하지 않는다. Tailwind 는 소스를 정적으로 훑어
          * 쓰인 클래스만 CSS 로 내보내므로, `bg-${name}` 은 스캔에 안 잡혀 스타일이 사라진다. */}
@@ -56,7 +54,7 @@ export function DesignGalleryPage() {
 
       <Section
         title="버튼"
-        description="Primary 는 채움, danger 는 아웃라인. 채움 빨강은 확인 다이얼로그에서만."
+        description="Primary 는 중성 채움, danger 는 코랄 아웃라인. 코랄 채움은 확인 다이얼로그에서만."
       >
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="primary">저장</Button>
@@ -75,23 +73,20 @@ export function DesignGalleryPage() {
         </div>
       </Section>
 
-      <Section title="상태 배지" description="색 + 점 + 텍스트 3중 인코딩. 흑백 스크린샷에서도 읽힌다.">
+      <Section title="상태 배지" description="셋뿐이다. 손이 필요한 것만 색이 붙고 끝난 것은 물러난다.">
         <div className="flex flex-wrap gap-2">
-          <StatusBadge tone="neutral">미처리</StatusBadge>
-          <StatusBadge tone="success">처리 완료</StatusBadge>
-          <StatusBadge tone="warning">검토 대기</StatusBadge>
-          <StatusBadge tone="info">진행 중</StatusBadge>
-          <StatusBadge tone="danger">차단됨</StatusBadge>
-          <StatusBadge tone="accent">신규</StatusBadge>
+          <StatusBadge tone="attention">미처리</StatusBadge>
+          <StatusBadge tone="neutral">진행 중</StatusBadge>
+          <StatusBadge tone="muted">처리 완료</StatusBadge>
         </div>
       </Section>
 
-      <Section title="처리 대기 큐" description="0이면 가라앉고, 1 이상이면 강조되고, 임계를 넘으면 위험.">
+      <Section title="처리 대기 큐" description="0이냐 아니냐 두 단계뿐. 3건이든 42건이든 할 일은 같다.">
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <QueueCard label="미처리 신고" count={0} to="/reports" icon={MessageSquareWarning} />
           <QueueCard label="검열 대기" count={7} to="/profanity" icon={SpellCheck} />
-          <QueueCard label="차단 IP" count={42} threshold={20} to="/ip-blocks" icon={ShieldBan} />
-          <QueueCard label="DLQ 적체" count={3} threshold={1} to="/ops" icon={Zap} />
+          <QueueCard label="차단 IP" count={42} to="/ip-blocks" icon={ShieldBan} />
+          <QueueCard label="DLQ 적체" count={3} to="/ops" icon={Zap} />
         </div>
       </Section>
 
@@ -171,7 +166,7 @@ export function DesignGalleryPage() {
             <KeyValue
               items={[
                 { label: 'joinCode', value: <span className="font-mono">ABCDE</span> },
-                { label: '상태', value: <StatusBadge tone="success">완주</StatusBadge> },
+                { label: '상태', value: <StatusBadge tone="muted">완주</StatusBadge> },
                 { label: '생성', value: <Timestamp value={new Date(Date.now() - 3600_000)} /> },
                 { label: '참여자', value: '4명' },
                 { label: '메모', value: null, full: true },
@@ -298,9 +293,9 @@ const SAMPLE_COLUMNS: ColumnDef<SampleRow, unknown>[] = [
     header: '상태',
     cell: (c) =>
       c.getValue() === 'PENDING' ? (
-        <StatusBadge tone="warning">미처리</StatusBadge>
+        <StatusBadge tone="attention">미처리</StatusBadge>
       ) : (
-        <StatusBadge tone="success">처리 완료</StatusBadge>
+        <StatusBadge tone="muted">처리 완료</StatusBadge>
       ),
   },
   {

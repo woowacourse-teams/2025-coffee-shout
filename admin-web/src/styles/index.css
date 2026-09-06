@@ -45,16 +45,10 @@
   --color-action: var(--action-primary-bg);
   --color-action-hover: var(--action-primary-bg-hover);
 
-  --color-success: var(--success-fg);
-  --color-success-bg: var(--success-bg);
-  --color-success-dot: var(--success-dot);
-  --color-warning: var(--warning-fg);
-  --color-warning-bg: var(--warning-bg);
-  --color-warning-dot: var(--warning-dot);
-  --color-info: var(--info-fg);
-  --color-info-bg: var(--info-bg);
-  --color-danger: var(--danger-fg);
-  --color-danger-bg: var(--danger-bg);
+  /* 신호는 하나다. 회색으로 못 하는 말만 이 색이 한다. */
+  --color-attention: var(--attention-fg);
+  --color-attention-bg: var(--attention-bg);
+  --color-attention-solid: var(--attention-solid);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

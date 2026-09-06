@@ -53,7 +53,7 @@ export function ConfirmDialog({
             <span
               className={cn(
                 'flex size-8 shrink-0 items-center justify-center rounded-md',
-                destructive ? 'bg-danger-bg text-danger' : 'bg-subtle text-ink-secondary',
+                destructive ? 'bg-attention-bg text-attention' : 'bg-subtle text-ink-secondary',
               )}
             >
               <TriangleAlert className="size-4" aria-hidden />

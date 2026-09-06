@@ -53,19 +53,25 @@
    * 이 색들은 상태에만 쓴다. 액션이나 차트 계열로 빌려주지 않는다.
    * 신호 색이 두 가지 뜻을 가지면 화면을 읽을 때마다 문맥을 따져야 한다.
    * ------------------------------------------------------------- */
-  --success-dot: #1fcd7e; /* 서비스 status.online. 점과 아이콘 전용, 흰 텍스트 금지 */
-  --success-bg: #e8f8f0;
-  --success-fg: #0e7a49; /* 흰 텍스트 5.39:1 */
-
-  --warning-dot: #ffdf20; /* 서비스 yellow. 점과 아이콘 전용 */
-  --warning-bg: #fff3c4; /* 서비스 tierColorMap.GOLD.bg */
-  --warning-fg: #8a6000; /* 서비스 GOLD.text(#9A6B00)를 AA(4.5)까지 낮춘 값. bg 위 5.03:1 */
-
-  --info-bg: #e6f0ff;
-  --info-fg: #0066ff; /* 서비스 blue. 흰 텍스트 4.83:1 */
-
-  --danger-bg: #fdecec;
-  --danger-fg: #c81e1e; /* 서비스 red(#FF0000)는 흰 텍스트 4.00:1로 AA 미달이라 낮춘 값 */
+  /* 이 시스템의 색은 <b>회색과 브랜드 코랄, 둘뿐이다.</b>
+   *
+   * 초록(성공), 노랑(경고), 파랑(정보), 별도의 빨강을 두지 않는다. 상태 색이 넷이면
+   * 한 화면에 네 가지가 동시에 떠서 어느 것이 급한지가 흐려진다. 실제로 운영자가 색을
+   * 보고 손을 움직이는 순간은 "손이 필요하다, 막혔다, 되돌릴 수 없다" 하나뿐이고,
+   * 그 자리를 브랜드 코랄이 맡는다.
+   *
+   * 코랄이 브랜드이면서 경고인 것이 겹쳐 보이지만 단계가 다르다. 아이덴티티는
+   * point-400(밝음), 경고는 point-600/700(짙음)이다. 같은 색상환의 다른 명도라
+   * 화면 전체가 한 색조로 묶이면서도 둘이 섞이지 않는다.
+   *
+   * 나머지 상태 구분은 회색의 명암으로 한다. 끝난 것은 물러나고 지금 상태인 것은
+   * 또렷하게 둔다. 색이 없어도 위계는 선다.
+   *
+   * 차트 계열(--chart-*)은 다른 얘기다. 항목을 서로 구분하는 것이 목적이라 여러 색이
+   * 필요하고, 그 색들은 상태를 뜻하지 않는다. */
+  --attention-bg: var(--point-50);
+  --attention-fg: var(--point-700); /* 흰 배경 6.83:1, 틴트 위 6.24:1 */
+  --attention-solid: var(--point-600); /* 채움 + 흰 텍스트 5.04:1 */
 
   /* ---------------------------------------------------------------
    * 4. 역할 별칭 (컴포넌트는 이것만 참조한다)
@@ -114,9 +120,9 @@
    * 접근성 때문이 아니라 밀도 때문이다. 표의 모든 행에 빨간 채움 버튼이 있으면
    * 화면이 경고로 뒤덮여 진짜 경고가 안 보인다. */
   --action-danger-bg: #ffffff;
-  --action-danger-border: var(--danger-fg);
-  --action-danger-text: var(--danger-fg); /* 흰 배경 5.74:1 */
-  --action-danger-confirm-bg: var(--danger-fg); /* Primary 와 3.09:1 로 구분된다 */
+  --action-danger-border: var(--attention-fg);
+  --action-danger-text: var(--attention-fg); /* 흰 배경 6.83:1 */
+  --action-danger-confirm-bg: var(--attention-solid); /* 채움 + 흰 텍스트 5.04:1 */
 
   /* 강조 */
   --accent: var(--point-400);
@@ -189,10 +195,12 @@
   --shadow-popover: 0 4px 12px rgb(16 24 40 / 0.08), 0 1px 3px rgb(16 24 40 / 0.06);
   --shadow-dialog: 0 16px 48px rgb(16 24 40 / 0.18);
 
-  --row-height: 2.25rem; /* 36px */
-  --row-height-compact: 2rem; /* 32px */
+  --row-height: 2.5rem; /* 40px - 표 행. 36px 은 클릭 대상으로 빠듯하다 */
+  --row-height-compact: 2.125rem; /* 34px - 밀집 모드 */
   --rail-width: 15rem; /* 240px */
-  --topbar-height: 2.75rem; /* 44px */
+  /* 56px. 44px 이면 로고와 제목이 상하 여백 없이 선에 붙어 답답하다.
+   * 레일 머리와 상단 바가 같은 높이라 가로선이 화면을 한 줄로 가로지른다. */
+  --topbar-height: 3.5rem;
 }
 
 /* 숫자 자리를 고정한다. 표에서 자릿수가 흔들리면 스캔이 안 된다. */

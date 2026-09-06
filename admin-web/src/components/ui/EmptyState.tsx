@@ -44,7 +44,7 @@ export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
         className,
       )}
     >
-      <p className="text-sm font-medium text-danger">불러오지 못했습니다</p>
+      <p className="text-sm font-medium text-attention">불러오지 못했습니다</p>
       {message && <p className="max-w-md text-xs text-ink-muted">{message}</p>}
       {onRetry && (
         <button

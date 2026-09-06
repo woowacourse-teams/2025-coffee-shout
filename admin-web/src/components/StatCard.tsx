@@ -30,13 +30,11 @@ export function StatCard({ label, value, hint, delta, suffix, className }: StatC
         </span>
         {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
 
+        {/* 증감에 색을 붙이지 않는다. 방 생성이 준 것이 나쁜 일인지 좋은 일인지는
+         * 지표마다 다르고, 초록이나 빨강을 달면 그 판단을 화면이 대신해 버린다.
+         * 방향은 화살표가 말하고 판단은 사람이 한다. */}
         {delta !== undefined && delta !== 0 && (
-          <span
-            className={cn(
-              'inline-flex items-center gap-0.5 text-xs font-medium',
-              rising ? 'text-success' : 'text-ink-secondary',
-            )}
-          >
+          <span className="inline-flex items-center gap-0.5 text-xs font-medium text-ink-secondary">
             {rising ? (
               <ArrowUp className="size-3" aria-hidden />
             ) : (

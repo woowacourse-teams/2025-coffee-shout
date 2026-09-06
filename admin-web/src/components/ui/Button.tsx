@@ -26,8 +26,9 @@ const button = cva(
         secondary:
           'bg-surface text-ink border border-border-strong hover:border-ink-muted hover:bg-subtle',
         ghost: 'text-ink-secondary hover:bg-subtle hover:text-ink',
-        danger: 'bg-surface text-danger border border-danger/40 hover:border-danger hover:bg-danger-bg',
-        dangerSolid: 'bg-danger text-ink-inverse hover:brightness-110',
+        danger:
+          'bg-surface text-attention border border-attention/35 hover:border-attention hover:bg-attention-bg',
+        dangerSolid: 'bg-attention-solid text-ink-inverse hover:brightness-110',
       },
       size: {
         sm: 'h-7 px-2.5 text-xs',
