@@ -7,7 +7,11 @@ import type {
   BlockedIp,
   DailySummary,
   DailyTrend,
+  EvalRun,
+  EvalRunDetail,
+  EvalScenario,
   GamePlayStat,
+  MonitorAlert,
   NicknameAudit,
   NicknameAuditQuality,
   NicknameAuditStatus,
@@ -23,6 +27,8 @@ import type {
   RoomSummary,
   UserDetail,
   UserSummary,
+  ZzolBotFeedback,
+  ZzolBotSession,
 } from '@/api/types';
 
 /**
@@ -346,5 +352,80 @@ export function useRemoveAdminAccount() {
   return useMutation({
     mutationFn: (id: number) => api.delete<void>(`/accounts/${id}`),
     onSuccess: () => client.invalidateQueries({ queryKey: keys.admins }),
+  });
+}
+
+/* ── ZzolBot ─────────────────────────────────────────────── */
+
+export function useZzolBotSessions() {
+  return useQuery({
+    queryKey: ['zzolbot', 'sessions'],
+    queryFn: () => api.get<ZzolBotSession[]>('/zzolbot/sessions'),
+  });
+}
+
+export function useZzolBotFeedback() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, feedback }: { id: number; feedback: ZzolBotFeedback }) =>
+      api.post<void>(`/zzolbot/sessions/${id}/feedback`, { feedback }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'sessions'] }),
+  });
+}
+
+/**
+ * 모니터링 알림. 무인 분석 결과라 화면을 열어 둔 사이에도 새 건이 쌓인다.
+ * 30초마다 다시 읽는다. 더 짧게 잡으면 Gemini 분석 주기보다 빨라 의미가 없다.
+ */
+export function useMonitorAlerts() {
+  return useQuery({
+    queryKey: ['zzolbot', 'alerts'],
+    queryFn: () => api.get<MonitorAlert[]>('/zzolbot/monitor/alerts'),
+    refetchInterval: 30_000,
+  });
+}
+
+export function useEvalRuns() {
+  return useQuery({
+    queryKey: ['zzolbot', 'eval', 'runs'],
+    queryFn: () => api.get<EvalRun[]>('/zzolbot/eval/runs'),
+  });
+}
+
+export function useEvalRunDetail(id: number | null) {
+  return useQuery({
+    queryKey: ['zzolbot', 'eval', 'runs', id],
+    queryFn: () => api.get<EvalRunDetail>(`/zzolbot/eval/runs/${id}`),
+    enabled: id !== null,
+  });
+}
+
+export function useEvalScenarios() {
+  return useQuery({
+    queryKey: ['zzolbot', 'eval', 'scenarios'],
+    queryFn: () => api.get<EvalScenario[]>('/zzolbot/eval/scenarios'),
+  });
+}
+
+/**
+ * 평가 실행. 서버가 202 로 받고 뒤에서 돈다.
+ *
+ * <p>이미 도는 중이면 409 다. 동시에 두 번 돌리면 Gemini 호출이 겹쳐 비용도 두 배고
+ * 결과도 서로 섞인다. 화면은 409 를 실패가 아니라 "이미 돌고 있다"로 읽어야 한다.
+ */
+export function useStartEvalRun() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { label: string; repeats?: number; kind?: string }) =>
+      api.post<void>('/zzolbot/eval/runs', body),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'eval', 'runs'] }),
+  });
+}
+
+export function useDeleteEvalScenario() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete<void>(`/zzolbot/eval/scenarios/${id}`),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'eval', 'scenarios'] }),
   });
 }

@@ -20,6 +20,7 @@ import { RoomDetailPage } from '@/pages/RoomDetailPage';
 import { RoomsPage } from '@/pages/RoomsPage';
 import { UserDetailPage } from '@/pages/UserDetailPage';
 import { UsersPage } from '@/pages/UsersPage';
+import { ZzolBotPage } from '@/pages/ZzolBotPage';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -68,6 +69,7 @@ export function App() {
                 <Route path="/patch-notes/new" element={<PatchNoteFormPage />} />
                 <Route path="/patch-notes/:id" element={<PatchNoteFormPage />} />
                 <Route path="/admins" element={<AdminAccountsPage />} />
+                <Route path="/zzolbot" element={<ZzolBotPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/design" element={<DesignGalleryPage />} />
                 <Route path="*" element={<NotFoundPage />} />

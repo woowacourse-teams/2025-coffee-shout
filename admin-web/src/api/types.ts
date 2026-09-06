@@ -244,3 +244,67 @@ export type AdminAccount = {
 
 export type AdminMe = { email: string };
 export type AdminToken = { accessToken: string };
+
+/* ── ZzolBot ─────────────────────────────────────────────── */
+
+export type ZzolBotFeedback = 'GOOD' | 'BAD';
+
+export type ZzolBotSession = {
+  id: number;
+  question: string;
+  answer: string;
+  feedback: ZzolBotFeedback | null;
+  /** 서버가 "MM/dd HH:mm" 으로 이미 포맷한 문자열이다. ISO 가 아니라 Timestamp 에 못 넣는다. */
+  createdAt: string;
+};
+
+export type MonitorAlert = {
+  id: number;
+  anomalous: boolean;
+  severity: string;
+  /** 원문 JSON 문자열. 서버가 파싱하지 않고 그대로 준다. */
+  signalsJson: string | null;
+  fingerprint: string | null;
+  analysisSummary: string | null;
+  suggestedActionsJson: string | null;
+  notified: boolean;
+  createdAt: string;
+};
+
+export type EvalRun = {
+  id: number;
+  label: string;
+  model: string;
+  status: string;
+  scenarioCount: number;
+  passCount: number;
+  startedAt: string;
+  finishedAt: string | null;
+};
+
+export type EvalResult = {
+  scenarioId: number;
+  accuracy: number;
+  groundedness: number;
+  hallucination: boolean;
+  verdict: string;
+  latencyMs: number;
+  missingToolCalls: number;
+  rationale: string | null;
+  answer: string | null;
+};
+
+export type EvalRunDetail = {
+  run: EvalRun;
+  results: EvalResult[];
+};
+
+export type EvalScenario = {
+  id: number;
+  name: string;
+  kind: string;
+  question: string;
+  rubric: string;
+  sourceType: string;
+  createdAt: string | null;
+};
