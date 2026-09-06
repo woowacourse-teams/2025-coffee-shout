@@ -431,7 +431,7 @@ class WsCatalogBuilderTest {
 
         @MessageMapping("/test/{joinCode}/command")
         @WsReceive(respondsOnTopics = "/test/{joinCode}/result", description = "테스트 수신 엔드포인트")
-        public void handleCommand(@DestinationVariable String joinCode, @Payload FixtureRequest request) {}
+        public void handleCommand(@DestinationVariable String joinCode) {}
     }
 
     static class FixtureGenericPublisher {
