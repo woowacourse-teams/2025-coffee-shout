@@ -18,6 +18,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
+/**
+ * 기존 Thymeleaf 백오피스 체인. <b>Phase 5 에서 통째로 제거한다.</b>
+ *
+ * <p>{@code @Order(2)}로 내린 것은 신규 REST 체인({@link AdminApiSecurityConfig}, Order 1)이
+ * {@code /admin/api/**}를 먼저 가져가야 하기 때문이다. 이 체인의 매처 {@code /admin/**}가
+ * 그 경로를 포함하므로 순서가 뒤바뀌면 SPA 요청이 폼 로그인 화면으로 리다이렉트된다.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,7 +34,7 @@ public class AdminSecurityConfig {
     private final AdminProperties adminProperties;
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/admin/**")
