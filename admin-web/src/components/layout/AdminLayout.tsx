@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   AlertTriangle,
   Gamepad2,
+  History,
   LayoutDashboard,
   LogOut,
   MessageSquareWarning,
@@ -49,6 +50,7 @@ const NAV: NavGroup[] = [
       { to: '/patch-notes', label: '패치노트', icon: ScrollText },
       { to: '/zzolbot', label: 'ZzolBot', icon: AlertTriangle },
       { to: '/admins', label: '관리자', icon: UserCog },
+      { to: '/audit-logs', label: '조치 이력', icon: History },
       { to: '/design', label: '디자인', icon: Palette },
     ],
   },

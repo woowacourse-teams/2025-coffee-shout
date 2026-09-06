@@ -1,35 +1,59 @@
 import { MessageSquareWarning, ShieldBan, SpellCheck } from 'lucide-react';
-import { useActionQueue, useDailySummary } from '@/api/queries';
+import { Link } from 'react-router-dom';
+import {
+  useActionQueue,
+  useAuditLogs,
+  useDailySummary,
+  useGamePlayStats,
+  useNicknameAuditQuality,
+  useReportSla,
+  useTrend,
+} from '@/api/queries';
+import { lazy, Suspense } from 'react';
+import { ActivityFeed } from '@/components/ActivityFeed';
+import { FunnelBar } from '@/components/FunnelBar';
+import { GameShareList } from '@/components/GameShareList';
+import { QueueCard } from '@/components/QueueCard';
+import { TrendLegend } from '@/components/TrendLegend';
+import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
-import { FunnelBar } from '@/components/FunnelBar';
-import { QueueCard } from '@/components/QueueCard';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatDurationMinutes, formatNumber, formatPercent } from '@/lib/format';
 
 /**
- * 홈. 운영자가 로그인해서 <b>3초 안에</b> 두 가지에 답할 수 있어야 한다.
- * "지금 처리할 일이 있나", "서비스가 잘 돌고 있나".
+ * recharts 는 이 차트 하나에만 쓰이는데 gzip 108KB 를 더한다. 지연 로드하면 로그인 화면과
+ * 목록 화면이 그 무게를 지지 않는다. 홈은 차트가 조금 늦게 떠도 나머지가 먼저 보인다.
  *
- * <p>레이아웃을 두 단으로 나눈다. 퍼널은 가로로 길어야 읽히고, 오늘의 숫자는 네 개짜리
- * 짧은 목록이라 세로로 쌓는 편이 밀도가 높다. 넷을 나란히 큰 카드로 두면 두 자리 숫자
- * 하나에 400px 짜리 빈 상자를 주게 된다.
+ * <p>범례를 {@link TrendLegend} 로 떼어낸 것이 이 분리의 전제다. 같은 모듈에서 범례를
+ * 정적으로 가져오면 recharts 가 메인 청크로 따라 들어와 지연 로드가 무효가 된다.
+ */
+const TrendChart = lazy(() =>
+  import('@/components/TrendChart').then((module) => ({ default: module.TrendChart })),
+);
+
+/**
+ * 홈. 운영자가 로그인해서 <b>3초 안에</b> 세 가지에 답할 수 있어야 한다.
+ * "지금 처리할 일이 있나", "서비스가 평소만큼 돌고 있나", "누가 방금 뭘 바꿨나".
  *
- * <p>최대폭을 둔다. 표 화면과 달리 대시보드는 넓어져 봐야 카드 안쪽 여백만 늘어난다.
- * 넓은 모니터에서 시선이 좌우로 흩어지면 3초 안에 훑는 것이 오히려 어려워진다.
- *
- * <p>응답시간, 에러율, JVM 같은 지표는 담지 않는다. Grafana(status.zzol.site)가 이미
- * 본다. 두 곳이 다른 숫자를 말하는 순간 양쪽 다 신뢰를 잃는다.
+ * <p>담는 지표의 기준은 하나다. <b>Grafana 가 못 보는 것.</b> 응답시간, 에러율, JVM 은
+ * 그쪽이 이미 본다. 두 곳이 다른 숫자를 말하는 순간 양쪽 다 신뢰를 잃는다.
+ * 여기 있는 것은 전부 도메인 조인이거나 우리 DB 에만 있는 기록이다.
  */
 export function HomePage() {
   const queue = useActionQueue();
   const summary = useDailySummary();
+  const trend = useTrend(14);
+  const games = useGamePlayStats(30);
+  const sla = useReportSla(30);
+  const auditQuality = useNicknameAuditQuality(30);
+  const logs = useAuditLogs(6);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-6">
       <PageHeader
         title="홈"
-        description="처리할 일과 오늘의 흐름. 인프라 지표는 Grafana가 봅니다."
+        description="처리할 일과 서비스 흐름. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
       />
 
       <Section title="처리 대기" description="숫자를 누르면 해당 화면으로 갑니다.">
@@ -75,37 +99,25 @@ export function HomePage() {
         )}
       </Section>
 
-      {/* 퍼널이 넓은 쪽, 오늘의 숫자가 좁은 쪽이다. 퍼널은 막대 길이로 읽는 그림이라
-       * 가로가 필요하고, 숫자 넷은 세로로 쌓으면 한눈에 들어온다. */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
+      {/* 왼쪽은 "서비스가 어떻게 돌고 있나", 오른쪽은 "오늘 얼마나 됐나".
+        * 추이는 가로가 길어야 모양이 보이고 오늘 숫자는 세로로 쌓아야 자릿수가 비교된다. */}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
         <Card>
           <CardHeader
-            title="방 진행 퍼널"
-            description="막대는 방 생성 대비. 오른쪽은 앞 단계 대비 전환율과 이탈 수."
+            title="최근 14일"
+            description="오늘 숫자만으로는 0이 정상인지 알 수 없습니다."
+            actions={<TrendLegend />}
           />
           <CardBody>
-            {summary.isPending ? (
-              <div className="flex flex-col gap-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Skeleton key={index} className="h-6" />
-                ))}
-              </div>
-            ) : summary.isError ? (
-              <ErrorState
-                message={(summary.error as Error).message}
-                onRetry={() => summary.refetch()}
-              />
+            {trend.isPending ? (
+              <Skeleton className="h-[220px]" />
+            ) : trend.isError ? (
+              <ErrorState message={(trend.error as Error).message} onRetry={() => trend.refetch()} />
             ) : (
-              summary.data && (
-                <FunnelBar
-                  stages={[
-                    { label: '방 생성', count: summary.data.funnel.created },
-                    { label: '2인 이상 입장', count: summary.data.funnel.joined },
-                    { label: '게임 시작', count: summary.data.funnel.gameStarted },
-                    { label: '룰렛 도달', count: summary.data.funnel.rouletteReached },
-                    { label: '완주', count: summary.data.funnel.completed },
-                  ]}
-                />
+              trend.data && (
+                <Suspense fallback={<Skeleton className="h-[220px]" />}>
+                  <TrendChart data={trend.data} />
+                </Suspense>
               )
             )}
           </CardBody>
@@ -139,13 +151,117 @@ export function HomePage() {
           )}
         </Card>
       </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="방 진행 퍼널"
+            description="오늘 기준. 오른쪽은 앞 단계 대비 전환율과 이탈 수."
+          />
+          <CardBody>
+            {summary.isPending ? (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Skeleton key={index} className="h-7" />
+                ))}
+              </div>
+            ) : (
+              summary.data && (
+                <FunnelBar
+                  stages={[
+                    { label: '방 생성', count: summary.data.funnel.created },
+                    { label: '2인 이상 입장', count: summary.data.funnel.joined },
+                    { label: '게임 시작', count: summary.data.funnel.gameStarted },
+                    { label: '룰렛 도달', count: summary.data.funnel.rouletteReached },
+                    { label: '완주', count: summary.data.funnel.completed },
+                  ]}
+                />
+              )
+            )}
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="게임별 플레이"
+            description="최근 30일 완료 기준. 비중이 0에 가까우면 아무도 고르지 않는다는 뜻입니다."
+          />
+          {games.isPending ? (
+            <CardBody className="flex flex-col gap-2.5">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-4" />
+              ))}
+            </CardBody>
+          ) : (
+            games.data && <GameShareList stats={games.data} />
+          )}
+        </Card>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="운영 품질"
+            description="일이 밀렸는지와 잘하고 있는지는 다른 질문입니다."
+          />
+          <dl className="divide-y divide-border-default">
+            <MetricRow
+              label="가장 오래 기다린 신고"
+              value={sla.data ? formatDurationMinutes(sla.data.oldestPendingMinutes) : '-'}
+              hint="접수 후 경과"
+            />
+            <MetricRow
+              label="신고 처리 중앙값"
+              value={sla.data ? formatDurationMinutes(sla.data.p50Minutes) : '-'}
+              hint={`최근 30일 ${sla.data?.resolvedCount ?? 0}건`}
+            />
+            <MetricRow
+              label="검열 AI 판정 뒤집힘"
+              value={auditQuality.data ? formatPercent(auditQuality.data.overrideRate) : '-'}
+              hint="높아지면 모델을 손볼 때"
+            />
+            <MetricRow
+              label="검열 오탐 / 미탐"
+              value={
+                auditQuality.data
+                  ? `${auditQuality.data.falsePositive} / ${auditQuality.data.falseNegative}`
+                  : '-'
+              }
+              hint="AI가 잘못 걸렀다 / 놓쳤다"
+            />
+          </dl>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="최근 조치"
+            description="Grafana 로는 볼 수 없는 기록입니다."
+            actions={
+              <Button asChild size="sm" variant="ghost">
+                <Link to="/audit-logs">전체 보기</Link>
+              </Button>
+            }
+          />
+          {logs.isPending ? (
+            <CardBody className="flex flex-col gap-3">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} className="h-8" />
+              ))}
+            </CardBody>
+          ) : logs.isError ? (
+            <ErrorState message={(logs.error as Error).message} onRetry={() => logs.refetch()} />
+          ) : (
+            <ActivityFeed logs={logs.data?.content ?? []} />
+          )}
+        </Card>
+      </div>
     </div>
   );
 }
 
 /**
- * 라벨은 왼쪽, 숫자는 오른쪽. 숫자를 한 줄에 세로로 맞춰 두면 위아래로 훑을 때
- * 자릿수가 눈으로 비교된다. 카드 넷을 나란히 두면 그 비교가 안 된다.
+ * 라벨은 왼쪽, 값은 오른쪽. 값을 한 줄에 세로로 맞춰 두면 위아래로 훑을 때
+ * 자릿수가 눈으로 비교된다. 카드를 나란히 두면 그 비교가 안 된다.
  */
 function MetricRow({
   label,
@@ -154,7 +270,7 @@ function MetricRow({
   hint,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   suffix?: string;
   hint?: string;
 }) {
@@ -165,8 +281,8 @@ function MetricRow({
         {hint && <span className="block text-2xs text-ink-muted">{hint}</span>}
       </dt>
       <dd className="flex shrink-0 items-baseline gap-1.5">
-        <span className="text-2xl font-bold leading-none tracking-[-0.02em] text-ink">
-          {formatNumber(value)}
+        <span className="text-xl font-bold leading-none tracking-[-0.02em] text-ink">
+          {typeof value === 'number' ? formatNumber(value) : value}
         </span>
         {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
       </dd>

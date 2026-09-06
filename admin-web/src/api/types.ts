@@ -36,6 +36,34 @@ export type Funnel = {
   completionRate: number;
 };
 
+export type DailyTrend = {
+  date: string;
+  created: number;
+  completed: number;
+  players: number;
+};
+
+export type GamePlayStat = {
+  miniGameType: string;
+  plays: number;
+  /** 전체 대비 비중. 0.0 ~ 1.0 */
+  share: number;
+};
+
+export type AdminAuditResult = 'SUCCESS' | 'FAILURE';
+
+export type AdminAuditLog = {
+  id: number;
+  actorEmail: string;
+  /** `DELETE /admin/api/ip-blocks/{ip}` 형태의 매핑 패턴. 화면이 문장으로 번역한다. */
+  action: string;
+  targetType: string | null;
+  targetId: string | null;
+  detail: string | null;
+  result: AdminAuditResult;
+  createdAt: string;
+};
+
 export type DailySummary = {
   date: string;
   funnel: Funnel;

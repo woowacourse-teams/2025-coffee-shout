@@ -3,8 +3,11 @@ import { api } from '@/api/client';
 import type {
   ActionQueue,
   AdminAccount,
+  AdminAuditLog,
   BlockedIp,
   DailySummary,
+  DailyTrend,
+  GamePlayStat,
   NicknameAudit,
   NicknameAuditQuality,
   NicknameAuditStatus,
@@ -60,6 +63,27 @@ export function useActionQueue() {
     queryFn: () => api.get<ActionQueue>('/overview/action-queue'),
     // 조치하고 돌아오면 바로 줄어들어야 한다. 30초면 표를 훑는 동안 한 번은 갱신된다.
     refetchInterval: 30_000,
+  });
+}
+
+export function useTrend(days = 14) {
+  return useQuery({
+    queryKey: ['overview', 'trend', days],
+    queryFn: () => api.get<DailyTrend[]>('/overview/trend', { days }),
+  });
+}
+
+export function useGamePlayStats(days = 30) {
+  return useQuery({
+    queryKey: ['overview', 'games', days],
+    queryFn: () => api.get<GamePlayStat[]>('/overview/games', { days }),
+  });
+}
+
+export function useAuditLogs(size = 20, page = 0) {
+  return useQuery({
+    queryKey: ['audit-logs', page, size],
+    queryFn: () => api.get<PageResponse<AdminAuditLog>>('/audit-logs', { page, size }),
   });
 }
 
