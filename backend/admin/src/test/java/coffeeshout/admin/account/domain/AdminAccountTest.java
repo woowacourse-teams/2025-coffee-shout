@@ -1,10 +1,9 @@
 package coffeeshout.admin.account.domain;
 
+import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import coffeeshout.global.exception.custom.BusinessException;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,26 +52,23 @@ class AdminAccountTest {
         @NullAndEmptySource
         @ValueSource(strings = {"   ", "\t"})
         void 비어있는_이메일은_거부한다(String email) {
-            assertThatThrownBy(() -> AdminAccount.create(email, null, NOW))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("비어 있을 수 없습니다");
+            assertCoffeeShoutException(() -> AdminAccount.create(email, null, NOW),
+                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @ParameterizedTest
         @ValueSource(strings = {"nobody", "@zzol.site", "mj@", "mj@a@b.site"})
         void 형식이_아닌_이메일은_거부한다(String email) {
-            assertThatThrownBy(() -> AdminAccount.create(email, null, NOW))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("형식이 올바르지 않습니다");
+            assertCoffeeShoutException(() -> AdminAccount.create(email, null, NOW),
+                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @Test
         void 이메일이_255자를_넘으면_거부한다() {
             final String tooLong = "a".repeat(250) + "@zzol.site";
 
-            assertThatThrownBy(() -> AdminAccount.create(tooLong, null, NOW))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("255자");
+            assertCoffeeShoutException(() -> AdminAccount.create(tooLong, null, NOW),
+                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @Test

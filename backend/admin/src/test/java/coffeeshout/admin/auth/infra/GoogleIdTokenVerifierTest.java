@@ -1,11 +1,11 @@
 package coffeeshout.admin.auth.infra;
 
+import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 
-import coffeeshout.global.exception.custom.BusinessException;
+import coffeeshout.admin.account.domain.AdminAccountErrorCode;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -82,9 +82,8 @@ class GoogleIdTokenVerifierTest {
         @NullAndEmptySource
         @ValueSource(strings = {"   "})
         void 토큰이_비어_있으면_거부한다(String token) {
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(token))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("ID 토큰이 비어 있습니다");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(token),
+                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
@@ -92,9 +91,8 @@ class GoogleIdTokenVerifierTest {
             willThrow(new BadJwtException("signature mismatch"))
                     .given(jwtDecoder).decode(TOKEN);
 
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessage("구글 인증에 실패했습니다.");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
+                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
@@ -103,18 +101,16 @@ class GoogleIdTokenVerifierTest {
             given(jwtDecoder.decode(TOKEN))
                     .willReturn(jwt(Map.of("aud", List.of("someone-else.apps.googleusercontent.com"))));
 
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessage("구글 인증에 실패했습니다.");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
+                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
         void 이메일이_검증되지_않았으면_거부한다() {
             given(jwtDecoder.decode(TOKEN)).willReturn(jwt(Map.of("email_verified", false)));
 
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("검증되지 않은 구글 계정");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
+                    AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
         }
 
         @Test
@@ -126,9 +122,8 @@ class GoogleIdTokenVerifierTest {
                             "email", "mj@zzol.site"));
             given(jwtDecoder.decode(TOKEN)).willReturn(withoutClaim);
 
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("검증되지 않은 구글 계정");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
+                    AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
         }
 
         @Test
@@ -140,9 +135,8 @@ class GoogleIdTokenVerifierTest {
                             "email_verified", true));
             given(jwtDecoder.decode(TOKEN)).willReturn(withoutEmail);
 
-            assertThatThrownBy(() -> verifier().verifyAndExtractEmail(TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("이메일이 없습니다");
+            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
+                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
     }
 }

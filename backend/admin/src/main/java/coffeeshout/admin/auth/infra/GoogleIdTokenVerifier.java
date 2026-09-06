@@ -5,29 +5,44 @@ import coffeeshout.admin.auth.AdminAuthProperties;
 import coffeeshout.admin.auth.domain.SocialIdTokenVerifier;
 import coffeeshout.global.exception.custom.BusinessException;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
 /**
  * 구글 ID 토큰 검증.
  *
- * <p>{@link JwtDecoders#fromIssuerLocation}이 구글 OpenID 디스커버리 문서를 읽어
- * JWKS 주소를 얻고 서명 키를 캐싱한다. 서명(RS256), 발급자, 만료는 디코더가 처리하므로
- * 여기서는 <b>대상(aud)</b>과 <b>이메일 검증 여부</b>만 추가로 확인한다.
+ * <p>서명(RS256), 발급자, 만료는 디코더가 처리하고, 여기서는 <b>대상(aud)</b>과
+ * <b>이메일 검증 여부</b>를 확인한다.
  *
- * <p>이메일 검증(email_verified)을 반드시 본다. 이메일 소유가 확인되지 않은 계정이
- * 관리자 이메일과 같은 주소를 주장하면 허용목록 대조가 그대로 뚫린다.
+ * <p>{@code JwtDecoders.fromIssuerLocation()}을 쓰지 않는다. 그 메서드는 <b>빈 생성 시점에</b>
+ * OpenID 디스커버리 문서를 받아오므로 앱 기동이 구글 네트워크에 묶인다. 구글이 잠깐 느리면
+ * 배포가 실패하고, 테스트는 인터넷 없이 못 돈다. JWKS 주소를 직접 지정하면 키는
+ * <b>첫 검증 때</b> 받아 캐싱하므로 기동 경로에서 외부 호출이 사라진다.
  */
 @Slf4j
 @Component
 public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
 
-    private static final String ISSUER = "https://accounts.google.com";
+    private static final String JWK_SET_URI = "https://www.googleapis.com/oauth2/v3/certs";
+
+    /**
+     * 구글은 ID 토큰의 iss 를 두 형태로 발급해 왔다. 둘 다 받는다.
+     * 하나만 허용하면 어느 날 다른 형태가 오는 순간 전원 로그인이 막힌다.
+     */
+    private static final Set<String> VALID_ISSUERS =
+            Set.of("https://accounts.google.com", "accounts.google.com");
+
     private static final String CLAIM_EMAIL = "email";
     private static final String CLAIM_EMAIL_VERIFIED = "email_verified";
 
@@ -35,12 +50,31 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
     private final String clientId;
 
     public GoogleIdTokenVerifier(AdminAuthProperties properties) {
-        this(JwtDecoders.fromIssuerLocation(ISSUER), properties.googleClientId());
+        this(defaultDecoder(), properties.googleClientId());
     }
 
     GoogleIdTokenVerifier(JwtDecoder jwtDecoder, String clientId) {
         this.jwtDecoder = jwtDecoder;
         this.clientId = clientId;
+    }
+
+    private static JwtDecoder defaultDecoder() {
+        final NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                new JwtTimestampValidator(),
+                issuerValidator()));
+        return decoder;
+    }
+
+    private static OAuth2TokenValidator<Jwt> issuerValidator() {
+        return jwt -> {
+            final Object issuer = jwt.getClaim(JwtClaimNames.ISS);
+            if (issuer != null && VALID_ISSUERS.contains(issuer.toString())) {
+                return OAuth2TokenValidatorResult.success();
+            }
+            return OAuth2TokenValidatorResult.failure(
+                    new OAuth2Error("invalid_issuer", "허용되지 않은 발급자입니다: " + issuer, null));
+        };
     }
 
     @Override

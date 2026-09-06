@@ -1,10 +1,10 @@
 package coffeeshout.admin.auth.infra;
 
+import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import coffeeshout.admin.account.domain.AdminAccountErrorCode;
 import coffeeshout.admin.auth.AdminAuthProperties;
-import coffeeshout.global.exception.custom.BusinessException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -63,9 +63,8 @@ class JjwtAdminTokenIssuerTest {
             final JjwtAdminTokenIssuer afterExpiry =
                     issuerAt(NOW.plus(Duration.ofSeconds(VALIDITY_SECONDS + 60)));
 
-            assertThatThrownBy(() -> afterExpiry.verify(token))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("만료된 관리자 토큰");
+            assertCoffeeShoutException(() -> afterExpiry.verify(token),
+                    AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED);
         }
 
         @Test
@@ -77,9 +76,8 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(OTHER_SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertThatThrownBy(() -> issuer.verify(forged))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("유효하지 않은 관리자 토큰");
+            assertCoffeeShoutException(() -> issuer.verify(forged),
+                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
@@ -93,9 +91,8 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertThatThrownBy(() -> issuer.verify(userToken))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("관리자 토큰이 아닙니다");
+            assertCoffeeShoutException(() -> issuer.verify(userToken),
+                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
@@ -106,16 +103,14 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertThatThrownBy(() -> issuer.verify(noSubject))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("주체가 없는");
+            assertCoffeeShoutException(() -> issuer.verify(noSubject),
+                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
         void 형식이_아닌_문자열은_거부한다() {
-            assertThatThrownBy(() -> issuer.verify("not-a-jwt"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("유효하지 않은 관리자 토큰");
+            assertCoffeeShoutException(() -> issuer.verify("not-a-jwt"),
+                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
     }
 }

@@ -1,13 +1,14 @@
 package coffeeshout.admin.auth.application;
 
+import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
 import coffeeshout.admin.account.application.AdminAccountService;
+import coffeeshout.admin.account.domain.AdminAccountErrorCode;
 import coffeeshout.admin.auth.domain.AdminTokenIssuer;
 import coffeeshout.admin.auth.domain.SocialIdTokenVerifier;
 import coffeeshout.global.exception.custom.BusinessException;
@@ -64,9 +65,8 @@ class AdminAuthServiceTest {
                     .willReturn("stranger@evil.site");
             given(adminAccountService.isAllowed("stranger@evil.site")).willReturn(false);
 
-            assertThatThrownBy(() -> adminAuthService.login(ID_TOKEN))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("관리자 허용목록에 없는 계정");
+            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
+                    AdminAccountErrorCode.NOT_ADMIN);
             then(adminTokenIssuer).should(never()).issue(any());
         }
 
@@ -75,11 +75,11 @@ class AdminAuthServiceTest {
             // 순서가 뒤바뀌면 이메일을 주장하는 것만으로 목록 등재 여부를 알아낼 수 있다.
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN))
                     .willThrow(new BusinessException(
-                            coffeeshout.admin.account.domain.AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID,
+                            AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID,
                             "구글 인증에 실패했습니다."));
 
-            assertThatThrownBy(() -> adminAuthService.login(ID_TOKEN))
-                    .isInstanceOf(BusinessException.class);
+            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
+                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
             then(adminAccountService).should(never()).isAllowed(any());
             then(adminTokenIssuer).should(never()).issue(any());
         }
@@ -102,9 +102,8 @@ class AdminAuthServiceTest {
             // 로컬이라고 아무 이메일이나 되는 것은 아니다.
             given(adminAccountService.isAllowed("stranger@evil.site")).willReturn(false);
 
-            assertThatThrownBy(() -> adminAuthService.devLogin("stranger@evil.site"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("관리자 허용목록에 없는 계정");
+            assertCoffeeShoutException(() -> adminAuthService.devLogin("stranger@evil.site"),
+                    AdminAccountErrorCode.NOT_ADMIN);
         }
     }
 }

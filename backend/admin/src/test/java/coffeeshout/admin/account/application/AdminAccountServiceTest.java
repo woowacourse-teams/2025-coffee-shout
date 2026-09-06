@@ -1,7 +1,7 @@
 package coffeeshout.admin.account.application;
 
+import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.never;
 
 import coffeeshout.admin.account.domain.AdminAccount;
 import coffeeshout.admin.account.domain.AdminAccountRepository;
+import coffeeshout.admin.account.domain.AdminAccountErrorCode;
 import coffeeshout.admin.auth.AdminAuthProperties;
-import coffeeshout.global.exception.custom.BusinessException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -158,25 +158,22 @@ class AdminAccountServiceTest {
         void 이미_DB에_있으면_거부한다() {
             given(adminAccountRepository.existsByEmail("mj@zzol.site")).willReturn(true);
 
-            assertThatThrownBy(() -> service(List.of(BOOTSTRAP)).add("mj@zzol.site", BOOTSTRAP))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("이미 등록된 관리자");
+            assertCoffeeShoutException(() -> service(List.of(BOOTSTRAP)).add("mj@zzol.site", BOOTSTRAP),
+                    AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS);
         }
 
         @Test
         void 부트스트랩에_있는_이메일도_거부한다() {
             // DB에 넣어봐야 list()가 감추므로, 넣히는 것 자체를 막아 혼란을 없앤다.
-            assertThatThrownBy(() -> service(List.of(BOOTSTRAP)).add(BOOTSTRAP, BOOTSTRAP))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("이미 등록된 관리자");
+            assertCoffeeShoutException(() -> service(List.of(BOOTSTRAP)).add(BOOTSTRAP, BOOTSTRAP),
+                    AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS);
             then(adminAccountRepository).should(never()).save(any());
         }
 
         @Test
         void 비어있는_이메일은_거부한다() {
-            assertThatThrownBy(() -> service(List.of(BOOTSTRAP)).add("   ", BOOTSTRAP))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("비어 있을 수 없습니다");
+            assertCoffeeShoutException(() -> service(List.of(BOOTSTRAP)).add("   ", BOOTSTRAP),
+                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
     }
 
@@ -198,9 +195,8 @@ class AdminAccountServiceTest {
             final AdminAccount self = account("mj@zzol.site", BOOTSTRAP);
             given(adminAccountRepository.findById(1L)).willReturn(Optional.of(self));
 
-            assertThatThrownBy(() -> service(List.of(BOOTSTRAP)).remove(1L, "  MJ@Zzol.Site "))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("자기 자신은 삭제할 수 없습니다");
+            assertCoffeeShoutException(() -> service(List.of(BOOTSTRAP)).remove(1L, "  MJ@Zzol.Site "),
+                    AdminAccountErrorCode.CANNOT_REMOVE_SELF);
             then(adminAccountRepository).should(never()).delete(any());
         }
 
@@ -208,9 +204,8 @@ class AdminAccountServiceTest {
         void 없는_id면_거부한다() {
             given(adminAccountRepository.findById(404L)).willReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service(List.of(BOOTSTRAP)).remove(404L, BOOTSTRAP))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining("존재하지 않는 관리자");
+            assertCoffeeShoutException(() -> service(List.of(BOOTSTRAP)).remove(404L, BOOTSTRAP),
+                    AdminAccountErrorCode.ADMIN_ACCOUNT_NOT_FOUND);
         }
     }
 }
