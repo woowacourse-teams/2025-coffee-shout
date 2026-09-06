@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquareWarning,
-  Palette,
   ScrollText,
   Search,
   ShieldBan,
@@ -51,7 +50,6 @@ const NAV: NavGroup[] = [
       { to: '/zzolbot', label: 'ZzolBot', icon: AlertTriangle },
       { to: '/admins', label: '관리자', icon: UserCog },
       { to: '/audit-logs', label: '조치 이력', icon: History },
-      { to: '/design', label: '디자인', icon: Palette },
     ],
   },
 ];

@@ -72,5 +72,5 @@ export function Skeleton({
   className?: string;
   style?: CSSProperties;
 }) {
-  return <div className={cn('animate-pulse rounded bg-subtle', className)} style={style} />;
+  return <div className={cn('animate-pulse rounded-md bg-subtle', className)} style={style} />;
 }

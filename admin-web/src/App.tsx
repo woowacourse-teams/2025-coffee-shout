@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/EmptyState';
 import { AdminAccountsPage } from '@/pages/AdminAccountsPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
 import { AuditLogsPage } from '@/pages/AuditLogsPage';
-import { DesignGalleryPage } from '@/pages/DesignGalleryPage';
 import { HomePage } from '@/pages/HomePage';
 import { IpBlocksPage } from '@/pages/IpBlocksPage';
 import { LoginPage } from '@/pages/LoginPage';
@@ -71,7 +70,6 @@ export function App() {
                 <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/zzolbot" element={<ZzolBotPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
-                <Route path="/design" element={<DesignGalleryPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Route>

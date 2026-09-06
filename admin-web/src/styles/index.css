@@ -78,7 +78,7 @@
   --tracking-metric: var(--metric-tracking);
 
   --radius-sm: var(--radius-sm);
-  --radius-DEFAULT: var(--radius);
+  --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
 
   --shadow-popover: var(--shadow-popover);

@@ -4,14 +4,15 @@ import { useAuditDecision, useNicknameAuditQuality, useNicknameAudits } from '@/
 import type { NicknameAudit, NicknameAuditStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
-import { ErrorState } from '@/components/ui/EmptyState';
+import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatCard } from '@/components/StatCard';
+import { Tabs } from '@/components/ui/Tabs';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { ProfanityWordsCard } from '@/components/ProfanityWordsCard';
-import { cn } from '@/lib/cn';
 import { formatPercent } from '@/lib/format';
 
 const TABS: { value: NicknameAuditStatus; label: string; hint: string }[] = [
@@ -100,54 +101,47 @@ export function ProfanityPage() {
         description="AI가 걸러낸 닉네임을 사람이 확인합니다. 뒤집힌 비율이 모델을 손볼 시점을 알려줍니다."
       />
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <StatCard
-          label="AI 판정 뒤집힘"
-          value={quality.data ? formatPercent(quality.data.overrideRate) : '-'}
-          hint="최근 30일. 높으면 모델 점검"
-        />
-        <StatCard
-          label="오탐"
-          value={quality.data?.falsePositive ?? 0}
-          hint="AI가 걸렀는데 관리자가 허용"
-        />
-        <StatCard
-          label="미탐"
-          value={quality.data?.falseNegative ?? 0}
-          hint="AI가 놓쳤는데 관리자가 차단"
-        />
-        <StatCard
-          label="판정 일치"
-          value={quality.data?.agreed ?? 0}
-          hint={`총 ${quality.data?.total ?? 0}건 중`}
-        />
-      </div>
+      <Loaded query={quality} skeleton={<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
+          ))}
+        </div>}>
+        {(data) => (
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <StatCard
+              label="AI 판정 뒤집힘"
+              value={formatPercent(data.overrideRate)}
+              hint="최근 30일. 높으면 모델 점검"
+            />
+            <StatCard
+              label="오탐"
+              value={data.falsePositive}
+              hint="AI가 걸렀는데 관리자가 허용"
+            />
+            <StatCard
+              label="미탐"
+              value={data.falseNegative}
+              hint="AI가 놓쳤는데 관리자가 차단"
+            />
+            <StatCard label="판정 일치" value={data.agreed} hint={`총 ${data.total}건 중`} />
+          </div>
+        )}
+      </Loaded>
 
       <Card>
         <CardHeader
           title="검열 대기"
           description={TABS.find((tab) => tab.value === status)?.hint}
           actions={
-            <div className="flex rounded-md border border-border-default p-0.5">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => {
-                    setStatus(tab.value);
-                    setPage(0);
-                  }}
-                  className={cn(
-                    'rounded px-2.5 py-1 text-xs font-medium transition-colors',
-                    status === tab.value
-                      ? 'bg-subtle text-ink'
-                      : 'text-ink-muted hover:text-ink',
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            <Tabs
+              tabs={TABS}
+              value={status}
+              label="검열 상태"
+              onChange={(next) => {
+                setStatus(next);
+                setPage(0);
+              }}
+            />
           }
         />
 

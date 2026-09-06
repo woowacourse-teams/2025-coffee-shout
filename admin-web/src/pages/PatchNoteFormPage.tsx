@@ -161,7 +161,7 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
                 rows={16}
                 placeholder="줄바꿈은 그대로 유지됩니다."
                 aria-invalid={contentOver}
-                className="w-full resize-y rounded border border-border-default bg-surface px-3 py-2 text-sm leading-relaxed text-ink transition-colors placeholder:text-ink-muted hover:border-ink-muted focus:border-accent focus:outline-none aria-[invalid=true]:border-attention-mark"
+                className="w-full resize-y rounded-md border border-border-default bg-surface px-3 py-2 text-sm leading-relaxed text-ink transition-colors placeholder:text-ink-muted hover:border-ink-muted focus:border-accent focus:outline-none aria-[invalid=true]:border-attention-mark"
               />
             </label>
 

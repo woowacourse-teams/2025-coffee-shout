@@ -14,7 +14,7 @@ import { cn } from '@/lib/cn';
  * 기다리지 않고 손끝에 먼저 알려 준다. 응답이 200ms 걸리는 조치에서 차이가 크다.
  */
 const button = cva(
-  'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded font-medium ' +
+  'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-medium ' +
     'transition-[background-color,border-color,color,transform] duration-100 ' +
     'active:scale-[0.97] ' +
     'disabled:pointer-events-none disabled:opacity-40 ' +

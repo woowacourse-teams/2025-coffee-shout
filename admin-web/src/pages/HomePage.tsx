@@ -18,6 +18,7 @@ import { TrendLegend } from '@/components/TrendLegend';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { formatDurationMinutes, formatNumber, formatPercent } from '@/lib/format';
 
@@ -109,46 +110,32 @@ export function HomePage() {
             actions={<TrendLegend />}
           />
           <CardBody>
-            {trend.isPending ? (
-              <Skeleton className="h-[220px]" />
-            ) : trend.isError ? (
-              <ErrorState message={(trend.error as Error).message} onRetry={() => trend.refetch()} />
-            ) : (
-              trend.data && (
+            <Loaded query={trend} skeleton={<Skeleton className="h-[220px]" />}>
+              {(data) => (
                 <Suspense fallback={<Skeleton className="h-[220px]" />}>
-                  <TrendChart data={trend.data} />
+                  <TrendChart data={data} />
                 </Suspense>
-              )
-            )}
+              )}
+            </Loaded>
           </CardBody>
         </Card>
 
         <Card>
           <CardHeader title="오늘" description={summary.data?.date} />
-          {summary.isPending ? (
-            <CardBody className="flex flex-col gap-3">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-8" />
-              ))}
-            </CardBody>
-          ) : (
-            summary.data && (
+          <Loaded query={summary} skeleton={<RowSkeleton rows={4} />}>
+            {(data) => (
               <dl className="divide-y divide-border-default">
-                <MetricRow label="방 생성" value={summary.data.funnel.created} />
+                <MetricRow label="방 생성" value={data.funnel.created} />
                 <MetricRow
                   label="완주"
-                  value={summary.data.funnel.completed}
-                  suffix={formatPercent(summary.data.funnel.completionRate, 0)}
+                  value={data.funnel.completed}
+                  suffix={formatPercent(data.funnel.completionRate, 0)}
                 />
-                <MetricRow
-                  label="참여자"
-                  value={summary.data.players}
-                  hint="여러 방 참여 시 중복"
-                />
-                <MetricRow label="신규 가입" value={summary.data.signups} />
+                <MetricRow label="참여자" value={data.players} hint="여러 방 참여 시 중복" />
+                <MetricRow label="신규 가입" value={data.signups} />
               </dl>
-            )
-          )}
+            )}
+          </Loaded>
         </Card>
       </div>
 
@@ -159,25 +146,19 @@ export function HomePage() {
             description="오늘 기준. 오른쪽은 앞 단계 대비 전환율과 이탈 수."
           />
           <CardBody>
-            {summary.isPending ? (
-              <div className="flex flex-col gap-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Skeleton key={index} className="h-7" />
-                ))}
-              </div>
-            ) : (
-              summary.data && (
+            <Loaded query={summary} skeleton={<RowSkeleton rows={5} height="h-7" />}>
+              {(data) => (
                 <FunnelBar
                   stages={[
-                    { label: '방 생성', count: summary.data.funnel.created },
-                    { label: '다른 사람 입장', count: summary.data.funnel.joined },
-                    { label: '게임 시작', count: summary.data.funnel.gameStarted },
-                    { label: '룰렛 도달', count: summary.data.funnel.rouletteReached },
-                    { label: '완주', count: summary.data.funnel.completed },
+                    { label: '방 생성', count: data.funnel.created },
+                    { label: '다른 사람 입장', count: data.funnel.joined },
+                    { label: '게임 시작', count: data.funnel.gameStarted },
+                    { label: '룰렛 도달', count: data.funnel.rouletteReached },
+                    { label: '완주', count: data.funnel.completed },
                   ]}
                 />
-              )
-            )}
+              )}
+            </Loaded>
           </CardBody>
         </Card>
 
@@ -186,15 +167,9 @@ export function HomePage() {
             title="게임별 플레이"
             description="최근 30일 완료 기준. 비중이 0에 가까우면 아무도 고르지 않는다는 뜻입니다."
           />
-          {games.isPending ? (
-            <CardBody className="flex flex-col gap-2.5">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-4" />
-              ))}
-            </CardBody>
-          ) : (
-            games.data && <GameShareList stats={games.data} />
-          )}
+          <Loaded query={games} skeleton={<RowSkeleton rows={4} height="h-4" />}>
+            {(data) => <GameShareList stats={data} />}
+          </Loaded>
         </Card>
       </div>
 
@@ -204,32 +179,40 @@ export function HomePage() {
             title="운영 품질"
             description="일이 밀렸는지와 잘하고 있는지는 다른 질문입니다."
           />
-          <dl className="divide-y divide-border-default">
-            <MetricRow
-              label="가장 오래 기다린 신고"
-              value={sla.data ? formatDurationMinutes(sla.data.oldestPendingMinutes) : '-'}
-              hint="접수 후 경과"
-            />
-            <MetricRow
-              label="신고 처리 중앙값"
-              value={sla.data ? formatDurationMinutes(sla.data.p50Minutes) : '-'}
-              hint={`최근 30일 ${sla.data?.resolvedCount ?? 0}건`}
-            />
-            <MetricRow
-              label="검열 AI 판정 뒤집힘"
-              value={auditQuality.data ? formatPercent(auditQuality.data.overrideRate) : '-'}
-              hint="높아지면 모델을 손볼 때"
-            />
-            <MetricRow
-              label="검열 오탐 / 미탐"
-              value={
-                auditQuality.data
-                  ? `${auditQuality.data.falsePositive} / ${auditQuality.data.falseNegative}`
-                  : '-'
-              }
-              hint="AI가 잘못 걸렀다 / 놓쳤다"
-            />
-          </dl>
+          {/* 신고 SLA 와 검열 품질은 다른 요청이다. 한 덩어리로 감싸면 한쪽이 실패할 때
+            * 멀쩡한 나머지 숫자까지 사라진다. */}
+          <Loaded query={sla} skeleton={<RowSkeleton rows={2} />}>
+            {(data) => (
+              <dl className="divide-y divide-border-default">
+                <MetricRow
+                  label="가장 오래 기다린 신고"
+                  value={formatDurationMinutes(data.oldestPendingMinutes)}
+                  hint="접수 후 경과"
+                />
+                <MetricRow
+                  label="신고 처리 중앙값"
+                  value={formatDurationMinutes(data.p50Minutes)}
+                  hint={`최근 30일 ${data.resolvedCount}건`}
+                />
+              </dl>
+            )}
+          </Loaded>
+          <Loaded query={auditQuality} skeleton={<RowSkeleton rows={2} />}>
+            {(data) => (
+              <dl className="divide-y divide-border-default border-t border-border-default">
+                <MetricRow
+                  label="검열 AI 판정 뒤집힘"
+                  value={formatPercent(data.overrideRate)}
+                  hint="높아지면 모델을 손볼 때"
+                />
+                <MetricRow
+                  label="검열 오탐 / 미탐"
+                  value={`${data.falsePositive} / ${data.falseNegative}`}
+                  hint="AI가 잘못 걸렀다 / 놓쳤다"
+                />
+              </dl>
+            )}
+          </Loaded>
         </Card>
 
         <Card>
@@ -242,19 +225,22 @@ export function HomePage() {
               </Button>
             }
           />
-          {logs.isPending ? (
-            <CardBody className="flex flex-col gap-3">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Skeleton key={index} className="h-8" />
-              ))}
-            </CardBody>
-          ) : logs.isError ? (
-            <ErrorState message={(logs.error as Error).message} onRetry={() => logs.refetch()} />
-          ) : (
-            <ActivityFeed logs={logs.data?.content ?? []} />
-          )}
+          <Loaded query={logs} skeleton={<RowSkeleton rows={5} />}>
+            {(data) => <ActivityFeed logs={data.content} />}
+          </Loaded>
         </Card>
       </div>
+    </div>
+  );
+}
+
+/** 목록형 카드의 로딩 자리. 카드마다 Array.from 을 반복해 적던 것을 모았다. */
+function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }) {
+  return (
+    <div className="flex flex-col gap-3 p-4">
+      {Array.from({ length: rows }).map((_, index) => (
+        <Skeleton key={index} className={height} />
+      ))}
     </div>
   );
 }

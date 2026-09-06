@@ -235,7 +235,7 @@ function FeedbackButton({
         'text-2xs text-ink-secondary transition-colors hover:border-border-strong hover:text-ink',
       )}
     >
-      <Icon className="size-3" aria-hidden />
+      <Icon className="size-3.5" aria-hidden />
       {label}
     </button>
   );

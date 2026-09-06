@@ -5,7 +5,8 @@ import type { Report, ReportStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
+import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { Loaded } from '@/components/ui/Loaded';
 import { Select } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
@@ -95,26 +96,34 @@ export function ReportsPage() {
         description="접수된 신고를 확인하고 처리합니다. 처리 시간은 최근 30일 기준입니다."
       />
 
-      {/* 지표 카드 행에만 최대폭을 준다. 표는 넓을수록 좋지만, 네 칸짜리 카드 행이
-        * 화면 끝까지 늘어나면 두 자리 숫자 하나에 400px 짜리 빈 상자가 된다. */}
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <StatCard label="미처리" value={sla.data?.pendingCount ?? 0} />
-        <StatCard
-          label="가장 오래 기다린 건"
-          value={sla.data ? formatDurationMinutes(sla.data.oldestPendingMinutes) : '-'}
-          hint="접수 후 경과"
-        />
-        <StatCard
-          label="처리 시간 중앙값"
-          value={sla.data ? formatDurationMinutes(sla.data.p50Minutes) : '-'}
-          hint="평균이 아닌 중앙값"
-        />
-        <StatCard
-          label="처리 시간 p95"
-          value={sla.data ? formatDurationMinutes(sla.data.p95Minutes) : '-'}
-          hint={`최근 30일 ${sla.data?.resolvedCount ?? 0}건 기준`}
-        />
-      </div>
+      {/* 실패하면 "-" 대신 실패했다고 말한다. "-" 는 "오늘 0건"과 똑같이 생겨서,
+        * 서버가 답을 못 준 것을 처리할 게 없는 것으로 읽게 만든다. */}
+      <Loaded query={sla} skeleton={<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
+          ))}
+        </div>}>
+        {(data) => (
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <StatCard label="미처리" value={data.pendingCount} />
+            <StatCard
+              label="가장 오래 기다린 건"
+              value={formatDurationMinutes(data.oldestPendingMinutes)}
+              hint="접수 후 경과"
+            />
+            <StatCard
+              label="처리 시간 중앙값"
+              value={formatDurationMinutes(data.p50Minutes)}
+              hint="평균이 아닌 중앙값"
+            />
+            <StatCard
+              label="처리 시간 p95"
+              value={formatDurationMinutes(data.p95Minutes)}
+              hint={`최근 30일 ${data.resolvedCount}건 기준`}
+            />
+          </div>
+        )}
+      </Loaded>
 
       <Card>
         <CardHeader

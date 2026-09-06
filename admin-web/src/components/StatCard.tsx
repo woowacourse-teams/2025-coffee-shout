@@ -22,7 +22,7 @@ export function StatCard({ label, value, hint, delta, suffix, className }: StatC
       className={cn(
         // 네 칸이 나란히 설 때 높이가 같아야 한다. 보조 문구가 없는 칸만 짧아지면
         // 줄이 들쭉날쭉해 보인다. 문구 줄은 항상 자리를 차지하고 비어 있을 뿐이다.
-        'flex h-full flex-col rounded-lg border border-border-default bg-surface px-4 py-3.5',
+        'flex h-full flex-col rounded-lg border border-border-default bg-surface p-4',
         className,
       )}
     >
