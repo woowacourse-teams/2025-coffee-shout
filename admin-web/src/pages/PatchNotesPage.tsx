@@ -82,7 +82,7 @@ export function PatchNotesPage() {
       <Card>
         <CardHeader
           title="패치노트 목록"
-          description={`${notes.data?.length ?? 0}건`}
+          description={notes.data ? `${notes.data.length}건` : undefined}
           actions={
             <Button asChild variant="primary" size="sm">
               <Link to="/patch-notes/new">새 글 작성</Link>

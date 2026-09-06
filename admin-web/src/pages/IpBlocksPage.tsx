@@ -50,7 +50,12 @@ export function IpBlocksPage() {
       />
 
       <Card>
-        <CardHeader title="차단 중인 IP" description={`${blocked.data?.length ?? 0}건`} />
+        {/* 건수는 성공했을 때만 적는다. 실패했는데 "0건"이라고 쓰면 차단된 IP 가
+          * 없다는 말이 되어, 바로 아래 표의 오류 문구와 서로 다른 말을 한다. */}
+        <CardHeader
+          title="차단 중인 IP"
+          description={blocked.data ? `${blocked.data.length}건` : undefined}
+        />
 
         {blocked.isError ? (
           <ErrorState
