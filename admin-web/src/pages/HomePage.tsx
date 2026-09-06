@@ -170,7 +170,7 @@ export function HomePage() {
                 <FunnelBar
                   stages={[
                     { label: '방 생성', count: summary.data.funnel.created },
-                    { label: '2인 이상 입장', count: summary.data.funnel.joined },
+                    { label: '다른 사람 입장', count: summary.data.funnel.joined },
                     { label: '게임 시작', count: summary.data.funnel.gameStarted },
                     { label: '룰렛 도달', count: summary.data.funnel.rouletteReached },
                     { label: '완주', count: summary.data.funnel.completed },

@@ -125,7 +125,7 @@ export function AnalyticsPage() {
                 <FunnelBar
                   stages={[
                     { label: '방 생성', count: period.data.funnel.created },
-                    { label: '2인 이상 입장', count: period.data.funnel.joined },
+                    { label: '다른 사람 입장', count: period.data.funnel.joined },
                     { label: '게임 시작', count: period.data.funnel.gameStarted },
                     { label: '룰렛 도달', count: period.data.funnel.rouletteReached },
                     { label: '완주', count: period.data.funnel.completed },

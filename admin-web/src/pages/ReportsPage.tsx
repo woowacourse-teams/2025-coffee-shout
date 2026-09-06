@@ -107,7 +107,7 @@ export function ReportsPage() {
         <StatCard
           label="처리 시간 중앙값"
           value={sla.data ? formatDurationMinutes(sla.data.p50Minutes) : '-'}
-          hint="평균이 아니다. 방치된 한 건이 평균을 끌고 간다"
+          hint="평균이 아닌 중앙값"
         />
         <StatCard
           label="처리 시간 p95"

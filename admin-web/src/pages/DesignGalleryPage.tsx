@@ -98,7 +98,7 @@ export function DesignGalleryPage() {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard label="방 생성" value={128} delta={12} />
           <StatCard label="게임 완료" value={94} delta={-6} />
-          <StatCard label="참여자" value={412} hint="같은 사람이 여러 방에 들어가면 중복 집계" />
+          <StatCard label="참여자" value={412} hint="여러 방 참여 시 중복 집계" />
           <StatCard label="완주율" value={formatPercent(0.734)} suffix="DONE 기준" />
         </div>
       </Section>

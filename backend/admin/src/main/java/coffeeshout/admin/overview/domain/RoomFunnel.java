@@ -15,7 +15,10 @@ package coffeeshout.admin.overview.domain;
  * 결과와 함께 저장되므로(MiniGameResultSaveEventListener) 시작과 완료를 구분하지 못한다.
  *
  * @param created      방 생성 수
- * @param joined       2인 이상이 들어온 방 (혼자 만들고 아무도 안 온 방을 걸러낸다)
+ * @param joined       방장 외에 한 명이라도 더 들어온 방
+ *                     <p>2인이라는 숫자가 기준인 것이 아니다. 2인부터 게임이 되므로
+ *                     이 단계가 재는 것은 "임계 인원을 넘었나"가 아니라
+ *                     <b>"만들어 놓고 아무도 안 왔나"</b>다. 방 수만 세면 안 보인다.
  * @param gameStarted  게임을 시작한 방 (roomStatus 가 READY 를 벗어남)
  * @param rouletteReached 룰렛까지 간 방
  * @param completed    끝까지 간 방 (DONE)

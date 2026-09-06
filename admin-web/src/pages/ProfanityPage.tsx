@@ -104,7 +104,7 @@ export function ProfanityPage() {
         <StatCard
           label="AI 판정 뒤집힘"
           value={quality.data ? formatPercent(quality.data.overrideRate) : '-'}
-          hint="최근 30일. 높아지면 모델을 손볼 때다"
+          hint="최근 30일. 높으면 모델 점검"
         />
         <StatCard
           label="오탐"

@@ -55,7 +55,7 @@ export function UserDetailPage() {
         <StatCard
           label="당첨 비율"
           value={formatPercent(winRate)}
-          hint="참여 대비. 인원 수가 방마다 달라 기대값도 방마다 다르다"
+          hint="참여 대비. 기대값은 방마다 다름"
         />
       </div>
 
