@@ -3,6 +3,7 @@ package coffeeshout.admin.overview.infra.persistence;
 import coffeeshout.admin.overview.domain.DailyTrendPoint;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository;
 import coffeeshout.admin.overview.domain.RoomFunnel;
+import coffeeshout.minigame.infra.persistence.QMiniGameEntity;
 import coffeeshout.minigame.infra.persistence.QMiniGameResultEntity;
 import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.infra.persistence.QPlayerEntity;
@@ -13,6 +14,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTemplate;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.sql.Date;
 import java.time.Instant;
@@ -33,15 +35,14 @@ public class QueryDslOverviewStatisticsRepository implements OverviewStatisticsR
     private static final QRoomEntity ROOM = QRoomEntity.roomEntity;
     private static final QPlayerEntity PLAYER = QPlayerEntity.playerEntity;
     private static final QUserEntity USER = QUserEntity.userEntity;
-    private static final QMiniGameResultEntity MINI_GAME_RESULT =
-            QMiniGameResultEntity.miniGameResultEntity;
+    private static final QMiniGameEntity MINI_GAME_PLAY = QMiniGameEntity.miniGameEntity;
+    private static final QMiniGameResultEntity MINI_GAME_RESULT = QMiniGameResultEntity.miniGameResultEntity;
 
     /** 게임을 시작한 방. READY 를 벗어났다는 뜻이다. */
     private static final List<RoomState> STARTED =
             List.of(RoomState.PLAYING, RoomState.SCORE_BOARD, RoomState.ROULETTE, RoomState.DONE);
 
-    private static final List<RoomState> ROULETTE_REACHED =
-            List.of(RoomState.ROULETTE, RoomState.DONE);
+    private static final List<RoomState> ROULETTE_REACHED = List.of(RoomState.ROULETTE, RoomState.DONE);
 
     private final JPAQueryFactory queryFactory;
 
@@ -54,8 +55,8 @@ public class QueryDslOverviewStatisticsRepository implements OverviewStatisticsR
         }
         return new RoomFunnel(
                 created,
-                countJoinedRooms(from, to),
                 countRooms(from, to, ROOM.roomStatus.in(STARTED)),
+                countRoomsWithMiniGamePlay(from, to),
                 countRooms(from, to, ROOM.roomStatus.in(ROULETTE_REACHED)),
                 countRooms(from, to, ROOM.roomStatus.eq(RoomState.DONE)));
     }
@@ -100,8 +101,7 @@ public class QueryDslOverviewStatisticsRepository implements OverviewStatisticsR
                 .fetch()) {
             final long count = nullToZero(row.get(ROOM.count()));
             final long completed = row.get(ROOM.roomStatus) == RoomState.DONE ? count : 0;
-            roomsByDate.merge(
-                    toLocalDate(row.get(roomDate)), new RoomCounts(count, completed), RoomCounts::plus);
+            roomsByDate.merge(toLocalDate(row.get(roomDate)), new RoomCounts(count, completed), RoomCounts::plus);
         }
 
         final DateTemplate<Date> playerDate = dateOf(PLAYER.createdAt);
@@ -139,9 +139,8 @@ public class QueryDslOverviewStatisticsRepository implements OverviewStatisticsR
                 .groupBy(MINI_GAME_RESULT.miniGameType)
                 .fetch()
                 .stream()
-                .map(row -> new GamePlayCount(
-                        row.get(MINI_GAME_RESULT.miniGameType),
-                        nullToZero(row.get(1, Long.class))))
+                .map(row ->
+                        new GamePlayCount(row.get(MINI_GAME_RESULT.miniGameType), nullToZero(row.get(1, Long.class))))
                 .toList();
     }
 
@@ -181,18 +180,28 @@ public class QueryDslOverviewStatisticsRepository implements OverviewStatisticsR
      * 참여자가 2명 이상인 방. 방장 혼자 만들고 아무도 안 들어온 방을 걸러낸다.
      * 그 방들을 세면 퍼널 1단계가 부풀어 이탈 지점을 못 찾는다.
      */
-    private long countJoinedRooms(LocalDateTime from, LocalDateTime to) {
-        // GROUP BY + HAVING 의 결과 행 수가 곧 답이다. 바깥에서 한 번 더 세려면
-        // 서브쿼리를 감싸야 하는데, 여기서는 행 수만 필요하므로 그대로 센다.
-        return queryFactory
-                .select(PLAYER.roomSession.id)
-                .from(PLAYER)
-                .join(PLAYER.roomSession, ROOM)
-                .where(ROOM.createdAt.goe(from), ROOM.createdAt.lt(to))
-                .groupBy(PLAYER.roomSession.id)
-                .having(PLAYER.count().goe(2))
-                .fetch()
-                .size();
+    /**
+     * 미니게임을 한 판이라도 끝낸 방의 수.
+     *
+     * <p>{@code mini_game_play} 를 조인하지 않고 exists 로 본다. 조인하면 판 수만큼
+     * 방이 부풀어 세 판 한 방이 셋으로 세진다. distinct 로 덮을 수도 있지만, 여기서
+     * 필요한 것은 "있느냐" 하나라서 첫 행을 찾는 순간 멈추는 exists 가 맞다.
+     *
+     * <p>기간은 <b>방 생성 시각</b>으로 자른다. 퍼널의 다른 단계와 같은 기준이어야
+     * 단계 간 숫자가 이어진다. mini_game_play 에는 시각 컬럼 자체가 없기도 하다.
+     */
+    private long countRoomsWithMiniGamePlay(LocalDateTime from, LocalDateTime to) {
+        return nullToZero(queryFactory
+                .select(ROOM.count())
+                .from(ROOM)
+                .where(
+                        ROOM.createdAt.goe(from),
+                        ROOM.createdAt.lt(to),
+                        JPAExpressions.selectOne()
+                                .from(MINI_GAME_PLAY)
+                                .where(MINI_GAME_PLAY.roomSessionId.eq(ROOM.id))
+                                .exists())
+                .fetchOne());
     }
 
     private static long nullToZero(Long value) {

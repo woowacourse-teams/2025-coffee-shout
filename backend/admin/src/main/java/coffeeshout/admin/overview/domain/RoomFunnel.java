@@ -15,21 +15,22 @@ package coffeeshout.admin.overview.domain;
  * 결과와 함께 저장되므로(MiniGameResultSaveEventListener) 시작과 완료를 구분하지 못한다.
  *
  * @param created      방 생성 수
- * @param joined       방장 외에 한 명이라도 더 들어온 방
- *                     <p>2인이라는 숫자가 기준인 것이 아니다. 2인부터 게임이 되므로
- *                     이 단계가 재는 것은 "임계 인원을 넘었나"가 아니라
- *                     <b>"만들어 놓고 아무도 안 왔나"</b>다. 방 수만 세면 안 보인다.
+ * @param miniGamePlayed 미니게임을 한 판이라도 끝낸 방
+ *                     <p>한때 이 자리에 "2인 이상 입장"이 있었다. 뺐다. 2인부터 게임이
+ *                     되므로 게임을 시작한 방은 전부 2인 이상이고, 그래서 그 칸은 늘
+ *                     100%를 찍었다. 언제나 100%인 칸은 아무것도 알려주지 않으면서
+ *                     퍼널의 한 줄을 차지한다.
+ *
+ *                     <p>대신 여기를 본다. {@code mini_game_play} 행은 게임이 <b>끝날 때</b>
+ *                     생기므로, 게임 시작과 이 단계 사이의 차이가 곧 <b>하다가 나간 방</b>이다.
+ *                     그건 실제로 손을 쓸 수 있는 신호다 - 특정 게임이 자꾸 중간에
+ *                     버려지는지를 게임별 플레이와 나란히 놓고 볼 수 있다.
  * @param gameStarted  게임을 시작한 방 (roomStatus 가 READY 를 벗어남)
  * @param rouletteReached 룰렛까지 간 방
  * @param completed    끝까지 간 방 (DONE)
  */
 public record RoomFunnel(
-        long created,
-        long joined,
-        long gameStarted,
-        long rouletteReached,
-        long completed
-) {
+        long created, long gameStarted, long miniGamePlayed, long rouletteReached, long completed) {
 
     public static RoomFunnel empty() {
         return new RoomFunnel(0, 0, 0, 0, 0);

@@ -37,7 +37,7 @@ class RoomFunnelTest {
             final RoomFunnel funnel = RoomFunnel.empty();
 
             assertThat(funnel.created()).isZero();
-            assertThat(funnel.joined()).isZero();
+            assertThat(funnel.miniGamePlayed()).isZero();
             assertThat(funnel.gameStarted()).isZero();
             assertThat(funnel.rouletteReached()).isZero();
             assertThat(funnel.completed()).isZero();

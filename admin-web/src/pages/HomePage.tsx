@@ -143,7 +143,7 @@ export function HomePage() {
         <Card>
           <CardHeader
             title="방 진행 퍼널"
-            description="오늘 기준. 오른쪽은 앞 단계 대비 전환율과 이탈 수."
+            description="오늘 기준. 게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
           />
           <CardBody>
             <Loaded query={summary} skeleton={<RowSkeleton rows={5} height="h-7" />}>
@@ -151,8 +151,8 @@ export function HomePage() {
                 <FunnelBar
                   stages={[
                     { label: '방 생성', count: data.funnel.created },
-                    { label: '다른 사람 입장', count: data.funnel.joined },
                     { label: '게임 시작', count: data.funnel.gameStarted },
+                    { label: '미니게임 완료', count: data.funnel.miniGamePlayed },
                     { label: '룰렛 도달', count: data.funnel.rouletteReached },
                     { label: '완주', count: data.funnel.completed },
                   ]}

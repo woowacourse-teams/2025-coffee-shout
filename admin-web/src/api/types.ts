@@ -29,8 +29,9 @@ export type ActionQueue = {
 
 export type Funnel = {
   created: number;
-  joined: number;
   gameStarted: number;
+  /** 미니게임을 한 판이라도 끝낸 방. 게임 시작과의 차이가 하다가 나간 방이다. */
+  miniGamePlayed: number;
   rouletteReached: number;
   completed: number;
   completionRate: number;
@@ -45,6 +46,8 @@ export type DailyTrend = {
 
 export type GamePlayStat = {
   miniGameType: string;
+  /** 화면에 찍는 한글 이름. 서버 enum 이 들고 있는 값을 그대로 받는다. */
+  label: string;
   plays: number;
   /** 전체 대비 비중. 0.0 ~ 1.0 */
   share: number;

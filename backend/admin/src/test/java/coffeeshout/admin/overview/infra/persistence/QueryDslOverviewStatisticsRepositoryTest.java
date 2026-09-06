@@ -68,11 +68,12 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             room("AAAA", RoomState.READY);
             room("BBBB", RoomState.READY);
 
-            final List<DailyTrendPoint> trend =
-                    overviewStatisticsRepository.findDailyTrend(WIDE_FROM, WIDE_TO);
+            final List<DailyTrendPoint> trend = overviewStatisticsRepository.findDailyTrend(WIDE_FROM, WIDE_TO);
 
-            assertThat(trend).singleElement()
-                    .extracting(DailyTrendPoint::created).isEqualTo(2L);
+            assertThat(trend)
+                    .singleElement()
+                    .extracting(DailyTrendPoint::created)
+                    .isEqualTo(2L);
         }
 
         @Test
@@ -83,8 +84,9 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             room("CCCC", RoomState.PLAYING);
             room("DDDD", RoomState.READY);
 
-            final DailyTrendPoint point =
-                    overviewStatisticsRepository.findDailyTrend(WIDE_FROM, WIDE_TO).getFirst();
+            final DailyTrendPoint point = overviewStatisticsRepository
+                    .findDailyTrend(WIDE_FROM, WIDE_TO)
+                    .getFirst();
 
             assertThat(point.created()).isEqualTo(4L);
             assertThat(point.completed()).isEqualTo(2L);
@@ -98,8 +100,9 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             playerJpaRepository.save(new PlayerEntity(room, "영희", PlayerType.GUEST));
             playerJpaRepository.save(new PlayerEntity(room, "민수", PlayerType.GUEST));
 
-            final DailyTrendPoint point =
-                    overviewStatisticsRepository.findDailyTrend(WIDE_FROM, WIDE_TO).getFirst();
+            final DailyTrendPoint point = overviewStatisticsRepository
+                    .findDailyTrend(WIDE_FROM, WIDE_TO)
+                    .getFirst();
 
             assertThat(point.created()).isEqualTo(1L);
             assertThat(point.players()).isEqualTo(3L);
@@ -109,8 +112,8 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
         void 기간에_아무것도_없으면_빈_목록이다() {
             room("AAAA", RoomState.READY);
 
-            assertThat(overviewStatisticsRepository.findDailyTrend(
-                    WIDE_FROM, LocalDateTime.of(2001, 1, 1, 0, 0))).isEmpty();
+            assertThat(overviewStatisticsRepository.findDailyTrend(WIDE_FROM, LocalDateTime.of(2001, 1, 1, 0, 0)))
+                    .isEmpty();
         }
     }
 
@@ -123,8 +126,7 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             // "완주"에만 세고 "게임 시작"에서 빠뜨리면 퍼널이 아래로 갈수록 늘어난다.
             room("AAAA", RoomState.DONE);
 
-            final RoomFunnel funnel =
-                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+            final RoomFunnel funnel = overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
 
             assertThat(funnel.created()).isEqualTo(1L);
             assertThat(funnel.gameStarted()).isEqualTo(1L);
@@ -139,8 +141,7 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             room("CCCC", RoomState.ROULETTE);
             room("DDDD", RoomState.DONE);
 
-            final RoomFunnel funnel =
-                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+            final RoomFunnel funnel = overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
 
             assertThat(funnel.created()).isEqualTo(4L);
             assertThat(funnel.gameStarted()).isEqualTo(3L);
@@ -149,20 +150,32 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
         }
 
         @Test
-        void 혼자_만들고_아무도_안_온_방은_입장으로_세지_않는다() {
-            // 이 한 칸이 "만들었는데 아무도 안 왔다"를 드러낸다. 방 수만 세면 안 보인다.
-            final RoomEntity alone = room("AAAA", RoomState.READY);
-            playerJpaRepository.save(new PlayerEntity(alone, "철수", PlayerType.HOST));
+        void 미니게임_기록이_없는_방은_완료로_세지_않는다() {
+            // 게임 시작과 이 단계의 차이가 곧 "하다가 나간 방"이다.
+            // mini_game_play 행은 게임이 끝날 때 생기므로, 시작만 한 방은 여기서 빠진다.
+            room("AAAA", RoomState.PLAYING);
 
-            final RoomEntity joined = room("BBBB", RoomState.READY);
-            playerJpaRepository.save(new PlayerEntity(joined, "영희", PlayerType.HOST));
-            playerJpaRepository.save(new PlayerEntity(joined, "민수", PlayerType.GUEST));
+            final RoomEntity finished = room("BBBB", RoomState.DONE);
+            final MiniGameEntity play = miniGameJpaRepository.save(
+                    new MiniGameEntity(finished.getId(), MiniGameType.CARD_GAME));
+            miniGameResultJpaRepository.save(new MiniGameResultEntity(play, 1L, 1, 100L));
 
-            final RoomFunnel funnel =
-                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+            final RoomFunnel funnel = overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
 
-            assertThat(funnel.created()).isEqualTo(2L);
-            assertThat(funnel.joined()).isEqualTo(1L);
+            assertThat(funnel.gameStarted()).isEqualTo(2L);
+            assertThat(funnel.miniGamePlayed()).isEqualTo(1L);
+        }
+
+        @Test
+        void 한_방에서_여러_판을_해도_한_번만_센다() {
+            // 조인으로 세면 판 수만큼 방이 부풀어 퍼널이 앞 단계보다 커진다.
+            final RoomEntity room = room("AAAA", RoomState.DONE);
+            miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.CARD_GAME));
+            miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
+            miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.WORM_GAME));
+
+            assertThat(overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO).miniGamePlayed())
+                    .isEqualTo(1L);
         }
 
         @Test
@@ -178,9 +191,12 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
 
             final LocalDateTime createdAt = room.getCreatedAt();
             assertThat(overviewStatisticsRepository
-                    .findFunnelBetween(createdAt, createdAt).created()).isZero();
+                            .findFunnelBetween(createdAt, createdAt)
+                            .created())
+                    .isZero();
             assertThat(overviewStatisticsRepository
-                    .findFunnelBetween(createdAt, createdAt.plusSeconds(1)).created())
+                            .findFunnelBetween(createdAt, createdAt.plusSeconds(1))
+                            .created())
                     .isEqualTo(1L);
         }
     }
@@ -192,34 +208,31 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
         void 참가자가_여럿이어도_한_판으로_센다() {
             // 한 판에 참가자 수만큼 결과 행이 생긴다. distinct 를 빼면 4명짜리 한 판이 4판이 된다.
             final RoomEntity room = room("AAAA", RoomState.DONE);
-            final MiniGameEntity play = miniGameJpaRepository.save(
-                    new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
+            final MiniGameEntity play =
+                    miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
             for (int rank = 1; rank <= 4; rank++) {
-                final PlayerEntity player = playerJpaRepository.save(
-                        new PlayerEntity(room, "p" + rank, PlayerType.GUEST));
-                miniGameResultJpaRepository.save(
-                        new MiniGameResultEntity(play, player.getId(), rank, 100L));
+                final PlayerEntity player =
+                        playerJpaRepository.save(new PlayerEntity(room, "p" + rank, PlayerType.GUEST));
+                miniGameResultJpaRepository.save(new MiniGameResultEntity(play, player.getId(), rank, 100L));
             }
 
             assertThat(overviewStatisticsRepository.countPlaysByGame(WIDE_FROM, WIDE_TO))
                     .singleElement()
-                    .extracting(GamePlayCount::plays).isEqualTo(1L);
+                    .extracting(GamePlayCount::plays)
+                    .isEqualTo(1L);
         }
 
         @Test
         void 게임_타입별로_나눠_센다() {
             final RoomEntity room = room("AAAA", RoomState.DONE);
-            final PlayerEntity player =
-                    playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
+            final PlayerEntity player = playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
 
-            final MiniGameEntity racing = miniGameJpaRepository.save(
-                    new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
-            final MiniGameEntity blockStacking = miniGameJpaRepository.save(
-                    new MiniGameEntity(room.getId(), MiniGameType.BLOCK_STACKING));
-            miniGameResultJpaRepository.save(
-                    new MiniGameResultEntity(racing, player.getId(), 1, 100L));
-            miniGameResultJpaRepository.save(
-                    new MiniGameResultEntity(blockStacking, player.getId(), 1, 200L));
+            final MiniGameEntity racing =
+                    miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
+            final MiniGameEntity blockStacking =
+                    miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.BLOCK_STACKING));
+            miniGameResultJpaRepository.save(new MiniGameResultEntity(racing, player.getId(), 1, 100L));
+            miniGameResultJpaRepository.save(new MiniGameResultEntity(blockStacking, player.getId(), 1, 200L));
 
             assertThat(overviewStatisticsRepository.countPlaysByGame(WIDE_FROM, WIDE_TO))
                     .hasSize(2)
@@ -228,7 +241,8 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
 
         @Test
         void 게임_기록이_없으면_빈_목록이다() {
-            assertThat(overviewStatisticsRepository.countPlaysByGame(WIDE_FROM, WIDE_TO)).isEmpty();
+            assertThat(overviewStatisticsRepository.countPlaysByGame(WIDE_FROM, WIDE_TO))
+                    .isEmpty();
         }
     }
 }
