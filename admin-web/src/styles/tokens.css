@@ -1,0 +1,187 @@
+/*
+ * ZZOL 백오피스 디자인 토큰
+ *
+ * 색을 새로 고르지 않는다. 실제 유저 화면(frontend/src/styles/theme.ts)의 팔레트를
+ * 그대로 가져와 백오피스의 역할에 배치한다. 백오피스가 자기만의 색을 가지면
+ * 같은 서비스의 두 화면이 다른 제품처럼 보인다.
+ *
+ * 출처:
+ *   frontend/src/styles/theme.ts   color.point, color.gray, color.blue, color.status
+ *   frontend/src/constants/color.ts  colorList(레이싱 게임 플레이어 색), tierColorMap
+ *   admin-web/public/brand/logo.svg  워드마크 fill = #FD6C6E (= point-400)
+ *
+ * 근거와 대비 수치는 docs/design-tokens.md 참조.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * 1. 브랜드 (frontend theme.color.point 그대로)
+   *
+   * point-400 이 로고 색이자 이 시스템의 키 컬러다. 밝아서(흰 배경 대비 2.78:1)
+   * 텍스트나 채움 버튼으로 쓸 수 없다. 틴트, 인디케이터, 포커스 링, 선택 상태로 쓴다.
+   * 텍스트가 필요하면 point-600 이상을 쓴다.
+   * ------------------------------------------------------------- */
+  --point-50: #fef2f2;
+  --point-100: #ffe1e1;
+  --point-200: #ffc8c9;
+  --point-300: #ff8789;
+  --point-400: #fd6c6e; /* 키 컬러 */
+  --point-500: #f53e41;
+  /* 600 이상은 서비스 스케일에 없어 같은 색조로 확장했다. 백오피스는 표 위에
+   * 브랜드색 텍스트를 얹을 일이 있는데 500(3.72:1)으로는 AA를 못 넘긴다. */
+  --point-600: #d42a2d; /* 흰 배경 5.04:1 */
+  --point-700: #b02023; /* 흰 배경 6.83:1 */
+
+  /* ---------------------------------------------------------------
+   * 2. 중성 (frontend theme.color.gray 그대로)
+   * ------------------------------------------------------------- */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5dc;
+  --gray-400: #99a1af;
+  --gray-500: #6a7282;
+  --gray-600: #4a5565;
+  --gray-700: #364153;
+  --gray-800: #1e2939;
+  --gray-900: #101828;
+  --gray-950: #030712;
+
+  /* ---------------------------------------------------------------
+   * 3. 상태 신호
+   *
+   * 이 색들은 상태에만 쓴다. 액션이나 차트 계열로 빌려주지 않는다.
+   * 신호 색이 두 가지 뜻을 가지면 화면을 읽을 때마다 문맥을 따져야 한다.
+   * ------------------------------------------------------------- */
+  --success-dot: #1fcd7e; /* 서비스 status.online. 점과 아이콘 전용, 흰 텍스트 금지 */
+  --success-bg: #e8f8f0;
+  --success-fg: #0e7a49; /* 흰 텍스트 5.39:1 */
+
+  --warning-dot: #ffdf20; /* 서비스 yellow. 점과 아이콘 전용 */
+  --warning-bg: #fff3c4; /* 서비스 tierColorMap.GOLD.bg */
+  --warning-fg: #8a6000; /* 서비스 GOLD.text(#9A6B00)를 AA(4.5)까지 낮춘 값. bg 위 5.03:1 */
+
+  --info-bg: #e6f0ff;
+  --info-fg: #0066ff; /* 서비스 blue. 흰 텍스트 4.83:1 */
+
+  --danger-bg: #fdecec;
+  --danger-fg: #c81e1e; /* 서비스 red(#FF0000)는 흰 텍스트 4.00:1로 AA 미달이라 낮춘 값 */
+
+  /* ---------------------------------------------------------------
+   * 4. 역할 별칭 (컴포넌트는 이것만 참조한다)
+   * ------------------------------------------------------------- */
+
+  /* 표면 */
+  --bg-canvas: var(--gray-50);
+  --bg-surface: #ffffff;
+  --bg-subtle: var(--gray-100);
+  --bg-selected: var(--point-50);
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+
+  /* 텍스트 */
+  --text-primary: var(--gray-900); /* 캔버스 위 16.98:1 */
+  --text-secondary: var(--gray-600); /* 카드 위 7.56:1 */
+  --text-muted: var(--gray-500); /* 카드 위 4.84:1 */
+  --text-inverse: #ffffff;
+
+  /* 사이드 레일 (다크)
+   * 레일을 gray-900 으로 두면 브랜드 로고를 원래 색 그대로 올릴 수 있다(6.38:1).
+   * 화이트 버전 로고를 따로 만들 필요가 없다. */
+  --rail-bg: var(--gray-900);
+  --rail-text: rgb(255 255 255 / 0.72);
+  --rail-text-active: #ffffff;
+  --rail-item-active-bg: rgb(253 108 110 / 0.16);
+  --rail-indicator: var(--point-400);
+  --rail-border: rgb(255 255 255 / 0.1);
+
+  /* 액션 */
+  --action-primary-bg: var(--gray-900); /* 흰 텍스트 17.75:1 */
+  --action-primary-bg-hover: var(--gray-800);
+  --action-primary-text: #ffffff;
+
+  --action-secondary-bg: #ffffff;
+  --action-secondary-border: var(--gray-300);
+  --action-secondary-text: var(--gray-800);
+
+  /* 파괴적 액션은 표 안에서 아웃라인, 확인 다이얼로그에서 채움으로 쓴다.
+   * 접근성 때문이 아니라 밀도 때문이다. 표의 모든 행에 빨간 채움 버튼이 있으면
+   * 화면이 경고로 뒤덮여 진짜 경고가 안 보인다. */
+  --action-danger-bg: #ffffff;
+  --action-danger-border: var(--danger-fg);
+  --action-danger-text: var(--danger-fg); /* 흰 배경 5.74:1 */
+  --action-danger-confirm-bg: var(--danger-fg); /* Primary 와 3.09:1 로 구분된다 */
+
+  /* 강조 */
+  --accent: var(--point-400);
+  --accent-subtle: var(--point-50);
+  --accent-text: var(--point-600); /* 400 은 텍스트 대비 미달이라 600 을 쓴다 */
+  --focus-ring: var(--point-400);
+
+  /* ---------------------------------------------------------------
+   * 5. 차트
+   *
+   * 서비스 colorList(레이싱 게임 플레이어 색)의 색조를 유지하되, 밝은 캔버스 위에서
+   * 3:1과 색각 이상 분리를 만족하도록 명도를 낮춘 값이다.
+   * dataviz 검증기 전 항목 통과 (최악 인접쌍 protan ΔE 10.4, 정상시야 ΔE 19.5).
+   *
+   * 순서를 고정한다. 계열을 순환시키거나 필터 결과에 따라 다시 칠하지 않는다.
+   * 색은 항목에 붙지 순위에 붙지 않는다.
+   * ------------------------------------------------------------- */
+  --chart-1: #f53e41; /* 브랜드 (point-500). 400 은 캔버스 대비 2.71:1 로 미달 */
+  --chart-2: #3a6bb0; /* 서비스 #5a88c8 */
+  --chart-3: #0f9e7a; /* 서비스 초록 계열 */
+  --chart-4: #c97a00; /* 서비스 #ffa102 */
+  --chart-5: #9b4fe0; /* 서비스 #bf77f6 */
+  --chart-6: #5e8a1a; /* 서비스 #85b62e */
+  --chart-grid: var(--gray-200);
+  --chart-axis: var(--gray-500);
+
+  /* 소셜 제공자 분포 차트 전용. 서비스 theme.color.oauth 값을 그대로 쓴다.
+   * 제공자 색은 브랜드 자산이라 차트 계열 순서와 무관하게 고정한다. */
+  --provider-google: #747775;
+  --provider-kakao: #fee500;
+  --provider-naver: #03a94d;
+
+  /* ---------------------------------------------------------------
+   * 6. 타이포그래피 (서비스와 같은 Pretendard)
+   * ------------------------------------------------------------- */
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', system-ui, sans-serif;
+  /* 기존 백오피스(static/css/admin.css)가 쓰던 폰트를 이어받는다. */
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.8125rem; /* 13px - 본문 기본. 어드민은 밀도가 미덕 */
+  --text-base: 0.875rem; /* 14px */
+  --text-lg: 1rem; /* 16px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px - KPI 숫자 */
+  --text-3xl: 2rem; /* 32px */
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  /* ---------------------------------------------------------------
+   * 7. 공간, 모서리, 그림자
+   * ------------------------------------------------------------- */
+  --radius-sm: 0.25rem;
+  --radius: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem; /* 8px - 카드 */
+
+  /* 표가 많은 화면에서 그림자는 노이즈다. 층위는 경계선과 배경 톤으로 만들고,
+   * 그림자는 실제로 떠 있는 것(드롭다운, 다이얼로그)에만 쓴다. */
+  --shadow-popover: 0 4px 12px rgb(16 24 40 / 0.08), 0 1px 3px rgb(16 24 40 / 0.06);
+  --shadow-dialog: 0 16px 48px rgb(16 24 40 / 0.18);
+
+  --row-height: 2.25rem; /* 36px */
+  --row-height-compact: 2rem; /* 32px */
+  --rail-width: 15rem; /* 240px */
+  --topbar-height: 2.75rem; /* 44px */
+}
+
+/* 숫자 자리를 고정한다. 표에서 자릿수가 흔들리면 스캔이 안 된다. */
+:root {
+  font-variant-numeric: tabular-nums;
+}
