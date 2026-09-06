@@ -37,8 +37,7 @@ class NoOpNicknameAuditorTest {
 
         @Test
         void null_입력은_예외가_발생한다() {
-            assertThatThrownBy(() -> auditor.audit(null))
-                    .isInstanceOf(NullPointerException.class);
+            assertThatThrownBy(() -> auditor.audit(null)).isInstanceOf(NullPointerException.class);
         }
 
         @Test
