@@ -53,6 +53,7 @@
   --color-attention-mark: var(--attention-mark);
   --color-attention-solid: var(--attention-solid);
   --color-attention-on-solid: var(--attention-on-solid);
+  --color-attention-icon-on-solid: var(--attention-icon-on-solid);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

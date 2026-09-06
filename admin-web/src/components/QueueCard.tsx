@@ -24,6 +24,8 @@ type QueueCardProps = {
  * 얼룩덜룩해진다. 카드 전체가 링크다. 숫자를 보고 바로 그 큐로 들어가는 것이 전부다.
  *
  * <p>색은 <b>아이콘 칩</b>이 진다. 평소 회색이던 칩이 로고색으로 채워지는 것이 신호다.
+ * 채워진 칩의 글리프는 흰색이다. 아이콘 혼자 뜻을 지지 않고 옆에 라벨과 숫자가 있어서,
+ * 흰 글리프여야 칩이 브랜드 마크처럼 하나로 읽힌다.
  * 숫자는 잉크로 둔다. 로고색은 밝아서(흰 배경 2.78:1) 24px 굵은 글씨로도 3:1 을 못 넘긴다.
  * 로고색으로 숫자를 쓰려면 읽힐 만큼 어둡게 내려야 하는데, 그러면 그건 로고색이 아니라
  * 그냥 빨강이다. 색은 채움으로 쓰고 글자는 잉크에 맡기면 둘 다 얻는다.
@@ -45,7 +47,7 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
           'flex size-8 shrink-0 items-center justify-center rounded-md transition-colors',
           idle
             ? 'bg-subtle text-ink-muted'
-            : 'bg-attention-solid text-attention-on-solid',
+            : 'bg-attention-solid text-attention-icon-on-solid',
         )}
       >
         <Icon className="size-4" strokeWidth={2.25} aria-hidden />
