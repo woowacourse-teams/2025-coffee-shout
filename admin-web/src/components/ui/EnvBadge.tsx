@@ -12,7 +12,7 @@ import { cn } from '@/lib/cn';
  * 화면은 똑같이 생겼다. 이 배지가 유일한 구분 장치다.
  */
 const TONE: Record<EnvName, string> = {
-  PROD: 'bg-attention-solid text-ink-inverse',
+  PROD: 'bg-attention-solid text-attention-on-solid',
   DEV: 'bg-subtle text-ink-secondary border border-border-strong',
   LOCAL: 'bg-subtle text-ink-muted border border-border-default',
 };

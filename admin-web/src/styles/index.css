@@ -45,10 +45,14 @@
   --color-action: var(--action-primary-bg);
   --color-action-hover: var(--action-primary-bg-hover);
 
-  /* 신호는 하나다. 회색으로 못 하는 말만 이 색이 한다. */
+  /* 신호는 하나다. 회색으로 못 하는 말만 이 색이 한다.
+   * mark 가 색을 지고 attention 은 그 옆의 글자색(=잉크)이다. 둘을 헷갈리면
+   * 로고색 글자가 다시 생겨난다. */
   --color-attention: var(--attention-fg);
   --color-attention-bg: var(--attention-bg);
+  --color-attention-mark: var(--attention-mark);
   --color-attention-solid: var(--attention-solid);
+  --color-attention-on-solid: var(--attention-on-solid);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

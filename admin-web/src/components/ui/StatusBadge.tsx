@@ -39,7 +39,7 @@ export function StatusBadge({ tone = 'neutral', children, className }: StatusBad
   return (
     <span className={cn(badge({ tone }), className)}>
       {tone === 'attention' && (
-        <span className="size-1.5 rounded-full bg-attention" aria-hidden />
+        <span className="size-1.5 rounded-full bg-attention-mark" aria-hidden />
       )}
       {children}
     </span>

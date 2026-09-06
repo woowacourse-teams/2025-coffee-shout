@@ -22,6 +22,11 @@ type QueueCardProps = {
  *
  * <p>카드 바탕은 언제나 흰색이다. 배경을 통째로 물들이면 네 칸이 나란히 있을 때 화면이
  * 얼룩덜룩해진다. 카드 전체가 링크다. 숫자를 보고 바로 그 큐로 들어가는 것이 전부다.
+ *
+ * <p>색은 <b>아이콘 칩</b>이 진다. 평소 회색이던 칩이 로고색으로 채워지는 것이 신호다.
+ * 숫자는 잉크로 둔다. 로고색은 밝아서(흰 배경 2.78:1) 24px 굵은 글씨로도 3:1 을 못 넘긴다.
+ * 로고색으로 숫자를 쓰려면 읽힐 만큼 어둡게 내려야 하는데, 그러면 그건 로고색이 아니라
+ * 그냥 빨강이다. 색은 채움으로 쓰고 글자는 잉크에 맡기면 둘 다 얻는다.
  */
 export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
   const idle = count === 0;
@@ -32,16 +37,18 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
       className={cn(
         'group relative flex items-center gap-3 rounded-lg border bg-surface px-4 py-3 transition-all duration-150',
         'hover:border-border-strong hover:shadow-popover active:scale-[0.99]',
-        idle ? 'border-border-default' : 'border-attention/25',
+        idle ? 'border-border-default' : 'border-attention-mark/40',
       )}
     >
       <span
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-md',
-          idle ? 'bg-subtle text-ink-muted' : 'bg-attention-bg text-attention',
+          'flex size-8 shrink-0 items-center justify-center rounded-md transition-colors',
+          idle
+            ? 'bg-subtle text-ink-muted'
+            : 'bg-attention-solid text-attention-on-solid',
         )}
       >
-        <Icon className="size-4" aria-hidden />
+        <Icon className="size-4" strokeWidth={2.25} aria-hidden />
       </span>
 
       {/* 라벨과 숫자를 한 줄에 나란히 둔다. 두 줄로 쌓으면 두 자리 숫자 하나에
@@ -53,7 +60,7 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
       <span
         className={cn(
           'shrink-0 text-2xl font-bold leading-none tracking-[-0.02em]',
-          idle ? 'text-ink-muted' : 'text-attention',
+          idle ? 'text-ink-muted' : 'text-ink',
         )}
       >
         {formatNumber(count)}

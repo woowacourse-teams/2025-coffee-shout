@@ -35,13 +35,17 @@ export function DesignGalleryPage() {
         </p>
       </header>
 
-      <Section title="색" description="회색과 브랜드 코랄, 둘뿐이다. 초록·노랑·파랑을 두지 않는다.">
+      <Section
+        title="색"
+        description="회색과 로고색(#FD6C6E), 둘뿐이다. 짙은 빨강 단계를 두지 않는다. 로고색은 채움과 마크로만 쓰고, 글자는 잉크가 진다."
+      >
         <div className="flex flex-wrap gap-3">
           <Swatch name="action" className="bg-action" note="Primary 버튼" />
-          <Swatch name="accent" className="bg-accent" note="아이덴티티. 텍스트 불가" />
-          <Swatch name="attention" className="bg-attention" note="유일한 신호색" />
-          <Swatch name="attention-solid" className="bg-attention-solid" note="채움 + 흰 텍스트" />
+          <Swatch name="accent" className="bg-accent" note="로고색. 아이덴티티" />
+          <Swatch name="attention-mark" className="bg-attention-mark" note="신호 마크" />
+          <Swatch name="attention-solid" className="bg-attention-solid" note="채움 + 잉크 6.38:1" />
           <Swatch name="attention-bg" className="bg-attention-bg" note="틴트" />
+          <Swatch name="attention" className="bg-attention" note="신호 옆 글자 = 잉크" />
         </div>
         {/* 클래스명을 문자열로 조립하지 않는다. Tailwind 는 소스를 정적으로 훑어
          * 쓰인 클래스만 CSS 로 내보내므로, `bg-${name}` 은 스캔에 안 잡혀 스타일이 사라진다. */}
@@ -54,7 +58,7 @@ export function DesignGalleryPage() {
 
       <Section
         title="버튼"
-        description="Primary 는 중성 채움, danger 는 코랄 아웃라인. 코랄 채움은 확인 다이얼로그에서만."
+        description="Primary 는 중성 채움, danger 는 코랄 테두리에 잉크 글자. 코랄 채움은 확인 다이얼로그에서만."
       >
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="primary">저장</Button>

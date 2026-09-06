@@ -44,7 +44,12 @@ export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
         className,
       )}
     >
-      <p className="text-sm font-medium text-attention">불러오지 못했습니다</p>
+      {/* 글자는 잉크로 두고 옆의 코랄 점이 신호를 진다. 문장을 로고색으로 물들이면
+       * 읽히도록 어둡게 내려야 하고, 그 순간 브랜드가 아니라 에러 빨강이 된다. */}
+      <p className="flex items-center gap-1.5 text-sm font-medium text-attention">
+        <span className="size-1.5 rounded-full bg-attention-mark" aria-hidden />
+        불러오지 못했습니다
+      </p>
       {message && <p className="max-w-md text-xs text-ink-muted">{message}</p>}
       {onRetry && (
         <button

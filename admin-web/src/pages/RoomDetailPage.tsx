@@ -81,7 +81,7 @@ export function RoomDetailPage() {
         <CardHeader title="룰렛 결과" description="당첨 확률은 미니게임 결과로 조정된 최종값입니다." />
         {roulette ? (
           <CardBody className="flex items-center gap-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-attention-bg text-attention">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-attention-solid text-attention-on-solid">
               <Trophy className="size-5" aria-hidden />
             </span>
             <div>
