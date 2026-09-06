@@ -4,10 +4,16 @@ import { ApiError } from '@/api/client';
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Skeleton } from '@/components/ui/EmptyState';
+import { AdminAccountsPage } from '@/pages/AdminAccountsPage';
 import { DesignGalleryPage } from '@/pages/DesignGalleryPage';
 import { HomePage } from '@/pages/HomePage';
+import { IpBlocksPage } from '@/pages/IpBlocksPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { ProfanityPage } from '@/pages/ProfanityPage';
+import { ReportsPage } from '@/pages/ReportsPage';
+import { RoomDetailPage } from '@/pages/RoomDetailPage';
+import { RoomsPage } from '@/pages/RoomsPage';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -44,6 +50,12 @@ export function App() {
             <Route element={<RequireAuth />}>
               <Route element={<AdminLayout />}>
                 <Route index element={<HomePage />} />
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/profanity" element={<ProfanityPage />} />
+                <Route path="/ip-blocks" element={<IpBlocksPage />} />
+                <Route path="/rooms" element={<RoomsPage />} />
+                <Route path="/rooms/:roomId" element={<RoomDetailPage />} />
+                <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/design" element={<DesignGalleryPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
