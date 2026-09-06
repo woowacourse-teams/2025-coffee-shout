@@ -25,7 +25,7 @@ export function UserDetailPage() {
 
   if (detail.isPending || !detail.data) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
         <Skeleton className="h-7 w-40" />
         <Skeleton className="h-40 rounded-lg" />
       </div>
@@ -49,7 +49,7 @@ export function UserDetailPage() {
         />
       </div>
 
-      <div className="grid max-w-[820px] grid-cols-2 gap-3 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
         <StatCard label="참여한 방" value={roomCount} />
         <StatCard label="당첨" value={winCount} />
         <StatCard

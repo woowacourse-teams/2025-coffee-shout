@@ -74,6 +74,9 @@
   --text-2xl: var(--text-2xl);
   --text-3xl: var(--text-3xl);
 
+  /* 숫자 전용 자간. 큰 숫자를 쓰는 곳은 전부 이걸 쓴다. */
+  --tracking-metric: var(--metric-tracking);
+
   --radius-sm: var(--radius-sm);
   --radius-DEFAULT: var(--radius);
   --radius-lg: var(--radius-lg);

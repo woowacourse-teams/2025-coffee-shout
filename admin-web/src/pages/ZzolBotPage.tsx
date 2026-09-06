@@ -32,7 +32,7 @@ export function ZzolBotPage() {
   const [panel, setPanel] = useState<Panel>('chat');
 
   return (
-    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="ZzolBot"
         description={DESCRIPTION[panel]}

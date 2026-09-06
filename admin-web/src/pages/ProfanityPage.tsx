@@ -100,7 +100,7 @@ export function ProfanityPage() {
         description="AI가 걸러낸 닉네임을 사람이 확인합니다. 뒤집힌 비율이 모델을 손볼 시점을 알려줍니다."
       />
 
-      <div className="grid max-w-[1100px] grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <StatCard
           label="AI 판정 뒤집힘"
           value={quality.data ? formatPercent(quality.data.overrideRate) : '-'}

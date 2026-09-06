@@ -35,7 +35,7 @@ export function AnalyticsPage() {
   const games = useGamePlayStats(days);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="서비스 분석"
         description="사람들이 이 서비스를 실제로 어떻게 쓰는지. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."

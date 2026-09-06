@@ -50,7 +50,7 @@ export function HomePage() {
   const logs = useAuditLogs(6);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="홈"
         description="처리할 일과 서비스 흐름. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
@@ -281,7 +281,7 @@ function MetricRow({
         {hint && <span className="block text-2xs text-ink-muted">{hint}</span>}
       </dt>
       <dd className="flex shrink-0 items-baseline gap-1.5">
-        <span className="text-xl font-bold leading-none tracking-[-0.02em] text-ink">
+        <span className="text-xl font-bold leading-none tracking-metric text-ink">
           {typeof value === 'number' ? formatNumber(value) : value}
         </span>
         {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}

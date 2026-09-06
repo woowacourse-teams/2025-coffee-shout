@@ -34,7 +34,7 @@ export function StatCard({ label, value, hint, delta, suffix, className }: StatC
         {/* 라벨보다 한 단계 위면 충분하다. 32px 까지 키우면 "1일 20시간" 같은 값이
          * 카드 폭을 넘어 줄바꿈되고, 그 순간 옆 카드와 높이가 어긋나 줄이 무너진다.
          * 숫자를 크게 하는 목적은 훑을 때 눈에 들어오게 하는 것이지 압도하는 게 아니다. */}
-        <span className="whitespace-nowrap text-2xl font-bold leading-none tracking-[-0.02em] text-ink">
+        <span className="whitespace-nowrap text-2xl font-bold leading-none tracking-metric text-ink">
           {typeof value === 'number' ? formatNumber(value) : value}
         </span>
         {suffix && <span className="whitespace-nowrap text-xs text-ink-muted">{suffix}</span>}

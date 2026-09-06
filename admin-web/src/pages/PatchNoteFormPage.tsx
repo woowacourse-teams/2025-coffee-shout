@@ -100,7 +100,7 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
   };
 
   return (
-    <form onSubmit={submit} className="mx-auto flex w-full max-w-[1100px] flex-col gap-6">
+    <form onSubmit={submit} className="flex flex-col gap-6">
       <PageHeader
         title={id === null ? '패치노트 작성' : '패치노트 수정'}
         description="저장하면 유저 화면에 바로 나갑니다. 예약 발행은 없습니다."
@@ -116,7 +116,9 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
         }
       />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      {/* 글을 쓰고 읽는 영역이라 여기만 좁게 잡는다. 한 줄이 화면 끝까지 가면
+        * 눈이 다음 줄 첫 글자를 못 찾는다. 목록 화면이 넓은 것과 반대 이유다. */}
+      <div className="grid max-w-[1100px] gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <Card>
           <CardHeader title="내용" />
           <CardBody className="flex flex-col gap-4">

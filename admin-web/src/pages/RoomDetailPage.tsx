@@ -31,7 +31,7 @@ export function RoomDetailPage() {
 
   if (detail.isPending || !detail.data) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
         <Skeleton className="h-7 w-40" />
         <Skeleton className="h-40 rounded-lg" />
       </div>
@@ -85,7 +85,7 @@ export function RoomDetailPage() {
               <Trophy className="size-5" aria-hidden />
             </span>
             <div>
-              <p className="text-lg font-semibold tracking-tight text-ink">
+              <p className="text-2xl font-bold leading-none tracking-metric text-ink">
                 {roulette.winnerPlayerName}
               </p>
               <p className="mt-0.5 text-xs text-ink-muted">

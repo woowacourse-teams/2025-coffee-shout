@@ -59,7 +59,7 @@ export function LoginPage() {
         </div>
 
         <div className="rounded-lg border border-border-default bg-surface p-6">
-          <h1 className="text-lg font-semibold tracking-tight text-ink">로그인</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-ink">로그인</h1>
           <p className="mt-1 text-xs leading-relaxed text-ink-muted">
             허용목록에 등록된 구글 계정만 들어올 수 있습니다.
           </p>

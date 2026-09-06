@@ -61,7 +61,7 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
 
       <span
         className={cn(
-          'shrink-0 text-2xl font-bold leading-none tracking-[-0.02em]',
+          'shrink-0 text-2xl font-bold leading-none tracking-metric',
           idle ? 'text-ink-muted' : 'text-ink',
         )}
       >

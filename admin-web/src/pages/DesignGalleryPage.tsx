@@ -7,6 +7,7 @@ import { CodeBlock } from '@/components/ui/CodeBlock';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Input, Label, SearchInput, Select } from '@/components/ui/Field';
 import { KeyValue } from '@/components/ui/KeyValue';
+import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
@@ -36,13 +37,11 @@ export function DesignGalleryPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-8">
-      <header>
-        <h2 className="text-xl font-semibold text-ink">디자인 갤러리</h2>
-        <p className="mt-1 text-xs text-ink-muted">
-          새 컴포넌트를 만들기 전에 여기서 먼저 찾아본다. 같은 동작에 다른 모양을 쓰지 않는다.
-        </p>
-      </header>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="디자인 갤러리"
+        description="새 컴포넌트를 만들기 전에 여기서 먼저 찾아봅니다. 같은 동작에 다른 모양을 쓰지 않습니다."
+      />
 
       <Section
         title="색"
@@ -237,24 +236,6 @@ export function DesignGalleryPage() {
         </Card>
       </Section>
     </div>
-  );
-}
-
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <h3 className="text-sm font-semibold text-ink">{title}</h3>
-      {description && <p className="mb-2 mt-0.5 text-xs text-ink-muted">{description}</p>}
-      <div className={description ? '' : 'mt-2'}>{children}</div>
-    </section>
   );
 }
 

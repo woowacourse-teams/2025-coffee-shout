@@ -36,7 +36,7 @@ export function CardHeader({ title, description, actions, className }: CardHeade
       )}
     >
       <div className="min-w-0">
-        <h2 className="text-base font-semibold text-ink">{title}</h2>
+        <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
         {description && (
           <p className="mt-0.5 text-xs text-ink-muted">{description}</p>
         )}
