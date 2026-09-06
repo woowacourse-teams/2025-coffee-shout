@@ -10,6 +10,24 @@ import com.tngtech.archunit.lang.ArchRule;
 /**
  * :admin 모듈 내 도메인(dashboard, patchnote, report) 간 직접 참조 금지.
  * 세 영역은 운영자 영역이라는 이유로 한 모듈에 있지만 서로 독립적으로 유지해야 한다.
+ *
+ * <p>백오피스 재설계로 들어온 {@code coffeeshout.admin.*} 하위 영역에는 상호 참조 금지를
+ * 걸지 않았다. overview 는 정의상 여러 영역(report, profanity, ipblock)을 모아 보여주는
+ * 화면이고 quality 도 신고와 검열을 함께 잰다. 모으는 것이 목적인 영역에 그 규칙을 걸면
+ * 우회하려고 의미 없는 중간 계층이 생긴다.
+ *
+ * <p>"기존 영역이 admin 하위를 참조하면 안 된다" 같은 방향 규칙도 두지 않았다.
+ * {@code report}가 이미 {@code admin.ipblock}(신고자 IP 해제)과 {@code admin.support}(공용
+ * 페이지 응답)를 정당하게 쓰고 있어 규칙과 코드가 처음부터 어긋난다. 예외를 달아 가며
+ * 유지하는 규칙은 곧 아무도 안 읽게 된다.
+ *
+ * <p>"공용 계층({@code admin.support})은 도메인을 참조하지 않는다"도 걸어 봤지만 같은 이유로
+ * 뺐다. 그 패키지의 {@code AdminViewExceptionHandler}가 Thymeleaf 컨트롤러를
+ * {@code assignableTypes}로 지목하고 있어 지금도 report 와 ipblock 을 안다. 그 클래스는
+ * Phase 5 에서 Thymeleaf 와 함께 사라지므로, 그때 이 규칙을 다시 검토한다.
+ *
+ * <p>즉 아래 여섯 규칙이 전부다. 코드가 지키지 못하는 규칙을 예외를 달아 가며 유지하면
+ * 곧 아무도 읽지 않는 장식이 된다.
  */
 @AnalyzeClasses(packages = "coffeeshout", importOptions = ImportOption.DoNotIncludeTests.class)
 public class AdminArchitectureTest {
