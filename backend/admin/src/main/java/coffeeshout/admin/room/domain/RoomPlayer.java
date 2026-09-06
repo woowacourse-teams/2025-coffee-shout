@@ -14,6 +14,4 @@ public record RoomPlayer(
         Long userId,
         String nickname,
         String userCode,
-        LocalDateTime joinedAt
-) {
-}
+        LocalDateTime joinedAt) {}

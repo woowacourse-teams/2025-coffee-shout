@@ -65,8 +65,7 @@ public class AdminAuditLog {
             String targetId,
             String detail,
             AdminAuditResult result,
-            Instant now
-    ) {
+            Instant now) {
         final AdminAuditLog log = new AdminAuditLog();
         // 길이 초과로 감사 기록이 통째로 유실되면 안 된다. 자르더라도 남기는 쪽을 택한다.
         log.actorEmail = truncate(blankToAnonymous(actorEmail), MAX_ACTOR);

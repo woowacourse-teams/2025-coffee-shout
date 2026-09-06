@@ -49,8 +49,7 @@ class JjwtAdminTokenIssuerTest {
         @Test
         void 만료_직전까지는_유효하다() {
             final String token = issuer.issue(MJ);
-            final JjwtAdminTokenIssuer justBeforeExpiry =
-                    issuerAt(NOW.plusSeconds(VALIDITY_SECONDS - 1));
+            final JjwtAdminTokenIssuer justBeforeExpiry = issuerAt(NOW.plusSeconds(VALIDITY_SECONDS - 1));
 
             assertThat(justBeforeExpiry.verify(token).email()).isEqualTo(MJ);
         }
@@ -62,11 +61,9 @@ class JjwtAdminTokenIssuerTest {
         @Test
         void 만료된_토큰은_거부한다() {
             final String token = issuer.issue(MJ);
-            final JjwtAdminTokenIssuer afterExpiry =
-                    issuerAt(NOW.plus(Duration.ofSeconds(VALIDITY_SECONDS + 60)));
+            final JjwtAdminTokenIssuer afterExpiry = issuerAt(NOW.plus(Duration.ofSeconds(VALIDITY_SECONDS + 60)));
 
-            assertCoffeeShoutException(() -> afterExpiry.verify(token),
-                    AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED);
+            assertCoffeeShoutException(() -> afterExpiry.verify(token), AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED);
         }
 
         @Test
@@ -78,8 +75,7 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(OTHER_SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertCoffeeShoutException(() -> issuer.verify(forged),
-                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
+            assertCoffeeShoutException(() -> issuer.verify(forged), AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
@@ -93,8 +89,7 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertCoffeeShoutException(() -> issuer.verify(userToken),
-                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
+            assertCoffeeShoutException(() -> issuer.verify(userToken), AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
@@ -105,14 +100,12 @@ class JjwtAdminTokenIssuerTest {
                     .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                     .compact();
 
-            assertCoffeeShoutException(() -> issuer.verify(noSubject),
-                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
+            assertCoffeeShoutException(() -> issuer.verify(noSubject), AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
 
         @Test
         void 형식이_아닌_문자열은_거부한다() {
-            assertCoffeeShoutException(() -> issuer.verify("not-a-jwt"),
-                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
+            assertCoffeeShoutException(() -> issuer.verify("not-a-jwt"), AdminAccountErrorCode.ADMIN_TOKEN_INVALID);
         }
     }
 }

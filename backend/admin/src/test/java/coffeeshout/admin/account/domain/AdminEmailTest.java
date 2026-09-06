@@ -19,10 +19,10 @@ class AdminEmailTest {
 
         @ParameterizedTest
         @CsvSource({
-                "MJ@ZZOL.SITE, mj@zzol.site",
-                "'  mj@zzol.site  ', mj@zzol.site",
-                "Mj@Zzol.Site, mj@zzol.site",
-                "mj@zzol.site, mj@zzol.site"
+            "MJ@ZZOL.SITE, mj@zzol.site",
+            "'  mj@zzol.site  ', mj@zzol.site",
+            "Mj@Zzol.Site, mj@zzol.site",
+            "mj@zzol.site, mj@zzol.site"
         })
         void 공백을_제거하고_소문자로_낮춘다(String raw, String expected) {
             assertThat(AdminEmail.of(raw).value()).isEqualTo(expected);
@@ -47,23 +47,20 @@ class AdminEmailTest {
         @NullAndEmptySource
         @ValueSource(strings = {"   ", "\t"})
         void 비어있으면_예외를_던진다(String raw) {
-            assertCoffeeShoutException(() -> AdminEmail.of(raw),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
+            assertCoffeeShoutException(() -> AdminEmail.of(raw), AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @ParameterizedTest
         @ValueSource(strings = {"nobody", "@zzol.site", "mj@", "mj@a@b.site"})
         void 형식이_아니면_예외를_던진다(String raw) {
-            assertCoffeeShoutException(() -> AdminEmail.of(raw),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
+            assertCoffeeShoutException(() -> AdminEmail.of(raw), AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @Test
         void 길이가_255자를_넘으면_예외를_던진다() {
             final String tooLong = "a".repeat(250) + "@zzol.site";
 
-            assertCoffeeShoutException(() -> AdminEmail.of(tooLong),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
+            assertCoffeeShoutException(() -> AdminEmail.of(tooLong), AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
         }
 
         @Test
@@ -79,8 +76,7 @@ class AdminEmailTest {
 
         @Test
         void 유효하면_값을_담아_돌려준다() {
-            assertThat(AdminEmail.parse("  MJ@Zzol.Site "))
-                    .contains(AdminEmail.of("mj@zzol.site"));
+            assertThat(AdminEmail.parse("  MJ@Zzol.Site ")).contains(AdminEmail.of("mj@zzol.site"));
         }
 
         @ParameterizedTest

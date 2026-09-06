@@ -68,17 +68,22 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
             final List<RoomSummary> found =
                     roomLookupRepository.search("ABCD", PageRequest.of(0, 20)).getContent();
 
-            assertThat(found).singleElement()
-                    .extracting(RoomSummary::playerCount).isEqualTo(2L);
+            assertThat(found)
+                    .singleElement()
+                    .extracting(RoomSummary::playerCount)
+                    .isEqualTo(2L);
         }
 
         @Test
         void 참여자가_없는_방도_0으로_나온다() {
             roomJpaRepository.save(new RoomEntity("EMPT"));
 
-            assertThat(roomLookupRepository.search("EMPT", PageRequest.of(0, 20)).getContent())
+            assertThat(roomLookupRepository
+                            .search("EMPT", PageRequest.of(0, 20))
+                            .getContent())
                     .singleElement()
-                    .extracting(RoomSummary::playerCount).isEqualTo(0L);
+                    .extracting(RoomSummary::playerCount)
+                    .isEqualTo(0L);
         }
 
         @Test
@@ -87,7 +92,9 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
             final RoomEntity older = roomJpaRepository.save(new RoomEntity("SAME"));
             final RoomEntity newer = roomJpaRepository.save(new RoomEntity("SAME"));
 
-            assertThat(roomLookupRepository.search("SAME", PageRequest.of(0, 20)).getContent())
+            assertThat(roomLookupRepository
+                            .search("SAME", PageRequest.of(0, 20))
+                            .getContent())
                     .extracting(RoomSummary::id)
                     .containsExactly(newer.getId(), older.getId());
         }
@@ -105,7 +112,9 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
         void 소문자로_검색해도_찾는다() {
             roomJpaRepository.save(new RoomEntity("ABCD"));
 
-            assertThat(roomLookupRepository.search("abcd", PageRequest.of(0, 20)).getContent())
+            assertThat(roomLookupRepository
+                            .search("abcd", PageRequest.of(0, 20))
+                            .getContent())
                     .hasSize(1);
         }
     }
@@ -130,10 +139,10 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
         void 로그인_사용자는_계정_닉네임을_함께_싣는다() {
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
             final UserEntity user = userJpaRepository.save(new UserEntity("AB3CD", "계정닉네임"));
-            playerJpaRepository.save(
-                    new PlayerEntity(room, "방에서쓴이름", PlayerType.HOST, user.getId()));
+            playerJpaRepository.save(new PlayerEntity(room, "방에서쓴이름", PlayerType.HOST, user.getId()));
 
-            final RoomPlayer player = roomLookupRepository.findPlayers(room.getId()).getFirst();
+            final RoomPlayer player =
+                    roomLookupRepository.findPlayers(room.getId()).getFirst();
 
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(player.playerName()).isEqualTo("방에서쓴이름");
@@ -147,7 +156,8 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
             playerJpaRepository.save(new PlayerEntity(room, "손님", PlayerType.GUEST));
 
-            final RoomPlayer player = roomLookupRepository.findPlayers(room.getId()).getFirst();
+            final RoomPlayer player =
+                    roomLookupRepository.findPlayers(room.getId()).getFirst();
 
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(player.userId()).isNull();
@@ -163,12 +173,10 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
         @Test
         void 게임_결과에_플레이어_이름을_붙여_돌려준다() {
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
-            final PlayerEntity player =
-                    playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
-            final MiniGameEntity miniGame = miniGameJpaRepository.save(
-                    new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
-            miniGameResultJpaRepository.save(new MiniGameResultEntity(
-                    miniGame, player.getId(), 1, 500L));
+            final PlayerEntity player = playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
+            final MiniGameEntity miniGame =
+                    miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
+            miniGameResultJpaRepository.save(new MiniGameResultEntity(miniGame, player.getId(), 1, 500L));
 
             assertThat(roomLookupRepository.findMiniGameResults(room.getId()))
                     .singleElement()
@@ -182,12 +190,10 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
         void 다른_방의_결과는_섞이지_않는다() {
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
             final RoomEntity other = roomJpaRepository.save(new RoomEntity("WXYZ"));
-            final PlayerEntity otherPlayer =
-                    playerJpaRepository.save(new PlayerEntity(other, "남", PlayerType.HOST));
-            final MiniGameEntity miniGame = miniGameJpaRepository.save(
-                    new MiniGameEntity(other.getId(), MiniGameType.RACING_GAME));
-            miniGameResultJpaRepository.save(new MiniGameResultEntity(
-                    miniGame, otherPlayer.getId(), 1, 500L));
+            final PlayerEntity otherPlayer = playerJpaRepository.save(new PlayerEntity(other, "남", PlayerType.HOST));
+            final MiniGameEntity miniGame =
+                    miniGameJpaRepository.save(new MiniGameEntity(other.getId(), MiniGameType.RACING_GAME));
+            miniGameResultJpaRepository.save(new MiniGameResultEntity(miniGame, otherPlayer.getId(), 1, 500L));
 
             assertThat(roomLookupRepository.findMiniGameResults(room.getId())).isEmpty();
         }
@@ -199,8 +205,7 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
         @Test
         void 당첨자와_확률을_돌려준다() {
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
-            final PlayerEntity winner =
-                    playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
+            final PlayerEntity winner = playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST));
             rouletteResultJpaRepository.save(new RouletteResultEntity(room, winner, 12));
 
             assertThat(roomLookupRepository.findRouletteResult(room.getId()))

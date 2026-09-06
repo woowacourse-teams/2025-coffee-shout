@@ -54,21 +54,16 @@ public class AdminPatchNoteController {
     }
 
     @PostMapping
-    public ResponseEntity<PatchNoteAdminResponse> create(
-            @Valid @RequestBody CreatePatchNoteRequest request) {
-        final Long id = patchNoteAdminService.create(
-                request.category(), request.title(), request.content());
+    public ResponseEntity<PatchNoteAdminResponse> create(@Valid @RequestBody CreatePatchNoteRequest request) {
+        final Long id = patchNoteAdminService.create(request.category(), request.title(), request.content());
         final URI location = UriComponentsBuilder.fromPath("/admin/api/patch-notes/{id}")
-                .buildAndExpand(id).toUri();
-        return ResponseEntity.created(location)
-                .body(PatchNoteAdminResponse.from(patchNoteAdminService.findById(id)));
+                .buildAndExpand(id)
+                .toUri();
+        return ResponseEntity.created(location).body(PatchNoteAdminResponse.from(patchNoteAdminService.findById(id)));
     }
 
     @PutMapping("/{id}")
-    public PatchNoteAdminResponse update(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdatePatchNoteRequest request
-    ) {
+    public PatchNoteAdminResponse update(@PathVariable Long id, @Valid @RequestBody UpdatePatchNoteRequest request) {
         patchNoteAdminService.update(id, request.category(), request.title(), request.content());
         return PatchNoteAdminResponse.from(patchNoteAdminService.findById(id));
     }

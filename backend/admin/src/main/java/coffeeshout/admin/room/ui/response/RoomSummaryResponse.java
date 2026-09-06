@@ -10,12 +10,15 @@ public record RoomSummaryResponse(
         RoomState status,
         LocalDateTime createdAt,
         LocalDateTime finishedAt,
-        long playerCount
-) {
+        long playerCount) {
 
     public static RoomSummaryResponse from(RoomSummary summary) {
         return new RoomSummaryResponse(
-                summary.id(), summary.joinCode(), summary.status(),
-                summary.createdAt(), summary.finishedAt(), summary.playerCount());
+                summary.id(),
+                summary.joinCode(),
+                summary.status(),
+                summary.createdAt(),
+                summary.finishedAt(),
+                summary.playerCount());
     }
 }

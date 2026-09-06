@@ -36,11 +36,9 @@ class AdminIpBlockControllerTest {
 
         @Test
         void 차단된_IP와_잔여_TTL을_돌려준다() {
-            given(ipBlockAdminService.getBlockedIps())
-                    .willReturn(List.of(new BlockedIp("1.2.3.4", 3600)));
+            given(ipBlockAdminService.getBlockedIps()).willReturn(List.of(new BlockedIp("1.2.3.4", 3600)));
 
-            assertThat(adminIpBlockController.list())
-                    .containsExactly(new BlockedIpResponse("1.2.3.4", 3600));
+            assertThat(adminIpBlockController.list()).containsExactly(new BlockedIpResponse("1.2.3.4", 3600));
         }
 
         @Test
@@ -66,8 +64,7 @@ class AdminIpBlockControllerTest {
         void 형식이_아니면_서비스를_호출하지_않는다(String invalidIp) {
             // 검증 없이 넘기면 레디스 키 패턴을 건드리는 경로가 열린다.
             assertCoffeeShoutException(
-                    () -> adminIpBlockController.unblock(invalidIp),
-                    GlobalErrorCode.VALIDATION_ERROR);
+                    () -> adminIpBlockController.unblock(invalidIp), GlobalErrorCode.VALIDATION_ERROR);
 
             then(ipBlockAdminService).shouldHaveNoInteractions();
         }

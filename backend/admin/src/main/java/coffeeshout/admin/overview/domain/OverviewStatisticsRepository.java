@@ -28,6 +28,5 @@ public interface OverviewStatisticsRepository {
     List<GamePlayCount> countPlaysByGame(LocalDateTime from, LocalDateTime to);
 
     /** 비중을 계산하기 전의 원시 집계. */
-    record GamePlayCount(MiniGameType miniGameType, long plays) {
-    }
+    record GamePlayCount(MiniGameType miniGameType, long plays) {}
 }

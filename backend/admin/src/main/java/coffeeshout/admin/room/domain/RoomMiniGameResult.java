@@ -9,6 +9,4 @@ public record RoomMiniGameResult(
         String playerName,
         Integer rank,
         Long score,
-        LocalDateTime createdAt
-) {
-}
+        LocalDateTime createdAt) {}

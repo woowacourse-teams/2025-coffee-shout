@@ -44,13 +44,10 @@ public class AdminAccountController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AdminAccountResponse add(
-            @Valid @RequestBody AddAdminAccountRequest request,
-            @AuthenticationPrincipal AdminPrincipal principal
-    ) {
+            @Valid @RequestBody AddAdminAccountRequest request, @AuthenticationPrincipal AdminPrincipal principal) {
         // 관리자가 직접 입력한 값이라 형식이 틀리면 틀렸다고 알려준다.
         // 로그인 판정과 달리 여기서는 숨길 이유가 없다.
-        return AdminAccountResponse.from(
-                adminAccountService.add(AdminEmail.of(request.email()), principal.email()));
+        return AdminAccountResponse.from(adminAccountService.add(AdminEmail.of(request.email()), principal.email()));
     }
 
     @DeleteMapping("/{id}")

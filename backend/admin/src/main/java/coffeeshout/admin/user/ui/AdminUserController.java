@@ -36,11 +36,8 @@ public class AdminUserController {
      */
     @GetMapping
     public PageResponse<UserSummaryResponse> search(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0") @Min(0) int page
-    ) {
-        return PageResponse.of(
-                userLookupService.search(keyword, page), UserSummaryResponse::from);
+            @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "0") @Min(0) int page) {
+        return PageResponse.of(userLookupService.search(keyword, page), UserSummaryResponse::from);
     }
 
     @GetMapping("/{userId}")

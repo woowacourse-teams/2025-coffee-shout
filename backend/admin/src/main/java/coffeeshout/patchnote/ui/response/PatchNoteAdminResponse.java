@@ -10,12 +10,10 @@ public record PatchNoteAdminResponse(
         String title,
         String content,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {
+        LocalDateTime updatedAt) {
 
     public static PatchNoteAdminResponse from(AdminRow row) {
         return new PatchNoteAdminResponse(
-                row.id(), row.category(), row.title(), row.content(),
-                row.createdAt(), row.updatedAt());
+                row.id(), row.category(), row.title(), row.content(), row.createdAt(), row.updatedAt());
     }
 }

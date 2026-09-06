@@ -65,9 +65,10 @@ class AdminAuditAspectTest {
     }
 
     private void authenticateAs(String email) {
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        new AdminPrincipal(AdminEmail.of(email)), null,
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(
+                        new AdminPrincipal(AdminEmail.of(email)),
+                        null,
                         List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
     }
 
@@ -93,9 +94,15 @@ class AdminAuditAspectTest {
 
             aspect.recordWrite(returning("ok"));
 
-            then(adminAuditLogService).should().record(
-                    actorCaptor.capture(), actionCaptor.capture(),
-                    any(), any(), any(), org.mockito.ArgumentMatchers.eq(AdminAuditResult.SUCCESS));
+            then(adminAuditLogService)
+                    .should()
+                    .record(
+                            actorCaptor.capture(),
+                            actionCaptor.capture(),
+                            any(),
+                            any(),
+                            any(),
+                            org.mockito.ArgumentMatchers.eq(AdminAuditResult.SUCCESS));
             assertThat(actorCaptor.getValue()).isEqualTo("mj@zzol.site");
             assertThat(actionCaptor.getValue()).isEqualTo("POST /admin/api/accounts");
         }
@@ -114,29 +121,27 @@ class AdminAuditAspectTest {
         @Test
         void 실제_id가_아니라_매핑_패턴을_action에_남긴다() throws Throwable {
             // id마다 다른 action이 쌓이면 "무슨 조치가 몇 번 있었나"를 집계할 수 없다.
-            bindRequest("DELETE", "/admin/api/accounts/7",
-                    "/admin/api/accounts/{id}", Map.of("id", "7"));
+            bindRequest("DELETE", "/admin/api/accounts/7", "/admin/api/accounts/{id}", Map.of("id", "7"));
             authenticateAs("mj@zzol.site");
 
             aspect.recordWrite(returning(null));
 
-            then(adminAuditLogService).should().record(
-                    any(), actionCaptor.capture(), any(), any(), any(), any());
+            then(adminAuditLogService).should().record(any(), actionCaptor.capture(), any(), any(), any(), any());
             assertThat(actionCaptor.getValue()).isEqualTo("DELETE /admin/api/accounts/{id}");
         }
 
         @Test
         void 자원_이름과_대상_id를_함께_남긴다() throws Throwable {
-            bindRequest("DELETE", "/admin/api/accounts/7",
-                    "/admin/api/accounts/{id}", Map.of("id", "7"));
+            bindRequest("DELETE", "/admin/api/accounts/7", "/admin/api/accounts/{id}", Map.of("id", "7"));
             authenticateAs("mj@zzol.site");
 
             aspect.recordWrite(returning(null));
 
             final ArgumentCaptor<String> targetType = ArgumentCaptor.forClass(String.class);
             final ArgumentCaptor<String> targetId = ArgumentCaptor.forClass(String.class);
-            then(adminAuditLogService).should().record(
-                    any(), any(), targetType.capture(), targetId.capture(), any(), any());
+            then(adminAuditLogService)
+                    .should()
+                    .record(any(), any(), targetType.capture(), targetId.capture(), any(), any());
             assertThat(targetType.getValue()).isEqualTo("accounts");
             assertThat(targetId.getValue()).isEqualTo("7");
         }
@@ -147,8 +152,7 @@ class AdminAuditAspectTest {
 
             aspect.recordWrite(returning("token"));
 
-            then(adminAuditLogService).should().record(
-                    actorCaptor.capture(), any(), any(), any(), any(), any());
+            then(adminAuditLogService).should().record(actorCaptor.capture(), any(), any(), any(), any(), any());
             assertThat(actorCaptor.getValue()).isEqualTo("anonymous");
         }
 
@@ -158,13 +162,18 @@ class AdminAuditAspectTest {
             authenticateAs("mj@zzol.site");
             final IllegalStateException error = new IllegalStateException("이미 등록된 관리자");
 
-            assertThatThrownBy(() -> aspect.recordWrite(throwing(error)))
-                    .isSameAs(error);
+            assertThatThrownBy(() -> aspect.recordWrite(throwing(error))).isSameAs(error);
 
             final ArgumentCaptor<String> detail = ArgumentCaptor.forClass(String.class);
-            then(adminAuditLogService).should().record(
-                    any(), any(), any(), any(), detail.capture(),
-                    org.mockito.ArgumentMatchers.eq(AdminAuditResult.FAILURE));
+            then(adminAuditLogService)
+                    .should()
+                    .record(
+                            any(),
+                            any(),
+                            any(),
+                            any(),
+                            detail.capture(),
+                            org.mockito.ArgumentMatchers.eq(AdminAuditResult.FAILURE));
             assertThat(detail.getValue()).contains("IllegalStateException", "이미 등록된 관리자");
         }
     }
@@ -179,8 +188,7 @@ class AdminAuditAspectTest {
             authenticateAs("mj@zzol.site");
 
             assertThat(aspect.recordWrite(returning("list"))).isEqualTo("list");
-            then(adminAuditLogService).should(never())
-                    .record(any(), any(), any(), any(), any(), any());
+            then(adminAuditLogService).should(never()).record(any(), any(), any(), any(), any(), any());
         }
 
         @Test
@@ -189,16 +197,14 @@ class AdminAuditAspectTest {
 
             aspect.recordWrite(returning("ok"));
 
-            then(adminAuditLogService).should(never())
-                    .record(any(), any(), any(), any(), any(), any());
+            then(adminAuditLogService).should(never()).record(any(), any(), any(), any(), any(), any());
         }
 
         @Test
         void 요청_컨텍스트가_없으면_기록하지_않는다() throws Throwable {
             // 스케줄러나 이벤트 리스너에서 호출되는 경우다.
             assertThat(aspect.recordWrite(returning("ok"))).isEqualTo("ok");
-            then(adminAuditLogService).should(never())
-                    .record(any(), any(), any(), any(), any(), any());
+            then(adminAuditLogService).should(never()).record(any(), any(), any(), any(), any(), any());
         }
     }
 
@@ -226,8 +232,7 @@ class AdminAuditAspectTest {
         }
 
         @Override
-        public void set$AroundClosure(org.aspectj.runtime.internal.AroundClosure arc) {
-        }
+        public void set$AroundClosure(org.aspectj.runtime.internal.AroundClosure arc) {}
 
         @Override
         public String toShortString() {

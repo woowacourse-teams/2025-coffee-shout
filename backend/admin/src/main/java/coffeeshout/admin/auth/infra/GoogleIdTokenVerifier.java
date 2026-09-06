@@ -41,8 +41,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
      * 구글은 ID 토큰의 iss 를 두 형태로 발급해 왔다. 둘 다 받는다.
      * 하나만 허용하면 어느 날 다른 형태가 오는 순간 전원 로그인이 막힌다.
      */
-    private static final Set<String> VALID_ISSUERS =
-            Set.of("https://accounts.google.com", "accounts.google.com");
+    private static final Set<String> VALID_ISSUERS = Set.of("https://accounts.google.com", "accounts.google.com");
 
     private static final String CLAIM_EMAIL = "email";
     private static final String CLAIM_EMAIL_VERIFIED = "email_verified";
@@ -65,10 +64,9 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
     }
 
     private static JwtDecoder defaultDecoder() {
-        final NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
-        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                new JwtTimestampValidator(),
-                issuerValidator()));
+        final NimbusJwtDecoder decoder =
+                NimbusJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(new JwtTimestampValidator(), issuerValidator()));
         return decoder;
     }
 
@@ -86,8 +84,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
     @Override
     public String verifyAndExtractEmail(String idToken) {
         if (idToken == null || idToken.isBlank()) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "ID 토큰이 비어 있습니다.");
+            throw new BusinessException(AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "ID 토큰이 비어 있습니다.");
         }
 
         final Jwt jwt = decode(idToken);
@@ -96,8 +93,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
 
         final String email = jwt.getClaimAsString(CLAIM_EMAIL);
         if (email == null || email.isBlank()) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "ID 토큰에 이메일이 없습니다.");
+            throw new BusinessException(AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "ID 토큰에 이메일이 없습니다.");
         }
         return email;
     }
@@ -108,8 +104,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
         } catch (JwtException e) {
             // 실패 사유를 응답에 담지 않는다. 어떤 검증에서 걸렸는지 알려주면 탐색을 돕는다.
             log.warn("구글 ID 토큰 검증 실패: {}", e.getMessage());
-            throw new BusinessException(
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "구글 인증에 실패했습니다.");
+            throw new BusinessException(AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "구글 인증에 실패했습니다.");
         }
     }
 
@@ -118,8 +113,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
         if (audience == null || !audience.contains(clientId)) {
             // 다른 서비스용으로 발급된 구글 토큰을 여기 들고 오는 경로를 막는다.
             log.warn("구글 ID 토큰 대상 불일치: aud={}", audience);
-            throw new BusinessException(
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "구글 인증에 실패했습니다.");
+            throw new BusinessException(AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "구글 인증에 실패했습니다.");
         }
     }
 
@@ -128,9 +122,7 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
         final Object verified = jwt.getClaim(CLAIM_EMAIL_VERIFIED);
         final boolean isVerified = Boolean.TRUE.equals(verified) || "true".equals(verified);
         if (!isVerified) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED,
-                    "이메일이 검증되지 않은 구글 계정입니다.");
+            throw new BusinessException(AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED, "이메일이 검증되지 않은 구글 계정입니다.");
         }
     }
 }

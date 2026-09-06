@@ -44,7 +44,8 @@ public class QueryDslUserLookupRepository implements UserLookupRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        final Long total = queryFactory.select(USER.count()).from(USER).where(condition).fetchOne();
+        final Long total =
+                queryFactory.select(USER.count()).from(USER).where(condition).fetchOne();
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
@@ -86,8 +87,7 @@ public class QueryDslUserLookupRepository implements UserLookupRepository {
     }
 
     private static ConstructorExpression<UserSummary> summaryProjection() {
-        return Projections.constructor(UserSummary.class,
-                USER.id, USER.userCode, USER.nickname, USER.createdAt);
+        return Projections.constructor(UserSummary.class, USER.id, USER.userCode, USER.nickname, USER.createdAt);
     }
 
     /**

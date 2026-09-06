@@ -43,8 +43,7 @@ class AdminPatchNoteControllerTest {
 
         @Test
         void 전체_목록을_돌려준다() {
-            given(patchNoteAdminService.findAll())
-                    .willReturn(List.of(row(1L, "첫 번째"), row(2L, "두 번째")));
+            given(patchNoteAdminService.findAll()).willReturn(List.of(row(1L, "첫 번째"), row(2L, "두 번째")));
 
             assertThat(adminPatchNoteController.list())
                     .extracting(PatchNoteAdminResponse::title)
@@ -58,8 +57,7 @@ class AdminPatchNoteControllerTest {
         @Test
         void 서버가_카테고리_선택지를_정한다() {
             // 프론트에 enum 을 복사해 두면 값이 늘 때 조용히 어긋난다.
-            assertThat(adminPatchNoteController.categories())
-                    .containsExactly(PatchNoteCategory.values());
+            assertThat(adminPatchNoteController.categories()).containsExactly(PatchNoteCategory.values());
         }
     }
 
@@ -73,14 +71,14 @@ class AdminPatchNoteControllerTest {
             given(patchNoteAdminService.findById(1L)).willReturn(row(1L, "제목"));
 
             final ResponseEntity<PatchNoteAdminResponse> response =
-                    adminPatchNoteController.create(
-                            new CreatePatchNoteRequest(PatchNoteCategory.UPDATE, "제목", "내용"));
+                    adminPatchNoteController.create(new CreatePatchNoteRequest(PatchNoteCategory.UPDATE, "제목", "내용"));
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-            assertThat(response.getHeaders().getLocation())
-                    .hasToString("/admin/api/patch-notes/1");
-            assertThat(response.getBody()).isNotNull()
-                    .extracting(PatchNoteAdminResponse::id).isEqualTo(1L);
+            assertThat(response.getHeaders().getLocation()).hasToString("/admin/api/patch-notes/1");
+            assertThat(response.getBody())
+                    .isNotNull()
+                    .extracting(PatchNoteAdminResponse::id)
+                    .isEqualTo(1L);
         }
     }
 
@@ -94,8 +92,7 @@ class AdminPatchNoteControllerTest {
             final PatchNoteAdminResponse response = adminPatchNoteController.update(
                     1L, new UpdatePatchNoteRequest(PatchNoteCategory.UPDATE, "바뀐 제목", "내용"));
 
-            then(patchNoteAdminService).should()
-                    .update(1L, PatchNoteCategory.UPDATE, "바뀐 제목", "내용");
+            then(patchNoteAdminService).should().update(1L, PatchNoteCategory.UPDATE, "바뀐 제목", "내용");
             assertThat(response.title()).isEqualTo("바뀐 제목");
         }
     }

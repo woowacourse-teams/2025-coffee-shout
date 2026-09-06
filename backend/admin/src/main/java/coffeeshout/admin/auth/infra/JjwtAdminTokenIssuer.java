@@ -65,19 +65,15 @@ public class JjwtAdminTokenIssuer implements AdminTokenIssuer {
                     .getPayload();
 
             if (!TYPE_ADMIN.equals(claims.get(CLAIM_TYPE, String.class))) {
-                throw new BusinessException(
-                        AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "관리자 토큰이 아닙니다.");
+                throw new BusinessException(AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "관리자 토큰이 아닙니다.");
             }
             return new AdminPrincipal(AdminEmail.parse(claims.getSubject())
-                    .orElseThrow(() -> new BusinessException(
-                            AdminAccountErrorCode.ADMIN_TOKEN_INVALID,
-                            "주체가 없는 관리자 토큰입니다.")));
+                    .orElseThrow(() ->
+                            new BusinessException(AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "주체가 없는 관리자 토큰입니다.")));
         } catch (ExpiredJwtException e) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED, "만료된 관리자 토큰입니다.");
+            throw new BusinessException(AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED, "만료된 관리자 토큰입니다.");
         } catch (JwtException | IllegalArgumentException e) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "유효하지 않은 관리자 토큰입니다.");
+            throw new BusinessException(AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "유효하지 않은 관리자 토큰입니다.");
         }
     }
 }

@@ -10,12 +10,7 @@ package coffeeshout.admin.quality.domain;
  *                             적체 추이는 스냅샷이 없어 못 그리지만 이 값 하나로 "지금 밀렸나"는 답한다.
  */
 public record ReportSla(
-        long resolvedCount,
-        long p50Minutes,
-        long p95Minutes,
-        long pendingCount,
-        long oldestPendingMinutes
-) {
+        long resolvedCount, long p50Minutes, long p95Minutes, long pendingCount, long oldestPendingMinutes) {
 
     public static ReportSla empty() {
         return new ReportSla(0, 0, 0, 0, 0);

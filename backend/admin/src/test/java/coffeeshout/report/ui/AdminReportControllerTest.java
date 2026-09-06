@@ -36,8 +36,8 @@ class AdminReportControllerTest {
     private AdminReportController adminReportController;
 
     private static ReportRow row(Long id, ReportStatus status) {
-        return new ReportRow(id, ReportCategory.BUG, MiniGameType.RACING_GAME, "ABCD",
-                "내용", status, CREATED_AT, null, "1.2.3.4");
+        return new ReportRow(
+                id, ReportCategory.BUG, MiniGameType.RACING_GAME, "ABCD", "내용", status, CREATED_AT, null, "1.2.3.4");
     }
 
     @Nested
@@ -45,21 +45,19 @@ class AdminReportControllerTest {
 
         @Test
         void 필터를_그대로_서비스에_넘긴다() {
-            given(reportAdminService.list(
-                    ReportStatus.PENDING, ReportCategory.BUG, MiniGameType.RACING_GAME, 2))
+            given(reportAdminService.list(ReportStatus.PENDING, ReportCategory.BUG, MiniGameType.RACING_GAME, 2))
                     .willReturn(new PageImpl<>(List.of(row(1L, ReportStatus.PENDING))));
 
-            adminReportController.list(
-                    ReportStatus.PENDING, ReportCategory.BUG, MiniGameType.RACING_GAME, 2);
+            adminReportController.list(ReportStatus.PENDING, ReportCategory.BUG, MiniGameType.RACING_GAME, 2);
 
-            then(reportAdminService).should()
+            then(reportAdminService)
+                    .should()
                     .list(ReportStatus.PENDING, ReportCategory.BUG, MiniGameType.RACING_GAME, 2);
         }
 
         @Test
         void 필터가_없으면_null로_넘겨_전체를_조회한다() {
-            given(reportAdminService.list(null, null, null, 0))
-                    .willReturn(new PageImpl<>(List.of()));
+            given(reportAdminService.list(null, null, null, 0)).willReturn(new PageImpl<>(List.of()));
 
             adminReportController.list(null, null, null, 0);
 
@@ -68,11 +66,10 @@ class AdminReportControllerTest {
 
         @Test
         void 페이지_메타데이터를_함께_돌려준다() {
-            given(reportAdminService.list(null, null, null, 0)).willReturn(
-                    new PageImpl<>(List.of(row(1L, ReportStatus.PENDING)), PageRequest.of(0, 20), 41));
+            given(reportAdminService.list(null, null, null, 0))
+                    .willReturn(new PageImpl<>(List.of(row(1L, ReportStatus.PENDING)), PageRequest.of(0, 20), 41));
 
-            final PageResponse<ReportResponse> response =
-                    adminReportController.list(null, null, null, 0);
+            final PageResponse<ReportResponse> response = adminReportController.list(null, null, null, 0);
 
             assertThat(response.totalElements()).isEqualTo(41);
             assertThat(response.totalPages()).isEqualTo(3);

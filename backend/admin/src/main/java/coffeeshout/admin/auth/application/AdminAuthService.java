@@ -46,8 +46,7 @@ public class AdminAuthService {
         // 어떤 이메일이 형식만 맞는지 훑어 관리자 계정을 좁혀 갈 수 있다.
         final AdminEmail email = AdminEmail.parse(rawEmail)
                 .filter(adminAccountService::isAllowed)
-                .orElseThrow(() -> new BusinessException(
-                        AdminAccountErrorCode.NOT_ADMIN, "관리자 허용목록에 없는 계정입니다."));
+                .orElseThrow(() -> new BusinessException(AdminAccountErrorCode.NOT_ADMIN, "관리자 허용목록에 없는 계정입니다."));
         return adminTokenIssuer.issue(email);
     }
 }

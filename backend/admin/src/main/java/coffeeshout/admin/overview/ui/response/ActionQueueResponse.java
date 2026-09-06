@@ -6,12 +6,7 @@ import coffeeshout.admin.overview.application.OverviewService.ActionQueue;
  * @param hasWork 하나라도 0이 아닌지. 화면이 네 값을 다시 더해 보지 않아도 되게 서버가 정한다.
  */
 public record ActionQueueResponse(
-        long pendingReports,
-        long flaggedNicknames,
-        long pendingNicknames,
-        int blockedIps,
-        boolean hasWork
-) {
+        long pendingReports, long flaggedNicknames, long pendingNicknames, int blockedIps, boolean hasWork) {
 
     public static ActionQueueResponse from(ActionQueue queue) {
         return new ActionQueueResponse(

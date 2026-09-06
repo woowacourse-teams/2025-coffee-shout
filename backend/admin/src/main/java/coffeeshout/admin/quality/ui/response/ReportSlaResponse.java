@@ -9,16 +9,14 @@ import coffeeshout.admin.quality.domain.ReportSla;
  * @param oldestPendingMinutes 가장 오래 기다린 미처리 신고의 나이. "지금 밀렸나"에 답한다.
  */
 public record ReportSlaResponse(
-        long resolvedCount,
-        long p50Minutes,
-        long p95Minutes,
-        long pendingCount,
-        long oldestPendingMinutes
-) {
+        long resolvedCount, long p50Minutes, long p95Minutes, long pendingCount, long oldestPendingMinutes) {
 
     public static ReportSlaResponse from(ReportSla sla) {
         return new ReportSlaResponse(
-                sla.resolvedCount(), sla.p50Minutes(), sla.p95Minutes(),
-                sla.pendingCount(), sla.oldestPendingMinutes());
+                sla.resolvedCount(),
+                sla.p50Minutes(),
+                sla.p95Minutes(),
+                sla.pendingCount(),
+                sla.oldestPendingMinutes());
     }
 }

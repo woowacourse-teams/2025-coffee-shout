@@ -30,11 +30,8 @@ public class AdminRoomController {
 
     @GetMapping
     public PageResponse<RoomSummaryResponse> search(
-            @RequestParam(required = false) String joinCode,
-            @RequestParam(defaultValue = "0") @Min(0) int page
-    ) {
-        return PageResponse.of(
-                roomLookupService.search(joinCode, page), RoomSummaryResponse::from);
+            @RequestParam(required = false) String joinCode, @RequestParam(defaultValue = "0") @Min(0) int page) {
+        return PageResponse.of(roomLookupService.search(joinCode, page), RoomSummaryResponse::from);
     }
 
     @GetMapping("/{roomId}")

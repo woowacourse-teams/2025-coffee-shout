@@ -18,12 +18,18 @@ public record ReportResponse(
         ReportStatus status,
         LocalDateTime createdAt,
         LocalDateTime resolvedAt,
-        String ip
-) {
+        String ip) {
 
     public static ReportResponse from(ReportRow row) {
         return new ReportResponse(
-                row.id(), row.category(), row.gameType(), row.joinCode(), row.content(),
-                row.status(), row.createdAt(), row.resolvedAt(), row.ip());
+                row.id(),
+                row.category(),
+                row.gameType(),
+                row.joinCode(),
+                row.content(),
+                row.status(),
+                row.createdAt(),
+                row.resolvedAt(),
+                row.ip());
     }
 }

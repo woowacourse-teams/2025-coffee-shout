@@ -10,14 +10,15 @@ public record RoomDetailResponse(
         RoomSummaryResponse summary,
         List<RoomPlayerResponse> players,
         List<RoomMiniGameResultResponse> miniGameResults,
-        RoomRouletteResultResponse roulette
-) {
+        RoomRouletteResultResponse roulette) {
 
     public static RoomDetailResponse from(RoomDetail detail) {
         return new RoomDetailResponse(
                 RoomSummaryResponse.from(detail.summary()),
                 detail.players().stream().map(RoomPlayerResponse::from).toList(),
-                detail.miniGameResults().stream().map(RoomMiniGameResultResponse::from).toList(),
+                detail.miniGameResults().stream()
+                        .map(RoomMiniGameResultResponse::from)
+                        .toList(),
                 detail.rouletteResult().map(RoomRouletteResultResponse::from).orElse(null));
     }
 }

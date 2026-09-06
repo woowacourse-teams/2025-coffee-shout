@@ -10,15 +10,9 @@ import java.time.Instant;
  * <p>탈퇴 여부도 없다. {@code @SQLRestriction} 때문에 여기 오는 유저는 전부 활성 회원이라
  * 그 칸을 두면 언제나 같은 값이 찍힌다.
  */
-public record UserSummaryResponse(
-        Long id,
-        String userCode,
-        String nickname,
-        Instant createdAt
-) {
+public record UserSummaryResponse(Long id, String userCode, String nickname, Instant createdAt) {
 
     public static UserSummaryResponse from(UserSummary summary) {
-        return new UserSummaryResponse(
-                summary.id(), summary.userCode(), summary.nickname(), summary.createdAt());
+        return new UserSummaryResponse(summary.id(), summary.userCode(), summary.nickname(), summary.createdAt());
     }
 }

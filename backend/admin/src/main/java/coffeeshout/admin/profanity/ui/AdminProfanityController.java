@@ -51,12 +51,9 @@ public class AdminProfanityController {
 
     @GetMapping("/audits")
     public PageResponse<NicknameAuditResponse> audits(
-            @RequestParam NicknameAuditStatus status,
-            @RequestParam(defaultValue = "0") @Min(0) int page
-    ) {
+            @RequestParam NicknameAuditStatus status, @RequestParam(defaultValue = "0") @Min(0) int page) {
         return PageResponse.of(
-                auditService.listByStatus(
-                        status, PageRequest.of(page, AUDIT_PAGE_SIZE, AUDITED_AT_DESC)),
+                auditService.listByStatus(status, PageRequest.of(page, AUDIT_PAGE_SIZE, AUDITED_AT_DESC)),
                 audit -> NicknameAuditResponse.from(audit, clock.getZone()));
     }
 
@@ -78,8 +75,7 @@ public class AdminProfanityController {
             @RequestParam(required = false) Language language,
             @RequestParam(required = false) WordSource source,
             @RequestParam(required = false) Boolean active,
-            @RequestParam(defaultValue = "0") @Min(0) int page
-    ) {
+            @RequestParam(defaultValue = "0") @Min(0) int page) {
         // 필터 enum 을 문자열로 받아 직접 파싱하던 부분이 사라졌다. 스프링이 변환하고,
         // 값이 어긋나면 400 으로 떨어진다. 전에는 조용히 null 이 되어 필터가 무시됐다.
         return PageResponse.of(

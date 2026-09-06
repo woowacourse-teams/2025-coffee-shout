@@ -8,12 +8,7 @@ import java.util.List;
  * @param winRate   참여 대비 당첨 비율. "왜 나만 걸리냐" 문의에 답하는 값이다.
  */
 public record UserDetailResponse(
-        UserSummaryResponse summary,
-        List<String> providers,
-        long roomCount,
-        long winCount,
-        double winRate
-) {
+        UserSummaryResponse summary, List<String> providers, long roomCount, long winCount, double winRate) {
 
     public static UserDetailResponse from(UserDetail detail) {
         return new UserDetailResponse(

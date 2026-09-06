@@ -31,11 +31,8 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
     private final AdminTokenIssuer adminTokenIssuer;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         final String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
@@ -45,9 +42,8 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
         final String token = header.substring(BEARER_PREFIX.length());
         try {
             final AdminPrincipal principal = adminTokenIssuer.verify(token);
-            final UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            principal, null, List.of(new SimpleGrantedAuthority(ROLE_ADMIN)));
+            final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    principal, null, List.of(new SimpleGrantedAuthority(ROLE_ADMIN)));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             log.debug("관리자 토큰 인증 실패, 익명 처리: {}", e.getMessage());

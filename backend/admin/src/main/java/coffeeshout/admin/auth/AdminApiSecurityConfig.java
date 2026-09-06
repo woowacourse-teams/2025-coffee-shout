@@ -40,31 +40,25 @@ public class AdminApiSecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain adminApiFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/admin/api/**")
+        http.securityMatcher("/admin/api/**")
                 // 없으면 admin-web(다른 오리진)의 프리플라이트가 인증 단계에서 막힌다(postmortem 0003).
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicPaths()).permitAll()
-                        .anyRequest().hasRole("ADMIN")
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .authorizeHttpRequests(auth -> auth.requestMatchers(publicPaths())
+                        .permitAll()
+                        .anyRequest()
+                        .hasRole("ADMIN"))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // formLogin·httpBasic 을 끄면 인증 진입점이 사라져 스프링이 기본값인
                 // Http403ForbiddenEntryPoint 를 쓴다. 그러면 미인증도 403 이 되어
                 // SPA 가 "토큰 재발급하면 되는 상황"과 "권한이 없어 소용없는 상황"을 구분하지 못한다.
-                .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )
+                .exceptionHandling(handling ->
+                        handling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 // 토큰 인증이라 세션 쿠키가 없다. CSRF 는 쿠키 자동 전송이 있을 때의 문제다.
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .addFilterBefore(
-                        new AdminJwtAuthenticationFilter(adminTokenIssuer),
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        new AdminJwtAuthenticationFilter(adminTokenIssuer), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -74,8 +68,8 @@ public class AdminApiSecurityConfig {
      */
     private String[] publicPaths() {
         if (environment.matchesProfiles(LOCAL_PROFILE)) {
-            return new String[]{LOGIN_PATH, DEV_LOGIN_PATH};
+            return new String[] {LOGIN_PATH, DEV_LOGIN_PATH};
         }
-        return new String[]{LOGIN_PATH};
+        return new String[] {LOGIN_PATH};
     }
 }

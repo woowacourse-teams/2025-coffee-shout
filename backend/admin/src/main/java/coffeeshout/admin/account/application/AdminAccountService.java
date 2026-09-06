@@ -61,27 +61,24 @@ public class AdminAccountService {
     public AdminAccountEntry add(AdminEmail email, AdminEmail actor) {
         if (isAllowed(email)) {
             throw new BusinessException(
-                    AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS,
-                    "이미 등록된 관리자입니다: " + email.value());
+                    AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS, "이미 등록된 관리자입니다: " + email.value());
         }
 
-        final AdminAccount saved = adminAccountRepository.save(
-                AdminAccount.create(email, actor, clock.instant()));
+        final AdminAccount saved = adminAccountRepository.save(AdminAccount.create(email, actor, clock.instant()));
         return AdminAccountEntry.database(
                 saved.getId(), saved.getEmail(), saved.getCreatedByEmail(), saved.getCreatedAt());
     }
 
     @Transactional
     public void remove(Long id, AdminEmail actor) {
-        final AdminAccount account = adminAccountRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        AdminAccountErrorCode.ADMIN_ACCOUNT_NOT_FOUND,
-                        "존재하지 않는 관리자입니다: " + id));
+        final AdminAccount account = adminAccountRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new BusinessException(AdminAccountErrorCode.ADMIN_ACCOUNT_NOT_FOUND, "존재하지 않는 관리자입니다: " + id));
 
         // 자기 자신을 지우면 그 순간 로그아웃되고, 남은 관리자가 없으면 복구 경로가 부트스트랩뿐이다.
         if (account.getEmail().equals(actor)) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.CANNOT_REMOVE_SELF, "자기 자신은 삭제할 수 없습니다.");
+            throw new BusinessException(AdminAccountErrorCode.CANNOT_REMOVE_SELF, "자기 자신은 삭제할 수 없습니다.");
         }
         adminAccountRepository.delete(account);
     }

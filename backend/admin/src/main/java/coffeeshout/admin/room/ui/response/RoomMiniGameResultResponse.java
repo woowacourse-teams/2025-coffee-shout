@@ -10,12 +10,15 @@ public record RoomMiniGameResultResponse(
         String playerName,
         Integer rank,
         Long score,
-        LocalDateTime createdAt
-) {
+        LocalDateTime createdAt) {
 
     public static RoomMiniGameResultResponse from(RoomMiniGameResult result) {
         return new RoomMiniGameResultResponse(
-                result.miniGameType(), result.playerId(), result.playerName(),
-                result.rank(), result.score(), result.createdAt());
+                result.miniGameType(),
+                result.playerId(),
+                result.playerName(),
+                result.rank(),
+                result.score(),
+                result.createdAt());
     }
 }

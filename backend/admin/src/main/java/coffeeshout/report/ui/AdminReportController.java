@@ -38,11 +38,8 @@ public class AdminReportController {
             @RequestParam(required = false) ReportStatus status,
             @RequestParam(required = false) ReportCategory category,
             @RequestParam(required = false) MiniGameType gameType,
-            @RequestParam(defaultValue = "0") @Min(0) int page
-    ) {
-        return PageResponse.of(
-                reportAdminService.list(status, category, gameType, page),
-                ReportResponse::from);
+            @RequestParam(defaultValue = "0") @Min(0) int page) {
+        return PageResponse.of(reportAdminService.list(status, category, gameType, page), ReportResponse::from);
     }
 
     /** 홈 대시보드의 처리 대기 큐가 쓴다. 목록을 받아 세지 않아도 되게 따로 둔다. */

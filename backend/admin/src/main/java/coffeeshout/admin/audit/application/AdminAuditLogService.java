@@ -35,14 +35,12 @@ public class AdminAuditLogService {
             String targetType,
             String targetId,
             String detail,
-            AdminAuditResult result
-    ) {
+            AdminAuditResult result) {
         try {
-            adminAuditLogRepository.save(AdminAuditLog.of(
-                    actorEmail, action, targetType, targetId, detail, result, clock.instant()));
+            adminAuditLogRepository.save(
+                    AdminAuditLog.of(actorEmail, action, targetType, targetId, detail, result, clock.instant()));
         } catch (Exception e) {
-            log.error("관리자 감사 로그 기록 실패: actor={} action={} result={}",
-                    actorEmail, action, result, e);
+            log.error("관리자 감사 로그 기록 실패: actor={} action={} result={}", actorEmail, action, result, e);
         }
     }
 }

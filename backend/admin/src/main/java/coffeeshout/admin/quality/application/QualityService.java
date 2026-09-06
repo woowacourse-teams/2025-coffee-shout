@@ -33,8 +33,7 @@ public class QualityService {
     public ReportSla reportSla(int days) {
         final Instant now = clock.instant();
         final List<Long> durations =
-                qualityStatisticsRepository.findResolvedDurationMinutes(
-                        now.minus(Duration.ofDays(days)), now);
+                qualityStatisticsRepository.findResolvedDurationMinutes(now.minus(Duration.ofDays(days)), now);
 
         final long pendingCount = qualityStatisticsRepository.countPendingReports();
         final long oldestPendingMinutes = qualityStatisticsRepository

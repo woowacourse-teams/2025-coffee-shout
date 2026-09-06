@@ -12,11 +12,7 @@ package coffeeshout.admin.quality.domain;
  * @param falsePositive AI 가 걸렀는데 관리자가 허용했다. 멀쩡한 닉네임을 막고 있었다는 뜻이다.
  * @param falseNegative AI 가 놓쳤는데 관리자가 차단했다. 걸러야 할 것을 통과시켰다는 뜻이다.
  */
-public record NicknameAuditQuality(
-        long total,
-        long falsePositive,
-        long falseNegative
-) {
+public record NicknameAuditQuality(long total, long falsePositive, long falseNegative) {
 
     public static NicknameAuditQuality empty() {
         return new NicknameAuditQuality(0, 0, 0);

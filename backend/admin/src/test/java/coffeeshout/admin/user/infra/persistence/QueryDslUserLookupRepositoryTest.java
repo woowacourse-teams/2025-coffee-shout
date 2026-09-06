@@ -50,7 +50,8 @@ class QueryDslUserLookupRepositoryTest extends AdminModuleServiceTest {
             userJpaRepository.save(new UserEntity("XY4ZQ", "박영희"));
 
             assertThat(userLookupRepository.search("철수", FIRST_PAGE).getContent())
-                    .extracting(UserSummary::nickname).containsExactly("김철수");
+                    .extracting(UserSummary::nickname)
+                    .containsExactly("김철수");
         }
 
         @Test
@@ -91,7 +92,8 @@ class QueryDslUserLookupRepositoryTest extends AdminModuleServiceTest {
             userJpaRepository.saveAndFlush(withdrawn);
 
             assertThat(userLookupRepository.search(null, FIRST_PAGE).getContent())
-                    .extracting(UserSummary::id).containsExactly(active.getId());
+                    .extracting(UserSummary::id)
+                    .containsExactly(active.getId());
         }
     }
 
@@ -103,8 +105,8 @@ class QueryDslUserLookupRepositoryTest extends AdminModuleServiceTest {
             final UserEntity user = userJpaRepository.save(new UserEntity("AB3CD", "철수"));
             final RoomEntity room1 = roomJpaRepository.save(new RoomEntity("AAAA"));
             final RoomEntity room2 = roomJpaRepository.save(new RoomEntity("BBBB"));
-            final PlayerEntity p1 = playerJpaRepository.save(
-                    new PlayerEntity(room1, "철수", PlayerType.HOST, user.getId()));
+            final PlayerEntity p1 =
+                    playerJpaRepository.save(new PlayerEntity(room1, "철수", PlayerType.HOST, user.getId()));
             playerJpaRepository.save(new PlayerEntity(room2, "철수", PlayerType.GUEST, user.getId()));
             rouletteResultJpaRepository.save(new RouletteResultEntity(room1, p1, 25));
 
@@ -122,7 +124,8 @@ class QueryDslUserLookupRepositoryTest extends AdminModuleServiceTest {
             playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST, user.getId()));
             playerJpaRepository.save(new PlayerEntity(room, "철수2", PlayerType.GUEST, user.getId()));
 
-            assertThat(userLookupRepository.findActivity(user.getId()).roomCount()).isEqualTo(1);
+            assertThat(userLookupRepository.findActivity(user.getId()).roomCount())
+                    .isEqualTo(1);
         }
 
         @Test
@@ -142,11 +145,12 @@ class QueryDslUserLookupRepositoryTest extends AdminModuleServiceTest {
             final UserEntity other = userJpaRepository.save(new UserEntity("XY4ZQ", "영희"));
             final RoomEntity room = roomJpaRepository.save(new RoomEntity("AAAA"));
             playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST, user.getId()));
-            final PlayerEntity otherPlayer = playerJpaRepository.save(
-                    new PlayerEntity(room, "영희", PlayerType.GUEST, other.getId()));
+            final PlayerEntity otherPlayer =
+                    playerJpaRepository.save(new PlayerEntity(room, "영희", PlayerType.GUEST, other.getId()));
             rouletteResultJpaRepository.save(new RouletteResultEntity(room, otherPlayer, 50));
 
-            assertThat(userLookupRepository.findActivity(user.getId()).winCount()).isZero();
+            assertThat(userLookupRepository.findActivity(user.getId()).winCount())
+                    .isZero();
         }
     }
 

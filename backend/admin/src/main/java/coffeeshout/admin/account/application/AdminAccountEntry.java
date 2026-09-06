@@ -15,16 +15,13 @@ public record AdminAccountEntry(
         AdminAccountSource source,
         boolean removable,
         AdminEmail createdByEmail,
-        Instant createdAt
-) {
+        Instant createdAt) {
 
     public static AdminAccountEntry bootstrap(AdminEmail email) {
         return new AdminAccountEntry(null, email, AdminAccountSource.BOOTSTRAP, false, null, null);
     }
 
-    public static AdminAccountEntry database(
-            Long id, AdminEmail email, AdminEmail createdByEmail, Instant createdAt) {
-        return new AdminAccountEntry(
-                id, email, AdminAccountSource.DATABASE, true, createdByEmail, createdAt);
+    public static AdminAccountEntry database(Long id, AdminEmail email, AdminEmail createdByEmail, Instant createdAt) {
+        return new AdminAccountEntry(id, email, AdminAccountSource.DATABASE, true, createdByEmail, createdAt);
     }
 }

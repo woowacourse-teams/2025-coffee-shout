@@ -118,10 +118,11 @@ public class OverviewService {
         final LocalDate today = LocalDate.now(clock);
         final LocalDate start = today.minusDays(days - 1L);
 
-        final Map<LocalDate, DailyTrendPoint> found = overviewStatisticsRepository
-                .findDailyTrend(start.atStartOfDay(), today.plusDays(1).atStartOfDay())
-                .stream()
-                .collect(Collectors.toMap(DailyTrendPoint::date, point -> point));
+        final Map<LocalDate, DailyTrendPoint> found =
+                overviewStatisticsRepository
+                        .findDailyTrend(start.atStartOfDay(), today.plusDays(1).atStartOfDay())
+                        .stream()
+                        .collect(Collectors.toMap(DailyTrendPoint::date, point -> point));
 
         return IntStream.range(0, days)
                 .mapToObj(start::plusDays)
@@ -139,45 +140,24 @@ public class OverviewService {
         return counts.stream()
                 .sorted(Comparator.comparingLong(GamePlayCount::plays).reversed())
                 .map(count -> new GamePlayStat(
-                        count.miniGameType(),
-                        count.plays(),
-                        total == 0 ? 0 : (double) count.plays() / total))
+                        count.miniGameType(), count.plays(), total == 0 ? 0 : (double) count.plays() / total))
                 .toList();
     }
 
-    public record ActionQueue(
-            long pendingReports,
-            long flaggedNicknames,
-            long pendingNicknames,
-            int blockedIps
-    ) {
+    public record ActionQueue(long pendingReports, long flaggedNicknames, long pendingNicknames, int blockedIps) {
 
         /** 하나라도 0이 아니면 화면 상단에 강조한다. */
         public boolean hasWork() {
-            return pendingReports > 0 || flaggedNicknames > 0
-                    || pendingNicknames > 0 || blockedIps > 0;
+            return pendingReports > 0 || flaggedNicknames > 0 || pendingNicknames > 0 || blockedIps > 0;
         }
     }
 
-    public record DailySummary(
-            LocalDate date,
-            RoomFunnel funnel,
-            long players,
-            long signups
-    ) {
-    }
+    public record DailySummary(LocalDate date, RoomFunnel funnel, long players, long signups) {}
 
     /**
      * @param from 포함, {@code to} 포함. 화면이 "9/1 ~ 9/30" 으로 그대로 쓴다.
      */
-    public record PeriodSummary(
-            int days,
-            LocalDate from,
-            LocalDate to,
-            RoomFunnel funnel,
-            long players,
-            long signups
-    ) {
+    public record PeriodSummary(int days, LocalDate from, LocalDate to, RoomFunnel funnel, long players, long signups) {
 
         /**
          * 방당 평균 참여자.

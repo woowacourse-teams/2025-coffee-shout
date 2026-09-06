@@ -16,8 +16,7 @@ class AdminAuditLogTest {
     private static final Instant NOW = Instant.parse("2026-09-06T00:00:00Z");
 
     private static AdminAuditLog of(String actor, String action) {
-        return AdminAuditLog.of(actor, action, "accounts", "1", null,
-                AdminAuditResult.SUCCESS, NOW);
+        return AdminAuditLog.of(actor, action, "accounts", "1", null, AdminAuditResult.SUCCESS, NOW);
     }
 
     @Nested
@@ -26,8 +25,13 @@ class AdminAuditLogTest {
         @Test
         void 주어진_값을_그대로_보관한다() {
             final AdminAuditLog log = AdminAuditLog.of(
-                    "mj@zzol.site", "DELETE /admin/api/accounts/{id}", "accounts", "7",
-                    "사유", AdminAuditResult.SUCCESS, NOW);
+                    "mj@zzol.site",
+                    "DELETE /admin/api/accounts/{id}",
+                    "accounts",
+                    "7",
+                    "사유",
+                    AdminAuditResult.SUCCESS,
+                    NOW);
 
             assertThat(log.getActorEmail()).isEqualTo("mj@zzol.site");
             assertThat(log.getAction()).isEqualTo("DELETE /admin/api/accounts/{id}");
@@ -43,15 +47,19 @@ class AdminAuditLogTest {
         @ValueSource(strings = {"   "})
         void 실행자가_없으면_anonymous로_남긴다(String actor) {
             // 로그인 시도는 인증 전이라 주체가 없다. 그래도 기록은 남아야 한다.
-            assertThat(of(actor, "POST /admin/api/auth/login").getActorEmail())
-                    .isEqualTo("anonymous");
+            assertThat(of(actor, "POST /admin/api/auth/login").getActorEmail()).isEqualTo("anonymous");
         }
 
         @Test
         void 실패도_기록한다() {
             final AdminAuditLog log = AdminAuditLog.of(
-                    "mj@zzol.site", "POST /admin/api/accounts", "accounts", null,
-                    "BusinessException: 이미 등록된 관리자입니다.", AdminAuditResult.FAILURE, NOW);
+                    "mj@zzol.site",
+                    "POST /admin/api/accounts",
+                    "accounts",
+                    null,
+                    "BusinessException: 이미 등록된 관리자입니다.",
+                    AdminAuditResult.FAILURE,
+                    NOW);
 
             assertThat(log.getResult()).isEqualTo(AdminAuditResult.FAILURE);
             assertThat(log.getDetail()).contains("이미 등록된 관리자");
@@ -79,9 +87,8 @@ class AdminAuditLogTest {
         @Test
         void detail은_TEXT_컬럼이라_자르지_않는다() {
             final String longDetail = "x".repeat(5000);
-            final AdminAuditLog log = AdminAuditLog.of(
-                    "mj@zzol.site", "POST /x", null, null, longDetail,
-                    AdminAuditResult.FAILURE, NOW);
+            final AdminAuditLog log =
+                    AdminAuditLog.of("mj@zzol.site", "POST /x", null, null, longDetail, AdminAuditResult.FAILURE, NOW);
 
             assertThat(log.getDetail()).hasSize(5000);
         }

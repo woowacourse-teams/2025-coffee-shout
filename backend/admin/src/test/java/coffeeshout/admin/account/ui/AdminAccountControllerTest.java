@@ -45,28 +45,28 @@ class AdminAccountControllerTest {
 
         @Test
         void 부트스트랩과_DB_항목을_함께_돌려준다() {
-            given(adminAccountService.list()).willReturn(List.of(
-                    AdminAccountEntry.bootstrap(ROOT),
-                    AdminAccountEntry.database(1L, MJ, ROOT, NOW)));
+            given(adminAccountService.list())
+                    .willReturn(
+                            List.of(AdminAccountEntry.bootstrap(ROOT), AdminAccountEntry.database(1L, MJ, ROOT, NOW)));
 
             final List<AdminAccountResponse> responses = adminAccountController.list();
 
-            assertThat(responses).extracting(AdminAccountResponse::email)
+            assertThat(responses)
+                    .extracting(AdminAccountResponse::email)
                     .containsExactly("root@zzol.site", "mj@zzol.site");
-            assertThat(responses).extracting(AdminAccountResponse::source)
+            assertThat(responses)
+                    .extracting(AdminAccountResponse::source)
                     .containsExactly(AdminAccountSource.BOOTSTRAP, AdminAccountSource.DATABASE);
         }
 
         @Test
         void 부트스트랩_항목은_삭제_불가로_표시한다() {
-            given(adminAccountService.list())
-                    .willReturn(List.of(AdminAccountEntry.bootstrap(ROOT)));
+            given(adminAccountService.list()).willReturn(List.of(AdminAccountEntry.bootstrap(ROOT)));
 
-            assertThat(adminAccountController.list()).singleElement()
-                    .satisfies(response -> {
-                        assertThat(response.removable()).isFalse();
-                        assertThat(response.id()).isNull();
-                    });
+            assertThat(adminAccountController.list()).singleElement().satisfies(response -> {
+                assertThat(response.removable()).isFalse();
+                assertThat(response.id()).isNull();
+            });
         }
 
         @Test
@@ -82,8 +82,7 @@ class AdminAccountControllerTest {
 
         @Test
         void 실행자를_추가자로_넘긴다() {
-            given(adminAccountService.add(MJ, ROOT))
-                    .willReturn(AdminAccountEntry.database(1L, MJ, ROOT, NOW));
+            given(adminAccountService.add(MJ, ROOT)).willReturn(AdminAccountEntry.database(1L, MJ, ROOT, NOW));
 
             final AdminAccountResponse response =
                     adminAccountController.add(new AddAdminAccountRequest("mj@zzol.site"), ACTOR);
@@ -95,8 +94,7 @@ class AdminAccountControllerTest {
 
         @Test
         void 입력값을_정규화해_서비스에_넘긴다() {
-            given(adminAccountService.add(MJ, ROOT))
-                    .willReturn(AdminAccountEntry.database(1L, MJ, ROOT, NOW));
+            given(adminAccountService.add(MJ, ROOT)).willReturn(AdminAccountEntry.database(1L, MJ, ROOT, NOW));
 
             adminAccountController.add(new AddAdminAccountRequest("  MJ@Zzol.Site "), ACTOR);
 

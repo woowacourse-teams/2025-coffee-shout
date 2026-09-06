@@ -47,19 +47,16 @@ public record AdminEmail(String value) {
 
     private static void validate(String normalized) {
         if (normalized == null) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일은 비어 있을 수 없습니다.");
+            throw new BusinessException(AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일은 비어 있을 수 없습니다.");
         }
         if (normalized.length() > MAX_LENGTH) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일이 255자를 넘습니다.");
+            throw new BusinessException(AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일이 255자를 넘습니다.");
         }
         // 완전한 RFC 검증은 하지 않는다. 실제 소유 검증은 구글 ID 토큰이 하므로
         // 여기서는 목록에 넣을 수 없는 값만 거른다.
         final int at = normalized.indexOf('@');
         if (at <= 0 || at == normalized.length() - 1 || normalized.indexOf('@', at + 1) >= 0) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일 형식이 올바르지 않습니다.");
+            throw new BusinessException(AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일 형식이 올바르지 않습니다.");
         }
     }
 

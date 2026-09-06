@@ -13,10 +13,4 @@ import java.time.Instant;
  * 전부 활성 회원이고, {@code deletedAt} 칸을 두면 언제나 null 이 찍힌다.
  * 늘 비어 있는 칸은 지표를 못 믿게 만든다.
  */
-public record UserSummary(
-        Long id,
-        String userCode,
-        String nickname,
-        Instant createdAt
-) {
-}
+public record UserSummary(Long id, String userCode, String nickname, Instant createdAt) {}

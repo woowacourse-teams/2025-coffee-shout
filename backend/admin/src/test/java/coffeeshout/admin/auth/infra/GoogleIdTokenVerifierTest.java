@@ -39,13 +39,16 @@ class GoogleIdTokenVerifierTest {
 
     private static Jwt jwt(Map<String, Object> claims) {
         final Map<String, Object> merged = new HashMap<>(Map.of(
-                "iss", "https://accounts.google.com",
-                "aud", List.of(CLIENT_ID),
-                "email", "mj@zzol.site",
-                "email_verified", true));
+                "iss",
+                "https://accounts.google.com",
+                "aud",
+                List.of(CLIENT_ID),
+                "email",
+                "mj@zzol.site",
+                "email_verified",
+                true));
         merged.putAll(claims);
-        return new Jwt(TOKEN, Instant.now(), Instant.now().plusSeconds(600),
-                Map.of("alg", "RS256"), merged);
+        return new Jwt(TOKEN, Instant.now(), Instant.now().plusSeconds(600), Map.of("alg", "RS256"), merged);
     }
 
     @Nested
@@ -68,8 +71,7 @@ class GoogleIdTokenVerifierTest {
 
         @Test
         void aud가_여러_개여도_우리_클라이언트가_있으면_통과한다() {
-            given(jwtDecoder.decode(TOKEN))
-                    .willReturn(jwt(Map.of("aud", List.of("other-client", CLIENT_ID))));
+            given(jwtDecoder.decode(TOKEN)).willReturn(jwt(Map.of("aud", List.of("other-client", CLIENT_ID))));
 
             assertThat(verifier().verifyAndExtractEmail(TOKEN)).isEqualTo("mj@zzol.site");
         }
@@ -82,17 +84,18 @@ class GoogleIdTokenVerifierTest {
         @NullAndEmptySource
         @ValueSource(strings = {"   "})
         void 토큰이_비어_있으면_거부한다(String token) {
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(token),
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(token), AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
         void 디코더가_거부하면_실패_사유를_감춘_메시지를_낸다() {
             willThrow(new BadJwtException("signature mismatch"))
-                    .given(jwtDecoder).decode(TOKEN);
+                    .given(jwtDecoder)
+                    .decode(TOKEN);
 
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(TOKEN), AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
@@ -101,42 +104,44 @@ class GoogleIdTokenVerifierTest {
             given(jwtDecoder.decode(TOKEN))
                     .willReturn(jwt(Map.of("aud", List.of("someone-else.apps.googleusercontent.com"))));
 
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(TOKEN), AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
 
         @Test
         void 이메일이_검증되지_않았으면_거부한다() {
             given(jwtDecoder.decode(TOKEN)).willReturn(jwt(Map.of("email_verified", false)));
 
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
-                    AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(TOKEN), AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
         }
 
         @Test
         void email_verified_클레임이_없으면_거부한다() {
-            final Jwt withoutClaim = new Jwt(TOKEN, Instant.now(), Instant.now().plusSeconds(600),
+            final Jwt withoutClaim = new Jwt(
+                    TOKEN,
+                    Instant.now(),
+                    Instant.now().plusSeconds(600),
                     Map.of("alg", "RS256"),
-                    Map.of("iss", "https://accounts.google.com",
-                            "aud", List.of(CLIENT_ID),
-                            "email", "mj@zzol.site"));
+                    Map.of("iss", "https://accounts.google.com", "aud", List.of(CLIENT_ID), "email", "mj@zzol.site"));
             given(jwtDecoder.decode(TOKEN)).willReturn(withoutClaim);
 
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
-                    AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(TOKEN), AdminAccountErrorCode.GOOGLE_EMAIL_UNVERIFIED);
         }
 
         @Test
         void 이메일_클레임이_없으면_거부한다() {
-            final Jwt withoutEmail = new Jwt(TOKEN, Instant.now(), Instant.now().plusSeconds(600),
+            final Jwt withoutEmail = new Jwt(
+                    TOKEN,
+                    Instant.now(),
+                    Instant.now().plusSeconds(600),
                     Map.of("alg", "RS256"),
-                    Map.of("iss", "https://accounts.google.com",
-                            "aud", List.of(CLIENT_ID),
-                            "email_verified", true));
+                    Map.of("iss", "https://accounts.google.com", "aud", List.of(CLIENT_ID), "email_verified", true));
             given(jwtDecoder.decode(TOKEN)).willReturn(withoutEmail);
 
-            assertCoffeeShoutException(() -> verifier().verifyAndExtractEmail(TOKEN),
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
+            assertCoffeeShoutException(
+                    () -> verifier().verifyAndExtractEmail(TOKEN), AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
         }
     }
 }

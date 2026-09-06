@@ -47,13 +47,15 @@ public class AdminAuditAspect {
 
         try {
             final Object result = joinPoint.proceed();
-            adminAuditLogService.record(
-                    actor, action, targetTypeOf(request), targetId, null, AdminAuditResult.SUCCESS);
+            adminAuditLogService.record(actor, action, targetTypeOf(request), targetId, null, AdminAuditResult.SUCCESS);
             return result;
         } catch (Throwable e) {
             // 실패도 남긴다. 반복된 실패가 곧 신호다.
             adminAuditLogService.record(
-                    actor, action, targetTypeOf(request), targetId,
+                    actor,
+                    action,
+                    targetTypeOf(request),
+                    targetId,
                     e.getClass().getSimpleName() + ": " + e.getMessage(),
                     AdminAuditResult.FAILURE);
             throw e;
@@ -69,13 +71,11 @@ public class AdminAuditAspect {
     }
 
     private static boolean isAuditTarget(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(ADMIN_API_PREFIX)
-                && WRITE_METHODS.contains(request.getMethod());
+        return request.getRequestURI().startsWith(ADMIN_API_PREFIX) && WRITE_METHODS.contains(request.getMethod());
     }
 
     private static String currentActorEmail() {
-        final Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof AdminPrincipal admin) {
             return admin.email().value();
         }
@@ -102,8 +102,7 @@ public class AdminAuditAspect {
 
     @SuppressWarnings("unchecked")
     private static String pathVariablesOf(HttpServletRequest request) {
-        final Object variables =
-                request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        final Object variables = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (variables instanceof java.util.Map<?, ?> map && !map.isEmpty()) {
             return map.values().stream()
                     .map(String::valueOf)

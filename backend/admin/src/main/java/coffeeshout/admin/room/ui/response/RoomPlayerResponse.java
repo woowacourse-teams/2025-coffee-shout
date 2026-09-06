@@ -15,13 +15,17 @@ public record RoomPlayerResponse(
         Long userId,
         String nickname,
         String userCode,
-        LocalDateTime joinedAt
-) {
+        LocalDateTime joinedAt) {
 
     public static RoomPlayerResponse from(RoomPlayer player) {
         return new RoomPlayerResponse(
-                player.id(), player.playerName(), player.playerType(),
+                player.id(),
+                player.playerName(),
+                player.playerType(),
                 player.userId() == null,
-                player.userId(), player.nickname(), player.userCode(), player.joinedAt());
+                player.userId(),
+                player.nickname(),
+                player.userCode(),
+                player.joinedAt());
     }
 }

@@ -7,5 +7,4 @@ import coffeeshout.admin.account.domain.AdminEmail;
  *
  * <p>회원(User) 도메인과 무관하다. 관리자 로그인은 회원 레코드를 만들지 않는다.
  */
-public record AdminPrincipal(AdminEmail email) {
-}
+public record AdminPrincipal(AdminEmail email) {}

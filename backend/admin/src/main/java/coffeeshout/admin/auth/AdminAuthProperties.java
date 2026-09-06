@@ -25,11 +25,11 @@ import org.springframework.validation.annotation.Validated;
 public record AdminAuthProperties(
         List<String> emails,
         String googleClientId,
-        @NotBlank
-        @Size(min = 32, message = "관리자 JWT secret은 HS256 최소 키 길이(32자) 이상이어야 합니다.")
+
+        @NotBlank @Size(min = 32, message = "관리자 JWT secret은 HS256 최소 키 길이(32자) 이상이어야 합니다.")
         String jwtSecret,
-        @Positive long tokenValiditySeconds
-) {
+
+        @Positive long tokenValiditySeconds) {
 
     public boolean isBootstrap(AdminEmail email) {
         return email != null && bootstrapEmails().contains(email);

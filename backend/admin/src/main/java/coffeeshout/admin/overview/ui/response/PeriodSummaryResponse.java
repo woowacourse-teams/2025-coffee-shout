@@ -20,8 +20,7 @@ public record PeriodSummaryResponse(
         FunnelResponse funnel,
         long players,
         long signups,
-        double avgPlayersPerRoom
-) {
+        double avgPlayersPerRoom) {
 
     public static PeriodSummaryResponse from(PeriodSummary summary) {
         return new PeriodSummaryResponse(

@@ -32,8 +32,8 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
     private NicknameFeedbackJpaRepository nicknameFeedbackJpaRepository;
 
     private void saveFeedback(String nickname, boolean aiFlagged, OperatorDecision decision) {
-        nicknameFeedbackJpaRepository.save(new NicknameFeedback(
-                nickname, aiFlagged, AiConfidence.of(0.9), decision, "사유"));
+        nicknameFeedbackJpaRepository.save(
+                new NicknameFeedback(nickname, aiFlagged, AiConfidence.of(0.9), decision, "사유"));
     }
 
     @Nested
@@ -43,8 +43,7 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
         void AI가_걸렀는데_관리자가_허용하면_오탐이다() {
             saveFeedback("멀쩡한닉", true, OperatorDecision.ALLOWED);
 
-            final NicknameAuditQuality quality =
-                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
+            final NicknameAuditQuality quality = qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
 
             assertThat(quality.falsePositive()).isEqualTo(1);
             assertThat(quality.falseNegative()).isZero();
@@ -54,8 +53,7 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
         void AI가_놓쳤는데_관리자가_차단하면_미탐이다() {
             saveFeedback("걸러야할닉", false, OperatorDecision.BLOCKED);
 
-            final NicknameAuditQuality quality =
-                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
+            final NicknameAuditQuality quality = qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
 
             assertThat(quality.falseNegative()).isEqualTo(1);
             assertThat(quality.falsePositive()).isZero();
@@ -66,8 +64,7 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
             saveFeedback("욕설닉", true, OperatorDecision.BLOCKED);
             saveFeedback("보통닉", false, OperatorDecision.ALLOWED);
 
-            final NicknameAuditQuality quality =
-                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
+            final NicknameAuditQuality quality = qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
 
             assertThat(quality.total()).isEqualTo(2);
             assertThat(quality.agreed()).isEqualTo(2);
@@ -82,8 +79,7 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
             saveFeedback("d", false, OperatorDecision.BLOCKED);
             saveFeedback("e", false, OperatorDecision.ALLOWED);
 
-            final NicknameAuditQuality quality =
-                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
+            final NicknameAuditQuality quality = qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
 
             assertThat(quality.total()).isEqualTo(5);
             assertThat(quality.falsePositive()).isEqualTo(1);
@@ -96,16 +92,15 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
         void 기간_밖의_판정은_세지_않는다() {
             saveFeedback("a", true, OperatorDecision.ALLOWED);
 
-            final NicknameAuditQuality quality = qualityStatisticsRepository
-                    .findNicknameAuditQuality(FROM, Instant.parse("2020-01-02T00:00:00Z"));
+            final NicknameAuditQuality quality =
+                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, Instant.parse("2020-01-02T00:00:00Z"));
 
             assertThat(quality.total()).isZero();
         }
 
         @Test
         void 판정이_없으면_전부_0이다() {
-            final NicknameAuditQuality quality =
-                    qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
+            final NicknameAuditQuality quality = qualityStatisticsRepository.findNicknameAuditQuality(FROM, TO);
 
             assertThat(quality.total()).isZero();
             assertThat(quality.overrideRate()).isZero();
@@ -118,12 +113,14 @@ class QueryDslQualityStatisticsRepositoryTest extends AdminModuleServiceTest {
         @Test
         void 미처리_신고가_없으면_대기_건수가_0이고_가장_오래된_건이_없다() {
             assertThat(qualityStatisticsRepository.countPendingReports()).isZero();
-            assertThat(qualityStatisticsRepository.findOldestPendingReportCreatedAt()).isEmpty();
+            assertThat(qualityStatisticsRepository.findOldestPendingReportCreatedAt())
+                    .isEmpty();
         }
 
         @Test
         void 처리된_신고가_없으면_소요_시간_목록이_비어_있다() {
-            assertThat(qualityStatisticsRepository.findResolvedDurationMinutes(FROM, TO)).isEmpty();
+            assertThat(qualityStatisticsRepository.findResolvedDurationMinutes(FROM, TO))
+                    .isEmpty();
         }
     }
 }

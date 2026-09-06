@@ -17,12 +17,17 @@ public record AdminAuditLogResponse(
         String targetId,
         String detail,
         AdminAuditResult result,
-        Instant createdAt
-) {
+        Instant createdAt) {
 
     public static AdminAuditLogResponse from(AdminAuditLog log) {
         return new AdminAuditLogResponse(
-                log.getId(), log.getActorEmail(), log.getAction(), log.getTargetType(),
-                log.getTargetId(), log.getDetail(), log.getResult(), log.getCreatedAt());
+                log.getId(),
+                log.getActorEmail(),
+                log.getAction(),
+                log.getTargetType(),
+                log.getTargetId(),
+                log.getDetail(),
+                log.getResult(),
+                log.getCreatedAt());
     }
 }

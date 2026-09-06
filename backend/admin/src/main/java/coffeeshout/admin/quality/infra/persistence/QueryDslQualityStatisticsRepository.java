@@ -61,12 +61,11 @@ public class QueryDslQualityStatisticsRepository implements QualityStatisticsRep
         return queryFactory
                 .select(REPORT.createdAt, REPORT.resolvedAt)
                 .from(REPORT)
-                .where(REPORT.resolvedAt.isNotNull(),
-                        REPORT.resolvedAt.goe(from), REPORT.resolvedAt.lt(to))
+                .where(REPORT.resolvedAt.isNotNull(), REPORT.resolvedAt.goe(from), REPORT.resolvedAt.lt(to))
                 .fetch()
                 .stream()
-                .map(row -> Duration.between(
-                        row.get(REPORT.createdAt), row.get(REPORT.resolvedAt)).toMinutes())
+                .map(row -> Duration.between(row.get(REPORT.createdAt), row.get(REPORT.resolvedAt))
+                        .toMinutes())
                 .sorted()
                 .toList();
     }

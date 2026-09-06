@@ -27,14 +27,12 @@ public class AdminQualityController {
      * @param days 조회 기간. 상한을 두는 것은 기간을 늘려 전체 스캔을 유발하는 것을 막기 위해서다.
      */
     @GetMapping("/nickname-audit")
-    public NicknameAuditQualityResponse nicknameAudit(
-            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+    public NicknameAuditQualityResponse nicknameAudit(@RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return NicknameAuditQualityResponse.from(qualityService.nicknameAuditQuality(days));
     }
 
     @GetMapping("/report-sla")
-    public ReportSlaResponse reportSla(
-            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+    public ReportSlaResponse reportSla(@RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return ReportSlaResponse.from(qualityService.reportSla(days));
     }
 }

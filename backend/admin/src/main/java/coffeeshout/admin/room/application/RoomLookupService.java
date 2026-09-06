@@ -36,9 +36,9 @@ public class RoomLookupService {
     }
 
     public RoomDetail findDetail(Long roomId) {
-        final RoomSummary summary = roomLookupRepository.findSummaryById(roomId)
-                .orElseThrow(() -> new BusinessException(
-                        GlobalErrorCode.NOT_EXIST, "방을 찾을 수 없습니다: " + roomId));
+        final RoomSummary summary = roomLookupRepository
+                .findSummaryById(roomId)
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.NOT_EXIST, "방을 찾을 수 없습니다: " + roomId));
 
         return new RoomDetail(
                 summary,
@@ -54,8 +54,7 @@ public class RoomLookupService {
             RoomSummary summary,
             List<RoomPlayer> players,
             List<RoomMiniGameResult> miniGameResults,
-            RoomRouletteResult roulette
-    ) {
+            RoomRouletteResult roulette) {
 
         public Optional<RoomRouletteResult> rouletteResult() {
             return Optional.ofNullable(roulette);

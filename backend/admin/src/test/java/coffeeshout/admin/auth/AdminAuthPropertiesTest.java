@@ -25,8 +25,7 @@ class AdminAuthPropertiesTest {
 
         @Test
         void 대소문자와_공백을_정규화해_보관한다() {
-            final AdminAuthProperties properties =
-                    withEmails(List.of("  MJ@Zzol.Site ", "root@ZZOL.site"));
+            final AdminAuthProperties properties = withEmails(List.of("  MJ@Zzol.Site ", "root@ZZOL.site"));
 
             assertThat(properties.bootstrapEmails()).containsExactly(MJ, ROOT);
         }
@@ -34,8 +33,7 @@ class AdminAuthPropertiesTest {
         @Test
         void 형식이_어긋난_항목은_조용히_걸러낸다() {
             // 환경변수 오타 하나로 앱이 아예 안 뜨면 배포가 막힌다.
-            final AdminAuthProperties properties =
-                    withEmails(Arrays.asList("mj@zzol.site", "", "   ", "오타", null));
+            final AdminAuthProperties properties = withEmails(Arrays.asList("mj@zzol.site", "", "   ", "오타", null));
 
             assertThat(properties.bootstrapEmails()).containsExactly(MJ);
         }
@@ -67,12 +65,14 @@ class AdminAuthPropertiesTest {
 
         @Test
         void 대소문자와_공백이_달라도_참이다() {
-            assertThat(properties.isBootstrap(AdminEmail.of("  MJ@Zzol.Site  "))).isTrue();
+            assertThat(properties.isBootstrap(AdminEmail.of("  MJ@Zzol.Site  ")))
+                    .isTrue();
         }
 
         @Test
         void 목록에_없으면_거짓이다() {
-            assertThat(properties.isBootstrap(AdminEmail.of("stranger@zzol.site"))).isFalse();
+            assertThat(properties.isBootstrap(AdminEmail.of("stranger@zzol.site")))
+                    .isFalse();
         }
 
         @Test

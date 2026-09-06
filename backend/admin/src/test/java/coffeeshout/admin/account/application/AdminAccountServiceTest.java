@@ -41,9 +41,7 @@ class AdminAccountServiceTest {
 
     private AdminAccountService service(List<String> bootstrapEmails) {
         return new AdminAccountService(
-                adminAccountRepository,
-                new AdminAuthProperties(bootstrapEmails, "client-id", SECRET, 3600),
-                CLOCK);
+                adminAccountRepository, new AdminAuthProperties(bootstrapEmails, "client-id", SECRET, 3600), CLOCK);
     }
 
     private AdminAccountService serviceWithBootstrap() {
@@ -80,7 +78,8 @@ class AdminAccountServiceTest {
 
         @Test
         void 환경변수의_대소문자가_달라도_판정한다() {
-            assertThat(service(List.of("  ROOT@Zzol.Site ")).isAllowed(BOOTSTRAP)).isTrue();
+            assertThat(service(List.of("  ROOT@Zzol.Site ")).isAllowed(BOOTSTRAP))
+                    .isTrue();
         }
 
         @Test
@@ -103,14 +102,13 @@ class AdminAccountServiceTest {
 
         @Test
         void 부트스트랩을_먼저_두고_DB를_뒤에_붙인다() {
-            given(adminAccountRepository.findAllByOrderByCreatedAtAsc())
-                    .willReturn(List.of(account(MJ, BOOTSTRAP)));
+            given(adminAccountRepository.findAllByOrderByCreatedAtAsc()).willReturn(List.of(account(MJ, BOOTSTRAP)));
 
             final List<AdminAccountEntry> entries = serviceWithBootstrap().list();
 
-            assertThat(entries).extracting(AdminAccountEntry::email)
-                    .containsExactly(BOOTSTRAP, MJ);
-            assertThat(entries).extracting(AdminAccountEntry::source)
+            assertThat(entries).extracting(AdminAccountEntry::email).containsExactly(BOOTSTRAP, MJ);
+            assertThat(entries)
+                    .extracting(AdminAccountEntry::source)
                     .containsExactly(AdminAccountSource.BOOTSTRAP, AdminAccountSource.DATABASE);
         }
 
@@ -118,27 +116,31 @@ class AdminAccountServiceTest {
         void 부트스트랩_항목은_삭제할_수_없다() {
             given(adminAccountRepository.findAllByOrderByCreatedAtAsc()).willReturn(List.of());
 
-            assertThat(serviceWithBootstrap().list()).singleElement()
-                    .extracting(AdminAccountEntry::removable).isEqualTo(false);
+            assertThat(serviceWithBootstrap().list())
+                    .singleElement()
+                    .extracting(AdminAccountEntry::removable)
+                    .isEqualTo(false);
         }
 
         @Test
         void DB_항목은_삭제할_수_있다() {
-            given(adminAccountRepository.findAllByOrderByCreatedAtAsc())
-                    .willReturn(List.of(account(MJ, BOOTSTRAP)));
+            given(adminAccountRepository.findAllByOrderByCreatedAtAsc()).willReturn(List.of(account(MJ, BOOTSTRAP)));
 
-            assertThat(service(List.of()).list()).singleElement()
-                    .extracting(AdminAccountEntry::removable).isEqualTo(true);
+            assertThat(service(List.of()).list())
+                    .singleElement()
+                    .extracting(AdminAccountEntry::removable)
+                    .isEqualTo(true);
         }
 
         @Test
         void 양쪽에_같은_이메일이_있으면_부트스트랩_줄만_남긴다() {
             // 두 줄로 보이면 삭제 가능한 줄을 지우고도 로그인이 되는 것을 버그로 오해한다.
-            given(adminAccountRepository.findAllByOrderByCreatedAtAsc())
-                    .willReturn(List.of(account(BOOTSTRAP, null)));
+            given(adminAccountRepository.findAllByOrderByCreatedAtAsc()).willReturn(List.of(account(BOOTSTRAP, null)));
 
-            assertThat(serviceWithBootstrap().list()).singleElement()
-                    .extracting(AdminAccountEntry::source).isEqualTo(AdminAccountSource.BOOTSTRAP);
+            assertThat(serviceWithBootstrap().list())
+                    .singleElement()
+                    .extracting(AdminAccountEntry::source)
+                    .isEqualTo(AdminAccountSource.BOOTSTRAP);
         }
     }
 
@@ -148,8 +150,7 @@ class AdminAccountServiceTest {
         @Test
         void 추가한_관리자를_실행자와_함께_저장한다() {
             given(adminAccountRepository.existsByEmail("mj@zzol.site")).willReturn(false);
-            given(adminAccountRepository.save(any()))
-                    .willAnswer(invocation -> invocation.getArgument(0));
+            given(adminAccountRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
 
             final AdminAccountEntry entry = serviceWithBootstrap().add(MJ, BOOTSTRAP);
 
@@ -162,14 +163,16 @@ class AdminAccountServiceTest {
         void 이미_DB에_있으면_거부한다() {
             given(adminAccountRepository.existsByEmail("mj@zzol.site")).willReturn(true);
 
-            assertCoffeeShoutException(() -> serviceWithBootstrap().add(MJ, BOOTSTRAP),
+            assertCoffeeShoutException(
+                    () -> serviceWithBootstrap().add(MJ, BOOTSTRAP),
                     AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS);
         }
 
         @Test
         void 부트스트랩에_있는_이메일도_거부한다() {
             // DB에 넣어봐야 list()가 감추므로, 넣히는 것 자체를 막아 혼란을 없앤다.
-            assertCoffeeShoutException(() -> serviceWithBootstrap().add(BOOTSTRAP, BOOTSTRAP),
+            assertCoffeeShoutException(
+                    () -> serviceWithBootstrap().add(BOOTSTRAP, BOOTSTRAP),
                     AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS);
             then(adminAccountRepository).should(never()).save(any());
         }
@@ -202,7 +205,8 @@ class AdminAccountServiceTest {
         void 없는_id면_거부한다() {
             given(adminAccountRepository.findById(404L)).willReturn(Optional.empty());
 
-            assertCoffeeShoutException(() -> serviceWithBootstrap().remove(404L, BOOTSTRAP),
+            assertCoffeeShoutException(
+                    () -> serviceWithBootstrap().remove(404L, BOOTSTRAP),
                     AdminAccountErrorCode.ADMIN_ACCOUNT_NOT_FOUND);
         }
     }

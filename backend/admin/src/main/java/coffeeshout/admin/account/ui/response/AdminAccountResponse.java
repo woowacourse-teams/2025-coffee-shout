@@ -8,13 +8,7 @@ import java.time.Instant;
  * @param removable 부트스트랩(환경변수) 관리자는 false. 화면이 삭제 버튼을 감추는 근거다.
  */
 public record AdminAccountResponse(
-        Long id,
-        String email,
-        AdminAccountSource source,
-        boolean removable,
-        String createdByEmail,
-        Instant createdAt
-) {
+        Long id, String email, AdminAccountSource source, boolean removable, String createdByEmail, Instant createdAt) {
 
     public static AdminAccountResponse from(AdminAccountEntry entry) {
         return new AdminAccountResponse(

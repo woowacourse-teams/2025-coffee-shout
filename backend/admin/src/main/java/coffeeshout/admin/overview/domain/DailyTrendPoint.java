@@ -10,5 +10,4 @@ import java.time.LocalDate;
  *
  * @param completed 완주한 방(DONE). created 와 함께 보면 그날의 완주율이 나온다.
  */
-public record DailyTrendPoint(LocalDate date, long created, long completed, long players) {
-}
+public record DailyTrendPoint(LocalDate date, long created, long completed, long players) {}

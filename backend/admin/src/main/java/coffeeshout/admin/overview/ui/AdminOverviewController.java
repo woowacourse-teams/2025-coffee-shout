@@ -44,15 +44,15 @@ public class AdminOverviewController {
      * @param days 상한을 둔다. 기간을 늘려 전체 스캔을 유발하는 것을 막는다.
      */
     @GetMapping("/trend")
-    public List<DailyTrendResponse> trend(
-            @RequestParam(defaultValue = "14") @Min(2) @Max(90) int days) {
-        return overviewService.trend(days).stream().map(DailyTrendResponse::from).toList();
+    public List<DailyTrendResponse> trend(@RequestParam(defaultValue = "14") @Min(2) @Max(90) int days) {
+        return overviewService.trend(days).stream()
+                .map(DailyTrendResponse::from)
+                .toList();
     }
 
     /** 게임별 완료 수와 비중. 비중이 0에 가까운 게임은 아무도 고르지 않는다는 뜻이다. */
     @GetMapping("/games")
-    public List<GamePlayStatResponse> games(
-            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+    public List<GamePlayStatResponse> games(@RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return overviewService.gamePlayStats(days).stream()
                 .map(GamePlayStatResponse::from)
                 .toList();
@@ -65,18 +65,14 @@ public class AdminOverviewController {
      * 하루치를 더하면 생성과 완주가 다른 날로 갈려 퍼널이 맞지 않는다.
      */
     @GetMapping("/period")
-    public PeriodSummaryResponse period(
-            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+    public PeriodSummaryResponse period(@RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return PeriodSummaryResponse.from(overviewService.periodSummary(days));
     }
 
     /** 날짜를 안 주면 오늘(KST)이다. */
     @GetMapping("/summary")
     public DailySummaryResponse summary(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        return DailySummaryResponse.from(
-                date == null ? overviewService.today() : overviewService.summaryOf(date));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return DailySummaryResponse.from(date == null ? overviewService.today() : overviewService.summaryOf(date));
     }
 }

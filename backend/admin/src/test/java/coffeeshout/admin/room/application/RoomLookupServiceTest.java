@@ -52,8 +52,7 @@ class RoomLookupServiceTest {
 
         @Test
         void 페이지_크기를_고정해_조회한다() {
-            given(roomLookupRepository.search(any(), any(Pageable.class)))
-                    .willReturn(new PageImpl<>(List.of()));
+            given(roomLookupRepository.search(any(), any(Pageable.class))).willReturn(new PageImpl<>(List.of()));
 
             roomLookupService.search("ABCDE", 3);
 
@@ -70,7 +69,8 @@ class RoomLookupServiceTest {
                     .willReturn(new PageImpl<>(List.of(summary(2L), summary(1L))));
 
             assertThat(roomLookupService.search("ABCDE", 0).getContent())
-                    .extracting(RoomSummary::id).containsExactly(2L, 1L);
+                    .extracting(RoomSummary::id)
+                    .containsExactly(2L, 1L);
         }
     }
 
@@ -80,12 +80,13 @@ class RoomLookupServiceTest {
         @Test
         void 방과_참여자와_게임결과와_룰렛을_모아_돌려준다() {
             given(roomLookupRepository.findSummaryById(1L)).willReturn(Optional.of(summary(1L)));
-            given(roomLookupRepository.findPlayers(1L)).willReturn(List.of(
-                    new RoomPlayer(10L, "엠제이", PlayerType.HOST, 100L, "mj", "AB12C", CREATED_AT)));
-            given(roomLookupRepository.findMiniGameResults(1L)).willReturn(List.of(
-                    new RoomMiniGameResult(MiniGameType.RACING_GAME, 10L, "엠제이", 1, 500L, CREATED_AT)));
-            given(roomLookupRepository.findRouletteResult(1L)).willReturn(Optional.of(
-                    new RoomRouletteResult(10L, "엠제이", 12, CREATED_AT.plusMinutes(8))));
+            given(roomLookupRepository.findPlayers(1L))
+                    .willReturn(List.of(new RoomPlayer(10L, "엠제이", PlayerType.HOST, 100L, "mj", "AB12C", CREATED_AT)));
+            given(roomLookupRepository.findMiniGameResults(1L))
+                    .willReturn(
+                            List.of(new RoomMiniGameResult(MiniGameType.RACING_GAME, 10L, "엠제이", 1, 500L, CREATED_AT)));
+            given(roomLookupRepository.findRouletteResult(1L))
+                    .willReturn(Optional.of(new RoomRouletteResult(10L, "엠제이", 12, CREATED_AT.plusMinutes(8))));
 
             final RoomDetail detail = roomLookupService.findDetail(1L);
 
@@ -110,8 +111,7 @@ class RoomLookupServiceTest {
         void 없는_방이면_거부하고_나머지를_조회하지_않는다() {
             given(roomLookupRepository.findSummaryById(404L)).willReturn(Optional.empty());
 
-            assertCoffeeShoutException(
-                    () -> roomLookupService.findDetail(404L), GlobalErrorCode.NOT_EXIST);
+            assertCoffeeShoutException(() -> roomLookupService.findDetail(404L), GlobalErrorCode.NOT_EXIST);
             then(roomLookupRepository).should(never()).findPlayers(any());
             then(roomLookupRepository).should(never()).findMiniGameResults(any());
         }

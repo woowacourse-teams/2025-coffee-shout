@@ -64,12 +64,10 @@ class AdminAuthServiceTest {
 
         @Test
         void 허용목록에_없으면_토큰을_발급하지_않는다() {
-            given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN))
-                    .willReturn("stranger@evil.site");
+            given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN)).willReturn("stranger@evil.site");
             given(adminAccountService.isAllowed(STRANGER)).willReturn(false);
 
-            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
-                    AdminAccountErrorCode.NOT_ADMIN);
+            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN), AdminAccountErrorCode.NOT_ADMIN);
             then(adminTokenIssuer).should(never()).issue(any());
         }
 
@@ -78,8 +76,7 @@ class AdminAuthServiceTest {
             // 둘을 구분해 주면 어떤 이메일이 형식만 맞는지 훑어 관리자 계정을 좁혀 갈 수 있다.
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN)).willReturn("형식오류");
 
-            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
-                    AdminAccountErrorCode.NOT_ADMIN);
+            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN), AdminAccountErrorCode.NOT_ADMIN);
             then(adminAccountService).should(never()).isAllowed(any());
             then(adminTokenIssuer).should(never()).issue(any());
         }
@@ -88,12 +85,10 @@ class AdminAuthServiceTest {
         void 구글_검증이_실패하면_허용목록을_보지_않는다() {
             // 순서가 뒤바뀌면 이메일을 주장하는 것만으로 목록 등재 여부를 알아낼 수 있다.
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN))
-                    .willThrow(new BusinessException(
-                            AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID,
-                            "구글 인증에 실패했습니다."));
+                    .willThrow(new BusinessException(AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID, "구글 인증에 실패했습니다."));
 
-            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
-                    AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
+            assertCoffeeShoutException(
+                    () -> adminAuthService.login(ID_TOKEN), AdminAccountErrorCode.GOOGLE_ID_TOKEN_INVALID);
             then(adminAccountService).should(never()).isAllowed(any());
             then(adminTokenIssuer).should(never()).issue(any());
         }
@@ -116,8 +111,8 @@ class AdminAuthServiceTest {
             // 로컬이라고 아무 이메일이나 되는 것은 아니다.
             given(adminAccountService.isAllowed(STRANGER)).willReturn(false);
 
-            assertCoffeeShoutException(() -> adminAuthService.devLogin("stranger@evil.site"),
-                    AdminAccountErrorCode.NOT_ADMIN);
+            assertCoffeeShoutException(
+                    () -> adminAuthService.devLogin("stranger@evil.site"), AdminAccountErrorCode.NOT_ADMIN);
         }
     }
 }

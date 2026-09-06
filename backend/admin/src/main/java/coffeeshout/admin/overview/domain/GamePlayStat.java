@@ -14,5 +14,4 @@ import coffeeshout.minigame.domain.MiniGameType;
  *
  * @param share 전체 대비 비중. 0.0 ~ 1.0
  */
-public record GamePlayStat(MiniGameType miniGameType, long plays, double share) {
-}
+public record GamePlayStat(MiniGameType miniGameType, long plays, double share) {}

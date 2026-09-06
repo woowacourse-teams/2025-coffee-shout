@@ -37,8 +37,7 @@ public class AdminAuditLogController {
     @Transactional(readOnly = true)
     public PageResponse<AdminAuditLogResponse> list(
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size
-    ) {
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return PageResponse.of(
                 adminAuditLogRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size)),
                 AdminAuditLogResponse::from);

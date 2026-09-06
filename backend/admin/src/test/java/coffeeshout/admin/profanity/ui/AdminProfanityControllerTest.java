@@ -37,8 +37,7 @@ import org.springframework.data.domain.Pageable;
 class AdminProfanityControllerTest {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-    private static final Clock CLOCK =
-            Clock.fixed(Instant.parse("2026-09-06T00:00:00Z"), KST);
+    private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-09-06T00:00:00Z"), KST);
 
     @Mock
     private ProfanityAuditService auditService;
@@ -70,11 +69,10 @@ class AdminProfanityControllerTest {
 
         @Test
         void 페이지_메타데이터를_함께_돌려준다() {
-            given(auditService.listByStatus(any(), any(Pageable.class))).willReturn(
-                    new PageImpl<>(List.<NicknameAudit>of(), PageRequest.of(0, 10), 25));
+            given(auditService.listByStatus(any(), any(Pageable.class)))
+                    .willReturn(new PageImpl<>(List.<NicknameAudit>of(), PageRequest.of(0, 10), 25));
 
-            final PageResponse<NicknameAuditResponse> response =
-                    controller().audits(NicknameAuditStatus.PENDING, 0);
+            final PageResponse<NicknameAuditResponse> response = controller().audits(NicknameAuditStatus.PENDING, 0);
 
             assertThat(response.totalElements()).isEqualTo(25);
             assertThat(response.totalPages()).isEqualTo(3);
@@ -105,20 +103,17 @@ class AdminProfanityControllerTest {
         @Test
         void 필터를_그대로_서비스에_넘긴다() {
             // 문자열을 직접 파싱하던 부분이 사라졌다. 값이 어긋나면 스프링이 400 을 낸다.
-            given(managementService.findAllPaged(
-                    "욕", Language.KOREAN, WordSource.MANUAL, true, 1, 20))
+            given(managementService.findAllPaged("욕", Language.KOREAN, WordSource.MANUAL, true, 1, 20))
                     .willReturn(new PageImpl<>(List.of()));
 
             controller().words("욕", Language.KOREAN, WordSource.MANUAL, true, 1);
 
-            then(managementService).should()
-                    .findAllPaged("욕", Language.KOREAN, WordSource.MANUAL, true, 1, 20);
+            then(managementService).should().findAllPaged("욕", Language.KOREAN, WordSource.MANUAL, true, 1, 20);
         }
 
         @Test
         void 필터가_없으면_null로_넘겨_전체를_조회한다() {
-            given(managementService.findAllPaged("", null, null, null, 0, 20))
-                    .willReturn(new PageImpl<>(List.of()));
+            given(managementService.findAllPaged("", null, null, null, 0, 20)).willReturn(new PageImpl<>(List.of()));
 
             controller().words("", null, null, null, 0);
 
@@ -127,13 +122,12 @@ class AdminProfanityControllerTest {
 
         @Test
         void 단어와_활성_여부를_돌려준다() {
-            given(managementService.findAllPaged("", null, null, null, 0, 20)).willReturn(
-                    new PageImpl<>(List.of(
-                            new ProfanityWord("욕설", Language.KOREAN, WordSource.MANUAL, true))));
+            given(managementService.findAllPaged("", null, null, null, 0, 20))
+                    .willReturn(
+                            new PageImpl<>(List.of(new ProfanityWord("욕설", Language.KOREAN, WordSource.MANUAL, true))));
 
             assertThat(controller().words("", null, null, null, 0).content())
-                    .containsExactly(new ProfanityWordResponse(
-                            "욕설", Language.KOREAN, WordSource.MANUAL, true));
+                    .containsExactly(new ProfanityWordResponse("욕설", Language.KOREAN, WordSource.MANUAL, true));
         }
     }
 

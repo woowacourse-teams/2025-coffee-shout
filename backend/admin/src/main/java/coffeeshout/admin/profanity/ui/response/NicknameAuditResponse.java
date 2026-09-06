@@ -17,8 +17,7 @@ public record NicknameAuditResponse(
         AiConfidence confidence,
         String reason,
         LocalDateTime createdAt,
-        LocalDateTime auditedAt
-) {
+        LocalDateTime auditedAt) {
 
     public static NicknameAuditResponse from(NicknameAudit audit, ZoneId zone) {
         return new NicknameAuditResponse(
@@ -28,7 +27,6 @@ public record NicknameAuditResponse(
                 audit.getConfidence() != null ? audit.getConfidence() : AiConfidence.UNKNOWN,
                 audit.getReason() != null ? audit.getReason() : "",
                 LocalDateTime.ofInstant(audit.getCreatedAt(), zone),
-                audit.getAuditedAt() == null
-                        ? null : LocalDateTime.ofInstant(audit.getAuditedAt(), zone));
+                audit.getAuditedAt() == null ? null : LocalDateTime.ofInstant(audit.getAuditedAt(), zone));
     }
 }

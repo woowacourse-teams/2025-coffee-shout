@@ -26,20 +26,13 @@ public class UserLookupService {
     }
 
     public UserDetail findDetail(Long userId) {
-        final UserSummary summary = userLookupRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(
-                        GlobalErrorCode.NOT_EXIST, "유저를 찾을 수 없습니다: " + userId));
+        final UserSummary summary = userLookupRepository
+                .findById(userId)
+                .orElseThrow(() -> new BusinessException(GlobalErrorCode.NOT_EXIST, "유저를 찾을 수 없습니다: " + userId));
 
         return new UserDetail(
-                summary,
-                userLookupRepository.findProviders(userId),
-                userLookupRepository.findActivity(userId));
+                summary, userLookupRepository.findProviders(userId), userLookupRepository.findActivity(userId));
     }
 
-    public record UserDetail(
-            UserSummary summary,
-            List<String> providers,
-            UserActivity activity
-    ) {
-    }
+    public record UserDetail(UserSummary summary, List<String> providers, UserActivity activity) {}
 }

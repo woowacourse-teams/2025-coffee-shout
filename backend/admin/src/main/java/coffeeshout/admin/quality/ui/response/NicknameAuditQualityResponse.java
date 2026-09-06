@@ -8,16 +8,14 @@ import coffeeshout.admin.quality.domain.NicknameAuditQuality;
  * @param overrideRate  관리자가 AI 판정을 뒤집은 비율. 검열 모델을 손볼 시점을 알려주는 신호
  */
 public record NicknameAuditQualityResponse(
-        long total,
-        long agreed,
-        long falsePositive,
-        long falseNegative,
-        double overrideRate
-) {
+        long total, long agreed, long falsePositive, long falseNegative, double overrideRate) {
 
     public static NicknameAuditQualityResponse from(NicknameAuditQuality quality) {
         return new NicknameAuditQualityResponse(
-                quality.total(), quality.agreed(),
-                quality.falsePositive(), quality.falseNegative(), quality.overrideRate());
+                quality.total(),
+                quality.agreed(),
+                quality.falsePositive(),
+                quality.falseNegative(),
+                quality.overrideRate());
     }
 }

@@ -15,6 +15,4 @@ public record RoomSummary(
         RoomState status,
         LocalDateTime createdAt,
         LocalDateTime finishedAt,
-        long playerCount
-) {
-}
+        long playerCount) {}
