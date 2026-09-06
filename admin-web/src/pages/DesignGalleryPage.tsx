@@ -1,7 +1,13 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { MessageSquareWarning, ShieldBan, SpellCheck, Zap } from 'lucide-react';
+import { useState } from 'react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { CodeBlock } from '@/components/ui/CodeBlock';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { Input, Label, SearchInput, Select } from '@/components/ui/Field';
+import { KeyValue } from '@/components/ui/KeyValue';
+import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/EmptyState';
@@ -18,8 +24,10 @@ import { formatDurationMinutes, formatPercent } from '@/lib/format';
  * 새로 만들 때 기존 것을 먼저 찾아보게 하는 목적이라면 이 한 페이지로 충분하다.
  */
 export function DesignGalleryPage() {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <header>
         <h2 className="text-xl font-semibold text-ink">디자인 갤러리</h2>
         <p className="mt-1 text-xs text-ink-muted">
@@ -142,6 +150,59 @@ export function DesignGalleryPage() {
         </div>
       </Section>
 
+      <Section title="입력" description="검색은 디바운스로 즉시 반영된다. 누를 필요 없는 버튼을 두지 않는다.">
+        <div className="flex flex-wrap items-end gap-3">
+          <SearchInput placeholder="닉네임 또는 유저코드" className="w-64" />
+          <Select defaultValue="" className="w-40">
+            <option value="">전체 상태</option>
+            <option value="PENDING">미처리</option>
+            <option value="RESOLVED">처리 완료</option>
+          </Select>
+          <Label className="w-40" hint="쉼표로 구분">
+            관리자 이메일
+            <Input placeholder="admin@zzol.site" />
+          </Label>
+        </div>
+      </Section>
+
+      <Section title="상세 속성" description="dl 로 쓴다. 라벨과 값의 관계가 마크업에 남는다.">
+        <Card>
+          <CardBody>
+            <KeyValue
+              items={[
+                { label: 'joinCode', value: <span className="font-mono">ABCDE</span> },
+                { label: '상태', value: <StatusBadge tone="success">완주</StatusBadge> },
+                { label: '생성', value: <Timestamp value={new Date(Date.now() - 3600_000)} /> },
+                { label: '참여자', value: '4명' },
+                { label: '메모', value: null, full: true },
+              ]}
+            />
+          </CardBody>
+        </Card>
+      </Section>
+
+      <Section title="원문 뷰어" description="운영 대화는 대개 원문을 슬랙에 붙이며 시작한다.">
+        <CodeBlock
+          value={'{\n  "joinCode": "ABCDE",\n  "winnerProbability": 12,\n  "createdAt": "2026-09-06T14:32:00+09:00"\n}'}
+          maxHeightClassName="max-h-40"
+        />
+      </Section>
+
+      <Section title="확인 창" description="취소가 기본 포커스. 조치 대상을 다시 보여준다.">
+        <Button variant="danger" onClick={() => setConfirmOpen(true)}>
+          IP 차단 해제하기
+        </Button>
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="이 IP의 차단을 해제할까요?"
+          description="해제하면 즉시 접속이 가능해집니다. 다시 차단하려면 조건이 재발생해야 합니다."
+          target="1.2.3.4 · 남은 차단 시간 23시간"
+          confirmLabel="차단 해제하기"
+          onConfirm={() => setConfirmOpen(false)}
+        />
+      </Section>
+
       <Section title="빈 상태와 오류" description="화면마다 문구를 따로 준다. 돌려쓰지 않는다.">
         <div className="grid gap-3 lg:grid-cols-3">
           <Card>
@@ -161,6 +222,12 @@ export function DesignGalleryPage() {
             </CardBody>
           </Card>
         </div>
+      </Section>
+
+      <Section title="페이지네이션" description="번호를 나열하지 않는다. 특정 건은 검색이 찾는다.">
+        <Card>
+          <Pagination page={2} totalPages={9} totalElements={173} onChange={() => {}} />
+        </Card>
       </Section>
     </div>
   );

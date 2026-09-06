@@ -32,7 +32,11 @@
 
   --color-rail: var(--rail-bg);
   --color-rail-active: var(--rail-item-active-bg);
+  --color-rail-hover: var(--rail-item-hover-bg);
   --color-rail-line: var(--rail-border);
+  --color-rail-ink: var(--rail-text);
+  --color-rail-ink-active: var(--rail-text-active);
+  --color-rail-ink-heading: var(--rail-text-heading);
 
   --color-accent: var(--accent);
   --color-accent-subtle: var(--accent-subtle);

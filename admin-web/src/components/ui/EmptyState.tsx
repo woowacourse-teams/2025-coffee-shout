@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 type EmptyStateProps = {
@@ -60,6 +60,12 @@ export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
 }
 
 /** 로딩 자리 표시. 실제 행 높이와 같게 두어 데이터가 오면 화면이 튀지 않는다. */
-export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded bg-subtle', className)} />;
+export function Skeleton({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return <div className={cn('animate-pulse rounded bg-subtle', className)} style={style} />;
 }

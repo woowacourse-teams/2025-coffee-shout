@@ -9,26 +9,30 @@ import { cn } from '@/lib/cn';
  * 접근성 때문이 아니라 밀도 때문이다. 표의 모든 행에 빨간 채움 버튼이 있으면 화면이
  * 경고로 뒤덮여 진짜 경고가 안 보인다. 채움 빨강은 확인 다이얼로그의 최종 실행 버튼
  * (`dangerSolid`)에서만 쓴다. 그 자리에는 primary 버튼이 없어 인접 혼동이 없다.
+ *
+ * <p>누르면 살짝 줄어든다. 토스가 쓰는 방식으로, 클릭이 먹었다는 것을 서버 응답을
+ * 기다리지 않고 손끝에 먼저 알려 준다. 응답이 200ms 걸리는 조치에서 차이가 크다.
  */
 const button = cva(
   'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded font-medium ' +
-    'transition-colors disabled:pointer-events-none disabled:opacity-50 ' +
+    'transition-[background-color,border-color,color,transform] duration-100 ' +
+    'active:scale-[0.97] ' +
+    'disabled:pointer-events-none disabled:opacity-40 ' +
     '[&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         primary: 'bg-action text-ink-inverse hover:bg-action-hover',
         secondary:
-          'bg-surface text-ink border border-border-strong hover:bg-subtle',
+          'bg-surface text-ink border border-border-strong hover:border-ink-muted hover:bg-subtle',
         ghost: 'text-ink-secondary hover:bg-subtle hover:text-ink',
-        danger:
-          'bg-surface text-danger border border-danger hover:bg-danger-bg',
+        danger: 'bg-surface text-danger border border-danger/40 hover:border-danger hover:bg-danger-bg',
         dangerSolid: 'bg-danger text-ink-inverse hover:brightness-110',
       },
       size: {
         sm: 'h-7 px-2.5 text-xs',
-        md: 'h-8 px-3 text-sm',
-        lg: 'h-9 px-4 text-base',
+        md: 'h-8 px-3.5 text-sm',
+        lg: 'h-10 px-5 text-base',
         icon: 'size-8',
       },
     },

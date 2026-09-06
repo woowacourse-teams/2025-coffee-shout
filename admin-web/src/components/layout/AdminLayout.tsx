@@ -63,15 +63,15 @@ export function AdminLayout() {
       <Rail />
 
       <div className="pl-rail">
-        <header className="sticky top-0 z-10 flex h-topbar items-center justify-between gap-3 border-b border-border-default bg-surface px-5">
-          <h1 className="text-sm font-semibold text-ink">{current?.label ?? '백오피스'}</h1>
-          <div className="flex items-center gap-2">
-            <EnvBadge />
-          </div>
+        <header className="sticky top-0 z-10 flex h-topbar items-center justify-between gap-3 border-b border-border-default bg-surface/85 px-6 backdrop-blur">
+          <h1 className="text-sm font-semibold tracking-tight text-ink">
+            {current?.label ?? '백오피스'}
+          </h1>
+          <EnvBadge />
         </header>
 
         {/* 본문에 최대폭을 두지 않는다. 표는 넓을수록 한 화면에 더 담긴다. */}
-        <main className="p-5">
+        <main className="p-6">
           <Outlet />
         </main>
       </div>
@@ -85,21 +85,20 @@ function Rail() {
       aria-label="주 메뉴"
       className="fixed inset-y-0 left-0 z-20 flex w-rail flex-col border-r border-rail-line bg-rail"
     >
-      {/* 로고는 원래 코랄 그대로 올린다. 다크 레일 위 대비가 6.38:1 이라
-       * 화이트 버전을 따로 만들 필요가 없다. */}
-      <div className="flex h-topbar shrink-0 items-center gap-2 border-b border-rail-line px-4">
-        <img src="/brand/character.svg" alt="" className="size-6" aria-hidden />
-        <img src="/brand/logo.svg" alt="ZZOL" className="h-3.5" />
-        <span className="text-2xs font-medium text-white/50">백오피스</span>
+      {/* 워드마크만 둔다. 캐릭터까지 붙이면 좁은 레일 머리에 그래픽이 두 개가 되어 번잡하다.
+       * 캐릭터는 파비콘으로만 쓴다. 탭에서는 정사각형 마크가 필요하기 때문이다. */}
+      <div className="flex h-topbar shrink-0 items-baseline gap-2 px-5">
+        <img src="/brand/logo.svg" alt="ZZOL" className="h-4 translate-y-0.5" />
+        <span className="text-2xs font-medium tracking-wide text-ink-muted">백오피스</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-3">
+      <div className="flex-1 overflow-y-auto px-3 pb-4">
         {NAV.map((group) => (
-          <div key={group.heading} className="mb-4 px-2">
-            <p className="px-2 pb-1 text-2xs font-medium tracking-wide text-white/35">
+          <div key={group.heading} className="mt-4 first:mt-1">
+            <p className="px-2 pb-1.5 text-2xs font-semibold tracking-wider text-rail-ink-heading">
               {group.heading}
             </p>
-            <ul className="flex flex-col gap-0.5">
+            <ul className="flex flex-col gap-px">
               {group.items.map((item) => (
                 <li key={item.to}>
                   <NavLink
@@ -107,23 +106,24 @@ function Rail() {
                     end={item.to === '/'}
                     className={({ isActive }) =>
                       cn(
-                        'relative flex items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors',
+                        // 액티브는 둥근 틴트 한 겹으로 끝낸다. 왼쪽 세로 막대까지 겹치면
+                        // 표시가 두 개가 되어 오히려 지저분해진다.
+                        'flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors',
                         isActive
-                          ? 'bg-rail-active font-medium text-white'
-                          : 'text-white/70 hover:bg-white/5 hover:text-white',
+                          ? 'bg-rail-active font-semibold text-rail-ink-active'
+                          : 'text-rail-ink hover:bg-rail-hover hover:text-ink',
                       )
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        {/* 액티브 인디케이터. 브랜드 코랄이 유일하게 선으로 등장하는 자리다. */}
-                        {isActive && (
-                          <span
-                            className="absolute inset-y-1 left-0 w-0.5 rounded-full bg-accent"
-                            aria-hidden
-                          />
-                        )}
-                        <item.icon className="size-4 shrink-0" aria-hidden />
+                        <item.icon
+                          className={cn(
+                            'size-4 shrink-0',
+                            isActive ? 'text-accent' : 'text-ink-muted',
+                          )}
+                          aria-hidden
+                        />
                         {item.label}
                       </>
                     )}
