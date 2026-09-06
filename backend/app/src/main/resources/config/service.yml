@@ -1,4 +1,4 @@
-# 서비스 도메인 설정 (user, room, player, friend, outbox, report, nickname-audit)
+# 서비스 도메인 설정 (user, room, player, friend, outbox, report, nickname-audit, profanity)
 user:
   code:
     max-retry: 100
@@ -50,3 +50,8 @@ nickname-audit:
     latency: 0s                        # 호출 하나가 흉내 낼 지연. 0으로 두면 LLM이 무한히 빠를 때의 처리량을 잰다.
     flagged-ratio: 0                   # FLAGGED로 판정할 비율(0~1). 올리면 자동 차단·사전 INSERT·트라이 재빌드까지 실제로 탄다.
                                        # 해상도는 0.01이다. 그보다 작은 값은 0으로 반올림돼 아무것도 안 걸린다.
+
+profanity:
+  trie:
+    rebuild:
+      min-interval: 5s                 # 재빌드 최소 간격(#1759). 근거는 ProfanityTrieRebuildProperties 참고.
