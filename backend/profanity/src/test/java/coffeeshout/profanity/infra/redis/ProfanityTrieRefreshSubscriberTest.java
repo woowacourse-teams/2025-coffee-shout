@@ -3,6 +3,7 @@ package coffeeshout.profanity.infra.redis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -18,6 +19,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
@@ -69,35 +72,22 @@ class ProfanityTrieRefreshSubscriberTest {
 
         @Test
         @DisplayName("연속 신호는 재빌드를 신호 횟수만큼 돌리지 않는다")
-        void 연속_신호가_병합된다() throws InterruptedException {
+        void 연속_신호가_병합된다() {
             구독자를_준비한다(Duration.ZERO);
-            final CountDownLatch firstEntered = new CountDownLatch(1);
-            final CountDownLatch releaseFirst = new CountDownLatch(1);
-            doAnswer(invocation -> {
-                        firstEntered.countDown();
-                        releaseFirst.await();
-                        return null;
-                    })
-                    .when(filterService)
-                    .rebuildTrie();
 
-            // 첫 신호가 실행기에 들어가 DB를 읽는 동안 나머지 19개는 병합돼야 한다.
             for (int i = 0; i < 20; i++) {
                 subscriber.onMessage(MESSAGE, null);
             }
-            assertThat(firstEntered.await(2, TimeUnit.SECONDS))
-                    .as("첫 재빌드가 DB를 읽는 중이다")
-                    .isTrue();
 
-            verify(filterService, times(1)).rebuildTrie();
-            assertThat(meterRegistry
+            await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(meterRegistry
                             .get("profanity.trie.rebuild.coalesced")
                             .counter()
                             .count())
-                    .as("병합돼 버려진 신호 수가 기록된다")
-                    .isGreaterThan(0);
-
-            releaseFirst.countDown();
+                    .as("신호 20개 중 일부가 병합돼 버려진다")
+                    .isGreaterThan(0));
+            // 신호 20개가 재빌드 20회가 되려면 매 반복 사이에 재빌드가 끝나야 하는데,
+            // 그러면 위 병합 단언이 먼저 깨진다. 워커 속도와 무관한 안전한 상한이다.
+            verify(filterService, atMost(19)).rebuildTrie();
         }
     }
 
@@ -109,40 +99,37 @@ class ProfanityTrieRefreshSubscriberTest {
         @DisplayName("신호 기반 재빌드는 동시 실행이 1을 넘지 않는다")
         void 신호_기반_재빌드는_동시_실행이_1을_넘지_않는다() throws InterruptedException {
             구독자를_준비한다(Duration.ZERO);
-            final AtomicInteger invocationCount = new AtomicInteger(0);
             final AtomicInteger concurrent = new AtomicInteger(0);
             final AtomicInteger maxConcurrent = new AtomicInteger(0);
-            final CountDownLatch firstEntered = new CountDownLatch(1);
-            final CountDownLatch releaseFirst = new CountDownLatch(1);
-            final CountDownLatch secondEntered = new CountDownLatch(1);
+            final CountDownLatch releaseRebuild = new CountDownLatch(1);
             doAnswer(invocation -> {
-                        maxConcurrent.updateAndGet(max -> Math.max(max, concurrent.incrementAndGet()));
-                        if (invocationCount.incrementAndGet() == 1) {
-                            firstEntered.countDown();
-                            releaseFirst.await();
-                        } else {
-                            secondEntered.countDown();
-                        }
+                        final int current = concurrent.incrementAndGet();
+                        maxConcurrent.updateAndGet(max -> Math.max(max, current));
+                        releaseRebuild.await(); // 테스트가 풀어줄 때까지, 딱 그만큼만 붙잡는다.
                         concurrent.decrementAndGet();
                         return null;
                     })
                     .when(filterService)
                     .rebuildTrie();
 
-            subscriber.onMessage(MESSAGE, null);
-            assertThat(firstEntered.await(2, TimeUnit.SECONDS))
-                    .as("첫 재빌드가 DB를 읽는 중이다")
-                    .isTrue();
+            // 10개 스레드가 동시에 신호를 보내도 CAS가 승자를 하나로 정한다.
+            final ExecutorService signalSenders = Executors.newFixedThreadPool(10);
+            for (int i = 0; i < 10; i++) {
+                signalSenders.execute(() -> subscriber.onMessage(MESSAGE, null));
+            }
+            signalSenders.shutdown();
+            signalSenders.awaitTermination(5, TimeUnit.SECONDS);
+
+            await().atMost(Duration.ofSeconds(2))
+                    .untilAsserted(() -> assertThat(concurrent.get()).isEqualTo(1));
 
             // 플래그는 DB를 읽기 전에 이미 내려가 있어 이 신호가 두 번째 재빌드를 예약한다.
+            // 실행기 스레드가 하나뿐이라 첫 재빌드가 끝나기 전에는 절대 함께 실행되지 않는다.
             subscriber.onMessage(MESSAGE, null);
 
-            // 실행기 스레드가 하나뿐이라 첫 재빌드가 끝나기 전에는 두 번째가 절대 시작될 수 없다.
-            // 실행기가 여러 스레드였다면 여기서 이미 secondEntered가 열렸을 것이다.
-            assertThat(secondEntered.getCount()).isEqualTo(1);
-
-            releaseFirst.countDown();
-            assertThat(secondEntered.await(2, TimeUnit.SECONDS)).isTrue();
+            releaseRebuild.countDown();
+            await().atMost(Duration.ofSeconds(2))
+                    .untilAsserted(() -> assertThat(concurrent.get()).isZero());
             assertThat(maxConcurrent.get()).isEqualTo(1);
         }
     }
