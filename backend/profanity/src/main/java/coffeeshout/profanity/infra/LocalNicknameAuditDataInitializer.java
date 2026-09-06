@@ -16,7 +16,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -57,7 +56,6 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
     private final Clock clock;
 
     @Override
-    @Transactional
     public void run(ApplicationArguments args) {
         seedUnaudited();
         seedSamples();
@@ -68,6 +66,12 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
      *
      * <p>행마다 저장하면 10만 건에 몇 분이 걸려 JDBC 배치로 넣는다. 일련번호가 이름을 유일하게 만들어
      * 유니크 제약에 걸리지 않는다.
+     *
+     * <p><b>트랜잭션을 걸지 않는다.</b> 10만 건을 하나로 묶으면 그동안 undo 로그가 계속 자라고 락도 함께
+     * 길어진다. 트랜잭션 밖에서는 커넥션이 autocommit이라 {@link #SEED_CHUNK}마다 커밋된다. 적재 도중 죽으면
+     * 앞쪽 청크는 남고 뒤쪽은 안 들어온 상태가 되는데, 그때는 {@code player_name_audit}에서 접두사
+     * {@value #SEED_PREFIX}로 시작하는 행을 지우고 다시 띄운다. {@link #alreadySeeded()}가 첫 이름만 보므로
+     * 지우지 않고 다시 띄우면 적재를 통째로 건너뛴다.
      */
     private void seedUnaudited() {
         final int count = properties.seed().count();
