@@ -3,7 +3,7 @@ package coffeeshout.admin.account.application;
 import coffeeshout.admin.account.domain.AdminAccount;
 import coffeeshout.admin.account.domain.AdminAccountErrorCode;
 import coffeeshout.admin.account.domain.AdminAccountRepository;
-import coffeeshout.admin.account.domain.AdminEmails;
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.auth.AdminAuthProperties;
 import coffeeshout.global.exception.custom.BusinessException;
 import java.time.Clock;
@@ -28,21 +28,20 @@ public class AdminAccountService {
     private final AdminAuthProperties adminAuthProperties;
     private final Clock clock;
 
-    public boolean isAllowed(String email) {
-        final String normalized = AdminEmails.normalize(email);
-        if (normalized == null) {
+    public boolean isAllowed(AdminEmail email) {
+        if (email == null) {
             return false;
         }
         // 부트스트랩을 먼저 본다. DB가 죽어도 break-glass 계정은 들어올 수 있어야 한다.
-        if (adminAuthProperties.isBootstrap(normalized)) {
+        if (adminAuthProperties.isBootstrap(email)) {
             return true;
         }
-        return adminAccountRepository.existsByEmail(normalized);
+        return adminAccountRepository.existsByEmail(email.value());
     }
 
     public List<AdminAccountEntry> list() {
         final List<AdminAccountEntry> entries = new ArrayList<>();
-        for (String email : adminAuthProperties.bootstrapEmails()) {
+        for (AdminEmail email : adminAuthProperties.bootstrapEmails()) {
             entries.add(AdminAccountEntry.bootstrap(email));
         }
         for (AdminAccount account : adminAccountRepository.findAllByOrderByCreatedAtAsc()) {
@@ -59,33 +58,28 @@ public class AdminAccountService {
     }
 
     @Transactional
-    public AdminAccountEntry add(String email, String actorEmail) {
-        final String normalized = AdminEmails.normalize(email);
-        if (normalized == null) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일은 비어 있을 수 없습니다.");
-        }
-        if (isAllowed(normalized)) {
+    public AdminAccountEntry add(AdminEmail email, AdminEmail actor) {
+        if (isAllowed(email)) {
             throw new BusinessException(
                     AdminAccountErrorCode.ADMIN_ACCOUNT_ALREADY_EXISTS,
-                    "이미 등록된 관리자입니다: " + normalized);
+                    "이미 등록된 관리자입니다: " + email.value());
         }
 
         final AdminAccount saved = adminAccountRepository.save(
-                AdminAccount.create(normalized, actorEmail, clock.instant()));
+                AdminAccount.create(email, actor, clock.instant()));
         return AdminAccountEntry.database(
                 saved.getId(), saved.getEmail(), saved.getCreatedByEmail(), saved.getCreatedAt());
     }
 
     @Transactional
-    public void remove(Long id, String actorEmail) {
+    public void remove(Long id, AdminEmail actor) {
         final AdminAccount account = adminAccountRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
                         AdminAccountErrorCode.ADMIN_ACCOUNT_NOT_FOUND,
                         "존재하지 않는 관리자입니다: " + id));
 
         // 자기 자신을 지우면 그 순간 로그아웃되고, 남은 관리자가 없으면 복구 경로가 부트스트랩뿐이다.
-        if (account.getEmail().equals(AdminEmails.normalize(actorEmail))) {
+        if (account.getEmail().equals(actor)) {
             throw new BusinessException(
                     AdminAccountErrorCode.CANNOT_REMOVE_SELF, "자기 자신은 삭제할 수 없습니다.");
         }

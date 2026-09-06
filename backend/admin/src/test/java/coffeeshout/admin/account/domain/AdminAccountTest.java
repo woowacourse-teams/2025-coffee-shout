@@ -1,81 +1,44 @@
 package coffeeshout.admin.account.domain;
 
-import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("AdminAccount")
 class AdminAccountTest {
 
     private static final Instant NOW = Instant.parse("2026-09-06T00:00:00Z");
+    private static final AdminEmail MJ = AdminEmail.of("mj@zzol.site");
+    private static final AdminEmail ROOT = AdminEmail.of("root@zzol.site");
 
     @Nested
     class create {
 
         @Test
-        void 이메일을_소문자로_정규화해_저장한다() {
-            final AdminAccount account = AdminAccount.create("  MJ@Zzol.Site  ", "root@zzol.site", NOW);
+        void 이메일과_추가자와_생성_시각을_보관한다() {
+            final AdminAccount account = AdminAccount.create(MJ, ROOT, NOW);
 
-            assertThat(account.getEmail()).isEqualTo("mj@zzol.site");
-        }
-
-        @Test
-        void 추가한_관리자_이메일도_정규화한다() {
-            final AdminAccount account = AdminAccount.create("mj@zzol.site", " ROOT@Zzol.site ", NOW);
-
-            assertThat(account.getCreatedByEmail()).isEqualTo("root@zzol.site");
+            assertThat(account.getEmail()).isEqualTo(MJ);
+            assertThat(account.getCreatedByEmail()).isEqualTo(ROOT);
+            assertThat(account.getCreatedAt()).isEqualTo(NOW);
         }
 
         @Test
         void 시스템이_추가한_경우_추가자가_없다() {
-            final AdminAccount account = AdminAccount.create("mj@zzol.site", null, NOW);
+            final AdminAccount account = AdminAccount.create(MJ, null, NOW);
 
             assertThat(account.getCreatedByEmail()).isNull();
         }
 
         @Test
-        void 생성_시각은_주입받은_값을_쓴다() {
-            final AdminAccount account = AdminAccount.create("mj@zzol.site", null, NOW);
+        void 저장한_값을_다시_읽어도_정규화된_상태를_유지한다() {
+            // 컬럼은 문자열이지만 밖으로는 AdminEmail 만 나가야 한다.
+            final AdminAccount account = AdminAccount.create(AdminEmail.of("  MJ@Zzol.Site "), null, NOW);
 
-            assertThat(account.getCreatedAt()).isEqualTo(NOW);
-        }
-
-        @ParameterizedTest
-        @NullAndEmptySource
-        @ValueSource(strings = {"   ", "\t"})
-        void 비어있는_이메일은_거부한다(String email) {
-            assertCoffeeShoutException(() -> AdminAccount.create(email, null, NOW),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {"nobody", "@zzol.site", "mj@", "mj@a@b.site"})
-        void 형식이_아닌_이메일은_거부한다(String email) {
-            assertCoffeeShoutException(() -> AdminAccount.create(email, null, NOW),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
-        }
-
-        @Test
-        void 이메일이_255자를_넘으면_거부한다() {
-            final String tooLong = "a".repeat(250) + "@zzol.site";
-
-            assertCoffeeShoutException(() -> AdminAccount.create(tooLong, null, NOW),
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL);
-        }
-
-        @Test
-        void 경계값_255자는_허용한다() {
-            final String exact = "a".repeat(255 - "@zzol.site".length()) + "@zzol.site";
-
-            assertThatCode(() -> AdminAccount.create(exact, null, NOW)).doesNotThrowAnyException();
+            assertThat(account.getEmail().value()).isEqualTo("mj@zzol.site");
         }
     }
 }

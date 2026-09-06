@@ -77,7 +77,7 @@ public class AdminAuditAspect {
         final Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof AdminPrincipal admin) {
-            return admin.email();
+            return admin.email().value();
         }
         // 로그인 시도는 인증 전이라 주체가 없다. 그래도 남긴다. 실패한 로그인 반복이 신호다.
         return ANONYMOUS;

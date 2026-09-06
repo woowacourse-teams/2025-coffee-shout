@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.audit.domain.AdminAuditResult;
 import coffeeshout.admin.auth.domain.AdminPrincipal;
 import java.util.List;
@@ -66,7 +67,7 @@ class AdminAuditAspectTest {
     private void authenticateAs(String email) {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
-                        new AdminPrincipal(email), null,
+                        new AdminPrincipal(AdminEmail.of(email)), null,
                         List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
     }
 

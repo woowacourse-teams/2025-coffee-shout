@@ -2,7 +2,7 @@ package coffeeshout.admin.auth.application;
 
 import coffeeshout.admin.account.application.AdminAccountService;
 import coffeeshout.admin.account.domain.AdminAccountErrorCode;
-import coffeeshout.admin.account.domain.AdminEmails;
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.auth.domain.AdminTokenIssuer;
 import coffeeshout.admin.auth.domain.SocialIdTokenVerifier;
 import coffeeshout.global.exception.custom.BusinessException;
@@ -27,8 +27,7 @@ public class AdminAuthService {
     private final AdminTokenIssuer adminTokenIssuer;
 
     public String login(String idToken) {
-        final String email = socialIdTokenVerifier.verifyAndExtractEmail(idToken);
-        return issueForAllowed(email);
+        return issueForAllowed(socialIdTokenVerifier.verifyAndExtractEmail(idToken));
     }
 
     /**
@@ -37,18 +36,18 @@ public class AdminAuthService {
      * <p>이 경로는 컨트롤러가 {@code @Profile("local")}로 막고, 시큐리티 설정도 local 에서만
      * 공개 경로로 등록한다. 서버 프로필과 컨트롤러 등록 두 겹으로 잠근다.
      */
-    public String devLogin(String email) {
-        log.warn("dev-login 으로 관리자 토큰 발급: email={}", AdminEmails.normalize(email));
-        return issueForAllowed(email);
+    public String devLogin(String rawEmail) {
+        log.warn("dev-login 으로 관리자 토큰 발급 시도: email={}", rawEmail);
+        return issueForAllowed(rawEmail);
     }
 
-    private String issueForAllowed(String email) {
-        final String normalized = AdminEmails.normalize(email);
-        if (!adminAccountService.isAllowed(normalized)) {
-            // 목록에 없는 것과 형식이 틀린 것을 같은 메시지로 돌려준다.
-            throw new BusinessException(
-                    AdminAccountErrorCode.NOT_ADMIN, "관리자 허용목록에 없는 계정입니다.");
-        }
-        return adminTokenIssuer.issue(normalized);
+    private String issueForAllowed(String rawEmail) {
+        // 형식이 어긋난 값도 목록에 없는 값과 같은 응답을 준다. 둘을 구분해 주면
+        // 어떤 이메일이 형식만 맞는지 훑어 관리자 계정을 좁혀 갈 수 있다.
+        final AdminEmail email = AdminEmail.parse(rawEmail)
+                .filter(adminAccountService::isAllowed)
+                .orElseThrow(() -> new BusinessException(
+                        AdminAccountErrorCode.NOT_ADMIN, "관리자 허용목록에 없는 계정입니다."));
+        return adminTokenIssuer.issue(email);
     }
 }

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 
 import coffeeshout.admin.account.application.AdminAccountService;
 import coffeeshout.admin.account.domain.AdminAccountErrorCode;
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.auth.domain.AdminTokenIssuer;
 import coffeeshout.admin.auth.domain.SocialIdTokenVerifier;
 import coffeeshout.global.exception.custom.BusinessException;
@@ -25,6 +26,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AdminAuthServiceTest {
 
     private static final String ID_TOKEN = "google-id-token";
+    private static final AdminEmail MJ = AdminEmail.of("mj@zzol.site");
+    private static final AdminEmail STRANGER = AdminEmail.of("stranger@evil.site");
 
     @Mock
     private SocialIdTokenVerifier socialIdTokenVerifier;
@@ -44,8 +47,8 @@ class AdminAuthServiceTest {
         @Test
         void 허용목록에_있으면_관리자_토큰을_발급한다() {
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN)).willReturn("mj@zzol.site");
-            given(adminAccountService.isAllowed("mj@zzol.site")).willReturn(true);
-            given(adminTokenIssuer.issue("mj@zzol.site")).willReturn("admin-token");
+            given(adminAccountService.isAllowed(MJ)).willReturn(true);
+            given(adminTokenIssuer.issue(MJ)).willReturn("admin-token");
 
             assertThat(adminAuthService.login(ID_TOKEN)).isEqualTo("admin-token");
         }
@@ -53,8 +56,8 @@ class AdminAuthServiceTest {
         @Test
         void 구글이_준_이메일을_정규화해_판정하고_발급한다() {
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN)).willReturn("  MJ@Zzol.Site ");
-            given(adminAccountService.isAllowed("mj@zzol.site")).willReturn(true);
-            given(adminTokenIssuer.issue("mj@zzol.site")).willReturn("admin-token");
+            given(adminAccountService.isAllowed(MJ)).willReturn(true);
+            given(adminTokenIssuer.issue(MJ)).willReturn("admin-token");
 
             assertThat(adminAuthService.login(ID_TOKEN)).isEqualTo("admin-token");
         }
@@ -63,10 +66,21 @@ class AdminAuthServiceTest {
         void 허용목록에_없으면_토큰을_발급하지_않는다() {
             given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN))
                     .willReturn("stranger@evil.site");
-            given(adminAccountService.isAllowed("stranger@evil.site")).willReturn(false);
+            given(adminAccountService.isAllowed(STRANGER)).willReturn(false);
 
             assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
                     AdminAccountErrorCode.NOT_ADMIN);
+            then(adminTokenIssuer).should(never()).issue(any());
+        }
+
+        @Test
+        void 형식이_어긋난_이메일도_허용목록에_없는_것과_같은_응답을_준다() {
+            // 둘을 구분해 주면 어떤 이메일이 형식만 맞는지 훑어 관리자 계정을 좁혀 갈 수 있다.
+            given(socialIdTokenVerifier.verifyAndExtractEmail(ID_TOKEN)).willReturn("형식오류");
+
+            assertCoffeeShoutException(() -> adminAuthService.login(ID_TOKEN),
+                    AdminAccountErrorCode.NOT_ADMIN);
+            then(adminAccountService).should(never()).isAllowed(any());
             then(adminTokenIssuer).should(never()).issue(any());
         }
 
@@ -90,8 +104,8 @@ class AdminAuthServiceTest {
 
         @Test
         void 구글_검증_없이_허용목록만으로_발급한다() {
-            given(adminAccountService.isAllowed("mj@zzol.site")).willReturn(true);
-            given(adminTokenIssuer.issue("mj@zzol.site")).willReturn("admin-token");
+            given(adminAccountService.isAllowed(MJ)).willReturn(true);
+            given(adminTokenIssuer.issue(MJ)).willReturn("admin-token");
 
             assertThat(adminAuthService.devLogin("mj@zzol.site")).isEqualTo("admin-token");
             then(socialIdTokenVerifier).should(never()).verifyAndExtractEmail(any());
@@ -100,7 +114,7 @@ class AdminAuthServiceTest {
         @Test
         void 허용목록_검사는_그대로_적용한다() {
             // 로컬이라고 아무 이메일이나 되는 것은 아니다.
-            given(adminAccountService.isAllowed("stranger@evil.site")).willReturn(false);
+            given(adminAccountService.isAllowed(STRANGER)).willReturn(false);
 
             assertCoffeeShoutException(() -> adminAuthService.devLogin("stranger@evil.site"),
                     AdminAccountErrorCode.NOT_ADMIN);

@@ -1,6 +1,6 @@
 package coffeeshout.admin.auth;
 
-import coffeeshout.admin.account.domain.AdminEmails;
+import coffeeshout.admin.account.domain.AdminEmail;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -16,6 +16,9 @@ import org.springframework.validation.annotation.Validated;
  * <p>{@code emails}는 환경변수 {@code ADMIN_EMAILS}로 주입하는 부트스트랩 허용목록이다.
  * DB {@code admin_account} 테이블과 합집합으로 판정하되, 이 목록은 백오피스 UI에서 삭제할 수 없다.
  * 관리자가 실수로 자기들을 전부 지워 아무도 못 들어가는 상태를 막는 break-glass 경로다.
+ *
+ * <p>바인딩은 {@code List<String>}으로 받는다. 환경변수에 오타가 있어도 앱이 뜨긴 해야 하므로,
+ * 형식이 어긋난 항목은 예외 대신 조용히 걸러낸다. 대신 남은 항목은 전부 정규화된 {@link AdminEmail}이다.
  */
 @Validated
 @ConfigurationProperties(prefix = "admin.auth")
@@ -28,31 +31,19 @@ public record AdminAuthProperties(
         @Positive long tokenValiditySeconds
 ) {
 
-    public AdminAuthProperties {
-        emails = normalizeAll(emails);
+    public boolean isBootstrap(AdminEmail email) {
+        return email != null && bootstrapEmails().contains(email);
     }
 
-    public boolean isBootstrap(String email) {
-        final String normalized = AdminEmails.normalize(email);
-        return normalized != null && emails.contains(normalized);
-    }
-
-    public List<String> bootstrapEmails() {
-        return emails;
-    }
-
-    private static List<String> normalizeAll(List<String> raw) {
-        if (raw == null) {
-            return List.of();
+    /** 순서를 유지해야 목록 화면에서 부트스트랩 관리자가 매번 같은 자리에 보인다. */
+    public Set<AdminEmail> bootstrapEmails() {
+        if (emails == null) {
+            return Set.of();
         }
-        // 순서를 유지해야 목록 화면에서 부트스트랩 관리자가 매번 같은 자리에 보인다.
-        final Set<String> normalized = new LinkedHashSet<>();
-        for (String each : raw) {
-            final String value = AdminEmails.normalize(each);
-            if (value != null) {
-                normalized.add(value);
-            }
+        final Set<AdminEmail> parsed = new LinkedHashSet<>();
+        for (String each : emails) {
+            AdminEmail.parse(each).ifPresent(parsed::add);
         }
-        return List.copyOf(normalized);
+        return parsed;
     }
 }

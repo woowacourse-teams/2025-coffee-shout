@@ -34,6 +34,6 @@ public class AdminAuthController {
      */
     @GetMapping("/me")
     public AdminMeResponse me(@AuthenticationPrincipal AdminPrincipal principal) {
-        return new AdminMeResponse(principal.email());
+        return new AdminMeResponse(principal.email().value());
     }
 }

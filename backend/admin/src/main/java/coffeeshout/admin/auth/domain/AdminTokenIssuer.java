@@ -1,8 +1,10 @@
 package coffeeshout.admin.auth.domain;
 
+import coffeeshout.admin.account.domain.AdminEmail;
+
 public interface AdminTokenIssuer {
 
-    String issue(String email);
+    String issue(AdminEmail email);
 
     /**
      * @return 토큰이 유효한 관리자 토큰이면 그 주체

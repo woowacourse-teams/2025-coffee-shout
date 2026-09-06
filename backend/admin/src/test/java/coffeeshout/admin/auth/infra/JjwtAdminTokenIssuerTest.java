@@ -4,6 +4,7 @@ import static coffeeshout.support.ExceptionAssertions.assertCoffeeShoutException
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.admin.account.domain.AdminAccountErrorCode;
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.auth.AdminAuthProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -25,6 +26,7 @@ class JjwtAdminTokenIssuerTest {
     private static final String OTHER_SECRET = "another-secret-key-that-is-also-32-bytes-long!!";
     private static final Instant NOW = Instant.parse("2026-09-06T00:00:00Z");
     private static final long VALIDITY_SECONDS = 3600;
+    private static final AdminEmail MJ = AdminEmail.of("mj@zzol.site");
 
     private static JjwtAdminTokenIssuer issuerAt(Instant now) {
         return new JjwtAdminTokenIssuer(
@@ -39,18 +41,18 @@ class JjwtAdminTokenIssuerTest {
 
         @Test
         void 발급한_토큰을_다시_검증하면_같은_주체가_나온다() {
-            final String token = issuer.issue("mj@zzol.site");
+            final String token = issuer.issue(MJ);
 
-            assertThat(issuer.verify(token).email()).isEqualTo("mj@zzol.site");
+            assertThat(issuer.verify(token).email()).isEqualTo(MJ);
         }
 
         @Test
         void 만료_직전까지는_유효하다() {
-            final String token = issuer.issue("mj@zzol.site");
+            final String token = issuer.issue(MJ);
             final JjwtAdminTokenIssuer justBeforeExpiry =
                     issuerAt(NOW.plusSeconds(VALIDITY_SECONDS - 1));
 
-            assertThat(justBeforeExpiry.verify(token).email()).isEqualTo("mj@zzol.site");
+            assertThat(justBeforeExpiry.verify(token).email()).isEqualTo(MJ);
         }
     }
 
@@ -59,7 +61,7 @@ class JjwtAdminTokenIssuerTest {
 
         @Test
         void 만료된_토큰은_거부한다() {
-            final String token = issuer.issue("mj@zzol.site");
+            final String token = issuer.issue(MJ);
             final JjwtAdminTokenIssuer afterExpiry =
                     issuerAt(NOW.plus(Duration.ofSeconds(VALIDITY_SECONDS + 60)));
 

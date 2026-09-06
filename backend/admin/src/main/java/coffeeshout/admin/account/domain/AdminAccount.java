@@ -1,6 +1,5 @@
 package coffeeshout.admin.account.domain;
 
-import coffeeshout.global.exception.custom.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,15 +13,18 @@ import lombok.NoArgsConstructor;
 
 /**
  * UI로 추가한 관리자. 환경변수 부트스트랩 관리자는 이 테이블에 없다.
+ *
+ * <p>ADR-0019가 정한 대로 도메인 객체가 JPA 어노테이션을 직접 갖는다.
+ * 컬럼은 문자열이지만 밖으로는 {@link AdminEmail}만 내보내 정규화되지 않은 값이 새지 않게 한다.
  */
 @Entity
 @Table(name = "admin_account")
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdminAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Long id;
 
     @Column(nullable = false, unique = true, length = 255)
@@ -32,36 +34,24 @@ public class AdminAccount {
     @Column(name = "created_by_email", length = 255)
     private String createdByEmail;
 
+    @Getter
     @Column(nullable = false)
     private Instant createdAt;
 
-    public static AdminAccount create(String email, String createdByEmail, Instant now) {
-        final String normalized = AdminEmails.normalize(email);
-        validateEmail(normalized);
-
+    public static AdminAccount create(AdminEmail email, AdminEmail createdBy, Instant now) {
         final AdminAccount account = new AdminAccount();
-        account.email = normalized;
-        account.createdByEmail = AdminEmails.normalize(createdByEmail);
+        account.email = email.value();
+        account.createdByEmail = createdBy == null ? null : createdBy.value();
         account.createdAt = now;
         return account;
     }
 
-    private static void validateEmail(String normalized) {
-        // 정규화 결과가 null이면 원본이 null이거나 공백뿐이었다는 뜻이다.
-        if (normalized == null) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일은 비어 있을 수 없습니다.");
-        }
-        if (normalized.length() > 255) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일이 255자를 넘습니다.");
-        }
-        // 완전한 RFC 검증은 하지 않는다. 실제 소유 검증은 구글 ID 토큰이 하므로
-        // 여기서는 목록에 넣을 수 없는 값(@ 없음)만 거른다.
-        final int at = normalized.indexOf('@');
-        if (at <= 0 || at == normalized.length() - 1 || normalized.indexOf('@', at + 1) >= 0) {
-            throw new BusinessException(
-                    AdminAccountErrorCode.INVALID_ADMIN_EMAIL, "관리자 이메일 형식이 올바르지 않습니다.");
-        }
+    public AdminEmail getEmail() {
+        return new AdminEmail(email);
+    }
+
+    /** 시스템이 추가한 경우 null. */
+    public AdminEmail getCreatedByEmail() {
+        return createdByEmail == null ? null : new AdminEmail(createdByEmail);
     }
 }

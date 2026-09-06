@@ -1,6 +1,7 @@
 package coffeeshout.admin.auth.infra;
 
 import coffeeshout.admin.account.domain.AdminAccountErrorCode;
+import coffeeshout.admin.account.domain.AdminEmail;
 import coffeeshout.admin.auth.AdminAuthProperties;
 import coffeeshout.admin.auth.domain.AdminPrincipal;
 import coffeeshout.admin.auth.domain.AdminTokenIssuer;
@@ -42,10 +43,10 @@ public class JjwtAdminTokenIssuer implements AdminTokenIssuer {
     }
 
     @Override
-    public String issue(String email) {
+    public String issue(AdminEmail email) {
         final long now = clock.millis();
         return Jwts.builder()
-                .subject(email)
+                .subject(email.value())
                 .claim(CLAIM_TYPE, TYPE_ADMIN)
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + validityMillis))
@@ -67,12 +68,10 @@ public class JjwtAdminTokenIssuer implements AdminTokenIssuer {
                 throw new BusinessException(
                         AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "관리자 토큰이 아닙니다.");
             }
-            final String email = claims.getSubject();
-            if (email == null || email.isBlank()) {
-                throw new BusinessException(
-                        AdminAccountErrorCode.ADMIN_TOKEN_INVALID, "주체가 없는 관리자 토큰입니다.");
-            }
-            return new AdminPrincipal(email);
+            return new AdminPrincipal(AdminEmail.parse(claims.getSubject())
+                    .orElseThrow(() -> new BusinessException(
+                            AdminAccountErrorCode.ADMIN_TOKEN_INVALID,
+                            "주체가 없는 관리자 토큰입니다.")));
         } catch (ExpiredJwtException e) {
             throw new BusinessException(
                     AdminAccountErrorCode.ADMIN_TOKEN_EXPIRED, "만료된 관리자 토큰입니다.");
