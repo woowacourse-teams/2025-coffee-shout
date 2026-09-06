@@ -424,7 +424,7 @@ class WsCatalogBuilderTest {
 
         @MessageMapping("/test/{joinCode}/action")
         @WsTopic(path = "/test/{joinCode}/result", payload = FixturePayload.class, description = "테스트 토픽")
-        public void doAction(@DestinationVariable String joinCode, @Payload FixtureRequest request) {}
+        public void doAction(@DestinationVariable String joinCode) {}
     }
 
     static class FixtureReceiveController {
