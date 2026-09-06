@@ -157,8 +157,7 @@ export function DesignGalleryPage() {
             <option value="PENDING">미처리</option>
             <option value="RESOLVED">처리 완료</option>
           </Select>
-          <Label className="w-40" hint="쉼표로 구분">
-            관리자 이메일
+          <Label className="w-40" text="관리자 이메일" hint="쉼표로 구분">
             <Input placeholder="admin@zzol.site" />
           </Label>
         </div>

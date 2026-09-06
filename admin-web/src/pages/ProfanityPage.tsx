@@ -10,6 +10,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { StatCard } from '@/components/StatCard';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { ProfanityWordsCard } from '@/components/ProfanityWordsCard';
 import { cn } from '@/lib/cn';
 import { formatPercent } from '@/lib/format';
 
@@ -172,6 +173,10 @@ export function ProfanityPage() {
           </>
         )}
       </Card>
+
+      {/* 검열 큐 아래에 둔다. 같은 화면인 이유는, 큐를 보다가 "이건 사전에 넣자" 하는
+       * 순간이 잦기 때문이다. 메뉴를 옮겨 가며 하면 그 흐름이 끊긴다. */}
+      <ProfanityWordsCard />
     </div>
   );
 }

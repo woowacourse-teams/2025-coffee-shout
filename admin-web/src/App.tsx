@@ -13,6 +13,7 @@ import { IpBlocksPage } from '@/pages/IpBlocksPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProfanityPage } from '@/pages/ProfanityPage';
+import { PatchNoteFormPage } from '@/pages/PatchNoteFormPage';
 import { PatchNotesPage } from '@/pages/PatchNotesPage';
 import { ReportsPage } from '@/pages/ReportsPage';
 import { RoomDetailPage } from '@/pages/RoomDetailPage';
@@ -64,6 +65,8 @@ export function App() {
                 <Route path="/users/:userId" element={<UserDetailPage />} />
                 <Route path="/games" element={<AnalyticsPage />} />
                 <Route path="/patch-notes" element={<PatchNotesPage />} />
+                <Route path="/patch-notes/new" element={<PatchNoteFormPage />} />
+                <Route path="/patch-notes/:id" element={<PatchNoteFormPage />} />
                 <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/design" element={<DesignGalleryPage />} />

@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 const FIELD_BASE =
@@ -49,12 +49,26 @@ export function Select({ className, children, ...props }: ComponentProps<'select
   );
 }
 
-type LabelProps = ComponentProps<'label'> & { hint?: string };
+type LabelProps = Omit<ComponentProps<'label'>, 'title'> & {
+  /** 라벨 문구. 컨트롤은 children 으로 받는다. */
+  text: ReactNode;
+  hint?: ReactNode;
+};
 
-export function Label({ className, children, hint, ...props }: LabelProps) {
+/**
+ * 입력 한 줄. 라벨 문구, 컨트롤, 보조 문구 순으로 쌓는다.
+ *
+ * <p>문구와 컨트롤을 따로 받는다. 둘을 children 하나로 받으면 라벨 텍스트용 span 안에
+ * input 이 들어가 문구 스타일이 컨트롤까지 덮고, 보조 문구가 컨트롤 아래가 아니라
+ * 엉뚱한 자리에 붙는다.
+ *
+ * <p>{@code <label>} 로 감싸므로 {@code htmlFor} 없이도 클릭이 컨트롤로 간다.
+ */
+export function Label({ className, text, children, hint, ...props }: LabelProps) {
   return (
-    <label className={cn('flex flex-col gap-1', className)} {...props}>
-      <span className="text-xs font-medium text-ink-secondary">{children}</span>
+    <label className={cn('flex flex-col gap-1.5', className)} {...props}>
+      <span className="text-xs font-medium text-ink-secondary">{text}</span>
+      {children}
       {hint && <span className="text-2xs text-ink-muted">{hint}</span>}
     </label>
   );

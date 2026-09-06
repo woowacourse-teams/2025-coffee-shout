@@ -13,6 +13,7 @@ import type {
   NicknameAuditStatus,
   PageResponse,
   PatchNote,
+  PatchNoteCategory,
   PeriodSummary,
   ProfanityWord,
   Report,
@@ -185,6 +186,30 @@ export function useProfanityWords(filters: WordFilters) {
   });
 }
 
+export function useAddProfanityWord() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { word: string; language: ProfanityWord['language'] }) =>
+      api.post<void>('/profanity/words', body),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['profanity', 'words'] }),
+  });
+}
+
+/**
+ * 단어를 지우지 않고 비활성으로 둔다. 삭제하면 왜 걸렸던 단어인지가 사라져
+ * 같은 단어를 두 번 추가하고 두 번 푸는 일이 반복된다.
+ */
+export function useToggleProfanityWord() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ word, active }: { word: string; active: boolean }) =>
+      active
+        ? api.post<void>(`/profanity/words/${encodeURIComponent(word)}/activate`)
+        : api.delete<void>(`/profanity/words/${encodeURIComponent(word)}/activate`),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['profanity', 'words'] }),
+  });
+}
+
 export function useNicknameAuditQuality(days = 30) {
   return useQuery({
     queryKey: keys.profanity.quality(days),
@@ -250,6 +275,44 @@ export function usePatchNotes() {
   return useQuery({
     queryKey: keys.patchNotes,
     queryFn: () => api.get<PatchNote[]>('/patch-notes'),
+  });
+}
+
+export function usePatchNote(id: number | null) {
+  return useQuery({
+    queryKey: ['patch-notes', 'detail', id],
+    queryFn: () => api.get<PatchNote>(`/patch-notes/${id}`),
+    // 새로 쓰는 화면에서는 부를 대상이 없다.
+    enabled: id !== null,
+  });
+}
+
+/**
+ * 카테고리 선택지는 서버가 준다. 프론트에 enum 을 복사해 두면 서버가 값을 늘려도
+ * 화면에 안 나오고, 반대로 없앤 값이 화면에 남아 저장할 때만 터진다.
+ */
+export function usePatchNoteCategories() {
+  return useQuery({
+    queryKey: ['patch-notes', 'categories'],
+    queryFn: () => api.get<PatchNoteCategory[]>('/patch-notes/categories'),
+    staleTime: Infinity,
+  });
+}
+
+export type PatchNoteForm = {
+  category: PatchNoteCategory;
+  title: string;
+  content: string;
+};
+
+export function useSavePatchNote() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, form }: { id: number | null; form: PatchNoteForm }) =>
+      id === null
+        ? api.post<PatchNote>('/patch-notes', form)
+        : api.put<PatchNote>(`/patch-notes/${id}`, form),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.patchNotes }),
   });
 }
 

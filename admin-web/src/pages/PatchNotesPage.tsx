@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDeletePatchNote, usePatchNotes } from '@/api/queries';
 import type { PatchNote, PatchNoteCategory } from '@/api/types';
 import { Button } from '@/components/ui/Button';
@@ -55,11 +56,16 @@ export function PatchNotesPage() {
       {
         id: 'actions',
         header: '',
-        meta: { width: '6rem', align: 'right' },
+        meta: { width: '9rem', align: 'right' },
         cell: (c) => (
-          <Button variant="danger" size="sm" onClick={() => setTarget(c.row.original)}>
-            삭제
-          </Button>
+          <div className="flex justify-end gap-1.5">
+            <Button asChild variant="secondary" size="sm">
+              <Link to={`/patch-notes/${c.row.original.id}`}>수정</Link>
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => setTarget(c.row.original)}>
+              삭제
+            </Button>
+          </div>
         ),
       },
     ],
@@ -78,9 +84,8 @@ export function PatchNotesPage() {
           title="패치노트 목록"
           description={`${notes.data?.length ?? 0}건`}
           actions={
-            // 작성 화면은 Phase 3b 후반에 붙인다. 목록과 삭제가 먼저 필요했다.
-            <Button variant="primary" disabled title="작성 화면은 준비 중입니다">
-              새 글 작성
+            <Button asChild variant="primary" size="sm">
+              <Link to="/patch-notes/new">새 글 작성</Link>
             </Button>
           }
         />
