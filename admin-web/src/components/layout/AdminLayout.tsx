@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   Gamepad2,
   LayoutDashboard,
+  LogOut,
   MessageSquareWarning,
   Palette,
   ScrollText,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useAuth } from '@/auth/AuthProvider';
 import { EnvBadge } from '@/components/ui/EnvBadge';
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
@@ -138,6 +140,41 @@ function Rail() {
           </div>
         ))}
       </div>
+
+      <AccountFooter />
     </nav>
+  );
+}
+
+/**
+ * 레일 바닥의 계정 영역. 지금 누구로 들어와 있는지가 늘 보여야 한다.
+ * 관리자 조치는 전부 감사 로그에 이 이메일로 남으므로, 남의 계정으로 눌렀다는 것을
+ * 나중에 알게 되는 상황을 만들면 안 된다.
+ */
+function AccountFooter() {
+  const auth = useAuth();
+  if (auth.status !== 'authenticated') {
+    return null;
+  }
+
+  return (
+    <div className="shrink-0 border-t border-rail-line p-3">
+      <div className="flex items-center gap-2">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-subtle text-2xs font-semibold text-ink-secondary">
+          {auth.email.slice(0, 1).toUpperCase()}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-xs text-ink-secondary" title={auth.email}>
+          {auth.email}
+        </span>
+        <button
+          type="button"
+          onClick={auth.logout}
+          aria-label="로그아웃"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-rail-hover hover:text-ink"
+        >
+          <LogOut className="size-3.5" aria-hidden />
+        </button>
+      </div>
+    </div>
   );
 }
