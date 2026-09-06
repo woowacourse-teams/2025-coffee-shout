@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 class WsCatalogBuilderTest {
@@ -514,7 +513,7 @@ class WsCatalogBuilderTest {
 
         @MessageMapping("/test/{joinCode}/command")
         @WsReceive(respondsOnTopics = "test/{joinCode}/result")
-        public void handleCommand(@Payload FixtureRequest request) {}
+        public void handleCommand() {}
     }
 
     public record FixturePayload(String name, int value) {}
