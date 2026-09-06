@@ -45,8 +45,25 @@
 | --- | --- |
 | 애플리케이션 유형 | **웹 애플리케이션** |
 | 이름 | `zzol-admin` (구분되게) |
-| 승인된 자바스크립트 원본 | `http://localhost:5173`<br>`https://admin.zzol.site` |
+| 승인된 자바스크립트 원본 | `http://localhost:5173`<br>`https://admin.zzol.site`<br>`https://dev-admin.zzol.site` |
 | 승인된 리디렉션 URI | **비워 둔다** |
+
+### 도메인
+
+| 환경 | 도메인 |
+| --- | --- |
+| 로컬 | `http://localhost:5173` (Vite 기본 포트) |
+| dev | `https://dev-admin.zzol.site` |
+| prod | `https://admin.zzol.site` |
+
+dev 를 `dev.admin.zzol.site`가 아니라 **`dev-admin.zzol.site`** 로 둔다. 점으로 한 단계 더 내려가면
+`*.zzol.site` 와일드카드 인증서가 덮지 못해(와일드카드는 한 레벨만 매칭) 인증서를 따로 발급해야 한다.
+하이픈이면 같은 레벨이라 기존 와일드카드로 끝난다.
+
+dev 와 prod 를 한 클라이언트에 함께 등록했다. `aud` 검증은 <b>환경 경계가 아니라 서비스 경계</b>를
+지키는 장치이고(서비스 로그인용 토큰이 백오피스로 넘어오는 것을 막는 것), 환경 사이의 실제 경계는
+각 환경의 `ADMIN_EMAILS`다. dev 테스터를 prod 에서 확실히 막아야 할 일이 생기면 그때 클라이언트를
+나누고 `ADMIN_GOOGLE_CLIENT_ID`만 환경별로 달리 주면 된다. 서버 코드는 바뀌지 않는다.
 
 ### 왜 서비스 로그인용과 분리하나
 
