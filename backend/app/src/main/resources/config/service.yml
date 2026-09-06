@@ -53,6 +53,5 @@ nickname-audit:
 
 profanity:
   trie:
-    refresh:
-      min-interval: 5s                 # 트라이 재빌드 최소 간격(#1759). 매시 안전망 재빌드가 이미 최대 1시간
-                                       # 지연을 허용하므로 몇 초는 그 안에 넉넉히 든다. 0이면 병합만 동작(측정 비교용).
+    rebuild:
+      min-interval: 5s                 # 재빌드 최소 간격(#1759). 근거는 ProfanityTrieRebuildProperties 참고.
