@@ -7,6 +7,7 @@ import coffeeshout.profanity.domain.audit.NicknameAudit;
 import coffeeshout.profanity.domain.audit.NicknameAuditStatus;
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -84,12 +85,15 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
         }
 
         final Timestamp now = Timestamp.from(clock.instant());
+        final long startedAt = System.nanoTime();
         jdbcTemplate.batchUpdate(SEED_INSERT, IntStream.range(0, count).boxed().toList(), SEED_CHUNK, (ps, index) -> {
             ps.setString(1, seedNickname(index));
             ps.setString(2, NicknameAuditStatus.UNAUDITED.name());
             ps.setTimestamp(3, now);
         });
-        log.info("[LocalInit] 측정용 미검열 닉네임 {}건 적재 완료", count);
+        final long elapsedMillis =
+                Duration.ofNanos(System.nanoTime() - startedAt).toMillis();
+        log.info("[LocalInit] 측정용 미검열 닉네임 {}건 적재 완료 ({}ms)", count, elapsedMillis);
     }
 
     /**
