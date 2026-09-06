@@ -84,6 +84,31 @@ public class OverviewService {
     }
 
     /**
+     * 최근 N일 <b>합계</b>. 하루치를 N번 더한 것이 아니라 구간 전체를 한 번에 집계한다.
+     *
+     * <p>날짜별 합으로 퍼널을 만들면 안 된다. 어제 생성돼 오늘 끝난 방은 생성이 어제,
+     * 완주가 오늘로 갈려 어느 날짜에서도 퍼널이 맞지 않는다. 구간으로 한 번에 세면
+     * 그 방은 생성과 완주가 같은 구간 안에 들어와 단계가 이어진다.
+     */
+    public PeriodSummary periodSummary(int days) {
+        final LocalDate today = LocalDate.now(clock);
+        final LocalDate start = today.minusDays(days - 1L);
+
+        final LocalDateTime from = start.atStartOfDay();
+        final LocalDateTime to = today.plusDays(1).atStartOfDay();
+        final ZoneId zone = clock.getZone();
+
+        return new PeriodSummary(
+                days,
+                start,
+                today,
+                overviewStatisticsRepository.findFunnelBetween(from, to),
+                overviewStatisticsRepository.countPlayersBetween(from, to),
+                overviewStatisticsRepository.countSignupsBetween(
+                        from.atZone(zone).toInstant(), to.atZone(zone).toInstant()));
+    }
+
+    /**
      * 최근 N일 흐름. 값이 없는 날을 0으로 채워 돌려준다.
      *
      * <p>빈 날을 빼면 차트가 날짜를 건너뛰어 "이틀 조용했다"가 안 보인다.
@@ -140,5 +165,29 @@ public class OverviewService {
             long players,
             long signups
     ) {
+    }
+
+    /**
+     * @param from 포함, {@code to} 포함. 화면이 "9/1 ~ 9/30" 으로 그대로 쓴다.
+     */
+    public record PeriodSummary(
+            int days,
+            LocalDate from,
+            LocalDate to,
+            RoomFunnel funnel,
+            long players,
+            long signups
+    ) {
+
+        /**
+         * 방당 평균 참여자.
+         *
+         * <p>분모를 생성된 방 전체로 둔다. 혼자 만들고 아무도 안 온 방도 포함이다.
+         * 2인 이상 방만으로 나누면 값이 늘 3~4 근처에 고정돼, 사람이 안 모이고 있다는
+         * 사실이 지표에서 사라진다.
+         */
+        public double avgPlayersPerRoom() {
+            return funnel.created() == 0 ? 0 : (double) players / funnel.created();
+        }
     }
 }

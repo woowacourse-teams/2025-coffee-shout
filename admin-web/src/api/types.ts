@@ -71,6 +71,23 @@ export type DailySummary = {
   signups: number;
 };
 
+/**
+ * 기간 합계. {@link DailySummary} 와 모양이 비슷하지만 따로 둔다.
+ * 홈의 "오늘"은 날짜 하나를, 분석의 "최근 30일"은 구간을 말한다.
+ */
+export type PeriodSummary = {
+  days: number;
+  /** 포함 */
+  from: string;
+  /** 포함 */
+  to: string;
+  funnel: Funnel;
+  players: number;
+  signups: number;
+  /** 분모는 생성된 방 전체다. 아무도 안 온 방도 포함이라 값이 낮으면 그게 신호다. */
+  avgPlayersPerRoom: number;
+};
+
 /* ── 신고 ───────────────────────────────────────────────── */
 
 export type ReportStatus = 'PENDING' | 'RESOLVED';

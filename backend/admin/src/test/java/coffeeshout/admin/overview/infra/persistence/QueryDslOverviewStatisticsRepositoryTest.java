@@ -6,6 +6,7 @@ import coffeeshout.AdminModuleServiceTest;
 import coffeeshout.admin.overview.domain.DailyTrendPoint;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository.GamePlayCount;
+import coffeeshout.admin.overview.domain.RoomFunnel;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.infra.persistence.MiniGameJpaRepository;
@@ -110,6 +111,77 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
 
             assertThat(overviewStatisticsRepository.findDailyTrend(
                     WIDE_FROM, LocalDateTime.of(2001, 1, 1, 0, 0))).isEmpty();
+        }
+    }
+
+    @Nested
+    class findFunnelBetween {
+
+        @Test
+        void 도달한_최대_단계까지_아래_단계를_모두_센다() {
+            // roomStatus 는 방이 도달한 최대 단계 하나만 들고 있다. DONE 인 방을
+            // "완주"에만 세고 "게임 시작"에서 빠뜨리면 퍼널이 아래로 갈수록 늘어난다.
+            room("AAAA", RoomState.DONE);
+
+            final RoomFunnel funnel =
+                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+
+            assertThat(funnel.created()).isEqualTo(1L);
+            assertThat(funnel.gameStarted()).isEqualTo(1L);
+            assertThat(funnel.rouletteReached()).isEqualTo(1L);
+            assertThat(funnel.completed()).isEqualTo(1L);
+        }
+
+        @Test
+        void 단계가_뒤로_갈수록_줄어든다() {
+            room("AAAA", RoomState.READY);
+            room("BBBB", RoomState.PLAYING);
+            room("CCCC", RoomState.ROULETTE);
+            room("DDDD", RoomState.DONE);
+
+            final RoomFunnel funnel =
+                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+
+            assertThat(funnel.created()).isEqualTo(4L);
+            assertThat(funnel.gameStarted()).isEqualTo(3L);
+            assertThat(funnel.rouletteReached()).isEqualTo(2L);
+            assertThat(funnel.completed()).isEqualTo(1L);
+        }
+
+        @Test
+        void 혼자_만들고_아무도_안_온_방은_입장으로_세지_않는다() {
+            // 이 한 칸이 "만들었는데 아무도 안 왔다"를 드러낸다. 방 수만 세면 안 보인다.
+            final RoomEntity alone = room("AAAA", RoomState.READY);
+            playerJpaRepository.save(new PlayerEntity(alone, "철수", PlayerType.HOST));
+
+            final RoomEntity joined = room("BBBB", RoomState.READY);
+            playerJpaRepository.save(new PlayerEntity(joined, "영희", PlayerType.HOST));
+            playerJpaRepository.save(new PlayerEntity(joined, "민수", PlayerType.GUEST));
+
+            final RoomFunnel funnel =
+                    overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
+
+            assertThat(funnel.created()).isEqualTo(2L);
+            assertThat(funnel.joined()).isEqualTo(1L);
+        }
+
+        @Test
+        void 방이_하나도_없으면_나머지를_조회하지_않고_0을_돌려준다() {
+            assertThat(overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO))
+                    .isEqualTo(RoomFunnel.empty());
+        }
+
+        @Test
+        void 상한은_배타다() {
+            // 자정 정각에 생긴 방이 이틀에 걸쳐 두 번 세지면 안 된다.
+            final RoomEntity room = room("AAAA", RoomState.READY);
+
+            final LocalDateTime createdAt = room.getCreatedAt();
+            assertThat(overviewStatisticsRepository
+                    .findFunnelBetween(createdAt, createdAt).created()).isZero();
+            assertThat(overviewStatisticsRepository
+                    .findFunnelBetween(createdAt, createdAt.plusSeconds(1)).created())
+                    .isEqualTo(1L);
         }
     }
 

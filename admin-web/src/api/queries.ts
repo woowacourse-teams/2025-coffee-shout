@@ -13,6 +13,7 @@ import type {
   NicknameAuditStatus,
   PageResponse,
   PatchNote,
+  PeriodSummary,
   ProfanityWord,
   Report,
   ReportSla,
@@ -70,6 +71,13 @@ export function useTrend(days = 14) {
   return useQuery({
     queryKey: ['overview', 'trend', days],
     queryFn: () => api.get<DailyTrend[]>('/overview/trend', { days }),
+  });
+}
+
+export function usePeriodSummary(days = 30) {
+  return useQuery({
+    queryKey: ['overview', 'period', days],
+    queryFn: () => api.get<PeriodSummary>('/overview/period', { days }),
   });
 }
 

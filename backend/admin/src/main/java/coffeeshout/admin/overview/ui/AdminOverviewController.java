@@ -5,6 +5,7 @@ import coffeeshout.admin.overview.ui.response.ActionQueueResponse;
 import coffeeshout.admin.overview.ui.response.DailySummaryResponse;
 import coffeeshout.admin.overview.ui.response.DailyTrendResponse;
 import coffeeshout.admin.overview.ui.response.GamePlayStatResponse;
+import coffeeshout.admin.overview.ui.response.PeriodSummaryResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
@@ -55,6 +56,18 @@ public class AdminOverviewController {
         return overviewService.gamePlayStats(days).stream()
                 .map(GamePlayStatResponse::from)
                 .toList();
+    }
+
+    /**
+     * 기간 합계. 분석 화면이 쓴다.
+     *
+     * <p>{@code /summary} 를 N번 부르는 것으로 대신할 수 없다. 어제 생성돼 오늘 끝난 방은
+     * 하루치를 더하면 생성과 완주가 다른 날로 갈려 퍼널이 맞지 않는다.
+     */
+    @GetMapping("/period")
+    public PeriodSummaryResponse period(
+            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+        return PeriodSummaryResponse.from(overviewService.periodSummary(days));
     }
 
     /** 날짜를 안 주면 오늘(KST)이다. */

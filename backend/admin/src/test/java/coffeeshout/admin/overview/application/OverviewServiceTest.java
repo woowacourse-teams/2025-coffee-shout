@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import coffeeshout.admin.ipblock.IpBlockAdminService;
 import coffeeshout.admin.overview.application.OverviewService.ActionQueue;
 import coffeeshout.admin.overview.application.OverviewService.DailySummary;
+import coffeeshout.admin.overview.application.OverviewService.PeriodSummary;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository;
 import coffeeshout.admin.overview.domain.RoomFunnel;
 import coffeeshout.global.ipblock.IpBlockStore.BlockedIp;
@@ -167,6 +168,60 @@ class OverviewServiceTest {
             assertThat(summary.funnel().completed()).isEqualTo(3L);
             assertThat(summary.players()).isEqualTo(42L);
             assertThat(summary.signups()).isEqualTo(7L);
+        }
+    }
+
+    @Nested
+    class periodSummary {
+
+        @Test
+        void 구간을_한_번에_집계한다() {
+            // 하루치를 N번 더하지 않는다. 어제 생기고 오늘 끝난 방이 두 날로 갈리면
+            // 어느 날짜에서도 퍼널이 맞지 않는다.
+            given(overviewStatisticsRepository.findFunnelBetween(any(), any()))
+                    .willReturn(RoomFunnel.empty());
+
+            service().periodSummary(7);
+
+            final ArgumentCaptor<LocalDateTime> from = ArgumentCaptor.forClass(LocalDateTime.class);
+            final ArgumentCaptor<LocalDateTime> to = ArgumentCaptor.forClass(LocalDateTime.class);
+            then(overviewStatisticsRepository).should()
+                    .findFunnelBetween(from.capture(), to.capture());
+            // 오늘(09-06)을 포함한 7일이므로 09-31 이 아니라 08-31 부터다.
+            assertThat(from.getValue()).isEqualTo(LocalDateTime.of(2026, 8, 31, 0, 0));
+            assertThat(to.getValue()).isEqualTo(LocalDateTime.of(2026, 9, 7, 0, 0));
+        }
+
+        @Test
+        void 구간의_시작과_끝_날짜를_함께_돌려준다() {
+            given(overviewStatisticsRepository.findFunnelBetween(any(), any()))
+                    .willReturn(RoomFunnel.empty());
+
+            final PeriodSummary summary = service().periodSummary(30);
+
+            assertThat(summary.days()).isEqualTo(30);
+            assertThat(summary.from()).isEqualTo(LocalDate.of(2026, 8, 8));
+            assertThat(summary.to()).isEqualTo(LocalDate.of(2026, 9, 6));
+        }
+
+        @Test
+        void 방당_평균_참여자는_생성된_방_전체로_나눈다() {
+            // 2인 이상 방(joined)으로 나누면 값이 늘 3~4 에 고정돼
+            // 사람이 안 모이고 있다는 사실이 지표에서 사라진다.
+            given(overviewStatisticsRepository.findFunnelBetween(any(), any()))
+                    .willReturn(new RoomFunnel(10, 4, 4, 3, 3));
+            given(overviewStatisticsRepository.countPlayersBetween(any(), any())).willReturn(20L);
+
+            assertThat(service().periodSummary(30).avgPlayersPerRoom()).isEqualTo(2.0);
+        }
+
+        @Test
+        void 방이_하나도_없으면_평균은_0이다() {
+            given(overviewStatisticsRepository.findFunnelBetween(any(), any()))
+                    .willReturn(RoomFunnel.empty());
+            given(overviewStatisticsRepository.countPlayersBetween(any(), any())).willReturn(0L);
+
+            assertThat(service().periodSummary(30).avgPlayersPerRoom()).isZero();
         }
     }
 

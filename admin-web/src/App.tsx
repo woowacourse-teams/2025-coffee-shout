@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { AdminAccountsPage } from '@/pages/AdminAccountsPage';
+import { AnalyticsPage } from '@/pages/AnalyticsPage';
 import { AuditLogsPage } from '@/pages/AuditLogsPage';
 import { DesignGalleryPage } from '@/pages/DesignGalleryPage';
 import { HomePage } from '@/pages/HomePage';
@@ -61,6 +62,7 @@ export function App() {
                 <Route path="/rooms/:roomId" element={<RoomDetailPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/users/:userId" element={<UserDetailPage />} />
+                <Route path="/games" element={<AnalyticsPage />} />
                 <Route path="/patch-notes" element={<PatchNotesPage />} />
                 <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
