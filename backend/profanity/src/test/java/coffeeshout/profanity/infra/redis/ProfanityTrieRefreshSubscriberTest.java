@@ -1,6 +1,7 @@
 package coffeeshout.profanity.infra.redis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -9,7 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import coffeeshout.profanity.application.ProfanityFilterService;
-import coffeeshout.profanity.config.ProfanityTrieRefreshProperties;
+import coffeeshout.profanity.config.ProfanityTrieRebuildProperties;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Clock;
 import java.time.Duration;
@@ -17,8 +18,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
@@ -60,7 +59,7 @@ class ProfanityTrieRefreshSubscriberTest {
 
     private void 구독자를_준비한다(Duration minInterval) {
         subscriber = new ProfanityTrieRefreshSubscriber(
-                container, filterService, meterRegistry, clock, new ProfanityTrieRefreshProperties(minInterval));
+                container, filterService, meterRegistry, clock, new ProfanityTrieRebuildProperties(minInterval));
         subscriber.register();
     }
 
@@ -70,49 +69,80 @@ class ProfanityTrieRefreshSubscriberTest {
 
         @Test
         @DisplayName("연속 신호는 재빌드를 신호 횟수만큼 돌리지 않는다")
-        void 연속_신호가_병합된다() {
+        void 연속_신호가_병합된다() throws InterruptedException {
             구독자를_준비한다(Duration.ZERO);
+            final CountDownLatch firstEntered = new CountDownLatch(1);
+            final CountDownLatch releaseFirst = new CountDownLatch(1);
+            doAnswer(invocation -> {
+                        firstEntered.countDown();
+                        releaseFirst.await();
+                        return null;
+                    })
+                    .when(filterService)
+                    .rebuildTrie();
 
+            // 첫 신호가 실행기에 들어가 DB를 읽는 동안 나머지 19개는 병합돼야 한다.
             for (int i = 0; i < 20; i++) {
                 subscriber.onMessage(MESSAGE, null);
             }
+            assertThat(firstEntered.await(2, TimeUnit.SECONDS))
+                    .as("첫 재빌드가 DB를 읽는 중이다")
+                    .isTrue();
 
-            await().atMost(Duration.ofSeconds(2))
-                    .untilAsserted(() -> verify(filterService, times(1)).rebuildTrie());
+            verify(filterService, times(1)).rebuildTrie();
             assertThat(meterRegistry
                             .get("profanity.trie.rebuild.coalesced")
                             .counter()
                             .count())
                     .as("병합돼 버려진 신호 수가 기록된다")
                     .isGreaterThan(0);
+
+            releaseFirst.countDown();
         }
+    }
+
+    @Nested
+    @DisplayName("동시 실행")
+    class 동시_실행 {
 
         @Test
-        @DisplayName("동시 실행이 1을 넘지 않는다")
-        void 동시_실행이_1을_넘지_않는다() throws InterruptedException {
+        @DisplayName("신호 기반 재빌드는 동시 실행이 1을 넘지 않는다")
+        void 신호_기반_재빌드는_동시_실행이_1을_넘지_않는다() throws InterruptedException {
             구독자를_준비한다(Duration.ZERO);
+            final AtomicInteger invocationCount = new AtomicInteger(0);
             final AtomicInteger concurrent = new AtomicInteger(0);
             final AtomicInteger maxConcurrent = new AtomicInteger(0);
+            final CountDownLatch firstEntered = new CountDownLatch(1);
+            final CountDownLatch releaseFirst = new CountDownLatch(1);
+            final CountDownLatch secondEntered = new CountDownLatch(1);
             doAnswer(invocation -> {
-                        final int current = concurrent.incrementAndGet();
-                        maxConcurrent.updateAndGet(max -> Math.max(max, current));
-                        // 재빌드가 순간에 끝나지 않음을 흉내낸다. Thread.sleep 대신 만료되는 대기로 막는다.
-                        new CountDownLatch(1).await(20, TimeUnit.MILLISECONDS);
+                        maxConcurrent.updateAndGet(max -> Math.max(max, concurrent.incrementAndGet()));
+                        if (invocationCount.incrementAndGet() == 1) {
+                            firstEntered.countDown();
+                            releaseFirst.await();
+                        } else {
+                            secondEntered.countDown();
+                        }
                         concurrent.decrementAndGet();
                         return null;
                     })
                     .when(filterService)
                     .rebuildTrie();
 
-            final ExecutorService signalSenders = Executors.newFixedThreadPool(10);
-            for (int i = 0; i < 10; i++) {
-                signalSenders.execute(() -> subscriber.onMessage(MESSAGE, null));
-            }
-            signalSenders.shutdown();
-            signalSenders.awaitTermination(5, TimeUnit.SECONDS);
+            subscriber.onMessage(MESSAGE, null);
+            assertThat(firstEntered.await(2, TimeUnit.SECONDS))
+                    .as("첫 재빌드가 DB를 읽는 중이다")
+                    .isTrue();
 
-            await().atMost(Duration.ofSeconds(2))
-                    .untilAsserted(() -> assertThat(concurrent.get()).isZero());
+            // 플래그는 DB를 읽기 전에 이미 내려가 있어 이 신호가 두 번째 재빌드를 예약한다.
+            subscriber.onMessage(MESSAGE, null);
+
+            // 실행기 스레드가 하나뿐이라 첫 재빌드가 끝나기 전에는 두 번째가 절대 시작될 수 없다.
+            // 실행기가 여러 스레드였다면 여기서 이미 secondEntered가 열렸을 것이다.
+            assertThat(secondEntered.getCount()).isEqualTo(1);
+
+            releaseFirst.countDown();
+            assertThat(secondEntered.await(2, TimeUnit.SECONDS)).isTrue();
             assertThat(maxConcurrent.get()).isEqualTo(1);
         }
     }
@@ -156,7 +186,7 @@ class ProfanityTrieRefreshSubscriberTest {
         @Test
         @DisplayName("간격 안에 들어온 신호는 간격이 지난 뒤에 반영된다")
         void 간격_안_신호는_지연되어_반영된다() {
-            final Duration minInterval = Duration.ofMillis(400);
+            final Duration minInterval = Duration.ofSeconds(1);
             구독자를_준비한다(minInterval);
 
             subscriber.onMessage(MESSAGE, null);
@@ -167,7 +197,7 @@ class ProfanityTrieRefreshSubscriberTest {
             // 간격이 지나기 전이라 두 번째 신호는 아직 반영되지 않는다.
             verify(filterService, times(1)).rebuildTrie();
 
-            await().atMost(Duration.ofSeconds(2))
+            await().atMost(Duration.ofSeconds(3))
                     .untilAsserted(() -> verify(filterService, times(2)).rebuildTrie());
         }
 
@@ -186,6 +216,25 @@ class ProfanityTrieRefreshSubscriberTest {
             subscriber.onMessage(MESSAGE, null);
 
             await().atMost(Duration.ofMillis(500))
+                    .untilAsserted(() -> verify(filterService, times(2)).rebuildTrie());
+        }
+
+        @Test
+        @DisplayName("시계가 뒤로 뛰어도 지연은 최소 간격을 넘지 않는다")
+        void 시계가_뒤로_뛰어도_지연은_최소_간격을_넘지_않는다() {
+            final Duration minInterval = Duration.ofMillis(300);
+            구독자를_준비한다(minInterval);
+
+            subscriber.onMessage(MESSAGE, null);
+            await().atMost(Duration.ofSeconds(2))
+                    .untilAsserted(() -> verify(filterService, times(1)).rebuildTrie());
+
+            // NTP 스텝 조정 등으로 시계가 뒤로 뛰는 상황을 흉내낸다. 클램프가 없으면 남은 시간이
+            // minInterval + 되돌린 폭(10초)이 되어 아래 대기 시간 안에 두 번째 재빌드가 끝나지 않는다.
+            clock.advance(Duration.ofSeconds(10).negated());
+            subscriber.onMessage(MESSAGE, null);
+
+            await().atMost(Duration.ofSeconds(2))
                     .untilAsserted(() -> verify(filterService, times(2)).rebuildTrie());
         }
     }
@@ -213,6 +262,20 @@ class ProfanityTrieRefreshSubscriberTest {
             subscriber.onMessage(MESSAGE, null);
             await().atMost(Duration.ofSeconds(2))
                     .untilAsserted(() -> verify(filterService, times(2)).rebuildTrie());
+        }
+    }
+
+    @Nested
+    @DisplayName("종료")
+    class 종료 {
+
+        @Test
+        @DisplayName("종료 후 신호가 와도 예외가 새지 않는다")
+        void 종료_후_신호는_예외없이_무시된다() {
+            구독자를_준비한다(Duration.ZERO);
+            subscriber.shutdown();
+
+            assertThatNoException().isThrownBy(() -> subscriber.onMessage(MESSAGE, null));
         }
     }
 
