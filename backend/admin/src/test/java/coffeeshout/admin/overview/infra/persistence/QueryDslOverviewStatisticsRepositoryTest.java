@@ -156,8 +156,8 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             room("AAAA", RoomState.PLAYING);
 
             final RoomEntity finished = room("BBBB", RoomState.DONE);
-            final MiniGameEntity play = miniGameJpaRepository.save(
-                    new MiniGameEntity(finished.getId(), MiniGameType.CARD_GAME));
+            final MiniGameEntity play =
+                    miniGameJpaRepository.save(new MiniGameEntity(finished.getId(), MiniGameType.CARD_GAME));
             miniGameResultJpaRepository.save(new MiniGameResultEntity(play, 1L, 1, 100L));
 
             final RoomFunnel funnel = overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO);
@@ -174,7 +174,9 @@ class QueryDslOverviewStatisticsRepositoryTest extends AdminModuleServiceTest {
             miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.RACING_GAME));
             miniGameJpaRepository.save(new MiniGameEntity(room.getId(), MiniGameType.WORM_GAME));
 
-            assertThat(overviewStatisticsRepository.findFunnelBetween(WIDE_FROM, WIDE_TO).miniGamePlayed())
+            assertThat(overviewStatisticsRepository
+                            .findFunnelBetween(WIDE_FROM, WIDE_TO)
+                            .miniGamePlayed())
                     .isEqualTo(1L);
         }
 

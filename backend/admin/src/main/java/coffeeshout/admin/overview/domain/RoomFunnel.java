@@ -29,8 +29,7 @@ package coffeeshout.admin.overview.domain;
  * @param rouletteReached 룰렛까지 간 방
  * @param completed    끝까지 간 방 (DONE)
  */
-public record RoomFunnel(
-        long created, long gameStarted, long miniGamePlayed, long rouletteReached, long completed) {
+public record RoomFunnel(long created, long gameStarted, long miniGamePlayed, long rouletteReached, long completed) {
 
     public static RoomFunnel empty() {
         return new RoomFunnel(0, 0, 0, 0, 0);

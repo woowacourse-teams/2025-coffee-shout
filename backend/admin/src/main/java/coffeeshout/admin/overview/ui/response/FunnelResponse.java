@@ -12,7 +12,12 @@ import coffeeshout.admin.overview.domain.RoomFunnel;
  * 0이 늘 찍히는 칸이 표에 있으면 지표 전체를 못 믿게 된다.
  */
 public record FunnelResponse(
-        long created, long gameStarted, long miniGamePlayed, long rouletteReached, long completed, double completionRate) {
+        long created,
+        long gameStarted,
+        long miniGamePlayed,
+        long rouletteReached,
+        long completed,
+        double completionRate) {
 
     public static FunnelResponse from(RoomFunnel funnel) {
         return new FunnelResponse(
