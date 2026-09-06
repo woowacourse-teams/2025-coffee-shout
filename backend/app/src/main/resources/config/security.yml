@@ -45,8 +45,19 @@ security:
       - /favicon.ico
 
 admin:
+  # 기존 Thymeleaf 백오피스 전용. Phase 5(신규 SPA 전환 완료)에서 제거한다.
   username: ${ADMIN_USERNAME}
   password: ${ADMIN_PASSWORD}
+  auth:
+    # 부트스트랩 허용목록. UI로 지울 수 없는 break-glass 경로다.
+    # 쉼표로 구분한다. 예: ADMIN_EMAILS=mj04300017@gmail.com,other@example.com
+    emails: ${ADMIN_EMAILS:}
+    # 백오피스 전용 구글 OAuth 웹 클라이언트 ID. 서비스 로그인용과 분리해서 발급한다.
+    google-client-id: ${ADMIN_GOOGLE_CLIENT_ID:}
+    # 미설정 시 사용자 JWT secret으로 폴백한다. 배포를 깨지 않으면서 분리 여지를 남긴다.
+    # 같은 키를 쓰더라도 type=ADMIN 클레임 검증이 있어 사용자 토큰은 관리자로 통과하지 못한다.
+    jwt-secret: ${ADMIN_JWT_SECRET:${JWT_SECRET}}
+    token-validity-seconds: 3600   # 1시간. 리프레시 토큰 없음, 만료되면 재로그인
 
 user:
   jwt:
