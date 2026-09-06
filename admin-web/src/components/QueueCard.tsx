@@ -30,34 +30,37 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
     <Link
       to={to}
       className={cn(
-        'group relative flex items-center gap-3.5 rounded-lg border bg-surface p-5 transition-all duration-150',
+        'group relative flex items-center gap-3 rounded-lg border bg-surface px-4 py-3 transition-all duration-150',
         'hover:border-border-strong hover:shadow-popover active:scale-[0.99]',
         idle ? 'border-border-default' : 'border-attention/25',
       )}
     >
       <span
         className={cn(
-          'flex size-9 shrink-0 items-center justify-center rounded-md',
+          'flex size-8 shrink-0 items-center justify-center rounded-md',
           idle ? 'bg-subtle text-ink-muted' : 'bg-attention-bg text-attention',
         )}
       >
         <Icon className="size-4" aria-hidden />
       </span>
 
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-medium text-ink-secondary">{label}</span>
-        <span
-          className={cn(
-            'mt-1 block text-3xl font-bold leading-none tracking-[-0.02em]',
-            idle ? 'text-ink-muted' : 'text-attention',
-          )}
-        >
-          {formatNumber(count)}
-        </span>
+      {/* 라벨과 숫자를 한 줄에 나란히 둔다. 두 줄로 쌓으면 두 자리 숫자 하나에
+       * 카드가 두 배로 높아져 안이 비어 보인다. */}
+      <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-secondary">
+        {label}
+      </span>
+
+      <span
+        className={cn(
+          'shrink-0 text-2xl font-bold leading-none tracking-[-0.02em]',
+          idle ? 'text-ink-muted' : 'text-attention',
+        )}
+      >
+        {formatNumber(count)}
       </span>
 
       <ArrowUpRight
-        className="size-4 shrink-0 text-ink-muted opacity-0 transition-opacity group-hover:opacity-100"
+        className="size-3.5 shrink-0 text-ink-muted opacity-0 transition-opacity group-hover:opacity-100"
         aria-hidden
       />
     </Link>

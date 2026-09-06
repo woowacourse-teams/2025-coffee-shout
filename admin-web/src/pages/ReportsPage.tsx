@@ -95,7 +95,9 @@ export function ReportsPage() {
         description="접수된 신고를 확인하고 처리합니다. 처리 시간은 최근 30일 기준입니다."
       />
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      {/* 지표 카드 행에만 최대폭을 준다. 표는 넓을수록 좋지만, 네 칸짜리 카드 행이
+        * 화면 끝까지 늘어나면 두 자리 숫자 하나에 400px 짜리 빈 상자가 된다. */}
+      <div className="grid max-w-[1100px] grid-cols-2 gap-3 xl:grid-cols-4">
         <StatCard label="미처리" value={sla.data?.pendingCount ?? 0} />
         <StatCard
           label="가장 오래 기다린 건"

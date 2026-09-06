@@ -33,21 +33,21 @@ export function FunnelBar({ stages, className }: FunnelBarProps) {
         const dropped = previous === undefined ? 0 : previous - stage.count;
 
         return (
-          <li key={stage.label} className="grid grid-cols-[7rem_1fr_auto] items-center gap-3">
+          <li key={stage.label} className="grid grid-cols-[6.5rem_1fr_5.5rem] items-center gap-3">
             <span className="truncate text-xs text-ink-secondary">{stage.label}</span>
 
-            <span className="relative h-6 overflow-hidden rounded-sm bg-subtle">
+            <span className="relative h-7 overflow-hidden rounded-md bg-subtle">
               <span
-                className="absolute inset-y-0 left-0 rounded-sm bg-chart-1 transition-[width]"
-                style={{ width: `${Math.max(widthRatio * 100, stage.count > 0 ? 1.5 : 0)}%` }}
+                className="absolute inset-y-0 left-0 rounded-md bg-accent transition-[width] duration-300"
+                style={{ width: `${Math.max(widthRatio * 100, stage.count > 0 ? 2 : 0)}%` }}
                 aria-hidden
               />
-              <span className="relative flex h-full items-center pl-2 text-xs font-medium text-ink">
+              <span className="relative flex h-full items-center px-2.5 text-xs font-semibold text-ink">
                 {formatNumber(stage.count)}
               </span>
             </span>
 
-            <span className="w-28 text-right text-xs tabular-nums">
+            <span className="text-right text-xs tabular-nums">
               {stepRatio === undefined ? (
                 <span className="text-ink-muted">기준</span>
               ) : (
