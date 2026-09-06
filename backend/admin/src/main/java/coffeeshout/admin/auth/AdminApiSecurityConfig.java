@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -48,6 +50,12 @@ public class AdminApiSecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                // formLogin·httpBasic 을 끄면 인증 진입점이 사라져 스프링이 기본값인
+                // Http403ForbiddenEntryPoint 를 쓴다. 그러면 미인증도 403 이 되어
+                // SPA 가 "토큰 재발급하면 되는 상황"과 "권한이 없어 소용없는 상황"을 구분하지 못한다.
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 // 토큰 인증이라 세션 쿠키가 없다. CSRF 는 쿠키 자동 전송이 있을 때의 문제다.
                 .csrf(csrf -> csrf.disable())

@@ -7,6 +7,7 @@ import coffeeshout.global.exception.custom.BusinessException;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
@@ -49,6 +50,11 @@ public class GoogleIdTokenVerifier implements SocialIdTokenVerifier {
     private final JwtDecoder jwtDecoder;
     private final String clientId;
 
+    /**
+     * 생성자가 둘이라 어느 쪽으로 주입할지 명시해야 한다. 표시가 없으면 스프링이
+     * 기본 생성자를 찾다가 기동에 실패한다.
+     */
+    @Autowired
     public GoogleIdTokenVerifier(AdminAuthProperties properties) {
         this(defaultDecoder(), properties.googleClientId());
     }
