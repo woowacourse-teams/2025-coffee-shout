@@ -52,6 +52,7 @@ public class ProfanityTrieRefreshSubscriber implements MessageListener {
     private final AtomicBoolean rebuildScheduled = new AtomicBoolean(false);
 
     private volatile Instant lastRebuildStartedAt = Instant.EPOCH;
+    private volatile boolean shuttingDown = false;
 
     private Counter rebuildFailureCounter;
     private Counter rebuildCoalescedCounter;
@@ -69,38 +70,34 @@ public class ProfanityTrieRefreshSubscriber implements MessageListener {
     }
 
     /**
-     * 리스너를 먼저 해제해 새 신호 유입을 끊은 뒤 실행기를 내린다. 순서를 바꿔 실행기부터 내리면,
-     * 스프링이 빈을 의존 역순으로 파괴해 이 구독자가 컨테이너보다 먼저 죽는 사이 들어온 신호가
-     * 이미 닫힌 실행기에 예약을 시도해 {@link RejectedExecutionException}이 리스너 스레드로 샌다.
-     * 진행 중인 재빌드는 끝까지 마치게 두고, 그래도 안 끝나면 강제 종료한다.
+     * 우아한 드레인을 하지 않는다. 재빌드 결과는 trieRef에 담기고 그 JVM은 지금 죽는 중이라, 끝까지
+     * 기다려 만든 트라이를 아무도 안 쓴다. 새 인스턴스는 기동 때 {@code ProfanityFilterService}의
+     * {@code @PostConstruct}가 다시 만든다. 실행기 종료를 기다리게 하면 #1753처럼 진행 중인 작업이
+     * 끝날 때까지 종료 자체가 막힌다. shuttingDown은 shutdownNow()보다 반드시 먼저 세운다.
+     * 반대로 하면 인터럽트가 먼저 도착해 그 예외가 재빌드 실패로 집계된다.
+     * 리스너를 먼저 해제해 새 신호 유입을 끊는다. 그래야 컨테이너가 이미 닫힌 실행기에 예약을
+     * 시도해 {@link RejectedExecutionException}이 리스너 스레드로 새는 것을 막는다.
      */
     @PreDestroy
     public void shutdown() {
+        shuttingDown = true;
         container.removeMessageListener(this, TRIE_REFRESH_TOPIC);
-        rebuildExecutor.shutdown();
-        try {
-            if (!rebuildExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
-                rebuildExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            rebuildExecutor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+        rebuildExecutor.shutdownNow();
     }
 
     @Override
     public void onMessage(@NonNull Message message, byte[] pattern) {
         log.debug("비속어 트라이 갱신 신호 수신");
-        if (rebuildScheduled.compareAndSet(false, true)) {
-            try {
-                rebuildExecutor.schedule(this::rebuild, delayUntilNextRebuildMillis(), TimeUnit.MILLISECONDS);
-            } catch (RejectedExecutionException e) {
-                // 실행기가 이미 종료 처리 중이라 예약을 받지 않는다. 플래그를 되돌려도 구독은 이미
-                // 해제된 뒤라 다음 신호는 없다.
-                rebuildScheduled.set(false);
-            }
-        } else {
+        if (!rebuildScheduled.compareAndSet(false, true)) {
             rebuildCoalescedCounter.increment();
+            return;
+        }
+        try {
+            rebuildExecutor.schedule(this::rebuild, delayUntilNextRebuildMillis(), TimeUnit.MILLISECONDS);
+        } catch (RejectedExecutionException e) {
+            // 실행기가 이미 종료 처리 중이라 예약을 받지 않는다. 플래그를 되돌려도 구독은 이미
+            // 해제된 뒤라 다음 신호는 없다.
+            rebuildScheduled.set(false);
         }
     }
 
@@ -129,6 +126,10 @@ public class ProfanityTrieRefreshSubscriber implements MessageListener {
         try {
             filterService.rebuildTrie();
         } catch (Exception e) {
+            // 종료 중 인터럽트로 죽은 재빌드는 실패가 아니다. 다음 기동이 다시 만든다.
+            if (shuttingDown) {
+                return;
+            }
             log.error("비속어 트라이 재빌드 실패 — channel: {}", ProfanityRedisChannel.TRIE_REFRESH, e);
             rebuildFailureCounter.increment();
         }
