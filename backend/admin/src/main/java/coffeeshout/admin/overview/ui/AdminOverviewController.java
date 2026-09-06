@@ -3,9 +3,15 @@ package coffeeshout.admin.overview.ui;
 import coffeeshout.admin.overview.application.OverviewService;
 import coffeeshout.admin.overview.ui.response.ActionQueueResponse;
 import coffeeshout.admin.overview.ui.response.DailySummaryResponse;
+import coffeeshout.admin.overview.ui.response.DailyTrendResponse;
+import coffeeshout.admin.overview.ui.response.GamePlayStatResponse;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/admin/api/overview")
+@Validated
 @RequiredArgsConstructor
 public class AdminOverviewController {
 
@@ -28,6 +35,26 @@ public class AdminOverviewController {
     @GetMapping("/action-queue")
     public ActionQueueResponse actionQueue() {
         return ActionQueueResponse.from(overviewService.actionQueue());
+    }
+
+    /**
+     * 최근 흐름. 오늘 숫자만 보여주면 "0인데 정상인가"에 답할 수 없다.
+     *
+     * @param days 상한을 둔다. 기간을 늘려 전체 스캔을 유발하는 것을 막는다.
+     */
+    @GetMapping("/trend")
+    public List<DailyTrendResponse> trend(
+            @RequestParam(defaultValue = "14") @Min(2) @Max(90) int days) {
+        return overviewService.trend(days).stream().map(DailyTrendResponse::from).toList();
+    }
+
+    /** 게임별 완료 수와 비중. 비중이 0에 가까운 게임은 아무도 고르지 않는다는 뜻이다. */
+    @GetMapping("/games")
+    public List<GamePlayStatResponse> games(
+            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+        return overviewService.gamePlayStats(days).stream()
+                .map(GamePlayStatResponse::from)
+                .toList();
     }
 
     /** 날짜를 안 주면 오늘(KST)이다. */

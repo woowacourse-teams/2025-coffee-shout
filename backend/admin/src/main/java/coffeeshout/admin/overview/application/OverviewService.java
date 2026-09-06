@@ -1,7 +1,10 @@
 package coffeeshout.admin.overview.application;
 
 import coffeeshout.admin.ipblock.IpBlockAdminService;
+import coffeeshout.admin.overview.domain.DailyTrendPoint;
+import coffeeshout.admin.overview.domain.GamePlayStat;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository;
+import coffeeshout.admin.overview.domain.OverviewStatisticsRepository.GamePlayCount;
 import coffeeshout.admin.overview.domain.RoomFunnel;
 import coffeeshout.profanity.application.ProfanityAuditService;
 import coffeeshout.profanity.domain.audit.NicknameAuditStatus;
@@ -10,6 +13,11 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -73,6 +81,43 @@ public class OverviewService {
                 overviewStatisticsRepository.countPlayersBetween(from, to),
                 overviewStatisticsRepository.countSignupsBetween(
                         from.atZone(zone).toInstant(), to.atZone(zone).toInstant()));
+    }
+
+    /**
+     * 최근 N일 흐름. 값이 없는 날을 0으로 채워 돌려준다.
+     *
+     * <p>빈 날을 빼면 차트가 날짜를 건너뛰어 "이틀 조용했다"가 안 보인다.
+     * 오히려 그 조용한 날이 봐야 할 신호다.
+     */
+    public List<DailyTrendPoint> trend(int days) {
+        final LocalDate today = LocalDate.now(clock);
+        final LocalDate start = today.minusDays(days - 1L);
+
+        final Map<LocalDate, DailyTrendPoint> found = overviewStatisticsRepository
+                .findDailyTrend(start.atStartOfDay(), today.plusDays(1).atStartOfDay())
+                .stream()
+                .collect(Collectors.toMap(DailyTrendPoint::date, point -> point));
+
+        return IntStream.range(0, days)
+                .mapToObj(start::plusDays)
+                .map(date -> found.getOrDefault(date, new DailyTrendPoint(date, 0, 0, 0)))
+                .toList();
+    }
+
+    /** 게임별 완료 수와 비중. 비중이 0에 가까운 게임은 아무도 고르지 않는다는 뜻이다. */
+    public List<GamePlayStat> gamePlayStats(int days) {
+        final LocalDate today = LocalDate.now(clock);
+        final List<GamePlayCount> counts = overviewStatisticsRepository.countPlaysByGame(
+                today.minusDays(days - 1L).atStartOfDay(), today.plusDays(1).atStartOfDay());
+
+        final long total = counts.stream().mapToLong(GamePlayCount::plays).sum();
+        return counts.stream()
+                .sorted(Comparator.comparingLong(GamePlayCount::plays).reversed())
+                .map(count -> new GamePlayStat(
+                        count.miniGameType(),
+                        count.plays(),
+                        total == 0 ? 0 : (double) count.plays() / total))
+                .toList();
     }
 
     public record ActionQueue(
