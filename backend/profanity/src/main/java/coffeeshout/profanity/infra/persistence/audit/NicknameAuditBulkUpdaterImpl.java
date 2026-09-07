@@ -24,6 +24,10 @@ public class NicknameAuditBulkUpdaterImpl implements NicknameAuditBulkUpdater {
      * ({@code ProfanityWordRepositoryImpl.bulkInsertIgnore}와 같은 함정). 그래서 반환값으로 갱신 행 수를
      * 세지 않고 void로 둔다.
      *
+     * <p>매칭된 행 수를 안 보므로 그 사이 지워진 행은 조용히 넘어간다. {@code saveAll}은 merge가 그 행을
+     * 다시 INSERT해 되살렸는데, 지운 행을 되살리지 않는 쪽이 맞다고 보고 그대로 둔다. 대신 호출자의 처리
+     * 건수와 판정 메트릭이 그만큼 실제보다 크게 세어진다.
+     *
      * <p>{@link NicknameAudit#complete}를 거쳐 status·confidence·reason·audited_at이 모두 채워진
      * 엔티티만 넘긴다. 갱신도 이 네 컬럼만 하고 attempt_count·created_at·player_name은 건드리지 않는다.
      * attempt_count는 일부러 뺐다: {@code incrementAttemptCount}가 JPQL 벌크 UPDATE로 DB에서 직접
