@@ -335,7 +335,7 @@ class QueryPerformanceTest {
 
                 // 1. Room 데이터 준비 및 삽입
                 List<RoomData> roomDataList = prepareRoomData(random, baseDate, totalDays);
-                long baseRoomId = insertRooms(conn, roomStmt, roomDataList, random);
+                long baseRoomId = insertRooms(conn, roomStmt, roomDataList);
 
                 // 2. Player 삽입
                 int totalPlayers = insertPlayers(playerStmt, roomDataList, baseRoomId);
