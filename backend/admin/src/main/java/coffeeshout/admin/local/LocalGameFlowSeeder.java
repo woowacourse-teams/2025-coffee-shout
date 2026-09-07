@@ -1,6 +1,8 @@
 package coffeeshout.admin.local;
 
 import coffeeshout.gamecommon.JoinCode;
+import coffeeshout.global.ipblock.Ip;
+import coffeeshout.global.ipblock.IpBlockStore;
 import coffeeshout.minigame.application.port.MiniGameEntityRepository;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;
@@ -115,6 +117,7 @@ public class LocalGameFlowSeeder implements ApplicationRunner {
     private final MiniGameResultJpaRepository miniGameResults;
     private final RouletteResultEntityRepository roulettes;
     private final UserJpaRepository users;
+    private final IpBlockStore ipBlockStore;
     private final JdbcTemplate jdbc;
     private final Clock clock;
 
@@ -131,9 +134,26 @@ public class LocalGameFlowSeeder implements ApplicationRunner {
         final LocalDate today = LocalDate.now(clock);
 
         seedUsers(random, today);
+        seedBlockedIps();
         final int roomCount = seedRooms(random, today);
 
         log.info("[LocalGameFlowSeeder] 최근 {}일치 방 {}개 삽입 완료", DAYS, roomCount);
+    }
+
+    /**
+     * 차단된 IP 몇 개.
+     *
+     * <p>Redis 에 TTL 로 들어가는 값이라 DB 시더와 수명이 다르다. 기동마다 스키마가
+     * 새로 생기는 DB 와 달리 Redis 는 그대로 남으므로, 같은 IP 를 다시 넣어도 TTL 만
+     * 갱신되고 중복이 쌓이지는 않는다.
+     *
+     * <p>비워 두면 홈의 "차단 IP" 칸이 늘 0 이라 그 칸이 제대로 도는지 알 수 없다.
+     * 문서 예제용으로 예약된 대역(RFC 5737)을 쓴다. 실제로 존재하는 주소를 적어 두면
+     * 나중에 이 목록을 보고 진짜 차단된 IP 로 오해할 수 있다.
+     */
+    private void seedBlockedIps() {
+        List.of("203.0.113.7", "203.0.113.42", "198.51.100.19")
+                .forEach(ip -> ipBlockStore.blockImmediately(new Ip(ip)));
     }
 
     /**
