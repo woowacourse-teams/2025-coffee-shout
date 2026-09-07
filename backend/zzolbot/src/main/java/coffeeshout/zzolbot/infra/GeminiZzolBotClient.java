@@ -34,6 +34,7 @@ public class GeminiZzolBotClient implements ZzolBotLlmClient {
     private final ZzolBotProperties properties;
     private final ZzolBotSchemaConverter schemaConverter;
 
+    @Override
     @Retry(name = "zzolBotGemini")
     @RateLimiter(name = "zzolBotGemini")
     public ZzolBotLlmResponse generate(
