@@ -310,7 +310,7 @@ class ProfanityAuditBatchProcessorTest {
             final int processed = processor.process(List.of(entity));
 
             assertThat(processed).isZero();
-            then(auditRepository).should(never()).saveAll(any());
+            then(auditRepository).should(never()).bulkUpdateAuditResults(any());
         }
     }
 
@@ -346,7 +346,7 @@ class ProfanityAuditBatchProcessorTest {
             processor.process(List.of(residual));
 
             then(auditRepository).should().deleteAll(List.of(residual));
-            then(auditRepository).should().saveAll(List.of());
+            then(auditRepository).should().bulkUpdateAuditResults(List.of());
             assertThat(residual.getStatus()).isEqualTo(NicknameAuditStatus.UNAUDITED);
         }
 
@@ -378,7 +378,7 @@ class ProfanityAuditBatchProcessorTest {
 
             processor.process(List.of(fresh));
 
-            then(auditRepository).should().saveAll(List.of(fresh));
+            then(auditRepository).should().bulkUpdateAuditResults(List.of(fresh));
             then(auditRepository).should(never()).deleteAll(any());
             assertThat(fresh.getStatus()).isEqualTo(NicknameAuditStatus.CLEAN);
         }
@@ -446,7 +446,7 @@ class ProfanityAuditBatchProcessorTest {
             final int processed = processor.process(List.of(entity));
 
             assertThat(processed).isZero();
-            then(auditRepository).should(never()).saveAll(any());
+            then(auditRepository).should(never()).bulkUpdateAuditResults(any());
         }
 
         @Test
@@ -537,7 +537,7 @@ class ProfanityAuditBatchProcessorTest {
         void 벌크_저장이_실패하면_판정을_버리지_않고_건별로_저장한다() {
             final List<NicknameAudit> batch = List.of(new NicknameAudit("닉하나"), new NicknameAudit("닉둘"));
             givenCleanResultsFor("닉하나", "닉둘");
-            givenBulkSaveFails();
+            givenBulkUpdateFails();
 
             final int processed = processor.process(batch);
 
@@ -553,7 +553,7 @@ class ProfanityAuditBatchProcessorTest {
             final NicknameAudit healthy = new NicknameAudit("닉하나");
             final NicknameAudit trouble = new NicknameAudit("말썽닉");
             givenCleanResultsFor("닉하나", "말썽닉");
-            givenBulkSaveFails();
+            givenBulkUpdateFails();
             willThrow(new DataIntegrityViolationException("uq_player_name_audit_name_status 충돌"))
                     .given(auditRepository)
                     .save(trouble);
@@ -572,7 +572,7 @@ class ProfanityAuditBatchProcessorTest {
         void 폴백은_이미_검열된_행을_중복으로_보고_지우지_않는다() {
             final NicknameAudit entity = new NicknameAudit("닉하나");
             givenCleanResultsFor("닉하나");
-            givenBulkSaveFails();
+            givenBulkUpdateFails();
             // 커밋이 끝나 자기 행이 이미 CLEAN으로 남아 있는 상태를 흉내낸다.
             given(auditRepository.findNicknamesWithTerminalStatus(any())).willReturn(Set.of("닉하나"));
 
@@ -586,7 +586,7 @@ class ProfanityAuditBatchProcessorTest {
         void 폴백이_돌아도_판정_메트릭은_행마다_한_번만_오른다() {
             final List<NicknameAudit> batch = List.of(new NicknameAudit("닉하나"), new NicknameAudit("닉둘"));
             givenCleanResultsFor("닉하나", "닉둘");
-            givenBulkSaveFails();
+            givenBulkUpdateFails();
 
             processor.process(batch);
 
@@ -605,10 +605,10 @@ class ProfanityAuditBatchProcessorTest {
                             .toList());
         }
 
-        private void givenBulkSaveFails() {
+        private void givenBulkUpdateFails() {
             willThrow(new DataIntegrityViolationException("uq_player_name_audit_name_status 충돌"))
                     .given(auditRepository)
-                    .saveAll(any());
+                    .bulkUpdateAuditResults(any());
         }
     }
 

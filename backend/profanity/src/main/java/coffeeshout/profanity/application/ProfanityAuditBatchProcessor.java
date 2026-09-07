@@ -146,6 +146,10 @@ public class ProfanityAuditBatchProcessor {
      *
      * <p>행마다 새 트랜잭션을 연다. 실패한 트랜잭션은 롤백 상태라 이어 쓸 수 없고, 한 행이 제약에 걸려도
      * 나머지 판정은 살아남아야 한다.
+     *
+     * <p>{@code save}는 JPA merge라 attempt_count까지 포함한 전 컬럼을 준영속 엔티티 값으로 덮는다.
+     * {@code NicknameAuditBulkUpdaterImpl}이 attempt_count를 일부러 뺀 것과 다른 컬럼 집합이다.
+     * 이 폴백은 벌크 저장이 실패했을 때만 도는 드문 경로라 그 차이를 맞추지 않는다.
      */
     private int settleIndividually(List<NicknameAudit> batch, Map<String, NicknameAuditResult> resultMap) {
         int settled = 0;
@@ -207,6 +211,11 @@ public class ProfanityAuditBatchProcessor {
      *
      * <p>배치 크기를 그대로 돌려주면 안 된다. 판정을 못 짝지어 그대로 남은 행까지 처리했다고 세면,
      * 드레인 루프가 진행이 없는데도 같은 0페이지를 계속 다시 읽는다.
+     *
+     * <p>{@code toPromote.size()}는 실제 UPDATE가 몇 행에 맞았는지가 아니라 승격을 시도한 행 수다.
+     * {@code NicknameAuditBulkUpdaterImpl}의 벌크 UPDATE는 rewriteBatchedStatements 때문에 매칭 행
+     * 수를 보지 않는다. 그 사이 다른 경로가 이 행을 지웠어도 이 카운트는 그대로 오르지만, 지운 행은
+     * 되살아나지 않고 다음 페이지 조회에도 안 잡히므로 드레인 루프가 헛돌지는 않는다.
      */
     private int settle(List<NicknameAudit> batch, List<String> nicknames, Map<String, NicknameAuditResult> resultMap) {
         // 배치 닉네임 중 이미 검열 완료(terminal) 행을 가진 것들을 한 번에 조회한다 (건별 조회 N+1 회피).
@@ -233,7 +242,7 @@ public class ProfanityAuditBatchProcessor {
             applyResult(entity, result);
             toPromote.add(entity);
         }
-        auditRepository.saveAll(toPromote);
+        auditRepository.bulkUpdateAuditResults(toPromote);
         countResults(toPromote);
         if (!redundant.isEmpty()) {
             auditRepository.deleteAll(redundant);

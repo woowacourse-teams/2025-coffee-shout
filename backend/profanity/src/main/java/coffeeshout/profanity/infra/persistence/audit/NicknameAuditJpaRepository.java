@@ -11,7 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-public interface NicknameAuditJpaRepository extends Repository<NicknameAudit, Long>, NicknameAuditRepository {
+public interface NicknameAuditJpaRepository
+        extends Repository<NicknameAudit, Long>, NicknameAuditRepository, NicknameAuditBulkUpdater {
 
     @Override
     @Modifying
