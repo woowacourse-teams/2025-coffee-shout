@@ -186,7 +186,7 @@
    * ------------------------------------------------------------- */
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', system-ui, sans-serif;
-  /* 기존 백오피스(static/css/admin.css)가 쓰던 폰트를 이어받는다. */
+  /* 걷어낸 Thymeleaf 백오피스가 쓰던 폰트를 이어받는다. */
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --text-2xs: 0.6875rem; /* 11px */

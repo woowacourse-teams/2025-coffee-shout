@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -17,6 +18,7 @@ import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/auth/AuthProvider';
 import { EnvBadge } from '@/components/ui/EnvBadge';
+import { Skeleton } from '@/components/ui/EmptyState';
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
 type NavGroup = { heading: string; items: NavItem[] };
@@ -89,7 +91,12 @@ export function AdminLayout() {
          * 상하 여백을 좌우보다 조금 크게 둔다. 상단 바 바로 아래에 제목이 붙으면
          * 두 줄이 한 덩어리로 읽혀 위계가 무너진다. */}
         <main className="mx-auto w-full max-w-[1320px] px-6 pb-10 pt-6">
-          <Outlet />
+          {/* 화면 코드를 라우트 단위로 나눠 받으므로 경계가 필요하다. 레일과 상단 바
+            * 바깥이 아니라 여기 두는 이유는, 화면을 옮길 때 네비게이션까지 사라졌다
+            * 다시 나타나면 어디에 있는지를 매번 다시 찾게 되기 때문이다. */}
+          <Suspense fallback={<Skeleton className="h-64" />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

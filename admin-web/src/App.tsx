@@ -1,25 +1,63 @@
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { lazy } from 'react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { ApiError } from '@/api/client';
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Skeleton } from '@/components/ui/EmptyState';
-import { AdminAccountsPage } from '@/pages/AdminAccountsPage';
-import { AnalyticsPage } from '@/pages/AnalyticsPage';
-import { AuditLogsPage } from '@/pages/AuditLogsPage';
 import { HomePage } from '@/pages/HomePage';
-import { IpBlocksPage } from '@/pages/IpBlocksPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { ProfanityPage } from '@/pages/ProfanityPage';
-import { PatchNoteFormPage } from '@/pages/PatchNoteFormPage';
-import { PatchNotesPage } from '@/pages/PatchNotesPage';
-import { ReportsPage } from '@/pages/ReportsPage';
-import { RoomDetailPage } from '@/pages/RoomDetailPage';
-import { RoomsPage } from '@/pages/RoomsPage';
-import { UserDetailPage } from '@/pages/UserDetailPage';
-import { UsersPage } from '@/pages/UsersPage';
-import { ZzolBotPage } from '@/pages/ZzolBotPage';
+
+/**
+ * 화면을 라우트 단위로 나눠 받는다.
+ *
+ * <p>전부 정적으로 가져오면 로그인 화면 하나 띄우는 데 백오피스 전체 코드를 내려받는다.
+ * 운영자는 대개 홈과 처리할 큐 한둘만 보고 닫으므로, 안 여는 화면의 무게까지 첫 진입에
+ * 지불할 이유가 없다.
+ *
+ * <p>로그인, 홈, 없는 주소는 정적으로 둔다. 셋은 첫 렌더에 필요하거나 곧바로 이어지는
+ * 화면이라, 쪼개면 흰 화면이 한 번 더 깜빡이는 값만 치른다.
+ */
+const AdminAccountsPage = lazy(() =>
+  import('@/pages/AdminAccountsPage').then((m) => ({ default: m.AdminAccountsPage })),
+);
+const AnalyticsPage = lazy(() =>
+  import('@/pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
+);
+const AuditLogsPage = lazy(() =>
+  import('@/pages/AuditLogsPage').then((m) => ({ default: m.AuditLogsPage })),
+);
+const IpBlocksPage = lazy(() =>
+  import('@/pages/IpBlocksPage').then((m) => ({ default: m.IpBlocksPage })),
+);
+const ProfanityPage = lazy(() =>
+  import('@/pages/ProfanityPage').then((m) => ({ default: m.ProfanityPage })),
+);
+const PatchNoteFormPage = lazy(() =>
+  import('@/pages/PatchNoteFormPage').then((m) => ({ default: m.PatchNoteFormPage })),
+);
+const PatchNotesPage = lazy(() =>
+  import('@/pages/PatchNotesPage').then((m) => ({ default: m.PatchNotesPage })),
+);
+const ReportsPage = lazy(() =>
+  import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })),
+);
+const RoomDetailPage = lazy(() =>
+  import('@/pages/RoomDetailPage').then((m) => ({ default: m.RoomDetailPage })),
+);
+const RoomsPage = lazy(() =>
+  import('@/pages/RoomsPage').then((m) => ({ default: m.RoomsPage })),
+);
+const UserDetailPage = lazy(() =>
+  import('@/pages/UserDetailPage').then((m) => ({ default: m.UserDetailPage })),
+);
+const UsersPage = lazy(() =>
+  import('@/pages/UsersPage').then((m) => ({ default: m.UsersPage })),
+);
+const ZzolBotPage = lazy(() =>
+  import('@/pages/ZzolBotPage').then((m) => ({ default: m.ZzolBotPage })),
+);
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({

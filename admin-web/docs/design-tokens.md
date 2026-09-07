@@ -118,7 +118,7 @@ dataviz 검증기 인접쌍 분리는 전 항목 통과. 최악 인접쌍은 pro
 | 용도 | 폰트 | 근거 |
 | --- | --- | --- |
 | 본문, UI | Pretendard Variable | 서비스 프론트가 쓰는 폰트와 동일 |
-| 숫자, ID, joinCode, 로그, JSON | JetBrains Mono | 기존 백오피스(`static/css/admin.css`)가 쓰던 폰트를 이어받음 |
+| 숫자, ID, joinCode, 로그, JSON | JetBrains Mono | 걷어낸 Thymeleaf 백오피스가 쓰던 폰트를 이어받음 |
 
 본문 기본 **13px**. 어드민은 정보 밀도가 미덕이라 소비자 앱의 여백 기준을 따르지 않는다. 전역 `tabular-nums`로 표에서 자릿수가 흔들리지 않게 한다.
 
