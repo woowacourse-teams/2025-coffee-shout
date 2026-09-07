@@ -19,11 +19,8 @@ public interface NicknameAuditRepository {
     List<NicknameAudit> saveAll(Iterable<NicknameAudit> entities);
 
     /**
-     * 이미 id를 가진 검열 완료 엔티티들의 결과 컬럼만 JDBC 배치 UPDATE 한 번으로 갱신한다.
-     *
-     * <p>{@code saveAll}은 id 있는 엔티티를 merge로 보내는데, 배치 조회가 트랜잭션 밖이라 엔티티가
-     * 준영속 상태라서 merge가 갱신 전 영속 인스턴스를 얻으려고 SELECT를 먼저 날린다. 배치 100건마다
-     * UPDATE 100 + SELECT 100 왕복 200회가 나가던 것을 이 메서드로 왕복 1회로 줄인다.
+     * 이미 id를 가진 엔티티들의 status·confidence·reason·audited_at을 JDBC 배치 UPDATE 한 번으로
+     * 갱신한다. {@link NicknameAudit#complete}를 거쳐 네 값이 모두 채워진 엔티티만 넘긴다.
      */
     void bulkUpdateAuditResults(List<NicknameAudit> entities);
 

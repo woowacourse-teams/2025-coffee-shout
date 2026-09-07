@@ -6,6 +6,8 @@ import coffeeshout.profanity.domain.audit.AiConfidence;
 import coffeeshout.profanity.domain.audit.NicknameAudit;
 import coffeeshout.profanity.domain.audit.NicknameAuditStatus;
 import coffeeshout.support.ServiceTest;
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +21,9 @@ class NicknameAuditJpaRepositoryTest extends ServiceTest {
 
     @Autowired
     private NicknameAuditJpaRepository auditRepository;
+
+    @Autowired
+    private EntityManager em;
 
     /**
      * 검열 호출이 되풀이 실패하는 행을 큐에서 빼는 경로다(#1759).
@@ -119,6 +124,38 @@ class NicknameAuditJpaRepositoryTest extends ServiceTest {
 
             assertThat(auditRepository.findNicknamesWithTerminalStatus(List.of("검열된닉")))
                     .containsOnly("검열된닉");
+        }
+    }
+
+    /**
+     * 승격 저장이 JDBC 배치 UPDATE({@code bulkUpdateAuditResults})로 바뀌면서 JPA가 대신해주던
+     * 타입 변환을 직접 하게 됐다. 값이 실제 DB를 오가며 제대로 들어가는지 다시 읽어 확인한다.
+     */
+    @Nested
+    class bulkUpdateAuditResults_매핑 {
+
+        @Test
+        void 승격된_행은_status_confidence_reason_audited_at이_모두_반영된다() {
+            final NicknameAudit fresh = auditRepository.save(new NicknameAudit("새닉네임"));
+
+            final Instant beforeAudit = Instant.now();
+            fresh.complete(NicknameAuditStatus.CLEAN, AiConfidence.of(0.42), "검열 사유");
+            final Instant afterAudit = Instant.now();
+
+            auditRepository.bulkUpdateAuditResults(List.of(fresh));
+            // JDBC UPDATE는 영속성 컨텍스트를 거치지 않아 1차 캐시가 갱신 전 값을 들고 있다.
+            // clear() 없이 findById를 부르면 방금 넘긴 fresh 인스턴스를 그대로 돌려받아 DB에 실제로
+            // 반영됐는지 확인하지 못한다.
+            em.clear();
+
+            final NicknameAudit promoted =
+                    auditRepository.findById(fresh.getId()).orElseThrow();
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(promoted.getStatus()).isEqualTo(NicknameAuditStatus.CLEAN);
+                softly.assertThat(promoted.getConfidence()).isEqualTo(AiConfidence.of(0.42));
+                softly.assertThat(promoted.getReason()).isEqualTo("검열 사유");
+                softly.assertThat(promoted.getAuditedAt()).isBetween(beforeAudit, afterAudit);
+            });
         }
     }
 }

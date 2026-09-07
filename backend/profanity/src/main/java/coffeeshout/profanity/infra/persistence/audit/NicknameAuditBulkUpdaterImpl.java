@@ -1,6 +1,5 @@
 package coffeeshout.profanity.infra.persistence.audit;
 
-import coffeeshout.profanity.domain.audit.AiConfidence;
 import coffeeshout.profanity.domain.audit.NicknameAudit;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -24,6 +23,12 @@ public class NicknameAuditBulkUpdaterImpl implements NicknameAuditBulkUpdater {
      * UPDATE로 재작성하고 executeBatch가 실제 행수 대신 SUCCESS_NO_INFO(-2)를 반환한다
      * ({@code ProfanityWordRepositoryImpl.bulkInsertIgnore}와 같은 함정). 그래서 반환값으로 갱신 행 수를
      * 세지 않고 void로 둔다.
+     *
+     * <p>{@link NicknameAudit#complete}를 거쳐 status·confidence·reason·audited_at이 모두 채워진
+     * 엔티티만 넘긴다. 갱신도 이 네 컬럼만 하고 attempt_count·created_at·player_name은 건드리지 않는다.
+     * attempt_count는 일부러 뺐다: {@code incrementAttemptCount}가 JPQL 벌크 UPDATE로 DB에서 직접
+     * 올리므로, 이 메서드에 넘어오는 준영속 엔티티가 든 값은 낡았을 수 있다. 예전 {@code saveAll}은 그
+     * 낡은 값으로 덮어썼다.
      */
     @Override
     public void bulkUpdateAuditResults(List<NicknameAudit> entities) {
@@ -37,8 +42,7 @@ public class NicknameAuditBulkUpdaterImpl implements NicknameAuditBulkUpdater {
         // 배치 항목마다 새로 만든다.
         jdbcTemplate.batchUpdate(sql, entities, 500, (ps, entity) -> {
             ps.setString(1, entity.getStatus().name());
-            final AiConfidence confidence = entity.getConfidence();
-            ps.setBigDecimal(2, confidence != null ? confidence.value() : null);
+            ps.setBigDecimal(2, entity.getConfidence().value());
             ps.setString(3, entity.getReason());
             ps.setTimestamp(4, Timestamp.from(entity.getAuditedAt()), Calendar.getInstance(UTC));
             ps.setLong(5, entity.getId());
