@@ -310,7 +310,7 @@ class ProfanityAuditBatchProcessorTest {
             final int processed = processor.process(List.of(entity));
 
             assertThat(processed).isZero();
-            then(auditRepository).should(never()).saveAll(any());
+            then(auditRepository).should(never()).bulkUpdateAuditResults(any());
         }
     }
 
@@ -346,7 +346,7 @@ class ProfanityAuditBatchProcessorTest {
             processor.process(List.of(residual));
 
             then(auditRepository).should().deleteAll(List.of(residual));
-            then(auditRepository).should().saveAll(List.of());
+            then(auditRepository).should().bulkUpdateAuditResults(List.of());
             assertThat(residual.getStatus()).isEqualTo(NicknameAuditStatus.UNAUDITED);
         }
 
@@ -378,7 +378,7 @@ class ProfanityAuditBatchProcessorTest {
 
             processor.process(List.of(fresh));
 
-            then(auditRepository).should().saveAll(List.of(fresh));
+            then(auditRepository).should().bulkUpdateAuditResults(List.of(fresh));
             then(auditRepository).should(never()).deleteAll(any());
             assertThat(fresh.getStatus()).isEqualTo(NicknameAuditStatus.CLEAN);
         }
@@ -446,7 +446,7 @@ class ProfanityAuditBatchProcessorTest {
             final int processed = processor.process(List.of(entity));
 
             assertThat(processed).isZero();
-            then(auditRepository).should(never()).saveAll(any());
+            then(auditRepository).should(never()).bulkUpdateAuditResults(any());
         }
 
         @Test
@@ -608,7 +608,7 @@ class ProfanityAuditBatchProcessorTest {
         private void givenBulkSaveFails() {
             willThrow(new DataIntegrityViolationException("uq_player_name_audit_name_status 충돌"))
                     .given(auditRepository)
-                    .saveAll(any());
+                    .bulkUpdateAuditResults(any());
         }
     }
 

@@ -233,7 +233,7 @@ public class ProfanityAuditBatchProcessor {
             applyResult(entity, result);
             toPromote.add(entity);
         }
-        auditRepository.saveAll(toPromote);
+        auditRepository.bulkUpdateAuditResults(toPromote);
         countResults(toPromote);
         if (!redundant.isEmpty()) {
             auditRepository.deleteAll(redundant);

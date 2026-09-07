@@ -8,6 +8,7 @@ import coffeeshout.profanity.domain.audit.NicknameAudit;
 import coffeeshout.profanity.domain.audit.NicknameAuditStatus;
 import coffeeshout.profanity.infra.persistence.audit.NicknameAuditJpaRepository;
 import coffeeshout.support.IntegrationTestSupport;
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,7 +40,31 @@ class ProfanityAuditServiceDuplicateKeyIntegrationTest extends IntegrationTestSu
         // 기존 (host, CLEAN)과 충돌하므로, 승격 대신 중복 재등록으로 인지해 제거하고 예외 없이 큐를 비워야 한다.
         assertThatCode(service::auditPending).doesNotThrowAnyException();
 
-        assertThat(auditRepository.countByStatusAndAuditedAtIsNull(NicknameAuditStatus.UNAUDITED)).isZero();
-        assertThat(auditRepository.findNicknamesByStatus(NicknameAuditStatus.CLEAN)).containsOnly("host");
+        assertThat(auditRepository.countByStatusAndAuditedAtIsNull(NicknameAuditStatus.UNAUDITED))
+                .isZero();
+        assertThat(auditRepository.findNicknamesByStatus(NicknameAuditStatus.CLEAN))
+                .containsOnly("host");
+    }
+
+    /**
+     * 승격 저장이 JDBC 배치 UPDATE({@code bulkUpdateAuditResults})로 바뀌면서 JPA가 대신해주던
+     * 타입 변환을 직접 하게 됐다. 값이 실제 DB를 오가며 제대로 들어가는지 다시 읽어 확인한다.
+     * 특히 audited_at은 Instant를 Timestamp.from()으로 바인딩하는데, 시간대 처리가 어긋나면
+     * Hibernate로 읽을 때 조용히 몇 시간씩 밀린다.
+     */
+    @Test
+    void 승격된_행은_status_confidence_reason_audited_at이_모두_반영된다() {
+        final NicknameAudit fresh = auditRepository.save(new NicknameAudit("새닉네임"));
+        final Instant beforeAudit = Instant.now();
+
+        service.auditPending();
+
+        final Instant afterAudit = Instant.now();
+        final NicknameAudit promoted = auditRepository.findById(fresh.getId()).orElseThrow();
+
+        assertThat(promoted.getStatus()).isEqualTo(NicknameAuditStatus.CLEAN);
+        assertThat(promoted.getConfidence()).isEqualTo(AiConfidence.UNKNOWN);
+        assertThat(promoted.getReason()).isEqualTo("no-op");
+        assertThat(promoted.getAuditedAt()).isBetween(beforeAudit, afterAudit);
     }
 }
