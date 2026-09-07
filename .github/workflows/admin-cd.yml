@@ -36,6 +36,27 @@ jobs:
       CLOUDFRONT_DISTRIBUTION_ID: ${{ github.ref_name == 'prod' && vars.ADMIN_CLOUDFRONT_DISTRIBUTION_ID_PROD || vars.ADMIN_CLOUDFRONT_DISTRIBUTION_ID }}
 
     steps:
+      # 필요한 값이 하나라도 비면 여기서 멈춘다.
+      #
+      # 이 가드가 없으면 S3 업로드까지 끝난 뒤 CloudFront 무효화에서 죽는다. 그러면
+      # 배포는 실패로 뜨는데 버킷에는 새 파일이 올라가 있어, 무엇이 서빙되는 중인지
+      # 알 수 없는 상태가 남는다. 아무것도 안 한 실패가 절반만 한 실패보다 낫다.
+      - name: Guard — 필수 변수 확인
+        env:
+          ROLE_ARN: ${{ vars.ADMIN_DEPLOY_ROLE_ARN }}
+        run: |
+          missing=""
+          [ -z "${S3_BUCKET}" ] && missing="${missing} ADMIN_S3_BUCKET"
+          [ -z "${CLOUDFRONT_DISTRIBUTION_ID}" ] && missing="${missing} ADMIN_CLOUDFRONT_DISTRIBUTION_ID"
+          [ -z "${ROLE_ARN}" ] && missing="${missing} ADMIN_DEPLOY_ROLE_ARN"
+
+          if [ -n "${missing}" ]; then
+            echo "::error::GitHub 저장소 변수가 비어 있습니다:${missing}"
+            echo "  prod 브랜치는 이름 뒤에 _PROD 가 붙습니다."
+            echo "  Settings > Secrets and variables > Actions > Variables 에서 채웁니다."
+            exit 1
+          fi
+
       # 버킷을 여러 환경이 프리픽스로 공유한다. 프리픽스 없는 값이 들어오면
       # 루트 sync --delete 가 양쪽 환경을 전부 지운다(2026-07-17 프론트에서 실제 발생).
       # frontend-cd 와 같은 가드를 둔다 - 같은 사고가 여기서 다시 날 이유가 없다.
