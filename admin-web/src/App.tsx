@@ -55,6 +55,7 @@ const UserDetailPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('@/pages/UsersPage').then((m) => ({ default: m.UsersPage })),
 );
+const OpsPage = lazy(() => import('@/pages/OpsPage').then((m) => ({ default: m.OpsPage })));
 const ZzolBotPage = lazy(() =>
   import('@/pages/ZzolBotPage').then((m) => ({ default: m.ZzolBotPage })),
 );
@@ -107,6 +108,7 @@ export function App() {
                 <Route path="/patch-notes/:id" element={<PatchNoteFormPage />} />
                 <Route path="/admins" element={<AdminAccountsPage />} />
                 <Route path="/zzolbot" element={<ZzolBotPage />} />
+                <Route path="/ops" element={<OpsPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>

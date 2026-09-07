@@ -1,4 +1,4 @@
-import { MessageSquareWarning, ShieldBan, SpellCheck } from 'lucide-react';
+import { MessageSquareWarning, ServerCog, ShieldBan, SpellCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   useActionQueue,
@@ -57,19 +57,27 @@ export function HomePage() {
         description="처리할 일과 서비스 흐름. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
       />
 
+      {/* 다섯 칸이다. 격리 메시지를 맨 앞에 둔다 - 나머지 넷은 사람이 판단해 줄 일이고
+        * 이건 시스템이 멈춘 것이라, 0이 아닌 순간 다른 무엇보다 먼저 봐야 한다. */}
       <Section title="처리 대기" description="숫자를 누르면 해당 화면으로 갑니다.">
         {queue.isError ? (
           <Card>
             <ErrorState message={(queue.error as Error).message} onRetry={() => queue.refetch()} />
           </Card>
         ) : (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             {queue.isPending
-              ? Array.from({ length: 4 }).map((_, index) => (
+              ? Array.from({ length: 5 }).map((_, index) => (
                   <Skeleton key={index} className="h-[4.5rem] rounded-lg" />
                 ))
               : queue.data && (
                   <>
+                    <QueueCard
+                      label="격리 메시지"
+                      count={queue.data.deadLetters}
+                      to="/ops"
+                      icon={ServerCog}
+                    />
                     <QueueCard
                       label="미처리 신고"
                       count={queue.data.pendingReports}

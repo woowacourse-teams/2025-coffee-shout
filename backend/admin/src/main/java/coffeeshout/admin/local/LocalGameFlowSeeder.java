@@ -3,6 +3,8 @@ package coffeeshout.admin.local;
 import coffeeshout.gamecommon.JoinCode;
 import coffeeshout.global.ipblock.Ip;
 import coffeeshout.global.ipblock.IpBlockStore;
+import coffeeshout.global.outbox.OutboxEvent;
+import coffeeshout.global.outbox.OutboxEventRepository;
 import coffeeshout.minigame.application.port.MiniGameEntityRepository;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;
@@ -16,6 +18,8 @@ import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.infra.persistence.PlayerEntity;
 import coffeeshout.room.infra.persistence.RoomEntity;
 import coffeeshout.room.infra.persistence.RouletteResultEntity;
+import coffeeshout.settlement.infra.persistence.SettlementDeadLetterEntity;
+import coffeeshout.settlement.infra.persistence.SettlementDeadLetterJpaRepository;
 import coffeeshout.user.infra.persistence.UserEntity;
 import coffeeshout.user.infra.persistence.UserJpaRepository;
 import java.time.Clock;
@@ -118,6 +122,8 @@ public class LocalGameFlowSeeder implements ApplicationRunner {
     private final RouletteResultEntityRepository roulettes;
     private final UserJpaRepository users;
     private final IpBlockStore ipBlockStore;
+    private final OutboxEventRepository outboxEventRepository;
+    private final SettlementDeadLetterJpaRepository settlementDeadLetterRepository;
     private final JdbcTemplate jdbc;
     private final Clock clock;
 
@@ -135,9 +141,45 @@ public class LocalGameFlowSeeder implements ApplicationRunner {
 
         seedUsers(random, today);
         seedBlockedIps();
+        seedDeadLetters();
         final int roomCount = seedRooms(random, today);
 
         log.info("[LocalGameFlowSeeder] 최근 {}일치 방 {}개 삽입 완료", DAYS, roomCount);
+    }
+
+    /**
+     * 격리된 메시지 몇 건.
+     *
+     * <p>비워 두면 시스템 화면의 목록과 재처리·폐기 버튼이 한 번도 그려지지 않는다.
+     * 정작 그 경로가 고장 나는 것은 운영 중에 격리가 처음 생기는 순간인데, 그때 처음
+     * 확인하게 된다.
+     *
+     * <p>outbox 쪽은 재시도 10회를 소진한 모양으로 만든다. 그래야 화면의 "다시 넣기"가
+     * 실제 조건(DEAD_LETTER 상태)에서 눌린다.
+     */
+    private void seedDeadLetters() {
+        outboxEventRepository.saveAll(List.of(
+                deadLetter("settlement:result", "{\"roomId\":41,\"amount\":12000}"),
+                deadLetter("room", "{\"joinCode\":\"X3YD\",\"event\":\"ROOM_FINISHED\"}"),
+                deadLetter("minigame", "{\"roomId\":77,\"type\":\"CARD_GAME\"}")));
+
+        settlementDeadLetterRepository.saveAll(List.of(
+                new SettlementDeadLetterEntity(
+                        "1757212800000-0",
+                        "JSON 파싱 실패: Unexpected character (\'}\') at position 42",
+                        "{\"roomId\":88,\"players\":[}"),
+                new SettlementDeadLetterEntity(
+                        "1757216400000-3", "최대 재전달 횟수 초과 (5회)", "{\"roomId\":91,\"amount\":8000,\"winner\":\"민준\"}")));
+    }
+
+    /** 재시도를 다 쓰고 격리된 모양으로 만든다. 상태만 바꾸면 화면의 재시도 수가 0으로 보인다. */
+    private OutboxEvent deadLetter(String streamKey, String payload) {
+        final OutboxEvent event = OutboxEvent.create(streamKey, payload);
+        for (int i = 0; i < 10; i++) {
+            event.incrementRetryCount();
+        }
+        event.markDeadLetter();
+        return event;
     }
 
     /**

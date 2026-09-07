@@ -7,10 +7,14 @@ import type {
   BlockedIp,
   DailySummary,
   DailyTrend,
+  DeadLetter,
+  DeadLetterSource,
+  Deployment,
   EvalRun,
   EvalRunDetail,
   EvalScenario,
   GamePlayStat,
+  Migrations,
   MonitorAlert,
   NicknameAudit,
   NicknameAuditQuality,
@@ -30,7 +34,6 @@ import type {
   ZzolBotFeedback,
   ZzolBotSession,
 } from '@/api/types';
-
 /**
  * 쿼리 키를 한 곳에 모은다. 조치 후 무엇을 다시 불러올지 정할 때 문자열을 흩어 두면
  * 화면 하나를 고칠 때마다 갱신이 빠지는 곳이 생긴다.
@@ -62,9 +65,7 @@ export const keys = {
   patchNotes: ['patch-notes'] as const,
   admins: ['admins'] as const,
 };
-
 /* ── 홈 ─────────────────────────────────────────────────── */
-
 export function useActionQueue() {
   return useQuery({
     queryKey: keys.overview.queue,
@@ -73,65 +74,55 @@ export function useActionQueue() {
     refetchInterval: 30_000,
   });
 }
-
 export function useTrend(days = 14) {
   return useQuery({
     queryKey: ['overview', 'trend', days],
     queryFn: () => api.get<DailyTrend[]>('/overview/trend', { days }),
   });
 }
-
 export function usePeriodSummary(days = 30) {
   return useQuery({
     queryKey: ['overview', 'period', days],
     queryFn: () => api.get<PeriodSummary>('/overview/period', { days }),
   });
 }
-
 export function useGamePlayStats(days = 30) {
   return useQuery({
     queryKey: ['overview', 'games', days],
     queryFn: () => api.get<GamePlayStat[]>('/overview/games', { days }),
   });
 }
-
 export function useAuditLogs(size = 20, page = 0) {
   return useQuery({
     queryKey: ['audit-logs', page, size],
     queryFn: () => api.get<PageResponse<AdminAuditLog>>('/audit-logs', { page, size }),
   });
 }
-
 export function useDailySummary(date?: string) {
   return useQuery({
     queryKey: keys.overview.summary(date),
     queryFn: () => api.get<DailySummary>('/overview/summary', { date }),
   });
 }
-
 /* ── 신고 ───────────────────────────────────────────────── */
-
 type ReportFilters = {
   status?: ReportStatus;
   category?: string;
   gameType?: string;
   page: number;
 };
-
 export function useReports(filters: ReportFilters) {
   return useQuery({
     queryKey: keys.reports.list(filters),
     queryFn: () => api.get<PageResponse<Report>>('/reports', { ...filters }),
   });
 }
-
 export function useReportSla(days = 30) {
   return useQuery({
     queryKey: keys.reports.sla(days),
     queryFn: () => api.get<ReportSla>('/quality/report-sla', { days }),
   });
 }
-
 export function useResolveReport() {
   const client = useQueryClient();
   return useMutation({
@@ -144,7 +135,6 @@ export function useResolveReport() {
     },
   });
 }
-
 export function useUnblockReporterIp() {
   const client = useQueryClient();
   return useMutation({
@@ -155,16 +145,13 @@ export function useUnblockReporterIp() {
     },
   });
 }
-
 /* ── 닉네임 검열 ─────────────────────────────────────────── */
-
 export function useNicknameAudits(status: NicknameAuditStatus, page: number) {
   return useQuery({
     queryKey: keys.profanity.audits(status, page),
     queryFn: () => api.get<PageResponse<NicknameAudit>>('/profanity/audits', { status, page }),
   });
 }
-
 export function useAuditDecision() {
   const client = useQueryClient();
   return useMutation({
@@ -176,7 +163,6 @@ export function useAuditDecision() {
     },
   });
 }
-
 type WordFilters = {
   search?: string;
   language?: string;
@@ -184,14 +170,12 @@ type WordFilters = {
   active?: boolean;
   page: number;
 };
-
 export function useProfanityWords(filters: WordFilters) {
   return useQuery({
     queryKey: keys.profanity.words(filters),
     queryFn: () => api.get<PageResponse<ProfanityWord>>('/profanity/words', { ...filters }),
   });
 }
-
 export function useAddProfanityWord() {
   const client = useQueryClient();
   return useMutation({
@@ -200,7 +184,6 @@ export function useAddProfanityWord() {
     onSuccess: () => client.invalidateQueries({ queryKey: ['profanity', 'words'] }),
   });
 }
-
 /**
  * 단어를 지우지 않고 비활성으로 둔다. 삭제하면 왜 걸렸던 단어인지가 사라져
  * 같은 단어를 두 번 추가하고 두 번 푸는 일이 반복된다.
@@ -215,23 +198,19 @@ export function useToggleProfanityWord() {
     onSuccess: () => client.invalidateQueries({ queryKey: ['profanity', 'words'] }),
   });
 }
-
 export function useNicknameAuditQuality(days = 30) {
   return useQuery({
     queryKey: keys.profanity.quality(days),
     queryFn: () => api.get<NicknameAuditQuality>('/quality/nickname-audit', { days }),
   });
 }
-
 /* ── IP 차단 ─────────────────────────────────────────────── */
-
 export function useBlockedIps() {
   return useQuery({
     queryKey: keys.ipBlocks,
     queryFn: () => api.get<BlockedIp[]>('/ip-blocks'),
   });
 }
-
 export function useUnblockIp() {
   const client = useQueryClient();
   return useMutation({
@@ -242,48 +221,39 @@ export function useUnblockIp() {
     },
   });
 }
-
 /* ── 방 ──────────────────────────────────────────────────── */
-
 export function useRoomSearch(joinCode: string, page: number) {
   return useQuery({
     queryKey: keys.rooms.search(joinCode, page),
     queryFn: () => api.get<PageResponse<RoomSummary>>('/rooms', { joinCode, page }),
   });
 }
-
 export function useRoomDetail(roomId: number) {
   return useQuery({
     queryKey: keys.rooms.detail(roomId),
     queryFn: () => api.get<RoomDetail>(`/rooms/${roomId}`),
   });
 }
-
 /* ── 유저 ────────────────────────────────────────────────── */
-
 export function useUserSearch(keyword: string, page: number) {
   return useQuery({
     queryKey: keys.users.search(keyword, page),
     queryFn: () => api.get<PageResponse<UserSummary>>('/users', { keyword, page }),
   });
 }
-
 export function useUserDetail(userId: number) {
   return useQuery({
     queryKey: keys.users.detail(userId),
     queryFn: () => api.get<UserDetail>(`/users/${userId}`),
   });
 }
-
 /* ── 패치노트 ────────────────────────────────────────────── */
-
 export function usePatchNotes() {
   return useQuery({
     queryKey: keys.patchNotes,
     queryFn: () => api.get<PatchNote[]>('/patch-notes'),
   });
 }
-
 export function usePatchNote(id: number | null) {
   return useQuery({
     queryKey: ['patch-notes', 'detail', id],
@@ -292,7 +262,6 @@ export function usePatchNote(id: number | null) {
     enabled: id !== null,
   });
 }
-
 /**
  * 카테고리 선택지는 서버가 준다. 프론트에 enum 을 복사해 두면 서버가 값을 늘려도
  * 화면에 안 나오고, 반대로 없앤 값이 화면에 남아 저장할 때만 터진다.
@@ -304,13 +273,11 @@ export function usePatchNoteCategories() {
     staleTime: Infinity,
   });
 }
-
 export type PatchNoteForm = {
   category: PatchNoteCategory;
   title: string;
   content: string;
 };
-
 export function useSavePatchNote() {
   const client = useQueryClient();
   return useMutation({
@@ -321,7 +288,6 @@ export function useSavePatchNote() {
     onSuccess: () => client.invalidateQueries({ queryKey: keys.patchNotes }),
   });
 }
-
 export function useDeletePatchNote() {
   const client = useQueryClient();
   return useMutation({
@@ -329,16 +295,13 @@ export function useDeletePatchNote() {
     onSuccess: () => client.invalidateQueries({ queryKey: keys.patchNotes }),
   });
 }
-
 /* ── 관리자 ──────────────────────────────────────────────── */
-
 export function useAdminAccounts() {
   return useQuery({
     queryKey: keys.admins,
     queryFn: () => api.get<AdminAccount[]>('/accounts'),
   });
 }
-
 export function useAddAdminAccount() {
   const client = useQueryClient();
   return useMutation({
@@ -346,7 +309,6 @@ export function useAddAdminAccount() {
     onSuccess: () => client.invalidateQueries({ queryKey: keys.admins }),
   });
 }
-
 export function useRemoveAdminAccount() {
   const client = useQueryClient();
   return useMutation({
@@ -354,16 +316,13 @@ export function useRemoveAdminAccount() {
     onSuccess: () => client.invalidateQueries({ queryKey: keys.admins }),
   });
 }
-
 /* ── ZzolBot ─────────────────────────────────────────────── */
-
 export function useZzolBotSessions() {
   return useQuery({
     queryKey: ['zzolbot', 'sessions'],
     queryFn: () => api.get<ZzolBotSession[]>('/zzolbot/sessions'),
   });
 }
-
 export function useZzolBotFeedback() {
   const client = useQueryClient();
   return useMutation({
@@ -372,7 +331,6 @@ export function useZzolBotFeedback() {
     onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'sessions'] }),
   });
 }
-
 /**
  * 모니터링 알림. 무인 분석 결과라 화면을 열어 둔 사이에도 새 건이 쌓인다.
  * 30초마다 다시 읽는다. 더 짧게 잡으면 Gemini 분석 주기보다 빨라 의미가 없다.
@@ -384,14 +342,12 @@ export function useMonitorAlerts() {
     refetchInterval: 30_000,
   });
 }
-
 export function useEvalRuns() {
   return useQuery({
     queryKey: ['zzolbot', 'eval', 'runs'],
     queryFn: () => api.get<EvalRun[]>('/zzolbot/eval/runs'),
   });
 }
-
 export function useEvalRunDetail(id: number | null) {
   return useQuery({
     queryKey: ['zzolbot', 'eval', 'runs', id],
@@ -399,14 +355,12 @@ export function useEvalRunDetail(id: number | null) {
     enabled: id !== null,
   });
 }
-
 export function useEvalScenarios() {
   return useQuery({
     queryKey: ['zzolbot', 'eval', 'scenarios'],
     queryFn: () => api.get<EvalScenario[]>('/zzolbot/eval/scenarios'),
   });
 }
-
 /**
  * 평가 실행. 서버가 202 로 받고 뒤에서 돈다.
  *
@@ -421,11 +375,59 @@ export function useStartEvalRun() {
     onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'eval', 'runs'] }),
   });
 }
-
 export function useDeleteEvalScenario() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => api.delete<void>(`/zzolbot/eval/scenarios/${id}`),
     onSuccess: () => client.invalidateQueries({ queryKey: ['zzolbot', 'eval', 'scenarios'] }),
+  });
+}
+/* ── 시스템 운영 ─────────────────────────────────────────── */
+export function useDeadLetters(source: DeadLetterSource, page = 0) {
+  return useQuery({
+    queryKey: ['ops', 'dead-letters', source, page],
+    queryFn: () => api.get<PageResponse<DeadLetter>>('/ops/dead-letters', { source, page }),
+  });
+}
+/**
+ * 다시 큐에 넣기. outbox 만 된다.
+ *
+ * <p>성공하면 목록과 홈의 대기 큐를 함께 무효화한다. 큐 숫자가 그대로면 조치가 안 먹은
+ * 것으로 보이고, 그러면 같은 버튼을 한 번 더 누르게 된다.
+ */
+export function useRequeueDeadLetter() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.post<void>(`/ops/dead-letters/outbox/${id}/requeue`),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ['ops', 'dead-letters'] });
+      client.invalidateQueries({ queryKey: keys.overview.queue });
+    },
+  });
+}
+export function useDiscardDeadLetter() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ source, id }: { source: DeadLetterSource; id: number }) =>
+      api.delete<void>(`/ops/dead-letters/${source}/${id}`),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ['ops', 'dead-letters'] });
+      client.invalidateQueries({ queryKey: keys.overview.queue });
+    },
+  });
+}
+export function useMigrations() {
+  return useQuery({
+    queryKey: ['ops', 'migrations'],
+    queryFn: () => api.get<Migrations>('/ops/migrations'),
+    // 배포 중이 아니면 안 바뀐다. 화면을 열어 둔 채로 다시 물을 이유가 없다.
+    staleTime: 5 * 60_000,
+  });
+}
+export function useDeployment() {
+  return useQuery({
+    queryKey: ['ops', 'deployment'],
+    queryFn: () => api.get<Deployment>('/ops/deployment'),
+    staleTime: Infinity,
   });
 }

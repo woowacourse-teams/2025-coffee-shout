@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import coffeeshout.admin.ipblock.IpBlockAdminService;
+import coffeeshout.admin.ops.application.OpsService;
 import coffeeshout.admin.overview.application.OverviewService.ActionQueue;
 import coffeeshout.admin.overview.application.OverviewService.DailySummary;
 import coffeeshout.admin.overview.application.OverviewService.PeriodSummary;
@@ -55,9 +56,17 @@ class OverviewServiceTest {
     @Mock
     private IpBlockAdminService ipBlockAdminService;
 
+    @Mock
+    private OpsService opsService;
+
     private OverviewService service() {
         return new OverviewService(
-                overviewStatisticsRepository, reportAdminService, profanityAuditService, ipBlockAdminService, CLOCK);
+                overviewStatisticsRepository,
+                reportAdminService,
+                profanityAuditService,
+                ipBlockAdminService,
+                opsService,
+                CLOCK);
     }
 
     private void givenAuditCount(NicknameAuditStatus status, long total) {

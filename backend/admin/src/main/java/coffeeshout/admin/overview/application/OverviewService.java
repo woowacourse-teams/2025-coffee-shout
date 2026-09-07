@@ -1,6 +1,7 @@
 package coffeeshout.admin.overview.application;
 
 import coffeeshout.admin.ipblock.IpBlockAdminService;
+import coffeeshout.admin.ops.application.OpsService;
 import coffeeshout.admin.overview.domain.DailyTrendPoint;
 import coffeeshout.admin.overview.domain.GamePlayStat;
 import coffeeshout.admin.overview.domain.OverviewStatisticsRepository;
@@ -41,6 +42,7 @@ public class OverviewService {
     private final ReportAdminService reportAdminService;
     private final ProfanityAuditService profanityAuditService;
     private final IpBlockAdminService ipBlockAdminService;
+    private final OpsService opsService;
     private final Clock clock;
 
     /** 상단의 처리 대기 큐. 0 이면 오늘 볼 게 없다는 뜻이다. */
@@ -49,7 +51,8 @@ public class OverviewService {
                 reportAdminService.countPending(),
                 countAudits(NicknameAuditStatus.FLAGGED),
                 countAudits(NicknameAuditStatus.PENDING),
-                ipBlockAdminService.getBlockedIps().size());
+                ipBlockAdminService.getBlockedIps().size(),
+                opsService.countDeadLetters());
     }
 
     /**
@@ -144,11 +147,22 @@ public class OverviewService {
                 .toList();
     }
 
-    public record ActionQueue(long pendingReports, long flaggedNicknames, long pendingNicknames, int blockedIps) {
+    /**
+     * @param deadLetters 발행·소비에 실패해 격리된 메시지. 다른 넷과 성격이 다르다.
+     *                    신고나 검열은 사람이 판단해 줄 일이고, 이건 <b>시스템이 멈춘</b>
+     *                    것이다. 정산 메시지 하나가 격리되면 그 방의 정산은 영영 안 되므로,
+     *                    0이 아닌 순간 다른 무엇보다 먼저 봐야 한다.
+     */
+    public record ActionQueue(
+            long pendingReports, long flaggedNicknames, long pendingNicknames, int blockedIps, long deadLetters) {
 
         /** 하나라도 0이 아니면 화면 상단에 강조한다. */
         public boolean hasWork() {
-            return pendingReports > 0 || flaggedNicknames > 0 || pendingNicknames > 0 || blockedIps > 0;
+            return pendingReports > 0
+                    || flaggedNicknames > 0
+                    || pendingNicknames > 0
+                    || blockedIps > 0
+                    || deadLetters > 0;
         }
     }
 

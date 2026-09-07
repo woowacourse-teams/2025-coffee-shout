@@ -34,6 +34,12 @@ export type ActionQueue = {
   flaggedNicknames: number;
   pendingNicknames: number;
   blockedIps: number;
+  /**
+   * 발행·소비에 실패해 격리된 메시지. 다른 넷과 성격이 다르다. 신고나 검열은 사람이
+   * 판단해 줄 일이고, 이건 시스템이 멈춘 것이다. 정산 메시지 하나가 격리되면 그 방의
+   * 정산은 영영 안 된다.
+   */
+  deadLetters: number;
   hasWork: boolean;
 };
 
@@ -320,4 +326,45 @@ export type EvalScenario = {
   rubric: string;
   sourceType: string;
   createdAt: string | null;
+};
+
+/* ── 시스템 운영 ─────────────────────────────────────────── */
+
+export type DeadLetterSource = 'OUTBOX' | 'SETTLEMENT';
+
+export type DeadLetter = {
+  source: DeadLetterSource;
+  id: number;
+  /** 원본을 로그에서 되짚을 때 쓰는 값. outbox 는 스트림 키, 정산은 record_id. */
+  reference: string;
+  reason: string;
+  /** 원문. 적체 건수는 Grafana 가 보여주지만 무엇이 왜 막혔는지는 이걸 봐야 안다. */
+  payload: string | null;
+  retryCount: number | null;
+  /** 서버가 정한다. 프론트가 소스별 규칙표를 따로 들면 한쪽만 고치는 날이 온다. */
+  requeueable: boolean;
+  createdAt: string;
+};
+
+export type MigrationItem = {
+  version: string | null;
+  description: string;
+  type: string;
+  installedOn: string | null;
+  success: boolean;
+  executionTimeMs: number | null;
+};
+
+export type Migrations = {
+  /** 이 환경이 Flyway 로 스키마를 관리하는지. 로컬은 ddl-auto 라 false 다. */
+  managed: boolean;
+  current: string | null;
+  records: MigrationItem[];
+};
+
+export type Deployment = {
+  version: string | null;
+  commit: string | null;
+  builtAt: string | null;
+  profile: string;
 };
