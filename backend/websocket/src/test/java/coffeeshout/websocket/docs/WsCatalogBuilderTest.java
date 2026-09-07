@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 class WsCatalogBuilderTest {
@@ -424,14 +423,14 @@ class WsCatalogBuilderTest {
 
         @MessageMapping("/test/{joinCode}/action")
         @WsTopic(path = "/test/{joinCode}/result", payload = FixturePayload.class, description = "테스트 토픽")
-        public void doAction(@DestinationVariable String joinCode, @Payload FixtureRequest request) {}
+        public void doAction(@DestinationVariable String joinCode) {}
     }
 
     static class FixtureReceiveController {
 
         @MessageMapping("/test/{joinCode}/command")
         @WsReceive(respondsOnTopics = "/test/{joinCode}/result", description = "테스트 수신 엔드포인트")
-        public void handleCommand(@DestinationVariable String joinCode, @Payload FixtureRequest request) {}
+        public void handleCommand(@DestinationVariable String joinCode) {}
     }
 
     static class FixtureGenericPublisher {
@@ -514,7 +513,7 @@ class WsCatalogBuilderTest {
 
         @MessageMapping("/test/{joinCode}/command")
         @WsReceive(respondsOnTopics = "test/{joinCode}/result")
-        public void handleCommand(@Payload FixtureRequest request) {}
+        public void handleCommand() {}
     }
 
     public record FixturePayload(String name, int value) {}

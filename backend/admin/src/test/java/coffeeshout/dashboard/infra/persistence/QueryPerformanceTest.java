@@ -383,7 +383,7 @@ class QueryPerformanceTest {
         return roomDataList;
     }
 
-    private long insertRooms(Connection conn, PreparedStatement roomStmt, List<RoomData> roomDataList, Random random)
+    private long insertRooms(Connection conn, PreparedStatement roomStmt, List<RoomData> roomDataList)
             throws Exception {
         System.out.println("  Room 생성 중...");
 
