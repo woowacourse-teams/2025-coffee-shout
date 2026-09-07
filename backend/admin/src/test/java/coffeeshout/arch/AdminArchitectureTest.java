@@ -21,12 +21,13 @@ import com.tngtech.archunit.lang.ArchRule;
  * 페이지 응답)를 정당하게 쓰고 있어 규칙과 코드가 처음부터 어긋난다. 예외를 달아 가며
  * 유지하는 규칙은 곧 아무도 안 읽게 된다.
  *
- * <p>"공용 계층({@code admin.support})은 도메인을 참조하지 않는다"도 걸어 봤지만 같은 이유로
- * 뺐다. 그 패키지의 {@code AdminViewExceptionHandler}가 Thymeleaf 컨트롤러를
- * {@code assignableTypes}로 지목하고 있어 지금도 report 와 ipblock 을 안다. 그 클래스는
- * Phase 5 에서 Thymeleaf 와 함께 사라지므로, 그때 이 규칙을 다시 검토한다.
+ * <p>"공용 계층({@code admin.support})은 도메인을 참조하지 않는다"는 한때 걸지 못했다.
+ * 그 패키지의 {@code AdminViewExceptionHandler}가 Thymeleaf 컨트롤러를
+ * {@code assignableTypes}로 지목해 report 와 ipblock 을 알고 있었기 때문이다.
+ * 그 클래스가 Thymeleaf 와 함께 사라져 이제 {@code PageResponse} 하나만 남았고,
+ * 도메인 import 가 0건이라 규칙을 걸 수 있게 됐다. 아래 마지막 규칙이 그것이다.
  *
- * <p>즉 아래 여섯 규칙이 전부다. 코드가 지키지 못하는 규칙을 예외를 달아 가며 유지하면
+ * <p>즉 아래 일곱 규칙이 전부다. 코드가 지키지 못하는 규칙을 예외를 달아 가며 유지하면
  * 곧 아무도 읽지 않는 장식이 된다.
  */
 @AnalyzeClasses(packages = "coffeeshout", importOptions = ImportOption.DoNotIncludeTests.class)
@@ -85,4 +86,19 @@ public class AdminArchitectureTest {
             .dependOnClassesThat()
             .resideInAPackage("coffeeshout.patchnote..")
             .as("report는 patchnote를 직접 참조할 수 없다");
+
+    /**
+     * 공용 계층은 도메인을 모른다.
+     *
+     * <p>{@code admin.support}는 {@code PageResponse}처럼 어느 도메인에서나 쓰는 것만 담는다.
+     * 여기서 특정 도메인을 참조하기 시작하면 그 도메인을 쓰지 않는 화면까지 같이 컴파일되고,
+     * 나중에 도메인 하나를 떼어낼 때 공용 계층이 붙잡는다.
+     */
+    @ArchTest
+    static final ArchRule support는_도메인을_참조할_수_없다 = noClasses()
+            .that()
+            .resideInAPackage("coffeeshout.admin.support..")
+            .should()
+            .dependOnClassesThat()
+            .resideInAnyPackage("coffeeshout.report..", "coffeeshout.patchnote..", "coffeeshout.dashboard..");
 }

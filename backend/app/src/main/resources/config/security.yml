@@ -45,9 +45,6 @@ security:
       - /favicon.ico
 
 admin:
-  # 기존 Thymeleaf 백오피스 전용. Phase 5(신규 SPA 전환 완료)에서 제거한다.
-  username: ${ADMIN_USERNAME}
-  password: ${ADMIN_PASSWORD}
   auth:
     # 부트스트랩 허용목록. UI로 지울 수 없는 break-glass 경로다.
     # 쉼표로 구분한다. 예: ADMIN_EMAILS=mj04300017@gmail.com,other@example.com

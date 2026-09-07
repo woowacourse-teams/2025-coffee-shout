@@ -29,8 +29,6 @@ dependencies {
     runtimeOnly(libs.jjwt.jackson)
     // Boot 4에서 RestClient 자동구성이 별도 모듈로 분리 — OAuth2 client가 RestClient.Builder를 요구
     implementation("org.springframework.boot:spring-boot-restclient")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     implementation(libs.resilience4j)
 
     annotationProcessor(variantOf(libs.querydsl.apt) { classifier("jpa") })

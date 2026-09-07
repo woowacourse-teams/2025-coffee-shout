@@ -11,6 +11,7 @@ import coffeeshout.user.application.service.AuthTokenService;
 import coffeeshout.user.domain.TokenPair;
 import coffeeshout.user.domain.User;
 import coffeeshout.user.domain.repository.UserRepository;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +33,19 @@ class SecurityConfigTest extends IntegrationTestSupport {
     AuthTokenService authTokenService;
 
     @Nested
-    class admin_체인 {
+    class 레거시_백오피스_제거 {
 
         @Test
-        void admin_엔드포인트는_비로그인_시_로그인_페이지로_리다이렉트된다() throws Exception {
-            final MvcResult result = mockMvc.perform(get("/admin")).andReturn();
+        void admin_아래_HTML_경로는_더_이상_없다() throws Exception {
+            // Thymeleaf 백오피스를 걷어냈다. 이 경로들이 살아나면 폼 로그인 체인도
+            // 같이 돌아왔다는 뜻이고, 그러면 /admin/api/** 를 그쪽이 가로챌 수 있다.
+            for (String path : List.of("/admin", "/admin/login", "/admin/profanity", "/admin/zzolbot")) {
+                final MvcResult result = mockMvc.perform(get(path)).andReturn();
 
-            assertThat(result.getResponse().getStatus())
-                    .isIn(HttpStatus.FOUND.value(), HttpStatus.MOVED_PERMANENTLY.value());
-        }
-
-        @Test
-        void admin_login_페이지는_인증_없이_접근_가능하다() throws Exception {
-            mockMvc.perform(get("/admin/login")).andExpect(status().isOk());
+                assertThat(result.getResponse().getStatus())
+                        .as("%s 는 매핑이 없어야 한다", path)
+                        .isNotIn(HttpStatus.OK.value(), HttpStatus.FOUND.value());
+            }
         }
     }
 
@@ -53,8 +54,8 @@ class SecurityConfigTest extends IntegrationTestSupport {
 
         @Test
         void 토큰_없이_호출하면_401을_반환한다() throws Exception {
-            // Thymeleaf 체인이 /admin/api/** 를 먼저 가져가면 로그인 페이지로 리다이렉트(302)된다.
-            // 401 이어야 신규 REST 체인(Order 1)이 앞에 있다는 뜻이다.
+            // 401 이어야 관리자 REST 체인이 잡았다는 뜻이다. 매처 없는 사용자 체인이
+            // 먼저 가져가면 응답이 달라진다.
             mockMvc.perform(get("/admin/api/auth/me")).andExpect(status().isUnauthorized());
         }
 

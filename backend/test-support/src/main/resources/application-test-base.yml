@@ -157,8 +157,6 @@ security:
     block-ttl: 24h
 
 admin:
-  username: admin
-  password: "1234"
   auth:
     emails: mj@zzol.site,root@zzol.site
     google-client-id: test-admin-client-id

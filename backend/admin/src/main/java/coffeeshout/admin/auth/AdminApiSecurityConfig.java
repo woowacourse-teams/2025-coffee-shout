@@ -18,12 +18,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * 신규 백오피스 SPA(admin-web)가 쓰는 REST 체인.
  *
- * <p>기존 Thymeleaf 백오피스({@link AdminSecurityConfig}, {@code @Order(2)})와 <b>따로 둔다.</b>
- * 한 체인에서 세션과 stateless 를 섞을 수 없고, 무엇보다 전환 기간에 두 백오피스가
- * 동시에 살아 있어야 운영 공백이 생기지 않는다. Thymeleaf 쪽은 Phase 5 에서 걷어낸다.
+ * <p>한때 Thymeleaf 백오피스 체인이 {@code @Order(2)}로 함께 있었다. 신규 SPA 로 넘어오면서
+ * 걷어냈고, 이제 관리자 경로를 지키는 체인은 이것 하나다.
  *
  * <p>필터 체인 순서: 0 = ws-catalog·internal webhook, <b>1 = admin API</b>,
- * 2 = admin Thymeleaf(레거시), 3 = user(매처 없는 fallback).
+ * 3 = user(매처 없는 fallback). 2번은 비어 있다 - 번호를 당기지 않는 이유는,
+ * 순서 값이 곧 이 파일들 사이의 약속이라 다시 매기면 전부 고쳐야 하기 때문이다.
  */
 @Configuration
 @RequiredArgsConstructor
