@@ -40,7 +40,22 @@ public class AdminAuditLogService {
             adminAuditLogRepository.save(
                     AdminAuditLog.of(actorEmail, action, targetType, targetId, detail, result, clock.instant()));
         } catch (Exception e) {
-            log.error("관리자 감사 로그 기록 실패: actor={} action={} result={}", actorEmail, action, result, e);
+            log.error("관리자 감사 로그 기록 실패: actor={} action={} result={}", forLog(actorEmail), forLog(action), result, e);
         }
+    }
+
+    /**
+     * 로그에 넣기 전에 줄바꿈을 지운다.
+     *
+     * <p>값에 개행이 들어 있으면 로그 한 줄이 여러 줄로 쪼개지고, 그 틈에 진짜처럼 생긴
+     * 가짜 로그 줄을 끼워 넣을 수 있다. 하필 이 자리는 <b>감사 로그가 실패했을 때</b> 남기는
+     * 마지막 흔적이라, 여기가 오염되면 무슨 일이 있었는지 되짚을 방법이 사라진다.
+     *
+     * <p>{@code actorEmail} 은 검증된 구글 토큰에서 오고 {@code action} 은 서버가 정한 매핑
+     * 패턴이라 지금은 개행이 들어올 경로가 없다. 다만 이 메서드는 조치가 <b>실패한</b> 경로에서
+     * 불리고, 그때 어떤 값이 넘어오는지는 호출부가 늘어날수록 보장하기 어려워진다.
+     */
+    private static String forLog(String value) {
+        return value == null ? null : value.replaceAll("[\\r\\n]", "_");
     }
 }

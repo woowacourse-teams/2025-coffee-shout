@@ -9,7 +9,7 @@
 
 ## 0. 전체 그림
 
-```
+```text
 [1] admin-web            구글 로그인 팝업 → ID 토큰 (구글이 서명한 JWT)
 [2] POST /admin/api/auth/login  { idToken }
 [3] 서버                  구글 JWKS로 서명 검증

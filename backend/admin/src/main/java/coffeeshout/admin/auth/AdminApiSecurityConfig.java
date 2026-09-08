@@ -49,7 +49,15 @@ public class AdminApiSecurityConfig {
                 // SPA 가 "토큰 재발급하면 되는 상황"과 "권한이 없어 소용없는 상황"을 구분하지 못한다.
                 .exceptionHandling(handling ->
                         handling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                // 토큰 인증이라 세션 쿠키가 없다. CSRF 는 쿠키 자동 전송이 있을 때의 문제다.
+                // CSRF 를 끈다. CodeQL 이 java/spring-disabled-csrf-protection 으로 잡지만 오탐이다.
+                //
+                // CSRF 는 브라우저가 자격증명을 <b>자동으로</b> 실어 보낼 때 성립한다. 이 체인은
+                // 세션이 없고(STATELESS), 토큰을 Authorization 헤더로만 읽으며, SPA 는 그 토큰을
+                // 쿠키가 아니라 localStorage 에 둔다. 다른 오리진의 스크립트는 그 값을 읽을 수 없고
+                // 헤더를 대신 붙여 줄 수도 없다. 실어 보낼 것이 없으니 위조할 요청도 없다.
+                //
+                // 반대로 켜면 SPA 가 매 요청마다 토큰을 받아 되돌려주는 왕복을 해야 하는데,
+                // 얻는 것이 없다. 쿠키 인증으로 바꾸는 날에는 이 줄부터 되돌려야 한다.
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
