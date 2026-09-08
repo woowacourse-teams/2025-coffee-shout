@@ -8,8 +8,8 @@ import coffeeshout.fixture.ProfanityWordFixture;
 import coffeeshout.profanity.domain.Language;
 import coffeeshout.profanity.domain.ProfanityWord;
 import coffeeshout.profanity.domain.ProfanityWordRepository;
-import coffeeshout.profanity.domain.WordSource;
 import coffeeshout.profanity.domain.TextNormalizer;
+import coffeeshout.profanity.domain.WordSource;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,10 +25,8 @@ class ProfanityFilterServiceTest {
         wordRepository = mock(ProfanityWordRepository.class);
         service = new ProfanityFilterService(wordRepository, new TextNormalizer());
 
-        given(wordRepository.findAllActive()).willReturn(List.of(
-                ProfanityWordFixture.한국어_수동_욕설(),
-                ProfanityWordFixture.영어_LDNOOBW_욕설()
-        ));
+        given(wordRepository.findAllActive())
+                .willReturn(List.of(ProfanityWordFixture.한국어_수동_욕설(), ProfanityWordFixture.영어_LDNOOBW_욕설()));
         service.init();
     }
 
@@ -90,9 +88,8 @@ class ProfanityFilterServiceTest {
 
         @Test
         void 트라이_재구성_후_새로운_단어를_감지한다() {
-            given(wordRepository.findAllActive()).willReturn(List.of(
-                    new ProfanityWord("신규욕설", Language.KOREAN, WordSource.MANUAL, true)
-            ));
+            given(wordRepository.findAllActive())
+                    .willReturn(List.of(new ProfanityWord("신규욕설", Language.KOREAN, WordSource.MANUAL, true)));
             service.rebuildTrie();
 
             assertThat(service.contains("이건 신규욕설이야")).isTrue();
