@@ -15,7 +15,6 @@ import { cn } from '@/lib/cn';
  */
 const ACTION_LABEL: Record<string, string> = {
   'POST /admin/api/auth/login': '로그인',
-  'POST /admin/api/auth/dev-login': '로컬 로그인',
   'POST /admin/api/accounts': '관리자 추가',
   'DELETE /admin/api/accounts/{id}': '관리자 삭제',
   'DELETE /admin/api/ip-blocks/{ip}': 'IP 차단 해제',

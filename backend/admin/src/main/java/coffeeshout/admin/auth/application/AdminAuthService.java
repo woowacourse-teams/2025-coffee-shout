@@ -30,17 +30,6 @@ public class AdminAuthService {
         return issueForAllowed(socialIdTokenVerifier.verifyAndExtractEmail(idToken));
     }
 
-    /**
-     * local 프로필 전용. 구글 검증 없이 허용목록만으로 토큰을 발급한다.
-     *
-     * <p>이 경로는 컨트롤러가 {@code @Profile("local")}로 막고, 시큐리티 설정도 local 에서만
-     * 공개 경로로 등록한다. 서버 프로필과 컨트롤러 등록 두 겹으로 잠근다.
-     */
-    public String devLogin(String rawEmail) {
-        log.warn("dev-login 으로 관리자 토큰 발급 시도: email={}", rawEmail);
-        return issueForAllowed(rawEmail);
-    }
-
     private String issueForAllowed(String rawEmail) {
         // 형식이 어긋난 값도 목록에 없는 값과 같은 응답을 준다. 둘을 구분해 주면
         // 어떤 이메일이 형식만 맞는지 훑어 관리자 계정을 좁혀 갈 수 있다.

@@ -112,6 +112,9 @@ export async function renderGoogleButton(
     text: 'signin_with',
     shape: 'rectangular',
     locale: 'ko',
+    // 폭을 재서 넘긴다. GSI 는 CSS 로 늘릴 수 없고 px 숫자만 받는다. 안 넘기면 버튼이
+    // 내용 폭만큼만 그려져 카드 안에서 혼자 좁아 보인다. 구글이 받는 상한은 400 이다.
+    width: Math.min(parent.clientWidth || 320, 400),
   });
 }
 

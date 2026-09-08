@@ -93,26 +93,4 @@ class AdminAuthServiceTest {
             then(adminTokenIssuer).should(never()).issue(any());
         }
     }
-
-    @Nested
-    class devLogin {
-
-        @Test
-        void 구글_검증_없이_허용목록만으로_발급한다() {
-            given(adminAccountService.isAllowed(MJ)).willReturn(true);
-            given(adminTokenIssuer.issue(MJ)).willReturn("admin-token");
-
-            assertThat(adminAuthService.devLogin("mj@zzol.site")).isEqualTo("admin-token");
-            then(socialIdTokenVerifier).should(never()).verifyAndExtractEmail(any());
-        }
-
-        @Test
-        void 허용목록_검사는_그대로_적용한다() {
-            // 로컬이라고 아무 이메일이나 되는 것은 아니다.
-            given(adminAccountService.isAllowed(STRANGER)).willReturn(false);
-
-            assertCoffeeShoutException(
-                    () -> adminAuthService.devLogin("stranger@evil.site"), AdminAccountErrorCode.NOT_ADMIN);
-        }
-    }
 }

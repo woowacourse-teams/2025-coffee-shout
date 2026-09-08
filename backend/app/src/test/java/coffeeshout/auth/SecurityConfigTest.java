@@ -86,9 +86,10 @@ class SecurityConfigTest extends IntegrationTestSupport {
         }
 
         @Test
-        void dev_login은_test_프로필에_존재하지_않는다() throws Exception {
-            // local 프로필에서만 컨트롤러가 등록된다. 배포 환경에 이 경로가 살아 있으면
-            // 허용목록에 있는 이메일만으로 구글 검증 없이 관리자 토큰이 나온다.
+        void dev_login_경로는_어느_프로필에도_없다() throws Exception {
+            // 한때 local 프로필에서만 열리는 dev-login 이 있었다. 구글 검증을 건너뛰고
+            // 허용목록만 보는 경로라, 프로필을 잘못 띄우면 그대로 인증 우회가 된다.
+            // 프로필로 잠그는 대신 경로 자체를 없앴다. 되살아나면 여기서 걸린다.
             mockMvc.perform(post("/admin/api/auth/dev-login")
                             .contentType("application/json")
                             .content("{\"email\":\"mj@zzol.site\"}"))

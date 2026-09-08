@@ -15,7 +15,6 @@ type AuthContextValue = AuthState & {
   /** 구글 ID 토큰을 관리자 토큰으로 교환한다. */
   loginWithGoogle: (idToken: string) => Promise<void>;
   /** local 프로필 전용 우회 경로. 구글 클라이언트 없이 개발할 때 쓴다. */
-  loginWithDevEmail: (email: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -68,11 +67,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [exchange],
   );
 
-  const loginWithDevEmail = useCallback(
-    (email: string) => exchange(() => api.post<AdminToken>('/auth/dev-login', { email })),
-    [exchange],
-  );
-
   const logout = useCallback(() => {
     clearToken();
     // 다음 로그인에서 계정 선택 화면이 다시 뜨게 한다. 이것을 안 하면 방금 로그아웃한
@@ -82,8 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ ...state, loginWithGoogle, loginWithDevEmail, logout }),
-    [state, loginWithGoogle, loginWithDevEmail, logout],
+    () => ({ ...state, loginWithGoogle, logout }),
+    [state, loginWithGoogle, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

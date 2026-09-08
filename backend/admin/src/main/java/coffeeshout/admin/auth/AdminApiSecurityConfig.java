@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,11 +30,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class AdminApiSecurityConfig {
 
     private static final String LOGIN_PATH = "/admin/api/auth/login";
-    private static final String DEV_LOGIN_PATH = "/admin/api/auth/dev-login";
-    private static final String LOCAL_PROFILE = "local";
 
     private final AdminTokenIssuer adminTokenIssuer;
-    private final Environment environment;
 
     @Bean
     @Order(1)
@@ -63,13 +59,16 @@ public class AdminApiSecurityConfig {
     }
 
     /**
-     * dev-login 은 local 프로필에서만 공개한다. 컨트롤러의 {@code @Profile("local")}과 합쳐
-     * 두 겹으로 잠근다. 배포 환경에는 엔드포인트도 없고 공개 경로도 아니다.
+     * 인증 없이 열어 두는 경로. <b>로그인 하나뿐이다.</b>
+     *
+     * <p>한때 {@code local} 프로필에서만 열리는 dev-login 이 여기 있었다. 구글 검증을
+     * 건너뛰고 허용목록만 보는 경로였는데 걷어냈다. 프로필로 잠그는 것은 프로필을
+     * 잘못 띄우는 순간 무력해진다 - 경로 자체가 없으면 그 실수가 성립하지 않는다.
+     *
+     * <p>로컬에서도 실제 구글 로그인을 쓴다. 승인된 자바스크립트 원본에
+     * {@code http://localhost:5173} 이 들어 있어 그대로 된다.
      */
     private String[] publicPaths() {
-        if (environment.matchesProfiles(LOCAL_PROFILE)) {
-            return new String[] {LOGIN_PATH, DEV_LOGIN_PATH};
-        }
         return new String[] {LOGIN_PATH};
     }
 }
