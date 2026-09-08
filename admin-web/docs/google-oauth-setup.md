@@ -45,7 +45,7 @@
 | --- | --- |
 | 애플리케이션 유형 | **웹 애플리케이션** |
 | 이름 | `zzol-admin` (구분되게) |
-| 승인된 자바스크립트 원본 | `http://localhost:5173`<br>`https://admin.zzol.site`<br>`https://dev-admin.zzol.site` |
+| 승인된 자바스크립트 원본 | `http://localhost:5173`<br>`https://admin.zzol.site`<br>`https://admin.dev.zzol.site` |
 | 승인된 리디렉션 URI | **비워 둔다** |
 
 ### 도메인
@@ -53,12 +53,16 @@
 | 환경 | 도메인 |
 | --- | --- |
 | 로컬 | `http://localhost:5173` (Vite 기본 포트) |
-| dev | `https://dev-admin.zzol.site` |
+| dev | `https://admin.dev.zzol.site` |
 | prod | `https://admin.zzol.site` |
 
-dev 를 `dev.admin.zzol.site`가 아니라 **`dev-admin.zzol.site`** 로 둔다. 점으로 한 단계 더 내려가면
-`*.zzol.site` 와일드카드 인증서가 덮지 못해(와일드카드는 한 레벨만 매칭) 인증서를 따로 발급해야 한다.
-하이픈이면 같은 레벨이라 기존 와일드카드로 끝난다.
+dev 는 **`admin.dev.zzol.site`** 다. 나머지 dev 주소가 `dev.zzol.site`, `dev.api.zzol.site` 처럼
+환경을 한 레벨로 떼어 놓고 있어 그쪽에 맞췄다.
+
+**인증서를 따로 챙겨야 한다.** `*.zzol.site` 와일드카드는 한 레벨만 매칭하므로
+`admin.dev.zzol.site` 를 덮지 못한다. `*.dev.zzol.site` 를 따로 발급하거나 ACM SAN 에 이 주소를
+직접 넣는다. 하이픈(`dev-admin.zzol.site`)이면 같은 레벨이라 기존 와일드카드로 끝났겠지만,
+주소 체계의 일관성을 택했다.
 
 dev 와 prod 를 한 클라이언트에 함께 등록했다. `aud` 검증은 <b>환경 경계가 아니라 서비스 경계</b>를
 지키는 장치이고(서비스 로그인용 토큰이 백오피스로 넘어오는 것을 막는 것), 환경 사이의 실제 경계는
