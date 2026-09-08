@@ -15,9 +15,11 @@ public interface NicknameAuditJpaRepository extends Repository<NicknameAudit, Lo
 
     @Override
     @Modifying
-    @Query(value = "INSERT INTO player_name_audit (player_name, status, created_at) "
-            + "VALUES (:nickname, 'UNAUDITED', :createdAt) "
-            + "ON DUPLICATE KEY UPDATE id = id", nativeQuery = true)
+    @Query(
+            value = "INSERT INTO player_name_audit (player_name, status, created_at) "
+                    + "VALUES (:nickname, 'UNAUDITED', :createdAt) "
+                    + "ON DUPLICATE KEY UPDATE id = id",
+            nativeQuery = true)
     void insertUnaudited(@Param("nickname") String nickname, @Param("createdAt") Instant createdAt);
 
     @Override

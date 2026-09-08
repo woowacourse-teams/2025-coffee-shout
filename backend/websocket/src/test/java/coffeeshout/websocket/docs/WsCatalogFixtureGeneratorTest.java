@@ -18,9 +18,7 @@ import org.springframework.http.ResponseEntity;
 @DisplayName("WsCatalog fixture 생성")
 class WsCatalogFixtureGeneratorTest extends WebsocketModuleRandomPortTest {
 
-    private static final Path FIXTURE_PATH = Path.of(
-            "src", "test", "resources", "__fixtures__", "ws-catalog.json"
-    );
+    private static final Path FIXTURE_PATH = Path.of("src", "test", "resources", "__fixtures__", "ws-catalog.json");
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -42,9 +40,8 @@ class WsCatalogFixtureGeneratorTest extends WebsocketModuleRandomPortTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
 
-        final String json = objectMapper.copy()
-                .enable(SerializationFeature.INDENT_OUTPUT)
-                .writeValueAsString(response.getBody());
+        final String json =
+                objectMapper.copy().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(response.getBody());
         return json + "\n";
     }
 }

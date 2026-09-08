@@ -17,7 +17,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProfanityFilterService implements ProfanityChecker {
 
-    private final AtomicReference<Trie> trieRef = new AtomicReference<>(Trie.builder().build());
+    private final AtomicReference<Trie> trieRef =
+            new AtomicReference<>(Trie.builder().build());
 
     private final ProfanityWordRepository wordRepository;
     private final TextNormalizer textNormalizer;
