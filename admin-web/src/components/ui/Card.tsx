@@ -2,18 +2,23 @@ import type { ComponentProps, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 /**
- * 카드. 그림자가 없다.
+ * 카드. 캔버스 위에 떠 있는 위젯이다.
  *
- * 표가 많은 화면에서 그림자는 노이즈다. 층위는 1px 경계선과 배경 톤 차이로 만들고,
- * 그림자는 실제로 떠 있는 것(드롭다운, 다이얼로그)에만 쓴다.
+ * <p>한때 그림자를 쓰지 않고 1px 경계선만으로 층위를 만들었다. 표가 많은 화면에서
+ * 그림자가 노이즈라고 봤기 때문인데, 실제로 만들어 놓고 보니 화면이 <b>문서처럼</b>
+ * 읽혔다. 카드가 바닥에 붙어 있으면 그 안의 표와 카드 사이에 경계가 안 생긴다.
+ *
+ * <p>그래서 뒤집었다. 대신 그림자를 아주 얕게 둬서(0.04, 0.06) 카드가 뜨긴 하되
+ * 시선을 끌지는 않게 했다. 경계선은 남긴다 - 그림자만으로는 흰 카드와 밝은 캔버스의
+ * 경계가 화면 밝기를 낮춘 환경에서 사라진다.
+ *
+ * <p>밀도는 잃지 않았다. 표는 {@code CardBody} 가 아니라 카드 직속으로 들어가므로
+ * 아래에서 늘린 여백이 행 높이에 닿지 않는다.
  */
 export function Card({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      className={cn(
-        'rounded-lg border border-border-default bg-surface',
-        className,
-      )}
+      className={cn('rounded-lg border border-border-default bg-surface shadow-card', className)}
       {...props}
     />
   );
@@ -30,10 +35,9 @@ type CardHeaderProps = {
 export function CardHeader({ title, description, actions, className }: CardHeaderProps) {
   return (
     <div
-      className={cn(
-        'flex items-start justify-between gap-3 border-b border-border-default px-4 py-3',
-        className,
-      )}
+      // 구분선을 긋지 않는다. 카드를 가로지르는 선은 그 자체로 "표의 머리글"처럼 읽혀서
+      // 위젯이 아니라 문서 한 장으로 보이게 만든다. 제목과 본문은 여백으로 나눈다.
+      className={cn('flex items-start justify-between gap-3 px-5 pb-3 pt-5', className)}
     >
       <div className="min-w-0">
         <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
@@ -47,5 +51,5 @@ export function CardHeader({ title, description, actions, className }: CardHeade
 }
 
 export function CardBody({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('p-4', className)} {...props} />;
+  return <div className={cn('px-5 pb-5', className)} {...props} />;
 }

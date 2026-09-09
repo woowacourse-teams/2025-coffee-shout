@@ -68,8 +68,11 @@ export function AdminLayout() {
     <div className="min-h-screen bg-canvas">
       <Rail />
 
-      <div className="pl-rail">
-        <header className="sticky top-0 z-10 flex h-topbar items-center justify-between gap-3 border-b border-border-default bg-surface/85 px-6 backdrop-blur">
+      <div className="pl-rail-offset">
+        {/* 캔버스 위에 그대로 얹는다. 흰 바탕에 경계선을 두면 상단 바가 또 하나의 카드처럼
+          * 보여서, 정작 봐야 할 카드들과 같은 무게를 갖는다. 스크롤할 때 글자가 겹치지
+          * 않도록 캔버스 색 반투명 배경과 블러만 남긴다. */}
+        <header className="sticky top-0 z-10 flex h-topbar items-center justify-between gap-3 bg-canvas/80 px-6 backdrop-blur">
           <h1 className="text-sm font-semibold tracking-tight text-ink">
             {current?.label ?? '백오피스'}
           </h1>
@@ -109,18 +112,22 @@ function Rail() {
   return (
     <nav
       aria-label="주 메뉴"
-      className="fixed inset-y-0 left-0 z-20 flex w-rail flex-col border-r border-rail-line bg-rail"
+      // 화면에 붙은 세로 슬래브가 아니라 캔버스 위에 떠 있는 패널이다.
+      // 가장자리에서 12px 떼어 두면 레일도 카드와 같은 종류의 물체로 읽혀서,
+      // 화면 전체가 한 장의 문서가 아니라 위젯이 놓인 판처럼 보인다.
+      className="fixed inset-y-rail-inset left-rail-inset z-20 flex w-rail flex-col overflow-hidden rounded-lg border border-rail-line bg-rail shadow-card"
     >
       {/* 워드마크만 둔다. 캐릭터까지 붙이면 좁은 레일 머리에 그래픽이 두 개가 되어 번잡하다.
        * 캐릭터는 파비콘으로만 쓴다. 탭에서는 정사각형 마크가 필요하기 때문이다.
        *
-       * 상단 바와 같은 높이(56px)에 아래 경계선까지 맞춰 가로선이 화면을 한 줄로 가로지른다. */}
-      <div className="flex h-topbar shrink-0 items-center gap-2.5 border-b border-rail-line px-5">
+       * 구분선을 뺐다. 레일이 떠 있는 패널이 되면서 "화면을 한 줄로 가로지르는 선"이
+       * 애초에 성립하지 않는다. 패널 안에 선을 그으면 그 패널만 두 칸으로 쪼개 보인다. */}
+      <div className="flex h-topbar shrink-0 items-center gap-2.5 px-4">
         <img src="/brand/logo.svg" alt="ZZOL" className="h-[18px]" />
         <span className="text-2xs font-medium tracking-wide text-ink-muted">백오피스</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-4">
+      <div className="flex-1 overflow-y-auto px-3 pb-4">
         {NAV.map((group) => (
           <div key={group.heading} className="mt-5 first:mt-0">
             <p className="px-2 pb-2 text-2xs font-semibold tracking-wider text-rail-ink-heading">

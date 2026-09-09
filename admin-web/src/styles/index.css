@@ -81,10 +81,13 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
 
+  --shadow-card: var(--shadow-card);
   --shadow-popover: var(--shadow-popover);
   --shadow-dialog: var(--shadow-dialog);
 
   --spacing-rail: var(--rail-width);
+  --spacing-rail-offset: var(--rail-offset);
+  --spacing-rail-inset: var(--rail-inset);
   --spacing-topbar: var(--topbar-height);
   --spacing-row: var(--row-height);
   --spacing-row-compact: var(--row-height-compact);
