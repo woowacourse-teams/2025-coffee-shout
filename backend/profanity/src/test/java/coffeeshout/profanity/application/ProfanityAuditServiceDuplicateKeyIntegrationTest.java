@@ -39,7 +39,9 @@ class ProfanityAuditServiceDuplicateKeyIntegrationTest extends IntegrationTestSu
         // 기존 (host, CLEAN)과 충돌하므로, 승격 대신 중복 재등록으로 인지해 제거하고 예외 없이 큐를 비워야 한다.
         assertThatCode(service::auditPending).doesNotThrowAnyException();
 
-        assertThat(auditRepository.countByStatusAndAuditedAtIsNull(NicknameAuditStatus.UNAUDITED)).isZero();
-        assertThat(auditRepository.findNicknamesByStatus(NicknameAuditStatus.CLEAN)).containsOnly("host");
+        assertThat(auditRepository.countByStatusAndAuditedAtIsNull(NicknameAuditStatus.UNAUDITED))
+                .isZero();
+        assertThat(auditRepository.findNicknamesByStatus(NicknameAuditStatus.CLEAN))
+                .containsOnly("host");
     }
 }
