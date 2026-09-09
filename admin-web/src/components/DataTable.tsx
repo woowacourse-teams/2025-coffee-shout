@@ -96,6 +96,9 @@ export function DataTable<T>({
       <table className="w-full border-collapse text-sm">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
+            // 회색 띠를 걷어냈다. 카드가 이미 흰 판이라 그 안에 또 다른 색면을 두면
+            // 표가 카드 안에 낀 다른 물체처럼 보인다. 머리글과 본문은 굵기와 크기가
+            // 이미 다르므로 아래 경계선 하나면 갈린다.
             <tr key={headerGroup.id} className="border-b border-border-default">
               {headerGroup.headers.map((header) => {
                 const meta = header.column.columnDef.meta;
@@ -108,7 +111,7 @@ export function DataTable<T>({
                     scope="col"
                     style={meta?.width ? { width: meta.width } : undefined}
                     className={cn(
-                      'whitespace-nowrap bg-subtle/60 px-3 py-2 text-2xs font-semibold tracking-wide text-ink-muted',
+                      'whitespace-nowrap px-3 pb-2 pt-1 text-2xs font-semibold tracking-wide text-ink-muted',
                       'first:pl-5 last:pr-5',
                       meta?.align === 'right' ? 'text-right' : 'text-left',
                     )}

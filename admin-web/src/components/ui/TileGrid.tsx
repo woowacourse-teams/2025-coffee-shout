@@ -36,12 +36,18 @@ export function TileGrid({
  * <p>격자 없이 자리 표시만 낸다. 실패 자리를 {@code Loaded} 에 넘길 때 격자 안쪽에
  * 들어가는 경우가 있어서다. 격자가 필요하면 감싸는 쪽이 {@link TileGrid} 로 감싼다.
  */
-export function TileSkeletons({ count = 4 }: { count?: number }) {
+export function TileSkeletons({
+  count = 4,
+  height = 'h-[6.25rem]',
+}: {
+  count?: number;
+  /** 실제 타일 높이와 같게 준다. 어긋나면 데이터가 올 때 화면이 튄다. */
+  height?: string;
+}) {
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
-        // 실제 타일 높이와 같다. 데이터가 와도 화면이 튀지 않는다.
-        <Skeleton key={index} className="h-[6.25rem] rounded-lg" />
+        <Skeleton key={index} className={cn('rounded-lg', height)} />
       ))}
     </>
   );

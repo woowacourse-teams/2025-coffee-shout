@@ -60,7 +60,8 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
       <div className="relative shrink-0" style={{ width: height, height }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -106,28 +107,45 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
       </div>
 
       {/* 범례가 곧 표다. 색 옆에 이름과 값과 비율을 함께 적어 두면 조각에 마우스를
-        * 올리지 않고도 읽힌다. 조각에 직접 라벨을 붙이면 작은 조각에서 글자가 겹친다. */}
-      <ul className="flex min-w-0 flex-1 flex-col gap-2">
+        * 올리지 않고도 읽힌다. 조각에 직접 라벨을 붙이면 작은 조각에서 글자가 겹친다.
+        *
+        * 세로 목록이 아니라 <b>가로 세 칸</b>이다. 세로로 쌓았더니 카드가 본문 폭 전체를
+        * 쓰는 자리라 이름은 왼쪽 끝, 숫자는 오른쪽 끝으로 갈려 그 사이 700px 가 비었다.
+        * 항목이 셋뿐이라 나란히 놓으면 그 폭이 그대로 채워지고, 세 값을 좌우로 비교하는
+        * 것이 도넛의 조각을 비교하는 것과 같은 방향이 된다. */}
+      <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
         {slices.map((slice) => (
-          <li key={slice.key} className="flex items-center gap-2.5">
-            {/* 조각과 같은 이유로 테두리를 둔다. 카카오 노랑 사각형은 테두리가 없으면
-              * 흰 바탕에서 아예 안 보인다. */}
-            <Swatch color={slice.color} bordered />
-            <span className="min-w-0 flex-1 truncate text-xs text-ink">{slice.name}</span>
-            <span className="shrink-0 text-xs tabular-nums">
-              <span className="font-semibold text-ink">{formatNumber(slice.value)}</span>
-              <span className="ml-1.5 text-ink-muted">
+          <div
+            key={slice.key}
+            className="flex flex-col gap-2 rounded-md border border-border-default px-4 py-3"
+          >
+            <span className="flex items-center gap-2">
+              {/* 조각과 같은 이유로 테두리를 둔다. 카카오 노랑 사각형은 테두리가 없으면
+                * 흰 바탕에서 아예 안 보인다. */}
+              <Swatch color={slice.color} bordered />
+              <span className="min-w-0 truncate text-xs font-medium text-ink-secondary">
+                {slice.name}
+              </span>
+            </span>
+            <span className="flex items-baseline gap-1.5 tabular-nums">
+              <span className="text-xl font-bold leading-none tracking-metric text-ink">
+                {formatNumber(slice.value)}
+              </span>
+              <span className="text-xs text-ink-muted">
                 {total === 0 ? '-' : formatPercent(slice.value / total, 0)}
               </span>
             </span>
-          </li>
+          </div>
         ))}
+      </div>
+      </div>
 
-        <li className="mt-1 text-2xs leading-relaxed text-ink-muted">
-          연결 {formatNumber(total)}건, 회원 {formatNumber(stats.userCount)}명. 한 사람이 여러
-          소셜을 연결할 수 있어 두 숫자는 맞지 않습니다.
-        </li>
-      </ul>
+      {/* 단서는 범례 안이 아니라 카드 바닥에 한 줄로 둔다. 범례 목록의 마지막 항목처럼
+        * 놓여 있으면 네 번째 제공자로 잘못 읽힌다. */}
+      <p className="text-2xs leading-relaxed text-ink-muted">
+        연결 {formatNumber(total)}건, 회원 {formatNumber(stats.userCount)}명. 한 사람이 여러
+        소셜을 연결할 수 있어 두 숫자는 맞지 않습니다.
+      </p>
     </div>
   );
 }

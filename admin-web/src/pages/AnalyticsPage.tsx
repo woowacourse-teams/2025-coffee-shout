@@ -122,10 +122,10 @@ export function AnalyticsPage() {
         </CardBody>
       </Card>
 
-      {/* 퍼널을 넓게 잡는다. 단계 이름과 막대와 전환율이 한 줄에 들어가야 하는데
-        * 반반으로 나누면 막대 자리가 먼저 줄어 길이 비교가 안 된다. 게임별 목록은
-        * 이름과 숫자뿐이라 좁아도 읽힌다. */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)]">
+      {/* 홈과 같은 분할이다(넓은 쪽 2, 좁은 쪽 1). 퍼널은 단계 이름과 막대와 전환율이
+        * 한 줄에 들어가야 해서 넓은 쪽이 맞고, 게임별 목록은 이름과 숫자뿐이라 좁아도
+        * 읽힌다. 화면마다 비율을 따로 정하면 메뉴를 옮길 때 카드 모서리가 움직인다. */}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
         <Card>
           <CardHeader
             title="방 진행 퍼널"
