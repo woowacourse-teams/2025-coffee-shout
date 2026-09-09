@@ -131,8 +131,10 @@ dataviz 검증기 인접쌍 분리는 전 항목 통과. 최악 인접쌍은 pro
 | 본문 | `text-sm` | 표 셀, 문단 |
 | 보조 | `text-xs text-ink-secondary` | 라벨, 설명 |
 | 미세 | `text-2xs text-ink-muted` | 배지, 표 헤더, 힌트 |
-| 큰 숫자 | `text-2xl font-bold leading-none tracking-metric` | `StatCard`, `QueueCard`, 강조 값 |
-| 줄 안 숫자 | `text-xl font-bold leading-none tracking-metric` | `MetricRow` |
+| 타일 숫자 | `text-2xl font-bold leading-none tracking-metric` | `Tile`, `QueueCard`, 방 상세 머리 |
+| 줄 안 숫자 | `text-xl font-bold leading-none tracking-metric` | 목록 줄의 값, 도넛 가운데 |
+
+숫자 크기는 둘뿐이고 기준은 **무엇 안에 있는가**다. 자기 칸을 가진 타일이면 24px, 목록 줄이나 그림 안에 얹히면 20px. 값이 길다고 한 곳만 줄이지 않는다 - 나란히 선 칸들의 시선 높이가 어긋난다.
 
 굵기는 셋뿐이다. `medium`(라벨), `semibold`(제목), `bold`(숫자). 그 사이 단계를 새로 쓰지 않는다.
 

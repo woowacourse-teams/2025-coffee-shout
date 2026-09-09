@@ -35,7 +35,7 @@ export function Pagination({
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 border-t border-border-default px-3 py-2',
+        'flex items-center justify-between gap-3 border-t border-border-default px-5 py-2.5',
         className,
       )}
     >

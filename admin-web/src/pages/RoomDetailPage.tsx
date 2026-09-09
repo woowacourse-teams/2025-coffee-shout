@@ -110,7 +110,7 @@ export function RoomDetailPage() {
         ) : (
           <ul className="divide-y divide-border-default">
             {players.map((player) => (
-              <li key={player.id} className="flex items-center gap-3 px-4 py-2.5">
+              <li key={player.id} className="flex items-center gap-3 px-5 py-2.5">
                 <span className="w-40 truncate font-medium text-ink">{player.playerName}</span>
                 {player.playerType === 'HOST' && <StatusBadge tone="neutral">방장</StatusBadge>}
                 {player.guest ? (

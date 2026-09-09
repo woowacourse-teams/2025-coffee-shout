@@ -106,7 +106,7 @@ export function ZzolBotChatPanel() {
           )}
         </CardBody>
 
-        <form onSubmit={submit} className="flex gap-2 border-t border-border-default p-4">
+        <form onSubmit={submit} className="flex gap-2 border-t border-border-default p-5">
           <Input
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
@@ -141,7 +141,7 @@ export function ZzolBotChatPanel() {
         ) : (
           <ul className="divide-y divide-border-default">
             {sessions.data?.map((session) => (
-              <li key={session.id} className="px-4 py-3">
+              <li key={session.id} className="px-5 py-3">
                 <p className="line-clamp-2 text-xs text-ink">{session.question}</p>
                 <p className="mt-1 flex items-center gap-2 text-2xs text-ink-muted">
                   {session.createdAt}

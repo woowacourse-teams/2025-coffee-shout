@@ -72,7 +72,11 @@ export function DataTable<T>({
 
   return (
     /* 넓은 표는 자기 컨테이너 안에서 가로 스크롤한다. 페이지가 통째로 밀리면
-     * 좌측 레일과 헤더까지 함께 움직여 화면이 무너진다. */
+     * 좌측 레일과 헤더까지 함께 움직여 화면이 무너진다.
+     *
+     * 셀 좌우 여백은 12px 인데 <b>맨 앞뒤 열만 20px</b>이다. 12px 로 통일하면 표의 첫
+     * 글자가 카드 제목보다 8px 안쪽에서 시작해 카드가 어긋나 보이고, 20px 로 통일하면
+     * 열이 많은 표에서 가로 스크롤이 그만큼 빨리 생긴다. 정렬이 필요한 것은 바깥 모서리뿐이다. */
     <div className={cn('overflow-x-auto', className)}>
       <table className="w-full border-collapse text-sm">
         <thead>
@@ -90,6 +94,7 @@ export function DataTable<T>({
                     style={meta?.width ? { width: meta.width } : undefined}
                     className={cn(
                       'whitespace-nowrap bg-subtle/60 px-3 py-2 text-2xs font-semibold tracking-wide text-ink-muted',
+                      'first:pl-5 last:pr-5',
                       meta?.align === 'right' ? 'text-right' : 'text-left',
                     )}
                   >
@@ -137,7 +142,7 @@ export function DataTable<T>({
             Array.from({ length: skeletonRows }).map((_, rowIndex) => (
               <tr key={rowIndex} className="border-b border-border-default">
                 {columns.map((_column, columnIndex) => (
-                  <td key={columnIndex} className="h-row px-3">
+                  <td key={columnIndex} className="h-row px-3 first:pl-5 last:pr-5">
                     <Skeleton
                       className="h-3"
                       // 폭을 조금씩 다르게 두면 실제 내용처럼 보여 로딩이 덜 답답하다.
@@ -165,6 +170,7 @@ export function DataTable<T>({
                       key={cell.id}
                       className={cn(
                         'h-row px-3 text-ink',
+                        'first:pl-5 last:pr-5',
                         meta?.align === 'right' && 'text-right tabular-nums',
                       )}
                     >

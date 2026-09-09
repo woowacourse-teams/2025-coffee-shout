@@ -31,7 +31,12 @@ export function TimelineDot({ last, accent, className }: TimelineDotProps) {
         )}
         aria-hidden
       />
-      {!last && <span className="absolute bottom-0 top-3 w-px bg-border-default" aria-hidden />}
+      {!last && (
+        // 아래로 6px 더 뺀다. 이 칸은 줄 바닥에서 끝나는데 다음 줄의 점은 자기 위쪽에
+        // 6px 여백을 두고 시작하므로, 그냥 두면 줄마다 6px 씩 선이 끊긴다. 빼는 값이
+        // 다음 점의 mt 와 같으므로 옆 칸의 여백이 얼마든 상관없다.
+        <span className="absolute bottom-0 top-3 -mb-1.5 w-px bg-border-default" aria-hidden />
+      )}
     </span>
   );
 }
