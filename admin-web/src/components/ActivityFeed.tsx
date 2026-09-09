@@ -31,7 +31,11 @@ const ACTION_LABEL: Record<string, string> = {
   'POST /admin/api/profanity/audits/{id}/allow': '닉네임 허용',
   'POST /admin/api/profanity/audits/{id}/block': '닉네임 차단',
   'POST /admin/api/profanity/words': '금칙어 추가',
+  'POST /admin/api/patch-notes': '패치노트 작성',
+  'PUT /admin/api/patch-notes/{id}': '패치노트 수정',
   'DELETE /admin/api/patch-notes/{id}': '패치노트 삭제',
+  'POST /admin/api/ops/dead-letters/outbox/{id}/requeue': '격리 메시지 재투입',
+  'DELETE /admin/api/ops/dead-letters/outbox/{id}': '격리 메시지 폐기',
 };
 
 export function ActivityFeed({ logs }: { logs: AdminAuditLog[] }) {
@@ -56,12 +60,18 @@ export function ActivityFeed({ logs }: { logs: AdminAuditLog[] }) {
             <TimelineDot last={last} accent={failed} />
 
             <div className={cn('min-w-0 flex-1', last ? 'pb-0' : 'pb-3')}>
-              <p className="truncate text-sm text-ink">
-                {ACTION_LABEL[log.action] ?? log.action}
+              {/* 조치 이름만 자른다. 예전에는 이름과 대상과 실패 표시를 한 문단에 넣고
+                * 통째로 잘랐는데, 이름이 긴 줄에서는 <b>"실패" 글자가 잘려 나가고 점만</b>
+                * 남았다. 그러면 빨간 점 하나가 아무 이유 없이 찍혀 있는 것처럼 보인다.
+                * 잘려도 되는 것은 이름뿐이라 나머지는 줄어들지 않게 둔다. */}
+              <p className="flex items-center gap-1.5 text-sm text-ink">
+                <span className="truncate" title={ACTION_LABEL[log.action] ?? log.action}>
+                  {ACTION_LABEL[log.action] ?? log.action}
+                </span>
                 {log.targetId && (
-                  <span className="ml-1.5 font-mono text-xs text-ink-muted">{log.targetId}</span>
+                  <span className="shrink-0 font-mono text-xs text-ink-muted">{log.targetId}</span>
                 )}
-                {failed && <span className="ml-1.5 text-xs text-attention">실패</span>}
+                {failed && <span className="shrink-0 text-xs text-attention">실패</span>}
               </p>
               <p className="truncate text-xs text-ink-muted">
                 {log.actorEmail}

@@ -5,7 +5,6 @@ import type { ProfanityWord } from '@/api/types';
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { Input, SearchInput, Select } from '@/components/ui/Field';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -152,26 +151,22 @@ export function ProfanityWordsCard() {
         </Select>
       </CardBody>
 
-      {words.isError ? (
-        <ErrorState message={(words.error as Error).message} onRetry={() => words.refetch()} />
-      ) : (
-        <>
-          <DataTable
-            columns={columns}
-            data={words.data?.content ?? []}
-            loading={words.isPending}
-            emptyTitle="단어가 없습니다"
-            emptyDescription="검색 조건을 지우거나 새 단어를 추가해 보세요."
-          />
-          {words.data && (
-            <Pagination
-              page={words.data.page}
-              totalPages={words.data.totalPages}
-              totalElements={words.data.totalElements}
-              onChange={setPage}
-            />
-          )}
-        </>
+      <DataTable
+        error={words.error}
+        onRetry={() => words.refetch()}
+        columns={columns}
+        data={words.data?.content ?? []}
+        loading={words.isPending}
+        emptyTitle="단어가 없습니다"
+        emptyDescription="검색 조건을 지우거나 새 단어를 추가해 보세요."
+      />
+      {words.data && (
+        <Pagination
+          page={words.data.page}
+          totalPages={words.data.totalPages}
+          totalElements={words.data.totalElements}
+          onChange={setPage}
+        />
       )}
     </Card>
   );

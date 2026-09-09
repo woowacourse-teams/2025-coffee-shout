@@ -10,7 +10,6 @@ import { useAuth } from '@/auth/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -133,19 +132,14 @@ export function AdminAccountsPage() {
           title="관리자 목록"
           description="환경변수(ADMIN_EMAILS)로 등록된 관리자는 UI에서 삭제할 수 없습니다. 전원이 잠기는 것을 막는 경로입니다."
         />
-        {accounts.isError ? (
-          <ErrorState
-            message={(accounts.error as Error).message}
-            onRetry={() => accounts.refetch()}
-          />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={accounts.data ?? []}
-            loading={accounts.isPending}
-            emptyTitle="관리자가 없습니다"
-          />
-        )}
+        <DataTable
+          error={accounts.error}
+          onRetry={() => accounts.refetch()}
+          columns={columns}
+          data={accounts.data ?? []}
+          loading={accounts.isPending}
+          emptyTitle="관리자가 없습니다"
+        />
       </Card>
 
       <ConfirmDialog

@@ -4,7 +4,6 @@ import { useAuditDecision, useNicknameAuditQuality, useNicknameAudits } from '@/
 import type { NicknameAudit, NicknameAuditStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -151,26 +150,22 @@ export function ProfanityPage() {
           }
         />
 
-        {audits.isError ? (
-          <ErrorState message={(audits.error as Error).message} onRetry={() => audits.refetch()} />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={audits.data?.content ?? []}
-              loading={audits.isPending}
-              emptyTitle={`${status} 상태의 닉네임이 없습니다`}
-              emptyDescription="새 닉네임이 검열에 걸리면 여기에 쌓입니다."
-            />
-            {audits.data && (
-              <Pagination
-                page={audits.data.page}
-                totalPages={audits.data.totalPages}
-                totalElements={audits.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
+        <DataTable
+          error={audits.error}
+          onRetry={() => audits.refetch()}
+          columns={columns}
+          data={audits.data?.content ?? []}
+          loading={audits.isPending}
+          emptyTitle={`${status} 상태의 닉네임이 없습니다`}
+          emptyDescription="새 닉네임이 검열에 걸리면 여기에 쌓입니다."
+        />
+        {audits.data && (
+          <Pagination
+            page={audits.data.page}
+            totalPages={audits.data.totalPages}
+            totalElements={audits.data.totalElements}
+            onChange={setPage}
+          />
         )}
       </Card>
 

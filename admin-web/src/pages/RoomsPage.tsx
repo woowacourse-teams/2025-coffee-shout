@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useRoomSearch } from '@/api/queries';
 import type { RoomState, RoomSummary } from '@/api/types';
 import { Card, CardHeader } from '@/components/ui/Card';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
@@ -87,27 +86,23 @@ export function RoomsPage() {
           }
         />
 
-        {rooms.isError ? (
-          <ErrorState message={(rooms.error as Error).message} onRetry={() => rooms.refetch()} />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={rooms.data?.content ?? []}
-              loading={rooms.isPending}
-              emptyTitle={joinCode ? `'${joinCode}' 방을 찾지 못했습니다` : '방이 없습니다'}
-              emptyDescription={joinCode ? '코드를 다시 확인해주세요.' : undefined}
-              onRowClick={(room) => navigate(`/rooms/${room.id}`)}
-            />
-            {rooms.data && (
-              <Pagination
-                page={rooms.data.page}
-                totalPages={rooms.data.totalPages}
-                totalElements={rooms.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
+        <DataTable
+          error={rooms.error}
+          onRetry={() => rooms.refetch()}
+          columns={columns}
+          data={rooms.data?.content ?? []}
+          loading={rooms.isPending}
+          emptyTitle={joinCode ? `'${joinCode}' 방을 찾지 못했습니다` : '방이 없습니다'}
+          emptyDescription={joinCode ? '코드를 다시 확인해주세요.' : undefined}
+          onRowClick={(room) => navigate(`/rooms/${room.id}`)}
+        />
+        {rooms.data && (
+          <Pagination
+            page={rooms.data.page}
+            totalPages={rooms.data.totalPages}
+            totalElements={rooms.data.totalElements}
+            onChange={setPage}
+          />
         )}
       </Card>
     </div>

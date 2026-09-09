@@ -5,7 +5,6 @@ import type { BlockedIp } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable } from '@/components/DataTable';
 import { formatDurationMinutes } from '@/lib/format';
@@ -57,20 +56,15 @@ export function IpBlocksPage() {
           description={blocked.data ? `${blocked.data.length}건` : undefined}
         />
 
-        {blocked.isError ? (
-          <ErrorState
-            message={(blocked.error as Error).message}
-            onRetry={() => blocked.refetch()}
-          />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={blocked.data ?? []}
-            loading={blocked.isPending}
-            emptyTitle="차단 중인 IP가 없습니다"
-            emptyDescription="자동 차단이 걸리면 여기에 나타납니다."
-          />
-        )}
+        <DataTable
+          error={blocked.error}
+          onRetry={() => blocked.refetch()}
+          columns={columns}
+          data={blocked.data ?? []}
+          loading={blocked.isPending}
+          emptyTitle="차단 중인 IP가 없습니다"
+          emptyDescription="자동 차단이 걸리면 여기에 나타납니다."
+        />
       </Card>
 
       <ConfirmDialog

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProviderStats, useUserSearch } from '@/api/queries';
 import type { UserSummary } from '@/api/types';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
-import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/EmptyState';
 import { Loaded } from '@/components/ui/Loaded';
 import { SearchInput } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -99,29 +99,25 @@ export function UsersPage() {
           }
         />
 
-        {users.isError ? (
-          <ErrorState message={(users.error as Error).message} onRetry={() => users.refetch()} />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={users.data?.content ?? []}
-              loading={users.isPending}
-              emptyTitle={keyword ? `'${keyword}' 유저를 찾지 못했습니다` : '유저가 없습니다'}
-              emptyDescription={
-                keyword ? '유저코드는 5자 전체를 정확히 입력해야 합니다.' : undefined
-              }
-              onRowClick={(user) => navigate(`/users/${user.id}`)}
-            />
-            {users.data && (
-              <Pagination
-                page={users.data.page}
-                totalPages={users.data.totalPages}
-                totalElements={users.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
+        <DataTable
+          error={users.error}
+          onRetry={() => users.refetch()}
+          columns={columns}
+          data={users.data?.content ?? []}
+          loading={users.isPending}
+          emptyTitle={keyword ? `'${keyword}' 유저를 찾지 못했습니다` : '유저가 없습니다'}
+          emptyDescription={
+            keyword ? '유저코드는 5자 전체를 정확히 입력해야 합니다.' : undefined
+          }
+          onRowClick={(user) => navigate(`/users/${user.id}`)}
+        />
+        {users.data && (
+          <Pagination
+            page={users.data.page}
+            totalPages={users.data.totalPages}
+            totalElements={users.data.totalElements}
+            onChange={setPage}
+          />
         )}
       </Card>
     </div>

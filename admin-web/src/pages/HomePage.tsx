@@ -205,7 +205,7 @@ export function HomePage() {
                   <MetricRow
                     label="완주"
                     value={data.funnel.completed}
-                    suffix={formatPercent(data.funnel.completionRate, 0)}
+                    hint={`생성 대비 ${formatPercent(data.funnel.completionRate, 0)}`}
                     series={pick(series, 'completed')}
                   />
                   <MetricRow
@@ -224,7 +224,10 @@ export function HomePage() {
         </div>
       </Section>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(20rem,2fr)]">
+      {/* items-start 다. 격자 칸은 기본으로 늘어나는데, 그러면 짧은 퍼널 카드가 옆의
+        * 조치 목록 높이까지 늘어나 아래쪽 절반이 빈 흰 판이 된다. 카드는 자기 내용만큼만
+        * 차지하게 두고 아래가 어긋나는 것은 그대로 둔다. */}
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(20rem,2fr)]">
         <Card>
           <CardHeader
             title="오늘 방 진행 퍼널"
@@ -296,13 +299,11 @@ function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }
 function MetricRow({
   label,
   value,
-  suffix,
   hint,
   series,
 }: {
   label: string;
   value: number | string;
-  suffix?: string;
   hint?: string;
   series?: number[];
 }) {
@@ -314,11 +315,11 @@ function MetricRow({
       </dt>
       <dd className="flex shrink-0 items-center gap-3">
         <Sparkline values={series ?? []} width={56} height={20} />
-        <span className="flex items-baseline gap-1.5">
-          <span className="text-xl font-bold leading-none tracking-metric text-ink">
-            {typeof value === 'number' ? formatNumber(value) : value}
-          </span>
-          {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
+        {/* 숫자 칸에 폭을 준다. 폭이 없으면 자릿수에 따라 숫자와 스파크라인이 좌우로
+          * 밀려서, 네 줄의 숫자가 제각각인 자리에 선다. 위아래로 훑을 때 자릿수를
+          * 비교하려고 세로로 쌓은 것인데 그 비교가 안 된다. */}
+        <span className="w-10 text-right text-xl font-bold leading-none tracking-metric text-ink">
+          {typeof value === 'number' ? formatNumber(value) : value}
         </span>
       </dd>
     </div>

@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 import { useAuditLogs } from '@/api/queries';
 import type { AdminAuditLog } from '@/api/types';
 import { Card, CardHeader } from '@/components/ui/Card';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -79,26 +78,22 @@ export function AuditLogsPage() {
           title="감사 로그"
           description="append-only 입니다. 수정도 삭제도 하지 않습니다."
         />
-        {logs.isError ? (
-          <ErrorState message={(logs.error as Error).message} onRetry={() => logs.refetch()} />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={logs.data?.content ?? []}
-              loading={logs.isPending}
-              emptyTitle="조치 이력이 없습니다"
-              emptyDescription="관리자가 무언가를 바꾸면 여기에 남습니다."
-            />
-            {logs.data && (
-              <Pagination
-                page={logs.data.page}
-                totalPages={logs.data.totalPages}
-                totalElements={logs.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
+        <DataTable
+          error={logs.error}
+          onRetry={() => logs.refetch()}
+          columns={columns}
+          data={logs.data?.content ?? []}
+          loading={logs.isPending}
+          emptyTitle="조치 이력이 없습니다"
+          emptyDescription="관리자가 무언가를 바꾸면 여기에 남습니다."
+        />
+        {logs.data && (
+          <Pagination
+            page={logs.data.page}
+            totalPages={logs.data.totalPages}
+            totalElements={logs.data.totalElements}
+            onChange={setPage}
+          />
         )}
       </Card>
     </div>

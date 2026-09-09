@@ -88,8 +88,7 @@ export function AnalyticsPage() {
               <Tile
                 label="완주율"
                 value={formatPercent(data.funnel.completionRate)}
-                suffix={`${data.funnel.completed}건`}
-                hint="생성된 방 중 DONE 까지 간 비율"
+                hint={`생성된 방 중 DONE 까지 간 비율. 완주 ${data.funnel.completed}건`}
                 trend={daily.completionRate}
               />
               <Tile

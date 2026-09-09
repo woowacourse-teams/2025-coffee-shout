@@ -5,7 +5,6 @@ import type { MonitorAlert } from '@/api/types';
 import { DataTable } from '@/components/DataTable';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { CodeBlock } from '@/components/ui/CodeBlock';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { KeyValue } from '@/components/ui/KeyValue';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 
@@ -80,18 +79,16 @@ export function ZzolBotMonitorPanel() {
           title="모니터링 분석"
           description="30초마다 다시 읽습니다. 줄을 누르면 원문이 아래에 펼쳐집니다."
         />
-        {alerts.isError ? (
-          <ErrorState message={(alerts.error as Error).message} onRetry={() => alerts.refetch()} />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={alerts.data ?? []}
-            loading={alerts.isPending}
-            onRowClick={setSelected}
-            emptyTitle="분석 기록이 없습니다"
-            emptyDescription="Alertmanager 웹훅이 들어오면 여기에 쌓입니다."
-          />
-        )}
+        <DataTable
+          error={alerts.error}
+          onRetry={() => alerts.refetch()}
+          columns={columns}
+          data={alerts.data ?? []}
+          loading={alerts.isPending}
+          onRowClick={setSelected}
+          emptyTitle="분석 기록이 없습니다"
+          emptyDescription="Alertmanager 웹훅이 들어오면 여기에 쌓입니다."
+        />
       </Card>
 
       {selected && (

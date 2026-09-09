@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { EmptyState, ErrorState } from '@/components/ui/EmptyState';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { KeyValue } from '@/components/ui/KeyValue';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -138,30 +138,23 @@ export function OpsPage() {
           }
         />
 
-        {deadLetters.isError ? (
-          <ErrorState
-            message={(deadLetters.error as Error).message}
-            onRetry={() => deadLetters.refetch()}
+        <DataTable
+          error={deadLetters.error}
+          onRetry={() => deadLetters.refetch()}
+          columns={columns}
+          data={deadLetters.data?.content ?? []}
+          loading={deadLetters.isPending}
+          onRowClick={(row) => setSelected(row.id === selected?.id ? null : row)}
+          emptyTitle="격리된 메시지가 없습니다"
+          emptyDescription="이 칸이 비어 있는 것이 정상입니다."
+        />
+        {deadLetters.data && (
+          <Pagination
+            page={deadLetters.data.page}
+            totalPages={deadLetters.data.totalPages}
+            totalElements={deadLetters.data.totalElements}
+            onChange={setPage}
           />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={deadLetters.data?.content ?? []}
-              loading={deadLetters.isPending}
-              onRowClick={(row) => setSelected(row.id === selected?.id ? null : row)}
-              emptyTitle="격리된 메시지가 없습니다"
-              emptyDescription="이 칸이 비어 있는 것이 정상입니다."
-            />
-            {deadLetters.data && (
-              <Pagination
-                page={deadLetters.data.page}
-                totalPages={deadLetters.data.totalPages}
-                totalElements={deadLetters.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
         )}
       </Card>
 

@@ -6,7 +6,6 @@ import type { PatchNote, PatchNoteCategory } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
@@ -90,16 +89,14 @@ export function PatchNotesPage() {
           }
         />
 
-        {notes.isError ? (
-          <ErrorState message={(notes.error as Error).message} onRetry={() => notes.refetch()} />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={notes.data ?? []}
-            loading={notes.isPending}
-            emptyTitle="패치노트가 없습니다"
-          />
-        )}
+        <DataTable
+          error={notes.error}
+          onRetry={() => notes.refetch()}
+          columns={columns}
+          data={notes.data ?? []}
+          loading={notes.isPending}
+          emptyTitle="패치노트가 없습니다"
+        />
       </Card>
 
       <ConfirmDialog

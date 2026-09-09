@@ -5,7 +5,6 @@ import type { Report, ReportStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { Select } from '@/components/ui/Field';
@@ -150,31 +149,24 @@ export function ReportsPage() {
           }
         />
 
-        {reports.isError ? (
-          <ErrorState
-            message={(reports.error as Error).message}
-            onRetry={() => reports.refetch()}
+        <DataTable
+          error={reports.error}
+          onRetry={() => reports.refetch()}
+          columns={columns}
+          data={reports.data?.content ?? []}
+          loading={reports.isPending}
+          emptyTitle={
+            status === 'PENDING' ? '미처리 신고가 없습니다' : '신고가 없습니다'
+          }
+          emptyDescription="새 신고가 들어오면 여기에 쌓입니다."
+        />
+        {reports.data && (
+          <Pagination
+            page={reports.data.page}
+            totalPages={reports.data.totalPages}
+            totalElements={reports.data.totalElements}
+            onChange={setPage}
           />
-        ) : (
-          <>
-            <DataTable
-              columns={columns}
-              data={reports.data?.content ?? []}
-              loading={reports.isPending}
-              emptyTitle={
-                status === 'PENDING' ? '미처리 신고가 없습니다' : '신고가 없습니다'
-              }
-              emptyDescription="새 신고가 들어오면 여기에 쌓입니다."
-            />
-            {reports.data && (
-              <Pagination
-                page={reports.data.page}
-                totalPages={reports.data.totalPages}
-                totalElements={reports.data.totalElements}
-                onChange={setPage}
-              />
-            )}
-          </>
         )}
       </Card>
 

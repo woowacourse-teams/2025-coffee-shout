@@ -9,7 +9,7 @@ import {
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/cn';
-import { EmptyState, Skeleton } from '@/components/ui/EmptyState';
+import { EmptyState, ErrorState, Skeleton } from '@/components/ui/EmptyState';
 
 /**
  * 열 정렬 방향. 숫자 열은 오른쪽으로 붙여야 자릿수가 눈으로 비교된다.
@@ -33,6 +33,15 @@ type DataTableProps<T> = {
   emptyDescription?: string;
   /** 행 클릭으로 드릴다운. 주면 커서와 호버가 붙는다. */
   onRowClick?: (row: T) => void;
+  /**
+   * 조회 실패. 주면 표 자리에 실패 문구를 그린다.
+   *
+   * <p>화면이 {@code error ? <ErrorState/> : <DataTable/>} 로 갈라 쓰던 것을 안으로
+   * 들였다. 그렇게 쓰면 실패했을 때 <b>표 머리까지 통째로 사라져</b>, 비었을 때와 실패했을
+   * 때가 다른 모양이 된다. 로딩과 빈 상태는 이미 이 컴포넌트가 머리를 남긴 채 그린다.
+   */
+  error?: unknown;
+  onRetry?: () => void;
   /** 로딩 스켈레톤 행 수. 실제 표시 행 수와 맞추면 데이터가 와도 화면이 튀지 않는다. */
   skeletonRows?: number;
   className?: string;
@@ -54,6 +63,8 @@ export function DataTable<T>({
   emptyTitle,
   emptyDescription,
   onRowClick,
+  error,
+  onRetry,
   skeletonRows = 6,
   className,
 }: DataTableProps<T>) {
@@ -68,7 +79,11 @@ export function DataTable<T>({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const showEmpty = !loading && data.length === 0;
+  const failed = error != null;
+  const showEmpty = !failed && !loading && data.length === 0;
+  // 실패했으면 스켈레톤을 돌리지 않는다. 재시도 버튼 위에서 회색 막대가 깜빡이면
+  // 아직 불러오는 중인 것처럼 보인다.
+  const showSkeleton = loading && !failed;
 
   return (
     /* 넓은 표는 자기 컨테이너 안에서 가로 스크롤한다. 페이지가 통째로 밀리면
@@ -138,7 +153,7 @@ export function DataTable<T>({
         </thead>
 
         <tbody>
-          {loading &&
+          {showSkeleton &&
             Array.from({ length: skeletonRows }).map((_, rowIndex) => (
               <tr key={rowIndex} className="border-b border-border-default">
                 {columns.map((_column, columnIndex) => (
@@ -153,7 +168,8 @@ export function DataTable<T>({
               </tr>
             ))}
 
-          {!loading &&
+          {!showSkeleton &&
+            !failed &&
             table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
@@ -183,6 +199,7 @@ export function DataTable<T>({
         </tbody>
       </table>
 
+      {failed && <ErrorState message={(error as Error)?.message} onRetry={onRetry} />}
       {showEmpty && <EmptyState title={emptyTitle} description={emptyDescription} />}
     </div>
   );
