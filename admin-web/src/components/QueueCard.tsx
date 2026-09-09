@@ -26,7 +26,7 @@ type QueueCardProps = {
  * 라벨 길이가 칸마다 달라서다. 그러면 눈이 다섯 번 좌우로 움직여야 한다. 쌓아 두면 숫자가
  * <b>모두 같은 왼쪽 선</b>에서 시작해 한 번의 세로 훑기로 끝난다.
  *
- * <p>표면과 글자 규격은 {@code Tile} 과 같다. 다른 것은 <b>누를 수 있다는 것</b>뿐이라
+ * <p>표면과 글자 규격은 {@code Tile} 과 같다. 숫자 크기도 20px 로 같다. 다른 것은 <b>누를 수 있다는 것</b>뿐이라
  * 아이콘 칩과 화살표만 더한다. 지표 타일과 나란히 놓였을 때 다른 종류의 물체로 보이면
  * 안 된다.
  *
@@ -71,7 +71,7 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
 
       <span
         className={cn(
-          'text-2xl font-bold leading-none tracking-metric',
+          'text-xl font-bold leading-none tracking-metric',
           idle ? 'text-ink-muted' : 'text-ink',
         )}
       >

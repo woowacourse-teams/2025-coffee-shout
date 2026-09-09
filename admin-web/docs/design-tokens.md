@@ -131,10 +131,11 @@ dataviz 검증기 인접쌍 분리는 전 항목 통과. 최악 인접쌍은 pro
 | 본문 | `text-sm` | 표 셀, 문단 |
 | 보조 | `text-xs text-ink-secondary` | 라벨, 설명 |
 | 미세 | `text-2xs text-ink-muted` | 배지, 표 헤더, 힌트 |
-| 타일 숫자 | `text-2xl font-bold leading-none tracking-metric` | `Tile`, `QueueCard`, 방 상세 머리 |
-| 줄 안 숫자 | `text-xl font-bold leading-none tracking-metric` | 목록 줄의 값, 도넛 가운데 |
+| 지표 숫자 | `text-xl font-bold leading-none tracking-metric` | `Tile`, `QueueCard`, 목록 줄, 도넛 가운데 |
 
-숫자 크기는 둘뿐이고 기준은 **무엇 안에 있는가**다. 자기 칸을 가진 타일이면 24px, 목록 줄이나 그림 안에 얹히면 20px. 값이 길다고 한 곳만 줄이지 않는다 - 나란히 선 칸들의 시선 높이가 어긋난다.
+**숫자 크기는 20px 하나뿐이다.** 타일만 24px 로 두었다가 되돌렸다. 타일 줄이 바로 옆 카드의 목록 줄보다 한 단계 크게 보여 그 줄만 튀었고, 화면을 훑을 때 눈이 거기서 걸렸다. 24px 이 필요할 만큼 압도해야 할 숫자가 이 화면에 없다. 13px 본문 위에서 20px bold 면 충분히 걸린다.
+
+값이 길다고 한 곳만 줄이지도 않는다. 나란히 선 칸들의 시선 높이가 어긋난다.
 
 굵기는 셋뿐이다. `medium`(라벨), `semibold`(제목), `bold`(숫자). 그 사이 단계를 새로 쓰지 않는다.
 
@@ -190,7 +191,7 @@ dataviz 검증기 인접쌍 분리는 전 항목 통과. 최악 인접쌍은 pro
 
 | 프리미티브 | 쓰는 곳 | 못 박은 것 |
 | --- | --- | --- |
-| `Tile` | 지표 한 칸 전부 | 라벨 12px medium, 값 24px bold `-0.02em`, 보조 문구 12px. 값 크기는 하나뿐 |
+| `Tile` | 지표 한 칸 전부 | 라벨 12px medium, 값 20px bold `-0.02em`, 보조 문구 12px |
 | `TileGrid` `TileSkeletons` | 타일 줄 | `gap-3`, 좁은 화면 2칸. 칸 수는 3, 4, 5만 |
 | `Meter` | 퍼널, 순위 막대 | 트랙 색, 반경, 0의 처리, 최소 2% |
 | `TimelineDot` | 조치 이력, 퍼널 단계 | 점 8px, 잇는 선 1px, 마지막에서 끊기 |

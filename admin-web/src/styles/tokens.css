@@ -203,7 +203,7 @@
   --text-base: 0.875rem; /* 14px */
   --text-lg: 1rem; /* 16px */
   --text-xl: 1.25rem; /* 20px */
-  --text-2xl: 1.5rem; /* 24px - KPI 숫자 */
+  --text-2xl: 1.5rem; /* 24px - 지금 쓰는 곳이 없다. 지표 숫자는 xl(20px) 하나로 통일했다 */
   --text-3xl: 2rem; /* 32px */
 
   --leading-tight: 1.25;

@@ -85,7 +85,7 @@ export function RoomDetailPage() {
               <Trophy className="size-5" aria-hidden />
             </span>
             <div>
-              <p className="text-2xl font-bold leading-none tracking-metric text-ink">
+              <p className="text-xl font-bold leading-none tracking-metric text-ink">
                 {roulette.winnerPlayerName}
               </p>
               <p className="mt-0.5 text-xs text-ink-muted">

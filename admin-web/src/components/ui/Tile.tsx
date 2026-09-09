@@ -30,8 +30,10 @@ type TileProps = {
  *
  * <ul>
  *   <li>라벨 12px medium, 보조 잉크. 한 줄로 자른다
- *   <li>값 24px bold, 자간 -0.02em. <b>크기는 하나뿐이다</b> - "1일 20시간" 같은 긴 값도
- *       카드 폭 안에 들어간다. 값마다 크기를 달리하면 나란히 선 칸들의 시선 높이가 어긋난다
+ *   <li>값 20px bold, 자간 -0.02em. <b>화면 전체에서 숫자 크기는 이것 하나뿐이다</b>.
+ *       한때 타일만 24px 이고 목록 줄과 도넛 가운데는 20px 이었는데, 타일 줄이 옆 카드보다
+ *       한 단계 크게 보여 그 줄만 튀었다. 24px 이 필요할 만큼 이 화면에 압도해야 할 숫자는
+ *       없다. 13px 본문 위에서 20px bold 면 훑을 때 충분히 걸린다
  *   <li>보조 문구 12px 흐린 잉크. 비어 있어도 자리를 차지한다 - 그래야 문구 없는 칸만
  *       짧아져 줄이 들쭉날쭉해지지 않는다
  * </ul>
@@ -56,7 +58,7 @@ export function Tile({ label, value, hint, suffix, delta, trend, className }: Ti
 
       <div className="mt-2 flex items-end justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-1.5">
-          <span className="whitespace-nowrap text-2xl font-bold leading-none tracking-metric text-ink">
+          <span className="whitespace-nowrap text-xl font-bold leading-none tracking-metric text-ink">
             {typeof value === 'number' ? formatNumber(value) : value}
           </span>
           {suffix && <span className="whitespace-nowrap text-xs text-ink-muted">{suffix}</span>}
