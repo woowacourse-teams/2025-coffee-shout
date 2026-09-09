@@ -1,5 +1,6 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useGamePlayStats, usePeriodSummary, useTrend } from '@/api/queries';
+import type { DailyTrend } from '@/api/types';
 import { FunnelBar } from '@/components/FunnelBar';
 import { GameShareList } from '@/components/GameShareList';
 import { StatCard } from '@/components/StatCard';
@@ -39,12 +40,37 @@ function CardRowSkeleton() {
   );
 }
 
+/**
+ * 합계 카드 옆에 붙일 일자별 계열.
+ *
+ * <p>합계 숫자 하나로는 <b>구간 내내 고르게 났는지, 하루에 몰렸는지</b>를 구분할 수 없다.
+ * 30일 방 생성 300건은 하루 10건씩일 수도, 이벤트 하루에 250건이 몰린 것일 수도 있다.
+ * 두 경우에 할 일이 완전히 다르다.
+ *
+ * <p>완주율과 방당 참여자는 서버가 <b>구간 합계로만</b> 준다. 여기서 일자별로 다시 만드는
+ * 것은 같은 정의를 두 곳에 두는 일이라 위험한데, 나눗셈이 같으므로(완주÷생성) 값이 갈리지
+ * 않는다. 대신 <b>분모가 0인 날은 건너뛰지 않고 0으로 둔다</b>. 그 날을 빼면 점 개수가
+ * 줄어 다른 계열과 가로축이 어긋난다.
+ */
+function useDailySeries(trend: DailyTrend[] | undefined) {
+  return useMemo(() => {
+    const series = trend ?? [];
+    return {
+      created: series.map((day) => day.created),
+      completionRate: series.map((day) => (day.created === 0 ? 0 : day.completed / day.created)),
+      playersPerRoom: series.map((day) => (day.created === 0 ? 0 : day.players / day.created)),
+    };
+  }, [trend]);
+}
+
 export function AnalyticsPage() {
   const [days, setDays] = useState<number>(30);
 
   const period = usePeriodSummary(days);
   const trend = useTrend(Math.min(days, 90));
   const games = useGamePlayStats(days);
+
+  const daily = useDailySeries(trend.data);
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,24 +89,23 @@ export function AnalyticsPage() {
         <Loaded query={period} skeleton={<CardRowSkeleton />}>
           {(data) => (
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-              <StatCard label="방 생성" value={data.funnel.created} />
+              <StatCard label="방 생성" value={data.funnel.created} trend={daily.created} />
               <StatCard
                 label="완주율"
                 value={formatPercent(data.funnel.completionRate)}
                 suffix={`${data.funnel.completed}건`}
                 hint="생성된 방 중 DONE 까지 간 비율"
+                trend={daily.completionRate}
               />
               <StatCard
                 label="방당 평균 참여자"
                 value={data.avgPlayersPerRoom.toFixed(1)}
                 suffix="명"
                 hint="혼자 만들고 아무도 안 온 방도 분모에 포함"
+                trend={daily.playersPerRoom}
               />
-              <StatCard
-                label="신규 가입"
-                value={data.signups}
-                hint="비회원도 게임은 가능합니다"
-              />
+              {/* 가입은 일자별 계열이 없다. 스파크라인 자리를 다른 계열로 채우지 않는다. */}
+              <StatCard label="신규 가입" value={data.signups} hint="비회원도 게임은 가능합니다" />
             </div>
           )}
         </Loaded>
@@ -103,7 +128,10 @@ export function AnalyticsPage() {
         </CardBody>
       </Card>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      {/* 퍼널을 넓게 잡는다. 단계 이름과 막대와 전환율이 한 줄에 들어가야 하는데
+        * 반반으로 나누면 막대 자리가 먼저 줄어 길이 비교가 안 된다. 게임별 목록은
+        * 이름과 숫자뿐이라 좁아도 읽힌다. */}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)]">
         <Card>
           <CardHeader
             title="방 진행 퍼널"
@@ -143,9 +171,9 @@ export function AnalyticsPage() {
           <Loaded
             query={games}
             skeleton={
-              <div className="flex flex-col gap-2.5 p-4">
+              <div className="flex flex-col gap-2.5 px-5 pb-5">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <Skeleton key={index} className="h-4" />
+                  <Skeleton key={index} className="h-7" />
                 ))}
               </div>
             }

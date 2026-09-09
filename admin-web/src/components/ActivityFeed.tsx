@@ -12,6 +12,13 @@ import { cn } from '@/lib/cn';
  * <p>action 은 매핑 패턴(`DELETE /admin/api/ip-blocks/{ip}`)이라 사람이 읽기 나쁘다.
  * 화면에서 문장으로 바꾼다. 서버가 문장을 저장하면 문구를 고칠 때 과거 기록까지
  * 바뀌어 버려서, 저장은 기계가 읽는 형태로 두고 번역은 화면이 한다.
+ *
+ * <h2>구분선이 아니라 타임라인</h2>
+ *
+ * <p>줄마다 가로 구분선을 긋던 것을 걷어내고 왼쪽에 세로 실선을 세웠다. 이 목록의 성격은
+ * "서로 무관한 항목 여럿"이 아니라 <b>시간 순으로 이어진 하나의 기록</b>이다. 가로선은
+ * 항목을 끊어 놓아 그 성격을 지웠다. 세로선은 반대로 잇는다. 조치 하나가 다른 조치를
+ * 되돌린 것인지(차단 → 해제) 읽으려면 그 이어짐이 보여야 한다.
  */
 const ACTION_LABEL: Record<string, string> = {
   'POST /admin/api/auth/login': '로그인',
@@ -37,19 +44,28 @@ export function ActivityFeed({ logs }: { logs: AdminAuditLog[] }) {
   }
 
   return (
-    <ul className="divide-y divide-border-default">
-      {logs.map((log) => {
+    <ul className="px-5 pb-5">
+      {logs.map((log, index) => {
         const failed = log.result === 'FAILURE';
+        const last = index === logs.length - 1;
+
         return (
-          <li key={log.id} className="flex items-start gap-2.5 px-4 py-2.5">
-            <span
-              className={cn(
-                'mt-1.5 size-1.5 shrink-0 rounded-full',
-                failed ? 'bg-attention-mark' : 'bg-border-strong',
+          <li key={log.id} className="relative flex gap-3 pl-0.5">
+            {/* 점과 선. 마지막 항목에서 선을 끊는다 - 아래로 이어질 것이 없다. */}
+            <span className="relative flex w-3 shrink-0 justify-center">
+              <span
+                className={cn(
+                  'z-10 mt-1.5 size-2 shrink-0 rounded-full ring-2 ring-surface',
+                  failed ? 'bg-attention-mark' : 'bg-border-strong',
+                )}
+                aria-hidden
+              />
+              {!last && (
+                <span className="absolute bottom-0 top-3 w-px bg-border-default" aria-hidden />
               )}
-              aria-hidden
-            />
-            <div className="min-w-0 flex-1">
+            </span>
+
+            <div className={cn('min-w-0 flex-1', last ? 'pb-0' : 'pb-3')}>
               <p className="truncate text-sm text-ink">
                 {ACTION_LABEL[log.action] ?? log.action}
                 {log.targetId && (

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import {
   AlertTriangle,
   Gamepad2,
@@ -59,25 +59,19 @@ const NAV: NavGroup[] = [
 ];
 
 export function AdminLayout() {
-  const { pathname } = useLocation();
-  const current = NAV.flatMap((group) => group.items).find((item) =>
-    item.to === '/' ? pathname === '/' : pathname.startsWith(item.to),
-  );
-
   return (
     <div className="min-h-screen bg-canvas">
       <Rail />
 
       <div className="pl-rail-offset">
-        {/* 캔버스 위에 그대로 얹는다. 흰 바탕에 경계선을 두면 상단 바가 또 하나의 카드처럼
-          * 보여서, 정작 봐야 할 카드들과 같은 무게를 갖는다. 스크롤할 때 글자가 겹치지
-          * 않도록 캔버스 색 반투명 배경과 블러만 남긴다. */}
-        <header className="sticky top-0 z-10 flex h-topbar items-center justify-between gap-3 bg-canvas/80 px-6 backdrop-blur">
-          <h1 className="text-sm font-semibold tracking-tight text-ink">
-            {current?.label ?? '백오피스'}
-          </h1>
-          <EnvBadge />
-        </header>
+        {/* 상단 바를 없앴다.
+         *
+         * 거기 있던 것은 지금 메뉴 이름과 환경 배지 둘뿐이었다. 메뉴 이름은 레일에서 이미
+         * 칠해져 있고 바로 아래 화면 제목이 같은 말을 크게 다시 적었다. 같은 단어가 한
+         * 화면에 세 번 있었고, 그중 상단 바의 것만 작아서 <b>제목이 두 개인 것처럼</b>
+         * 보였다. 환경 배지는 레일 머리로 옮겼다. 로고 옆이 오히려 눈에 먼저 걸린다.
+         *
+         * 56px 짜리 가로 띠가 사라지면서 첫 위젯이 화면 맨 위에서 시작한다. */}
 
         {/* 본문 폭은 <b>여기서만</b> 정한다.
          *
@@ -125,6 +119,7 @@ function Rail() {
       <div className="flex h-topbar shrink-0 items-center gap-2.5 px-4">
         <img src="/brand/logo.svg" alt="ZZOL" className="h-[18px]" />
         <span className="text-2xs font-medium tracking-wide text-ink-muted">백오피스</span>
+        <EnvBadge className="ml-auto" />
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-4">

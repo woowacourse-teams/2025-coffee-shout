@@ -2,7 +2,7 @@ import { ENV_NAME, type EnvName } from '@/lib/env';
 import { cn } from '@/lib/cn';
 
 /**
- * 지금 어느 환경을 보고 있는지. 상단 바에 <b>항상</b> 떠 있다.
+ * 지금 어느 환경을 보고 있는지. 레일 머리의 로고 옆에 <b>항상</b> 떠 있다.
  *
  * <p>PROD 만 색이 붙는다. DEV 와 LOCAL 은 회색이다. 둘을 색으로 갈라 봐야
  * 잘못 눌렀을 때 손해가 없는 환경끼리 구분하는 것이라 얻는 게 없고,

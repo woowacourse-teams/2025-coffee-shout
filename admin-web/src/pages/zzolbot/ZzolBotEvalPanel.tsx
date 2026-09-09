@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import {
   useDeleteEvalScenario,
   useEvalRunDetail,
@@ -11,12 +11,19 @@ import type { EvalResult, EvalRun, EvalScenario } from '@/api/types';
 import { ApiError } from '@/api/client';
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState } from '@/components/ui/EmptyState';
+import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
 import { Input, Select } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatPercent } from '@/lib/format';
+
+/** recharts 를 지연 로드한다. ZzolBot 화면은 대화 탭으로 먼저 들어오는 일이 많다. */
+const EvalPassRateChart = lazy(() =>
+  import('@/components/EvalPassRateChart').then((module) => ({
+    default: module.EvalPassRateChart,
+  })),
+);
 
 /**
  * 골든셋 평가.
@@ -80,8 +87,28 @@ export function ZzolBotEvalPanel() {
     [],
   );
 
+  const finishedRuns = (runs.data ?? []).filter(
+    (run) => run.finishedAt !== null && run.scenarioCount > 0,
+  );
+
   return (
     <div className="flex flex-col gap-4">
+      {/* 표보다 위에 둔다. 이 화면에 들어오는 이유가 "좋아졌나"이고, 그 답이 여기 있다.
+        * 점이 하나뿐이면 선이 안 그려지므로 둘 이상일 때만 낸다. */}
+      {finishedRuns.length >= 2 && (
+        <Card>
+          <CardHeader
+            title="통과율 추이"
+            description="끝난 실행만. 왼쪽이 과거입니다. 세로축은 0~100%로 고정해 작은 차이가 급등락으로 보이지 않게 했습니다."
+          />
+          <CardBody>
+            <Suspense fallback={<Skeleton className="h-[200px]" />}>
+              <EvalPassRateChart runs={finishedRuns} />
+            </Suspense>
+          </CardBody>
+        </Card>
+      )}
+
       <Card>
         <CardHeader
           title="평가 실행"

@@ -4,16 +4,16 @@ import {
   useActionQueue,
   useAuditLogs,
   useDailySummary,
-  useGamePlayStats,
   useNicknameAuditQuality,
   useReportSla,
   useTrend,
 } from '@/api/queries';
 import { lazy, Suspense } from 'react';
+import type { DailyTrend } from '@/api/types';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { FunnelBar } from '@/components/FunnelBar';
-import { GameShareList } from '@/components/GameShareList';
 import { QueueCard } from '@/components/QueueCard';
+import { Sparkline } from '@/components/Sparkline';
 import { TrendLegend } from '@/components/TrendLegend';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
@@ -28,6 +28,9 @@ import { formatDurationMinutes, formatNumber, formatPercent } from '@/lib/format
  *
  * <p>범례를 {@link TrendLegend} 로 떼어낸 것이 이 분리의 전제다. 같은 모듈에서 범례를
  * 정적으로 가져오면 recharts 가 메인 청크로 따라 들어와 지연 로드가 무효가 된다.
+ *
+ * <p>{@code Sparkline} 은 반대로 정적으로 가져온다. recharts 를 쓰지 않고 {@code polyline}
+ * 하나로 그리기 때문에 무게가 없다.
  */
 const TrendChart = lazy(() =>
   import('@/components/TrendChart').then((module) => ({ default: module.TrendChart })),
@@ -40,15 +43,31 @@ const TrendChart = lazy(() =>
  * <p>담는 지표의 기준은 하나다. <b>Grafana 가 못 보는 것.</b> 응답시간, 에러율, JVM 은
  * 그쪽이 이미 본다. 두 곳이 다른 숫자를 말하는 순간 양쪽 다 신뢰를 잃는다.
  * 여기 있는 것은 전부 도메인 조인이거나 우리 DB 에만 있는 기록이다.
+ *
+ * <h2>배치는 위 세 질문의 순서를 따른다</h2>
+ *
+ * <p>① 처리 대기와 운영 품질을 위에 붙여 둔다. "밀렸나"와 "잘 처리하고 있나"는 같은
+ * 질문의 앞뒤인데, 운영 품질이 화면 맨 아래에 있어서 둘을 함께 보려면 스크롤해야 했다.
+ *
+ * <p>② 그다음이 서비스 흐름이다. 14일 추이와 오늘 숫자를 나란히 두고, 그 아래 오늘 퍼널을
+ * 놓는다. 셋 다 "지금 정상인가"에 답한다.
+ *
+ * <p>③ 최근 조치가 맨 아래에 가로로 눕는다. 시간 순 기록이라 세로로 길고, 옆에 무엇을
+ * 두든 높이가 안 맞았다.
+ *
+ * <p><b>게임별 플레이는 뺐다.</b> 30일 집계라 이 화면의 "지금"과 시간축이 다르고,
+ * 서비스 분석 화면에 똑같은 카드가 이미 있다. 같은 카드를 두 곳에 두면 한쪽만 고치는
+ * 날이 온다.
  */
 export function HomePage() {
   const queue = useActionQueue();
   const summary = useDailySummary();
   const trend = useTrend(14);
-  const games = useGamePlayStats(30);
   const sla = useReportSla(30);
   const auditQuality = useNicknameAuditQuality(30);
-  const logs = useAuditLogs(6);
+  const logs = useAuditLogs(8);
+
+  const series = trend.data ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,7 +76,7 @@ export function HomePage() {
         description="처리할 일과 서비스 흐름. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
       />
 
-      {/* 다섯 칸이다. 격리 메시지를 맨 앞에 둔다 - 나머지 넷은 사람이 판단해 줄 일이고
+      {/* 다섯 칸이다. 격리 메시지를 맨 앞에 둔다. 나머지 넷은 사람이 판단해 줄 일이고
         * 이건 시스템이 멈춘 것이라, 0이 아닌 순간 다른 무엇보다 먼저 봐야 한다. */}
       <Section title="처리 대기" description="숫자를 누르면 해당 화면으로 갑니다.">
         {queue.isError ? (
@@ -68,7 +87,7 @@ export function HomePage() {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             {queue.isPending
               ? Array.from({ length: 5 }).map((_, index) => (
-                  <Skeleton key={index} className="h-[4.5rem] rounded-lg" />
+                  <Skeleton key={index} className="h-[5.5rem] rounded-lg" />
                 ))
               : queue.data && (
                   <>
@@ -108,50 +127,107 @@ export function HomePage() {
         )}
       </Section>
 
-      {/* 왼쪽은 "서비스가 어떻게 돌고 있나", 오른쪽은 "오늘 얼마나 됐나".
-        * 추이는 가로가 길어야 모양이 보이고 오늘 숫자는 세로로 쌓아야 자릿수가 비교된다. */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
-        <Card>
-          <CardHeader
-            title="최근 14일"
-            description="오늘 숫자만으로는 0이 정상인지 알 수 없습니다."
-            actions={<TrendLegend />}
-          />
-          <CardBody>
-            <Loaded query={trend} skeleton={<Skeleton className="h-[220px]" />}>
-              {(data) => (
-                <Suspense fallback={<Skeleton className="h-[220px]" />}>
-                  <TrendChart data={data} />
-                </Suspense>
-              )}
-            </Loaded>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader title="오늘" description={summary.data?.date} />
-          <Loaded query={summary} skeleton={<RowSkeleton rows={4} />}>
+      {/* 처리 대기 바로 아래다. 밀린 양과 처리 품질은 한 덩어리로 봐야 판단이 선다.
+        * 신고 SLA 와 검열 품질은 다른 요청이라 따로 감싼다. 한 덩어리로 묶으면 한쪽이
+        * 실패할 때 멀쩡한 나머지 숫자까지 사라진다. */}
+      <Section
+        title="운영 품질"
+        description="최근 30일. 일이 밀렸는지와 잘 처리하고 있는지는 다른 질문입니다."
+      >
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <Loaded query={sla} skeleton={<TileSkeleton count={2} />} errorClassName={TILE_ERROR}>
             {(data) => (
-              <dl className="divide-y divide-border-default">
-                <MetricRow label="방 생성" value={data.funnel.created} />
-                <MetricRow
-                  label="완주"
-                  value={data.funnel.completed}
-                  suffix={formatPercent(data.funnel.completionRate, 0)}
+              <>
+                <QualityTile
+                  label="가장 오래 기다린 신고"
+                  value={formatDurationMinutes(data.oldestPendingMinutes)}
+                  hint="접수 후 경과"
                 />
-                <MetricRow label="참여자" value={data.players} hint="여러 방 참여 시 중복" />
-                <MetricRow label="신규 가입" value={data.signups} />
-              </dl>
+                <QualityTile
+                  label="신고 처리 중앙값"
+                  value={formatDurationMinutes(data.p50Minutes)}
+                  hint={`30일 ${data.resolvedCount}건`}
+                />
+              </>
             )}
           </Loaded>
-        </Card>
-      </div>
+          <Loaded
+            query={auditQuality}
+            skeleton={<TileSkeleton count={2} />}
+            errorClassName={TILE_ERROR}
+          >
+            {(data) => (
+              <>
+                <QualityTile
+                  label="검열 AI 판정 뒤집힘"
+                  value={formatPercent(data.overrideRate)}
+                  hint="높아지면 모델을 손볼 때"
+                />
+                <QualityTile
+                  label="검열 오탐 / 미탐"
+                  value={`${data.falsePositive} / ${data.falseNegative}`}
+                  hint="AI가 잘못 걸렀다 / 놓쳤다"
+                />
+              </>
+            )}
+          </Loaded>
+        </div>
+      </Section>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <Section title="서비스 흐름" description="오늘 숫자만으로는 0이 정상인지 알 수 없습니다.">
+        {/* 왼쪽은 "어떻게 돌고 있나", 오른쪽은 "오늘 얼마나 됐나".
+          * 추이는 가로가 길어야 모양이 보이고, 오늘 숫자는 세로로 쌓아야 자릿수가 비교된다. */}
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
+          <Card>
+            <CardHeader title="최근 14일" actions={<TrendLegend />} />
+            <CardBody>
+              <Loaded query={trend} skeleton={<Skeleton className="h-[220px]" />}>
+                {(data) => (
+                  <Suspense fallback={<Skeleton className="h-[220px]" />}>
+                    <TrendChart data={data} />
+                  </Suspense>
+                )}
+              </Loaded>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader title="오늘" description={summary.data?.date} />
+            <Loaded query={summary} skeleton={<RowSkeleton rows={4} />}>
+              {(data) => (
+                <dl className="flex flex-col">
+                  <MetricRow
+                    label="방 생성"
+                    value={data.funnel.created}
+                    series={pick(series, 'created')}
+                  />
+                  <MetricRow
+                    label="완주"
+                    value={data.funnel.completed}
+                    suffix={formatPercent(data.funnel.completionRate, 0)}
+                    series={pick(series, 'completed')}
+                  />
+                  <MetricRow
+                    label="참여자"
+                    value={data.players}
+                    hint="여러 방 참여 시 중복"
+                    series={pick(series, 'players')}
+                  />
+                  {/* 신규 가입은 일자별 계열이 없다. 스파크라인 자리는 비워 둔다.
+                    * 다른 계열의 모양을 빌려 오면 그건 이 지표의 흐름이 아니다. */}
+                  <MetricRow label="신규 가입" value={data.signups} hint="비회원도 게임은 가능" />
+                </dl>
+              )}
+            </Loaded>
+          </Card>
+        </div>
+      </Section>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(20rem,2fr)]">
         <Card>
           <CardHeader
-            title="방 진행 퍼널"
-            description="오늘 기준. 게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
+            title="오늘 방 진행 퍼널"
+            description="게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
           />
           <CardBody>
             <Loaded query={summary} skeleton={<RowSkeleton rows={5} height="h-7" />}>
@@ -172,59 +248,6 @@ export function HomePage() {
 
         <Card>
           <CardHeader
-            title="게임별 플레이"
-            description="최근 30일 완료 기준. 비중이 0에 가까우면 아무도 고르지 않는다는 뜻입니다."
-          />
-          <Loaded query={games} skeleton={<RowSkeleton rows={4} height="h-4" />}>
-            {(data) => <GameShareList stats={data} />}
-          </Loaded>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Card>
-          <CardHeader
-            title="운영 품질"
-            description="일이 밀렸는지와 잘하고 있는지는 다른 질문입니다."
-          />
-          {/* 신고 SLA 와 검열 품질은 다른 요청이다. 한 덩어리로 감싸면 한쪽이 실패할 때
-            * 멀쩡한 나머지 숫자까지 사라진다. */}
-          <Loaded query={sla} skeleton={<RowSkeleton rows={2} />}>
-            {(data) => (
-              <dl className="divide-y divide-border-default">
-                <MetricRow
-                  label="가장 오래 기다린 신고"
-                  value={formatDurationMinutes(data.oldestPendingMinutes)}
-                  hint="접수 후 경과"
-                />
-                <MetricRow
-                  label="신고 처리 중앙값"
-                  value={formatDurationMinutes(data.p50Minutes)}
-                  hint={`최근 30일 ${data.resolvedCount}건`}
-                />
-              </dl>
-            )}
-          </Loaded>
-          <Loaded query={auditQuality} skeleton={<RowSkeleton rows={2} />}>
-            {(data) => (
-              <dl className="divide-y divide-border-default border-t border-border-default">
-                <MetricRow
-                  label="검열 AI 판정 뒤집힘"
-                  value={formatPercent(data.overrideRate)}
-                  hint="높아지면 모델을 손볼 때"
-                />
-                <MetricRow
-                  label="검열 오탐 / 미탐"
-                  value={`${data.falsePositive} / ${data.falseNegative}`}
-                  hint="AI가 잘못 걸렀다 / 놓쳤다"
-                />
-              </dl>
-            )}
-          </Loaded>
-        </Card>
-
-        <Card>
-          <CardHeader
             title="최근 조치"
             description="Grafana 로는 볼 수 없는 기록입니다."
             actions={
@@ -233,7 +256,7 @@ export function HomePage() {
               </Button>
             }
           />
-          <Loaded query={logs} skeleton={<RowSkeleton rows={5} />}>
+          <Loaded query={logs} skeleton={<RowSkeleton rows={6} />}>
             {(data) => <ActivityFeed logs={data.content} />}
           </Loaded>
         </Card>
@@ -242,10 +265,21 @@ export function HomePage() {
   );
 }
 
+/**
+ * 운영 품질 타일이 실패했을 때의 자리. 타일 둘이 차지하던 폭을 그대로 쓰고 카드 표면을
+ * 입힌다. 격자 칸에 맨몸 문구만 남기면 캔버스 위에 글자가 떠 있는 꼴이 된다.
+ */
+const TILE_ERROR = 'col-span-2 rounded-lg border border-border-default bg-surface shadow-card';
+
+/** 추이 응답에서 계열 하나만 뽑는다. 스파크라인은 값 배열만 받는다. */
+function pick(series: DailyTrend[], key: 'created' | 'completed' | 'players') {
+  return series.map((day) => day[key]);
+}
+
 /** 목록형 카드의 로딩 자리. 카드마다 Array.from 을 반복해 적던 것을 모았다. */
 function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }) {
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-3 px-5 pb-5">
       {Array.from({ length: rows }).map((_, index) => (
         <Skeleton key={index} className={height} />
       ))}
@@ -253,32 +287,74 @@ function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }
   );
 }
 
+function TileSkeleton({ count }: { count: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, index) => (
+        <Skeleton key={index} className="h-[5.5rem] rounded-lg" />
+      ))}
+    </>
+  );
+}
+
+/**
+ * 운영 품질 한 칸. 값이 "1일 20시간" 같은 문자열이라 {@code StatCard} 의 증감·스파크라인
+ * 자리가 전부 빈다. 쓰지 않는 슬롯을 지운 작은 타일을 따로 둔다.
+ */
+function QualityTile({ label, value, hint }: { label: string; value: string; hint: string }) {
+  return (
+    <div className="flex h-full flex-col rounded-lg border border-border-default bg-surface px-5 py-4 shadow-card">
+      <p className="truncate text-xs font-medium text-ink-secondary" title={label}>
+        {label}
+      </p>
+      <p className="mt-2 whitespace-nowrap text-xl font-bold leading-none tracking-metric text-ink">
+        {value}
+      </p>
+      <p className="mt-auto truncate pt-2 text-xs text-ink-muted" title={hint}>
+        {hint}
+      </p>
+    </div>
+  );
+}
+
 /**
  * 라벨은 왼쪽, 값은 오른쪽. 값을 한 줄에 세로로 맞춰 두면 위아래로 훑을 때
  * 자릿수가 눈으로 비교된다. 카드를 나란히 두면 그 비교가 안 된다.
+ *
+ * <p>값과 라벨 사이에 최근 14일 흐름을 그린다. 옆 카드의 큰 차트와 같은 데이터인데,
+ * 큰 차트는 세 계열이 겹쳐 있어 <b>한 지표만 따로</b> 보기가 어렵다. 여기서는 "오늘
+ * 12건"이 평소만큼인지가 한 줄 안에서 끝난다.
+ *
+ * <p>줄 사이 구분선을 지웠다. 네 줄이 각각 하나의 위젯처럼 보여야 하는데, 가로선이
+ * 그것을 표의 행으로 되돌려 놓았다.
  */
 function MetricRow({
   label,
   value,
   suffix,
   hint,
+  series,
 }: {
   label: string;
   value: number | string;
   suffix?: string;
   hint?: string;
+  series?: number[];
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3">
+    <div className="flex items-center justify-between gap-3 px-5 py-2.5">
       <dt className="min-w-0">
         <span className="block text-sm text-ink-secondary">{label}</span>
         {hint && <span className="block text-2xs text-ink-muted">{hint}</span>}
       </dt>
-      <dd className="flex shrink-0 items-baseline gap-1.5">
-        <span className="text-xl font-bold leading-none tracking-metric text-ink">
-          {typeof value === 'number' ? formatNumber(value) : value}
+      <dd className="flex shrink-0 items-center gap-3">
+        <Sparkline values={series ?? []} width={56} height={20} />
+        <span className="flex items-baseline gap-1.5">
+          <span className="text-xl font-bold leading-none tracking-metric text-ink">
+            {typeof value === 'number' ? formatNumber(value) : value}
+          </span>
+          {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
         </span>
-        {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
       </dd>
     </div>
   );
