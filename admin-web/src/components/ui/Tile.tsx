@@ -4,38 +4,48 @@ import { Sparkline } from '@/components/Sparkline';
 import { cn } from '@/lib/cn';
 import { formatNumber } from '@/lib/format';
 
-type StatCardProps = {
+type TileProps = {
   label: string;
   value: number | string;
   /** 값이 무엇을 세는지. 지표 이름만으로 모호한 것은 여기서 밝힌다. */
   hint?: string;
+  /** 값 뒤에 붙는 단위나 보조 수치. "명", "12건" 같은 것. */
+  suffix?: ReactNode;
   /** 어제 대비 증감. 없으면 표시하지 않는다. 0을 "변화 없음"으로 꾸미지 않는다. */
   delta?: number;
-  suffix?: ReactNode;
-  /**
-   * 같은 지표의 일자별 값. 있으면 숫자 오른쪽에 흐름을 그린다.
-   * 합계 숫자 하나로는 "구간 내내 고르게 났는지, 하루에 몰렸는지"를 구분할 수 없다.
-   */
+  /** 같은 지표의 일자별 값. 있으면 숫자 오른쪽에 흐름을 그린다. */
   trend?: number[];
   className?: string;
 };
 
-export function StatCard({
-  label,
-  value,
-  hint,
-  delta,
-  suffix,
-  trend,
-  className,
-}: StatCardProps) {
+/**
+ * 지표 한 칸. 백오피스에서 숫자 하나를 보여주는 자리는 <b>전부 이것</b>이다.
+ *
+ * <p>예전에는 화면마다 따로 있었다. 분석 화면의 {@code StatCard}, 홈의 운영 품질 타일,
+ * 신고 화면의 SLA 칸이 각각 손으로 짜여 있었고 라벨 크기와 여백과 숫자 크기가 조금씩
+ * 달랐다. 화면을 옮길 때마다 같은 종류의 정보가 다르게 생겨 있으면 읽는 사람이 매번
+ * 다시 자리를 잡아야 한다.
+ *
+ * <h2>규격</h2>
+ *
+ * <ul>
+ *   <li>라벨 12px medium, 보조 잉크. 한 줄로 자른다
+ *   <li>값 24px bold, 자간 -0.02em. <b>크기는 하나뿐이다</b> - "1일 20시간" 같은 긴 값도
+ *       카드 폭 안에 들어간다. 값마다 크기를 달리하면 나란히 선 칸들의 시선 높이가 어긋난다
+ *   <li>보조 문구 12px 흐린 잉크. 비어 있어도 자리를 차지한다 - 그래야 문구 없는 칸만
+ *       짧아져 줄이 들쭉날쭉해지지 않는다
+ * </ul>
+ *
+ * <p>증감에 색을 붙이지 않는다. 방 생성이 준 것이 나쁜 일인지 좋은 일인지는 지표마다
+ * 다르고, 초록이나 빨강을 달면 그 판단을 화면이 대신해 버린다. 방향은 화살표가 말하고
+ * 판단은 사람이 한다.
+ */
+export function Tile({ label, value, hint, suffix, delta, trend, className }: TileProps) {
   const rising = delta !== undefined && delta > 0;
 
   return (
     <div
       className={cn(
-        // 네 칸이 나란히 설 때 높이가 같아야 한다. 보조 문구가 없는 칸만 짧아지면
-        // 줄이 들쭉날쭉해 보인다. 문구 줄은 항상 자리를 차지하고 비어 있을 뿐이다.
         'flex h-full flex-col rounded-lg border border-border-default bg-surface px-5 py-4 shadow-card',
         className,
       )}
@@ -46,17 +56,11 @@ export function StatCard({
 
       <div className="mt-2 flex items-end justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-1.5">
-          {/* 라벨보다 한 단계 위면 충분하다. 32px 까지 키우면 "1일 20시간" 같은 값이
-           * 카드 폭을 넘어 줄바꿈되고, 그 순간 옆 카드와 높이가 어긋나 줄이 무너진다.
-           * 숫자를 크게 하는 목적은 훑을 때 눈에 들어오게 하는 것이지 압도하는 게 아니다. */}
           <span className="whitespace-nowrap text-2xl font-bold leading-none tracking-metric text-ink">
             {typeof value === 'number' ? formatNumber(value) : value}
           </span>
           {suffix && <span className="whitespace-nowrap text-xs text-ink-muted">{suffix}</span>}
 
-          {/* 증감에 색을 붙이지 않는다. 방 생성이 준 것이 나쁜 일인지 좋은 일인지는
-           * 지표마다 다르고, 초록이나 빨강을 달면 그 판단을 화면이 대신해 버린다.
-           * 방향은 화살표가 말하고 판단은 사람이 한다. */}
           {delta !== undefined && delta !== 0 && (
             <span className="inline-flex items-center gap-0.5 text-xs font-medium text-ink-secondary">
               {rising ? (
@@ -75,8 +79,6 @@ export function StatCard({
         )}
       </div>
 
-      {/* 한 줄로 자른다. 두 줄이 되면 카드 높이가 제각각이 되고, 보조 문구 하나 때문에
-       * 줄 전체가 흔들린다. 잘린 문구는 마우스를 올리면 전문이 뜬다. */}
       <p className="mt-auto truncate pt-2 text-xs text-ink-muted" title={hint}>
         {hint ?? ' '}
       </p>

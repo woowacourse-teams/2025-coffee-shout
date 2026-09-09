@@ -1,5 +1,6 @@
 import type { GamePlayStat } from '@/api/types';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Meter } from '@/components/ui/Meter';
 import { cn } from '@/lib/cn';
 import { formatNumber, formatPercent } from '@/lib/format';
 
@@ -17,6 +18,7 @@ import { formatNumber, formatPercent } from '@/lib/format';
  * 전체의 몇 퍼센트인가"가 아니라 <b>"꼴찌가 누구고 얼마나 안 쓰이는가"</b>다. 게임을
  * 목록에서 뺄지 정하는 자리이기 때문이다. 원그래프는 작은 조각들을 서로 비교하지 못한다.
  * 게임이 여덟 개면 아래쪽 넷은 전부 얇은 부채꼴이 되어 순서조차 안 보인다.
+ * 항목이 셋뿐인 소셜 제공자 분포는 반대 이유로 도넛이다.
  *
  * <p>막대는 <b>1위 대비</b> 길이다. 전체 대비로 그리면 게임이 여덟 개일 때 모든 막대가
  * 짧아져 서로 비교가 안 된다. 전체 대비 비율은 숫자로 따로 적으므로, 막대는 순위 비교만
@@ -64,16 +66,12 @@ export function GameShareList({ stats }: { stats: GamePlayStat[] }) {
 
           {/* 막대는 이름 아래 전체 폭을 쓴다. 이름과 한 줄에 두었을 때는 긴 게임 이름
             * 하나가 막대 자리를 잡아먹어 줄마다 막대 시작점이 달랐다. */}
-          <span className="col-start-2 h-1.5 overflow-hidden rounded-full bg-subtle">
-            <span
-              className={cn(
-                'block h-full rounded-full',
-                index === 0 ? 'bg-accent' : 'bg-accent/55',
-              )}
-              style={{ width: `${Math.max((stat.plays / top) * 100, 2)}%` }}
-              aria-hidden
-            />
-          </span>
+          <Meter
+            ratio={top === 0 ? 0 : stat.plays / top}
+            size="sm"
+            muted={index > 0}
+            className="col-start-2"
+          />
         </li>
       ))}
     </ul>

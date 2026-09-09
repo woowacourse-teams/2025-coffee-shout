@@ -3,7 +3,8 @@ import { useGamePlayStats, usePeriodSummary, useTrend } from '@/api/queries';
 import type { DailyTrend } from '@/api/types';
 import { FunnelBar } from '@/components/FunnelBar';
 import { GameShareList } from '@/components/GameShareList';
-import { StatCard } from '@/components/StatCard';
+import { Tile } from '@/components/ui/Tile';
+import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { TrendLegend } from '@/components/TrendLegend';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/EmptyState';
@@ -29,17 +30,6 @@ const TrendChart = lazy(() =>
  * 길게 잡을 이유가 없다.
  */
 const RANGES = [7, 14, 30, 90].map((days) => ({ value: days, label: `${days}일` }));
-
-/** 지표 카드 네 칸의 로딩 자리. 실제 카드와 같은 높이라 데이터가 와도 화면이 안 튄다. */
-function CardRowSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
-      ))}
-    </div>
-  );
-}
 
 /**
  * 합계 카드 옆에 붙일 일자별 계열.
@@ -87,18 +77,22 @@ export function AnalyticsPage() {
           period.data ? `${period.data.from} ~ ${period.data.to} (${period.data.days}일)` : undefined
         }
       >
-        <Loaded query={period} skeleton={<CardRowSkeleton />} errorClassName={ERROR_SURFACE}>
+        <Loaded query={period} skeleton={
+            <TileGrid>
+              <TileSkeletons />
+            </TileGrid>
+          } errorClassName={ERROR_SURFACE}>
           {(data) => (
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-              <StatCard label="방 생성" value={data.funnel.created} trend={daily.created} />
-              <StatCard
+            <TileGrid>
+              <Tile label="방 생성" value={data.funnel.created} trend={daily.created} />
+              <Tile
                 label="완주율"
                 value={formatPercent(data.funnel.completionRate)}
                 suffix={`${data.funnel.completed}건`}
                 hint="생성된 방 중 DONE 까지 간 비율"
                 trend={daily.completionRate}
               />
-              <StatCard
+              <Tile
                 label="방당 평균 참여자"
                 value={data.avgPlayersPerRoom.toFixed(1)}
                 suffix="명"
@@ -106,8 +100,8 @@ export function AnalyticsPage() {
                 trend={daily.playersPerRoom}
               />
               {/* 가입은 일자별 계열이 없다. 스파크라인 자리를 다른 계열로 채우지 않는다. */}
-              <StatCard label="신규 가입" value={data.signups} hint="비회원도 게임은 가능합니다" />
-            </div>
+              <Tile label="신규 가입" value={data.signups} hint="비회원도 게임은 가능합니다" />
+            </TileGrid>
           )}
         </Loaded>
       </Section>

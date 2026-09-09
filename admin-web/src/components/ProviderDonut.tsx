@@ -1,5 +1,7 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { ProviderStats } from '@/api/types';
+import { TOOLTIP_STYLE } from '@/components/charts/theme';
+import { Swatch } from '@/components/ui/Legend';
 import { formatNumber, formatPercent } from '@/lib/format';
 
 /**
@@ -83,12 +85,7 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                fontSize: '12px',
-                boxShadow: 'var(--shadow-popover)',
-              }}
+              contentStyle={TOOLTIP_STYLE}
               formatter={(value, name) => [
                 `${formatNumber(Number(value ?? 0))}건 (${
                   total === 0 ? '-' : formatPercent(Number(value ?? 0) / total, 0)
@@ -115,11 +112,7 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
           <li key={slice.key} className="flex items-center gap-2.5">
             {/* 조각과 같은 이유로 테두리를 둔다. 카카오 노랑 사각형은 테두리가 없으면
               * 흰 바탕에서 아예 안 보인다. */}
-            <span
-              className="size-2.5 shrink-0 rounded-sm border border-border-strong"
-              style={{ backgroundColor: slice.color }}
-              aria-hidden
-            />
+            <Swatch color={slice.color} bordered />
             <span className="min-w-0 flex-1 truncate text-xs text-ink">{slice.name}</span>
             <span className="shrink-0 text-xs tabular-nums">
               <span className="font-semibold text-ink">{formatNumber(slice.value)}</span>

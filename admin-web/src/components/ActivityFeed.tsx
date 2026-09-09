@@ -1,5 +1,6 @@
 import type { AdminAuditLog } from '@/api/types';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { TimelineDot } from '@/components/ui/Timeline';
 import { formatRelative } from '@/lib/format';
 import { cn } from '@/lib/cn';
 
@@ -51,19 +52,8 @@ export function ActivityFeed({ logs }: { logs: AdminAuditLog[] }) {
 
         return (
           <li key={log.id} className="relative flex gap-3 pl-0.5">
-            {/* 점과 선. 마지막 항목에서 선을 끊는다 - 아래로 이어질 것이 없다. */}
-            <span className="relative flex w-3 shrink-0 justify-center">
-              <span
-                className={cn(
-                  'z-10 mt-1.5 size-2 shrink-0 rounded-full ring-2 ring-surface',
-                  failed ? 'bg-attention-mark' : 'bg-border-strong',
-                )}
-                aria-hidden
-              />
-              {!last && (
-                <span className="absolute bottom-0 top-3 w-px bg-border-default" aria-hidden />
-              )}
-            </span>
+            {/* 실패한 조치만 점이 로고색이다. 목록을 훑을 때 그 줄에 눈이 먼저 가야 한다. */}
+            <TimelineDot last={last} accent={failed} />
 
             <div className={cn('min-w-0 flex-1', last ? 'pb-0' : 'pb-3')}>
               <p className="truncate text-sm text-ink">

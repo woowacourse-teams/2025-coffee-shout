@@ -26,6 +26,10 @@ type QueueCardProps = {
  * 라벨 길이가 칸마다 달라서다. 그러면 눈이 다섯 번 좌우로 움직여야 한다. 쌓아 두면 숫자가
  * <b>모두 같은 왼쪽 선</b>에서 시작해 한 번의 세로 훑기로 끝난다.
  *
+ * <p>표면과 글자 규격은 {@code Tile} 과 같다. 다른 것은 <b>누를 수 있다는 것</b>뿐이라
+ * 아이콘 칩과 화살표만 더한다. 지표 타일과 나란히 놓였을 때 다른 종류의 물체로 보이면
+ * 안 된다.
+ *
  * <p>카드 바탕은 언제나 흰색이다. 배경을 통째로 물들이면 다섯 칸이 나란히 있을 때 화면이
  * 얼룩덜룩해진다. 색은 <b>아이콘 칩</b>이 진다. 평소 회색이던 칩이 로고색으로 채워지는
  * 것이 신호다. 채워진 칩의 글리프는 흰색이다. 아이콘 혼자 뜻을 지지 않고 옆에 라벨과
@@ -42,7 +46,7 @@ export function QueueCard({ label, count, to, icon: Icon }: QueueCardProps) {
     <Link
       to={to}
       className={cn(
-        'group relative flex flex-col gap-3 rounded-lg border bg-surface px-4 py-3.5 shadow-card transition-all duration-150',
+        'group relative flex flex-col gap-3 rounded-lg border bg-surface px-5 py-4 shadow-card transition-all duration-150',
         'hover:-translate-y-px hover:border-border-strong hover:shadow-popover active:translate-y-0',
         idle ? 'border-border-default' : 'border-attention-mark/45',
       )}

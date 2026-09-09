@@ -5,13 +5,14 @@ import type { Report, ReportStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/EmptyState';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { Select } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
-import { StatCard } from '@/components/StatCard';
+import { Tile } from '@/components/ui/Tile';
+import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
@@ -103,32 +104,30 @@ export function ReportsPage() {
         query={sla}
         errorClassName={ERROR_SURFACE}
         skeleton={
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
-            ))}
-          </div>
+          <TileGrid>
+            <TileSkeletons />
+          </TileGrid>
         }
       >
         {(data) => (
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <StatCard label="미처리" value={data.pendingCount} />
-            <StatCard
+          <TileGrid>
+            <Tile label="미처리" value={data.pendingCount} />
+            <Tile
               label="가장 오래 기다린 건"
               value={formatDurationMinutes(data.oldestPendingMinutes)}
               hint="접수 후 경과"
             />
-            <StatCard
+            <Tile
               label="처리 시간 중앙값"
               value={formatDurationMinutes(data.p50Minutes)}
               hint="평균이 아닌 중앙값"
             />
-            <StatCard
+            <Tile
               label="처리 시간 p95"
               value={formatDurationMinutes(data.p95Minutes)}
               hint={`최근 30일 ${data.resolvedCount}건 기준`}
             />
-          </div>
+          </TileGrid>
         )}
       </Loaded>
 

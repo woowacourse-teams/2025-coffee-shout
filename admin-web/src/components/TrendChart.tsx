@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { DailyTrend } from '@/api/types';
+import { ACTIVE_DOT, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE } from '@/components/charts/theme';
 import { formatNumber } from '@/lib/format';
 
 type TrendChartProps = {
@@ -42,19 +43,15 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }} barGap={2}>
-        <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+        <CartesianGrid {...GRID_STYLE} />
         <XAxis
           dataKey="date"
           tickFormatter={(value: string) => value.slice(5).replace('-', '/')}
-          tick={{ fontSize: 11, fill: 'var(--chart-axis)' }}
-          tickLine={false}
-          axisLine={false}
+          {...AXIS_STYLE}
           minTickGap={16}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: 'var(--chart-axis)' }}
-          tickLine={false}
-          axisLine={false}
+          {...AXIS_STYLE}
           width={44}
           allowDecimals={false}
         />
@@ -62,12 +59,7 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
           // 그날 칸 전체를 옅게 누른다. 선 차트의 세로 실선을 그대로 쓰면 막대 사이 어디를
           // 가리키는지 애매해진다.
           cursor={{ fill: 'var(--chart-grid)', fillOpacity: 0.55 }}
-          contentStyle={{
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border)',
-            fontSize: '12px',
-            boxShadow: 'var(--shadow-popover)',
-          }}
+          contentStyle={TOOLTIP_STYLE}
           labelFormatter={(value) => String(value)}
           formatter={(value, name) => [formatNumber(Number(value ?? 0)), String(name ?? '')]}
         />
@@ -95,8 +87,7 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
           stroke="var(--chart-3)"
           strokeWidth={2}
           dot={false}
-          // 막대 위를 지나므로 흰 테두리를 둘러 점이 막대에 먹히지 않게 한다.
-          activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--bg-surface)' }}
+          activeDot={ACTIVE_DOT}
         />
       </ComposedChart>
     </ResponsiveContainer>

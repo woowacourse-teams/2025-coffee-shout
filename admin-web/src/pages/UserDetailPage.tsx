@@ -6,7 +6,8 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
 import { KeyValue } from '@/components/ui/KeyValue';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { StatCard } from '@/components/StatCard';
+import { Tile } from '@/components/ui/Tile';
+import { TileGrid } from '@/components/ui/TileGrid';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { formatPercent } from '@/lib/format';
@@ -49,15 +50,15 @@ export function UserDetailPage() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-        <StatCard label="참여한 방" value={roomCount} />
-        <StatCard label="당첨" value={winCount} />
-        <StatCard
+      <TileGrid columns={3}>
+        <Tile label="참여한 방" value={roomCount} />
+        <Tile label="당첨" value={winCount} />
+        <Tile
           label="당첨 비율"
           value={formatPercent(winRate)}
           hint="참여 대비. 기대값은 방마다 다름"
         />
-      </div>
+      </TileGrid>
 
       <Card>
         <CardHeader title="계정" />

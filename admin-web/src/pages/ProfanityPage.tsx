@@ -4,12 +4,13 @@ import { useAuditDecision, useNicknameAuditQuality, useNicknameAudits } from '@/
 import type { NicknameAudit, NicknameAuditStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
-import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/EmptyState';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
-import { StatCard } from '@/components/StatCard';
+import { Tile } from '@/components/ui/Tile';
+import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { Tabs } from '@/components/ui/Tabs';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
@@ -106,32 +107,30 @@ export function ProfanityPage() {
         query={quality}
         errorClassName={ERROR_SURFACE}
         skeleton={
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
-            ))}
-          </div>
+          <TileGrid>
+            <TileSkeletons />
+          </TileGrid>
         }
       >
         {(data) => (
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <StatCard
+          <TileGrid>
+            <Tile
               label="AI 판정 뒤집힘"
               value={formatPercent(data.overrideRate)}
               hint="최근 30일. 높으면 모델 점검"
             />
-            <StatCard
+            <Tile
               label="오탐"
               value={data.falsePositive}
               hint="AI가 걸렀는데 관리자가 허용"
             />
-            <StatCard
+            <Tile
               label="미탐"
               value={data.falseNegative}
               hint="AI가 놓쳤는데 관리자가 차단"
             />
-            <StatCard label="판정 일치" value={data.agreed} hint={`총 ${data.total}건 중`} />
-          </div>
+            <Tile label="판정 일치" value={data.agreed} hint={`총 ${data.total}건 중`} />
+          </TileGrid>
         )}
       </Loaded>
 

@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
 import { Loaded } from '@/components/ui/Loaded';
+import { Tile } from '@/components/ui/Tile';
+import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { formatDurationMinutes, formatNumber, formatPercent } from '@/lib/format';
@@ -85,11 +87,9 @@ export function HomePage() {
             <ErrorState message={(queue.error as Error).message} onRetry={() => queue.refetch()} />
           </Card>
         ) : (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <TileGrid columns={5}>
             {queue.isPending
-              ? Array.from({ length: 5 }).map((_, index) => (
-                  <Skeleton key={index} className="h-[5.5rem] rounded-lg" />
-                ))
+              ? <TileSkeletons count={5} />
               : queue.data && (
                   <>
                     <QueueCard
@@ -124,7 +124,7 @@ export function HomePage() {
                     />
                   </>
                 )}
-          </div>
+          </TileGrid>
         )}
       </Section>
 
@@ -135,16 +135,16 @@ export function HomePage() {
         title="운영 품질"
         description="최근 30일. 일이 밀렸는지와 잘 처리하고 있는지는 다른 질문입니다."
       >
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          <Loaded query={sla} skeleton={<TileSkeleton count={2} />} errorClassName={`col-span-2 ${ERROR_SURFACE}`}>
+        <TileGrid>
+          <Loaded query={sla} skeleton={<TileSkeletons count={2} />} errorClassName={`col-span-2 ${ERROR_SURFACE}`}>
             {(data) => (
               <>
-                <QualityTile
+                <Tile
                   label="가장 오래 기다린 신고"
                   value={formatDurationMinutes(data.oldestPendingMinutes)}
                   hint="접수 후 경과"
                 />
-                <QualityTile
+                <Tile
                   label="신고 처리 중앙값"
                   value={formatDurationMinutes(data.p50Minutes)}
                   hint={`30일 ${data.resolvedCount}건`}
@@ -154,17 +154,17 @@ export function HomePage() {
           </Loaded>
           <Loaded
             query={auditQuality}
-            skeleton={<TileSkeleton count={2} />}
+            skeleton={<TileSkeletons count={2} />}
             errorClassName={`col-span-2 ${ERROR_SURFACE}`}
           >
             {(data) => (
               <>
-                <QualityTile
+                <Tile
                   label="검열 AI 판정 뒤집힘"
                   value={formatPercent(data.overrideRate)}
                   hint="높아지면 모델을 손볼 때"
                 />
-                <QualityTile
+                <Tile
                   label="검열 오탐 / 미탐"
                   value={`${data.falsePositive} / ${data.falseNegative}`}
                   hint="AI가 잘못 걸렀다 / 놓쳤다"
@@ -172,7 +172,7 @@ export function HomePage() {
               </>
             )}
           </Loaded>
-        </div>
+        </TileGrid>
       </Section>
 
       <Section title="서비스 흐름" description="오늘 숫자만으로는 0이 정상인지 알 수 없습니다.">
@@ -278,36 +278,6 @@ function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }
       {Array.from({ length: rows }).map((_, index) => (
         <Skeleton key={index} className={height} />
       ))}
-    </div>
-  );
-}
-
-function TileSkeleton({ count }: { count: number }) {
-  return (
-    <>
-      {Array.from({ length: count }).map((_, index) => (
-        <Skeleton key={index} className="h-[5.5rem] rounded-lg" />
-      ))}
-    </>
-  );
-}
-
-/**
- * 운영 품질 한 칸. 값이 "1일 20시간" 같은 문자열이라 {@code StatCard} 의 증감·스파크라인
- * 자리가 전부 빈다. 쓰지 않는 슬롯을 지운 작은 타일을 따로 둔다.
- */
-function QualityTile({ label, value, hint }: { label: string; value: string; hint: string }) {
-  return (
-    <div className="flex h-full flex-col rounded-lg border border-border-default bg-surface px-5 py-4 shadow-card">
-      <p className="truncate text-xs font-medium text-ink-secondary" title={label}>
-        {label}
-      </p>
-      <p className="mt-2 whitespace-nowrap text-xl font-bold leading-none tracking-metric text-ink">
-        {value}
-      </p>
-      <p className="mt-auto truncate pt-2 text-xs text-ink-muted" title={hint}>
-        {hint}
-      </p>
     </div>
   );
 }

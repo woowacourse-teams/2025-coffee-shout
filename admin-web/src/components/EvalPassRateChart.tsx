@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { EvalRun } from '@/api/types';
+import { ACTIVE_DOT, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE } from '@/components/charts/theme';
 import { formatPercent } from '@/lib/format';
 
 /**
@@ -50,31 +51,22 @@ export function EvalPassRateChart({ runs, height = 200 }: { runs: EvalRun[]; hei
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -14 }}>
-        <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+        <CartesianGrid {...GRID_STYLE} />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 11, fill: 'var(--chart-axis)' }}
-          tickLine={false}
-          axisLine={false}
+          {...AXIS_STYLE}
           minTickGap={12}
         />
         <YAxis
           domain={[0, 1]}
           ticks={[0, 0.25, 0.5, 0.75, 1]}
           tickFormatter={(value: number) => formatPercent(value, 0)}
-          tick={{ fontSize: 11, fill: 'var(--chart-axis)' }}
-          tickLine={false}
-          axisLine={false}
+          {...AXIS_STYLE}
           width={46}
         />
         <Tooltip
           cursor={{ stroke: 'var(--border-strong)' }}
-          contentStyle={{
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border)',
-            fontSize: '12px',
-            boxShadow: 'var(--shadow-popover)',
-          }}
+          contentStyle={TOOLTIP_STYLE}
           formatter={(value, _name, item) => {
             const point = item?.payload as (typeof points)[number] | undefined;
             return [
@@ -107,7 +99,7 @@ export function EvalPassRateChart({ runs, height = 200 }: { runs: EvalRun[]; hei
           // 실행이 스무 건 이하라 점을 전부 찍는다. 실행 하나하나가 사람이 누른 사건이고,
           // 몇 번 돌았는지가 선의 모양만큼 중요하다.
           dot={{ r: 3, strokeWidth: 0, fill: 'var(--chart-1)' }}
-          activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--bg-surface)' }}
+          activeDot={{ ...ACTIVE_DOT, r: 5 }}
         />
       </LineChart>
     </ResponsiveContainer>
