@@ -22,7 +22,8 @@ public class NoOpNicknameAuditor implements NicknameAuditor {
 
         requireNonNull(nicknames, "nicknames은 null일 수 없습니다.");
         return nicknames.stream()
-                .map(nickname -> new NicknameAuditResult(nickname, NicknameAuditStatus.CLEAN, AiConfidence.UNKNOWN, "no-op"))
+                .map(nickname ->
+                        new NicknameAuditResult(nickname, NicknameAuditStatus.CLEAN, AiConfidence.UNKNOWN, "no-op"))
                 .toList();
     }
 }
