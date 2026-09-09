@@ -5,6 +5,7 @@ import type { NicknameAudit, NicknameAuditStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
@@ -101,11 +102,17 @@ export function ProfanityPage() {
         description="AI가 걸러낸 닉네임을 사람이 확인합니다. 뒤집힌 비율이 모델을 손볼 시점을 알려줍니다."
       />
 
-      <Loaded query={quality} skeleton={<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
-          ))}
-        </div>}>
+      <Loaded
+        query={quality}
+        errorClassName={ERROR_SURFACE}
+        skeleton={
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
+            ))}
+          </div>
+        }
+      >
         {(data) => (
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <StatCard

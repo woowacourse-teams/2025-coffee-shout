@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
 import { Loaded } from '@/components/ui/Loaded';
+import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { formatDurationMinutes, formatNumber, formatPercent } from '@/lib/format';
 
@@ -135,7 +136,7 @@ export function HomePage() {
         description="최근 30일. 일이 밀렸는지와 잘 처리하고 있는지는 다른 질문입니다."
       >
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          <Loaded query={sla} skeleton={<TileSkeleton count={2} />} errorClassName={TILE_ERROR}>
+          <Loaded query={sla} skeleton={<TileSkeleton count={2} />} errorClassName={`col-span-2 ${ERROR_SURFACE}`}>
             {(data) => (
               <>
                 <QualityTile
@@ -154,7 +155,7 @@ export function HomePage() {
           <Loaded
             query={auditQuality}
             skeleton={<TileSkeleton count={2} />}
-            errorClassName={TILE_ERROR}
+            errorClassName={`col-span-2 ${ERROR_SURFACE}`}
           >
             {(data) => (
               <>
@@ -264,12 +265,6 @@ export function HomePage() {
     </div>
   );
 }
-
-/**
- * 운영 품질 타일이 실패했을 때의 자리. 타일 둘이 차지하던 폭을 그대로 쓰고 카드 표면을
- * 입힌다. 격자 칸에 맨몸 문구만 남기면 캔버스 위에 글자가 떠 있는 꼴이 된다.
- */
-const TILE_ERROR = 'col-span-2 rounded-lg border border-border-default bg-surface shadow-card';
 
 /** 추이 응답에서 계열 하나만 뽑는다. 스파크라인은 값 배열만 받는다. */
 function pick(series: DailyTrend[], key: 'created' | 'completed' | 'players') {

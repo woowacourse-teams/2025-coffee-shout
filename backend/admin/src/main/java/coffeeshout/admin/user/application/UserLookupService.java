@@ -1,5 +1,6 @@
 package coffeeshout.admin.user.application;
 
+import coffeeshout.admin.user.domain.ProviderCount;
 import coffeeshout.admin.user.domain.UserActivity;
 import coffeeshout.admin.user.domain.UserLookupRepository;
 import coffeeshout.admin.user.domain.UserSummary;
@@ -25,6 +26,11 @@ public class UserLookupService {
         return userLookupRepository.search(keyword, PageRequest.of(page, PAGE_SIZE));
     }
 
+    /** 소셜 제공자 분포. 활성 회원 수를 함께 준다 - 연결 수의 합과 회원 수는 다르다. */
+    public ProviderStats findProviderStats() {
+        return new ProviderStats(userLookupRepository.countUsers(), userLookupRepository.countByProvider());
+    }
+
     public UserDetail findDetail(Long userId) {
         final UserSummary summary = userLookupRepository
                 .findById(userId)
@@ -35,4 +41,6 @@ public class UserLookupService {
     }
 
     public record UserDetail(UserSummary summary, List<String> providers, UserActivity activity) {}
+
+    public record ProviderStats(long userCount, List<ProviderCount> counts) {}
 }

@@ -229,6 +229,19 @@ export type UserSummary = {
   createdAt: string;
 };
 
+/**
+ * 소셜 제공자 분포.
+ *
+ * <b>연결 수의 합은 회원 수와 다르다.</b> 한 사람이 구글과 카카오를 모두 연결할 수 있다.
+ * 그래서 서버가 회원 수를 따로 준다. 합을 회원 수로 읽으면 다른 화면의 숫자와 어긋난다.
+ */
+export type ProviderStats = {
+  /** 활성 회원 수. 탈퇴 회원은 빠진다. */
+  userCount: number;
+  /** 연결이 있는 제공자만. 많은 순. provider 는 소문자 google/kakao/naver. */
+  providers: { provider: string; count: number }[];
+};
+
 export type UserDetail = {
   summary: UserSummary;
   providers: string[];

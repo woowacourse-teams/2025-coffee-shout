@@ -1,5 +1,6 @@
 package coffeeshout.admin.user.infra.persistence;
 
+import coffeeshout.admin.user.domain.ProviderCount;
 import coffeeshout.admin.user.domain.UserActivity;
 import coffeeshout.admin.user.domain.UserLookupRepository;
 import coffeeshout.admin.user.domain.UserSummary;
@@ -83,6 +84,30 @@ public class QueryDslUserLookupRepository implements UserLookupRepository {
                 .from(OAUTH)
                 .where(OAUTH.user.id.eq(userId))
                 .orderBy(OAUTH.linkedAt.asc())
+                .fetch();
+    }
+
+    @Override
+    public long countUsers() {
+        final Long total = queryFactory.select(USER.count()).from(USER).fetchOne();
+        return nullToZero(total);
+    }
+
+    /**
+     * 제공자별 연결 수.
+     *
+     * <p>{@code oauth_account} 만 세지 않고 {@code user} 를 조인한다. 조인하지 않으면
+     * {@code UserEntity} 의 {@code @SQLRestriction} 이 걸리지 않아 <b>탈퇴 회원의 연결까지
+     * 세어진다</b>. 같은 화면의 회원 수는 탈퇴를 빼고 세므로 두 숫자가 어긋난다.
+     */
+    @Override
+    public List<ProviderCount> countByProvider() {
+        return queryFactory
+                .select(Projections.constructor(ProviderCount.class, OAUTH.provider, OAUTH.count()))
+                .from(OAUTH)
+                .join(OAUTH.user, USER)
+                .groupBy(OAUTH.provider)
+                .orderBy(OAUTH.count().desc())
                 .fetch();
     }
 

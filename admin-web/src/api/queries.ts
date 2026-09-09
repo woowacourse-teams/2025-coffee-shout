@@ -24,6 +24,7 @@ import type {
   PatchNoteCategory,
   PeriodSummary,
   ProfanityWord,
+  ProviderStats,
   Report,
   ReportSla,
   ReportStatus,
@@ -61,6 +62,7 @@ export const keys = {
   users: {
     search: (keyword: string, page: number) => ['users', 'search', keyword, page] as const,
     detail: (userId: number) => ['users', 'detail', userId] as const,
+    providers: ['users', 'providers'] as const,
   },
   patchNotes: ['patch-notes'] as const,
   admins: ['admins'] as const,
@@ -239,6 +241,12 @@ export function useUserSearch(keyword: string, page: number) {
   return useQuery({
     queryKey: keys.users.search(keyword, page),
     queryFn: () => api.get<PageResponse<UserSummary>>('/users', { keyword, page }),
+  });
+}
+export function useProviderStats() {
+  return useQuery({
+    queryKey: keys.users.providers,
+    queryFn: () => api.get<ProviderStats>('/users/providers'),
   });
 }
 export function useUserDetail(userId: number) {

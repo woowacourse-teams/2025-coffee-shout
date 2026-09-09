@@ -2,6 +2,8 @@ package coffeeshout.admin.user.ui;
 
 import coffeeshout.admin.support.PageResponse;
 import coffeeshout.admin.user.application.UserLookupService;
+import coffeeshout.admin.user.application.UserLookupService.ProviderStats;
+import coffeeshout.admin.user.ui.response.ProviderStatsResponse;
 import coffeeshout.admin.user.ui.response.UserDetailResponse;
 import coffeeshout.admin.user.ui.response.UserSummaryResponse;
 import jakarta.validation.constraints.Min;
@@ -38,6 +40,19 @@ public class AdminUserController {
     public PageResponse<UserSummaryResponse> search(
             @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "0") @Min(0) int page) {
         return PageResponse.of(userLookupService.search(keyword, page), UserSummaryResponse::from);
+    }
+
+    /**
+     * 소셜 제공자 분포.
+     *
+     * <p>{@code /{userId}} 보다 먼저 선언한다. 순서로 결정되지는 않지만, 읽는 사람이
+     * 리터럴 경로와 변수 경로가 같은 자리에 있다는 것을 바로 보게 하려는 것이다.
+     * 매칭은 스프링이 리터럴을 더 구체적인 패턴으로 보고 고른다.
+     */
+    @GetMapping("/providers")
+    public ProviderStatsResponse providers() {
+        final ProviderStats stats = userLookupService.findProviderStats();
+        return ProviderStatsResponse.of(stats.userCount(), stats.counts());
     }
 
     @GetMapping("/{userId}")

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { ErrorState, Skeleton } from '@/components/ui/EmptyState';
+import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { Select } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -98,11 +99,17 @@ export function ReportsPage() {
 
       {/* 실패하면 "-" 대신 실패했다고 말한다. "-" 는 "오늘 0건"과 똑같이 생겨서,
         * 서버가 답을 못 준 것을 처리할 게 없는 것으로 읽게 만든다. */}
-      <Loaded query={sla} skeleton={<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
-          ))}
-        </div>}>
+      <Loaded
+        query={sla}
+        errorClassName={ERROR_SURFACE}
+        skeleton={
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-[6.5rem] rounded-lg" />
+            ))}
+          </div>
+        }
+      >
         {(data) => (
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <StatCard label="미처리" value={data.pendingCount} />

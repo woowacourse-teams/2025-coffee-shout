@@ -7,6 +7,7 @@ import { StatCard } from '@/components/StatCard';
 import { TrendLegend } from '@/components/TrendLegend';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/EmptyState';
+import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
@@ -86,7 +87,7 @@ export function AnalyticsPage() {
           period.data ? `${period.data.from} ~ ${period.data.to} (${period.data.days}일)` : undefined
         }
       >
-        <Loaded query={period} skeleton={<CardRowSkeleton />}>
+        <Loaded query={period} skeleton={<CardRowSkeleton />} errorClassName={ERROR_SURFACE}>
           {(data) => (
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               <StatCard label="방 생성" value={data.funnel.created} trend={daily.created} />

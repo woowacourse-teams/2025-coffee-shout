@@ -26,4 +26,15 @@ public interface UserLookupRepository {
 
     /** 이 유저가 쓰는 소셜 제공자. 여러 개를 연결할 수 있다. */
     List<String> findProviders(Long userId);
+
+    /** 활성 회원 수. 제공자별 연결 수의 합과 다르다 - 한 사람이 여러 소셜을 연결할 수 있다. */
+    long countUsers();
+
+    /**
+     * 제공자별 연결 수. 연결이 하나도 없는 제공자는 결과에 나오지 않는다.
+     *
+     * <p>화면이 그 빈자리를 채운다. 여기서 0짜리 행을 만들어 주려면 저장소가 제공자
+     * 목록을 알아야 하는데, 그건 {@code :user} 모듈의 enum 이고 조회 저장소가 알 일이 아니다.
+     */
+    List<ProviderCount> countByProvider();
 }
