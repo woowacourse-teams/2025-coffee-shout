@@ -10,6 +10,7 @@ import {
   DELAY_AFTER_API,
 } from './domUtils';
 import { MiniGameType } from '@/types/miniGame/common';
+import { chooseHeading } from '@/features/miniGame/wormGame/devtools/wormBot';
 
 // 기본 게임 순서 상수
 export const DEFAULT_SINGLE_GAME: readonly MiniGameType[] = ['CARD_GAME'] as const;
@@ -258,28 +259,87 @@ const racingGamePlayPageAction = async () => {
 
   await wait(DELAY_BETWEEN_ACTIONS);
 
-  // 1초에 5번 클릭 = 200ms마다 클릭
   const CLICK_INTERVAL_MS = 100;
+  // 서버 TapPerSecondSpeedCalculator 는 speed = 초당 탭 수 를 [3, 60] 으로 clamp 한다.
+  // 100ms 틱마다 1~6번 쏘면 초당 10~60탭이라 속도가 바닥부터 천장까지 훑는다.
+  const MIN_TAPS_PER_TICK = 1;
+  const MAX_TAPS_PER_TICK = 6;
+  // 매 틱 새로 뽑으면 서버가 창 단위로 평균 내 값이 뭉개진다. 1~2초 유지해야 가감속이 보인다.
+  const MIN_HOLD_MS = 1000;
+  const MAX_HOLD_MS = 2000;
+
+  const randomInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+  let tapsPerTick = randomInt(MIN_TAPS_PER_TICK, MAX_TAPS_PER_TICK);
+  let holdUntil = Date.now() + randomInt(MIN_HOLD_MS, MAX_HOLD_MS);
 
   racingGameClickIntervalId = window.setInterval(() => {
+    if (Date.now() >= holdUntil) {
+      tapsPerTick = randomInt(MIN_TAPS_PER_TICK, MAX_TAPS_PER_TICK);
+      holdUntil = Date.now() + randomInt(MIN_HOLD_MS, MAX_HOLD_MS);
+    }
+
     // RacingGameOverlay 요소 찾기 (data-testid 사용)
     const overlayElement = findElement('racing-game-overlay');
 
     // Overlay를 찾지 못한 경우 body에 이벤트 발생 (fallback)
     const targetElement = overlayElement || document.body;
 
-    // pointerdown 이벤트 발생
-    const pointerDownEvent = new PointerEvent('pointerdown', {
-      bubbles: true,
-      cancelable: true,
-      pointerId: 1,
-      pointerType: 'mouse',
-      clientX: window.innerWidth / 2,
-      clientY: window.innerHeight / 2,
-    });
+    for (let i = 0; i < tapsPerTick; i++) {
+      // 좌표를 조금씩 흩어 같은 틱의 리플이 완전히 겹치지 않게 한다.
+      const pointerDownEvent = new PointerEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        pointerId: 1,
+        pointerType: 'mouse',
+        clientX: window.innerWidth / 2 + randomInt(-30, 30),
+        clientY: window.innerHeight / 2 + randomInt(-30, 30),
+      });
 
-    targetElement.dispatchEvent(pointerDownEvent);
+      targetElement.dispatchEvent(pointerDownEvent);
+    }
   }, CLICK_INTERVAL_MS);
+};
+
+let wormGameSteerIntervalId: number | null = null;
+
+export const clearWormGameSteerInterval = () => {
+  if (wormGameSteerIntervalId !== null) {
+    clearInterval(wormGameSteerIntervalId);
+    wormGameSteerIntervalId = null;
+  }
+};
+
+// 지렁이 게임 봇: WormGameProvider 가 dev 에서 노출한 스토어(window.__ZZOL_WORM_STORE__)를 읽어
+// 궤적·경계를 피하는 방향(devtools/wormBot.chooseHeading)으로 조향한다. 스토어가 없으면 포인터를 흔드는 폴백.
+const wormGamePlayPageAction = async () => {
+  clearWormGameSteerInterval();
+  await wait(DELAY_BETWEEN_ACTIONS);
+
+  const STEER_INTERVAL_MS = 150;
+  const POINTER_DISTANCE_PX = 120;
+  let fallbackAngle = Math.random() * Math.PI * 2;
+
+  wormGameSteerIntervalId = window.setInterval(() => {
+    const store = window.__ZZOL_WORM_STORE__;
+    if (store) {
+      const heading = chooseHeading(store);
+      if (heading !== null) store.steer(heading);
+      return;
+    }
+    const targetElement = findElement('worm-game-container') || document.body;
+    fallbackAngle += (Math.random() - 0.5) * 1.2;
+    targetElement.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        cancelable: true,
+        pointerId: 1,
+        pointerType: 'mouse',
+        clientX: window.innerWidth / 2 + Math.cos(fallbackAngle) * POINTER_DISTANCE_PX,
+        clientY: window.innerHeight / 2 + Math.sin(fallbackAngle) * POINTER_DISTANCE_PX,
+      })
+    );
+  }, STEER_INTERVAL_MS);
 };
 
 // 페이지 액션 목록
@@ -321,6 +381,10 @@ export const pageActions: PageAction[] = [
   {
     pathPattern: /^\/room\/[^/]+\/RACING_GAME\/play$/,
     execute: racingGamePlayPageAction,
+  },
+  {
+    pathPattern: /^\/room\/[^/]+\/WORM_GAME\/play$/,
+    execute: wormGamePlayPageAction,
   },
 ];
 
