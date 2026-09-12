@@ -40,9 +40,8 @@ const PatchNotesPage = lazy(() =>
 const ReportsPage = lazy(() =>
   import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })),
 );
-const TracePage = lazy(() =>
-  import('@/pages/TracePage').then((m) => ({ default: m.TracePage })),
-);
+const RoomsPage = lazy(() => import('@/pages/RoomsPage').then((m) => ({ default: m.RoomsPage })));
+const UsersPage = lazy(() => import('@/pages/UsersPage').then((m) => ({ default: m.UsersPage })));
 const OpsPage = lazy(() => import('@/pages/OpsPage').then((m) => ({ default: m.OpsPage })));
 const ZzolBotPage = lazy(() =>
   import('@/pages/ZzolBotPage').then((m) => ({ default: m.ZzolBotPage })),
@@ -86,16 +85,16 @@ export function App() {
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/profanity" element={<ProfanityPage />} />
                 <Route path="/ip-blocks" element={<IpBlocksPage />} />
-                <Route path="/trace" element={<TracePage />} />
-                {/* 방 조회와 유저 조회와 각각의 상세, 네 라우트를 추적 하나로 합쳤다.
-                  * 옛 주소를 살려 두는 이유는 북마크와 다른 화면의 링크 때문이다.
-                  * 상세 주소(/rooms/12)는 목록으로 보낸다 - 패널을 여는 데 필요한 것은
-                  * 검색어가 아니라 id 라서 그대로 옮길 수 없고, 억지로 옮기면 검색 결과에
-                  * 없는 방의 패널만 덩그러니 열린다. */}
-                <Route path="/rooms" element={<Navigate to="/trace" replace />} />
-                <Route path="/rooms/:roomId" element={<Navigate to="/trace" replace />} />
-                <Route path="/users" element={<Navigate to="/trace" replace />} />
-                <Route path="/users/:userId" element={<Navigate to="/trace" replace />} />
+                <Route path="/rooms" element={<RoomsPage />} />
+                <Route path="/users" element={<UsersPage />} />
+                {/* 상세가 라우트에서 패널로 옮겨 갔다. 옛 주소는 목록으로 보낸다 - 패널을
+                  * 여는 데 필요한 것은 id 인데 그 id 가 검색 결과 안에 있다는 보장이 없고,
+                  * 억지로 열면 목록에 없는 항목의 패널만 덩그러니 뜬다. */}
+                <Route path="/rooms/:roomId" element={<Navigate to="/rooms" replace />} />
+                <Route path="/users/:userId" element={<Navigate to="/users" replace />} />
+                {/* 방과 유저를 한 화면에 합쳤다가 되돌렸다. 표 두 개가 세로로 쌓이면서
+                  * 어느 표를 보고 있는지가 흐려졌다. */}
+                <Route path="/trace" element={<Navigate to="/rooms" replace />} />
                 {/* 서비스 분석을 홈에 흡수했다. 옛 주소는 홈으로 보낸다. */}
                 <Route path="/games" element={<Navigate to="/" replace />} />
                 <Route path="/patch-notes" element={<PatchNotesPage />} />

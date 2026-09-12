@@ -12,6 +12,7 @@ import {
   ShieldBan,
   SpellCheck,
   UserCog,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useActionQueue } from '@/api/queries';
@@ -75,14 +76,29 @@ function QueueBadge({ item, queue }: { item: NavItem; queue?: ActionQueue }) {
 }
 
 /**
- * 레일 그룹은 <b>업무 흐름</b>으로 묶는다. 알파벳순이나 만든 순이 아니다.
- * 운영자는 "지금 처리할 것 → 무슨 일이 있었나 → 도구" 순으로 화면을 옮긴다.
+ * 레일은 <b>무슨 일을 하는 자리인가</b>로 묶는다. 만든 순도 알파벳순도 아니다.
+ *
+ * <p>한때 운영과 조회와 관리 셋이었다. "운영"과 "관리"는 백오피스의 모든 화면에 해당하는
+ * 말이라 어느 쪽에 넣어도 말이 됐고, 실제로 시스템과 조치 이력이 관리에 들어가 있었지만
+ * 둘이 하는 일은 전혀 달랐다. <b>묶음 이름이 아무것도 걸러내지 못하면 묶지 않은 것과 같다.</b>
+ *
+ * <p>지금 셋은 각자 다른 질문에 답한다.
+ *
+ * <ul>
+ *   <li><b>검토</b> - 사람이 판단해야 끝나는 일. 읽고 허용하거나 차단한다
+ *   <li><b>기록</b> - 지나간 것을 찾아보는 일. 바꾸지 않는다
+ *   <li><b>도구</b> - 서비스를 바꾸거나 다루는 일
+ * </ul>
+ *
+ * <p>홈만 묶음 밖에 둔다. 어느 묶음에 넣어도 그 묶음의 뜻이 넓어지고, 맨 위 한 줄은
+ * 이름표 없이도 무엇인지 분명하다.
  */
+const HOME: NavItem = { to: '/', label: '홈', icon: LayoutDashboard };
+
 const NAV: NavGroup[] = [
   {
-    heading: '운영',
+    heading: '검토',
     items: [
-      { to: '/', label: '홈', icon: LayoutDashboard },
       {
         to: '/reports',
         label: '신고',
@@ -101,18 +117,20 @@ const NAV: NavGroup[] = [
     ],
   },
   {
-    heading: '관리',
+    heading: '기록',
     items: [
-      // 방 조회와 유저 조회를 합친 화면이다. 운영자는 문의를 손에 들고 오는데 둘이
-      // 갈려 있으면 "이게 방 코드인지 유저 코드인지"를 조사보다 먼저 판단해야 했다.
-      //
-      // 서비스 분석은 메뉴에서 뺐다. 홈이 서비스 요약을 맡으면서 같은 카드를 두 화면이
-      // 갖게 됐고, 같은 카드가 두 곳에 있으면 한쪽만 고치는 날이 온다. 거기에만 있던
-      // 기간 탭과 "세지 않는 것" 설명은 홈으로 옮겼다.
-      { to: '/trace', label: '추적', icon: Search },
+      { to: '/rooms', label: '방', icon: Search },
+      { to: '/users', label: '유저', icon: Users },
+      // 조치 이력이 여기 있는 것이 낯설어 보이지만, 하는 일은 방과 유저를 찾는 것과 같다.
+      // 지나간 것을 찾아보고 아무것도 바꾸지 않는다.
+      { to: '/audit-logs', label: '조치 이력', icon: History },
+    ],
+  },
+  {
+    heading: '도구',
+    items: [
       { to: '/patch-notes', label: '패치노트', icon: ScrollText },
       { to: '/zzolbot', label: 'ZzolBot', icon: AlertTriangle },
-      { to: '/admins', label: '관리자', icon: UserCog },
       {
         to: '/ops',
         label: '시스템',
@@ -120,7 +138,7 @@ const NAV: NavGroup[] = [
         count: (queue) => queue.deadLetters,
         critical: true,
       },
-      { to: '/audit-logs', label: '조치 이력', icon: History },
+      { to: '/admins', label: '관리자', icon: UserCog },
     ],
   },
 ];
@@ -194,6 +212,11 @@ function Rail() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-4">
+        {/* 홈은 이름표 없이 맨 위 한 줄이다. 아래 묶음들과 간격으로 갈린다. */}
+        <ul className="flex flex-col gap-0.5">
+          <NavRow item={HOME} queue={queue.data} />
+        </ul>
+
         {NAV.map((group) => (
           <div key={group.heading} className="mt-5 first:mt-0">
             <p className="px-2 pb-2 text-2xs font-semibold tracking-wider text-rail-ink-heading">
@@ -201,36 +224,7 @@ function Rail() {
             </p>
             <ul className="flex flex-col gap-0.5">
               {group.items.map((item) => (
-                <li key={item.to}>
-                  <NavLink
-                    to={item.to}
-                    end={item.to === '/'}
-                    className={({ isActive }) =>
-                      cn(
-                        // 액티브는 둥근 틴트 한 겹으로 끝낸다. 왼쪽 세로 막대까지 겹치면
-                        // 표시가 두 개가 되어 오히려 지저분해진다.
-                        'flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors',
-                        isActive
-                          ? 'bg-rail-active font-semibold text-rail-ink-active'
-                          : 'text-rail-ink hover:bg-rail-hover hover:text-ink',
-                      )
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <item.icon
-                          className={cn(
-                            'size-4 shrink-0',
-                            isActive ? 'text-accent' : 'text-ink-muted',
-                          )}
-                          aria-hidden
-                        />
-                        {item.label}
-                        <QueueBadge item={item} queue={queue.data} />
-                      </>
-                    )}
-                  </NavLink>
-                </li>
+                <NavRow key={item.to} item={item} queue={queue.data} />
               ))}
             </ul>
           </div>
@@ -239,6 +233,39 @@ function Rail() {
 
       <AccountFooter />
     </nav>
+  );
+}
+
+/** 메뉴 한 줄. 홈은 묶음 밖에서, 나머지는 묶음 안에서 같은 모양으로 쓴다. */
+function NavRow({ item, queue }: { item: NavItem; queue?: ActionQueue }) {
+  return (
+    <li>
+      <NavLink
+        to={item.to}
+        end={item.to === '/'}
+        className={({ isActive }) =>
+          cn(
+            // 액티브는 둥근 틴트 한 겹으로 끝낸다. 왼쪽 세로 막대까지 겹치면
+            // 표시가 두 개가 되어 오히려 지저분해진다.
+            'flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors',
+            isActive
+              ? 'bg-rail-active font-semibold text-rail-ink-active'
+              : 'text-rail-ink hover:bg-rail-hover hover:text-ink',
+          )
+        }
+      >
+        {({ isActive }) => (
+          <>
+            <item.icon
+              className={cn('size-4 shrink-0', isActive ? 'text-accent' : 'text-ink-muted')}
+              aria-hidden
+            />
+            {item.label}
+            <QueueBadge item={item} queue={queue} />
+          </>
+        )}
+      </NavLink>
+    </li>
   );
 }
 

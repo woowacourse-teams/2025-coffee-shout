@@ -8,7 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { formatPercent } from '@/lib/format';
 import { miniGameLabel } from '@/lib/labels';
-import { roomStatusBadge } from '@/pages/trace/roomStatus';
+import { roomStatusBadge } from '@/pages/lookup/roomStatus';
 
 /**
  * 방 한 건. "우리 방 결과가 이상해요" 문의에 답하는 자리다.

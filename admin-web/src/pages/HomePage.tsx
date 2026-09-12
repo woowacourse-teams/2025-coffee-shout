@@ -21,7 +21,7 @@ import {
   useProviderStats,
   useTrend,
 } from '@/api/queries';
-import type { DailyTrend, InboxItem, InboxKind } from '@/api/types';
+import type { DailyTrend, Funnel, InboxItem, InboxKind } from '@/api/types';
 import { ActionQueueStrip } from '@/components/ActionQueueStrip';
 import { FunnelBar } from '@/components/FunnelBar';
 import { GameShareList } from '@/components/GameShareList';
@@ -37,7 +37,7 @@ import { Tile } from '@/components/ui/Tile';
 import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
-import { formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent } from '@/lib/format';
 import { inboxKindLabel, reportCategoryLabel } from '@/lib/labels';
 
 const TrendChart = lazy(() =>
@@ -235,28 +235,50 @@ export function HomePage() {
             title="방 진행 퍼널"
             description="게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
           />
-          {/* 다섯 단계가 남는 높이를 <b>줄 사이로</b> 나눠 가진다.
-           *
-           * 가운데 정렬로 두면 위아래에 120px 씩 빈 자리가 남아 카드가 비어 보였다. 옆
-           * 카드가 여덟 줄이라 이 차이는 어느 짝을 지어도 얼마간 생긴다. 간격으로 흡수하면
-           * 여백으로 읽히고, 덩어리째 가운데 두면 빈 판으로 읽힌다. */}
-          <CardBody className="flex flex-1 flex-col">
-            <Loaded query={period} skeleton={<RowSkeleton rows={5} height="h-7" />}>
-              {(data) => (
-                <FunnelBar
-                  className="flex-1 justify-between"
-                  stages={[
-                    { label: '방 생성', count: data.funnel.created },
-                    { label: '게임 시작', count: data.funnel.gameStarted },
-                    { label: '미니게임 완료', count: data.funnel.miniGamePlayed },
-                    { label: '룰렛 도달', count: data.funnel.rouletteReached },
-                    { label: '완주', count: data.funnel.completed },
-                  ]}
-                />
-              )}
+          {/* 막대 위에 요약 두 칸을 얹는다.
+            *
+            * 한때 다섯 단계만 있었고, 옆 카드보다 짧아 생긴 빈 자리를 단계 사이 간격으로
+            * 벌려 메웠다. 그건 공백을 여백으로 위장한 것이지 채운 것이 아니다.
+            *
+            * 이 카드가 답해야 할 질문은 <b>어디서 제일 많이 빠지나</b>인데, 그 답이 오른쪽
+            * 끝 -19 다섯 개를 눈으로 견줘야 나왔다. 위로 올려 숫자로 적으면 카드가 내용으로
+            * 차고 질문에도 바로 답한다. */}
+          <CardBody className="flex flex-1 flex-col gap-4">
+            <Loaded query={period} skeleton={<RowSkeleton rows={6} height="h-7" />}>
+              {(data) => {
+                const stages = funnelStages(data.funnel);
+                const worst = worstDrop(stages);
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-md bg-subtle px-4 py-3">
+                        <p className="text-xs text-ink-secondary">완주율</p>
+                        <p className="mt-1.5 text-xl font-bold leading-none tracking-metric text-ink">
+                          {formatPercent(data.funnel.completionRate)}
+                        </p>
+                        <p className="mt-1.5 text-2xs text-ink-muted">
+                          {formatNumber(data.funnel.created)}개 중 {formatNumber(data.funnel.completed)}개
+                        </p>
+                      </div>
+                      <div className="rounded-md bg-subtle px-4 py-3">
+                        <p className="text-xs text-ink-secondary">가장 많이 빠지는 구간</p>
+                        <p className="mt-1.5 text-xl font-bold leading-none tracking-metric text-ink">
+                          {worst === null ? '-' : `${formatNumber(worst.dropped)}개`}
+                        </p>
+                        <p className="mt-1.5 truncate text-2xs text-ink-muted">
+                          {worst === null ? '이탈 없음' : `${worst.from} 다음`}
+                        </p>
+                      </div>
+                    </div>
+
+                    <FunnelBar stages={stages} />
+                  </>
+                );
+              }}
             </Loaded>
           </CardBody>
         </Card>
+
         <Card className="flex flex-col">
           <CardHeader
             title="게임별 플레이"
@@ -465,6 +487,38 @@ function routeOf(item: InboxItem): string {
 
 function count(items: InboxItem[], kind: InboxKind): number {
   return items.filter((item) => item.kind === kind).length;
+}
+
+/** 퍼널 다섯 단계. 카드와 요약 계산이 같은 목록을 봐야 어긋나지 않는다. */
+function funnelStages(funnel: Funnel) {
+  return [
+    { label: '방 생성', count: funnel.created },
+    { label: '게임 시작', count: funnel.gameStarted },
+    { label: '미니게임 완료', count: funnel.miniGamePlayed },
+    { label: '룰렛 도달', count: funnel.rouletteReached },
+    { label: '완주', count: funnel.completed },
+  ];
+}
+
+/**
+ * 가장 많이 빠진 구간.
+ *
+ * <p>비율이 아니라 <b>개수</b>로 고른다. 운영자가 읽는 말은 "열아홉 개 방이 게임도 못
+ * 시작했다"이지 "11퍼센트가 이탈했다"가 아니다. 비율은 분모가 작을수록 커져서, 뒤쪽
+ * 단계의 작은 이탈이 앞쪽의 큰 이탈보다 커 보인다.
+ *
+ * <p>같은 값이면 앞 단계를 고른다. 앞에서 빠진 방은 뒤 단계에 아예 오지 못하므로 먼저
+ * 손볼 곳도 앞쪽이다.
+ */
+function worstDrop(stages: { label: string; count: number }[]) {
+  let worst: { from: string; dropped: number } | null = null;
+  for (let index = 1; index < stages.length; index += 1) {
+    const dropped = (stages[index - 1]?.count ?? 0) - (stages[index]?.count ?? 0);
+    if (dropped > 0 && (worst === null || dropped > worst.dropped)) {
+      worst = { from: stages[index - 1]?.label ?? '', dropped };
+    }
+  }
+  return worst;
 }
 
 /** 추이 응답에서 계열 하나만 뽑는다. 스파크라인은 값 배열만 받는다. */
