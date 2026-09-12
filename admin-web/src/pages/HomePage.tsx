@@ -1,223 +1,169 @@
-import { Hourglass, MessageSquareWarning, ServerCog, ShieldBan, SpellCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import {
-  useActionQueue,
-  useAuditLogs,
-  useDailySummary,
-  useNicknameAuditQuality,
-  useReportSla,
-  useTrend,
-} from '@/api/queries';
-import { lazy, Suspense } from 'react';
-import type { DailyTrend } from '@/api/types';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuditLogs, useDailySummary, useInbox, useTrend } from '@/api/queries';
+import type { DailyTrend, InboxItem, InboxKind } from '@/api/types';
 import { ActivityFeed } from '@/components/ActivityFeed';
-import { FunnelBar } from '@/components/FunnelBar';
-import { ActionQueueStrip } from '@/components/ActionQueueStrip';
-import { TrendLegend } from '@/components/TrendLegend';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { Loaded } from '@/components/ui/Loaded';
-import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { MetricRow } from '@/components/ui/MetricRow';
-import { PageHeader, Section } from '@/components/ui/PageHeader';
-import { formatDurationMinutes, formatPercent } from '@/lib/format';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { Tabs } from '@/components/ui/Tabs';
+import { Timestamp } from '@/components/ui/Timestamp';
+import { DataTable } from '@/components/DataTable';
+import { formatPercent } from '@/lib/format';
+import { inboxKindLabel, reportCategoryLabel } from '@/lib/labels';
 
-/**
- * recharts 는 이 차트 하나에만 쓰이는데 gzip 108KB 를 더한다. 지연 로드하면 로그인 화면과
- * 목록 화면이 그 무게를 지지 않는다. 홈은 차트가 조금 늦게 떠도 나머지가 먼저 보인다.
- *
- * <p>범례를 {@link TrendLegend} 로 떼어낸 것이 이 분리의 전제다. 같은 모듈에서 범례를
- * 정적으로 가져오면 recharts 가 메인 청크로 따라 들어와 지연 로드가 무효가 된다.
- *
- * <p>{@code Sparkline} 은 반대로 정적으로 가져온다. recharts 를 쓰지 않고 {@code polyline}
- * 하나로 그리기 때문에 무게가 없다.
- */
 /**
  * 이 화면의 유일한 좌우 분할이다. 넓은 쪽 2, 좁은 쪽 1.
  *
- * <p>한때 줄마다 비율이 달랐다. 추이와 오늘은 2:1, 퍼널과 조치는 3:2 였다. 각 줄만 보면
- * 그럴듯했지만 <b>위아래로 놓고 보면 오른쪽 카드들의 왼쪽 모서리가 어긋났다.</b> 눈에 딱
- * 짚이지는 않는데 화면 전체가 어수선해 보이는 원인이 이런 것이다.
- *
- * <p>줄마다 최적 비율을 따로 찾지 않는다. 하나로 고정하고 내용을 거기 맞춘다.
+ * <p>{@code items-start} 를 준다. 기본값(stretch)이면 오른쪽 카드가 왼쪽 표 높이까지
+ * 늘어나 <b>아래 절반이 빈 흰 판</b>이 된다. 표는 스무 행이고 오른쪽 목록은 네 줄이라
+ * 그 차이가 크다. 카드 사이로 캔버스가 보이는 것은 흠이 아니다. 흠은 카드 <b>안</b>이
+ * 비는 것이다.
  */
-const SPLIT = 'grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]';
+const SPLIT = 'grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]';
 
-const TrendChart = lazy(() =>
-  import('@/components/TrendChart').then((module) => ({ default: module.TrendChart })),
-);
+type KindFilter = InboxKind | 'ALL';
 
 /**
- * 홈. 운영자가 로그인해서 <b>3초 안에</b> 세 가지에 답할 수 있어야 한다.
- * "지금 처리할 일이 있나", "서비스가 평소만큼 돌고 있나", "누가 방금 뭘 바꿨나".
+ * 작업함.
  *
- * <p>담는 지표의 기준은 하나다. <b>Grafana 가 못 보는 것.</b> 응답시간, 에러율, JVM 은
- * 그쪽이 이미 본다. 두 곳이 다른 숫자를 말하는 순간 양쪽 다 신뢰를 잃는다.
- * 여기 있는 것은 전부 도메인 조인이거나 우리 DB 에만 있는 기록이다.
+ * <p>예전 홈은 대시보드였다. 처리 대기 다섯 칸, 운영 품질 두 카드, 14일 추이, 오늘 퍼널,
+ * 최근 조치가 같은 무게로 쌓여 세로 2600px 였고, 숫자를 보여준 뒤에는 <b>다른 화면으로
+ * 던졌다.</b> 운영자는 숫자를 보러 오는 게 아니라 일을 끝내러 온다.
  *
- * <h2>배치는 위 세 질문의 순서를 따른다</h2>
+ * <p>그래서 홈이 답하는 질문을 하나로 좁혔다. <b>지금 무엇을 처리해야 하는가.</b> 신고와
+ * 닉네임 검열과 격리 메시지가 세 화면에 흩어져 있어 오늘 할 일을 끝내려면 세 화면을
+ * 왕복해야 했다. 여기서 한 목록으로 훑는다.
  *
- * <p>① 처리 대기와 운영 품질을 위에 붙여 둔다. "밀렸나"와 "잘 처리하고 있나"는 같은
- * 질문의 앞뒤인데, 운영 품질이 화면 맨 아래에 있어서 둘을 함께 보려면 스크롤해야 했다.
- *
- * <p>② 그다음이 서비스 흐름이다. 14일 추이와 오늘 숫자를 나란히 두고, 그 아래 오늘 퍼널을
- * 놓는다. 셋 다 "지금 정상인가"에 답한다.
- *
- * <p>③ 최근 조치가 맨 아래에 가로로 눕는다. 시간 순 기록이라 세로로 길고, 옆에 무엇을
- * 두든 높이가 안 맞았다.
- *
- * <p><b>게임별 플레이는 뺐다.</b> 30일 집계라 이 화면의 "지금"과 시간축이 다르고,
- * 서비스 분석 화면에 똑같은 카드가 이미 있다. 같은 카드를 두 곳에 두면 한쪽만 고치는
- * 날이 온다.
+ * <p>"평소만큼 돌고 있나"는 서비스 분석이 답한다. 추이와 퍼널과 운영 품질을 그쪽으로
+ * 옮겼다. 레일에서 한 번 누르는 거리이고, 두 질문을 한 화면에 쌓았기 때문에 홈이
+ * 길어졌던 것이다. 오른쪽의 오늘 숫자와 스파크라인이 "평소와 다른가"에는 답한다.
  */
 export function HomePage() {
-  const queue = useActionQueue();
+  const navigate = useNavigate();
+  const inbox = useInbox();
   const summary = useDailySummary();
   const trend = useTrend(14);
-  const sla = useReportSla(30);
-  const auditQuality = useNicknameAuditQuality(30);
-  // 다섯 건이다. 옆 퍼널 카드와 높이를 맞추려고 정한 수다. 더 보려면 전체 보기로 간다.
+  // 다섯 건이다. 더 보려면 전체 보기로 간다.
   const logs = useAuditLogs(5);
 
+  const [kind, setKind] = useState<KindFilter>('ALL');
+
+  const items = inbox.data ?? [];
+  const filtered = kind === 'ALL' ? items : items.filter((item) => item.kind === kind);
   const series = trend.data ?? [];
+
+  const columns = useMemo<ColumnDef<InboxItem, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'kind',
+        header: '종류',
+        meta: { width: '6rem' },
+        cell: (c) => <KindBadge kind={c.getValue() as InboxKind} />,
+      },
+      {
+        accessorKey: 'title',
+        header: '내용',
+        cell: (c) => <span className="line-clamp-2">{String(c.getValue())}</span>,
+      },
+      {
+        accessorKey: 'detail',
+        header: '사유',
+        // 주인공은 내용 열이다. 사유가 16rem 을 차지하고 있어서 정작 신고 본문이 두 줄로
+        // 감겼는데, 사유에는 대개 "버그" 같은 한 단어가 들어간다. 곁들이는 열이 본문을
+        // 밀어내면 표를 훑는 속도가 그만큼 떨어진다.
+        meta: { width: '11rem' },
+        cell: (c) => {
+          const item = c.row.original;
+          const detail = c.getValue() as string | null;
+          if (!detail) {
+            return <span className="text-ink-muted">-</span>;
+          }
+          // 신고의 사유 자리에는 카테고리가 온다. 서버 enum 이라 한글로 바꾼다.
+          const text = item.kind === 'REPORT' ? reportCategoryLabel(detail) : detail;
+          return (
+            <span className="line-clamp-2 text-ink-secondary" title={text}>
+              {text}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: 'occurredAt',
+        header: '들어온 시각',
+        meta: { width: '13rem' },
+        cell: (c) => <Timestamp value={c.getValue() as string} />,
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="홈"
-        description="처리할 일과 서비스 흐름. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
+        title="작업함"
+        description="신고와 닉네임 검열과 격리 메시지를 한 목록으로 봅니다. 인프라 지표는 Grafana(status.zzol.site)가 봅니다."
       />
 
-      <Section title="처리 대기" description="숫자를 누르면 해당 화면으로 갑니다.">
-        <Loaded query={queue} skeleton={<TileGrid columns={5}><TileSkeletons count={5} height="h-[4.75rem]" /></TileGrid>}>
-          {(data) => (
-            <ActionQueueStrip
-              items={[
-                // 맨 앞이다. 나머지 넷은 사람이 판단해 줄 일이고 쌓이는 게 정상이지만,
-                // 이건 시스템이 멈춘 것이라 0이 아닌 순간 다른 무엇보다 먼저 봐야 한다.
-                {
-                  label: '격리 메시지',
-                  count: data.deadLetters,
-                  to: '/ops',
-                  icon: ServerCog,
-                  critical: true,
-                },
-                {
-                  label: '미처리 신고',
-                  count: data.pendingReports,
-                  to: '/reports',
-                  icon: MessageSquareWarning,
-                },
-                // 화면에 FLAGGED, PENDING 을 그대로 적던 것을 걷어냈다. 서버 enum 이름이고
-                // 운영자가 쓰는 말이 아니다. 검열 화면이 이미 각 상태에 붙여 둔 설명을
-                // 그대로 가져왔다.
-                {
-                  label: 'AI가 걸러낸 닉네임',
-                  count: data.flaggedNicknames,
-                  to: '/profanity',
-                  icon: SpellCheck,
-                },
-                {
-                  label: 'AI가 판단 못한 닉네임',
-                  count: data.pendingNicknames,
-                  to: '/profanity',
-                  icon: Hourglass,
-                },
-                { label: '차단 IP', count: data.blockedIps, to: '/ip-blocks', icon: ShieldBan },
-              ]}
-            />
-          )}
-        </Loaded>
-      </Section>
+      <div className={SPLIT}>
+        <Card>
+          <CardHeader
+            title="처리할 일"
+            // 스무 건 상한을 화면에 적는다. 적지 않으면 이 목록이 전부인 줄 알고,
+            // 신고 서른아홉 건이 밀려 있어도 열두 건만 있는 것으로 읽는다.
+            description="세 곳에서 모은 최신 20건입니다. 전체 목록은 각 화면에 있습니다."
+            actions={
+              <Tabs
+                label="종류"
+                value={kind}
+                onChange={setKind}
+                tabs={[
+                  { value: 'ALL', label: `전체 ${items.length}` },
+                  { value: 'REPORT', label: `신고 ${count(items, 'REPORT')}` },
+                  {
+                    value: 'NICKNAME',
+                    label: `닉네임 ${count(items, 'NICKNAME')}`,
+                  },
+                  {
+                    value: 'DEAD_LETTER',
+                    label: `격리 ${count(items, 'DEAD_LETTER')}`,
+                  },
+                ]}
+              />
+            }
+          />
 
-      {/* 처리 대기 바로 아래다. 밀린 양과 처리 품질은 한 덩어리로 봐야 판단이 선다.
-        *
-        * 타일 넷을 늘어놓다가 두 묶음으로 접었다. 네 지표가 같은 무게로 나란히 서 있으면
-        * 서로 무관한 넷으로 읽히는데, 실제로는 <b>질문이 둘</b>이다. 신고를 얼마나 빨리
-        * 처리하나, AI 검열이 얼마나 정확한가. 각 묶음 안에서만 값을 견주면 되고 묶음끼리는
-        * 견줄 일이 없다.
-        *
-        * 접으면서 "검열 오탐 / 미탐 = 0 / 0" 도 풀렸다. 라벨의 슬래시와 값의 슬래시가
-        * 겹쳐서 어느 쪽이 오탐인지 세어 봐야 했는데, 줄로 나누면 각자 이름을 갖는다.
-        *
-        * 두 요청은 따로 감싼다. 한 덩어리로 묶으면 한쪽이 실패할 때 멀쩡한 나머지 숫자까지
-        * 사라진다. */}
-      <Section
-        title="운영 품질"
-        description="최근 30일. 일이 밀렸는지와 잘 처리하고 있는지는 다른 질문입니다."
-      >
-        {/* 여기는 반반이다. 두 카드가 같은 급의 질문이라 한쪽을 넓히면 그쪽이 더 중요해
-          * 보인다. 2:1 분할은 "넓은 쪽이 본문, 좁은 쪽이 곁들이"일 때만 쓴다. */}
-        <div className="grid gap-4 xl:grid-cols-2">
-          <Card>
-            <CardHeader title="신고 처리 속도" description="접수부터 처리까지 걸린 시간" />
-            <CardBody>
-              <Loaded query={sla} skeleton={<RowSkeleton rows={3} />}>
-                {(data) => (
-                    <dl className="flex flex-col">
-                      <MetricRow
-                        label="가장 오래 기다린 건"
-                        value={formatDurationMinutes(data.oldestPendingMinutes)}
-                        hint="아직 처리 안 된 것 중 접수가 가장 이른 건"
-                      />
-                      <MetricRow
-                        label="처리 시간 중앙값"
-                        value={formatDurationMinutes(data.p50Minutes)}
-                        hint={`30일 동안 처리한 ${data.resolvedCount}건 기준`}
-                      />
-                  </dl>
-                )}
-              </Loaded>
-            </CardBody>
-          </Card>
+          {/* 행을 누르면 그 종류의 화면으로 가되 해당 항목이 열린 상태로 간다.
+           *
+           * 여기서 바로 처리하지 않는 이유가 있다. 세 종류의 조치가 서로 다르고
+           * (신고는 처리 완료, 닉네임은 허용과 차단, 격리는 재투입과 폐기), 격리는
+           * 원문을 읽지 않고 누르면 안 되는 조치다. 조치 UI 세 벌을 여기 겹쳐 놓으면
+           * 작업함이 세 화면을 합친 것이 아니라 <b>네 번째 화면</b>이 된다.
+           *
+           * 지금은 신고만 패널로 열린다. 나머지 둘은 그 화면에 패널이 생기는 대로
+           * 같은 주소 규칙으로 이어진다. */}
+          <DataTable
+            columns={columns}
+            data={filtered}
+            loading={inbox.isPending}
+            error={inbox.error}
+            onRetry={() => inbox.refetch()}
+            onRowClick={(item) => navigate(routeOf(item))}
+            emptyTitle={kind === 'ALL' ? '처리할 일이 없습니다' : '이 종류는 없습니다'}
+            emptyDescription={
+              kind === 'ALL'
+                ? '새 신고나 검열 대기가 생기면 여기에 쌓입니다.'
+                : '다른 종류를 눌러 보세요.'
+            }
+          />
+        </Card>
 
-          <Card>
-            <CardHeader title="검열 판정 정확도" description="AI 판정을 운영자가 뒤집은 비율" />
-            <CardBody>
-              <Loaded query={auditQuality} skeleton={<RowSkeleton rows={3} />}>
-                {(data) => (
-                  <dl className="flex flex-col">
-                    <MetricRow
-                      label="판정 뒤집힘"
-                      value={formatPercent(data.overrideRate)}
-                      hint="높아지면 모델을 손볼 때"
-                    />
-                    <MetricRow
-                      label="오탐"
-                      value={data.falsePositive}
-                      hint="AI가 걸렀는데 운영자가 허용"
-                    />
-                    <MetricRow
-                      label="미탐"
-                      value={data.falseNegative}
-                      hint="AI가 놓쳤는데 운영자가 차단"
-                    />
-                  </dl>
-                )}
-              </Loaded>
-            </CardBody>
-          </Card>
-        </div>
-      </Section>
-
-      <Section title="서비스 흐름" description="오늘 숫자만으로는 0이 정상인지 알 수 없습니다.">
-        {/* 왼쪽은 "어떻게 돌고 있나", 오른쪽은 "오늘 얼마나 됐나".
-          * 추이는 가로가 길어야 모양이 보이고, 오늘 숫자는 세로로 쌓아야 자릿수가 비교된다. */}
-        <div className={SPLIT}>
-          <Card>
-            <CardHeader title="최근 14일" actions={<TrendLegend />} />
-            <CardBody>
-              <Loaded query={trend} skeleton={<Skeleton className="h-[220px]" />}>
-                {(data) => (
-                  <Suspense fallback={<Skeleton className="h-[220px]" />}>
-                    <TrendChart data={data} />
-                  </Suspense>
-                )}
-              </Loaded>
-            </CardBody>
-          </Card>
-
+        <div className="flex flex-col gap-4">
           <Card>
             <CardHeader title="오늘" description={summary.data?.date} />
             <CardBody>
@@ -242,8 +188,8 @@ export function HomePage() {
                       series={pick(series, 'players')}
                     />
                     {/* 신규 가입은 일자별 계열이 없다. 빈 배열을 줘서 그림 없이 자리만
-                      * 잡는다. 다른 계열의 모양을 빌려 오면 그건 이 지표의 흐름이 아니고,
-                      * 아예 안 주면 이 줄만 숫자가 왼쪽으로 밀린다. */}
+                     * 잡는다. 다른 계열의 모양을 빌려 오면 그건 이 지표의 흐름이 아니고,
+                     * 아예 안 주면 이 줄만 숫자가 왼쪽으로 밀린다. */}
                     <MetricRow
                       label="신규 가입"
                       value={data.signups}
@@ -255,58 +201,59 @@ export function HomePage() {
               </Loaded>
             </CardBody>
           </Card>
-        </div>
-      </Section>
 
-      {/* 두 카드의 높이를 맞춘다.
-        *
-        * 한때 items-start 로 각자 내용만큼만 차지하게 뒀는데 나란히 선 카드의 아래가
-        * 어긋나 보였다. 그렇다고 기본값(stretch)만 두면 짧은 퍼널 카드가 조치 목록
-        * 높이까지 늘어나 아래 절반이 빈 흰 판이 된다.
-        *
-        * 양쪽에서 좁혔다. 조치는 다섯 건만 보여 목록을 짧게 하고, 퍼널은 남는 높이를
-        * 위아래로 나눠 가운데 선다. 남는 30px 남짓이 위아래로 갈리면 여백으로 읽히지
-        * 빈 판으로는 안 읽힌다. */}
-      <div className={SPLIT}>
-        <Card className="flex flex-col">
-          <CardHeader
-            title="오늘 방 진행 퍼널"
-            description="게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
-          />
-          <CardBody className="flex flex-1 flex-col justify-center">
-            <Loaded query={summary} skeleton={<RowSkeleton rows={5} height="h-7" />}>
-              {(data) => (
-                <FunnelBar
-                  stages={[
-                    { label: '방 생성', count: data.funnel.created },
-                    { label: '게임 시작', count: data.funnel.gameStarted },
-                    { label: '미니게임 완료', count: data.funnel.miniGamePlayed },
-                    { label: '룰렛 도달', count: data.funnel.rouletteReached },
-                    { label: '완주', count: data.funnel.completed },
-                  ]}
-                />
-              )}
+          <Card>
+            <CardHeader
+              title="최근 조치"
+              description="Grafana 로는 볼 수 없는 기록입니다."
+              actions={
+                <Button asChild size="sm" variant="ghost">
+                  <Link to="/audit-logs">전체 보기</Link>
+                </Button>
+              }
+            />
+            <Loaded query={logs} skeleton={<RowSkeleton rows={5} />}>
+              {(data) => <ActivityFeed logs={data.content} />}
             </Loaded>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader
-            title="최근 조치"
-            description="Grafana 로는 볼 수 없는 기록입니다."
-            actions={
-              <Button asChild size="sm" variant="ghost">
-                <Link to="/audit-logs">전체 보기</Link>
-              </Button>
-            }
-          />
-          <Loaded query={logs} skeleton={<RowSkeleton rows={5} />}>
-            {(data) => <ActivityFeed logs={data.content} />}
-          </Loaded>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
+}
+
+/**
+ * 종류 표식.
+ *
+ * <p>격리만 색이 붙는다. 신고와 검열은 평소에도 쌓이는 것이 정상이라 늘 코랄이면 그 색이
+ * 뜻을 잃는다. 격리는 평소 0이고 1이 되는 순간이 곧 사고다.
+ */
+function KindBadge({ kind }: { kind: InboxKind }) {
+  return (
+    <StatusBadge tone={kind === 'DEAD_LETTER' ? 'attention' : 'neutral'}>
+      {inboxKindLabel(kind)}
+    </StatusBadge>
+  );
+}
+
+/**
+ * 행을 눌렀을 때 갈 곳.
+ *
+ * <p>격리 메시지의 식별자는 {@code OUTBOX:3} 처럼 출처가 앞에 붙는다. 두 테이블의 id 가
+ * 겹쳐서 숫자만으로는 무엇을 폐기할지 정해지지 않기 때문이다.
+ */
+function routeOf(item: InboxItem): string {
+  if (item.kind === 'REPORT') {
+    return `/reports?open=report:${item.id}`;
+  }
+  if (item.kind === 'NICKNAME') {
+    return '/profanity';
+  }
+  return '/ops';
+}
+
+function count(items: InboxItem[], kind: InboxKind): number {
+  return items.filter((item) => item.kind === kind).length;
 }
 
 /** 추이 응답에서 계열 하나만 뽑는다. 스파크라인은 값 배열만 받는다. */
@@ -318,8 +265,6 @@ function pick(series: DailyTrend[], key: 'created' | 'completed' | 'players') {
  * 목록형 카드의 로딩 자리. 카드마다 Array.from 을 반복해 적던 것을 모았다.
  *
  * <p>좌우 여백이 없다. 전부 {@code CardBody} 안에서 쓰이므로 여백은 거기서 온다.
- * 예전에는 목록이 카드 직속이라 여기서 여백을 줬는데, 그때 값이 남아 있으면 여백이
- * 두 겹이 된다.
  */
 function RowSkeleton({ rows, height = 'h-8' }: { rows: number; height?: string }) {
   return (

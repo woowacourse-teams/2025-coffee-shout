@@ -14,6 +14,7 @@ import type {
   EvalRunDetail,
   EvalScenario,
   GamePlayStat,
+  InboxItem,
   Migrations,
   MonitorAlert,
   NicknameAudit,
@@ -54,6 +55,7 @@ export const keys = {
     words: (filters: unknown) => ['profanity', 'words', filters] as const,
     quality: (days: number) => ['profanity', 'quality', days] as const,
   },
+  inbox: ['inbox'] as const,
   ipBlocks: ['ip-blocks'] as const,
   rooms: {
     search: (joinCode: string, page: number) => ['rooms', 'search', joinCode, page] as const,
@@ -76,6 +78,20 @@ export function useActionQueue() {
     refetchInterval: 30_000,
   });
 }
+/**
+ * 통합 작업함. 신고와 닉네임 검열과 격리 메시지를 한 목록으로 받는다.
+ *
+ * <p>큐와 같은 주기로 갱신한다. 둘은 같은 것을 다르게 말하는 사이라, 배지는 줄었는데
+ * 목록에는 그 줄이 남아 있으면 조치가 안 먹은 것으로 읽힌다.
+ */
+export function useInbox() {
+  return useQuery({
+    queryKey: keys.inbox,
+    queryFn: () => api.get<InboxItem[]>('/inbox'),
+    refetchInterval: 30_000,
+  });
+}
+
 export function useTrend(days = 14) {
   return useQuery({
     queryKey: ['overview', 'trend', days],

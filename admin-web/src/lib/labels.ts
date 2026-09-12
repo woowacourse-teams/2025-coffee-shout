@@ -27,8 +27,24 @@ const MINI_GAME: Record<string, string> = {
   WORM_GAME: '지렁이 게임',
 };
 
+/**
+ * 작업함의 종류 표식.
+ *
+ * <p>짧게 둔다. 표의 첫 열이라 길면 내용 열을 밀어낸다. "격리 메시지"가 아니라 "격리"인
+ * 것도 그래서다. 무엇이 격리됐는지는 바로 옆 칸이 말한다.
+ */
+const INBOX_KIND: Record<string, string> = {
+  REPORT: '신고',
+  NICKNAME: '닉네임',
+  DEAD_LETTER: '격리',
+};
+
 export function reportCategoryLabel(value: string): string {
   return REPORT_CATEGORY[value] ?? value;
+}
+
+export function inboxKindLabel(value: string): string {
+  return INBOX_KIND[value] ?? value;
 }
 
 export function miniGameLabel(value: string): string {

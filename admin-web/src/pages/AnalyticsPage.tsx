@@ -1,5 +1,11 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { useGamePlayStats, usePeriodSummary, useTrend } from '@/api/queries';
+import {
+  useGamePlayStats,
+  useNicknameAuditQuality,
+  usePeriodSummary,
+  useReportSla,
+  useTrend,
+} from '@/api/queries';
 import type { DailyTrend } from '@/api/types';
 import { FunnelBar } from '@/components/FunnelBar';
 import { GameShareList } from '@/components/GameShareList';
@@ -10,12 +16,15 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
+import { MetricRow } from '@/components/ui/MetricRow';
 import { PageHeader, Section } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatPercent } from '@/lib/format';
+import { formatDurationMinutes, formatPercent } from '@/lib/format';
 
 const TrendChart = lazy(() =>
-  import('@/components/TrendChart').then((module) => ({ default: module.TrendChart })),
+  import('@/components/TrendChart').then((module) => ({
+    default: module.TrendChart,
+  })),
 );
 
 /**
@@ -29,7 +38,10 @@ const TrendChart = lazy(() =>
  * 인덱스를 타도 구간이 길수록 스캔이 늘고, 백오피스 한 번 열자고 운영 DB 를
  * 길게 잡을 이유가 없다.
  */
-const RANGES = [7, 14, 30, 90].map((days) => ({ value: days, label: `${days}일` }));
+const RANGES = [7, 14, 30, 90].map((days) => ({
+  value: days,
+  label: `${days}일`,
+}));
 
 /**
  * 합계 카드 옆에 붙일 일자별 계열.
@@ -60,6 +72,8 @@ export function AnalyticsPage() {
   const period = usePeriodSummary(days);
   const trend = useTrend(Math.min(days, 90));
   const games = useGamePlayStats(days);
+  const sla = useReportSla(days);
+  const auditQuality = useNicknameAuditQuality(days);
 
   const daily = useDailySeries(trend.data);
 
@@ -74,14 +88,20 @@ export function AnalyticsPage() {
       <Section
         title="기간 합계"
         description={
-          period.data ? `${period.data.from} ~ ${period.data.to} (${period.data.days}일)` : undefined
+          period.data
+            ? `${period.data.from} ~ ${period.data.to} (${period.data.days}일)`
+            : undefined
         }
       >
-        <Loaded query={period} skeleton={
+        <Loaded
+          query={period}
+          skeleton={
             <TileGrid>
               <TileSkeletons />
             </TileGrid>
-          } errorClassName={ERROR_SURFACE}>
+          }
+          errorClassName={ERROR_SURFACE}
+        >
           {(data) => (
             <TileGrid>
               <Tile label="방 생성" value={data.funnel.created} trend={daily.created} />
@@ -123,9 +143,13 @@ export function AnalyticsPage() {
       </Card>
 
       {/* 홈과 같은 분할이다(넓은 쪽 2, 좁은 쪽 1). 퍼널은 단계 이름과 막대와 전환율이
-        * 한 줄에 들어가야 해서 넓은 쪽이 맞고, 게임별 목록은 이름과 숫자뿐이라 좁아도
-        * 읽힌다. 화면마다 비율을 따로 정하면 메뉴를 옮길 때 카드 모서리가 움직인다. */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
+       * 한 줄에 들어가야 해서 넓은 쪽이 맞고, 게임별 목록은 이름과 숫자뿐이라 좁아도
+       * 읽힌다. 화면마다 비율을 따로 정하면 메뉴를 옮길 때 카드 모서리가 움직인다.
+       *
+       * items-start 를 준다. 기본값이면 다섯 줄짜리 퍼널이 여덟 줄짜리 게임 목록 높이까지
+       * 늘어나 카드 아래 300px 가 빈 흰 판이 됐다. 카드 사이로 캔버스가 보이는 것은 흠이
+       * 아니다. 흠은 카드 안이 비는 것이다. */}
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
         <Card>
           <CardHeader
             title="방 진행 퍼널"
@@ -147,7 +171,10 @@ export function AnalyticsPage() {
                   stages={[
                     { label: '방 생성', count: data.funnel.created },
                     { label: '게임 시작', count: data.funnel.gameStarted },
-                    { label: '미니게임 완료', count: data.funnel.miniGamePlayed },
+                    {
+                      label: '미니게임 완료',
+                      count: data.funnel.miniGamePlayed,
+                    },
                     { label: '룰렛 도달', count: data.funnel.rouletteReached },
                     { label: '완주', count: data.funnel.completed },
                   ]}
@@ -177,6 +204,81 @@ export function AnalyticsPage() {
         </Card>
       </div>
 
+      {/* 홈에서 옮겨 왔다.
+       *
+       * 홈이 작업함이 되면서 "지금 무엇을 처리하는가"만 답하게 됐고, "우리가 얼마나 잘
+       * 처리하고 있는가"는 여기로 왔다. 둘은 앞뒤 같아 보이지만 보는 주기가 다르다.
+       * 밀린 양은 하루에도 몇 번씩 보고, 처리 품질은 주 단위로 본다.
+       *
+       * 옮기면서 30일 고정이던 것을 위 기간 탭에 붙였다. 홈에서는 기간 개념이 없어
+       * 고정값을 쓸 수밖에 없었는데, 여기서는 7일과 90일을 견줄 수 있다. 모델을 손본 뒤
+       * 좋아졌는지는 그 비교로만 알 수 있다.
+       *
+       * 두 요청은 따로 감싼다. 한 덩어리로 묶으면 한쪽이 실패할 때 멀쩡한 나머지
+       * 숫자까지 사라진다. */}
+      <Section
+        title="운영 품질"
+        description="일이 밀렸는지와 잘 처리하고 있는지는 다른 질문입니다."
+      >
+        {/* 여기는 반반이다. 두 카드가 같은 급의 질문이라 한쪽을 넓히면 그쪽이 더 중요해
+         * 보인다. 2:1 분할은 넓은 쪽이 본문이고 좁은 쪽이 곁들일 때만 쓴다. */}
+        <div className="grid items-start gap-4 xl:grid-cols-2">
+          <Card>
+            <CardHeader title="신고 처리 속도" description="접수부터 처리까지 걸린 시간" />
+            <CardBody>
+              <Loaded query={sla} skeleton={<RowSkeleton rows={2} />}>
+                {(data) => (
+                  <dl className="flex flex-col">
+                    <MetricRow
+                      label="가장 오래 기다린 건"
+                      value={formatDurationMinutes(data.oldestPendingMinutes)}
+                      hint="아직 처리 안 된 것 중 접수가 가장 이른 건"
+                    />
+                    <MetricRow
+                      label="처리 시간 중앙값"
+                      value={formatDurationMinutes(data.p50Minutes)}
+                      hint={`${days}일 동안 처리한 ${data.resolvedCount}건 기준`}
+                    />
+                    <MetricRow
+                      label="처리 시간 p95"
+                      value={formatDurationMinutes(data.p95Minutes)}
+                      hint="스무 건 중 한 건은 이보다 오래 걸린다"
+                    />
+                  </dl>
+                )}
+              </Loaded>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader title="검열 판정 정확도" description="AI 판정을 운영자가 뒤집은 비율" />
+            <CardBody>
+              <Loaded query={auditQuality} skeleton={<RowSkeleton rows={3} />}>
+                {(data) => (
+                  <dl className="flex flex-col">
+                    <MetricRow
+                      label="판정 뒤집힘"
+                      value={formatPercent(data.overrideRate)}
+                      hint={`${days}일 동안 판정한 ${data.total}건 기준`}
+                    />
+                    <MetricRow
+                      label="오탐"
+                      value={data.falsePositive}
+                      hint="AI가 걸렀는데 운영자가 허용"
+                    />
+                    <MetricRow
+                      label="미탐"
+                      value={data.falseNegative}
+                      hint="AI가 놓쳤는데 운영자가 차단"
+                    />
+                  </dl>
+                )}
+              </Loaded>
+            </CardBody>
+          </Card>
+        </div>
+      </Section>
+
       {/* 이 화면이 무엇을 못 보는지 적어 둔다. 지표를 믿으려면 경계를 알아야 하고,
        * 반년 뒤에 이 숫자를 보는 사람은 여기 적힌 것을 다시 알아낼 방법이 없다. */}
       <Card>
@@ -191,11 +293,22 @@ export function AnalyticsPage() {
             게임이 끝날 때 결과와 함께 저장됩니다.
           </p>
           <p>
-            <b className="text-ink">참여자</b>는 사람이 아니라 참여 건수입니다. 같은 사람이 방
-            셋에 들어가면 3으로 셉니다.
+            <b className="text-ink">참여자</b>는 사람이 아니라 참여 건수입니다. 같은 사람이 방 셋에
+            들어가면 3으로 셉니다.
           </p>
         </CardBody>
       </Card>
+    </div>
+  );
+}
+
+/** 목록형 카드의 로딩 자리. 좌우 여백은 CardBody 가 준다. */
+function RowSkeleton({ rows }: { rows: number }) {
+  return (
+    <div className="flex flex-col gap-3 py-1">
+      {Array.from({ length: rows }).map((_, index) => (
+        <Skeleton key={index} className="h-8" />
+      ))}
     </div>
   );
 }

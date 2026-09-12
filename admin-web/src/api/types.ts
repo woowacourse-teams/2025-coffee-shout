@@ -43,6 +43,29 @@ export type ActionQueue = {
   hasWork: boolean;
 };
 
+/** 작업함 한 줄의 출처. 화면이 이 값으로 칩과 이동할 곳을 정한다. */
+export type InboxKind = 'REPORT' | 'NICKNAME' | 'DEAD_LETTER';
+
+/**
+ * 통합 작업함 한 줄.
+ *
+ * <p>세 출처를 한 모양으로 맞춘 것이다. 담긴 정보가 서로 다른데도 같은 네 칸으로
+ * 줄인 이유는, 목록에서 묻는 것이 늘 같기 때문이다. 무엇에 대한 일이고, 왜 올라왔고,
+ * 언제 들어왔는가.
+ *
+ * <p>서버가 <b>최신 20건</b>만 준다. 페이지가 없다. 이 화면은 전부를 훑는 자리가 아니라
+ * 다음에 처리할 것을 보는 자리고, 전체 목록은 각 화면에 있다.
+ */
+export type InboxItem = {
+  kind: InboxKind;
+  /** 출처 안에서의 식별자. 격리 메시지만 `OUTBOX:3` 처럼 출처가 앞에 붙는다. */
+  id: string;
+  title: string;
+  /** 왜 올라왔는지. 신고는 카테고리, 닉네임과 격리는 사유다. 없을 수 있다. */
+  detail: string | null;
+  occurredAt: string;
+};
+
 export type Funnel = {
   created: number;
   gameStarted: number;
