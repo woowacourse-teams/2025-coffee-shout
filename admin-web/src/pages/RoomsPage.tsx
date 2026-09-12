@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRoomSearch } from '@/api/queries';
 import type { RoomState, RoomSummary } from '@/api/types';
 import { Card, CardHeader } from '@/components/ui/Card';
@@ -21,7 +21,11 @@ export function roomStatusBadge(status: RoomState) {
 
 export function RoomsPage() {
   const navigate = useNavigate();
-  const [input, setInput] = useState('');
+  // 다른 화면이 코드를 들고 넘어온다. 신고 패널의 방 링크가 `?joinCode=ABC12` 로 온다.
+  // 초기값으로만 읽는다 - 이후 입력은 여기서 하는 것이므로 주소를 계속 따라가면
+  // 지우고 다시 치는 동안 주소가 덮어써 버린다.
+  const [params] = useSearchParams();
+  const [input, setInput] = useState(() => params.get('joinCode') ?? '');
   const [page, setPage] = useState(0);
 
   // 타이핑마다 서버를 때리면 5글자 코드에 다섯 번 조회한다.
