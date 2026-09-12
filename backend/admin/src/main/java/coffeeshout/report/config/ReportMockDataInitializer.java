@@ -50,8 +50,17 @@ public class ReportMockDataInitializer implements ApplicationRunner {
         final Instant base = Instant.now(clock);
 
         // 1. BUG — 미니게임 버그 (13건)
-        list.add(bug(MiniGameType.CARD_GAME, "ABC12", "카드게임 시작 후 5초 만에 앱이 강제 종료됩니다.", base, 0));
-        list.add(bug(MiniGameType.CARD_GAME, "XYZ99", "상대방 카드가 화면에 표시되지 않아요.", base, 1));
+        // 길이를 일부러 한계(200자)까지 늘린 건이다. 짧은 문장만 있으면 내용 열이 늘 한 줄에
+        // 들어가서 어느 폭이 맞는지를 화면에서 정할 수 없다. 실제 신고는 이만큼 길게 들어온다.
+        list.add(bug(
+                MiniGameType.CARD_GAME,
+                "ABC12",
+                "카드게임 시작 후 5초 만에 앱이 강제 종료됩니다. 안드로이드 14, 갤럭시 S23 울트라에서 와이파이와 LTE 둘 다 같은 증상이고 방을 새로 만들어도 똑같습니다. "
+                        + "다른 미니게임은 멀쩡한데 카드게임만 그렇고 오늘만 네 번 겪었습니다. 로그가 필요하면 보내드릴게요.",
+                base,
+                0));
+        list.add(bug(
+                MiniGameType.CARD_GAME, "XYZ99", "상대방 카드가 화면에 표시되지 않아요. 제 카드는 보이는데 다른 사람 자리는 뒷면만 계속 떠 있습니다.", base, 1));
         list.add(bug(MiniGameType.RACING_GAME, "QWE34", "레이싱 게임 결과 화면에서 점수가 0으로 나옵니다.", base, 2));
         list.add(bug(MiniGameType.SPEED_TOUCH, "RTY56", "스피드 터치 버튼이 가끔 반응하지 않습니다.", base, 3));
         list.add(bug(MiniGameType.BLIND_TIMER, "UIO78", "블라인드 타이머가 0초에서 멈추지 않아요.", base, 4));
@@ -65,7 +74,11 @@ public class ReportMockDataInitializer implements ApplicationRunner {
         list.add(bug(MiniGameType.RACING_GAME, "ASD01", "레이싱 게임 조이스틱 입력이 씹힙니다.", base, 14));
 
         // 2. SUGGESTION — 건의사항 (15건)
-        list.add(suggestion("다크모드 지원을 추가해주세요.", base, 15));
+        list.add(suggestion(
+                "다크모드 지원을 추가해주세요. 밤에 친구들과 방을 잡고 노는 일이 많은데 흰 화면이 너무 밝습니다. "
+                        + "시스템 설정을 따라가는 자동 전환이면 가장 좋고 안 되면 설정에 토글 하나만 있어도 충분합니다. 룰렛 화면이 특히 눈이 부십니다.",
+                base,
+                15));
         list.add(suggestion("게임 결과 공유 기능이 있으면 좋겠어요.", base, 16));
         list.add(suggestion("방 비밀번호 설정 기능을 추가해주세요.", base, 17));
         list.add(suggestion("친구 목록 기능을 만들어주세요.", base, 18));
@@ -102,7 +115,10 @@ public class ReportMockDataInitializer implements ApplicationRunner {
 
         list.add(other("운영자 연락처를 알고 싶어요.", base, 38));
         list.add(other("커피빵 굿즈를 팔면 살게요!", base, 39));
-        list.add(other("서비스 이용약관 링크가 깨져 있습니다.", base, 40));
+        list.add(other(
+                "서비스 이용약관 링크가 깨져 있습니다. 마이페이지 아래쪽에서 누르면 404가 뜨고 회원가입 화면의 링크도 같은 주소라 똑같이 안 열립니다. 모바일 사파리와 크롬 둘 다 확인했습니다.",
+                base,
+                40));
         list.add(other("광고 문의는 어디로 하나요?", base, 41));
         list.add(other("피드백 감사합니다. 계속 발전해주세요!", base, 42));
 
