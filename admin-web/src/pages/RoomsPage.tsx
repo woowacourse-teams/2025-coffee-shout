@@ -12,8 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
-import { GameShareList } from '@/components/GameShareList';
-import { DonutChart } from '@/components/charts/DonutChart';
+import { DistributionBars } from '@/components/charts/DistributionBars';
 import { Histogram } from '@/components/charts/Histogram';
 import { RoomPanel } from '@/pages/lookup/RoomPanel';
 import { roomStatusBadge } from '@/pages/lookup/roomStatus';
@@ -142,11 +141,18 @@ export function RoomsPage() {
             title="게임별 플레이"
             description="끝난 판만 셉니다. 시작만 하고 만 게임은 기록이 없습니다."
           />
-          {/* 목록이 카드 바닥까지 늘어나야 옆 카드와 높이가 맞는다. GameShareList 는
-           * 자기 여백을 들고 있어 CardBody 로 감싸지 않는다. */}
-          <div className="flex-1">
-            <Loaded query={stats}>{(data) => <GameShareList stats={data.games} />}</Loaded>
-          </div>
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  ranked
+                  data={data.games.map((stat) => ({ label: stat.label, count: stat.plays }))}
+                  emptyTitle="완료된 게임이 없습니다"
+                  emptyDescription="게임이 끝나야 집계됩니다."
+                />
+              )}
+            </Loaded>
+          </CardBody>
         </Card>
 
         <Card className="flex flex-col">
@@ -179,13 +185,13 @@ export function RoomsPage() {
           <CardBody className="flex flex-1 items-center pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DonutChart
-                  slices={data.statuses.map((slice) => ({
+                <DistributionBars
+                  data={data.statuses.map((slice) => ({
                     label: roomStateLabel(slice.status),
                     count: slice.count,
                   }))}
-                  highlight={roomStateLabel('DONE')}
-                  centerLabel="방"
+                  emptyTitle="방이 없습니다"
+                  emptyDescription="기간을 늘려 보세요."
                 />
               )}
             </Loaded>

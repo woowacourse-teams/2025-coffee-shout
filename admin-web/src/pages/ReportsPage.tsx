@@ -20,10 +20,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { DailyChart } from '@/components/charts/DailyChart';
+import { DistributionBars } from '@/components/charts/DistributionBars';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { Histogram } from '@/components/charts/Histogram';
 import { Skeleton } from '@/components/ui/EmptyState';
-import { GameShareList } from '@/components/GameShareList';
 import { formatDurationMinutes } from '@/lib/format';
 import { miniGameLabel, reportCategoryLabel } from '@/lib/labels';
 
@@ -42,14 +42,9 @@ const DAILY_SERIES = [
  * 퍼센트인가가 아니다. 그 숫자는 카드 설명에 한 줄로 적는다.
  */
 function gameRanking(stats: ReportStats) {
-  const games = stats.games.filter((row) => row.gameType !== null);
-  const total = games.reduce((sum, row) => sum + row.count, 0);
-  return games.map((row) => ({
-    miniGameType: row.gameType as string,
-    label: row.label as string,
-    plays: row.count,
-    share: total === 0 ? 0 : row.count / total,
-  }));
+  return stats.games
+    .filter((row) => row.gameType !== null)
+    .map((row) => ({ label: row.label as string, count: row.count }));
 }
 
 function gameCardDescription(stats: ReportStats | undefined) {
@@ -193,7 +188,6 @@ export function ReportsPage() {
                     label: reportCategoryLabel(slice.category),
                     count: slice.count,
                   }))}
-                  highlight={reportCategoryLabel('BUG')}
                   centerLabel="신고"
                 />
               )}
@@ -203,12 +197,18 @@ export function ReportsPage() {
 
         <Card className="flex flex-col">
           <CardHeader title="게임별 신고" description={gameCardDescription(stats.data)} />
-          {/* GameShareList 는 자기 여백을 들고 있어 CardBody 로 감싸지 않는다. */}
-          <div className="flex-1">
-            <Loaded query={stats} skeleton={<Skeleton className="mx-5 mb-5 h-40" />}>
-              {(data) => <GameShareList stats={gameRanking(data)} />}
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  ranked
+                  data={gameRanking(data)}
+                  emptyTitle="게임에 붙은 신고가 없습니다"
+                  emptyDescription="버그 신고에는 게임이 함께 들어옵니다."
+                />
+              )}
             </Loaded>
-          </div>
+          </CardBody>
         </Card>
       </div>
 

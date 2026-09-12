@@ -14,7 +14,10 @@ import { cn } from '@/lib/cn';
  * 스크린샷으로 시작한다.
  */
 const badge = cva(
-  'inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-2xs font-medium',
+  // whitespace-nowrap 이 없으면 좁은 열에서 "UI 추가"가 두 줄로 접히면서 배지가
+  // 세로로 부풀어 그 행만 키가 커진다. 배지는 낱말이 아니라 <b>표식</b>이라 줄을 바꾸면
+  // 안 된다. 열이 좁으면 열을 넓히는 것이 맞다.
+  'inline-flex items-center gap-1.5 whitespace-nowrap rounded-sm px-1.5 py-0.5 text-2xs font-medium',
   {
     variants: {
       tone: {

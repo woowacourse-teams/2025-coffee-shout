@@ -11,8 +11,8 @@ import { Legend } from '@/components/ui/Legend';
  */
 const ITEMS = [
   { label: '방 생성', color: 'var(--chart-1)', shape: 'bar' },
-  { label: '완주', color: 'var(--chart-2)', shape: 'bar' },
-  { label: '참여자', color: 'var(--chart-3)', shape: 'line' },
+  { label: '완주', color: 'var(--gray-300)', shape: 'bar' },
+  { label: '참여자', color: 'var(--chart-1)', shape: 'line' },
 ] as const;
 
 export function TrendLegend() {

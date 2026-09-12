@@ -64,7 +64,12 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
             formatter={(value, name) => [formatNumber(Number(value ?? 0)), String(name ?? '')]}
           />
           {/* 90일까지 열려 있어 막대가 얇아진다. 최대 폭을 잡아 두면 구간이 짧을 때 막대
-            * 하나가 통짜로 뚱뚱해지는 것을 막고, 길어지면 알아서 얇아진다. */}
+           * 하나가 통짜로 뚱뚱해지는 것을 막고, 길어지면 알아서 얇아진다.
+           *
+           * 색은 로고색과 회색 둘뿐이다. 한때 완주를 파랑, 참여자를 초록으로 뒀는데
+           * 그 셋이 한 카드에 모이면서 화면에서 여기만 알록달록해졌다. 주인공인 방 생성이
+           * 로고색이고 완주는 회색이다. 아래 판은 계열이 하나뿐이라 다시 로고색을 쓴다 -
+           * 판이 나뉘어 있어 두 로고색이 서로 다른 것을 뜻한다고 오해될 자리가 없다. */}
           <Bar
             dataKey="created"
             name="방 생성"
@@ -75,7 +80,7 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
           <Bar
             dataKey="completed"
             name="완주"
-            fill="var(--chart-2)"
+            fill="var(--gray-300)"
             maxBarSize={14}
             radius={[3, 3, 0, 0]}
           />
@@ -83,10 +88,10 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
       </ResponsiveContainer>
 
       {/* 두 판 사이에 실선을 긋는다.
-        *
-        * 눈금이 서로 다른데 경계가 없으면 아래 선이 위 막대와 같은 축의 연장으로 읽혀서,
-        * 참여자 20이 방 20과 같은 높이인 줄 알게 된다. 선 하나가 "여기서부터 다른 눈금"을
-        * 말하고, 그 위의 이름이 무엇의 눈금인지를 말한다. */}
+       *
+       * 눈금이 서로 다른데 경계가 없으면 아래 선이 위 막대와 같은 축의 연장으로 읽혀서,
+       * 참여자 20이 방 20과 같은 높이인 줄 알게 된다. 선 하나가 "여기서부터 다른 눈금"을
+       * 말하고, 그 위의 이름이 무엇의 눈금인지를 말한다. */}
       <div className="mt-1 flex items-center border-t border-border-default pl-[40px] pt-1.5">
         <span className="text-2xs text-ink-muted">참여자</span>
       </div>
@@ -101,7 +106,7 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
             minTickGap={16}
           />
           {/* 눈금을 셋으로 묶는다. 낮은 판에 다섯을 넣으면 숫자가 서로 붙어 읽히지 않고,
-            * 여기서 정확한 값은 툴팁이 말한다. */}
+           * 여기서 정확한 값은 툴팁이 말한다. */}
           <YAxis {...AXIS_STYLE} width={AXIS_WIDTH} allowDecimals={false} tickCount={3} />
           <Tooltip
             cursor={{ stroke: 'var(--chart-grid)' }}
@@ -112,7 +117,7 @@ export function TrendChart({ data, height = 220 }: TrendChartProps) {
             type="monotone"
             dataKey="players"
             name="참여자"
-            stroke="var(--chart-3)"
+            stroke="var(--chart-1)"
             strokeWidth={2}
             dot={false}
             activeDot={ACTIVE_DOT}

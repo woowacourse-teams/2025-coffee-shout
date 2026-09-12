@@ -11,7 +11,6 @@ import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { DailyChart } from '@/components/charts/DailyChart';
 import { DistributionBars } from '@/components/charts/DistributionBars';
-import { DonutChart } from '@/components/charts/DonutChart';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { Loaded } from '@/components/ui/Loaded';
 import { ShareNote } from '@/components/ui/ShareNote';
@@ -74,6 +73,8 @@ export function AuditLogsPage() {
       {
         accessorKey: 'action',
         header: '조치',
+        // 폭을 주지 않으면 "격리 메시지 재투입"이 두 줄로 접혀 그 행만 키가 커진다.
+        meta: { width: '11rem' },
         // 서버가 남기는 것은 매핑 패턴이라 그대로 찍으면 조치 이력이 서버 로그가 된다.
         // 모르는 값은 원문을 남긴다 - 새 조치가 생긴 것을 화면에서 알아채야 한다.
         cell: (c) => {
@@ -82,7 +83,9 @@ export function AuditLogsPage() {
           return label === action ? (
             <span className="font-mono text-xs text-ink-muted">{action}</span>
           ) : (
-            <span title={action}>{label}</span>
+            <span className="whitespace-nowrap" title={action}>
+              {label}
+            </span>
           );
         },
       },
@@ -148,10 +151,19 @@ export function AuditLogsPage() {
         </CardBody>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader title="조치 종류" description="쓰이지 않는 조치는 화면에서 뺄 후보입니다." />
-          <CardBody>
+      {/* 조치 종류와 담당자를 한 카드에 나란히 둔다.
+       *
+       * 카드를 나누면 줄 수가 아홉과 셋이라 짧은 쪽 바닥에 150px 짜리 빈 자리가 남는다.
+       * 둘 다 "최근 30일 조치를 무엇으로 쪼갤 것인가"라는 같은 질문의 두 가지 답이라
+       * 한 지붕 아래 두어도 카드의 뜻이 흐려지지 않는다. */}
+      <Card>
+        <CardHeader
+          title="조치 쪼개 보기"
+          description="왼쪽은 무엇을 했는지, 오른쪽은 누가 했는지입니다."
+        />
+        <CardBody className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-2.5">
+            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-muted">종류</p>
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
                 <DistributionBars
@@ -164,26 +176,22 @@ export function AuditLogsPage() {
                 />
               )}
             </Loaded>
-          </CardBody>
-        </Card>
+          </div>
 
-        {/* 담당자는 도넛이다. 다섯 이하이고 합이 곧 전체 조치라, 여기서 묻는 것이
-         * "한 사람이 거의 다 하고 있나"라는 전체 대비 크기다. 조치 종류는 아홉 개가
-         * 넘고 꼴찌를 봐야 해서 순위 막대로 남는다. */}
-        <Card className="flex flex-col">
-          <CardHeader title="담당자" description="많은 순 다섯 명과 나머지 한 칸입니다." />
-          <CardBody className="flex flex-1 items-center pb-4">
+          <div className="flex flex-col gap-2.5">
+            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-muted">담당자</p>
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DonutChart
-                  slices={data.actors.map((row) => ({ label: row.actorEmail, count: row.count }))}
-                  centerLabel="조치"
+                <DistributionBars
+                  data={data.actors.map((row) => ({ label: row.actorEmail, count: row.count }))}
+                  emptyTitle="조치가 없습니다"
+                  emptyDescription="관리자가 상태를 바꾸면 여기에 쌓입니다."
                 />
               )}
             </Loaded>
-          </CardBody>
-        </Card>
-      </div>
+          </div>
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader

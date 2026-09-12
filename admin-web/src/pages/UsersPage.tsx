@@ -14,7 +14,7 @@ import { ShareNote } from '@/components/ui/ShareNote';
 import { DataTable } from '@/components/DataTable';
 import { Histogram } from '@/components/charts/Histogram';
 import { DailyChart } from '@/components/charts/DailyChart';
-import { ProviderDonut } from '@/components/ProviderDonut';
+import { ProviderShare } from '@/components/ProviderShare';
 import { readId } from '@/pages/RoomsPage';
 import { UserPanel } from '@/pages/lookup/UserPanel';
 import { miniGameLabel } from '@/lib/labels';
@@ -185,10 +185,7 @@ export function UsersPage() {
           <CardBody>
             <Loaded query={stats}>
               {(data) => (
-                <ProviderDonut
-                  stats={{ userCount: data.userCount, providers: data.providers }}
-                  height={164}
-                />
+                <ProviderShare stats={{ userCount: data.userCount, providers: data.providers }} />
               )}
             </Loaded>
           </CardBody>

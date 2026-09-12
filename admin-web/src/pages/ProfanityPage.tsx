@@ -19,7 +19,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { DailyChart } from '@/components/charts/DailyChart';
-import { DonutChart } from '@/components/charts/DonutChart';
+import { DistributionBars } from '@/components/charts/DistributionBars';
 import { Histogram } from '@/components/charts/Histogram';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { nicknameAuditStatusLabel } from '@/lib/labels';
@@ -169,13 +169,13 @@ export function ProfanityPage() {
           <CardBody className="flex flex-1 items-center pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DonutChart
-                  slices={data.statuses.map((slice) => ({
+                <DistributionBars
+                  data={data.statuses.map((slice) => ({
                     label: nicknameAuditStatusLabel(slice.status),
                     count: slice.count,
                   }))}
-                  highlight={nicknameAuditStatusLabel('CLEAN')}
-                  centerLabel="닉네임"
+                  emptyTitle="검열 기록이 없습니다"
+                  emptyDescription="닉네임이 만들어지면 여기에 쌓입니다."
                 />
               )}
             </Loaded>

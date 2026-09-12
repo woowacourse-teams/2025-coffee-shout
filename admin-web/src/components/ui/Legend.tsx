@@ -21,12 +21,19 @@ type SwatchProps = {
 
 export function Swatch({ color, shape = 'chip', bordered, className }: SwatchProps) {
   const shapeClass =
-    shape === 'bar' ? 'h-3 w-2 rounded-[2px]' : shape === 'line' ? 'h-0.5 w-4 rounded-full' : 'size-2.5 rounded-sm';
+    shape === 'bar'
+      ? 'h-3 w-2 rounded-[2px]'
+      : shape === 'line'
+        ? 'h-0.5 w-4 rounded-full'
+        : 'size-2.5 rounded-sm';
 
   return (
     <span
       className={cn('shrink-0', shapeClass, bordered && 'border border-border-strong', className)}
       style={{ backgroundColor: color }}
+      // 검사 스크립트가 "한 그림 안의 조각 색이 서로 구분되는가"를 잴 때 이 표시를 찾는다.
+      // 상태 배지의 점과 생김새가 같아 클래스만으로는 갈라낼 수 없다.
+      data-swatch=""
       aria-hidden
     />
   );

@@ -9,11 +9,24 @@ type DistributionBarsProps = {
   /** 값이 전부 0일 때 칸 대신 보여줄 문구. */
   emptyTitle: string;
   emptyDescription?: string;
+  /**
+   * 줄 앞에 순위 숫자를 붙인다. 값 순으로 정렬된 목록에만 쓴다.
+   *
+   * <p>목록이 이미 정렬돼 있어도 숫자가 있어야 "3위와 4위가 붙어 있다"를 말로 옮길 수
+   * 있다. 반대로 구간 분포(1명, 2~3명…)처럼 순서가 값이 아닌 목록에 숫자를 붙이면
+   * 1등이 아닌 칸이 1번으로 읽힌다.
+   */
+  ranked?: boolean;
   className?: string;
 };
 
 /**
  * 구간 분포. 인원수, 플레이 횟수, 소요 시간처럼 <b>순서가 있는 칸</b>을 그린다.
+ *
+ * <p>가로 막대는 <b>이 컴포넌트 하나</b>다. 순위 목록(게임별 비중)과 구간 목록(진행 단계)이
+ * 한때 서로 다른 모양이었다. 하나는 이름이 막대 위에 있고 하나는 왼쪽에 있어서, 같은
+ * 화면에 둘이 나란히 서면 줄 높이도 막대 시작점도 맞지 않았다. 같은 일을 하는 그림이
+ * 둘이면 한쪽만 고치는 날이 온다. 순위 숫자만 {@code ranked} 로 켜고 끈다.
  *
  * <h2>세로 막대였다가 가로 막대가 됐다</h2>
  *
@@ -42,6 +55,7 @@ export function DistributionBars({
   data,
   emptyTitle,
   emptyDescription,
+  ranked,
   className,
 }: DistributionBarsProps) {
   const total = data.reduce((sum, bucket) => sum + bucket.count, 0);
@@ -53,14 +67,30 @@ export function DistributionBars({
   const top = Math.max(...data.map((bucket) => bucket.count));
 
   return (
-    <ul className={cn('flex flex-col gap-2.5', className)}>
-      {data.map((bucket) => (
+    <ul className={cn('flex w-full flex-col gap-2.5', className)}>
+      {data.map((bucket, index) => (
         <li
           key={bucket.label}
           // 이름 칸을 고정 폭으로 둔다. 내용에 맞춰 늘어나게 두면 카드마다 막대 시작점이
-          // 달라져, 나란히 선 카드 둘의 그림이 서로 어긋나 보인다.
-          className="grid grid-cols-[5.5rem_1fr_auto] items-center gap-3"
+          // 달라져, 나란히 선 카드 둘의 그림이 서로 어긋나 보인다. 폭은 가장 긴 이름
+          // ("격리 메시지 재투입", 아홉 자)이 잘리지 않는 값이다. 잘라 놓으면 조치 이름은
+          // 앞부분이 서로 비슷해서 무엇인지 구분이 안 된다.
+          className={cn(
+            'grid items-center gap-3',
+            ranked ? 'grid-cols-[1.25rem_7.5rem_1fr_auto]' : 'grid-cols-[7.5rem_1fr_auto]',
+          )}
         >
+          {ranked && (
+            // 1위만 진하게 둔다. 나머지는 순서를 확인하는 용도라 물러나 있어도 된다.
+            <span
+              className={cn(
+                'text-2xs font-semibold tabular-nums',
+                index === 0 ? 'text-ink-secondary' : 'text-ink-muted',
+              )}
+            >
+              {index + 1}
+            </span>
+          )}
           <span className="truncate text-xs text-ink-secondary" title={bucket.label}>
             {bucket.label}
           </span>

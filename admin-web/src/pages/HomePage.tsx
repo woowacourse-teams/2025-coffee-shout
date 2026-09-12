@@ -24,7 +24,6 @@ import {
 import type { DailyTrend, Funnel, InboxItem, InboxKind } from '@/api/types';
 import { ActionQueueStrip } from '@/components/ActionQueueStrip';
 import { FunnelBar } from '@/components/FunnelBar';
-import { GameShareList } from '@/components/GameShareList';
 import { TrendLegend } from '@/components/TrendLegend';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/EmptyState';
@@ -37,6 +36,7 @@ import { Tile } from '@/components/ui/Tile';
 import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { DistributionBars } from '@/components/charts/DistributionBars';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { inboxKindLabel, reportCategoryLabel } from '@/lib/labels';
 
@@ -45,8 +45,8 @@ const TrendChart = lazy(() =>
 );
 
 /** 도넛도 recharts 다. 같은 이유로 떼어 받는다. */
-const ProviderDonut = lazy(() =>
-  import('@/components/ProviderDonut').then((module) => ({ default: module.ProviderDonut })),
+const ProviderShare = lazy(() =>
+  import('@/components/ProviderShare').then((module) => ({ default: module.ProviderShare })),
 );
 
 /**
@@ -65,7 +65,7 @@ const SPLIT_HALF = 'grid gap-4 xl:grid-cols-2';
  * <p>서버는 스무 건을 주는데 여기서는 여덟 줄만 깐다. 종류별 건수는 칩이 스무 건 전부를
  * 세고, 전체를 훑을 일이면 각 화면으로 가면 된다.
  */
-const PREVIEW_ROWS = 8;
+const PREVIEW_ROWS = 7;
 
 type KindFilter = InboxKind | 'ALL';
 
@@ -158,10 +158,7 @@ export function HomePage() {
 
       <div className={SPLIT_WIDE}>
         <Card className="flex flex-col">
-          <CardHeader
-            title="최근 14일"
-            actions={<TrendLegend />}
-          />
+          <CardHeader title="최근 14일" actions={<TrendLegend />} />
           <CardBody className="flex flex-1 flex-col justify-center">
             <Loaded query={trend} skeleton={<Skeleton className="h-[220px]" />}>
               {(data) => (
@@ -227,8 +224,12 @@ export function HomePage() {
         </Card>
       </div>
 
-      {/* 둘 다 "무엇이 얼마나" 를 막대로 말하는 목록이라 높이가 비슷하다. 짝을 지을 때
-       * 의미만 보고 묶으면 한쪽 카드 안이 200px 넘게 비는 일이 생긴다. */}
+      {/* 둘 다 "무엇이 얼마나"를 막대로 말하는 목록이라 높이가 비슷하다. 짝을 지을 때
+       * 의미만 보고 묶으면 한쪽 카드 안이 200px 넘게 비는 일이 생긴다.
+       *
+       * 셋을 한 줄에 세워 봤다가 되돌렸다. 소셜 제공자까지 끼우니 칸이 3분의 1로 좁아져
+       * 막대가 전부 뭉툭한 토막이 되고, 이름 칸이 고정 폭이라 그 왼쪽이 통째로 비었다.
+       * 빈 자리를 없애려다 세 카드를 다 망가뜨린 셈이다. */}
       <div className={SPLIT_HALF}>
         <Card className="flex flex-col">
           <CardHeader
@@ -236,13 +237,13 @@ export function HomePage() {
             description="게임 시작과 미니게임 완료의 차이가 하다가 나간 방입니다."
           />
           {/* 막대 위에 요약 두 칸을 얹는다.
-            *
-            * 한때 다섯 단계만 있었고, 옆 카드보다 짧아 생긴 빈 자리를 단계 사이 간격으로
-            * 벌려 메웠다. 그건 공백을 여백으로 위장한 것이지 채운 것이 아니다.
-            *
-            * 이 카드가 답해야 할 질문은 <b>어디서 제일 많이 빠지나</b>인데, 그 답이 오른쪽
-            * 끝 -19 다섯 개를 눈으로 견줘야 나왔다. 위로 올려 숫자로 적으면 카드가 내용으로
-            * 차고 질문에도 바로 답한다. */}
+           *
+           * 한때 다섯 단계만 있었고, 옆 카드보다 짧아 생긴 빈 자리를 단계 사이 간격으로
+           * 벌려 메웠다. 그건 공백을 여백으로 위장한 것이지 채운 것이 아니다.
+           *
+           * 이 카드가 답해야 할 질문은 <b>어디서 제일 많이 빠지나</b>인데, 그 답이 오른쪽
+           * 끝 -19 다섯 개를 눈으로 견줘야 나왔다. 위로 올려 숫자로 적으면 카드가 내용으로
+           * 차고 질문에도 바로 답한다. */}
           <CardBody className="flex flex-1 flex-col gap-4">
             <Loaded query={period} skeleton={<RowSkeleton rows={6} height="h-7" />}>
               {(data) => {
@@ -257,7 +258,8 @@ export function HomePage() {
                           {formatPercent(data.funnel.completionRate)}
                         </p>
                         <p className="mt-1.5 text-2xs text-ink-muted">
-                          {formatNumber(data.funnel.created)}개 중 {formatNumber(data.funnel.completed)}개
+                          {formatNumber(data.funnel.created)}개 중{' '}
+                          {formatNumber(data.funnel.completed)}개
                         </p>
                       </div>
                       <div className="rounded-md border border-border-default px-4 py-3">
@@ -295,12 +297,26 @@ export function HomePage() {
                 </div>
               }
             >
-              {(data) => <GameShareList stats={data} />}
+              {(data) => (
+                <DistributionBars
+                  ranked
+                  className="px-5 pb-5"
+                  data={data.map((stat) => ({ label: stat.label, count: stat.plays }))}
+                  emptyTitle="완료된 게임이 없습니다"
+                  emptyDescription="게임이 끝나야 집계됩니다. 시작만 하고 만 게임은 기록이 남지 않습니다."
+                />
+              )}
             </Loaded>
           </div>
         </Card>
       </div>
 
+      {/* 표가 여덟 줄이던 때는 옆 카드가 그만큼 늘어나 도넛 하나가 600px 짜리 카드
+       * 한가운데 떠 있었다. 가운데 정렬이라 위아래가 똑같이 비어 배치처럼 보였지만,
+       * 비는 양이 그만큼이면 그건 배치가 아니다.
+       *
+       * 표를 여섯 줄로 줄이고 도넛을 위아래로 쌓아 둘의 키를 맞췄다. 목록에서 여섯 건을
+       * 보고 나면 어차피 해당 화면으로 넘어간다. */}
       <div className={SPLIT_WIDE}>
         <InboxCard
           items={items}
@@ -311,14 +327,13 @@ export function HomePage() {
           error={inbox.error}
           onRetry={() => inbox.refetch()}
         />
-
         <Card className="flex flex-col">
-          <CardHeader title="소셜 제공자" />
+          <CardHeader title="소셜 제공자" description="연결 기준입니다. 회원 수와 다릅니다." />
           <CardBody className="flex flex-1 flex-col justify-center">
             <Loaded query={providers} skeleton={<Skeleton className="h-[200px]" />}>
               {(data) => (
                 <Suspense fallback={<Skeleton className="h-[200px]" />}>
-                  <ProviderDonut stats={data} />
+                  <ProviderShare stats={data} layout="column" />
                 </Suspense>
               )}
             </Loaded>
