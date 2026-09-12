@@ -1,5 +1,6 @@
 package coffeeshout.admin.room.domain;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -17,4 +18,12 @@ public interface RoomLookupRepository {
     List<RoomMiniGameResult> findMiniGameResults(Long roomId);
 
     Optional<RoomRouletteResult> findRouletteResult(Long roomId);
+
+    /**
+     * 기간 안에 만들어진 방을 한 줄씩. 구간 나누기는 서비스가 한다.
+     *
+     * <p>방 수만큼 행을 읽는다. 기간에 상한이 있어야 하는 이유이고, 그 상한은 요청을 받는
+     * 컨트롤러가 건다.
+     */
+    List<RoomSnapshot> findSnapshots(LocalDateTime from, LocalDateTime to);
 }

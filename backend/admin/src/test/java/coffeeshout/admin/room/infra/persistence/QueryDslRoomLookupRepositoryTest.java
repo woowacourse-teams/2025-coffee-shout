@@ -1,16 +1,19 @@
 package coffeeshout.admin.room.infra.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import coffeeshout.AdminModuleServiceTest;
 import coffeeshout.admin.room.domain.RoomLookupRepository;
 import coffeeshout.admin.room.domain.RoomPlayer;
+import coffeeshout.admin.room.domain.RoomSnapshot;
 import coffeeshout.admin.room.domain.RoomSummary;
 import coffeeshout.minigame.domain.MiniGameType;
 import coffeeshout.minigame.infra.persistence.MiniGameEntity;
 import coffeeshout.minigame.infra.persistence.MiniGameJpaRepository;
 import coffeeshout.minigame.infra.persistence.MiniGameResultEntity;
 import coffeeshout.minigame.infra.persistence.MiniGameResultJpaRepository;
+import coffeeshout.room.domain.RoomState;
 import coffeeshout.room.domain.player.PlayerType;
 import coffeeshout.room.infra.persistence.PlayerEntity;
 import coffeeshout.room.infra.persistence.PlayerJpaRepository;
@@ -20,6 +23,7 @@ import coffeeshout.room.infra.persistence.RouletteResultEntity;
 import coffeeshout.room.infra.persistence.RouletteResultJpaRepository;
 import coffeeshout.user.infra.persistence.UserEntity;
 import coffeeshout.user.infra.persistence.UserJpaRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
@@ -196,6 +200,60 @@ class QueryDslRoomLookupRepositoryTest extends AdminModuleServiceTest {
             miniGameResultJpaRepository.save(new MiniGameResultEntity(miniGame, otherPlayer.getId(), 1, 500L));
 
             assertThat(roomLookupRepository.findMiniGameResults(room.getId())).isEmpty();
+        }
+    }
+
+    @Nested
+    class findSnapshots {
+
+        @Test
+        void 참여자가_여러_명이어도_방은_한_줄이다() {
+            // player 를 조인하면 참여자 수만큼 방이 불어나 방 수 자체가 틀어진다.
+            // 이 화면은 방을 세는 자리다.
+            final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
+            playerJpaRepository.save(new PlayerEntity(room, "철수", PlayerType.HOST, null));
+            playerJpaRepository.save(new PlayerEntity(room, "영희", PlayerType.GUEST, null));
+            playerJpaRepository.save(new PlayerEntity(room, "민수", PlayerType.GUEST, null));
+
+            final LocalDateTime now = LocalDateTime.now();
+
+            assertThat(roomLookupRepository.findSnapshots(now.minusDays(1), now.plusDays(1)))
+                    .extracting(RoomSnapshot::playerCount)
+                    .containsExactly(3L);
+        }
+
+        @Test
+        void 기간_밖의_방은_빠진다() {
+            roomJpaRepository.save(new RoomEntity("ABCD"));
+
+            final LocalDateTime now = LocalDateTime.now();
+
+            assertThat(roomLookupRepository.findSnapshots(now.minusDays(10), now.minusDays(9)))
+                    .isEmpty();
+        }
+
+        @Test
+        void 끝난_방은_종료_시각이_함께_온다() {
+            final RoomEntity room = roomJpaRepository.save(new RoomEntity("ABCD"));
+            room.finish();
+            roomJpaRepository.saveAndFlush(room);
+
+            final LocalDateTime now = LocalDateTime.now();
+
+            assertThat(roomLookupRepository.findSnapshots(now.minusDays(1), now.plusDays(1)))
+                    .extracting(RoomSnapshot::status, snapshot -> snapshot.finishedAt() != null)
+                    .containsExactly(tuple(RoomState.DONE, true));
+        }
+
+        @Test
+        void 진행_중인_방은_종료_시각이_없다() {
+            roomJpaRepository.save(new RoomEntity("ABCD"));
+
+            final LocalDateTime now = LocalDateTime.now();
+
+            assertThat(roomLookupRepository.findSnapshots(now.minusDays(1), now.plusDays(1)))
+                    .extracting(RoomSnapshot::finishedAt)
+                    .containsOnlyNulls();
         }
     }
 

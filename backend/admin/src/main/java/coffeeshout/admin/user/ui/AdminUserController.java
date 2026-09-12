@@ -5,7 +5,9 @@ import coffeeshout.admin.user.application.UserLookupService;
 import coffeeshout.admin.user.application.UserLookupService.ProviderStats;
 import coffeeshout.admin.user.ui.response.ProviderStatsResponse;
 import coffeeshout.admin.user.ui.response.UserDetailResponse;
+import coffeeshout.admin.user.ui.response.UserStatsResponse;
 import coffeeshout.admin.user.ui.response.UserSummaryResponse;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,9 +39,9 @@ public class AdminUserController {
      * @param keyword 닉네임 부분 일치 또는 유저코드 완전 일치
      */
     @GetMapping
-    public PageResponse<UserSummaryResponse> search(
+    public PageResponse<UserSummaryResponse.Row> search(
             @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "0") @Min(0) int page) {
-        return PageResponse.of(userLookupService.search(keyword, page), UserSummaryResponse::from);
+        return PageResponse.of(userLookupService.search(keyword, page), UserSummaryResponse.Row::from);
     }
 
     /**
@@ -53,6 +55,18 @@ public class AdminUserController {
     public ProviderStatsResponse providers() {
         final ProviderStats stats = userLookupService.findProviderStats();
         return ProviderStatsResponse.of(stats.userCount(), stats.counts());
+    }
+
+    /**
+     * 화면 상단 그래프.
+     *
+     * <p>{@code days} 는 가입 추이에만 걸린다. 참여도와 잔존 분포는 회원 전체가 대상이다.
+     * 기간을 걸면 그 기간에 활동한 사람만 남아, 빠져나간 사람을 묻는 그래프에서 빠져나간
+     * 사람이 사라진다.
+     */
+    @GetMapping("/stats")
+    public UserStatsResponse stats(@RequestParam(defaultValue = "30") @Min(1) @Max(180) int days) {
+        return UserStatsResponse.from(userLookupService.findStats(days));
     }
 
     @GetMapping("/{userId}")

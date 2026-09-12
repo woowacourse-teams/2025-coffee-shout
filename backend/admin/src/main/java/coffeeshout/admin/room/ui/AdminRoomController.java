@@ -1,9 +1,12 @@
 package coffeeshout.admin.room.ui;
 
 import coffeeshout.admin.room.application.RoomLookupService;
+import coffeeshout.admin.room.application.RoomStatsService;
 import coffeeshout.admin.room.ui.response.RoomDetailResponse;
+import coffeeshout.admin.room.ui.response.RoomStatsResponse;
 import coffeeshout.admin.room.ui.response.RoomSummaryResponse;
 import coffeeshout.admin.support.PageResponse;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -27,11 +30,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminRoomController {
 
     private final RoomLookupService roomLookupService;
+    private final RoomStatsService roomStatsService;
 
     @GetMapping
     public PageResponse<RoomSummaryResponse> search(
             @RequestParam(required = false) String joinCode, @RequestParam(defaultValue = "0") @Min(0) int page) {
         return PageResponse.of(roomLookupService.search(joinCode, page), RoomSummaryResponse::from);
+    }
+
+    /**
+     * 화면 상단 그래프.
+     *
+     * <p>{@code /{roomId}} 보다 먼저 선언한다. 매칭은 스프링이 리터럴을 더 구체적인 패턴으로
+     * 보고 고르지만, 읽는 사람이 두 경로가 같은 자리에 있다는 것을 바로 보게 하려는 것이다.
+     *
+     * @param days 상한을 둔다. 기간 안의 방을 한 줄씩 읽으므로 기간이 곧 읽는 양이다.
+     */
+    @GetMapping("/stats")
+    public RoomStatsResponse stats(@RequestParam(defaultValue = "30") @Min(1) @Max(90) int days) {
+        return RoomStatsResponse.from(roomStatsService.findStats(days));
     }
 
     @GetMapping("/{roomId}")

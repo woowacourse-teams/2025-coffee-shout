@@ -4,6 +4,7 @@ import coffeeshout.admin.room.domain.RoomLookupRepository;
 import coffeeshout.admin.room.domain.RoomMiniGameResult;
 import coffeeshout.admin.room.domain.RoomPlayer;
 import coffeeshout.admin.room.domain.RoomRouletteResult;
+import coffeeshout.admin.room.domain.RoomSnapshot;
 import coffeeshout.admin.room.domain.RoomSummary;
 import coffeeshout.minigame.infra.persistence.QMiniGameResultEntity;
 import coffeeshout.room.infra.persistence.QPlayerEntity;
@@ -14,6 +15,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -131,6 +133,24 @@ public class QueryDslRoomLookupRepository implements RoomLookupRepository {
                 .join(ROULETTE.winner, PLAYER)
                 .where(ROULETTE.roomSession.id.eq(roomId))
                 .fetchFirst());
+    }
+
+    /**
+     * 인원수를 서브쿼리로 붙인다. player 를 조인하면 참여자 수만큼 방이 불어나 방 수 자체가
+     * 틀어진다. 여기서 세는 것은 방이지 참여자가 아니다.
+     */
+    @Override
+    public List<RoomSnapshot> findSnapshots(LocalDateTime from, LocalDateTime to) {
+        return queryFactory
+                .select(Projections.constructor(
+                        RoomSnapshot.class,
+                        ROOM.roomStatus,
+                        ROOM.createdAt,
+                        ROOM.finishedAt,
+                        JPAExpressions.select(PLAYER.count()).from(PLAYER).where(PLAYER.roomSession.id.eq(ROOM.id))))
+                .from(ROOM)
+                .where(ROOM.createdAt.goe(from), ROOM.createdAt.lt(to))
+                .fetch();
     }
 
     private static BooleanExpression joinCodeEq(String joinCode) {

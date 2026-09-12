@@ -1,17 +1,27 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useRoomSearch } from '@/api/queries';
-import type { RoomState, RoomSummary } from '@/api/types';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { SearchInput } from '@/components/ui/Field';
+import { useRoomSearch, useRoomStats } from '@/api/queries';
+import type { RoomState, RoomStats, RoomSummary } from '@/api/types';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { SearchInput, Select } from '@/components/ui/Field';
+import { Loaded } from '@/components/ui/Loaded';
+import { Skeleton } from '@/components/ui/EmptyState';
+import { ShareNote } from '@/components/ui/ShareNote';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { GameShareList } from '@/components/GameShareList';
+import { DistributionBars } from '@/components/charts/DistributionBars';
 import { RoomPanel } from '@/pages/lookup/RoomPanel';
 import { roomStatusBadge } from '@/pages/lookup/roomStatus';
+import { formatNumber } from '@/lib/format';
+import { roomStateLabel } from '@/lib/labels';
 import { useDebounced } from '@/lib/useDebounced';
+
+/** 상단 그래프 기간. 기간 안의 방을 한 줄씩 읽으므로 서버가 90일에서 끊는다. */
+const RANGES = [7, 30, 90] as const;
 
 /**
  * 방 조회. "우리 방 결과가 이상해요" 문의에 답하는 화면이다.
@@ -31,10 +41,12 @@ export function RoomsPage() {
   // 계속 따라가면 지우고 다시 치는 동안 주소가 입력을 덮어쓴다.
   const [input, setInput] = useState(() => params.get('q') ?? '');
   const [page, setPage] = useState(0);
+  const [days, setDays] = useState<number>(30);
 
   // 타이핑마다 서버를 때리면 다섯 글자 코드에 다섯 번 조회한다.
   const joinCode = useDebounced(input, 300);
   const rooms = useRoomSearch(joinCode, page);
+  const stats = useRoomStats(days);
 
   const openId = readId(params.get('open'), 'room');
 
@@ -101,6 +113,103 @@ export function RoomsPage() {
         }
       />
 
+      {/* 기간 선택은 네 카드가 함께 쓴다. 카드마다 두면 같은 화면에 서로 다른 기간의
+       * 그래프가 나란히 서서, 인원 분포와 게임 비중이 같은 방들을 말하는지 아닌지를
+       * 매번 확인해야 한다. 한 줄 위에 하나만 둔다. */}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs text-ink-muted">
+          {stats.data
+            ? `최근 ${days}일에 만들어진 방 ${formatNumber(stats.data.roomCount)}개를 봅니다.`
+            : `최근 ${days}일에 만들어진 방을 봅니다.`}
+        </p>
+        <Select
+          value={String(days)}
+          onChange={(event) => setDays(Number(event.target.value))}
+          className="w-24"
+        >
+          {RANGES.map((range) => (
+            <option key={range} value={range}>
+              최근 {range}일
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="flex flex-col">
+          <CardHeader
+            title="게임별 플레이"
+            description="끝난 판만 셉니다. 시작만 하고 만 게임은 기록이 없습니다."
+          />
+          {/* 목록이 카드 바닥까지 늘어나야 옆 카드와 높이가 맞는다. GameShareList 는
+           * 자기 여백을 들고 있어 CardBody 로 감싸지 않는다. */}
+          <div className="flex-1">
+            <Loaded query={stats}>{(data) => <GameShareList stats={data.games} />}</Loaded>
+          </div>
+        </Card>
+
+        <Card className="flex min-h-[18rem] flex-col">
+          <CardHeader
+            title="방 인원"
+            description="방을 만든 사람을 포함한 참여자 수입니다."
+            actions={stats.data && <SoloShare stats={stats.data} />}
+          />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  data={data.playerBuckets}
+                  height="100%"
+                  emptyTitle="방이 없습니다"
+                  emptyDescription="기간을 늘려 보세요."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="flex min-h-[18rem] flex-col">
+          <CardHeader
+            title="진행 단계"
+            description="방이 멈춘 자리입니다. 끝까지 간 방만 완주입니다."
+            actions={stats.data && <DoneShare stats={stats.data} />}
+          />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  height="100%"
+                  data={data.statuses.map((slice) => ({
+                    label: roomStateLabel(slice.status),
+                    count: slice.count,
+                  }))}
+                  emptyTitle="방이 없습니다"
+                  emptyDescription="기간을 늘려 보세요."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+
+        <Card className="flex min-h-[18rem] flex-col">
+          <CardHeader title="소요 시간" description="끝난 방만 셉니다. 진행 중인 방은 빠집니다." />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  height="100%"
+                  data={data.durationBuckets}
+                  emptyTitle="끝난 방이 없습니다"
+                  emptyDescription="방이 끝나야 소요 시간이 남습니다."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader title="방 목록" description="행을 누르면 그 방의 기록이 옆에서 열립니다." />
         <DataTable
@@ -125,8 +234,8 @@ export function RoomsPage() {
       </Card>
 
       {/* 참여자에서 그 사람으로 건너뛴다. 화면은 바뀌지만 패널은 열린 채로 이어지고,
-        * 유저 쪽에서 이 방으로 돌아오는 길이 남는다. 문의는 대개 "이 방의 이 사람"으로
-        * 오므로 그 경로가 끊겨 있으면 조사가 매번 검색부터 다시 시작된다. */}
+       * 유저 쪽에서 이 방으로 돌아오는 길이 남는다. 문의는 대개 "이 방의 이 사람"으로
+       * 오므로 그 경로가 끊겨 있으면 조사가 매번 검색부터 다시 시작된다. */}
       <RoomPanel
         roomId={openId}
         onClose={close}
@@ -134,6 +243,22 @@ export function RoomsPage() {
       />
     </div>
   );
+}
+
+/**
+ * 참여자가 방장 하나뿐인 방의 비율.
+ *
+ * <p>막대를 눈으로 더해야 나오는 값이라 제목 옆에 적는다. 이 값이 크면 방은 만들어지는데
+ * 초대가 안 닿고 있다는 뜻이고, 그건 게임이나 룰렛과 무관한 문제다.
+ */
+function SoloShare({ stats }: { stats: RoomStats }) {
+  return <ShareNote value={stats.soloRoomCount} total={stats.roomCount} suffix="개가 혼자" />;
+}
+
+/** 끝까지 간 방의 비율. */
+function DoneShare({ stats }: { stats: RoomStats }) {
+  const done = stats.statuses.find((slice) => slice.status === 'DONE')?.count ?? 0;
+  return <ShareNote value={done} total={stats.roomCount} suffix="개가 완주" />;
 }
 
 /** `room:12` 에서 12를 꺼낸다. 종류가 다르거나 숫자가 아니면 열지 않는다. */

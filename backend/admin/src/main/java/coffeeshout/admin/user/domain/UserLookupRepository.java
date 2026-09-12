@@ -1,5 +1,6 @@
 package coffeeshout.admin.user.domain;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,7 @@ public interface UserLookupRepository {
     /**
      * @param keyword 닉네임 부분 일치 또는 유저코드 완전 일치. 비어 있으면 최근 가입부터 전체.
      */
-    Page<UserSummary> search(String keyword, Pageable pageable);
+    Page<UserListRow> search(String keyword, Pageable pageable);
 
     Optional<UserSummary> findById(Long userId);
 
@@ -37,4 +38,21 @@ public interface UserLookupRepository {
      * 목록을 알아야 하는데, 그건 {@code :user} 모듈의 enum 이고 조회 저장소가 알 일이 아니다.
      */
     List<ProviderCount> countByProvider();
+
+    /**
+     * 기간 안의 가입 시각. 날짜로 묶지 않고 시각 그대로 준다.
+     *
+     * <p>SQL 의 {@code DATE()} 로 묶으면 DB 세션 시간대가 경계를 정한다. 화면이 쓰는 날짜는
+     * 운영자가 보는 날짜라 그 둘이 어긋나면 자정 근처 가입이 하루 옆 막대에 꽂힌다.
+     * 날짜로 접는 일은 시간대를 아는 서비스가 한다.
+     */
+    List<Instant> findSignupTimes(Instant from, Instant to);
+
+    /**
+     * 활동한 적 있는 회원의 활동량. 한 번도 방에 안 들어온 사람은 빠져서 온다.
+     *
+     * <p>그 사람들을 0으로 채우지 않는 이유는 회원 수를 이미 {@link #countUsers()} 가
+     * 알고 있어서다. 여기서 전체 회원과 조인하면 활동 없는 회원 수만큼 빈 줄을 읽는다.
+     */
+    List<UserPlayAggregate> aggregatePlays();
 }
