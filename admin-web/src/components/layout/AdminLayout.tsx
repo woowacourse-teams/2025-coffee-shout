@@ -16,13 +16,65 @@ import {
   UserCog,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useActionQueue } from '@/api/queries';
+import type { ActionQueue } from '@/api/types';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/auth/AuthProvider';
 import { EnvBadge } from '@/components/ui/EnvBadge';
 import { Skeleton } from '@/components/ui/EmptyState';
+import { formatNumber } from '@/lib/format';
 
-type NavItem = { to: string; label: string; icon: LucideIcon };
+/**
+ * 대기 건수를 다는 자리.
+ *
+ * <p>배지를 다는 기준은 <b>일을 하면 0으로 줄어드는가</b>이다. 차단 IP 는 지금 몇 개가
+ * 걸려 있는지를 말할 뿐 처리할 일이 아니라서 배지가 없다. 달아 두면 아무도 아무것도
+ * 안 해도 숫자가 계속 떠 있고, 그런 배지는 곧 눈에서 지워진다.
+ */
+type QueueCount = (queue: ActionQueue) => number;
+
+type NavItem = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  count?: QueueCount;
+  critical?: boolean;
+};
 type NavGroup = { heading: string; items: NavItem[] };
+
+/**
+ * 메뉴 옆 대기 건수.
+ *
+ * <p>0 이면 그리지 않는다. 회색 0 을 달아 두면 아홉 개 메뉴 옆에 0 이 줄줄이 서서,
+ * 정작 숫자가 붙은 자리를 찾는 데 시간이 걸린다. <b>배지가 있다는 것 자체가 신호다.</b>
+ *
+ * <p>색은 격리 메시지에만 준다. 신고와 검열은 평소에도 쌓여 있는 것이 정상이라 늘
+ * 코랄이면 그 색이 아무 뜻도 없어진다. 격리 메시지는 평소 0 이고 1 이 되는 순간이
+ * 곧 사고라서, 회색이던 자리가 코랄로 <b>바뀌는</b> 것이 신호가 된다.
+ */
+function QueueBadge({ item, queue }: { item: NavItem; queue?: ActionQueue }) {
+  if (!item.count || !queue) {
+    return null;
+  }
+
+  const count = item.count(queue);
+  if (count === 0) {
+    return null;
+  }
+
+  return (
+    <span
+      className={cn(
+        'ml-auto min-w-5 rounded-sm px-1 text-center text-2xs font-semibold leading-4',
+        item.critical
+          ? 'bg-attention-solid text-attention-on-solid'
+          : 'bg-subtle text-ink-secondary',
+      )}
+    >
+      {formatNumber(count)}
+    </span>
+  );
+}
 
 /**
  * 레일 그룹은 <b>업무 흐름</b>으로 묶는다. 알파벳순이나 만든 순이 아니다.
@@ -33,8 +85,20 @@ const NAV: NavGroup[] = [
     heading: '운영',
     items: [
       { to: '/', label: '홈', icon: LayoutDashboard },
-      { to: '/reports', label: '신고', icon: MessageSquareWarning },
-      { to: '/profanity', label: '닉네임 검열', icon: SpellCheck },
+      {
+        to: '/reports',
+        label: '신고',
+        icon: MessageSquareWarning,
+        count: (queue) => queue.pendingReports,
+      },
+      {
+        to: '/profanity',
+        label: '닉네임 검열',
+        icon: SpellCheck,
+        // 두 상태를 합쳐 센다. 레일에서 알아야 할 것은 "저기 손댈 게 남았나"지
+        // AI 가 걸러낸 것과 판단 못한 것의 비율이 아니다. 그 구분은 화면이 한다.
+        count: (queue) => queue.flaggedNicknames + queue.pendingNicknames,
+      },
       { to: '/ip-blocks', label: 'IP 차단', icon: ShieldBan },
     ],
   },
@@ -52,7 +116,13 @@ const NAV: NavGroup[] = [
       { to: '/patch-notes', label: '패치노트', icon: ScrollText },
       { to: '/zzolbot', label: 'ZzolBot', icon: AlertTriangle },
       { to: '/admins', label: '관리자', icon: UserCog },
-      { to: '/ops', label: '시스템', icon: ServerCog },
+      {
+        to: '/ops',
+        label: '시스템',
+        icon: ServerCog,
+        count: (queue) => queue.deadLetters,
+        critical: true,
+      },
       { to: '/audit-logs', label: '조치 이력', icon: History },
     ],
   },
@@ -103,6 +173,10 @@ export function AdminLayout() {
 }
 
 function Rail() {
+  // 레일에서 한 번만 부른다. 화면마다 따로 부르면 같은 숫자를 여러 번 물어보게 되고,
+  // 화면을 옮길 때마다 배지가 깜빡인다. 여기 있으면 화면이 바뀌어도 레일은 안 다시 그린다.
+  const queue = useActionQueue();
+
   return (
     <nav
       aria-label="주 메뉴"
@@ -155,6 +229,7 @@ function Rail() {
                           aria-hidden
                         />
                         {item.label}
+                        <QueueBadge item={item} queue={queue.data} />
                       </>
                     )}
                   </NavLink>
