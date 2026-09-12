@@ -3,15 +3,17 @@ package coffeeshout.cardgame.ui;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import coffeeshout.GameModuleWebSocketTest;
-import coffeeshout.cardgame.application.CardGameService;
 import coffeeshout.cardgame.application.response.MiniGameStateMessage;
 import coffeeshout.cardgame.domain.CardGame;
 import coffeeshout.fixture.CardGameDeckStub;
 import coffeeshout.fixture.CardGameFake;
 import coffeeshout.fixture.GamerFixture;
+import coffeeshout.fixture.TestDataHelper;
 import coffeeshout.gamecommon.Gamer;
 import coffeeshout.gamecommon.JoinCode;
 import coffeeshout.minigame.application.GameSessionService;
+import coffeeshout.minigame.domain.MiniGameType;
+import coffeeshout.minigame.event.GameStartReadyEvent;
 import coffeeshout.minigame.ui.request.CommandType;
 import coffeeshout.minigame.ui.request.MiniGameMessage;
 import coffeeshout.minigame.ui.request.command.SelectCardCommand;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.Customization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -45,7 +48,10 @@ class CardGameIntegrationTest extends GameModuleWebSocketTest {
     GameSessionService gameSessionService;
 
     @Autowired
-    CardGameService cardGameService;
+    ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    TestDataHelper testDataHelper;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -54,8 +60,9 @@ class CardGameIntegrationTest extends GameModuleWebSocketTest {
     void setUp(@Autowired JoinCodeGenerator joinCodeGenerator) throws Exception {
         joinCode = joinCodeGenerator.generate();
         host = GamerFixture.호스트_꾹이();
-        gamers = GamerFixture.꾹이_루키_엠제이_한스();
+        gamers = 루키가_회원인_명단(joinCode);
         cardGame = new CardGameFake(new CardGameDeckStub());
+        testDataHelper.게임_시작_준비된_방_생성(joinCode, gamers);
         gameSessionService.deleteSession(joinCode);
         gameSessionService.initSession(joinCode, host);
         gameSessionService.getSession(joinCode).replaceGames(host, List.of(cardGame));
@@ -104,6 +111,7 @@ class CardGameIntegrationTest extends GameModuleWebSocketTest {
         assertThat(payloadAs(secondRoundScoreBoard, MiniGameStateMessage.class).cardGameState())
                 .isEqualTo("SCORE_BOARD");
         assertThat(payloadAs(done, MiniGameStateMessage.class).cardGameState()).isEqualTo("DONE");
+        결과_저장과_정산_아웃박스를_확인한다(MiniGameType.CARD_GAME, gamers.size());
     }
 
     @Test
@@ -244,12 +252,13 @@ class CardGameIntegrationTest extends GameModuleWebSocketTest {
     }
 
     /**
-     * WS START 커맨드(Room 검증·영속 경유) 대신 :game 서비스를 직접 호출해 게임을 시작한다.
-     * {@code startGame}으로 READY→PLAYING 전이 후 {@code start}로 플로우를 스케줄한다(프로덕션 onGameStartReady와 동일 순서).
+     * 프로덕션 시작 경로를 그대로 탄다 — {@code :room}의 {@code MiniGameStartConsumer}가 발행하는
+     * {@code GameStartReadyEvent}부터다. 서비스의 {@code start()}를 직접 부르면 미니게임 엔티티·플레이어
+     * 스냅샷을 만드는 단계가 통째로 건너뛰어져, 종료 시 결과 저장 경로가 돌 수 없다(#1663).
      */
     private void startCardGame() {
-        gameSessionService.startGame(joinCode, host, gamers);
-        cardGameService.start(joinCode.getValue(), host.getName());
+        eventPublisher.publishEvent(
+                new GameStartReadyEvent("evt-" + joinCode.getValue(), joinCode.getValue(), host.getName(), gamers));
     }
 
     /**
