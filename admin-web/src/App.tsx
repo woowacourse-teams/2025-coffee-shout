@@ -22,9 +22,6 @@ import { NotFoundPage } from '@/pages/NotFoundPage';
 const AdminAccountsPage = lazy(() =>
   import('@/pages/AdminAccountsPage').then((m) => ({ default: m.AdminAccountsPage })),
 );
-const AnalyticsPage = lazy(() =>
-  import('@/pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
-);
 const AuditLogsPage = lazy(() =>
   import('@/pages/AuditLogsPage').then((m) => ({ default: m.AuditLogsPage })),
 );
@@ -43,17 +40,8 @@ const PatchNotesPage = lazy(() =>
 const ReportsPage = lazy(() =>
   import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })),
 );
-const RoomDetailPage = lazy(() =>
-  import('@/pages/RoomDetailPage').then((m) => ({ default: m.RoomDetailPage })),
-);
-const RoomsPage = lazy(() =>
-  import('@/pages/RoomsPage').then((m) => ({ default: m.RoomsPage })),
-);
-const UserDetailPage = lazy(() =>
-  import('@/pages/UserDetailPage').then((m) => ({ default: m.UserDetailPage })),
-);
-const UsersPage = lazy(() =>
-  import('@/pages/UsersPage').then((m) => ({ default: m.UsersPage })),
+const TracePage = lazy(() =>
+  import('@/pages/TracePage').then((m) => ({ default: m.TracePage })),
 );
 const OpsPage = lazy(() => import('@/pages/OpsPage').then((m) => ({ default: m.OpsPage })));
 const ZzolBotPage = lazy(() =>
@@ -98,11 +86,18 @@ export function App() {
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/profanity" element={<ProfanityPage />} />
                 <Route path="/ip-blocks" element={<IpBlocksPage />} />
-                <Route path="/rooms" element={<RoomsPage />} />
-                <Route path="/rooms/:roomId" element={<RoomDetailPage />} />
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/users/:userId" element={<UserDetailPage />} />
-                <Route path="/games" element={<AnalyticsPage />} />
+                <Route path="/trace" element={<TracePage />} />
+                {/* 방 조회와 유저 조회와 각각의 상세, 네 라우트를 추적 하나로 합쳤다.
+                  * 옛 주소를 살려 두는 이유는 북마크와 다른 화면의 링크 때문이다.
+                  * 상세 주소(/rooms/12)는 목록으로 보낸다 - 패널을 여는 데 필요한 것은
+                  * 검색어가 아니라 id 라서 그대로 옮길 수 없고, 억지로 옮기면 검색 결과에
+                  * 없는 방의 패널만 덩그러니 열린다. */}
+                <Route path="/rooms" element={<Navigate to="/trace" replace />} />
+                <Route path="/rooms/:roomId" element={<Navigate to="/trace" replace />} />
+                <Route path="/users" element={<Navigate to="/trace" replace />} />
+                <Route path="/users/:userId" element={<Navigate to="/trace" replace />} />
+                {/* 서비스 분석을 홈에 흡수했다. 옛 주소는 홈으로 보낸다. */}
+                <Route path="/games" element={<Navigate to="/" replace />} />
                 <Route path="/patch-notes" element={<PatchNotesPage />} />
                 <Route path="/patch-notes/new" element={<PatchNoteFormPage />} />
                 <Route path="/patch-notes/:id" element={<PatchNoteFormPage />} />

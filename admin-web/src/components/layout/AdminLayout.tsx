@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   AlertTriangle,
-  Gamepad2,
   History,
   LayoutDashboard,
   LogOut,
@@ -12,7 +11,6 @@ import {
   Search,
   ShieldBan,
   SpellCheck,
-  Users,
   UserCog,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -103,16 +101,15 @@ const NAV: NavGroup[] = [
     ],
   },
   {
-    heading: '조회',
-    items: [
-      { to: '/rooms', label: '방 조회', icon: Search },
-      { to: '/users', label: '유저', icon: Users },
-      { to: '/games', label: '서비스 분석', icon: Gamepad2 },
-    ],
-  },
-  {
     heading: '관리',
     items: [
+      // 방 조회와 유저 조회를 합친 화면이다. 운영자는 문의를 손에 들고 오는데 둘이
+      // 갈려 있으면 "이게 방 코드인지 유저 코드인지"를 조사보다 먼저 판단해야 했다.
+      //
+      // 서비스 분석은 메뉴에서 뺐다. 홈이 서비스 요약을 맡으면서 같은 카드를 두 화면이
+      // 갖게 됐고, 같은 카드가 두 곳에 있으면 한쪽만 고치는 날이 온다. 거기에만 있던
+      // 기간 탭과 "세지 않는 것" 설명은 홈으로 옮겼다.
+      { to: '/trace', label: '추적', icon: Search },
       { to: '/patch-notes', label: '패치노트', icon: ScrollText },
       { to: '/zzolbot', label: 'ZzolBot', icon: AlertTriangle },
       { to: '/admins', label: '관리자', icon: UserCog },

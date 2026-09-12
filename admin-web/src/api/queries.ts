@@ -246,10 +246,12 @@ export function useRoomSearch(joinCode: string, page: number) {
     queryFn: () => api.get<PageResponse<RoomSummary>>('/rooms', { joinCode, page }),
   });
 }
-export function useRoomDetail(roomId: number) {
+export function useRoomDetail(roomId: number | null) {
   return useQuery({
-    queryKey: keys.rooms.detail(roomId),
+    queryKey: keys.rooms.detail(roomId ?? 0),
     queryFn: () => api.get<RoomDetail>(`/rooms/${roomId}`),
+    // 패널이 닫혀 있으면 열린 방이 없다. 막지 않으면 /rooms/0 을 불러 404 가 난다.
+    enabled: roomId !== null,
   });
 }
 /* ── 유저 ────────────────────────────────────────────────── */
@@ -265,10 +267,11 @@ export function useProviderStats() {
     queryFn: () => api.get<ProviderStats>('/users/providers'),
   });
 }
-export function useUserDetail(userId: number) {
+export function useUserDetail(userId: number | null) {
   return useQuery({
-    queryKey: keys.users.detail(userId),
+    queryKey: keys.users.detail(userId ?? 0),
     queryFn: () => api.get<UserDetail>(`/users/${userId}`),
+    enabled: userId !== null,
   });
 }
 /* ── 패치노트 ────────────────────────────────────────────── */

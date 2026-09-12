@@ -61,7 +61,13 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      {/* 도넛 위, 범례 아래로 쌓는다.
+        *
+        * 한때 좌우로 놓고 범례를 가로 세 칸으로 깔았다. 그때는 이 카드가 본문 폭 전체를
+        * 쓰는 자리였다. 홈으로 옮기면서 3분의 1 열에 들어가자 한 칸이 100px 이 되어
+        * 제공자 이름이 통째로 잘리고 숫자와 비율만 서로 붙어 남았다. 좁은 자리에서는
+        * 세로가 맞다. */}
+      <div className="flex flex-col items-center gap-4">
       <div className="relative shrink-0" style={{ width: height, height }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -109,17 +115,15 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
       {/* 범례가 곧 표다. 색 옆에 이름과 값과 비율을 함께 적어 두면 조각에 마우스를
         * 올리지 않고도 읽힌다. 조각에 직접 라벨을 붙이면 작은 조각에서 글자가 겹친다.
         *
-        * 세로 목록이 아니라 <b>가로 세 칸</b>이다. 세로로 쌓았더니 카드가 본문 폭 전체를
-        * 쓰는 자리라 이름은 왼쪽 끝, 숫자는 오른쪽 끝으로 갈려 그 사이 700px 가 비었다.
-        * 항목이 셋뿐이라 나란히 놓으면 그 폭이 그대로 채워지고, 세 값을 좌우로 비교하는
-        * 것이 도넛의 조각을 비교하는 것과 같은 방향이 된다. */}
-      <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+        * 한 줄에 하나씩 쌓고 값을 오른쪽 끝에 맞춘다. 세 값이 같은 세로선에 서야 자릿수가
+        * 비교되고, 그 비교 방향이 도넛 조각의 크기 비교와 어긋나지 않는다. */}
+      <div className="flex w-full min-w-0 flex-col">
         {slices.map((slice) => (
           <div
             key={slice.key}
-            className="flex flex-col gap-2 rounded-md border border-border-default px-4 py-3"
+            className="flex items-center justify-between gap-3 border-b border-border-default py-2 last:border-b-0"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex min-w-0 items-center gap-2">
               {/* 조각과 같은 이유로 테두리를 둔다. 카카오 노랑 사각형은 테두리가 없으면
                 * 흰 바탕에서 아예 안 보인다. */}
               <Swatch color={slice.color} bordered />
@@ -127,7 +131,7 @@ export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; h
                 {slice.name}
               </span>
             </span>
-            <span className="flex items-baseline gap-1.5 tabular-nums">
+            <span className="flex shrink-0 items-baseline gap-1.5 tabular-nums">
               <span className="text-xl font-bold leading-none tracking-metric text-ink">
                 {formatNumber(slice.value)}
               </span>

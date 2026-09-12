@@ -276,7 +276,7 @@ function ReportPanel({
                       label: '방',
                       value: (
                         <Link
-                          to={`/rooms?joinCode=${encodeURIComponent(report.joinCode)}`}
+                          to={`/trace?q=${encodeURIComponent(report.joinCode)}`}
                           className="inline-flex items-center gap-1 font-mono text-xs text-ink underline decoration-border-strong underline-offset-2 hover:decoration-ink"
                         >
                           {report.joinCode}
