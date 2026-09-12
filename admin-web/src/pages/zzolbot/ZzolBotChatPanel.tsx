@@ -95,7 +95,16 @@ export function ZzolBotChatPanel() {
           }
         />
 
-        <CardBody className="flex min-h-[22rem] flex-col gap-2.5">
+        {/* 대화가 남는 높이를 가져간다.
+          *
+          * 카드를 세로 플렉스로 두지 않았을 때는 늘어난 높이가 <b>입력칸 아래</b>에
+          * 남았다. 옆 카드가 여덟 줄이라 이 카드도 그 높이로 늘어나는데, 정작 입력칸은
+          * 화면 가운데쯤에 떠 있고 그 아래 100px 넘게 비어 있었다. 채팅에서 입력칸은
+          * 바닥에 있어야 손이 거기로 간다.
+          *
+          * 대화가 길어지면 이 영역만 스크롤한다. 카드 전체가 늘어나면 입력칸이 화면
+          * 밖으로 밀려 한 줄 칠 때마다 스크롤을 내려야 한다. */}
+        <CardBody className="flex min-h-[22rem] flex-1 flex-col gap-2.5 overflow-y-auto">
           {turns.length === 0 ? (
             <EmptyState
               title="아직 주고받은 말이 없습니다"
@@ -106,7 +115,7 @@ export function ZzolBotChatPanel() {
           )}
         </CardBody>
 
-        <form onSubmit={submit} className="flex gap-2 border-t border-border-default p-5">
+        <form onSubmit={submit} className="flex shrink-0 gap-2 border-t border-border-default p-5">
           <Input
             value={question}
             onChange={(event) => setQuestion(event.target.value)}

@@ -251,7 +251,7 @@ export function HomePage() {
                 return (
                   <>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-md bg-subtle px-4 py-3">
+                      <div className="rounded-md border border-border-default px-4 py-3">
                         <p className="text-xs text-ink-secondary">완주율</p>
                         <p className="mt-1.5 text-xl font-bold leading-none tracking-metric text-ink">
                           {formatPercent(data.funnel.completionRate)}
@@ -260,7 +260,7 @@ export function HomePage() {
                           {formatNumber(data.funnel.created)}개 중 {formatNumber(data.funnel.completed)}개
                         </p>
                       </div>
-                      <div className="rounded-md bg-subtle px-4 py-3">
+                      <div className="rounded-md border border-border-default px-4 py-3">
                         <p className="text-xs text-ink-secondary">가장 많이 빠지는 구간</p>
                         <p className="mt-1.5 text-xl font-bold leading-none tracking-metric text-ink">
                           {worst === null ? '-' : `${formatNumber(worst.dropped)}개`}
