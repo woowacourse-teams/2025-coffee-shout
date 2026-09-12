@@ -131,7 +131,6 @@ subprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
         exclude("**/QueryPerformanceTest.class")
-        systemProperty("updateFixture", System.getProperty("updateFixture", "false"))
         jvmArgs("-Xmx1g", "-XX:+HeapDumpOnOutOfMemoryError")
         // reuse-off로 JVM(모듈)마다 독립 컨테이너를 쓰므로 모듈별 DB/Redis 인덱스 격리는 불필요(이슈 #1402)
     }

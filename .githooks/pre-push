@@ -38,4 +38,35 @@ if [ -n "$FE" ]; then
     fi
 fi
 
-exit 0
+# 백엔드 WS 계약 — 게이트는 backend-ci 다. 여기선 이번에 올라가는 커밋의 WS 계약 애노테이션 변경만 본다.
+# payload record 의 필드만 바뀐 경우는 안 걸리고 CI 가 잡는다.
+# 범위를 브랜치 전체로 잡으면 한 번 애노테이션을 건드린 뒤 모든 push 가 30초씩 느려진다.
+# 줄 시작을 고정하는 건 주석과 예외 메시지 속 "@WsTopic" 을 거르려는 것이다.
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+PUSHED=$(git rev-parse -q --verify "origin/$BRANCH") || PUSHED=$(git merge-base origin/dev HEAD)
+git diff "$PUSHED..HEAD" -- backend \
+  | grep -qE '^[+-][[:space:]]*@(WsTopic|WsQueue|WsReceive|MessageMapping)[[:space:]]*\(' || exit 0
+
+# 컨트랙트 테스트는 MySQL·Valkey 컨테이너를 띄운다(reuse 는 #1402 에서 영구 비활성).
+# Docker 가 꺼졌으면 push 를 막지 않고 CI 에 맡긴다.
+if ! docker info >/dev/null 2>&1; then
+    echo "[pre-push] Docker 가 꺼져 있어 ws-catalog fixture 검사를 건너뜁니다. backend-ci 가 잡습니다."
+    exit 0
+fi
+
+# 성공해도 애플리케이션 로그가 수백 줄 나온다. 파일로 받고 실패했을 때만 꼬리를 보여준다.
+LOG=$(mktemp -t ws-catalog-pre-push)
+echo "[pre-push] ws-catalog fixture 갱신… (컨테이너 기동 포함 30초 내외)"
+if ! backend/gradlew -p backend :app:test --tests '*WsCatalogContractTest*' -q >"$LOG" 2>&1; then
+    grep -E "발행 경로 상수|수신 문서|expected|but was|Test.*FAILED" "$LOG" | head -20
+    echo "[pre-push] 컨트랙트 테스트 실패 — 전체 로그: $LOG"
+    echo "  리포트: backend/app/build/reports/tests/test/index.html"
+    exit 1
+fi
+rm -f "$LOG"
+
+git diff --quiet -- backend/app/src/test/resources/__fixtures__/ws-catalog.json && exit 0
+
+echo "[pre-push] ws-catalog fixture 를 갱신했습니다. 커밋에 포함하고 다시 push 하세요:"
+echo "  git add backend/app/src/test/resources/__fixtures__/ws-catalog.json"
+exit 1

@@ -36,6 +36,12 @@ import org.springframework.stereotype.Component;
 @Profile("!prod")
 public class WsCatalogBuilder implements SmartInitializingSingleton {
 
+    // 스캔 순서(getDeclaredMethods)는 JVM 이 보장하지 않는다. 병합 전에 발행 지점으로 정렬해야
+    // 대표 payloadType(getFirst)과 referencedSchemas 순서가 실행마다 같아진다.
+    private static final Comparator<RawEntry> BY_SOURCE = Comparator.comparing(
+                    (RawEntry entry) -> entry.source().className())
+            .thenComparing(entry -> entry.source().methodName());
+
     private final ApplicationContext applicationContext;
     private final WsCatalogProperties properties;
     private volatile WsCatalog cached;
@@ -82,7 +88,9 @@ public class WsCatalogBuilder implements SmartInitializingSingleton {
 
         final List<WsCatalog.TopicEntry> topics = mergeTopics(rawTopics);
         final List<WsCatalog.QueueEntry> queues = mergeQueues(rawQueues);
-        sends.sort(Comparator.comparing(WsCatalog.SendEntry::destination));
+        sends.sort(Comparator.comparing(WsCatalog.SendEntry::destination)
+                .thenComparing(entry -> entry.source().className())
+                .thenComparing(entry -> entry.source().methodName()));
 
         final Map<String, WsCatalog.SchemaEntry> schemas = expandSchemas(referenced);
 
@@ -136,8 +144,9 @@ public class WsCatalogBuilder implements SmartInitializingSingleton {
     }
 
     private List<WsCatalog.TopicEntry> mergeTopics(List<RawTopic> raw) {
-        final Map<String, List<RawTopic>> byPath =
-                raw.stream().collect(Collectors.groupingBy(RawTopic::path, LinkedHashMap::new, Collectors.toList()));
+        final Map<String, List<RawTopic>> byPath = raw.stream()
+                .sorted(BY_SOURCE)
+                .collect(Collectors.groupingBy(RawTopic::path, LinkedHashMap::new, Collectors.toList()));
         final List<WsCatalog.TopicEntry> result = new ArrayList<>();
         for (final Map.Entry<String, List<RawTopic>> entry : byPath.entrySet()) {
             result.add(mergeTopicGroup(entry.getKey(), entry.getValue()));
@@ -153,8 +162,9 @@ public class WsCatalogBuilder implements SmartInitializingSingleton {
     }
 
     private List<WsCatalog.QueueEntry> mergeQueues(List<RawQueue> raw) {
-        final Map<String, List<RawQueue>> byPath =
-                raw.stream().collect(Collectors.groupingBy(RawQueue::path, LinkedHashMap::new, Collectors.toList()));
+        final Map<String, List<RawQueue>> byPath = raw.stream()
+                .sorted(BY_SOURCE)
+                .collect(Collectors.groupingBy(RawQueue::path, LinkedHashMap::new, Collectors.toList()));
         final List<WsCatalog.QueueEntry> result = new ArrayList<>();
         for (final Map.Entry<String, List<RawQueue>> entry : byPath.entrySet()) {
             result.add(mergeQueueGroup(entry.getKey(), entry.getValue()));
