@@ -122,8 +122,11 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
         <Card>
           <CardHeader title="내용" />
           <CardBody className="flex flex-col gap-4">
-            <Label text="분류" hint="유저 화면에서 글을 분류하는 데 씁니다">
+            {/* 분류는 네 가지뿐이라 입력칸만큼 넓을 이유가 없다. 폭이 넓으면 고른 값과
+              * 화살표 사이가 비어 무엇을 고른 것인지 한눈에 안 들어온다. */}
+            <Label text="분류" hint="유저 화면에서 글을 분류하는 데 씁니다" className="items-start">
               <Select
+                className="w-48"
                 value={form.category}
                 onChange={(event) =>
                   setForm({ ...form, category: event.target.value as PatchNoteCategory })
@@ -137,7 +140,7 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
               </Select>
             </Label>
 
-            <Label text="제목" hint={`${form.title.length} / ${MAX_TITLE}`}>
+            <Label text="제목" counter={`${form.title.length} / ${MAX_TITLE}`}>
               <Input
                 value={form.title}
                 onChange={(event) => setForm({ ...form, title: event.target.value })}
@@ -146,13 +149,7 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
               />
             </Label>
 
-            <label className="flex flex-col gap-1.5">
-              <span className="flex items-baseline justify-between text-xs font-medium text-ink-secondary">
-                본문
-                <span className="text-2xs font-normal text-ink-muted">
-                  {form.content.length} / {MAX_CONTENT}
-                </span>
-              </span>
+            <Label text="본문" counter={`${form.content.length} / ${MAX_CONTENT}`}>
               {/* textarea 는 Field 에 없다. 이 화면에서만 쓰는 것을 프리미티브로
                * 올리면 쓰는 곳이 하나인 컴포넌트가 늘어난다. */}
               <textarea
@@ -163,7 +160,7 @@ function PatchNoteForm({ id, initial }: { id: number | null; initial: PatchNoteF
                 aria-invalid={contentOver}
                 className="w-full resize-y rounded-md border border-border-default bg-surface px-3 py-2 text-sm leading-relaxed text-ink transition-colors placeholder:text-ink-muted hover:border-ink-muted focus:border-accent focus:outline-none aria-[invalid=true]:border-attention-mark"
               />
-            </label>
+            </Label>
 
             {save.isError && (
               <p className="text-xs text-attention">

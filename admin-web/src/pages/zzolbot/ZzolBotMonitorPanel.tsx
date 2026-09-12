@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useMonitorAlerts } from '@/api/queries';
 import type { MonitorAlert } from '@/api/types';
 import { DataTable } from '@/components/DataTable';
+import { alertSeverityLabel } from '@/lib/labels';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { KeyValue } from '@/components/ui/KeyValue';
@@ -45,7 +46,7 @@ export function ZzolBotMonitorPanel() {
         accessorKey: 'severity',
         header: '심각도',
         meta: { width: '7rem' },
-        cell: (c) => <span className="font-mono text-xs">{String(c.getValue())}</span>,
+        cell: (c) => <span className="text-xs">{alertSeverityLabel(String(c.getValue()))}</span>,
       },
       {
         accessorKey: 'analysisSummary',
@@ -100,7 +101,7 @@ export function ZzolBotMonitorPanel() {
           <CardBody className="flex flex-col gap-4">
             <KeyValue
               items={[
-                { label: '심각도', value: <span className="font-mono">{selected.severity}</span> },
+                { label: '심각도', value: alertSeverityLabel(selected.severity) },
                 {
                   label: '지문',
                   value: selected.fingerprint ? (

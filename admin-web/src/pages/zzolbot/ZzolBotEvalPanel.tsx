@@ -10,6 +10,7 @@ import {
 import type { EvalResult, EvalRun, EvalScenario } from '@/api/types';
 import { ApiError } from '@/api/client';
 import { DataTable } from '@/components/DataTable';
+import { evalKindLabel, evalSourceLabel } from '@/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -280,7 +281,7 @@ function ScenarioCard({ scenarios }: { scenarios: ReturnType<typeof useEvalScena
         accessorKey: 'kind',
         header: '종류',
         meta: { width: '8rem' },
-        cell: (c) => <span className="font-mono text-xs">{String(c.getValue())}</span>,
+        cell: (c) => <span className="text-xs">{evalKindLabel(String(c.getValue()))}</span>,
       },
       {
         accessorKey: 'question',
@@ -291,7 +292,7 @@ function ScenarioCard({ scenarios }: { scenarios: ReturnType<typeof useEvalScena
         accessorKey: 'sourceType',
         header: '출처',
         meta: { width: '8rem' },
-        cell: (c) => <span className="text-xs text-ink-muted">{String(c.getValue())}</span>,
+        cell: (c) => <span className="text-xs text-ink-muted">{evalSourceLabel(String(c.getValue()))}</span>,
       },
       {
         id: 'actions',

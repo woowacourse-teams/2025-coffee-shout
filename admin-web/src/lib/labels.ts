@@ -104,6 +104,31 @@ const AUDIT_ACTION: Record<string, string> = {
   'POST /admin/api/zzolbot/sessions/{id}/feedback': '봇 답변 평가',
 };
 
+/** 평가 시나리오의 종류. 봇에게 무엇을 시키는 상황인지. */
+const EVAL_KIND: Record<string, string> = {
+  CHAT: '대화',
+  MONITOR: '모니터링',
+};
+
+/** 평가 시나리오가 어디서 왔는지. */
+const EVAL_SOURCE: Record<string, string> = {
+  MANUAL: '손으로 등록',
+  RECORDED: '실환경 녹화',
+};
+
+/**
+ * 알림 심각도. 알림 시스템이 주는 값을 그대로 받는다.
+ *
+ * <p>색을 붙이지 않는다. 이 시스템의 유채색은 코랄 하나이고 그 자리는 "손이 필요하다"가
+ * 맡는다. 심각도가 셋이면 색도 셋이 되어 어느 것이 급한지가 오히려 흐려진다.
+ */
+const ALERT_SEVERITY: Record<string, string> = {
+  critical: '심각',
+  warning: '경고',
+  info: '정보',
+  none: '없음',
+};
+
 export function reportCategoryLabel(value: string): string {
   return REPORT_CATEGORY[value] ?? value;
 }
@@ -130,4 +155,16 @@ export function providerLabel(value: string): string {
 
 export function auditActionLabel(value: string): string {
   return AUDIT_ACTION[value] ?? value;
+}
+
+export function evalKindLabel(value: string): string {
+  return EVAL_KIND[value] ?? value;
+}
+
+export function evalSourceLabel(value: string): string {
+  return EVAL_SOURCE[value] ?? value;
+}
+
+export function alertSeverityLabel(value: string): string {
+  return ALERT_SEVERITY[value?.toLowerCase()] ?? value;
 }
