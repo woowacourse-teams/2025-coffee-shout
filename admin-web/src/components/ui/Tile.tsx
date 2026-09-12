@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Sparkline } from '@/components/Sparkline';
 import { cn } from '@/lib/cn';
@@ -15,6 +16,16 @@ type TileProps = {
   delta?: number;
   /** 같은 지표의 일자별 값. 있으면 숫자 오른쪽에 흐름을 그린다. */
   trend?: number[];
+  /**
+   * 라벨 오른쪽 끝에 흐리게 세우는 표식.
+   *
+   * <p>같은 화면의 처리 대기 줄에는 아이콘이 있는데 지표 칸에는 없어서, 같은 종류의
+   * 물체가 두 규칙으로 서 있었다. 훑을 때 글자를 읽기 전에 자리부터 잡히는 효과도 있다.
+   *
+   * <p>흐리게 두는 것이 규칙이다. 또렷하면 라벨보다 먼저 보이는데, 아이콘 혼자로는 무슨
+   * 지표인지 말하지 못한다. 자리만 지키는 역할이다.
+   */
+  icon?: LucideIcon;
   className?: string;
 };
 
@@ -42,7 +53,16 @@ type TileProps = {
  * 다르고, 초록이나 빨강을 달면 그 판단을 화면이 대신해 버린다. 방향은 화살표가 말하고
  * 판단은 사람이 한다.
  */
-export function Tile({ label, value, hint, suffix, delta, trend, className }: TileProps) {
+export function Tile({
+  label,
+  value,
+  hint,
+  suffix,
+  delta,
+  trend,
+  icon: Icon,
+  className,
+}: TileProps) {
   const rising = delta !== undefined && delta > 0;
 
   return (
@@ -52,9 +72,12 @@ export function Tile({ label, value, hint, suffix, delta, trend, className }: Ti
         className,
       )}
     >
-      <p className="truncate text-xs font-medium text-ink-secondary" title={label}>
-        {label}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="truncate text-xs font-medium text-ink-secondary" title={label}>
+          {label}
+        </p>
+        {Icon && <Icon className="size-4 shrink-0 text-ink-muted/70" strokeWidth={2} aria-hidden />}
+      </div>
 
       <div className="mt-2 flex items-end justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-1.5">
