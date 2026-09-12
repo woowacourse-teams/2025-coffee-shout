@@ -91,9 +91,13 @@ export function ProfanityWordsCard() {
         meta: { width: '6rem', align: 'right' },
         cell: (c) => {
           const row = c.row.original;
+          // 둘 다 secondary 다. 끄기를 danger 로 두었더니 스무 행이 통째로 코랄 테두리가
+          // 되어 화면이 경고로 뒤덮였고, 바로 위 검열 대기의 "차단" 과 같은 무게로 읽혔다.
+          // 차단은 되돌리려면 사람이 다시 판정해야 하지만 끄기는 옆 버튼 한 번으로
+          // 돌아온다. 되돌릴 수 있는 조치에는 색을 주지 않는다.
           return (
             <Button
-              variant={row.active ? 'danger' : 'secondary'}
+              variant="secondary"
               size="sm"
               disabled={toggle.isPending}
               onClick={() => toggle.mutate({ word: row.word, active: !row.active })}
