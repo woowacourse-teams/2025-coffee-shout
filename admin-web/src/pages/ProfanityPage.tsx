@@ -13,12 +13,13 @@ import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { Tabs } from '@/components/ui/Tabs';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { nicknameAuditStatusLabel } from '@/lib/labels';
 import { ProfanityWordsCard } from '@/components/ProfanityWordsCard';
 import { formatPercent } from '@/lib/format';
 
 const TABS: { value: NicknameAuditStatus; label: string; hint: string }[] = [
-  { value: 'FLAGGED', label: 'FLAGGED', hint: 'AI가 걸러낸 닉네임' },
-  { value: 'PENDING', label: 'PENDING', hint: 'AI가 판단하지 못한 닉네임' },
+  { value: 'FLAGGED', label: nicknameAuditStatusLabel('FLAGGED'), hint: 'AI가 걸러낸 닉네임' },
+  { value: 'PENDING', label: nicknameAuditStatusLabel('PENDING'), hint: 'AI가 판단하지 못한 닉네임' },
 ];
 
 export function ProfanityPage() {
@@ -156,7 +157,7 @@ export function ProfanityPage() {
           columns={columns}
           data={audits.data?.content ?? []}
           loading={audits.isPending}
-          emptyTitle={`${status} 상태의 닉네임이 없습니다`}
+          emptyTitle={`${nicknameAuditStatusLabel(status)} 상태의 닉네임이 없습니다`}
           emptyDescription="새 닉네임이 검열에 걸리면 여기에 쌓입니다."
         />
         {audits.data && (

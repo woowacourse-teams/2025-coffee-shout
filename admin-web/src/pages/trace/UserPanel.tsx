@@ -8,6 +8,7 @@ import { MetricRow } from '@/components/ui/MetricRow';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { formatPercent } from '@/lib/format';
+import { providerLabel } from '@/lib/labels';
 
 /**
  * 유저 한 명.
@@ -84,7 +85,7 @@ export function UserPanel({
                     <span className="flex flex-wrap gap-1.5">
                       {data.providers.map((provider) => (
                         <StatusBadge key={provider} tone="neutral">
-                          {provider}
+                          {providerLabel(provider)}
                         </StatusBadge>
                       ))}
                     </span>

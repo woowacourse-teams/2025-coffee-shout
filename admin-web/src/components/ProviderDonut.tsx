@@ -3,6 +3,7 @@ import type { ProviderStats } from '@/api/types';
 import { TOOLTIP_STYLE } from '@/components/charts/theme';
 import { Swatch } from '@/components/ui/Legend';
 import { formatNumber, formatPercent } from '@/lib/format';
+import { providerLabel } from '@/lib/labels';
 
 /**
  * 제공자 색은 각 브랜드가 실제로 쓰는 색이다.
@@ -25,10 +26,16 @@ import { formatNumber, formatPercent } from '@/lib/format';
  * 색이 혼자 지지 않는다</b>. 옆의 범례에 이름과 건수와 비율이 나란히 적혀 있고 툴팁도
  * 이름을 읽어 준다. {@code --chart-1}(로고색 선)에 적용한 것과 같은 예외다.
  */
-const PROVIDER: Record<string, { label: string; color: string }> = {
-  google: { label: '구글', color: 'var(--provider-google)' },
-  kakao: { label: '카카오', color: 'var(--provider-kakao)' },
-  naver: { label: '네이버', color: 'var(--provider-naver)' },
+/**
+ * 제공자 색. 이름은 {@code labels.ts} 가 갖는다.
+ *
+ * <p>둘을 한 곳에 두었더니 유저 패널이 같은 이름을 자기 쪽에 또 적게 됐다. 이름이 두 벌이면
+ * 한쪽만 고치는 날이 온다. 색은 이 차트만 쓰므로 여기 남는다.
+ */
+const PROVIDER_COLOR: Record<string, string> = {
+  google: 'var(--provider-google)',
+  kakao: 'var(--provider-kakao)',
+  naver: 'var(--provider-naver)',
 };
 
 /**
@@ -53,8 +60,8 @@ const PROVIDER: Record<string, { label: string; color: string }> = {
 export function ProviderDonut({ stats, height = 200 }: { stats: ProviderStats; height?: number }) {
   const slices = stats.providers.map((row) => ({
     key: row.provider,
-    name: PROVIDER[row.provider]?.label ?? row.provider,
-    color: PROVIDER[row.provider]?.color ?? 'var(--chart-1)',
+    name: providerLabel(row.provider),
+    color: PROVIDER_COLOR[row.provider] ?? 'var(--chart-1)',
     value: row.count,
   }));
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
