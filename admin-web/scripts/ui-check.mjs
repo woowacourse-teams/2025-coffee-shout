@@ -109,6 +109,28 @@ function audit(gapLimit) {
     }
   }
 
+  // 위아래로 쌓은 칸 안에서 목록이 폭을 못 쓰는 자리.
+  //
+  // 위의 여백 검사는 카드 안 모든 리프를 합쳐 상자를 만든다. 목록이 좁아도 그 아래 설명
+  // 문단이 폭을 다 쓰고 있으면 상자는 꽉 찬 것으로 나온다. 실제로 도넛 범례가 좌우로
+  // 100px 씩 비어 있는데 검사가 통과한 적이 있다.
+  //
+  // 세로로 쌓은 칸(flex-direction: column)만 본다. 그 안에서 가로는 남는 방향이라 목록이
+  // 부모만큼 넓어야 맞다. 좌우로 놓은 칸에서는 목록이 남은 자리만 쓰는 것이 정상이고,
+  // 격자 칸도 마찬가지다.
+  for (const list of document.querySelectorAll('div.rounded-lg.border ul')) {
+    const parent = list.parentElement;
+    if (!parent) continue;
+    const parentStyle = getComputedStyle(parent);
+    if (parentStyle.display !== 'flex' || !parentStyle.flexDirection.startsWith('column')) continue;
+    const short = parent.clientWidth - list.getBoundingClientRect().width;
+    if (short > gapLimit) {
+      const card = list.closest('div.rounded-lg.border');
+      const title = card?.querySelector('h2')?.textContent?.trim() ?? '화면';
+      out.push(`목록이 폭을 못 씀: ${title} (${Math.round(short)}px 모자람)`);
+    }
+  }
+
   // 높이로 재지 않는다. 배지와 버튼은 안쪽 여백이 있어 한 줄이어도 글자 높이의 두 배가
   // 된다. 글자에 Range 를 걸어 줄 상자가 몇 개인지 센다.
   for (const node of document.querySelectorAll('span, button, a, th, td')) {
@@ -163,6 +185,20 @@ for (const route of ROUTES) {
   await page.goto(BASE_URL + route, { waitUntil: 'networkidle' });
   // 차트가 부모 크기를 재고 다시 그릴 시간을 준다.
   await page.waitForTimeout(1200);
+  // 검사가 빈 화면을 통과시키지 않게 한다.
+  //
+  // 토큰이 만료돼 로그인 화면이 떠 있는 것을 모르고 "모든 화면 통과"를 세 번 보고한 적이
+  // 있다. 아무것도 안 그려진 화면에는 잡을 문제도 없다. 카드가 하나도 없으면 그건 통과가
+  // 아니라 검사가 못 돈 것이다.
+  const cards = await page.evaluate(
+    () => document.querySelectorAll('div.rounded-lg.border').length,
+  );
+  if (cards === 0) {
+    console.error(`\n${route}: 카드가 하나도 없습니다. 토큰이 만료됐거나 화면이 깨졌습니다.`);
+    await browser.close();
+    process.exit(2);
+  }
+
   const rows = await page.evaluate(audit, GAP_LIMIT);
   if (rows.length > 0) {
     problems += rows.length;

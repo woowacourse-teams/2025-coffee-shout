@@ -158,8 +158,8 @@ export function AuditLogsPage() {
        * 한 지붕 아래 두어도 카드의 뜻이 흐려지지 않는다. */}
       <Card>
         <CardHeader
-          title="조치 쪼개 보기"
-          description="왼쪽은 무엇을 했는지, 오른쪽은 누가 했는지입니다."
+          title="종류와 담당자"
+          description="최근 30일 조치를 무엇을 했는지와 누가 했는지로 나눠 봅니다."
         />
         <CardBody className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-2">
           <div className="flex flex-col gap-2.5">

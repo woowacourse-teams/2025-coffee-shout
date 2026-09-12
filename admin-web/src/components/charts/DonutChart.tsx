@@ -125,7 +125,10 @@ export function DonutChart({ slices, centerLabel, layout = 'row', size = 148 }: 
       </div>
 
       {/* 범례가 곧 표다. 값을 오른쪽 끝에 맞춰 자릿수가 비교되게 한다. */}
-      <ul className="flex min-w-0 flex-1 flex-col">
+      {/* w-full 이 없으면 위아래로 쌓았을 때 목록이 내용 폭만 쓰고 좌우가 빈다.
+       * 부모의 items-center 가 폭을 내용에 맞춰 줄이기 때문이다. 가운데로 모아야 하는
+       * 것은 원이지 목록이 아니다. */}
+      <ul className="flex w-full min-w-0 flex-1 flex-col">
         {visible.map((slice) => (
           <li
             key={slice.label}
