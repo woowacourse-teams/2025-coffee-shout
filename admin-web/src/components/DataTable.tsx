@@ -233,7 +233,10 @@ export function DataTable<T>({
                     // 호버는 회색, 선택은 코랄 틴트다. 둘 다 코랄이면 지나가는 손가락과
                     // 지금 보고 있는 행이 같은 모양이 되어, 마우스를 움직일 때마다
                     // 선택이 옮겨 다니는 것처럼 보인다.
-                    onRowClick && 'cursor-pointer hover:bg-canvas',
+                    //
+                    // 회색은 subtle 이다. 캔버스가 흰색이 되면서 bg-canvas 로는 흰 카드
+                    // 위에서 아무 일도 일어나지 않았다.
+                    onRowClick && 'cursor-pointer hover:bg-subtle',
                     selected && 'bg-selected hover:bg-selected',
                   )}
                 >

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
+import { Meter } from '@/components/ui/Meter';
 import { cn } from '@/lib/cn';
 import { formatNumber } from '@/lib/format';
 
@@ -15,28 +16,33 @@ export type QueueItem = {
 /**
  * 처리 대기 줄.
  *
- * <p>다섯 칸을 <b>판 하나에 세로로</b> 쌓는다. 한때 가로로 다섯 장의 카드를 늘어놓았는데,
- * 화면 폭 전체를 쓰면서 각 칸 안이 비었고 홈에서 가장 큰 덩어리가 되어 정작 그 옆에
- * 무엇을 둬도 눌렸다. 세로로 세우면 좁은 열에 들어가고, 다섯 숫자가 오른쪽 끝에 정렬돼
- * <b>어디가 많이 밀렸는지</b>가 한눈에 비교된다. 가로로 늘어놓으면 그 비교를 못 한다.
+ * <p>숫자 옆에 <b>막대</b>를 깐다. 숫자만 다섯 개 세워 두면 어디가 제일 밀렸는지를 알려고
+ * 매번 다섯을 읽고 머릿속에서 비교해야 한다. 39와 30은 눈으로 구분되지 않지만 막대 길이는
+ * 구분된다. 대시보드에서 비교는 글이 아니라 길이가 해야 한다.
  *
- * <p>칸막이 선을 두지 않는다. 줄마다 선을 그으면 다섯 줄이 다섯 개의 다른 것으로 보이는데,
- * 이것들은 "지금 밀린 일"이라는 한 덩어리다.
+ * <p>기준은 <b>이 다섯 중 가장 큰 값</b>이다. 큐마다 "많다"의 기준이 달라서(신고 39는 흔하고
+ * 격리 5는 사고다) 절대 기준을 세울 수 없다. 서로 견주는 것까지만 하고, 그 이상은 각 화면이
+ * 맡는다.
  *
  * <p>색은 격리 메시지에만 붙는다. 신고와 검열은 평소에도 쌓이는 것이 정상이라 늘 코랄이면
  * 그 색이 뜻을 잃는다. 격리는 평소 0이고, 회색이던 자리가 코랄로 <b>바뀌는</b> 것이 신호다.
  */
 export function ActionQueueStrip({ items }: { items: QueueItem[] }) {
+  // 전부 0이면 나누기가 무너진다. 그때는 모든 막대가 0이어야 맞다.
+  const top = Math.max(...items.map((item) => item.count), 0);
+
   return (
-    <ul className="flex flex-col px-2 pb-2">
+    // flex-1 과 justify-between 으로 남는 높이를 줄 사이에 나눠 가진다. 옆 카드와 높이를
+    // 맞추려고 그냥 늘리면 목록 아래가 빈 판이 되는데, 간격으로 흡수하면 여백으로 읽힌다.
+    <ul className="flex flex-1 flex-col justify-between px-5 pb-5">
       {items.map((item) => (
-        <QueueRow key={item.label} item={item} />
+        <QueueRow key={item.label} item={item} top={top} />
       ))}
     </ul>
   );
 }
 
-function QueueRow({ item }: { item: QueueItem }) {
+function QueueRow({ item, top }: { item: QueueItem; top: number }) {
   const idle = item.count === 0;
   const alarming = item.critical === true && !idle;
 
@@ -44,26 +50,40 @@ function QueueRow({ item }: { item: QueueItem }) {
     <li>
       <Link
         to={item.to}
-        className="flex items-center gap-2.5 rounded-md px-3 py-2.5 transition-colors hover:bg-canvas"
+        className="-mx-2 block rounded-md px-2 py-1.5 transition-colors hover:bg-subtle"
       >
-        <item.icon
-          className={cn('size-4 shrink-0', alarming ? 'text-attention-mark' : 'text-ink-muted')}
-          strokeWidth={2}
-          aria-hidden
+        <span className="flex items-baseline gap-2">
+          <item.icon
+            className={cn(
+              'size-3.5 shrink-0 translate-y-0.5',
+              alarming ? 'text-attention-mark' : 'text-ink-muted',
+            )}
+            strokeWidth={2}
+            aria-hidden
+          />
+          <span className="min-w-0 flex-1 truncate text-xs text-ink" title={item.label}>
+            {item.label}
+          </span>
+          {/* 0은 흐리게 둔다. 지울 수는 없다 - 칸이 사라지면 그 큐가 없어진 것처럼 보이고,
+            * 다섯 줄의 자리가 매번 바뀌면 늘 보던 자리에서 숫자를 찾지 못한다. */}
+          <span
+            className={cn(
+              'shrink-0 text-xs font-semibold tabular-nums',
+              idle ? 'text-ink-muted' : 'text-ink',
+            )}
+          >
+            {formatNumber(item.count)}
+          </span>
+        </span>
+
+        {/* 막대는 이름 아래 전체 폭을 쓴다. 이름과 한 줄에 두면 긴 라벨 하나가 막대 자리를
+          * 잡아먹어 줄마다 막대 시작점이 달라진다. 게임별 플레이와 같은 규칙이다. */}
+        <Meter
+          ratio={top === 0 ? 0 : item.count / top}
+          size="sm"
+          muted={!alarming}
+          className="mt-1.5"
         />
-        <span className="min-w-0 flex-1 truncate text-sm text-ink-secondary" title={item.label}>
-          {item.label}
-        </span>
-        {/* 0은 흐리게 둔다. 지울 수는 없다 - 칸이 사라지면 그 큐가 없어진 것처럼 보이고,
-          * 다섯 줄의 자리가 매번 바뀌면 늘 보던 자리에서 숫자를 찾지 못한다. */}
-        <span
-          className={cn(
-            'shrink-0 text-xl font-bold leading-none tracking-metric tabular-nums',
-            idle ? 'text-ink-muted' : 'text-ink',
-          )}
-        >
-          {formatNumber(item.count)}
-        </span>
       </Link>
     </li>
   );

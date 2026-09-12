@@ -169,7 +169,7 @@ function PlayerRow({
       <button
         type="button"
         onClick={() => onPivot(player.userId as number)}
-        className="flex w-full items-center gap-2.5 rounded-sm py-2 text-left text-sm transition-colors hover:bg-canvas"
+        className="flex w-full items-center gap-2.5 rounded-sm py-2 text-left text-sm transition-colors hover:bg-subtle"
       >
         {body}
         <ArrowUpRight className="size-3.5 shrink-0 text-ink-muted" aria-hidden />
