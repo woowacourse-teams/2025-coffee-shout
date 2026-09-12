@@ -4,7 +4,13 @@ import coffeeshout.profanity.application.port.NicknameAuditRepository;
 import coffeeshout.profanity.domain.audit.AiConfidence;
 import coffeeshout.profanity.domain.audit.NicknameAudit;
 import coffeeshout.profanity.domain.audit.NicknameAuditStatus;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -19,7 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
 
+    /** 14일에 걸쳐 흩는다. 검열 대기는 신고보다 빨리 쌓이고 빨리 처리되는 편이다. */
+    private static final int DAYS = 14;
+
+    /** 고정 씨앗. 기동할 때마다 같은 데이터가 나와야 화면 변경을 비교할 수 있다. */
+    private static final long SEED = 20_260_912L;
+
     private final NicknameAuditRepository auditRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private final Clock clock;
 
     @Override
     @Transactional
@@ -96,7 +113,39 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
 
         auditRepository.saveAll(flaggedData);
         auditRepository.saveAll(pendingData);
+        backdate(flaggedData, pendingData);
         log.info("[LocalInit] 닉네임 검열 샘플 데이터 삽입 완료 — FLAGGED {}건, PENDING {}건", flaggedData.size(), pendingData.size());
+    }
+
+    /**
+     * 접수 시각을 흩는다.
+     *
+     * <p>생성자가 {@code createdAt = Instant.now()} 를 박아서 예순 건이 전부 기동 시각에
+     * 몰렸다. 검열 화면의 "접수" 열이 예순 행 모두 같은 값이라 아무 말도 하지 않았고,
+     * 통합 작업함에서는 이 예순 건이 <b>최신 스무 칸을 통째로 덮어</b> 신고와 격리 메시지가
+     * 한 건도 안 보였다.
+     *
+     * <p>도메인에 시각 주입 생성자를 열지 않는다. 그 구멍은 운영 코드에서도 쓸 수 있게 되고,
+     * 그때부터 이 필드는 "기록된 시각"이 아니라 "누군가 정한 시각"이 된다.
+     *
+     * <p>JdbcTemplate 이 아니라 JPQL 로 쓴다. {@code Timestamp} 나 {@code LocalDateTime} 으로
+     * 넘기면 드라이버의 변환 경로가 삽입 때와 달라 아홉 시간이 어긋났다. JPQL 은 Hibernate 가
+     * 삽입에 쓰는 매핑을 그대로 탄다.
+     */
+    @SafeVarargs
+    private void backdate(List<NicknameAudit>... groups) {
+        final Random random = new Random(SEED);
+        final Instant now = clock.instant();
+        for (List<NicknameAudit> group : groups) {
+            for (NicknameAudit audit : group) {
+                final Instant at = now.minus(Duration.ofMinutes(random.nextInt(DAYS * 24 * 60)));
+                entityManager
+                        .createQuery("UPDATE NicknameAudit a SET a.createdAt = :at, a.auditedAt = :at WHERE a.id = :id")
+                        .setParameter("at", at)
+                        .setParameter("id", audit.getId())
+                        .executeUpdate();
+            }
+        }
     }
 
     private NicknameAudit flagged(String nickname, double confidence, String reason) {

@@ -4,7 +4,8 @@ import coffeeshout.profanity.application.port.NicknameFeedbackRepository;
 import coffeeshout.profanity.domain.audit.AiConfidence;
 import coffeeshout.profanity.domain.audit.NicknameFeedback;
 import coffeeshout.profanity.domain.audit.NicknameFeedback.OperatorDecision;
-import java.sql.Timestamp;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,7 +133,10 @@ public class LocalNicknameFeedbackDataInitializer implements ApplicationRunner {
     private static final List<String> AGREED_ALLOWED_REASONS = List.of("정상 닉네임", "AI 미검출 확인", "문제 없음");
 
     private final NicknameFeedbackRepository feedbackRepository;
-    private final JdbcTemplate jdbc;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final Clock clock;
 
     @Override
@@ -197,13 +200,19 @@ public class LocalNicknameFeedbackDataInitializer implements ApplicationRunner {
      *
      * <p>전부 기동 시각에 몰려 있으면 7일 구간과 30일 구간이 같은 숫자를 낸다. 기간 탭이
      * 동작하는지를 화면에서 확인할 수 없게 된다.
+     *
+     * <p>JdbcTemplate 이 아니라 JPQL 로 쓴다. {@code Timestamp} 나 {@code LocalDateTime} 으로
+     * 넘기면 드라이버의 변환 경로가 삽입 때와 달라 같은 컬럼인데 아홉 시간이 어긋났고,
+     * 화면에 <b>미래 시각</b>이 찍혔다. JPQL 은 Hibernate 가 삽입에 쓰는 매핑을 그대로 타므로
+     * 시간대를 손으로 계산할 일이 없다.
      */
     private void backdate(NicknameFeedback feedback, Instant now, Random random) {
         final Instant judgedAt = now.minus(Duration.ofMinutes(random.nextInt(DAYS * 24 * 60)));
-        jdbc.update(
-                "UPDATE player_name_feedback SET created_at = ? WHERE id = ?",
-                Timestamp.from(judgedAt),
-                feedback.getId());
+        entityManager
+                .createQuery("UPDATE NicknameFeedback f SET f.createdAt = :at WHERE f.id = :id")
+                .setParameter("at", judgedAt)
+                .setParameter("id", feedback.getId())
+                .executeUpdate();
     }
 
     private static String pick(List<String> candidates, Random random) {
