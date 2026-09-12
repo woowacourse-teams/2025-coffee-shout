@@ -90,7 +90,9 @@ export function UsersPage() {
         }
       />
 
-      <Card>
+      {/* 열이 셋뿐이라 본문 폭을 다 쓰면 닉네임과 가입 사이가 1100px 빈다. IP 차단과
+        * 같은 경우다. 페이지 폭을 다시 정의하는 게 아니라 이 카드에만 건다. */}
+      <Card className="max-w-3xl">
         <CardHeader title="유저 목록" description="행을 누르면 활동 기록이 옆에서 열립니다." />
         <DataTable
           columns={columns}
