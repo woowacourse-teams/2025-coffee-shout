@@ -59,18 +59,13 @@ public class UserNicknameCleanupService {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onProfanityWordBlocked(ProfanityWordBlockedEvent event) {
-        final Optional<UserNickname> blocked = toNickname(event.word());
-        if (blocked.isEmpty()) {
-            return;
-        }
-        final List<User> users = userRepository.findAllByNickname(blocked.get());
-
-        if (users.isEmpty()) {
-            return;
-        }
-
-        log.info("비속어 차단으로 닉네임 일괄 교체: word={}, userCount={}", event.word(), users.size());
-        replaceAll(users);
+        toNickname(event.word())
+                .map(userRepository::findAllByNickname)
+                .filter(users -> !users.isEmpty())
+                .ifPresent(users -> {
+                    log.info("비속어 차단으로 닉네임 일괄 교체: word={}, userCount={}", event.word(), users.size());
+                    replaceAll(users);
+                });
     }
 
     private void replaceAll(List<User> users) {
