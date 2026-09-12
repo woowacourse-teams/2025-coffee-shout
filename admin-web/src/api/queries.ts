@@ -4,6 +4,7 @@ import type {
   ActionQueue,
   AdminAccount,
   AdminAuditLog,
+  AdminAuditStats,
   AuditLogFilters,
   BlockedIp,
   DailySummary,
@@ -20,6 +21,7 @@ import type {
   MonitorAlert,
   NicknameAudit,
   NicknameAuditQuality,
+  NicknameAuditStats,
   NicknameAuditStatus,
   PageResponse,
   PatchNote,
@@ -29,6 +31,7 @@ import type {
   ProviderStats,
   Report,
   ReportSla,
+  ReportStats,
   ReportStatus,
   RoomDetail,
   RoomStats,
@@ -115,6 +118,13 @@ export function useGamePlayStats(days = 30) {
     queryFn: () => api.get<GamePlayStat[]>('/overview/games', { days }),
   });
 }
+/** 조치 이력 화면 상단 그래프. 표의 필터와 이어지지 않는다. */
+export function useAuditLogStats(days = 30) {
+  return useQuery({
+    queryKey: ['audit-logs', 'stats', days] as const,
+    queryFn: () => api.get<AdminAuditStats>('/audit-logs/stats', { days }),
+  });
+}
 export function useAuditLogs(filters: AuditLogFilters) {
   return useQuery({
     queryKey: ['audit-logs', filters],
@@ -138,6 +148,13 @@ export function useReports(filters: ReportFilters) {
   return useQuery({
     queryKey: keys.reports.list(filters),
     queryFn: () => api.get<PageResponse<Report>>('/reports', { ...filters }),
+  });
+}
+/** 신고 화면 상단 그래프. SLA 와 따로 부른다. 저쪽은 처리할 때마다 다시 부른다. */
+export function useReportStats(days = 30) {
+  return useQuery({
+    queryKey: ['quality', 'report-stats', days] as const,
+    queryFn: () => api.get<ReportStats>('/quality/report-stats', { days }),
   });
 }
 export function useReportSla(days = 30) {
@@ -219,6 +236,12 @@ export function useToggleProfanityWord() {
         ? api.post<void>(`/profanity/words/${encodeURIComponent(word)}/activate`)
         : api.delete<void>(`/profanity/words/${encodeURIComponent(word)}/activate`),
     onSuccess: () => client.invalidateQueries({ queryKey: ['profanity', 'words'] }),
+  });
+}
+export function useNicknameAuditStats(days = 30) {
+  return useQuery({
+    queryKey: ['quality', 'nickname-audit-stats', days] as const,
+    queryFn: () => api.get<NicknameAuditStats>('/quality/nickname-audit-stats', { days }),
   });
 }
 export function useNicknameAuditQuality(days = 30) {

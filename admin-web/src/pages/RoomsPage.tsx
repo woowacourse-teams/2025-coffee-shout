@@ -13,7 +13,8 @@ import { Pagination } from '@/components/ui/Pagination';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { GameShareList } from '@/components/GameShareList';
-import { DistributionBars } from '@/components/charts/DistributionBars';
+import { DonutChart } from '@/components/charts/DonutChart';
+import { Histogram } from '@/components/charts/Histogram';
 import { RoomPanel } from '@/pages/lookup/RoomPanel';
 import { roomStatusBadge } from '@/pages/lookup/roomStatus';
 import { formatNumber } from '@/lib/format';
@@ -148,7 +149,7 @@ export function RoomsPage() {
           </div>
         </Card>
 
-        <Card className="flex min-h-[18rem] flex-col">
+        <Card className="flex flex-col">
           <CardHeader
             title="방 인원"
             description="방을 만든 사람을 포함한 참여자 수입니다."
@@ -157,9 +158,8 @@ export function RoomsPage() {
           <CardBody className="flex-1 pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DistributionBars
+                <Histogram
                   data={data.playerBuckets}
-                  height="100%"
                   emptyTitle="방이 없습니다"
                   emptyDescription="기간을 늘려 보세요."
                 />
@@ -170,36 +170,34 @@ export function RoomsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="flex min-h-[18rem] flex-col">
+        <Card className="flex flex-col">
           <CardHeader
             title="진행 단계"
             description="방이 멈춘 자리입니다. 끝까지 간 방만 완주입니다."
             actions={stats.data && <DoneShare stats={stats.data} />}
           />
-          <CardBody className="flex-1 pb-4">
+          <CardBody className="flex flex-1 items-center pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DistributionBars
-                  height="100%"
-                  data={data.statuses.map((slice) => ({
+                <DonutChart
+                  slices={data.statuses.map((slice) => ({
                     label: roomStateLabel(slice.status),
                     count: slice.count,
                   }))}
-                  emptyTitle="방이 없습니다"
-                  emptyDescription="기간을 늘려 보세요."
+                  highlight={roomStateLabel('DONE')}
+                  centerLabel="방"
                 />
               )}
             </Loaded>
           </CardBody>
         </Card>
 
-        <Card className="flex min-h-[18rem] flex-col">
+        <Card className="flex flex-col">
           <CardHeader title="소요 시간" description="끝난 방만 셉니다. 진행 중인 방은 빠집니다." />
           <CardBody className="flex-1 pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DistributionBars
-                  height="100%"
+                <Histogram
                   data={data.durationBuckets}
                   emptyTitle="끝난 방이 없습니다"
                   emptyDescription="방이 끝나야 소요 시간이 남습니다."

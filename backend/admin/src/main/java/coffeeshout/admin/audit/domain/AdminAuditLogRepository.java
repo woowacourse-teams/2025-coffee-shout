@@ -1,6 +1,7 @@
 package coffeeshout.admin.audit.domain;
 
 import java.time.Instant;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +23,13 @@ public interface AdminAuditLogRepository {
      * @param from       이 시각부터. 끝을 받지 않는 것은 감사 로그를 늘 "지금까지"로 읽기 때문이다
      */
     Page<AdminAuditLog> search(String actorEmail, AdminAuditResult result, Instant from, Pageable pageable);
+
+    /**
+     * 기간 안의 조치를 한 줄씩. 종류, 담당자, 일자별 집계가 이 한 번의 조회에서 나온다.
+     *
+     * <p>세 그래프가 <b>같은 순간의 같은 조치들</b>을 말해야 해서 나눠 돌리지 않는다.
+     * 조치가 초당 수십 건 쌓이는 테이블이 아니라 한 번에 읽어도 부담이 없고, 기간에는
+     * 상한을 둔다.
+     */
+    List<AdminAuditLog> findAllByCreatedAtBetween(Instant from, Instant to);
 }

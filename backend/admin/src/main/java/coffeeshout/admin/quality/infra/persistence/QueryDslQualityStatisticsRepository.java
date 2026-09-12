@@ -3,10 +3,12 @@ package coffeeshout.admin.quality.infra.persistence;
 import coffeeshout.admin.quality.domain.NicknameAuditQuality;
 import coffeeshout.admin.quality.domain.QualityStatisticsRepository;
 import coffeeshout.profanity.domain.audit.NicknameFeedback.OperatorDecision;
+import coffeeshout.profanity.domain.audit.QNicknameAudit;
 import coffeeshout.profanity.domain.audit.QNicknameFeedback;
 import coffeeshout.report.domain.ReportStatus;
 import coffeeshout.report.infra.persistence.QReport;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +23,7 @@ public class QueryDslQualityStatisticsRepository implements QualityStatisticsRep
 
     private static final QNicknameFeedback FEEDBACK = QNicknameFeedback.nicknameFeedback;
     private static final QReport REPORT = QReport.report;
+    private static final QNicknameAudit AUDIT = QNicknameAudit.nicknameAudit;
 
     private final JPAQueryFactory queryFactory;
 
@@ -86,6 +89,29 @@ public class QueryDslQualityStatisticsRepository implements QualityStatisticsRep
                 .from(REPORT)
                 .where(REPORT.status.eq(ReportStatus.PENDING))
                 .fetchOne());
+    }
+
+    @Override
+    public List<ReportRecord> findReportsBetween(Instant from, Instant to) {
+        return queryFactory
+                .select(Projections.constructor(
+                        ReportRecord.class, REPORT.category, REPORT.gameType, REPORT.createdAt, REPORT.resolvedAt))
+                .from(REPORT)
+                .where(REPORT.createdAt.goe(from), REPORT.createdAt.lt(to))
+                .fetch();
+    }
+
+    /**
+     * 처리일 기준 집계는 접수일로 자른 목록에 없는 신고를 포함해야 한다. 어제 접수돼 오늘
+     * 처리된 신고가 그렇다. 그래서 <b>처리 시각이 기간 안</b>인 것도 함께 읽는다.
+     */
+    @Override
+    public List<AuditRecord> findAuditsBetween(Instant from, Instant to) {
+        return queryFactory
+                .select(Projections.constructor(AuditRecord.class, AUDIT.status, AUDIT.confidence, AUDIT.createdAt))
+                .from(AUDIT)
+                .where(AUDIT.createdAt.goe(from), AUDIT.createdAt.lt(to))
+                .fetch();
     }
 
     private static long nullToZero(Long value) {

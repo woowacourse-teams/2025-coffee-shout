@@ -9,6 +9,7 @@ import jakarta.persistence.PersistenceContext;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
@@ -111,10 +112,16 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
                 pending("화병난거북이", 0.54, "과장된 감정 표현"),
                 pending("비관론자야", 0.46, "부정적 관점 표현, 저위험"));
 
+        final List<NicknameAudit> settledData = settledData();
+
         auditRepository.saveAll(flaggedData);
         auditRepository.saveAll(pendingData);
-        backdate(flaggedData, pendingData);
-        log.info("[LocalInit] 닉네임 검열 샘플 데이터 삽입 완료 — FLAGGED {}건, PENDING {}건", flaggedData.size(), pendingData.size());
+        auditRepository.saveAll(settledData);
+        backdate(flaggedData, pendingData, settledData);
+        log.info(
+                "[LocalInit] 닉네임 검열 샘플 데이터 삽입 완료 - 대기 {}건, 판정 끝 {}건",
+                flaggedData.size() + pendingData.size(),
+                settledData.size());
     }
 
     /**
@@ -146,6 +153,39 @@ public class LocalNicknameAuditDataInitializer implements ApplicationRunner {
                         .executeUpdate();
             }
         }
+    }
+
+    /**
+     * 이미 판정이 끝난 닉네임.
+     *
+     * <p>대기 둘만 넣었더니 검열 화면의 판정 분포가 <b>같은 높이의 막대 두 개</b>였다.
+     * 실제 서비스에서 대부분의 닉네임은 걸리지 않고 그대로 지나가고(CLEAN), 걸린 것 중
+     * 일부만 사람이 막거나 풀어 준다. 그 비율이 없으면 "지금 큐에 30건"이 많은 건지
+     * 적은 건지 견줄 데가 없다.
+     */
+    private List<NicknameAudit> settledData() {
+        final List<NicknameAudit> settled = new ArrayList<>();
+        final Random random = new Random(SEED);
+
+        for (int i = 0; i < 180; i++) {
+            settled.add(
+                    settled("유저닉네임" + (i + 1), NicknameAuditStatus.CLEAN, 0.02 + random.nextDouble() * 0.2, "비속어 없음"));
+        }
+        for (int i = 0; i < 22; i++) {
+            settled.add(settled(
+                    "허용된닉네임" + (i + 1), NicknameAuditStatus.ALLOWED, 0.55 + random.nextDouble() * 0.25, "관리자 허용"));
+        }
+        for (int i = 0; i < 41; i++) {
+            settled.add(settled(
+                    "차단된닉네임" + (i + 1), NicknameAuditStatus.BLOCKED, 0.75 + random.nextDouble() * 0.24, "관리자 차단"));
+        }
+        return settled;
+    }
+
+    private NicknameAudit settled(String nickname, NicknameAuditStatus status, double confidence, String reason) {
+        final NicknameAudit entity = new NicknameAudit(nickname);
+        entity.complete(status, AiConfidence.of(confidence), reason);
+        return entity;
     }
 
     private NicknameAudit flagged(String nickname, double confidence, String reason) {

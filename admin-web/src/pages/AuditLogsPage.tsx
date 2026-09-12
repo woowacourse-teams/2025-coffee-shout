@@ -1,14 +1,20 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
-import { useAuditLogs } from '@/api/queries';
+import { useAuditLogStats, useAuditLogs } from '@/api/queries';
 import type { AdminAuditLog, AdminAuditResult } from '@/api/types';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { SearchInput, Select } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { DailyChart } from '@/components/charts/DailyChart';
+import { DistributionBars } from '@/components/charts/DistributionBars';
+import { DonutChart } from '@/components/charts/DonutChart';
+import { Skeleton } from '@/components/ui/EmptyState';
+import { Loaded } from '@/components/ui/Loaded';
+import { ShareNote } from '@/components/ui/ShareNote';
 import { auditActionLabel } from '@/lib/labels';
 import { useDebounced } from '@/lib/useDebounced';
 
@@ -20,11 +26,19 @@ const RANGES = [
   { value: '30', label: '30일' },
 ];
 
+/** 실패가 코랄이다. 되돌려야 할 일이 있다는 신호라 그 막대가 늘어나는 것을 먼저 봐야 한다. */
+const DAILY_SERIES = [
+  { key: 'failure', name: '실패', color: 'var(--chart-1)' },
+  { key: 'success', name: '성공', color: 'var(--gray-300)' },
+];
+
 export function AuditLogsPage() {
   const [page, setPage] = useState(0);
   const [actorInput, setActorInput] = useState('');
   const [result, setResult] = useState<AdminAuditResult | ''>('');
   const [days, setDays] = useState('');
+
+  const stats = useAuditLogStats(30);
 
   // 타이핑마다 서버를 때리지 않는다. 이메일 앞자리를 치는 동안 예닐곱 번 조회된다.
   const actorEmail = useDebounced(actorInput, 300);
@@ -114,6 +128,62 @@ export function AuditLogsPage() {
         title="조치 이력"
         description="관리자가 상태를 바꾼 모든 요청이 남습니다. 조회는 남기지 않습니다. 목록을 열어본 기록까지 쌓으면 실제 조치가 묻힙니다."
       />
+
+      {/* 표를 뒤지기 전에 어디를 볼지 정하는 자리다. 실패가 튄 날을 보고 그 기간을
+       * 거는 식으로 쓴다. 그래서 이 그래프들은 아래 필터를 따라가지 않는다. */}
+      <Card>
+        <CardHeader
+          title="일자별 조치"
+          description="최근 30일입니다. 아래 필터와 무관하게 전체를 봅니다."
+          actions={
+            stats.data && (
+              <ShareNote value={stats.data.failed} total={stats.data.total} suffix="건이 실패" />
+            )
+          }
+        />
+        <CardBody>
+          <Loaded query={stats} skeleton={<Skeleton className="h-44" />}>
+            {(data) => <DailyChart data={data.daily} series={DAILY_SERIES} height={200} />}
+          </Loaded>
+        </CardBody>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader title="조치 종류" description="쓰이지 않는 조치는 화면에서 뺄 후보입니다." />
+          <CardBody>
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DistributionBars
+                  data={data.actions.map((row) => ({
+                    label: auditActionLabel(row.action),
+                    count: row.count,
+                  }))}
+                  emptyTitle="조치가 없습니다"
+                  emptyDescription="관리자가 상태를 바꾸면 여기에 쌓입니다."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+
+        {/* 담당자는 도넛이다. 다섯 이하이고 합이 곧 전체 조치라, 여기서 묻는 것이
+         * "한 사람이 거의 다 하고 있나"라는 전체 대비 크기다. 조치 종류는 아홉 개가
+         * 넘고 꼴찌를 봐야 해서 순위 막대로 남는다. */}
+        <Card className="flex flex-col">
+          <CardHeader title="담당자" description="많은 순 다섯 명과 나머지 한 칸입니다." />
+          <CardBody className="flex flex-1 items-center pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DonutChart
+                  slices={data.actors.map((row) => ({ label: row.actorEmail, count: row.count }))}
+                  centerLabel="조치"
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader

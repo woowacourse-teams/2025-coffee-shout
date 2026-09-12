@@ -1,9 +1,14 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
-import { useAuditDecision, useNicknameAuditQuality, useNicknameAudits } from '@/api/queries';
+import {
+  useAuditDecision,
+  useNicknameAuditQuality,
+  useNicknameAuditStats,
+  useNicknameAudits,
+} from '@/api/queries';
 import type { NicknameAudit, NicknameAuditStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
 import { Loaded } from '@/components/ui/Loaded';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -13,13 +18,27 @@ import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { Tabs } from '@/components/ui/Tabs';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { DailyChart } from '@/components/charts/DailyChart';
+import { DonutChart } from '@/components/charts/DonutChart';
+import { Histogram } from '@/components/charts/Histogram';
+import { Skeleton } from '@/components/ui/EmptyState';
 import { nicknameAuditStatusLabel } from '@/lib/labels';
 import { ProfanityWordsCard } from '@/components/ProfanityWordsCard';
 import { formatPercent } from '@/lib/format';
 
 const TABS: { value: NicknameAuditStatus; label: string; hint: string }[] = [
   { value: 'FLAGGED', label: nicknameAuditStatusLabel('FLAGGED'), hint: 'AI가 걸러낸 닉네임' },
-  { value: 'PENDING', label: nicknameAuditStatusLabel('PENDING'), hint: 'AI가 판단하지 못한 닉네임' },
+  {
+    value: 'PENDING',
+    label: nicknameAuditStatusLabel('PENDING'),
+    hint: 'AI가 판단하지 못한 닉네임',
+  },
+];
+
+/** 걸린 쪽이 코랄이다. 사람 손이 필요해지는 쪽이라 그 막대가 늘어나는 것을 먼저 봐야 한다. */
+const DAILY_SERIES = [
+  { key: 'flagged', name: '걸림', color: 'var(--chart-1)' },
+  { key: 'passed', name: '통과', color: 'var(--gray-300)' },
 ];
 
 export function ProfanityPage() {
@@ -28,6 +47,7 @@ export function ProfanityPage() {
 
   const audits = useNicknameAudits(status, page);
   const quality = useNicknameAuditQuality(30);
+  const stats = useNicknameAuditStats(30);
   const decide = useAuditDecision();
 
   const columns = useMemo<ColumnDef<NicknameAudit, unknown>[]>(
@@ -73,7 +93,7 @@ export function ProfanityPage() {
         cell: (c) => (
           <span className="inline-flex gap-1.5">
             {/* 확인 창을 두지 않는다. 검열 판정은 되돌릴 수 있고(반대 버튼을 누르면 된다)
-              * 한 번에 수십 건을 처리하는 화면이라 매번 창이 뜨면 일이 안 된다. */}
+             * 한 번에 수십 건을 처리하는 화면이라 매번 창이 뜨면 일이 안 된다. */}
             <Button
               size="sm"
               disabled={decide.isPending}
@@ -119,20 +139,67 @@ export function ProfanityPage() {
               value={formatPercent(data.overrideRate)}
               hint="최근 30일. 높으면 모델 점검"
             />
-            <Tile
-              label="오탐"
-              value={data.falsePositive}
-              hint="AI가 걸렀는데 관리자가 허용"
-            />
-            <Tile
-              label="미탐"
-              value={data.falseNegative}
-              hint="AI가 놓쳤는데 관리자가 차단"
-            />
+            <Tile label="오탐" value={data.falsePositive} hint="AI가 걸렀는데 관리자가 허용" />
+            <Tile label="미탐" value={data.falseNegative} hint="AI가 놓쳤는데 관리자가 차단" />
             <Tile label="판정 일치" value={data.agreed} hint={`총 ${data.total}건 중`} />
           </TileGrid>
         )}
       </Loaded>
+
+      {/* 대기 목록은 지금 손이 필요한 것만 보여준다. 목록이 길어진 것이 욕이 늘어서인지
+       * 모델이 예민해져서인지는 이 셋을 나란히 봐야 갈린다.
+       *
+       * 일자별만 한 줄을 통째로 쓴다. 가로축이 서른 칸이라 절반 폭에서는 날짜 눈금이
+       * 서로 붙어 언제인지 못 읽는다. 칸이 다섯 이하인 분포 둘은 반씩 나눠도 넉넉하다. */}
+      <Card>
+        <CardHeader
+          title="일자별 검열"
+          description="걸림은 사람이 봐야 하는 판정입니다. 최근 30일."
+        />
+        <CardBody>
+          <Loaded query={stats} skeleton={<Skeleton className="h-44" />}>
+            {(data) => <DailyChart data={data.daily} series={DAILY_SERIES} height={200} />}
+          </Loaded>
+        </CardBody>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="flex flex-col">
+          <CardHeader title="판정 분포" description="닉네임이 어디에서 멈췄는지입니다." />
+          <CardBody className="flex flex-1 items-center pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DonutChart
+                  slices={data.statuses.map((slice) => ({
+                    label: nicknameAuditStatusLabel(slice.status),
+                    count: slice.count,
+                  }))}
+                  highlight={nicknameAuditStatusLabel('CLEAN')}
+                  centerLabel="닉네임"
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+
+        <Card className="flex flex-col">
+          <CardHeader
+            title="AI 신뢰도"
+            description="걸린 닉네임만 셉니다. 낮은 쪽이 두꺼우면 확신 없이 걸고 있다는 뜻입니다."
+          />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <Histogram
+                  data={data.confidenceBuckets}
+                  emptyTitle="걸린 닉네임이 없습니다"
+                  emptyDescription="검열에 걸려야 신뢰도가 남습니다."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader

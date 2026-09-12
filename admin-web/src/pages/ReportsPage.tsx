@@ -2,10 +2,10 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useReportSla, useReports, useResolveReport } from '@/api/queries';
-import type { Report, ReportStatus } from '@/api/types';
+import { useReportSla, useReportStats, useReports, useResolveReport } from '@/api/queries';
+import type { Report, ReportStats, ReportStatus } from '@/api/types';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { ContextPanel, usePanelParam } from '@/components/ui/ContextPanel';
 import { ERROR_SURFACE } from '@/components/ui/errorSurface';
@@ -19,8 +19,46 @@ import { TileGrid, TileSkeletons } from '@/components/ui/TileGrid';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { DailyChart } from '@/components/charts/DailyChart';
+import { DonutChart } from '@/components/charts/DonutChart';
+import { Histogram } from '@/components/charts/Histogram';
+import { Skeleton } from '@/components/ui/EmptyState';
+import { GameShareList } from '@/components/GameShareList';
 import { formatDurationMinutes } from '@/lib/format';
 import { miniGameLabel, reportCategoryLabel } from '@/lib/labels';
+
+/** 접수가 코랄이다. 들어오는 일이 주인공이고, 처리는 그것을 얼마나 따라갔는지를 보여준다. */
+const DAILY_SERIES = [
+  { key: 'received', name: '접수', color: 'var(--chart-1)' },
+  { key: 'resolved', name: '처리', color: 'var(--gray-300)' },
+];
+
+/**
+ * 게임과 무관한 신고를 순위에서 뺀다.
+ *
+ * <p>건의와 기타는 대개 게임에 붙지 않아 이 칸 하나가 전체의 3분의 2를 먹는다. 남겨 두면
+ * 1위가 "게임 아님"이 되고, 막대는 1위 대비 길이라 나머지 게임이 전부 실선처럼 얇아진다.
+ * 이 카드가 묻는 것은 <b>어느 게임에서 신고가 나오는가</b>지 게임 신고가 전체의 몇
+ * 퍼센트인가가 아니다. 그 숫자는 카드 설명에 한 줄로 적는다.
+ */
+function gameRanking(stats: ReportStats) {
+  const games = stats.games.filter((row) => row.gameType !== null);
+  const total = games.reduce((sum, row) => sum + row.count, 0);
+  return games.map((row) => ({
+    miniGameType: row.gameType as string,
+    label: row.label as string,
+    plays: row.count,
+    share: total === 0 ? 0 : row.count / total,
+  }));
+}
+
+function gameCardDescription(stats: ReportStats | undefined) {
+  if (!stats) {
+    return '게임과 무관한 신고는 빠집니다.';
+  }
+  const other = stats.games.find((row) => row.gameType === null)?.count ?? 0;
+  return `게임과 무관한 신고 ${other}건은 뺐습니다. 비중은 게임 신고끼리의 비중입니다.`;
+}
 
 export function ReportsPage() {
   const [status, setStatus] = useState<ReportStatus | ''>('PENDING');
@@ -29,11 +67,13 @@ export function ReportsPage() {
 
   const reports = useReports({ status: status || undefined, page });
   const sla = useReportSla(30);
+  const stats = useReportStats(30);
   const resolve = useResolveReport();
 
   // 열린 신고를 주소에 남긴다. 조사하다 찾은 건을 링크로 넘길 수 있어야 한다.
   const panel = usePanelParam('report');
-  const selected = reports.data?.content.find((report) => String(report.id) === panel.value) ?? null;
+  const selected =
+    reports.data?.content.find((report) => String(report.id) === panel.value) ?? null;
 
   const columns = useMemo<ColumnDef<Report, unknown>[]>(
     () => [
@@ -102,7 +142,7 @@ export function ReportsPage() {
       />
 
       {/* 실패하면 "-" 대신 실패했다고 말한다. "-" 는 "오늘 0건"과 똑같이 생겨서,
-        * 서버가 답을 못 준 것을 처리할 게 없는 것으로 읽게 만든다. */}
+       * 서버가 답을 못 준 것을 처리할 게 없는 것으로 읽게 만든다. */}
       <Loaded
         query={sla}
         errorClassName={ERROR_SURFACE}
@@ -139,6 +179,70 @@ export function ReportsPage() {
           </TileGrid>
         )}
       </Loaded>
+
+      {/* 무엇 때문에 신고가 들어오는가. 목록과 SLA 타일이 둘 다 답하지 못하는 질문이다.
+       * 신고의 절반이 한 게임에서 나오면 그건 신고 처리로 풀 일이 아니다. */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="flex flex-col">
+          <CardHeader title="카테고리" description="최근 30일에 접수된 신고입니다." />
+          <CardBody className="flex flex-1 items-center pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <DonutChart
+                  slices={data.categories.map((slice) => ({
+                    label: reportCategoryLabel(slice.category),
+                    count: slice.count,
+                  }))}
+                  highlight={reportCategoryLabel('BUG')}
+                  centerLabel="신고"
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+
+        <Card className="flex flex-col">
+          <CardHeader title="게임별 신고" description={gameCardDescription(stats.data)} />
+          {/* GameShareList 는 자기 여백을 들고 있어 CardBody 로 감싸지 않는다. */}
+          <div className="flex-1">
+            <Loaded query={stats} skeleton={<Skeleton className="mx-5 mb-5 h-40" />}>
+              {(data) => <GameShareList stats={gameRanking(data)} />}
+            </Loaded>
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="일자별 접수와 처리"
+            description="처리는 접수일이 아니라 처리한 날로 셉니다."
+          />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => <DailyChart data={data.daily} series={DAILY_SERIES} height="100%" />}
+            </Loaded>
+          </CardBody>
+        </Card>
+
+        <Card className="flex flex-col">
+          <CardHeader
+            title="처리까지 걸린 시간"
+            description="처리된 신고만 셉니다. 미처리 건은 빠집니다."
+          />
+          <CardBody className="flex-1 pb-4">
+            <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
+              {(data) => (
+                <Histogram
+                  data={data.resolveBuckets}
+                  emptyTitle="처리된 신고가 없습니다"
+                  emptyDescription="처리해야 소요 시간이 남습니다."
+                />
+              )}
+            </Loaded>
+          </CardBody>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader
@@ -243,17 +347,17 @@ function ReportPanel({
       {report && (
         <div className="flex flex-col gap-5">
           {/* 내용을 맨 위에 크게 둔다. 운영자가 이 패널을 여는 이유가 이것 하나다.
-            * 메타데이터를 위에 깔면 매번 그것을 지나쳐 아래로 내려가야 한다. */}
+           * 메타데이터를 위에 깔면 매번 그것을 지나쳐 아래로 내려가야 한다. */}
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink">{report.content}</p>
 
           {/* 없는 것은 칸도 만들지 않는다.
-            *
-            * 건의 신고에는 게임도 방도 없고 미처리 건에는 처리 시각이 없다. 그대로 두면
-            * 여섯 칸 중 넷이 "-" 로 서서, 화면이 값을 못 불러온 것처럼 보인다. 빈 칸이
-            * 늘어선 패널은 조회가 실패한 패널과 똑같이 생겼다.
-            *
-            * 신고자 IP 만 예외로 "-" 를 남긴다. 그 자리는 값이 있어야 정상이라 비어 있다는
-            * 사실 자체가 정보다. 칸을 지우면 원래 그런 신고인 줄 알게 된다. */}
+           *
+           * 건의 신고에는 게임도 방도 없고 미처리 건에는 처리 시각이 없다. 그대로 두면
+           * 여섯 칸 중 넷이 "-" 로 서서, 화면이 값을 못 불러온 것처럼 보인다. 빈 칸이
+           * 늘어선 패널은 조회가 실패한 패널과 똑같이 생겼다.
+           *
+           * 신고자 IP 만 예외로 "-" 를 남긴다. 그 자리는 값이 있어야 정상이라 비어 있다는
+           * 사실 자체가 정보다. 칸을 지우면 원래 그런 신고인 줄 알게 된다. */}
           <KeyValue
             items={[
               {
@@ -269,7 +373,9 @@ function ReportPanel({
               ...(report.resolvedAt
                 ? [{ label: '처리', value: <Timestamp value={report.resolvedAt} /> }]
                 : []),
-              ...(report.gameType ? [{ label: '게임', value: miniGameLabel(report.gameType) }] : []),
+              ...(report.gameType
+                ? [{ label: '게임', value: miniGameLabel(report.gameType) }]
+                : []),
               ...(report.joinCode
                 ? [
                     {

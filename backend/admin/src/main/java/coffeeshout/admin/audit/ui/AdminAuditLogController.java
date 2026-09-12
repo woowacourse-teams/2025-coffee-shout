@@ -1,8 +1,10 @@
 package coffeeshout.admin.audit.ui;
 
+import coffeeshout.admin.audit.application.AdminAuditStatsService;
 import coffeeshout.admin.audit.domain.AdminAuditLogRepository;
 import coffeeshout.admin.audit.domain.AdminAuditResult;
 import coffeeshout.admin.audit.ui.response.AdminAuditLogResponse;
+import coffeeshout.admin.audit.ui.response.AdminAuditStatsResponse;
 import coffeeshout.admin.support.PageResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminAuditLogController {
 
     private final AdminAuditLogRepository adminAuditLogRepository;
+    private final AdminAuditStatsService adminAuditStatsService;
     private final Clock clock;
 
     /**
@@ -54,6 +57,21 @@ public class AdminAuditLogController {
                 adminAuditLogRepository.search(
                         blankToNull(actorEmail), result, since(days), PageRequest.of(page, size)),
                 AdminAuditLogResponse::from);
+    }
+
+    /**
+     * 화면 상단 그래프.
+     *
+     * <p>표의 필터와 이어져 있지 않다. 필터를 걸면 그래프도 같이 좁아지는 편이 일관돼
+     * 보이지만, 여기서 그래프가 하는 일은 <b>필터를 무엇으로 걸지 정하는 것</b>이다.
+     * 실패가 튄 날을 보고 그 기간을 거는 식이라, 그래프가 먼저 좁아지면 그 판단을 할
+     * 근거가 사라진다.
+     *
+     * @param days 상한을 둔다. 기간 안의 조치를 한 줄씩 읽으므로 기간이 곧 읽는 양이다.
+     */
+    @GetMapping("/stats")
+    public AdminAuditStatsResponse stats(@RequestParam(defaultValue = "30") @Min(1) @Max(90) int days) {
+        return AdminAuditStatsResponse.from(adminAuditStatsService.findStats(days));
     }
 
     /**

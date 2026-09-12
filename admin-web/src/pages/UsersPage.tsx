@@ -12,13 +12,24 @@ import { Loaded } from '@/components/ui/Loaded';
 import { Skeleton } from '@/components/ui/EmptyState';
 import { ShareNote } from '@/components/ui/ShareNote';
 import { DataTable } from '@/components/DataTable';
-import { DistributionBars } from '@/components/charts/DistributionBars';
-import { SignupChart } from '@/components/charts/SignupChart';
+import { Histogram } from '@/components/charts/Histogram';
+import { DailyChart } from '@/components/charts/DailyChart';
 import { ProviderDonut } from '@/components/ProviderDonut';
 import { readId } from '@/pages/RoomsPage';
 import { UserPanel } from '@/pages/lookup/UserPanel';
 import { miniGameLabel } from '@/lib/labels';
 import { useDebounced } from '@/lib/useDebounced';
+
+/**
+ * 가입은 선이다.
+ *
+ * <p>견줄 상대가 없는 한 계열이라 읽을 것이 흐름뿐이다. 막대 서른 개를 세우면 그 흐름이
+ * 톱니로 흩어지고, 하루 한두 명인 값이라 막대 하나하나는 어차피 눈금 한 칸이다.
+ * 계열이 둘인 화면(접수와 처리, 성공과 실패)은 같은 이유로 반대편에 있다.
+ */
+const SIGNUP_SERIES = [
+  { key: 'count', name: '가입', color: 'var(--chart-1)', shape: 'line' as const },
+];
 
 /** 가입 추이 기간. 서버가 180일까지 받는다. */
 const RANGES = [14, 30, 90] as const;
@@ -164,7 +175,7 @@ export function UsersPage() {
            * 둔다. 고정 높이로 두면 카드 바닥에 200px 짜리 빈 공간이 남는다. */}
           <CardBody className="flex-1 pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-48" />}>
-              {(data) => <SignupChart data={data.signups} height="100%" />}
+              {(data) => <DailyChart data={data.signups} series={SIGNUP_SERIES} height="100%" />}
             </Loaded>
           </CardBody>
         </Card>
@@ -188,7 +199,7 @@ export function UsersPage() {
        * 기간에 활동한 사람만 남아, 빠져나간 사람을 묻는 그래프에서 빠져나간 사람이
        * 사라진다. 그 사실을 카드 설명에 적어 둔다. */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="flex min-h-[18rem] flex-col">
+        <Card className="flex flex-col">
           <CardHeader
             title="참여도"
             description="끝낸 판 수로 나눈 회원 수입니다. 기간과 무관한 전체 회원입니다."
@@ -200,8 +211,7 @@ export function UsersPage() {
           <CardBody className="flex-1 pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DistributionBars
-                  height="100%"
+                <Histogram
                   data={data.playBuckets}
                   emptyTitle="회원이 없습니다"
                   emptyDescription="가입이 있어야 분포가 그려집니다."
@@ -211,7 +221,7 @@ export function UsersPage() {
           </CardBody>
         </Card>
 
-        <Card className="flex min-h-[18rem] flex-col">
+        <Card className="flex flex-col">
           <CardHeader
             title="마지막 참여"
             description="마지막으로 방에 들어온 뒤 지난 날입니다."
@@ -220,8 +230,7 @@ export function UsersPage() {
           <CardBody className="flex-1 pb-4">
             <Loaded query={stats} skeleton={<Skeleton className="h-40" />}>
               {(data) => (
-                <DistributionBars
-                  height="100%"
+                <Histogram
                   data={data.activityBuckets}
                   emptyTitle="회원이 없습니다"
                   emptyDescription="가입이 있어야 분포가 그려집니다."

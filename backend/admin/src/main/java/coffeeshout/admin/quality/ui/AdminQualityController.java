@@ -2,7 +2,9 @@ package coffeeshout.admin.quality.ui;
 
 import coffeeshout.admin.quality.application.QualityService;
 import coffeeshout.admin.quality.ui.response.NicknameAuditQualityResponse;
+import coffeeshout.admin.quality.ui.response.NicknameAuditStatsResponse;
 import coffeeshout.admin.quality.ui.response.ReportSlaResponse;
+import coffeeshout.admin.quality.ui.response.ReportStatsResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +36,23 @@ public class AdminQualityController {
     @GetMapping("/report-sla")
     public ReportSlaResponse reportSla(@RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return ReportSlaResponse.from(qualityService.reportSla(days));
+    }
+
+    /**
+     * 신고 화면 상단 그래프.
+     *
+     * <p>{@code /report-sla} 와 나눠 둔다. SLA 는 처리할 때마다 바뀌어 조치 후 다시 부르고,
+     * 이쪽은 하루에 몇 번 안 바뀐다. 묶으면 신고 하나 처리할 때마다 기간 전체를 다시 센다.
+     *
+     * @param days 상한을 둔다. 기간 안의 신고를 한 줄씩 읽으므로 기간이 곧 읽는 양이다.
+     */
+    @GetMapping("/report-stats")
+    public ReportStatsResponse reportStats(@RequestParam(defaultValue = "30") @Min(1) @Max(90) int days) {
+        return ReportStatsResponse.from(qualityService.reportStats(days));
+    }
+
+    @GetMapping("/nickname-audit-stats")
+    public NicknameAuditStatsResponse nicknameAuditStats(@RequestParam(defaultValue = "30") @Min(1) @Max(90) int days) {
+        return NicknameAuditStatsResponse.from(qualityService.nicknameAuditStats(days));
     }
 }

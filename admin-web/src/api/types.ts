@@ -94,6 +94,24 @@ export type GamePlayStat = {
 
 export type AdminAuditResult = 'SUCCESS' | 'FAILURE';
 
+/**
+ * 조치 이력 화면 상단 그래프.
+ *
+ * <p>표는 "이 조치가 무엇이었나"에 답한다. 감사 로그를 열기 전에 알아야 하는 것이 둘
+ * 남는다. 실패가 늘고 있는가, 어떤 조치가 실제로 쓰이는가. 표의 필터와 이어져 있지 않다.
+ * 그래프가 하는 일이 필터를 무엇으로 걸지 정하는 것이라, 함께 좁아지면 그 판단을 할
+ * 근거가 사라진다.
+ */
+export type AdminAuditStats = {
+  total: number;
+  failed: number;
+  /** 많은 순. action 은 매핑 패턴 그대로다. */
+  actions: { action: string; count: number }[];
+  /** 많은 순. 여섯 번째부터는 '그 외' 한 칸으로 묶여 온다. */
+  actors: { actorEmail: string; count: number }[];
+  daily: { date: string; success: number; failure: number }[];
+};
+
 /** 감사 로그 필터. 비운 값은 서버에서 조건이 걸리지 않는다. */
 export type AuditLogFilters = {
   /** 부분 일치. 운영자는 이메일 전체가 아니라 앞자리만 기억한다. */
@@ -165,6 +183,25 @@ export type ReportSla = {
   oldestPendingMinutes: number;
 };
 
+/**
+ * 신고 화면 상단 그래프.
+ *
+ * <p>목록은 "이 신고가 무엇인가"에, 처리 시간 타일은 "지금 밀렸나"에 답한다. 둘 다 답하지
+ * 못하는 질문이 남는다. 무엇 때문에 신고가 들어오는가. 신고의 절반이 한 게임에서 나오면
+ * 그건 신고 처리로 풀 일이 아니라 그 게임을 고칠 일이다.
+ */
+export type ReportStats = {
+  total: number;
+  /** 신고가 없는 카테고리도 0으로 온다. */
+  categories: { category: string; count: number }[];
+  /** 많은 순. gameType 이 null 이면 게임과 무관한 신고다. */
+  games: { gameType: string | null; label: string | null; count: number }[];
+  /** 처리는 접수일이 아니라 처리일로 센다. */
+  daily: { date: string; received: number; resolved: number }[];
+  /** 처리된 신고만 센다. */
+  resolveBuckets: Bucket[];
+};
+
 /* ── 닉네임 검열 ─────────────────────────────────────────── */
 
 export type NicknameAuditStatus =
@@ -193,6 +230,23 @@ export type NicknameAuditQuality = {
   falsePositive: number;
   falseNegative: number;
   overrideRate: number;
+};
+
+/**
+ * 검열 화면 상단 그래프.
+ *
+ * <p>대기 목록은 지금 손이 필요한 것만 보여준다. 그 옆에 있어야 하는 것은 검열이 어디로
+ * 가고 있는가다. 목록이 길어진 것이 욕이 늘어서인지 모델이 예민해져서인지는 판정 분포와
+ * 신뢰도 분포를 나란히 봐야 갈린다.
+ */
+export type NicknameAuditStats = {
+  total: number;
+  /** 하나도 없는 판정도 0으로 온다. */
+  statuses: { status: NicknameAuditStatus; count: number }[];
+  /** flagged 는 사람이 봐야 하는 판정(FLAGGED, PENDING, BLOCKED)이다. */
+  daily: { date: string; flagged: number; passed: number }[];
+  /** 걸린 닉네임만 센다. 지나간 닉네임의 신뢰도는 0에 몰려 나머지를 눌러 버린다. */
+  confidenceBuckets: Bucket[];
 };
 
 /* ── IP 차단 ─────────────────────────────────────────────── */
