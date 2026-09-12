@@ -70,6 +70,40 @@ const PROVIDER: Record<string, string> = {
   naver: '네이버',
 };
 
+/**
+ * 감사 로그의 조치.
+ *
+ * <p>서버가 남기는 것은 요청 본문이 아니라 <b>매핑 패턴</b>이다. 본문을 남기면 로그인
+ * 요청의 구글 ID 토큰이 그대로 저장되기 때문이다. 그래서 화면이 받는 값은
+ * {@code POST /admin/api/reports/{id}/resolve} 같은 주소이고, 그대로 찍으면 조치 이력이
+ * 사람이 읽는 기록이 아니라 서버 로그가 된다.
+ *
+ * <p>격리 메시지 폐기의 키에 주의한다. 실제 매핑은 출처가 경로에 들어가
+ * {@code {source}} 자리를 갖는다. 한때 {@code outbox} 로 적혀 있어서 그 조치만 영영
+ * 번역되지 않고 원문이 노출됐다.
+ */
+const AUDIT_ACTION: Record<string, string> = {
+  'POST /admin/api/auth/login': '로그인',
+  'POST /admin/api/accounts': '관리자 추가',
+  'DELETE /admin/api/accounts/{id}': '관리자 삭제',
+  'DELETE /admin/api/ip-blocks/{ip}': 'IP 차단 해제',
+  'POST /admin/api/reports/{id}/resolve': '신고 처리',
+  'DELETE /admin/api/reports/{id}/reporter-ip-block': '신고자 IP 해제',
+  'POST /admin/api/profanity/audits/{id}/allow': '닉네임 허용',
+  'POST /admin/api/profanity/audits/{id}/block': '닉네임 차단',
+  'POST /admin/api/profanity/words': '금칙어 추가',
+  'POST /admin/api/profanity/words/{word}/activate': '금칙어 켜기',
+  'DELETE /admin/api/profanity/words/{word}/activate': '금칙어 끄기',
+  'POST /admin/api/patch-notes': '패치노트 작성',
+  'PUT /admin/api/patch-notes/{id}': '패치노트 수정',
+  'DELETE /admin/api/patch-notes/{id}': '패치노트 삭제',
+  'POST /admin/api/ops/dead-letters/outbox/{id}/requeue': '격리 메시지 재투입',
+  'DELETE /admin/api/ops/dead-letters/{source}/{id}': '격리 메시지 폐기',
+  'POST /admin/api/zzolbot/eval/runs': '평가 실행',
+  'DELETE /admin/api/zzolbot/eval/scenarios/{id}': '평가 시나리오 삭제',
+  'POST /admin/api/zzolbot/sessions/{id}/feedback': '봇 답변 평가',
+};
+
 export function reportCategoryLabel(value: string): string {
   return REPORT_CATEGORY[value] ?? value;
 }
@@ -92,4 +126,8 @@ export function roomStateLabel(value: string): string {
 
 export function providerLabel(value: string): string {
   return PROVIDER[value] ?? value;
+}
+
+export function auditActionLabel(value: string): string {
+  return AUDIT_ACTION[value] ?? value;
 }

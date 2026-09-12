@@ -8,6 +8,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
+import { auditActionLabel } from '@/lib/labels';
 
 export function AuditLogsPage() {
   const [page, setPage] = useState(0);
@@ -30,7 +31,17 @@ export function AuditLogsPage() {
       {
         accessorKey: 'action',
         header: '조치',
-        cell: (c) => <span className="font-mono text-xs">{String(c.getValue())}</span>,
+        // 서버가 남기는 것은 매핑 패턴이라 그대로 찍으면 조치 이력이 서버 로그가 된다.
+        // 모르는 값은 원문을 남긴다 - 새 조치가 생긴 것을 화면에서 알아채야 한다.
+        cell: (c) => {
+          const action = String(c.getValue());
+          const label = auditActionLabel(action);
+          return label === action ? (
+            <span className="font-mono text-xs text-ink-muted">{action}</span>
+          ) : (
+            <span title={action}>{label}</span>
+          );
+        },
       },
       {
         accessorKey: 'targetId',

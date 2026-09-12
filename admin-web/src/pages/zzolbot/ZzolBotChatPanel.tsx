@@ -145,8 +145,18 @@ export function ZzolBotChatPanel() {
                 <p className="line-clamp-2 text-xs text-ink">{session.question}</p>
                 <p className="mt-1 flex items-center gap-2 text-2xs text-ink-muted">
                   {session.createdAt}
+                  {/* 아래 평가 버튼과 같은 글리프를 쓴다. 한때 여기만 컬러 이모지였는데,
+                    * 회색과 코랄뿐인 화면에서 그 두 글자만 색이 튀었고 버튼과 같은 뜻인
+                    * 것도 바로 안 읽혔다. */}
                   {session.feedback && (
-                    <span>{session.feedback === 'GOOD' ? '👍 좋았음' : '👎 아쉬움'}</span>
+                    <span className="inline-flex items-center gap-1">
+                      {session.feedback === 'GOOD' ? (
+                        <ThumbsUp className="size-3" aria-hidden />
+                      ) : (
+                        <ThumbsDown className="size-3" aria-hidden />
+                      )}
+                      {session.feedback === 'GOOD' ? '좋았음' : '아쉬움'}
+                    </span>
                   )}
                 </p>
               </li>
