@@ -9,6 +9,7 @@
 #   ip_block_request_blocked_total      차단된 요청 카운터
 #   login_start_total / login_success_total  라벨: provider, job — LoginMetricService(앱 코드) 신설
 #     (예외: LoginSuccessDroppedToZero는 기존 메트릭으로 잡히지 않아 전용 카운터를 도입했다)
+#   nickname_audit_unaudited_queue      닉네임 AI 검열 회차 시작 시점의 미검열 적체량 (ProfanityAuditService)
 #
 # ⚠️ 임계값은 전부 베이스라인 미측정 상태의 보수적 추정치다(ADR-0026 트레이드오프).
 #    배포 전 Prometheus API로 정상 범위를 재고, 초기엔 오탐을 줄이는 방향(높게)으로 둔다.
@@ -107,3 +108,35 @@ groups:
         annotations:
           summary: "{{ $labels.provider }} 로그인 성공 0 ({{ $labels.job }}) — 시도는 계속됨"
           description: "최근 로그인 시도는 있으나 성공이 없다. redirect_uri(스킴/호스트)·provider 콘솔 등록·시크릿을 점검. 여러 provider 동시 발생 시 프록시/baseUrl 의심."
+
+      # 닉네임 AI 검열 큐 적체 — 등록은 제한이 없고 처리만 상한에 묶여 있어, 유입이 처리량을 넘으면
+      # 큐가 단조 증가한다. 게이지는 12시간 주기 회차가 시작할 때만 갱신돼 회차 사이 값이 그대로
+      # 유지되므로 for가 짧아도 놓치지 않는다.
+      # blue/green 두 인스턴스 중 분산 락을 잡은 쪽만 게이지를 갱신하고 나머지는 0에 머물러
+      # max()로 활성 인스턴스 값을 고른다(OutboxDeadLetterHigh와 같은 이유).
+      # 앱 재기동 직후에는 게이지가 0으로 시작해 다음 회차까지 최대 12시간 알림이 해제된 상태가 된다.
+      # 임계 1만 — 하루 처리량 상한이 그 언저리다. 무료 티어 RPD 500에 배치 100이면 5만 건이지만,
+      # 회차 예산 10분에 레이트리미터가 13초당 1회만 허용해 회차당 약 4600건, 하루 두 회차로 약
+      # 9200건이 실제 상한이다. 1만 건이 남아 있으면 하루 안에 큐를 못 비운다.
+      # ⚠️ prod 적체 베이스라인 미측정. 실측 후 재조정한다.
+      - alert: NicknameAuditQueueBacklogHigh
+        expr: max by (job) (nickname_audit_unaudited_queue{job="prod-app"}) > 10000
+        for: 10m
+        labels:
+          severity: warning
+          incident_group: nickname-audit-backlog
+        annotations:
+          summary: "닉네임 검열 큐 적체 (> 1만, {{ $labels.job }})"
+          description: "미검열 닉네임이 {{ $value }}건. 하루 처리량을 넘어 큐가 줄지 않는 상태. 검열 회차 로그와 Gemini 쿼터를 확인."
+
+      # 임계 5만 — 무료 티어 하루 요청 상한(RPD 500 × 배치 100)이라, 쿼터를 다 써도 하루에 비울 수 없는 양이다.
+      # 위 warning과 같은 인시던트라 incident_group으로 묶어 LLM 분석을 한 번만 쓴다(#1598).
+      - alert: NicknameAuditQueueBacklogCritical
+        expr: max by (job) (nickname_audit_unaudited_queue{job="prod-app"}) > 50000
+        for: 10m
+        labels:
+          severity: critical
+          incident_group: nickname-audit-backlog
+        annotations:
+          summary: "닉네임 검열 큐 적체 심각 (> 5만, {{ $labels.job }})"
+          description: "미검열 닉네임이 {{ $value }}건. 하루 쿼터를 전부 써도 비우지 못하는 양. 회차 예산·배치 크기 상향 또는 쿼터 증설을 검토."
