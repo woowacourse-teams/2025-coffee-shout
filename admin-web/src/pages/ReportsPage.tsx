@@ -167,6 +167,7 @@ export function ReportsPage() {
           data={reports.data?.content ?? []}
           loading={reports.isPending}
           onRowClick={(report) => panel.open(String(report.id))}
+          isRowSelected={(report) => String(report.id) === panel.value}
           emptyTitle={status === 'PENDING' ? '미처리 신고가 없습니다' : '신고가 없습니다'}
           emptyDescription="새 신고가 들어오면 여기에 쌓입니다."
         />

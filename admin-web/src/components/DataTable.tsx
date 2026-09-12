@@ -31,8 +31,15 @@ type DataTableProps<T> = {
   /** 비어 있을 때 문구. 화면마다 다르게 준다. */
   emptyTitle: string;
   emptyDescription?: string;
-  /** 행 클릭으로 드릴다운. 주면 커서와 호버가 붙는다. */
+  /** 행 클릭으로 드릴다운. 주면 커서와 호버가 붙고 위아래 화살표로 행을 옮길 수 있다. */
   onRowClick?: (row: T) => void;
+  /**
+   * 지금 열려 있는 행. 상세가 옆 패널에서 열리면서 생긴 자리다.
+   *
+   * <p>패널만 열고 표에 표시를 안 하면 스무 행 중 무엇을 보고 있는지가 화면에서 사라진다.
+   * 패널을 닫았다 다시 열 때 어디까지 봤는지를 매번 다시 찾게 된다.
+   */
+  isRowSelected?: (row: T) => boolean;
   /**
    * 조회 실패. 주면 표 자리에 실패 문구를 그린다.
    *
@@ -56,6 +63,21 @@ type DataTableProps<T> = {
  * <p>정렬은 클라이언트에서 한다. 한 페이지가 20행이라 서버 왕복이 필요 없고,
  * 페이지 안에서 즉시 뒤집히는 편이 훑기에 낫다.
  */
+/**
+ * 위아래 화살표로 포커스를 옆 행에 옮긴다.
+ *
+ * <p>큐를 비우는 일은 같은 동작의 반복이라, 손이 마우스와 키보드를 오가는 비용이 스무 번
+ * 그대로 쌓인다. 표 안에서만 움직이므로 tbody 를 벗어나지 않는다. 끝에 닿으면 아무 일도
+ * 일어나지 않는다. 순환시키면 마지막 행에서 한 번 더 눌렀을 때 맨 위로 튀어, 어디 있는지를
+ * 놓친다.
+ */
+function moveFocus(current: HTMLElement, direction: 1 | -1) {
+  const rows = Array.from(
+    current.closest('tbody')?.querySelectorAll<HTMLElement>('tr[tabindex]') ?? [],
+  );
+  rows[rows.indexOf(current) + direction]?.focus();
+}
+
 export function DataTable<T>({
   columns,
   data,
@@ -63,6 +85,7 @@ export function DataTable<T>({
   emptyTitle,
   emptyDescription,
   onRowClick,
+  isRowSelected,
   error,
   onRetry,
   skeletonRows = 6,
@@ -173,32 +196,65 @@ export function DataTable<T>({
 
           {!showSkeleton &&
             !failed &&
-            table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={cn(
-                  'border-b border-border-default transition-colors',
-                  onRowClick && 'cursor-pointer hover:bg-selected',
-                )}
-              >
-                {row.getVisibleCells().map((cell) => {
-                  const meta = cell.column.columnDef.meta;
-                  return (
-                    <td
-                      key={cell.id}
-                      className={cn(
-                        'h-row px-3 text-ink',
-                        'first:pl-5 last:pr-5',
-                        meta?.align === 'right' && 'text-right tabular-nums',
-                      )}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            table.getRowModel().rows.map((row) => {
+              const selected = isRowSelected?.(row.original) === true;
+
+              return (
+                <tr
+                  key={row.id}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  // 행에 실제 포커스를 준다. 직접 만든 "커서 행" 상태로는 포커스 링과
+                  // 스크린리더 낭독을 각각 따로 구현해야 하는데, 브라우저가 이미 한다.
+                  tabIndex={onRowClick ? 0 : undefined}
+                  aria-selected={isRowSelected ? selected : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            onRowClick(row.original);
+                            return;
+                          }
+                          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                            // 표 안에서 움직일 때 페이지가 같이 스크롤되면 포커스가 화면
+                            // 밖으로 나간다. 브라우저의 기본 스크롤을 막고 focus 가 옮긴다.
+                            event.preventDefault();
+                            moveFocus(event.currentTarget, event.key === 'ArrowDown' ? 1 : -1);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    'border-b border-border-default transition-colors',
+                    // 포커스 링 자체는 전역 :focus-visible 이 그린다. 여기서는 안쪽으로만
+                    // 당긴다. 기본 offset 2px 이면 링이 행 밖으로 나가 위아래 행에 걸치고,
+                    // 표가 가로 스크롤할 때는 좌우가 컨테이너에 잘린다.
+                    'focus-visible:-outline-offset-2',
+                    // 호버는 회색, 선택은 코랄 틴트다. 둘 다 코랄이면 지나가는 손가락과
+                    // 지금 보고 있는 행이 같은 모양이 되어, 마우스를 움직일 때마다
+                    // 선택이 옮겨 다니는 것처럼 보인다.
+                    onRowClick && 'cursor-pointer hover:bg-canvas',
+                    selected && 'bg-selected hover:bg-selected',
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta;
+                    return (
+                      <td
+                        key={cell.id}
+                        className={cn(
+                          'h-row px-3 text-ink',
+                          'first:pl-5 last:pr-5',
+                          meta?.align === 'right' && 'text-right tabular-nums',
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
         </tbody>
       </table>
 
