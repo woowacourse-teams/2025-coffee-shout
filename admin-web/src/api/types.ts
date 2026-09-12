@@ -94,6 +94,17 @@ export type GamePlayStat = {
 
 export type AdminAuditResult = 'SUCCESS' | 'FAILURE';
 
+/** 감사 로그 필터. 비운 값은 서버에서 조건이 걸리지 않는다. */
+export type AuditLogFilters = {
+  /** 부분 일치. 운영자는 이메일 전체가 아니라 앞자리만 기억한다. */
+  actorEmail?: string;
+  result?: AdminAuditResult;
+  /** 최근 며칠. 비우면 기간 제한 없음. */
+  days?: number;
+  page: number;
+  size?: number;
+};
+
 export type AdminAuditLog = {
   id: number;
   actorEmail: string;
@@ -157,12 +168,7 @@ export type ReportSla = {
 /* ── 닉네임 검열 ─────────────────────────────────────────── */
 
 export type NicknameAuditStatus =
-  | 'UNAUDITED'
-  | 'FLAGGED'
-  | 'PENDING'
-  | 'CLEAN'
-  | 'ALLOWED'
-  | 'BLOCKED';
+  'UNAUDITED' | 'FLAGGED' | 'PENDING' | 'CLEAN' | 'ALLOWED' | 'BLOCKED';
 
 export type NicknameAudit = {
   id: number;
@@ -209,6 +215,25 @@ export type RoomSummary = {
   playerCount: number;
 };
 
+/**
+ * 방 화면 상단 그래프.
+ *
+ * <p>목록만 있는 화면은 "이 방이 어땠나"에만 답한다. 그 위에 하나 더 있다. 요즘 방들이
+ * 어떤 모양인가. 2인 방이 절반이면 밸런스를 2인 기준으로 봐야 하고, 끝까지 가는 방이
+ * 30%면 목록을 아무리 뒤져도 그 사실은 안 보인다.
+ */
+export type RoomStats = {
+  roomCount: number;
+  games: GamePlayStat[];
+  playerBuckets: Bucket[];
+  /** 방이 하나도 없는 상태도 0으로 온다. 순서는 방이 거쳐 가는 순서다. */
+  statuses: { status: RoomState; count: number }[];
+  /** 끝난 방만 센다. 진행 중인 방을 0분으로 넣으면 방이 빨리 끝나는 것처럼 보인다. */
+  durationBuckets: Bucket[];
+  /** 참여자가 방장 하나뿐인 방. 칸 이름으로 찾지 않도록 서버가 따로 센다. */
+  soloRoomCount: number;
+};
+
 export type RoomPlayer = {
   id: number;
   playerName: string;
@@ -250,6 +275,49 @@ export type UserSummary = {
   userCode: string;
   nickname: string | null;
   createdAt: string;
+};
+
+/**
+ * 유저 목록 한 줄. 요약에 활동량 셋이 더 붙는다.
+ *
+ * <p>목록에서 판단이 끝나는 일이 많아서다. 문의 대응에서 먼저 묻는 것은 "이 사람이 얼마나,
+ * 무엇을, 언제까지 했나"인데 그동안은 행을 하나씩 열어야 알 수 있었다.
+ *
+ * <p>당첨 수는 뺐다. 룰렛 확률의 결과라 그 사람에 대해 말해 주는 것이 거의 없다.
+ */
+export type UserRow = UserSummary & {
+  /** 끝낸 미니게임 판 수. 방에 들어오기만 한 것은 세지 않는다. */
+  playCount: number;
+  /** 가장 많이 한 게임의 enum 이름. 한 판도 안 했으면 null. */
+  topGame: string | null;
+  /** 마지막으로 방에 들어온 때. */
+  lastPlayedAt: string | null;
+};
+
+/** 분포 한 칸. 구간 경계는 서버가 정한다. 화면이 나누면 경계가 두 곳에서 관리된다. */
+export type Bucket = { label: string; count: number };
+
+/**
+ * 유저 화면 상단 그래프.
+ *
+ * <p>{@code signups} 만 기간을 탄다. 참여도와 잔존은 회원 전체가 대상이다. 기간을 걸면
+ * 그 기간에 활동한 사람만 남아, 빠져나간 사람을 묻는 그래프에서 빠져나간 사람이 사라진다.
+ */
+export type UserStats = {
+  userCount: number;
+  providers: { provider: string; count: number }[];
+  /** 가입이 없는 날도 0으로 온다. 빠진 날이 있으면 선이 이어져 없던 날이 사라진다. */
+  signups: { date: string; count: number }[];
+  playBuckets: Bucket[];
+  activityBuckets: Bucket[];
+  /**
+   * 한 판이라도 끝낸 회원 수와 최근 7일 안에 방에 들어온 회원 수.
+   *
+   * <p>칸에서 더해 쓰지 않고 서버가 따로 준다. 칸 이름은 사람이 읽는 글자라, 화면이 그
+   * 글자로 칸을 찾아 합계를 내면 라벨을 한 번 다듬는 순간 숫자가 조용히 0이 된다.
+   */
+  playedUserCount: number;
+  activeUserCount: number;
 };
 
 /**

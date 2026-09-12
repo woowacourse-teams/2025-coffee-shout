@@ -1,18 +1,47 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import { useAuditLogs } from '@/api/queries';
-import type { AdminAuditLog } from '@/api/types';
+import type { AdminAuditLog, AdminAuditResult } from '@/api/types';
 import { Card, CardHeader } from '@/components/ui/Card';
+import { SearchInput, Select } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Timestamp } from '@/components/ui/Timestamp';
 import { DataTable } from '@/components/DataTable';
 import { auditActionLabel } from '@/lib/labels';
+import { useDebounced } from '@/lib/useDebounced';
+
+/** 기간 선택지. 비움은 "전 기간"이다. */
+const RANGES = [
+  { value: '', label: '전 기간' },
+  { value: '1', label: '오늘' },
+  { value: '7', label: '7일' },
+  { value: '30', label: '30일' },
+];
 
 export function AuditLogsPage() {
   const [page, setPage] = useState(0);
-  const logs = useAuditLogs(30, page);
+  const [actorInput, setActorInput] = useState('');
+  const [result, setResult] = useState<AdminAuditResult | ''>('');
+  const [days, setDays] = useState('');
+
+  // 타이핑마다 서버를 때리지 않는다. 이메일 앞자리를 치는 동안 예닐곱 번 조회된다.
+  const actorEmail = useDebounced(actorInput, 300);
+
+  const logs = useAuditLogs({
+    page,
+    size: 30,
+    actorEmail: actorEmail || undefined,
+    result: result || undefined,
+    days: days ? Number(days) : undefined,
+  });
+
+  /** 조건을 바꾸면 첫 페이지로 돌아간다. 3페이지에서 필터를 걸면 결과가 없는 페이지가 뜬다. */
+  const change = (apply: () => void) => {
+    apply();
+    setPage(0);
+  };
 
   const columns = useMemo<ColumnDef<AdminAuditLog, unknown>[]>(
     () => [
@@ -77,6 +106,8 @@ export function AuditLogsPage() {
     [],
   );
 
+  const filtered = Boolean(actorEmail || result || days);
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -88,6 +119,38 @@ export function AuditLogsPage() {
         <CardHeader
           title="감사 로그"
           description="append-only 입니다. 수정도 삭제도 하지 않습니다."
+          actions={
+            <div className="flex flex-wrap items-center gap-2">
+              <SearchInput
+                value={actorInput}
+                onChange={(event) => change(() => setActorInput(event.target.value))}
+                placeholder="실행자 (일부만)"
+                className="w-52"
+              />
+              <Select
+                value={result}
+                onChange={(event) =>
+                  change(() => setResult(event.target.value as AdminAuditResult | ''))
+                }
+                className="w-28"
+              >
+                <option value="">전체 결과</option>
+                <option value="SUCCESS">성공</option>
+                <option value="FAILURE">실패</option>
+              </Select>
+              <Select
+                value={days}
+                onChange={(event) => change(() => setDays(event.target.value))}
+                className="w-28"
+              >
+                {RANGES.map((range) => (
+                  <option key={range.label} value={range.value}>
+                    {range.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          }
         />
         <DataTable
           error={logs.error}
@@ -95,8 +158,10 @@ export function AuditLogsPage() {
           columns={columns}
           data={logs.data?.content ?? []}
           loading={logs.isPending}
-          emptyTitle="조치 이력이 없습니다"
-          emptyDescription="관리자가 무언가를 바꾸면 여기에 남습니다."
+          emptyTitle={filtered ? '조건에 맞는 조치가 없습니다' : '조치 이력이 없습니다'}
+          emptyDescription={
+            filtered ? '조건을 풀어 보세요.' : '관리자가 무언가를 바꾸면 여기에 남습니다.'
+          }
         />
         {logs.data && (
           <Pagination

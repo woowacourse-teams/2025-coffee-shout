@@ -4,6 +4,7 @@ import type {
   ActionQueue,
   AdminAccount,
   AdminAuditLog,
+  AuditLogFilters,
   BlockedIp,
   DailySummary,
   DailyTrend,
@@ -30,9 +31,11 @@ import type {
   ReportSla,
   ReportStatus,
   RoomDetail,
+  RoomStats,
   RoomSummary,
   UserDetail,
-  UserSummary,
+  UserRow,
+  UserStats,
   ZzolBotFeedback,
   ZzolBotSession,
 } from '@/api/types';
@@ -60,11 +63,13 @@ export const keys = {
   rooms: {
     search: (joinCode: string, page: number) => ['rooms', 'search', joinCode, page] as const,
     detail: (roomId: number) => ['rooms', 'detail', roomId] as const,
+    stats: (days: number) => ['rooms', 'stats', days] as const,
   },
   users: {
     search: (keyword: string, page: number) => ['users', 'search', keyword, page] as const,
     detail: (userId: number) => ['users', 'detail', userId] as const,
     providers: ['users', 'providers'] as const,
+    stats: (days: number) => ['users', 'stats', days] as const,
   },
   patchNotes: ['patch-notes'] as const,
   admins: ['admins'] as const,
@@ -110,10 +115,10 @@ export function useGamePlayStats(days = 30) {
     queryFn: () => api.get<GamePlayStat[]>('/overview/games', { days }),
   });
 }
-export function useAuditLogs(size = 20, page = 0) {
+export function useAuditLogs(filters: AuditLogFilters) {
   return useQuery({
-    queryKey: ['audit-logs', page, size],
-    queryFn: () => api.get<PageResponse<AdminAuditLog>>('/audit-logs', { page, size }),
+    queryKey: ['audit-logs', filters],
+    queryFn: () => api.get<PageResponse<AdminAuditLog>>('/audit-logs', { ...filters }),
   });
 }
 export function useDailySummary(date?: string) {
@@ -246,6 +251,13 @@ export function useRoomSearch(joinCode: string, page: number) {
     queryFn: () => api.get<PageResponse<RoomSummary>>('/rooms', { joinCode, page }),
   });
 }
+/** 방 화면 상단 그래프. 기간 안의 방을 한 줄씩 읽으므로 서버가 기간에 상한을 건다. */
+export function useRoomStats(days: number) {
+  return useQuery({
+    queryKey: keys.rooms.stats(days),
+    queryFn: () => api.get<RoomStats>('/rooms/stats', { days }),
+  });
+}
 export function useRoomDetail(roomId: number | null) {
   return useQuery({
     queryKey: keys.rooms.detail(roomId ?? 0),
@@ -258,7 +270,14 @@ export function useRoomDetail(roomId: number | null) {
 export function useUserSearch(keyword: string, page: number) {
   return useQuery({
     queryKey: keys.users.search(keyword, page),
-    queryFn: () => api.get<PageResponse<UserSummary>>('/users', { keyword, page }),
+    queryFn: () => api.get<PageResponse<UserRow>>('/users', { keyword, page }),
+  });
+}
+/** 유저 화면 상단 그래프. days 는 가입 추이에만 걸린다. */
+export function useUserStats(days: number) {
+  return useQuery({
+    queryKey: keys.users.stats(days),
+    queryFn: () => api.get<UserStats>('/users/stats', { days }),
   });
 }
 export function useProviderStats() {
